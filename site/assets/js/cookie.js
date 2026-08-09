@@ -1,21 +1,29 @@
-/**
- * cookie.js — Логика баннера куки
- * Точка Плавления
- */
+/* Точка плавления — cookie.js */
 (function () {
-  const banner = document.getElementById('cookie-banner');
-  const btn    = document.getElementById('cookie-accept');
-  if (!banner || !btn) return;
+  const banner = document.querySelector('.cookie-banner');
+  if (!banner) return;
 
-  btn.addEventListener('click', async () => {
-    try {
-      await fetch('/set-cookie.php', { method: 'POST' });
-    } catch (_) { /* fallback */ }
-    // Set via JS too for robustness
-    document.cookie = 'cookie_consent=1; path=/; max-age=' + (365 * 24 * 3600) + '; SameSite=Lax';
-    banner.style.transform = 'translateX(-50%) translateY(120%)';
-    banner.style.opacity   = '0';
-    banner.style.transition = 'all 0.4s ease';
-    setTimeout(() => banner.remove(), 500);
-  });
+  /* Проверяем localStorage (PHP setcookie работает только через set-cookie.php) */
+  if (localStorage.getItem('cookie_consent') === 'yes') {
+    banner.classList.add('hidden');
+    return;
+  }
+
+  const acceptBtn = banner.querySelector('[data-cookie-accept]');
+  const declineBtn = banner.querySelector('[data-cookie-decline]');
+
+  if (acceptBtn) {
+    acceptBtn.addEventListener('click', () => {
+      localStorage.setItem('cookie_consent', 'yes');
+      fetch('/set-cookie.php', { method: 'POST' })
+        .catch(() => {});
+      banner.classList.add('hidden');
+    });
+  }
+  if (declineBtn) {
+    declineBtn.addEventListener('click', () => {
+      localStorage.setItem('cookie_consent', 'no');
+      banner.classList.add('hidden');
+    });
+  }
 })();

@@ -1,21 +1,15 @@
 <?php
 /**
- * cookie-banner.php — Баннер куки (всплывает при первом визите)
- * Логика: если нет куки cookie_consent — показываем баннер
+ * cookie-banner.php — GDPR-баннер
  */
-if (!isset($_COOKIE['cookie_consent'])):
 ?>
-<div class="cookie-banner" id="cookie-banner" role="alertdialog" aria-label="Использование файлов cookie">
-  <div class="cookie-banner__content">
-    <div class="cookie-banner__text">
-      <p>Мы используем куки для аналитики и улучшения сайта. Подробнее — в <a href="/cookies">Политике куки</a>.</p>
-    </div>
-    <div class="cookie-banner__actions">
-      <button class="btn-pill btn-dark" id="cookie-accept">Принять</button>
-      <a href="/cookies" class="cookie-banner__link">Подробнее</a>
-    </div>
+<div class="cookie-banner" role="dialog" aria-label="Согласие на использование куки" id="cookie-banner">
+  <p class="cookie-banner__text">
+    Мы используем куки для аналитики и улучшения сайта.
+    <a href="/cookies">Политика куки</a>
+  </p>
+  <div class="cookie-banner__actions">
+    <button class="btn btn--accent" data-cookie-accept>Принять</button>
+    <button class="btn btn--outline" data-cookie-decline style="font-size:0.8rem">Отклонить</button>
   </div>
 </div>
-
-<script src="/assets/js/cookie.js"></script>
-<?php endif; ?>
