@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Точка Плавления — Вариант 1 (Классический «Точки» со Скетчами)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..900;1,400..900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-outer: #2a2a2a;
+      --bg-paper: #f5f0e8;
+      --bg-paper-darker: #edeae2;
+      --bg-card: #ffffff;
+      --text-main: #1a1a1a;
+      --text-muted: #6b6560;
+      --accent: #fc6c2b;
+      --accent-light: rgba(252, 108, 43, 0.12);
+      --border-color: #e4dec3;
+      --font-heading: 'Hanken Grotesk', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --radius-pill: 100px;
+      --glass-bg: rgba(255, 255, 255, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.7);
+      --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.04);
+      --shadow-hover: 0 12px 24px rgba(0, 0, 0, 0.08), 0 4px 8px rgba(252, 108, 43, 0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-outer);
+      color: var(--text-main);
+      font-family: var(--font-heading);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 30px 15px;
+      position: relative;
+    }
+
+    /* Grain Overlay */
+    .grain-overlay {
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      pointer-events: none; z-index: 999; opacity: 0.05;
+    }
+
+    .paper-sheet {
+      width: 100%;
+      max-width: 1160px;
+      background-color: var(--bg-paper);
+      border-radius: 28px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Variant Switcher Bar */
+    .variant-bar {
+      background: #1a1a1a; color: #fff; padding: 10px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: var(--font-mono); font-size: 13px; border-bottom: 2px solid var(--accent);
+    }
+    .variant-bar .variant-tabs { display: flex; gap: 10px; }
+    .variant-bar a {
+      color: #fff; text-decoration: none; padding: 4px 12px; border-radius: 20px; background: #333; transition: all 0.2s;
+    }
+    .variant-bar a.active, .variant-bar a:hover { background: var(--accent); color: #fff; }
+
+    /* Sticky Glass Header Nav */
+    .header-nav {
+      position: sticky; top: 0; z-index: 90;
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(228, 222, 195, 0.6);
+      height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+    }
+
+    .logo {
+      font-weight: 800; font-size: 18px; letter-spacing: 1px; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; color: var(--text-main); text-decoration: none;
+    }
+    .logo-symbol { color: var(--accent); font-size: 20px; }
+
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 500; text-transform: uppercase;
+      letter-spacing: 0.5px; color: var(--text-main); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .btn-pill {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+      padding: 10px 22px; border-radius: var(--radius-pill);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.25s ease; border: 1.5px solid transparent;
+    }
+    .btn-dark { background: var(--text-main); color: #fff; }
+    .btn-dark:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(252, 108, 43, 0.4); }
+    .btn-outline { border-color: var(--text-main); color: var(--text-main); background: transparent; }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    /* HERO SECTION */
+    .hero-section {
+      padding: 60px 40px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+      position: relative;
+    }
+
+    .scribble-hero {
+      position: absolute; top: -20px; right: 40px; width: 260px; pointer-events: none; opacity: 0.8;
+    }
+
+    .badge-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+      color: var(--accent); background: var(--accent-light);
+      padding: 6px 14px; border-radius: var(--radius-pill); margin-bottom: 20px;
+      border: 1px solid rgba(252, 108, 43, 0.2);
+    }
+    .badge-dot {
+      width: 8px; height: 8px; background: var(--accent); border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent); animation: pulseDot 1.8s infinite ease-in-out;
+    }
+    @keyframes pulseDot { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.6; } }
+
+    .hero-title {
+      font-size: 52px; font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; margin-bottom: 18px;
+    }
+    .wavy-accent { color: var(--text-main); position: relative; display: inline-block; }
+    .wavy-accent::after {
+      content: ""; position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 2 Q 5 0, 10 2 T 20 2' fill='none' stroke='%23fc6c2b' stroke-width='2'/%3E%3C/svg%3E");
+      background-repeat: repeat-x; background-size: 16px 6px;
+    }
+
+    .hero-subtitle { font-family: var(--font-mono); font-size: 14px; color: var(--text-muted); margin-bottom: 30px; max-width: 460px; }
+    .hero-actions { display: flex; gap: 14px; margin-bottom: 36px; }
+
+    .social-proof { display: flex; align-items: center; gap: 14px; }
+    .avatar-group { display: flex; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 50%; border: 2px solid var(--bg-paper);
+      margin-left: -10px; background-size: cover; background-position: center; background-color: #ddd;
+    }
+    .avatar:first-child { margin-left: 0; }
+    .proof-text { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--text-main); }
+
+    /* Hand-Drawn SVG Sketch Graphic in Hero */
+    .hero-sketch-box {
+      width: 100%; height: 350px; background: #ffffff;
+      border: 1.5px solid var(--border-color); border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: center; padding: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04); position: relative;
+    }
+
+    /* HOT ARTICLES */
+    .articles-section { padding: 60px 40px; border-top: 1px solid var(--border-color); }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+    .section-title-wrap { display: flex; align-items: center; gap: 14px; }
+    .title-dash { width: 40px; height: 4px; background: var(--accent); border-radius: 2px; }
+    .section-title { font-size: 28px; font-weight: 800; }
+
+    .articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+
+    .card {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 20px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: var(--shadow-sm); cursor: pointer;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: rgba(252, 108, 43, 0.4); }
+
+    .card-media {
+      height: 150px; background: #f8f6f0; border-radius: var(--radius-md); margin-bottom: 18px;
+      display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;
+      border: 1px dashed var(--border-color);
+    }
+
+    .card__dash { width: 24px; height: 2px; background: var(--accent); margin-bottom: 12px; }
+    .tag-orange { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; margin-bottom: 8px; display: inline-block; }
+    .card-title { font-size: 18px; font-weight: 700; line-height: 1.3; margin-bottom: 10px; }
+    .card-desc { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); margin-bottom: 16px; }
+    .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+    .tag-pill { font-family: var(--font-mono); font-size: 11px; background: var(--bg-paper-darker); color: var(--text-main); padding: 3px 10px; border-radius: var(--radius-pill); }
+
+    .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid #f0ede4; font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); }
+    .btn-plus { width: 32px; height: 32px; border-radius: 50%; background: var(--bg-paper-darker); display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-main); transition: all 0.3s; }
+    .card:hover .btn-plus { background: var(--accent); color: #fff; transform: rotate(45deg); }
+
+    /* SECTIONS + SIDEBAR WITH SKETCH SIGNPOST */
+    .sections-wrapper { background: var(--bg-paper-darker); padding: 60px 40px; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+    .sections-grid { display: grid; grid-template-columns: 1fr 300px; gap: 30px; }
+
+    .sketch-signpost { width: 130px; height: 85px; margin-bottom: 16px; display: block; }
+
+    .feed-list { display: flex; flex-direction: column; gap: 8px; }
+    .feed-row {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-md);
+      padding: 16px 20px; display: grid; grid-template-columns: 100px 1fr 80px; align-items: center; gap: 16px;
+      transition: background 0.2s, transform 0.2s; text-decoration: none; color: inherit;
+    }
+    .feed-row:hover { background: #faf7f2; transform: translateX(4px); border-color: var(--accent); }
+    .feed-tag { font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--accent); text-transform: uppercase; }
+    .feed-title { font-size: 15px; font-weight: 700; }
+    .feed-time { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-align: right; }
+
+    /* Sidebar Glass Panels */
+    .sidebar { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 84px; }
+    .glass-panel {
+      background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 22px; box-shadow: var(--shadow-sm);
+    }
+    .panel-title { font-size: 14px; font-family: var(--font-mono); text-transform: uppercase; font-weight: 700; margin-bottom: 14px; color: var(--text-main); }
+    .tags-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .cloud-pill { font-family: var(--font-mono); font-size: 12px; padding: 6px 14px; border-radius: var(--radius-pill); background: #fff; border: 1px solid var(--border-color); color: var(--text-main); text-decoration: none; transition: all 0.2s; }
+    .cloud-pill:hover, .cloud-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* INTERACTIVE */
+    .interactive-section { padding: 60px 40px; }
+    .interactive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+    .icard {
+      background: var(--glass-bg); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--glass-border); border-radius: var(--radius-lg); padding: 28px;
+      display: flex; flex-direction: column; justify-content: space-between; transition: all 0.3s ease; cursor: pointer;
+    }
+    .icard:hover { border-color: var(--accent); transform: translateY(-4px); box-shadow: 0 10px 25px rgba(252, 108, 43, 0.15); }
+    .icard-icon { width: 44px; height: 44px; background: var(--accent-light); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+    .icard-icon svg { width: 24px; height: 24px; stroke: var(--accent); }
+    .icard-title { font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+    .icard-desc { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+    .icard-link { font-family: var(--font-mono); font-size: 13px; font-weight: 600; color: var(--accent); text-decoration: underline; text-underline-offset: 4px; }
+
+    /* COURSES CTA */
+    .cta-section { padding: 40px; }
+    .cta-card {
+      background: #ffffff; border: 1.5px solid var(--border-color); border-radius: 20px; padding: 48px;
+      position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center;
+    }
+    .hatch-ornament {
+      position: absolute; top: 0; right: 0; width: 120px; height: 120px;
+      background-image: repeating-linear-gradient(45deg, var(--accent) 0, var(--accent) 4px, transparent 0, transparent 12px);
+      opacity: 0.15; border-bottom-left-radius: 100px; pointer-events: none;
+    }
+
+    /* FOOTER */
+    .footer { background: #1a1a1a; color: #ffffff; padding: 60px 40px 30px 40px; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 50px; }
+    .footer-col-1 .logo { color: #fff; margin-bottom: 16px; }
+    .footer-desc { font-family: var(--font-mono); font-size: 13px; color: #999; max-width: 300px; }
+    .footer-col-title { font-family: var(--font-mono); font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .footer-links a { font-family: var(--font-mono); font-size: 13px; color: #ccc; text-decoration: none; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-bottom { border-top: 1px solid #333; padding-top: 24px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; color: #777; }
+
+    /* Modal */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); z-index: 1000; display: none; align-items: center; justify-content: center; }
+    .modal-box { background: var(--bg-paper); border-radius: var(--radius-lg); padding: 30px; max-width: 500px; width: 90%; border: 2px solid var(--accent); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+  </style>
+</head>
+<body>
+
+  <svg class="grain-overlay">
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>
+    <rect width="100%" height="100%" filter="url(#grain)"/>
+  </svg>
+
+  <div class="paper-sheet">
+
+    <!-- Top Variant Switcher Bar -->
+    <div class="variant-bar">
+      <div><strong>ВАРИАНТ 1 (Скетч-издание):</strong> Классический бумажный стиль + Рукотворные SVG Скетчи</div>
+      <div class="variant-tabs">
+        <a href="variant1.html" class="active">Вариант 1 (со Скетчами)</a>
+        <a href="variant2.html">Вариант 2 (Blueprint)</a>
+        <a href="variant3.html">Вариант 3 (Стек карточек)</a>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <header class="header-nav">
+      <a href="#" class="logo">
+        <span class="logo-symbol">⊕</span> Точка плавления
+      </a>
+      <ul class="nav-links">
+        <li><a href="#articles">Статьи</a></li>
+        <li><a href="#sections">Разделы</a></li>
+        <li><a href="#interactive">Интерактив</a></li>
+        <li><a href="#courses">Курсы</a></li>
+      </ul>
+      <a href="#courses" class="btn-pill btn-dark">Начать →</a>
+    </header>
+
+    <!-- HERO Section -->
+    <section class="hero-section">
+      <svg class="scribble-hero" viewBox="0 0 200 40">
+        <path d="M10 20 Q 50 5, 100 25 T 190 15" fill="none" stroke="#fc6c2b" stroke-width="3" stroke-dasharray="4 2"/>
+      </svg>
+
+      <div>
+        <div class="badge-pill">
+          <span class="badge-dot"></span> ◉ Платформа для мейкеров
+        </div>
+        <h1 class="hero-title">
+          Паяй. <br>
+          Твори. <br>
+          <span class="wavy-accent">Понимай.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Практическое руководство по микроэлектронике, SMD/BGA пайке, выбору припоев и работе с термовоздушными станциями.
+        </p>
+
+        <div class="hero-actions">
+          <a href="#articles" class="btn-pill btn-dark">К статьям →</a>
+          <a href="#courses" class="btn-pill btn-outline">Наши курсы</a>
+        </div>
+
+        <div class="social-proof">
+          <div class="avatar-group">
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80');"></div>
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=100&q=80');"></div>
+            <div class="avatar" style="background-image: url('https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=100&q=80');"></div>
+          </div>
+          <div class="proof-text">+2 500 мейкеров в сообществе</div>
+        </div>
+      </div>
+
+      <!-- Hand-drawn Line-Art Sketch: Soldering Station & Maker Desk -->
+      <div class="hero-sketch-box">
+        <svg viewBox="0 0 320 240" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="width:100%; height:auto;">
+          <!-- Desk line -->
+          <rect x="20" y="195" width="280" height="8" rx="2" fill="#f8f6f0"/>
+          
+          <!-- Soldering Station -->
+          <rect x="35" y="125" width="75" height="70" rx="6" fill="#ffffff"/>
+          <rect x="48" y="137" width="48" height="24" rx="2"/>
+          <text x="56" y="153" font-family="IBM Plex Mono" font-size="10" font-weight="700" fill="#1a1a1a" stroke="none">340°C</text>
+          <circle cx="54" cy="175" r="4" fill="#fc6c2b" stroke="none"/>
+          <circle cx="72" cy="175" r="4"/>
+          <circle cx="90" cy="175" r="4"/>
+          
+          <!-- Wire Cord to Iron -->
+          <path d="M 110 165 Q 140 185, 165 145" stroke="#1a1a1a" stroke-dasharray="4 2"/>
+
+          <!-- Soldering Iron Pen -->
+          <g transform="translate(165, 105) rotate(35)">
+            <rect x="0" y="0" width="14" height="75" rx="4" fill="#1a1a1a"/>
+            <polygon points="5,75 9,75 7,100" fill="#fc6c2b"/>
+          </g>
+
+          <!-- PCB Board & Smoke -->
+          <rect x="180" y="165" width="100" height="30" rx="4" fill="#f8f6f0"/>
+          <circle cx="210" cy="180" r="4" stroke="#fc6c2b"/>
+          <circle cx="240" cy="180" r="4"/>
+          
+          <!-- Smoke lines -->
+          <path d="M 215 155 Q 210 135, 220 115" stroke="#999999"/>
+          <path d="M 225 160 Q 230 140, 225 120" stroke="#999999"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- HOT ARTICLES -->
+    <section class="articles-section" id="articles">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="title-dash"></div>
+          <h2 class="section-title">Горячие статьи</h2>
+        </div>
+        <a href="#sections" class="btn-pill btn-outline">Все материалы →</a>
+      </div>
+
+      <div class="articles-grid">
+        <!-- Card 1 -->
+        <div class="card">
+          <div>
+            <div class="card-media">
+              <!-- Hand-drawn SVG icon: Soldering Tip & Board -->
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round">
+                <path d="M12 2v20M2 12h20M7 7l10 10M17 7L7 17"/>
+              </svg>
+            </div>
+            <div class="card__dash"></div>
+            <span class="tag-orange">Гайд для новичков</span>
+            <h3 class="card-title">Как паять паяльником: пошаговый разбор температур и флюса</h3>
+            <p class="card-desc">Подробное руководство по выбору жала, температурного режима 320°C–350°C и припоя.</p>
+            <div class="card-tags">
+              <span class="tag-pill">THT</span>
+              <span class="tag-pill">Флюс</span>
+              <span class="tag-pill">Новичкам</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>⏱ 8 мин чтения</span>
+            <div class="btn-plus">+</div>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card">
+          <div>
+            <div class="card-media">
+              <!-- Hand-drawn SVG icon: Chip QFN -->
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round">
+                <rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/>
+              </svg>
+            </div>
+            <div class="card__dash"></div>
+            <span class="tag-orange">Продвинутый SMD</span>
+            <h3 class="card-title">Секреты монтажа 0603 и QFN корпусов без соплей и перегрева</h3>
+            <p class="card-desc">Методика микросварки паяльной пастой и феном с использованием капиллярного эффекта.</p>
+            <div class="card-tags">
+              <span class="tag-pill">SMD</span>
+              <span class="tag-pill">QFN</span>
+              <span class="tag-pill">Термофен</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>⏱ 12 мин чтения</span>
+            <div class="btn-plus">+</div>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card">
+          <div>
+            <div class="card-media">
+              <!-- Hand-drawn SVG icon: Soldering station heat -->
+              <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#1a1a1a" stroke-width="1.6" stroke-linecap="round">
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+              </svg>
+            </div>
+            <div class="card__dash"></div>
+            <span class="tag-orange">Оборудование</span>
+            <h3 class="card-title">Обзор ИК-станций и паяльников T12 vs JBC C245 в 2026 году</h3>
+            <p class="card-desc">Честный тест скорости нагрева, термостабилизации и долговечности картриджей.</p>
+            <div class="card-tags">
+              <span class="tag-pill">JBC</span>
+              <span class="tag-pill">T12</span>
+              <span class="tag-pill">Тесты</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span>⏱ 15 мин чтения</span>
+            <div class="btn-plus">+</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTIONS + SIDEBAR WITH SKETCH SIGNPOST -->
+    <section class="sections-wrapper" id="sections">
+      <div class="section-header" style="margin-bottom: 20px;">
+        <div class="section-title-wrap">
+          <div class="title-dash"></div>
+          <h2 class="section-title">Каталог знаний и Лента</h2>
+        </div>
+      </div>
+
+      <!-- Hand-drawn SVG Sketch Signpost -->
+      <svg class="sketch-signpost" viewBox="0 0 140 90" fill="none" stroke="#1a1a1a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 70 85 L 70 10"/>
+        <!-- Sign 1 Left -->
+        <path d="M 30 18 L 70 18 L 70 34 L 30 34 L 20 26 Z" fill="#ffffff"/>
+        <text x="32" y="29" font-family="IBM Plex Mono" font-size="8" font-weight="700" fill="#1a1a1a" stroke="none">ОСНОВЫ</text>
+        <!-- Sign 2 Right -->
+        <path d="M 70 40 L 110 40 L 120 48 L 110 56 L 70 56 Z" fill="#ffffff"/>
+        <text x="75" y="51" font-family="IBM Plex Mono" font-size="8" font-weight="700" fill="#1a1a1a" stroke="none">BGA & SMD</text>
+      </svg>
+
+      <div class="sections-grid">
+        <!-- Feed List -->
+        <div class="feed-list">
+          <a href="#" class="feed-row">
+            <span class="feed-tag">Флюс</span>
+            <span class="feed-title">Чем отличается канифоль от безотмывочного флюса RMA-223?</span>
+            <span class="feed-time">5 мин</span>
+          </a>
+          <a href="#" class="feed-row">
+            <span class="feed-tag">Температура</span>
+            <span class="feed-title">Почему нельзя перегревать плату выше 260°C при демонтаже?</span>
+            <span class="feed-time">7 мин</span>
+          </a>
+          <a href="#" class="feed-row">
+            <span class="feed-tag">BGA</span>
+            <span class="feed-title">Реболлинг процессора: трафареты, шарики ПОС-63 и паяльная паста</span>
+            <span class="feed-time">14 мин</span>
+          </a>
+          <a href="#" class="feed-row">
+            <span class="feed-tag">Инструмент</span>
+            <span class="feed-title">Как выбрать оплётку для удаления припоя и не повредить пятачки</span>
+            <span class="feed-time">6 мин</span>
+          </a>
+          <a href="#" class="feed-row">
+            <span class="feed-tag">Припой</span>
+            <span class="feed-title">Бессвинцовый припой (SAC305) vs Свинцовый (Sn63/Pb37)</span>
+            <span class="feed-time">10 мин</span>
+          </a>
+          <a href="#" class="feed-row">
+            <span class="feed-tag">Ремонт</span>
+            <span class="feed-title">Восстановление оборванных дорожек медным эмальпроводом</span>
+            <span class="feed-time">9 мин</span>
+          </a>
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+          <div class="glass-panel">
+            <div class="panel-title">Теги по темам</div>
+            <div class="tags-cloud">
+              <a href="#" class="cloud-pill active">BGA</a>
+              <a href="#" class="cloud-pill">SMD</a>
+              <a href="#" class="cloud-pill">THT</a>
+              <a href="#" class="cloud-pill">Флюс</a>
+              <a href="#" class="cloud-pill">Температура</a>
+              <a href="#" class="cloud-pill">Ремонт</a>
+              <a href="#" class="cloud-pill">Инструменты</a>
+              <a href="#" class="cloud-pill">ИК-станция</a>
+            </div>
+          </div>
+
+          <div class="glass-panel">
+            <div class="panel-title">Разделы портала</div>
+            <ul class="side-nav">
+              <li><a href="#">Основы и ТБ <span>→</span></a></li>
+              <li><a href="#">Оборудование <span>→</span></a></li>
+              <li><a href="#">Расходные материалы <span>→</span></a></li>
+              <li><a href="#">Спец-технологии BGA <span>→</span></a></li>
+              <li><a href="#">Видео-уроки <span>→</span></a></li>
+            </ul>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- INTERACTIVE Section -->
+    <section class="interactive-section" id="interactive">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="title-dash"></div>
+          <h2 class="section-title">Интерактивные инструменты</h2>
+        </div>
+      </div>
+
+      <div class="interactive-grid">
+        <div class="icard" onclick="openModal('calc')">
+          <div>
+            <div class="icard-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+            </div>
+            <h3 class="icard-title">Калькулятор флюса</h3>
+            <p class="icard-desc">Автоматический расчёт вида флюса и температуры под тип сплава и корпус.</p>
+          </div>
+          <span class="icard-link">Открыть калькулятор →</span>
+        </div>
+
+        <div class="icard" onclick="openModal('quiz')">
+          <div>
+            <div class="icard-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3M12 17h.01"/></svg>
+            </div>
+            <h3 class="icard-title">Тест по пайке</h3>
+            <p class="icard-desc">Проверь свои знания температурных режимов, типов окисления и безопасности.</p>
+          </div>
+          <span class="icard-link">Пройти тест →</span>
+        </div>
+
+        <div class="icard" onclick="openModal('alloys')">
+          <div>
+            <div class="icard-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </div>
+            <h3 class="icard-title">Схема припоев</h3>
+            <p class="icard-desc">Интерактивная таблица плавления сплавов ПОС-61, SAC305, Розе и Вуда.</p>
+          </div>
+          <span class="icard-link">Посмотреть схему →</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- COURSES CTA -->
+    <section class="cta-section" id="courses">
+      <div class="cta-card">
+        <div class="hatch-ornament"></div>
+        <div class="cta-content">
+          <span class="cta-tag">[ Курсы & Практикум ]</span>
+          <h2 class="cta-title">Освой монтаж любой сложности за 4 недели</h2>
+          <p class="cta-subtitle">От уверенного удержания паяльника до восстановления залитых планарных устройств под микроскопом.</p>
+          <div class="hero-actions">
+            <a href="#" class="btn-pill btn-dark">Записаться на курс →</a>
+            <a href="#" class="btn-pill btn-outline">Программа обучения</a>
+          </div>
+        </div>
+        <div>
+          <svg width="140" height="140" viewBox="0 0 100 100" fill="none" stroke="#fc6c2b" stroke-width="1.5">
+            <circle cx="50" cy="50" r="40" stroke-dasharray="4 2"/>
+            <path d="M30 50 L50 30 L70 50 L50 70 Z"/>
+            <circle cx="50" cy="50" r="8" fill="#fc6c2b"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div class="footer-col-1">
+          <a href="#" class="logo">
+            <span class="logo-symbol">⊕</span> Точка плавления
+          </a>
+          <p class="footer-desc">Независимая обучающая платформа по пайке, микроэлектронике и ремонту техники для инженеров и мейкеров.</p>
+        </div>
+        <div>
+          <div class="footer-col-title">Разделы</div>
+          <ul class="footer-links">
+            <li><a href="#articles">Статьи</a></li>
+            <li><a href="#sections">Каталог знаний</a></li>
+            <li><a href="#interactive">Интерактив</a></li>
+            <li><a href="#courses">Курсы</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Проект</div>
+          <ul class="footer-links">
+            <li><a href="#">О проекте</a></li>
+            <li><a href="#">Авторы</a></li>
+            <li><a href="#">Контакты</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Сообщество</div>
+          <ul class="footer-links">
+            <li><a href="#">Telegram канал</a></li>
+            <li><a href="#">YouTube гайды</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>© 2026 Точка плавления. Все права защищены.</div>
+        <div>Engineered for precision.</div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal-box">
+      <h3 id="modal-title" style="font-size:22px; font-weight:800; margin-bottom:12px;"></h3>
+      <div id="modal-body" style="font-family:var(--font-mono); font-size:13px; color:var(--text-muted); margin-bottom:20px;"></div>
+      <button onclick="closeModal()" class="btn-pill btn-dark">Закрыть</button>
+    </div>
+  </div>
+
+  <script>
+    function openModal(type) {
+      const modal = document.getElementById('modal');
+      const title = document.getElementById('modal-title');
+      const body = document.getElementById('modal-body');
+      
+      if(type === 'calc') {
+        title.innerText = '⚙️ Калькулятор флюса и температуры';
+        body.innerHTML = `
+          <p style="margin-bottom:10px;"><strong>Сплав:</strong> Sn63/Pb37 (Свинцовый)</p>
+          <p style="margin-bottom:10px;"><strong>Рекомендуемая температура:</strong> 310°C – 330°C</p>
+          <p style="margin-bottom:10px;"><strong>Флюс:</strong> RMA-223 / NC-559 (Безотмывочный гелевый)</p>
+        `;
+      } else if(type === 'quiz') {
+        title.innerText = '🧠 Экспресс-тест по пайке';
+        body.innerHTML = `
+          <p style="margin-bottom:10px;"><strong>Вопрос 1 из 3:</strong> Какая оптимальная температура паяльника для бессвинцового припоя SAC305?</p>
+          <button style="margin-top:8px; padding:6px 12px; background:#fff; border:1px solid #ccc; border-radius:6px; cursor:pointer;" onclick="alert('Правильно! SAC305 плавится при 217°C, рабочая температура 340-360°C.')">A) 340°C - 360°C</button>
+        `;
+      } else {
+        title.innerText = '📊 Схема плавления припоев';
+        body.innerHTML = `
+          <table style="width:100%; border-collapse:collapse; text-align:left;">
+            <tr style="border-bottom:1px solid #ccc;"><th>Сплав</th><th>Состав</th><th>t° плавления</th></tr>
+            <tr><td>ПОС-61</td><td>61% Sn, 39% Pb</td><td>183°C</td></tr>
+            <tr><td>SAC305</td><td>Sn-3.0Ag-0.5Cu</td><td>217°C</td></tr>
+            <tr><td>Сплав Розе</td><td>Bi-Pb-Sn</td><td>94°C</td></tr>
+          </table>
+        `;
+      }
+      modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "mcpServers": {
+    "ui-expert-mcp": {
+      "command": "node",
+      "args": ["C:/mcp_servers/ui-expert-mcp/dist/index.js"],
+      "description": "UI/UX design improvements, component design system guidance, and frontend expert MCP server"
+    },
+    "ux-mcp-server": {
+      "command": "node",
+      "args": ["C:/mcp_servers/ux-mcp-server/dist/index.js"],
+      "description": "28 UX knowledge resources, 23 analysis tools, Nielsen heuristics, and WCAG accessibility standards"
+    },
+    "mcp-stack-inspire": {
+      "command": "node",
+      "args": ["C:/mcp_servers/MCP-Stack-for-UI-UX-Designers/inspire-mcp/build/index.js"],
+      "description": "Web UI layout & component inspiration scraper server"
+    }
+  }
+}

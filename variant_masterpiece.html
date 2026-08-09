@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Точка Плавления — Дизайн в цвете Референсов (Stripe Dev / Piccalilli / Polar)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:ital,wght@0,400..900;1,400..900&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style id="theme-styles">
+    /* Theme Palette 1: Stripe Dev & Polar (Default: Midnight Navy & Indigo/Cyan) */
+    :root {
+      --bg-outer: #0a2540;
+      --bg-paper: #ffffff;
+      --bg-paper-darker: #f6f9fc;
+      --bg-card: #ffffff;
+      --bg-yellow-callout: #f0f7ff;
+      --border-yellow: #bae6fd;
+      --bg-red-alert: #fff1f2;
+      --border-red: #fecdd3;
+      --text-main: #0a2540;
+      --text-muted: #425466;
+      --accent: #635bff;
+      --accent-secondary: #00d4ff;
+      --accent-light: rgba(99, 91, 255, 0.1);
+      --border-color: #e6e8eb;
+      --font-heading: 'Hanken Grotesk', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --radius-pill: 100px;
+      --glass-bg: rgba(255, 255, 255, 0.88);
+      --shadow-card: 0 10px 30px rgba(10, 37, 64, 0.06);
+      --shadow-hover: 0 18px 40px rgba(99, 91, 255, 0.18);
+    }
+
+    /* Theme Palette 2: Piccalilli (Modern Coral & Dark Slate) */
+    body.theme-piccalilli {
+      --bg-outer: #0f172a;
+      --bg-paper: #fafaf9;
+      --bg-paper-darker: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-yellow-callout: #fefce8;
+      --border-yellow: #fef08a;
+      --bg-red-alert: #fff1f2;
+      --border-red: #fecdd3;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent: #f43f5e;
+      --accent-secondary: #10b981;
+      --accent-light: rgba(244, 63, 94, 0.1);
+      --border-color: #e2e8f0;
+      --shadow-hover: 0 18px 40px rgba(244, 63, 94, 0.18);
+    }
+
+    /* Theme Palette 3: Polar Dark Mode (Pitch Black & Neon Lime/Cyan) */
+    body.theme-polar-dark {
+      --bg-outer: #09090b;
+      --bg-paper: #18181b;
+      --bg-paper-darker: #27272a;
+      --bg-card: #27272a;
+      --bg-yellow-callout: #1c1917;
+      --border-yellow: #78350f;
+      --bg-red-alert: #271313;
+      --border-red: #991b1b;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --accent: #06b6d4;
+      --accent-secondary: #a3e635;
+      --accent-light: rgba(6, 182, 212, 0.15);
+      --border-color: #3f3f46;
+      --glass-bg: rgba(24, 24, 27, 0.88);
+      --shadow-hover: 0 18px 40px rgba(6, 182, 212, 0.25);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-outer);
+      color: var(--text-main);
+      font-family: var(--font-heading);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 0 15px 40px 15px;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    /* Top Switcher Bar */
+    .variant-bar {
+      width: 100%; max-width: 1160px; background: #0f172a; color: #fff;
+      padding: 12px 20px; margin-top: 15px; margin-bottom: 10px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-family: var(--font-mono); font-size: 13px; border: 1px solid #334155;
+    }
+    .palette-btn-group { display: flex; gap: 8px; }
+    .pal-btn {
+      color: #fff; text-decoration: none; padding: 5px 14px; border-radius: 20px;
+      background: #1e293b; transition: all 0.2s; border: 1px solid #475569; cursor: pointer; font-size: 12px; font-family: var(--font-mono);
+    }
+    .pal-btn.active, .pal-btn:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Main Paper Container */
+    .paper-sheet {
+      width: 100%; max-width: 1160px; background-color: var(--bg-paper);
+      border-radius: 28px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+      position: relative; overflow: hidden; display: flex; flex-direction: column;
+      border: 1px solid var(--border-color); transition: background 0.3s;
+    }
+
+    /* Glass Header Nav */
+    .header-nav {
+      position: sticky; top: 0; z-index: 90;
+      background: var(--glass-bg);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--border-color);
+      height: 66px; display: flex; align-items: center; justify-content: space-between; padding: 0 36px;
+    }
+
+    .logo {
+      font-weight: 900; font-size: 19px; letter-spacing: 0.5px; text-transform: uppercase;
+      display: flex; align-items: center; gap: 8px; color: var(--text-main); text-decoration: none;
+    }
+    .logo-symbol { color: var(--accent); font-size: 22px; }
+
+    .nav-links { display: flex; gap: 28px; list-style: none; }
+    .nav-links a {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 600; text-transform: uppercase;
+      color: var(--text-main); text-decoration: none; transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    .btn-pill {
+      font-family: var(--font-mono); font-size: 13px; font-weight: 700;
+      padding: 10px 24px; border-radius: var(--radius-pill);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer;
+      transition: all 0.25s ease; border: 1.5px solid transparent;
+    }
+    .btn-dark { background: var(--accent); color: #fff; }
+    .btn-dark:hover { filter: brightness(1.15); transform: translateY(-2px); box-shadow: 0 4px 16px var(--accent-light); }
+    .btn-outline { border-color: var(--text-main); color: var(--text-main); background: transparent; }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+    /* HERO SECTION */
+    .hero-section {
+      padding: 60px 40px; display: grid; grid-template-columns: 1fr 1.05fr; gap: 40px; align-items: center; position: relative;
+    }
+
+    .badge-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+      color: var(--accent); background: var(--accent-light);
+      padding: 6px 16px; border-radius: var(--radius-pill); margin-bottom: 20px;
+      border: 1px solid var(--accent);
+    }
+
+    .hero-title { font-size: 52px; font-weight: 900; line-height: 1.08; letter-spacing: -1.5px; margin-bottom: 20px; }
+
+    .wavy-accent { color: var(--text-main); position: relative; display: inline-block; }
+    .wavy-accent::after {
+      content: ""; position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 4'%3E%3Cpath d='M0 2 Q 5 0, 10 2 T 20 2' fill='none' stroke='%23635bff' stroke-width='2'/%3E%3C/svg%3E");
+      background-repeat: repeat-x; background-size: 16px 6px;
+    }
+
+    .hero-subtitle { font-family: var(--font-mono); font-size: 14px; color: var(--text-muted); margin-bottom: 30px; max-width: 480px; line-height: 1.6; }
+
+    /* Stripe Dev / nan.fyi Interactive Soldering Workbench Widget */
+    .dev-bench-widget {
+      background: var(--bg-card); border: 1.5px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 24px; box-shadow: var(--shadow-card);
+    }
+
+    .widget-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border-color); margin-bottom: 16px;
+      font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    }
+
+    .tip-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 16px; }
+    .tip-tab {
+      font-family: var(--font-mono); font-size: 11px; font-weight: 700;
+      padding: 8px 4px; border-radius: 6px; border: 1px solid var(--border-color);
+      background: var(--bg-paper-darker); color: var(--text-main); text-align: center; cursor: pointer; transition: all 0.2s;
+    }
+    .tip-tab.active, .tip-tab:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .range-wrap { margin-bottom: 16px; }
+    .range-label-row { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+    .range-input { width: 100%; height: 8px; border-radius: 4px; background: var(--border-color); outline: none; accent-color: var(--accent); cursor: pointer; }
+
+    .bench-console {
+      background: #0f172a; color: #38bdf8; border-radius: 10px; padding: 14px;
+      font-family: var(--font-mono); font-size: 12px; line-height: 1.5; box-shadow: inset 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .console-accent { color: #a855f7; font-weight: 700; }
+
+    /* ARTICLES CATALOG SECTION */
+    .articles-section { padding: 60px 40px; border-top: 1px solid var(--border-color); background: var(--bg-paper-darker); }
+    .cat-filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px; }
+
+    .filter-pill {
+      font-family: var(--font-mono); font-size: 12px; font-weight: 600;
+      padding: 8px 20px; border-radius: var(--radius-pill); border: 1px solid var(--border-color);
+      background: var(--bg-paper); color: var(--text-main); cursor: pointer; transition: all 0.2s;
+    }
+    .filter-pill.active, .filter-pill:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+
+    .articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+
+    .piccalilli-card {
+      background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg);
+      padding: 24px; display: flex; flex-direction: column; justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; text-decoration: none; color: inherit;
+    }
+    .piccalilli-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-hover); border-color: var(--accent); }
+
+    .card-sketch-box {
+      height: 140px; background: var(--bg-paper-darker); border-radius: var(--radius-md); margin-bottom: 18px;
+      display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border-color);
+    }
+
+    .card-meta-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .card-code-tag { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; }
+    .card-date { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
+
+    .card-h3 { font-size: 20px; font-weight: 800; line-height: 1.25; margin-bottom: 10px; }
+    .card-excerpt { font-family: var(--font-mono); font-size: 13px; color: var(--text-muted); margin-bottom: 18px; line-height: 1.5; }
+
+    .card-foot {
+      display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border-color);
+      font-family: var(--font-mono); font-size: 12px; color: var(--text-muted);
+    }
+
+    .plus-circle {
+      width: 32px; height: 32px; border-radius: 50%; background: var(--bg-paper-darker);
+      display: flex; align-items: center; justify-content: center; font-size: 16px; color: var(--text-main); transition: all 0.3s;
+    }
+    .piccalilli-card:hover .plus-circle { background: var(--accent); color: #fff; transform: rotate(45deg); }
+
+    /* KNOWLEDGE BASE & TUTORIAL READER */
+    .knowledge-section { padding: 60px 40px; border-top: 1px solid var(--border-color); background: var(--bg-paper); }
+    .knowledge-grid { display: grid; grid-template-columns: 1fr 320px; gap: 36px; }
+
+    .reader-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 36px; }
+    .breadcrumbs { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+    .reader-h2 { font-size: 32px; font-weight: 900; line-height: 1.2; margin-bottom: 16px; }
+
+    /* Callout Yellow Box */
+    .callout-yellow {
+      background: var(--bg-yellow-callout); border: 1px solid var(--border-yellow); border-radius: 12px;
+      padding: 20px; margin: 20px 0; font-size: 14px; line-height: 1.6;
+    }
+    .callout-label { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+
+    /* Alert Red Box */
+    .alert-red {
+      background: var(--bg-red-alert); border: 1px solid var(--border-red); border-radius: 12px;
+      padding: 20px; margin: 20px 0; font-size: 14px; line-height: 1.6;
+    }
+    .alert-label { font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: #e11d48; text-transform: uppercase; margin-bottom: 6px; }
+
+    /* Tech Spec Table */
+    .tech-table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 13px; font-family: var(--font-mono); }
+    .tech-table th, .tech-table td { border: 1px solid var(--border-color); padding: 10px 14px; text-align: left; }
+    .tech-table th { background: var(--bg-paper-darker); font-weight: 700; text-transform: uppercase; }
+
+    /* Sticky Sidebar */
+    .sidebar { display: flex; flex-direction: column; gap: 20px; position: sticky; top: 86px; }
+    .side-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); padding: 22px; }
+    .side-title { font-family: var(--font-mono); font-size: 13px; font-weight: 700; text-transform: uppercase; margin-bottom: 14px; color: var(--text-main); }
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 8px; }
+    .tag-btn { font-family: var(--font-mono); font-size: 12px; padding: 6px 14px; border-radius: var(--radius-pill); background: var(--bg-paper-darker); border: 1px solid var(--border-color); color: var(--text-main); text-decoration: none; }
+    .tag-btn:hover, .tag-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* FAQ SECTION */
+    .faq-section { padding: 60px 40px; border-top: 1px solid var(--border-color); background: var(--bg-paper-darker); }
+    .faq-item { border-bottom: 1px solid var(--border-color); padding: 20px 0; cursor: pointer; }
+    .faq-q { font-size: 18px; font-weight: 800; display: flex; justify-content: space-between; align-items: center; }
+    .faq-a { font-family: var(--font-mono); font-size: 14px; color: var(--text-muted); margin-top: 10px; display: none; line-height: 1.6; }
+
+    /* FOOTER */
+    .footer { background: #0f172a; color: #ffffff; padding: 60px 40px 30px 40px; margin-top: auto; }
+    .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+    .footer-col-1 .logo { color: #fff; margin-bottom: 16px; }
+    .footer-desc { font-family: var(--font-mono); font-size: 13px; color: #94a3b8; max-width: 320px; }
+    .footer-title { font-family: var(--font-mono); font-size: 13px; font-weight: 700; text-transform: uppercase; color: var(--accent); margin-bottom: 18px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { font-family: var(--font-mono); font-size: 13px; color: #cbd5e1; text-decoration: none; }
+    .footer-links a:hover { color: var(--accent); }
+    .footer-bottom { border-top: 1px solid #1e293b; padding-top: 24px; display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; color: #64748b; }
+
+    @media (max-width: 960px) {
+      .hero-section, .knowledge-grid { grid-template-columns: 1fr; }
+      .articles-grid { grid-template-columns: 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Switcher Bar -->
+  <div class="variant-bar">
+    <div><strong>ПЕРЕКЛЮЧАТЕЛЬ ПАЛИТРЫ РЕФЕРЕНСОВ:</strong></div>
+    <div class="palette-btn-group">
+      <button class="pal-btn active" onclick="setPalette('stripe')">1. Stripe Dev (Midnight & Indigo)</button>
+      <button class="pal-btn" onclick="setPalette('piccalilli')">2. Piccalilli (Coral & Dark Slate)</button>
+      <button class="pal-btn" onclick="setPalette('polar')">3. Polar (Pitch Black & Neon Cyan)</button>
+    </div>
+  </div>
+
+  <!-- Main Paper Sheet Container -->
+  <div class="paper-sheet">
+
+    <!-- Sticky Glass Header Nav -->
+    <header class="header-nav">
+      <a href="#" class="logo">
+        <span class="logo-symbol">⊕</span> Точка плавления
+      </a>
+      <ul class="nav-links">
+        <li><a href="#articles">Каталог</a></li>
+        <li><a href="#bench">Термо-Верстак</a></li>
+        <li><a href="#knowledge">База Знаний</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+      <a href="#bench" class="btn-pill btn-dark">Открыть Верстак →</a>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <div>
+        <div class="badge-pill">
+          ◉ [ 2026 // ENGINEERING & MAKER HUB ]
+        </div>
+        <h1 class="hero-title">
+          Паяй. <br>
+          Твори. <br>
+          <span class="wavy-accent">Понимай.</span>
+        </h1>
+        <p class="hero-subtitle">
+          Современный инди-портал по микроэлектронике: от выбора жала и температурного профиля 340°C до восстановления BGA плат под микроскопом.
+        </p>
+
+        <div style="display:flex; gap:14px; margin-bottom:30px;">
+          <a href="#articles" class="btn-pill btn-dark">Все гайды →</a>
+          <a href="#bench" class="btn-pill btn-outline">Симулятор t°</a>
+        </div>
+
+        <div style="display:flex; align-items:center; gap:12px; font-family:var(--font-mono); font-size:13px;">
+          <span style="color:var(--accent); font-weight:700;">+2 500</span> инженеров и мейкеров в сообществе
+        </div>
+      </div>
+
+      <!-- Stripe Dev / nan.fyi Interactive Workbench Widget -->
+      <div class="dev-bench-widget" id="bench">
+        <div class="widget-header">
+          <span>⚙️ ИНТЕРАКТИВНЫЙ ТЕРМО-ВЕРСТАК</span>
+          <span style="color:var(--accent);">● LIVE SIMULATOR</span>
+        </div>
+
+        <div class="tip-tabs">
+          <button class="tip-tab active" onclick="setTip('T12-K', '80W', 'SMD/Разъёмы')">T12-K</button>
+          <button class="tip-tab" onclick="setTip('C245-I', '130W', 'Микроскопия')">C245-I</button>
+          <button class="tip-tab" onclick="setTip('T12-BC2', '80W', 'THT выводы')">T12-BC2</button>
+          <button class="tip-tab" onclick="setTip('C210-0201', '40W', '0201 SMD')">C210</button>
+        </div>
+
+        <div class="range-wrap">
+          <div class="range-label-row">
+            <span>Установка t° паяльника:</span>
+            <span style="color:var(--accent);" id="bench-temp-num">340°C</span>
+          </div>
+          <input type="range" min="200" max="450" value="340" class="range-input" id="bench-slider" oninput="updateBench(this.value)">
+        </div>
+
+        <!-- Terminal Console Output -->
+        <div class="bench-console" id="console-output">
+          <div>> STATUS: <span class="console-accent">OPTIMAL (320°C - 350°C)</span></div>
+          <div>> ALLOY: Sn63/Pb37 (Свинцовый)</div>
+          <div>> RECOMMENDED FLUX: RMA-223 / NC-559</div>
+          <div>> THERMAL RISK: <span class="console-accent">SAFE ZONE</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ARTICLES CATALOG SECTION -->
+    <section class="articles-section" id="articles">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <h2 style="font-size:32px; font-weight:900;">Каталог материалов и гайдов</h2>
+        <span style="font-family:var(--font-mono); font-size:12px; color:var(--text-muted);">UPDATED WEEKLY</span>
+      </div>
+
+      <div class="cat-filters">
+        <button class="filter-pill active" onclick="filterMaster('all')">Все гайды (6)</button>
+        <button class="filter-pill" onclick="filterMaster('beginner')">Новичкам</button>
+        <button class="filter-pill" onclick="filterMaster('smd')">SMD & BGA</button>
+        <button class="filter-pill" onclick="filterMaster('equip')">Оборудование</button>
+      </div>
+
+      <div class="articles-grid" id="master-grid">
+        <!-- Card 1 -->
+        <a href="#knowledge" class="piccalilli-card" data-cat="beginner">
+          <div>
+            <div class="card-sketch-box">
+              <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2v20M2 12h20M7 7l10 10M17 7L7 17"/></svg>
+            </div>
+            <div class="card-meta-row">
+              <span class="card-code-tag">[ 01 // THT & FLUX ]</span>
+              <span class="card-date">7 авг 2026</span>
+            </div>
+            <h3 class="card-h3">Как паять паяльником: пошаговый разбор температур</h3>
+            <p class="card-excerpt">Подробное руководство по выбору жала, температурного режима 320°C–350°C и припоя.</p>
+          </div>
+          <div class="card-foot">
+            <span>⏱ 8 мин чтения</span>
+            <div class="plus-circle">+</div>
+          </div>
+        </a>
+
+        <!-- Card 2 -->
+        <a href="#knowledge" class="piccalilli-card" data-cat="smd">
+          <div>
+            <div class="card-sketch-box">
+              <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><rect x="4" y="4" width="16" height="16" rx="2"/><circle cx="12" cy="12" r="3"/></svg>
+            </div>
+            <div class="card-meta-row">
+              <span class="card-code-tag">[ 02 // QFN & FEHN ]</span>
+              <span class="card-date">5 авг 2026</span>
+            </div>
+            <h3 class="card-h3">Секреты монтажа QFN корпусов феном без соплей</h3>
+            <p class="card-excerpt">Методика микросварки паяльной пастой с использованием капиллярного эффекта.</p>
+          </div>
+          <div class="card-foot">
+            <span>⏱ 12 мин чтения</span>
+            <div class="plus-circle">+</div>
+          </div>
+        </a>
+
+        <!-- Card 3 -->
+        <a href="#knowledge" class="piccalilli-card" data-cat="equip">
+          <div>
+            <div class="card-sketch-box">
+              <svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            </div>
+            <div class="card-meta-row">
+              <span class="card-code-tag">[ 03 // STATIONS ]</span>
+              <span class="card-date">2 авг 2026</span>
+            </div>
+            <h3 class="card-h3">Обзор ИК-станций и паяльников T12 vs JBC C245</h3>
+            <p class="card-excerpt">Честный тест скорости нагрева, термостабилизации и долговечности картриджей.</p>
+          </div>
+          <div class="card-foot">
+            <span>⏱ 15 мин чтения</span>
+            <div class="plus-circle">+</div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <!-- KNOWLEDGE BASE & TUTORIAL READER -->
+    <section class="knowledge-section" id="knowledge">
+      <div class="knowledge-grid">
+        <div class="reader-card">
+          <div class="breadcrumbs">Главная > Гайды > Температурные режимы</div>
+          <h2 class="reader-h2">Как правильно выбрать температуру паяльника и не перегреть плату</h2>
+          <p style="font-size:15px; color:var(--text-muted); margin-bottom:20px; line-height:1.6;">
+            Главная ошибка начинающих мейкеров — завышать температуру до 400°C при любых сложностях. Это приводит к мгновенному выгоранию флюса и отслоению дорожек.
+          </p>
+
+          <div class="callout-yellow">
+            <div class="callout-label">💡 СОВЕТ ИНЖЕНЕРА</div>
+            <strong>Простое правило пайки:</strong> процесс плавления должен начинаться за 2–3 секунды. Если припой не растекается — возьмите более широкое жало (K или BC2) вместо поднятия температуры!
+          </div>
+
+          <table class="tech-table">
+            <thead>
+              <tr><th>Сплав</th><th>t° плавления</th><th>Рабочая t° жала</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>ПОС-61 (Sn63/Pb37)</strong></td><td>183°C</td><td>310°C – 330°C</td></tr>
+              <tr><td><strong>SAC305 (Бессвинцовый)</strong></td><td>217°C</td><td>340°C – 360°C</td></tr>
+              <tr><td><strong>Сплав Розе</strong></td><td>94°C</td><td>150°C – 200°C</td></tr>
+            </tbody>
+          </table>
+
+          <div class="alert-red">
+            <div class="alert-label">⚠️ КРАСНЫЕ ФЛАГИ / ОПАСНОСТЬ</div>
+            • Обугливание флюса с образованием нагара.<br>
+            • Отслаивание медных пятачков (pads) от текстолита.<br>
+            • Повреждение внутренних слоев многослойных плат.
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="side-card">
+            <div class="side-title">Теги по темам</div>
+            <div class="tag-cloud">
+              <a href="#" class="tag-btn active">BGA</a>
+              <a href="#" class="tag-btn">SMD</a>
+              <a href="#" class="tag-btn">THT</a>
+              <a href="#" class="tag-btn">Флюс</a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- FAQ SECTION -->
+    <section class="faq-section" id="faq">
+      <h2 style="font-size:28px; font-weight:900; margin-bottom:20px;">Часто задаваемые вопросы</h2>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>Нужно ли смывать безотмывочный флюс RMA-223?</span><span>+</span></div>
+        <div class="faq-a">При работе с высокочастотными цепями или высоковольтными платами смывка спиртом обязательна, так как остатки флюса притягивают пыль.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><span>Чем отличается свинцовый припой от бессвинцового?</span><span>+</span></div>
+        <div class="faq-a">Свинцовый (ПОС-61) плавится при 183°C и даёт блестящую галтель. Бессвинцовый (SAC305) плавится при 217°C и требует идеального флюса.</div>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-grid">
+        <div class="footer-col-1">
+          <a href="#" class="logo" style="color:#fff;">
+            <span class="logo-symbol">⊕</span> Точка плавления
+          </a>
+          <p class="footer-desc">Независимая обучающая платформа по пайке и микроэлектронике для инженеров и мейкеров.</p>
+        </div>
+        <div>
+          <div class="footer-title">Разделы</div>
+          <ul class="footer-links">
+            <li><a href="#articles">Каталог</a></li>
+            <li><a href="#bench">Термо-Верстак</a></li>
+            <li><a href="#knowledge">База знаний</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-title">Сообщество</div>
+          <ul class="footer-links">
+            <li><a href="#">Telegram</a></li>
+            <li><a href="#">YouTube</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-title">Контакты</div>
+          <ul class="footer-links">
+            <li><a href="#">Поддержка</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2026 Точка плавления.</div>
+        <div>Engineered for precision & clarity.</div>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    function setPalette(name) {
+      document.body.className = '';
+      document.querySelectorAll('.pal-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      if (name === 'piccalilli') {
+        document.body.classList.add('theme-piccalilli');
+      } else if (name === 'polar') {
+        document.body.classList.add('theme-polar-dark');
+      }
+    }
+
+    let currentTip = 'T12-K';
+    function setTip(name, power, use) {
+      currentTip = name;
+      document.querySelectorAll('.tip-tab').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      updateBench(document.getElementById('bench-slider').value);
+    }
+
+    function updateBench(val) {
+      document.getElementById('bench-temp-num').innerText = val + '°C';
+      const consoleBox = document.getElementById('console-output');
+      if(val < 280) {
+        consoleBox.innerHTML = `<div>> TIP MODEL: <span class="console-accent">${currentTip}</span></div><div>> STATUS: <span style="color:#ffd700;">UNDERHEAT (COLD SOLDER RISK)</span></div><div>> RECOMMENDED FLUX: ROSIN / KANIFOL</div>`;
+      } else if(val <= 360) {
+        consoleBox.innerHTML = `<div>> TIP MODEL: <span class="console-accent">${currentTip}</span></div><div>> STATUS: <span class="console-accent">OPTIMAL (SAFE ZONE)</span></div><div>> RECOMMENDED FLUX: RMA-223 / NC-559</div>`;
+      } else {
+        consoleBox.innerHTML = `<div>> TIP MODEL: <span class="console-accent">${currentTip}</span></div><div>> STATUS: <span style="color:#ff3333; font-weight:700;">OVERHEAT WARNING!</span></div><div>> RISK: PAD DELAMINATION & FLUX BURNOUT</div>`;
+      }
+    }
+
+    function filterMaster(cat) {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.querySelectorAll('.piccalilli-card').forEach(card => {
+        if(cat === 'all' || card.getAttribute('data-cat') === cat) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function toggleFaq(el) {
+      const ans = el.querySelector('.faq-a');
+      if(ans.style.display === 'block') {
+        ans.style.display = 'none';
+      } else {
+        ans.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>

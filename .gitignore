@@ -1,0 +1,7 @@
+# Игнорировать временные файлы и загруженный PHP
+/php
+/php.zip
+php_portable/
+*.zip
+*.log
+.DS_Store

@@ -1,0 +1,48 @@
+# Точка Плавления — .htaccess
+# ЧПУ-урлы, редиректы, защита
+
+Options -Indexes
+RewriteEngine On
+
+# Force trailing slash removal for cleanliness
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)/$ /$1 [R=301,L]
+
+# Article: /article/slug/ → article.php?slug=slug
+RewriteRule ^article/([a-z0-9-]+)/?$ /article.php?slug=$1 [L,QSA]
+
+# Category/tag: /tag/smd/ → category.php?tag=smd
+RewriteRule ^tag/([a-z0-9-]+)/?$ /category.php?tag=$1 [L,QSA]
+
+# Interactive page
+RewriteRule ^interactive/?$ /interactive.php [L]
+
+# Legal pages
+RewriteRule ^cookies/?$ /cookies.php [L]
+RewriteRule ^privacy/?$ /privacy.php [L]
+
+# Cookie setter endpoint
+RewriteRule ^set-cookie/?$ /set-cookie.php [L]
+
+# 404
+ErrorDocument 404 /404.php
+
+# Security headers
+<IfModule mod_headers.c>
+  Header set X-Frame-Options "SAMEORIGIN"
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/plain image/svg+xml
+</IfModule>
+
+# Cache static assets
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType image/svg+xml "access plus 1 week"
+</IfModule>

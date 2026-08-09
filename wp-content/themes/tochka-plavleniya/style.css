@@ -1,0 +1,114 @@
+/*
+Theme Name: Tochka Plavleniya Inter @font-face Edition
+Theme URI: https://tochkaplavleniya.ru/
+Author: Antigravity AI & UI-Expert
+Description: Изумрудно-шалфейный ирландский стиль с явным объявлением @font-face Inter (normal, 400).
+Version: 9.0.0
+Text Domain: tochka-plavleniya
+*/
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  --bg-outer: #181c1f;
+  --bg-paper: #f9f7f2;
+  --bg-card-subtle: #f0ebe1;
+  --bg-card: #ffffff;
+  --text-main: #1c242b;
+  --text-muted: #5a6673;
+  --accent: #2e5b48; /* Ирландский Изумрудный Шалфей */
+  --accent-heat: #d96b43; /* Тёплый Терракот */
+  --accent-light: rgba(46, 91, 72, 0.1);
+  --border-color: #e2dcd0;
+  
+  --font-heading: 'Unbounded', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+
+  --fz-h1: 38px;
+  --fz-h2: 26px;
+  --fz-h3: 18px;
+  --fz-body: 15px;
+  --fz-sub: 13.5px;
+  --fz-mono-tag: 11px;
+  --fz-meta: 12px;
+
+  --radius-card: 28px;
+  --radius-inner: 16px;
+  --radius-pill: 100px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-style: normal !important;
+}
+
+body {
+  background-color: var(--bg-outer);
+  color: var(--text-main);
+  font-family: var(--font-body);
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.55;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 15px 40px 15px;
+}
+
+.paper-sheet {
+  width: 100%; max-width: 1080px; background-color: var(--bg-paper);
+  border-radius: var(--radius-card); padding: 56px 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35); border: 1px solid var(--border-color);
+  display: flex; flex-direction: column; gap: 40px;
+}
+
+.guides-h1 { font-family: var(--font-heading); font-size: var(--fz-h1); font-weight: 800; font-style: normal; line-height: 1.15; letter-spacing: -1.2px; margin-bottom: 16px; color: var(--text-main); }
+.guides-subtext { font-family: var(--font-body); font-size: var(--fz-body); font-style: normal; font-weight: 400; color: var(--text-muted); line-height: 1.65; margin-bottom: 28px; }
+
+.cat-pills-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 36px; }
+.cat-pill-btn { font-family: var(--font-mono); font-size: var(--fz-meta); font-weight: 600; padding: 8px 22px; border-radius: var(--radius-pill); background: var(--bg-card-subtle); border: 1px solid var(--border-color); color: var(--text-main); cursor: pointer; transition: all 0.2s ease; }
+.cat-pill-btn.active, .cat-pill-btn:hover { background: var(--accent); color: #ffffff; border-color: var(--accent); }
+
+.guides-3col-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.guide-card-tochki { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-inner); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; text-decoration: none; color: inherit; }
+.guide-card-tochki:hover { transform: translateY(-4px); box-shadow: 0 14px 30px rgba(46, 91, 72, 0.1); border-color: var(--accent); }
+
+.card-sketch-container { background: var(--bg-card-subtle); border-radius: 12px; height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; border: 1px solid var(--border-color); }
+.card-tag-mono { font-family: var(--font-mono); font-size: var(--fz-mono-tag); font-weight: 700; color: var(--accent-heat); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 8px; display: block; }
+.card-title-h3 { font-family: var(--font-heading); font-size: var(--fz-h3); font-weight: 700; font-style: normal; line-height: 1.35; letter-spacing: -0.3px; margin-bottom: 10px; color: var(--text-main); }
+.card-desc-mono { font-family: var(--font-body); font-size: var(--fz-sub); font-style: normal; font-weight: 400; color: var(--text-muted); margin-bottom: 20px; line-height: 1.55; }
+.card-date-foot { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 12px; }
+
+@media (max-width: 960px) {
+  .guides-3col-grid { grid-template-columns: 1fr; }
+}
