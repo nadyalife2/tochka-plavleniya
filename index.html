@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Точка плавления — пайка электроники</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <a href="/" class="nav__logo">⊕ Точка плавления</a>
+    <ul class="nav__menu">
+      <li><a href="#articles">Статьи</a></li>
+      <li><a href="#courses">Курсы</a></li>
+      <li><a href="#interactive">Интерактив</a></li>
+      <li><a href="#about">О проекте</a></li>
+    </ul>
+    <a href="#courses" class="btn btn--accent">Начать →</a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero__content">
+      <span class="hero__tag">[ Твоя точка входа в электронику ]</span>
+      <h1 class="hero__title">Паяй.<br>Твори.<br><span class="accent">Понимай.</span></h1>
+      <p class="hero__sub">Гид по пайке от первого шва до сложных плат.<br>Статьи, инструменты и курсы — всё в одном месте.</p>
+      <div class="hero__btns">
+        <a href="#courses" class="btn btn--accent">→ Начать с нуля</a>
+        <a href="#articles" class="btn btn--outline">Читать статьи</a>
+      </div>
+    </div>
+    <div class="hero__visual">
+      <div class="hero__board">
+        <div class="board__chip"></div>
+        <div class="board__chip board__chip--sm"></div>
+        <div class="board__line"></div>
+        <div class="board__line board__line--v"></div>
+        <div class="board__dot"></div>
+        <div class="board__dot board__dot--2"></div>
+        <div class="board__dot board__dot--3"></div>
+        <span class="board__label">PCB v1.0</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED ARTICLES -->
+  <section class="featured" id="articles">
+    <div class="container">
+      <div class="section-header">
+        <h2>Горячие статьи</h2>
+        <a href="#" class="link-all">Все статьи →</a>
+      </div>
+      <div class="featured__grid">
+        <article class="card card--featured">
+          <span class="card__tag">ОСНОВЫ</span>
+          <h3>Как выбрать паяльник: полный гид для начинающих</h3>
+          <p>Разбираемся в мощности, формах жала и температурных режимах — что реально важно при покупке.</p>
+          <div class="card__footer">
+            <span class="card__time">8 мин</span>
+            <a href="#" class="card__link">Читать →</a>
+          </div>
+        </article>
+        <article class="card card--featured">
+          <span class="card__tag">SMD</span>
+          <h3>SMD-монтаж без страха: с чего начать</h3>
+          <p>Пошаговый разбор пайки поверхностного монтажа для тех, кто боится маленьких компонентов.</p>
+          <div class="card__footer">
+            <span class="card__time">12 мин</span>
+            <a href="#" class="card__link">Читать →</a>
+          </div>
+        </article>
+        <article class="card card--featured">
+          <span class="card__tag">РЕМОНТ</span>
+          <h3>Диагностика платы: где искать проблему</h3>
+          <p>Мультиметр, визуальный осмотр и логика поиска неисправностей — практический разбор.</p>
+          <div class="card__footer">
+            <span class="card__time">10 мин</span>
+            <a href="#" class="card__link">Читать →</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- РАЗДЕЛЫ -->
+  <section class="sections">
+    <div class="container">
+      <h2>Разделы</h2>
+      <div class="sections__grid">
+        <a href="#" class="section-tile">
+          <span class="section-tile__icon">🔧</span>
+          <span class="section-tile__name">Основы пайки</span>
+          <span class="section-tile__count">14 статей</span>
+        </a>
+        <a href="#" class="section-tile">
+          <span class="section-tile__icon">💡</span>
+          <span class="section-tile__name">SMD-монтаж</span>
+          <span class="section-tile__count">9 статей</span>
+        </a>
+        <a href="#" class="section-tile">
+          <span class="section-tile__icon">🛠️</span>
+          <span class="section-tile__name">Инструменты</span>
+          <span class="section-tile__count">11 статей</span>
+        </a>
+        <a href="#" class="section-tile">
+          <span class="section-tile__icon">⚡</span>
+          <span class="section-tile__name">Ремонт плат</span>
+          <span class="section-tile__count">7 статей</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ИНТЕРАКТИВ -->
+  <section class="interactive" id="interactive">
+    <div class="container">
+      <div class="section-header">
+        <h2>Попробуй прямо сейчас</h2>
+        <p class="section-sub">Бесплатные инструменты для практики</p>
+      </div>
+      <div class="interactive__grid">
+        <div class="icard">
+          <div class="icard__icon">🧮</div>
+          <h3>Калькулятор флюса</h3>
+          <p>Рассчитай нужное количество флюса под твой проект</p>
+          <a href="#" class="btn btn--accent btn--sm">Открыть</a>
+        </div>
+        <div class="icard">
+          <div class="icard__icon">📝</div>
+          <h3>Тест по пайке</h3>
+          <p>Проверь свои знания и узнай, какой ты паяльщик</p>
+          <a href="#" class="btn btn--accent btn--sm">Пройти тест</a>
+        </div>
+        <div class="icard">
+          <div class="icard__icon">🗺️</div>
+          <h3>Схема припоев</h3>
+          <p>Интерактивная таблица температур и составов</p>
+          <a href="#" class="btn btn--accent btn--sm">Смотреть</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ЛЕНТА СТАТЕЙ -->
+  <section class="articles-feed">
+    <div class="container">
+      <div class="section-header">
+        <h2>Последние материалы</h2>
+        <a href="#" class="link-all">Все →</a>
+      </div>
+      <div class="feed__grid">
+        <article class="feed-card">
+          <span class="card__tag">ИНСТРУМЕНТЫ</span>
+          <h4>Лучший флюс в 2026 году: сравниваем 5 вариантов</h4>
+          <span class="card__time">6 мин</span>
+        </article>
+        <article class="feed-card">
+          <span class="card__tag">ОСНОВЫ</span>
+          <h4>Температура пайки: как не перегреть компонент</h4>
+          <span class="card__time">5 мин</span>
+        </article>
+        <article class="feed-card">
+          <span class="card__tag">SMD</span>
+          <h4>Паяем BGA: миф или реальность для домашней мастерской</h4>
+          <span class="card__time">15 мин</span>
+        </article>
+        <article class="feed-card">
+          <span class="card__tag">РЕМОНТ</span>
+          <h4>Как выпаять конденсатор не повредив дорожку</h4>
+          <span class="card__time">7 мин</span>
+        </article>
+        <article class="feed-card">
+          <span class="card__tag">ОСНОВЫ</span>
+          <h4>Жало паяльника: когда менять и как ухаживать</h4>
+          <span class="card__time">4 мин</span>
+        </article>
+        <article class="feed-card">
+          <span class="card__tag">ИНСТРУМЕНТЫ</span>
+          <h4>Паяльная станция vs паяльник: что выбрать</h4>
+          <span class="card__time">9 мин</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" id="courses">
+    <div class="container">
+      <div class="cta__inner">
+        <span class="cta__tag">[ Курсы ]</span>
+        <h2>Начни свой первый проект</h2>
+        <p>От паяльника в руках до работающей схемы — за 4 недели.<br>Практика, обратная связь, живые проекты.</p>
+        <div class="cta__btns">
+          <a href="#" class="btn btn--light">→ Записаться на курс</a>
+          <a href="#" class="btn btn--ghost">Посмотреть программу</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer" id="about">
+    <div class="container">
+      <div class="footer__top">
+        <div class="footer__brand">
+          <span class="nav__logo">⊕ Точка плавления</span>
+          <p>Сайт о пайке электроники для тех,<br>кто хочет понимать, а не просто делать.</p>
+        </div>
+        <div class="footer__nav">
+          <span class="footer__nav-title">Разделы</span>
+          <a href="#">Основы пайки</a>
+          <a href="#">SMD-монтаж</a>
+          <a href="#">Инструменты</a>
+          <a href="#">Ремонт плат</a>
+        </div>
+        <div class="footer__nav">
+          <span class="footer__nav-title">Проект</span>
+          <a href="#">О нас</a>
+          <a href="#">Курсы</a>
+          <a href="#">Интерактив</a>
+          <a href="#">Контакт</a>
+        </div>
+        <div class="footer__nav">
+          <span class="footer__nav-title">Соцсети</span>
+          <a href="#">Telegram</a>
+          <a href="#">YouTube</a>
+          <a href="#">VK</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>© 2026 Точка плавления</span>
+        <span>Все материалы свободно распространяются</span>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
