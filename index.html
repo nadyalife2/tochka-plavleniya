@@ -1,241 +1,329 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Точка плавления — пайка электроники</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <meta name="description" content="Образовательная платформа по пайке электроники. Статьи, курсы, интерактивные инструменты.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="nav">
-    <a href="/" class="nav__logo">⊕ Точка плавления</a>
-    <ul class="nav__menu">
-      <li><a href="#articles">Статьи</a></li>
-      <li><a href="#courses">Курсы</a></li>
-      <li><a href="#interactive">Интерактив</a></li>
-      <li><a href="#about">О проекте</a></li>
-    </ul>
-    <a href="#courses" class="btn btn--accent">Начать →</a>
-  </nav>
+<!-- Внешний тёмный фон -->
+<div class="outer-bg">
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero__content">
-      <span class="hero__tag">[ Твоя точка входа в электронику ]</span>
-      <h1 class="hero__title">Паяй.<br>Твори.<br><span class="accent">Понимай.</span></h1>
-      <p class="hero__sub">Гид по пайке от первого шва до сложных плат.<br>Статьи, инструменты и курсы — всё в одном месте.</p>
-      <div class="hero__btns">
-        <a href="#courses" class="btn btn--accent">→ Начать с нуля</a>
-        <a href="#articles" class="btn btn--outline">Читать статьи</a>
-      </div>
-    </div>
-    <div class="hero__visual">
-      <div class="hero__board">
-        <div class="board__chip"></div>
-        <div class="board__chip board__chip--sm"></div>
-        <div class="board__line"></div>
-        <div class="board__line board__line--v"></div>
-        <div class="board__dot"></div>
-        <div class="board__dot board__dot--2"></div>
-        <div class="board__dot board__dot--3"></div>
-        <span class="board__label">PCB v1.0</span>
-      </div>
-    </div>
-  </section>
+  <!-- Белая «страница» поверх тёмного фона -->
+  <div class="page-wrap">
 
-  <!-- FEATURED ARTICLES -->
-  <section class="featured" id="articles">
-    <div class="container">
-      <div class="section-header">
-        <h2>Горячие статьи</h2>
+    <!-- NAV -->
+    <header class="nav">
+      <a href="/" class="nav__logo">
+        <span class="nav__logo-icon">⊕</span>
+        <span class="nav__logo-text">Точка плавления</span>
+      </a>
+      <nav class="nav__menu">
+        <a href="#articles" class="nav__link nav__link--active">Статьи</a>
+        <a href="#courses" class="nav__link">Курсы</a>
+        <a href="#interactive" class="nav__link">Интерактив</a>
+        <a href="#about" class="nav__link">О проекте</a>
+      </nav>
+      <a href="#courses" class="btn btn--dark">Начать →</a>
+    </header>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero__left">
+        <span class="badge">● Платформа для мейкеров</span>
+        <h1 class="hero__title">
+          Паяй.
+          Твори.<br>
+          <span class="hero__title-accent">Понимай.</span>
+        </h1>
+        <p class="hero__sub">Образовательная платформа для тех, кто хочет освоить электронику по-настоящему. От основ пайки до сложного ремонта печатных плат.</p>
+        <div class="hero__btns">
+          <a href="#articles" class="btn btn--dark">К статьям →</a>
+          <a href="#courses" class="btn btn--outline">Наши курсы</a>
+        </div>
+        <div class="hero__social-proof">
+          <div class="avatars">
+            <div class="avatar" style="background:#c8c0b4"></div>
+            <div class="avatar" style="background:#a89880"></div>
+            <div class="avatar" style="background:#d4c8b8"></div>
+          </div>
+          <span class="hero__count">+2 500 <span class="muted">мейкеров уже с нами</span></span>
+        </div>
+      </div>
+      <div class="hero__right">
+        <!-- SVG-скетч: паяльник + плата -->
+        <svg viewBox="0 0 360 360" fill="none" xmlns="http://www.w3.org/2000/svg" class="hero__svg">
+          <!-- Плата -->
+          <rect x="60" y="120" width="240" height="150" rx="8" stroke="#1a1a1a" stroke-width="3" fill="#f0ece4"/>
+          <!-- Дорожки -->
+          <path d="M100 170 H160 V200 H240" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M100 210 H140 V180 H200" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M200 180 H260" stroke="#1a1a1a" stroke-width="2.5" stroke-linecap="round"/>
+          <!-- Чип -->
+          <rect x="155" y="155" width="60" height="50" rx="4" stroke="#1a1a1a" stroke-width="2.5" fill="#e0dbd0"/>
+          <text x="170" y="186" font-family="IBM Plex Mono" font-size="9" fill="#555">IC-01</text>
+          <!-- Ножки чипа -->
+          <line x1="155" y1="165" x2="140" y2="165" stroke="#1a1a1a" stroke-width="2"/>
+          <line x1="155" y1="175" x2="140" y2="175" stroke="#1a1a1a" stroke-width="2"/>
+          <line x1="155" y1="185" x2="140" y2="185" stroke="#1a1a1a" stroke-width="2"/>
+          <line x1="215" y1="165" x2="230" y2="165" stroke="#1a1a1a" stroke-width="2"/>
+          <line x1="215" y1="175" x2="230" y2="175" stroke="#1a1a1a" stroke-width="2"/>
+          <line x1="215" y1="185" x2="230" y2="185" stroke="#1a1a1a" stroke-width="2"/>
+          <!-- Точки пайки (анимированные) -->
+          <circle cx="100" cy="170" r="7" fill="#fc6c2b" class="solder-dot"/>
+          <circle cx="260" cy="180" r="6" fill="#1a1a1a" class="solder-dot-dark"/>
+          <circle cx="100" cy="210" r="6" fill="#1a1a1a"/>
+          <!-- Паяльник -->
+          <g transform="translate(230, 80) rotate(35)">
+            <rect x="0" y="0" width="12" height="70" rx="4" fill="#1a1a1a"/>
+            <rect x="2" y="70" width="8" height="20" rx="2" fill="#555"/>
+            <polygon points="6,90 0,110 12,110" fill="#888"/>
+            <!-- Жар -->
+            <path d="M6 112 Q2 120 6 128 Q10 120 6 112" fill="#fc6c2b" opacity="0.8"/>
+          </g>
+          <!-- Хэтчинг по углам -->
+          <line x1="60" y1="135" x2="75" y2="120" stroke="#ccc" stroke-width="1"/>
+          <line x1="60" y1="150" x2="90" y2="120" stroke="#ccc" stroke-width="1"/>
+          <line x1="285" y1="255" x2="300" y2="240" stroke="#ccc" stroke-width="1"/>
+          <line x1="275" y1="270" x2="300" y2="245" stroke="#ccc" stroke-width="1"/>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ГОРЯЧИЕ СТАТЬИ -->
+    <section class="section" id="articles">
+      <div class="section__header">
+        <h2 class="section__title">Горячие статьи <span class="title-underline"></span></h2>
         <a href="#" class="link-all">Все статьи →</a>
       </div>
-      <div class="featured__grid">
-        <article class="card card--featured">
-          <span class="card__tag">ОСНОВЫ</span>
-          <h3>Как выбрать паяльник: полный гид для начинающих</h3>
-          <p>Разбираемся в мощности, формах жала и температурных режимах — что реально важно при покупке.</p>
-          <div class="card__footer">
-            <span class="card__time">8 мин</span>
-            <a href="#" class="card__link">Читать →</a>
+      <div class="cards-grid cards-grid--3">
+
+        <article class="card">
+          <div class="card__img card__img--grid"></div>
+          <div class="card__body">
+            <span class="tag">Основы</span>
+            <h3 class="card__title">Температурные профили: как не перегреть плату</h3>
+            <p class="card__text">Разбираем теплоёмкость текстолита и настраиваем ИК-станцию для идеальной пайки BGA-чипов.</p>
+            <div class="card__footer">
+              <span class="read-time">8 мин чтения</span>
+              <a href="#" class="card__arrow">↗</a>
+            </div>
           </div>
         </article>
-        <article class="card card--featured">
-          <span class="card__tag">SMD</span>
-          <h3>SMD-монтаж без страха: с чего начать</h3>
-          <p>Пошаговый разбор пайки поверхностного монтажа для тех, кто боится маленьких компонентов.</p>
-          <div class="card__footer">
-            <span class="card__time">12 мин</span>
-            <a href="#" class="card__link">Читать →</a>
+
+        <article class="card">
+          <div class="card__img card__img--smd"></div>
+          <div class="card__body">
+            <span class="tag">SMD</span>
+            <h3 class="card__title">Монтаж компонентов 0402: секреты пинцета</h3>
+            <p class="card__text">Техника удержания, выбор паяльной пасты и траектория движения жала для мелких компонентов.</p>
+            <div class="card__footer">
+              <span class="read-time">5 мин чтения</span>
+              <a href="#" class="card__arrow">↗</a>
+            </div>
           </div>
         </article>
-        <article class="card card--featured">
-          <span class="card__tag">РЕМОНТ</span>
-          <h3>Диагностика платы: где искать проблему</h3>
-          <p>Мультиметр, визуальный осмотр и логика поиска неисправностей — практический разбор.</p>
-          <div class="card__footer">
-            <span class="card__time">10 мин</span>
-            <a href="#" class="card__link">Читать →</a>
+
+        <article class="card">
+          <div class="card__img card__img--repair"></div>
+          <div class="card__body">
+            <span class="tag">Ремонт</span>
+            <h3 class="card__title">Восстановление оторванных пятаков</h3>
+            <p class="card__text">Медная оплётка, УФ-маска и перемычки — пошаговое руководство по спасению безнадёжных плат.</p>
+            <div class="card__footer">
+              <span class="read-time">12 мин чтения</span>
+              <a href="#" class="card__arrow">↗</a>
+            </div>
           </div>
         </article>
-      </div>
-    </div>
-  </section>
 
-  <!-- РАЗДЕЛЫ -->
-  <section class="sections">
-    <div class="container">
-      <h2>Разделы</h2>
-      <div class="sections__grid">
-        <a href="#" class="section-tile">
-          <span class="section-tile__icon">🔧</span>
-          <span class="section-tile__name">Основы пайки</span>
-          <span class="section-tile__count">14 статей</span>
-        </a>
-        <a href="#" class="section-tile">
-          <span class="section-tile__icon">💡</span>
-          <span class="section-tile__name">SMD-монтаж</span>
-          <span class="section-tile__count">9 статей</span>
-        </a>
-        <a href="#" class="section-tile">
-          <span class="section-tile__icon">🛠️</span>
-          <span class="section-tile__name">Инструменты</span>
-          <span class="section-tile__count">11 статей</span>
-        </a>
-        <a href="#" class="section-tile">
-          <span class="section-tile__icon">⚡</span>
-          <span class="section-tile__name">Ремонт плат</span>
-          <span class="section-tile__count">7 статей</span>
-        </a>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ИНТЕРАКТИВ -->
-  <section class="interactive" id="interactive">
-    <div class="container">
-      <div class="section-header">
-        <h2>Попробуй прямо сейчас</h2>
-        <p class="section-sub">Бесплатные инструменты для практики</p>
+    <!-- РАЗДЕЛЫ -->
+    <section class="section section--gray">
+      <div class="section__header">
+        <h2 class="section__title">Разделы <span class="title-underline"></span></h2>
       </div>
-      <div class="interactive__grid">
+      <div class="tiles-grid">
+        <a href="#" class="tile">
+          <span class="tile__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/><path d="M14 2v6h6" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="tile__count">12 материалов</span>
+          <span class="tile__name">Основы пайки</span>
+        </a>
+        <a href="#" class="tile">
+          <span class="tile__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="#1a1a1a" stroke-width="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" stroke="#1a1a1a" stroke-width="2"/><line x1="12" y1="12" x2="12" y2="16" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/><line x1="10" y1="14" x2="14" y2="14" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="tile__count">8 материалов</span>
+          <span class="tile__name">SMD-монтаж</span>
+        </a>
+        <a href="#" class="tile">
+          <span class="tile__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="tile__count">15 материалов</span>
+          <span class="tile__name">Инструменты</span>
+        </a>
+        <a href="#" class="tile">
+          <span class="tile__icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#1a1a1a" stroke-width="2"/><path d="M12 8v4l3 3" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="tile__count">20 материалов</span>
+          <span class="tile__name">Ремонт плат</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- ИНТЕРАКТИВ -->
+    <section class="section" id="interactive">
+      <div class="section__header">
+        <h2 class="section__title">Интерактив <span class="title-underline"></span></h2>
+        <p class="section__sub">Бесплатные инструменты — попробуй прямо сейчас</p>
+      </div>
+      <div class="cards-grid cards-grid--3">
+
         <div class="icard">
-          <div class="icard__icon">🧮</div>
-          <h3>Калькулятор флюса</h3>
-          <p>Рассчитай нужное количество флюса под твой проект</p>
-          <a href="#" class="btn btn--accent btn--sm">Открыть</a>
+          <div class="icard__icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="24" height="24" rx="4" stroke="#fc6c2b" stroke-width="2"/><path d="M10 16h12M16 10v12" stroke="#fc6c2b" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="icard__title">Калькулятор флюса</h3>
+          <p class="icard__text">Рассчитайте идеальное количество и тип флюса под вашу задачу.</p>
+          <a href="#" class="icard__link">Открыть →</a>
         </div>
-        <div class="icard">
-          <div class="icard__icon">📝</div>
-          <h3>Тест по пайке</h3>
-          <p>Проверь свои знания и узнай, какой ты паяльщик</p>
-          <a href="#" class="btn btn--accent btn--sm">Пройти тест</a>
-        </div>
-        <div class="icard">
-          <div class="icard__icon">🗺️</div>
-          <h3>Схема припоев</h3>
-          <p>Интерактивная таблица температур и составов</p>
-          <a href="#" class="btn btn--accent btn--sm">Смотреть</a>
-        </div>
-      </div>
-    </div>
-  </section>
 
-  <!-- ЛЕНТА СТАТЕЙ -->
-  <section class="articles-feed">
-    <div class="container">
-      <div class="section-header">
-        <h2>Последние материалы</h2>
-        <a href="#" class="link-all">Все →</a>
-      </div>
-      <div class="feed__grid">
-        <article class="feed-card">
-          <span class="card__tag">ИНСТРУМЕНТЫ</span>
-          <h4>Лучший флюс в 2026 году: сравниваем 5 вариантов</h4>
-          <span class="card__time">6 мин</span>
-        </article>
-        <article class="feed-card">
-          <span class="card__tag">ОСНОВЫ</span>
-          <h4>Температура пайки: как не перегреть компонент</h4>
-          <span class="card__time">5 мин</span>
-        </article>
-        <article class="feed-card">
-          <span class="card__tag">SMD</span>
-          <h4>Паяем BGA: миф или реальность для домашней мастерской</h4>
-          <span class="card__time">15 мин</span>
-        </article>
-        <article class="feed-card">
-          <span class="card__tag">РЕМОНТ</span>
-          <h4>Как выпаять конденсатор не повредив дорожку</h4>
-          <span class="card__time">7 мин</span>
-        </article>
-        <article class="feed-card">
-          <span class="card__tag">ОСНОВЫ</span>
-          <h4>Жало паяльника: когда менять и как ухаживать</h4>
-          <span class="card__time">4 мин</span>
-        </article>
-        <article class="feed-card">
-          <span class="card__tag">ИНСТРУМЕНТЫ</span>
-          <h4>Паяльная станция vs паяльник: что выбрать</h4>
-          <span class="card__time">9 мин</span>
-        </article>
-      </div>
-    </div>
-  </section>
+        <div class="icard">
+          <div class="icard__icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M28 9L16 21 8 13" stroke="#fc6c2b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="16" cy="16" r="13" stroke="#fc6c2b" stroke-width="2"/></svg>
+          </div>
+          <h3 class="icard__title">Тест по пайке</h3>
+          <p class="icard__text">Проверь знания и узнай свой уровень — новичок, мастер или профи.</p>
+          <a href="#" class="icard__link">Начать →</a>
+        </div>
 
-  <!-- CTA -->
-  <section class="cta" id="courses">
-    <div class="container">
+        <div class="icard">
+          <div class="icard__icon-wrap">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><rect x="4" y="4" width="10" height="10" rx="2" stroke="#fc6c2b" stroke-width="2"/><rect x="18" y="4" width="10" height="10" rx="2" stroke="#fc6c2b" stroke-width="2"/><rect x="4" y="18" width="10" height="10" rx="2" stroke="#fc6c2b" stroke-width="2"/><rect x="18" y="18" width="10" height="10" rx="2" stroke="#fc6c2b" stroke-width="2"/></svg>
+          </div>
+          <h3 class="icard__title">Схема припоев</h3>
+          <p class="icard__text">Интерактивная таблица сплавов, температур плавления и применения.</p>
+          <a href="#" class="icard__link">Изучить →</a>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ЛЕНТА СТАТЕЙ -->
+    <section class="section section--gray">
+      <div class="section__header">
+        <h2 class="section__title">Лента статей <span class="title-underline"></span></h2>
+        <a href="#" class="link-all">Архив →</a>
+      </div>
+      <div class="feed">
+        <a href="#" class="feed-item">
+          <span class="tag">Основы</span>
+          <span class="feed-item__title">Выбор паяльной станции для новичка: Т12 или 900М?</span>
+          <span class="feed-item__time">4 мин</span>
+        </a>
+        <a href="#" class="feed-item">
+          <span class="tag">Инструменты</span>
+          <span class="feed-item__title">Осциллограф для начинающих: как читать сигналы</span>
+          <span class="feed-item__time">10 мин</span>
+        </a>
+        <a href="#" class="feed-item">
+          <span class="tag">Ремонт</span>
+          <span class="feed-item__title">Диагностика цепей питания ноутбука</span>
+          <span class="feed-item__time">15 мин</span>
+        </a>
+        <a href="#" class="feed-item">
+          <span class="tag">Химия</span>
+          <span class="feed-item__title">Отмывка плат: изопропанол vs специализированные жидкости</span>
+          <span class="feed-item__time">6 мин</span>
+        </a>
+        <a href="#" class="feed-item">
+          <span class="tag">SMD</span>
+          <span class="feed-item__title">Пайка QFN корпусов термофеном: пошаговый гайд</span>
+          <span class="feed-item__time">9 мин</span>
+        </a>
+        <a href="#" class="feed-item">
+          <span class="tag">Проекты</span>
+          <span class="feed-item__title">Собираем лабораторный блок питания из ATX</span>
+          <span class="feed-item__time">20 мин</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta" id="courses">
       <div class="cta__inner">
-        <span class="cta__tag">[ Курсы ]</span>
-        <h2>Начни свой первый проект</h2>
-        <p>От паяльника в руках до работающей схемы — за 4 недели.<br>Практика, обратная связь, живые проекты.</p>
+        <span class="tag tag--light">[ Курсы ]</span>
+        <h2 class="cta__title">Начни свой первый проект</h2>
+        <p class="cta__sub">От паяльника в руках до работающей схемы — за 4 недели.<br>Практика, обратная связь, живые проекты.</p>
+        <!-- Скетч-иллюстрация -->
+        <svg class="cta__sketch" viewBox="0 0 200 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="20" y="30" width="160" height="80" rx="6" stroke="#1a1a1a" stroke-width="2" fill="none"/>
+          <path d="M50 60 H80 V80 H130" stroke="#1a1a1a" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="50" cy="60" r="5" fill="#fc6c2b"/>
+          <circle cx="130" cy="80" r="5" fill="#1a1a1a"/>
+          <rect x="85" y="52" width="40" height="28" rx="3" stroke="#1a1a1a" stroke-width="1.5" fill="#ede8df"/>
+          <g transform="translate(155, 10) rotate(30)">
+            <rect width="8" height="40" rx="3" fill="#1a1a1a"/>
+            <polygon points="4,40 0,54 8,54" fill="#777"/>
+            <path d="M4 54 Q1 60 4 66 Q7 60 4 54" fill="#fc6c2b"/>
+          </g>
+        </svg>
         <div class="cta__btns">
-          <a href="#" class="btn btn--light">→ Записаться на курс</a>
-          <a href="#" class="btn btn--ghost">Посмотреть программу</a>
+          <a href="#" class="btn btn--dark">→ Записаться на курс</a>
+          <a href="#" class="btn btn--outline">Посмотреть программу</a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- FOOTER -->
-  <footer class="footer" id="about">
-    <div class="container">
-      <div class="footer__top">
+    <!-- FOOTER -->
+    <footer class="footer" id="about">
+      <div class="footer__grid">
         <div class="footer__brand">
-          <span class="nav__logo">⊕ Точка плавления</span>
-          <p>Сайт о пайке электроники для тех,<br>кто хочет понимать, а не просто делать.</p>
+          <span class="nav__logo-icon">⊕</span>
+          <span class="nav__logo-text">Точка плавления</span>
+          <p class="footer__desc">Образовательная платформа по пайке электроники. Точность в каждом соединении.</p>
         </div>
-        <div class="footer__nav">
-          <span class="footer__nav-title">Разделы</span>
+        <div class="footer__col">
+          <span class="footer__col-title">Разделы</span>
           <a href="#">Основы пайки</a>
           <a href="#">SMD-монтаж</a>
           <a href="#">Инструменты</a>
           <a href="#">Ремонт плат</a>
         </div>
-        <div class="footer__nav">
-          <span class="footer__nav-title">Проект</span>
+        <div class="footer__col">
+          <span class="footer__col-title">Проект</span>
           <a href="#">О нас</a>
           <a href="#">Курсы</a>
           <a href="#">Интерактив</a>
           <a href="#">Контакт</a>
         </div>
-        <div class="footer__nav">
-          <span class="footer__nav-title">Соцсети</span>
+        <div class="footer__col">
+          <span class="footer__col-title">Сообщество</span>
           <a href="#">Telegram</a>
           <a href="#">YouTube</a>
-          <a href="#">VK</a>
+          <a href="#">VKontakte</a>
         </div>
       </div>
       <div class="footer__bottom">
         <span>© 2026 Точка плавления</span>
-        <span>Все материалы свободно распространяются</span>
+        <span>Engineered for precision.</span>
       </div>
-    </div>
-  </footer>
+    </footer>
+
+  </div><!-- /page-wrap -->
+</div><!-- /outer-bg -->
 
 </body>
 </html>
