@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "ui-expert": {
+      "command": "node",
+      "args": [
+        "C:/Projects/ui-expert-mcp/dist/index.js"
+      ]
+    }
+  }
+}
