@@ -1,7 +1,11 @@
-# Игнорировать временные файлы и загруженный PHP
+# Игнорировать временные файлы и портативный PHP
 /php
 /php.zip
 php_portable/
 *.zip
 *.log
 .DS_Store
+*.png
+.playwright-mcp/
+ux-mcp-server/
+wp-content/Qwen_*
