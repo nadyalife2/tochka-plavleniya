@@ -10,6 +10,11 @@
       "args": ["D:/сайт для пайки/ux-mcp-server/dist/index.js"],
       "description": "28 UX knowledge resources, 23 analysis tools, Nielsen heuristics, and WCAG accessibility standards"
     },
+    "uimax": {
+      "command": "npx",
+      "args": ["-y", "@uimax/mcp-server"],
+      "description": "UIMax MCP — полный frontend-ревьюер кода. Превращает агента в frontend-эксперта, который читает твой код, сам находит проблемы и предлагает конкретные CSS-правки."
+    },
     "mcp-stack-inspire": {
       "command": "node",
       "args": ["C:/mcp_servers/MCP-Stack-for-UI-UX-Designers/inspire-mcp/build/index.js"],
