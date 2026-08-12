@@ -12,7 +12,7 @@ if (!function_exists('e')) {
 if (!function_exists('render_tag')) {
     function render_tag($tag_key, $tag_name, $active_tag = '') {
         $is_active = ($active_tag === $tag_key || ($active_tag === '' && $tag_key === 'all')) ? 'active' : '';
-        $href = $tag_key === 'all' ? '/' : "/tag/{$tag_key}/";
+        $href = $tag_key === 'all' ? '/' : "/?tag={$tag_key}";
         echo "<a href='{$href}' class='pill {$is_active}' data-filter='{$tag_key}'>{$tag_name}</a>";
     }
 }
@@ -37,31 +37,37 @@ if (!function_exists('paginate')) {
 
 if (!function_exists('render_pagination')) {
     /**
-     * Отрисовка бруталистской пагинации
+     * Отрисовка пагинации с сохранением всех GET-параметров (tag, s)
      */
     function render_pagination(array $paginated, string $base_url = '/'): string {
         if ($paginated['total_pages'] <= 1) return '';
+        
+        // Preserve active query params (tag, s)
+        $queryParams = $_GET;
         
         $html = '<nav class="pagination">';
         
         // Prev button
         if ($paginated['current'] > 1) {
             $prev = $paginated['current'] - 1;
-            $sep = (strpos($base_url, '?') !== false) ? '&' : '?';
-            $html .= "<a href=\"{$base_url}{$sep}page={$prev}\" class=\"page-btn nav-btn\">← Назад</a>";
+            $queryParams['page'] = $prev;
+            $link = $base_url . '?' . http_build_query($queryParams);
+            $html .= "<a href=\"" . e($link) . "\" class=\"page-btn nav-btn\">← Назад</a>";
         }
         
         for ($i = 1; $i <= $paginated['total_pages']; $i++) {
             $active = ($i === $paginated['current']) ? ' active' : '';
-            $sep = (strpos($base_url, '?') !== false) ? '&' : '?';
-            $html .= "<a href=\"{$base_url}{$sep}page={$i}\" class=\"page-btn{$active}\">{$i}</a>";
+            $queryParams['page'] = $i;
+            $link = $base_url . '?' . http_build_query($queryParams);
+            $html .= "<a href=\"" . e($link) . "\" class=\"page-btn{$active}\">{$i}</a>";
         }
         
         // Next button
         if ($paginated['current'] < $paginated['total_pages']) {
             $next = $paginated['current'] + 1;
-            $sep = (strpos($base_url, '?') !== false) ? '&' : '?';
-            $html .= "<a href=\"{$base_url}{$sep}page={$next}\" class=\"page-btn nav-btn\">Вперёд →</a>";
+            $queryParams['page'] = $next;
+            $link = $base_url . '?' . http_build_query($queryParams);
+            $html .= "<a href=\"" . e($link) . "\" class=\"page-btn nav-btn\">Вперед →</a>";
         }
         
         $html .= '</nav>';

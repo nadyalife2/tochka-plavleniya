@@ -90,6 +90,40 @@
     --shadow-color: #1E1E24;
 }
 
+/* 5. BLUEPRINT MINIMAL (Clean White Paper & Outline Accent) */
+[data-theme="blueprint"] {
+    --bg: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --text-main: #111827;
+    --text-muted: #4B5563;
+    --text-dim: #9CA3AF;
+
+    --accent-orange: #FC6C2B;
+    --accent-yellow: #F59E0B;
+    --accent-green: #10B981;
+    --accent-peach: #EC4899;
+    --accent-blue: #3B82F6;
+    --accent-red: #EF4444;
+
+    --border: #111827;
+    --shadow-color: #111827;
+}
+
+/* Blueprint mode card overrides: white/transparent background with colored borders */
+[data-theme="blueprint"] .card-featured,
+[data-theme="blueprint"] .card-secondary,
+[data-theme="blueprint"] .card-tertiary {
+    background-color: #FFFFFF !important;
+    border-width: 2px !important;
+    border-style: solid !important;
+}
+
+[data-theme="blueprint"] .card-featured { border-color: var(--accent-green) !important; }
+[data-theme="blueprint"] .card-secondary { border-color: var(--accent-blue) !important; }
+[data-theme="blueprint"] .card-tertiary:nth-child(1) { border-color: var(--accent-orange) !important; }
+[data-theme="blueprint"] .card-tertiary:nth-child(2) { border-color: var(--accent-yellow) !important; }
+
+
 /* ==========================================================================
    BASE & RESET
    ========================================================================== */

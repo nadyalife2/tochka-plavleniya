@@ -105,6 +105,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e) e.stopPropagation();
         if (searchContainer) {
             searchContainer.classList.remove('active');
+            if (headerSearchInput) {
+                headerSearchInput.value = '';
+            }
+            if (articlesGrid) {
+                filterHomeGrid('');
+            }
         }
     }
 
