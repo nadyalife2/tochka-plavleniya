@@ -19,17 +19,16 @@
                 <!-- Custom PCB Command Search Console -->
                 <div class="header-search-container" id="header-search-container">
                     <button type="button" class="search-trigger-btn" id="search-expand-btn" title="Поиск по сайту (Ctrl+K)" aria-label="Поиск по сайту">
-                        <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="10" cy="10" r="6.5" stroke-width="2" />
-                            <line x1="10" y1="5.5" x2="10" y2="7.5" stroke-width="1.5" stroke="var(--accent-orange)" />
-                            <line x1="10" y1="12.5" x2="10" y2="14.5" stroke-width="1.5" stroke="var(--accent-orange)" />
-                            <line x1="5.5" y1="10" x2="7.5" y2="10" stroke-width="1.5" stroke="var(--accent-orange)" />
-                            <line x1="12.5" y1="10" x2="14.5" y2="10" stroke-width="1.5" stroke="var(--accent-orange)" />
-                            <path d="M14.5 14.5 L20.5 20.5" stroke-width="2.8" />
-                            <circle cx="18" cy="18" r="1" fill="var(--accent-orange)" stroke="none" />
+                        <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="10" cy="10" r="6" stroke-width="2" />
+                            <line x1="14.2" y1="14.2" x2="20" y2="20" stroke-width="2.6" />
+                            <!-- Перекрестие, выходящее за рамку линзы -->
+                            <line x1="10" y1="1.5" x2="10" y2="5.5" stroke-width="1.3" stroke="var(--accent-orange)" />
+                            <line x1="10" y1="14.5" x2="10" y2="18.5" stroke-width="1.3" stroke="var(--accent-orange)" />
+                            <line x1="1.5" y1="10" x2="5.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
+                            <line x1="14.5" y1="10" x2="18.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
+                            <circle cx="10" cy="10" r="1.2" fill="var(--accent-orange)" stroke="none" />
                         </svg>
-                        <span class="search-btn-label">Поиск</span>
-                        <kbd class="search-btn-kbd">⌘K</kbd>
                     </button>
                     
                     <div class="search-console-popover" id="search-console-popover">

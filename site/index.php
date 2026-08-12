@@ -16,7 +16,7 @@ include __DIR__ . '/includes/header.php';
     <div>
         <h1>Паяем.<br><span>Проектируем.</span><br>Прошиваем.</h1>
         <p>Блог и лаборатория о том, как превратить кучу компонентов в работающее устройство. Без воды, с интерактивными калькуляторами и справочниками.</p>
-        <a href="/interactive.php" class="btn-primary">Перейти к инструментам ⚡</a>
+        <a href="/interactive.php" class="btn-dark">Перейти к инструментам</a>
     </div>
     <div class="hero-img">
         <svg viewBox="0 0 320 220" width="100%" height="100%" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round">

@@ -97,6 +97,41 @@ h3{font-size:var(--step-2);line-height:1.35;font-weight:600}
   font-size:.6rem;color:white;font-weight:700}
 .hero__avatars span:first-child{margin-left:0}
 
+.hero__right {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.hero__illustration {
+  width: 100%;
+  max-width: 420px;
+  background: var(--bg-muted);
+  border-radius: var(--radius-l);
+  padding: var(--space-m);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-card);
+}
+@media (prefers-color-scheme: dark) {
+  .hero__illustration {
+    background: var(--bg-muted);
+    border-color: var(--border);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+    scroll-behavior: auto !important;
+  }
+}
+.btn:focus-visible, .pill:focus-visible, .card__btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
 /* BUTTONS */
 .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.65rem 1.4rem;
   border-radius:var(--radius-pill);font-size:.9rem;font-weight:600;cursor:pointer;
@@ -276,8 +311,9 @@ h3{font-size:var(--step-2);line-height:1.35;font-weight:600}
           <span>+2 500 мейкеров уже читают</span>
         </div>
       </div>
-      <div aria-hidden="true">
-        <svg viewBox="0 0 400 340" fill="none" style="width:100%;max-height:380px">
+      <div class="hero__right" aria-hidden="true">
+        <div class="hero__illustration">
+          <svg viewBox="0 0 400 340" fill="none" style="width:100%;max-height:380px">
           <!-- Плата -->
           <rect x="40" y="80" width="300" height="200" rx="8" stroke="#fc6c2b" stroke-width="1.5" stroke-dasharray="4 3"/>
           <!-- Дорожки -->
@@ -333,6 +369,7 @@ h3{font-size:var(--step-2);line-height:1.35;font-weight:600}
           <rect x="80" y="240" width="40" height="16" rx="2" stroke="#6b6560" stroke-width="1" fill="none"/>
           <text x="100" y="251" font-family="IBM Plex Mono,monospace" font-size="6" fill="#6b6560" text-anchor="middle">CAP</text>
         </svg>
+        </div>
       </div>
     </div>
   </div>
@@ -454,6 +491,7 @@ h3{font-size:var(--step-2);line-height:1.35;font-weight:600}
           </ul>
         </div>
         <!-- Превью TL;DR -->
+        <!-- ACF Field: callout_type (values: tldr, important, tip, danger) -->
         <div class="tldr">
           <p class="tldr__label">TL;DR — суть за 30 секунд</p>
           <ul>

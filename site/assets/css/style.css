@@ -153,30 +153,25 @@ body {
 .search-trigger-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.45rem 0.9rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: 10px;
-    background: var(--bg-card);
+    justify-content: center;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
     color: var(--text-main);
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    font-weight: 700;
     cursor: pointer;
-    box-shadow: 3px 3px 0px var(--shadow-color);
-    transition: all 0.2s ease;
-    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
 }
 
 .search-trigger-btn:hover {
-    transform: translate(-1px, -1px);
-    box-shadow: 4px 4px 0px var(--accent-orange);
+    background: rgba(252, 108, 43, 0.1);
     color: var(--accent-orange);
-    background: var(--bg);
+    transform: scale(1.12);
 }
 
 .search-trigger-btn:hover .soldering-loupe-icon {
-    transform: scale(1.1) rotate(5deg);
+    transform: rotate(15deg);
 }
 
 .search-btn-kbd {
@@ -461,23 +456,27 @@ body {
     border-radius: 50%; 
     z-index: -1; 
     border: var(--border-width) solid var(--border);
+    box-shadow: 6px 6px 0px var(--shadow-color);
 }
 .hero h1 { 
     font-family: var(--font-serif); 
     font-size: clamp(2.5rem, 5vw, 4.5rem); 
     font-weight: 800; 
-    line-height: 1.0; 
+    line-height: 1.3; 
     margin-bottom: 1.5rem; 
     letter-spacing: -0.03em;
 }
 .hero h1 span { 
+    display: inline-block;
     color: var(--text-main); 
     font-style: italic; 
     background: var(--accent-orange);
     color: #FFFFFF;
-    padding: 0 10px;
+    padding: 4px 12px 14px;
     border-radius: 6px;
     border: var(--border-width) solid var(--border);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    line-height: 1;
 }
 .hero p {
     font-size: 1.1rem;
@@ -530,6 +529,34 @@ body {
     box-shadow: 0px 0px 0px var(--shadow-color);
 }
 .btn-primary.small { padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+
+.btn-dark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.6rem;
+    background: var(--text-main);
+    color: var(--bg);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: var(--border-width) solid var(--border);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+.btn-dark:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--accent-orange);
+    background: var(--text-main);
+    color: var(--bg);
+}
+.btn-dark:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px var(--shadow-color);
+}
 
 .filters-wrapper { 
     margin: 3rem 0 2rem; 
