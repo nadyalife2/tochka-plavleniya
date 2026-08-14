@@ -8,6 +8,60 @@
    COLOR THEMES (4 VARIANTS)
    ========================================================================== */
 
+/* 0. EDITORIAL MINIMAL (Premium Journal Style - VC.ru / Habr) */
+[data-theme="minimal"] {
+    --bg: #f7f9fa;
+    --bg-card: #ffffff;
+    --text-main: #292520;
+    --text-muted: #655544;
+    --text-dim: #aca89e;
+
+    --accent-orange: #dd8b48; /* Burnt terracotta */
+    --accent-yellow: #dfd7c6; /* Warm concrete */
+    --accent-green: #395437;  /* Luxurious deep forest sage */
+    --accent-peach: #fcfbf9;
+    --accent-blue: #eef2f6;
+    --accent-red: #c2410c;
+
+    --border: #dfd7c6;
+    --border-width: 1px;
+    --shadow-color: rgba(223, 215, 198, 0.25);
+    --radius-card: 12px;
+    --radius-btn: 8px;
+    
+    --font-heading: 'Inter', system-ui, sans-serif;
+    --font-serif: 'Inter', system-ui, sans-serif;
+}
+
+body[data-theme="minimal"] {
+    background-image: none !important;
+    background-color: #F5F6F8 !important;
+}
+
+[data-theme="minimal"] .card {
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 12px !important;
+}
+[data-theme="minimal"] .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    border-color: #CBD5E1 !important;
+}
+[data-theme="minimal"] .header {
+    border: 1px solid #dfd7c6 !important;
+    box-shadow: 0 2px 8px rgba(223, 215, 198, 0.15) !important;
+    border-radius: 12px !important;
+}
+[data-theme="minimal"] .card-img {
+    border: 1px solid #dfd7c6 !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    background: #fdfdfc !important;
+    height: 140px !important;
+    margin: 10px 0 !important;
+}
+
 /* 1. CRAFT (Default: Warm Muted Craft Paper) */
 :root, [data-theme="craft"] {
     --bg: #F6F4EE;
@@ -1060,6 +1114,87 @@ body {
 @media (max-width: 480px) {
     .footer-grid { grid-template-columns: 1fr; }
     .card { box-shadow: 2px 2px 0px var(--shadow-color); }
+}
+
+/* Card Author Header Row */
+.card-author-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.author-avatar-small {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent-orange);
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+}
+.author-name-small {
+    font-weight: 600;
+    color: var(--text-main);
+}
+.card-date-small {
+    color: var(--text-dim);
+    margin-left: auto;
+}
+
+/* Card Metrics Footer */
+.card-footer-metrics {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+.metric-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+}
+.vote-up, .vote-down {
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: color 0.2s;
+}
+.vote-up:hover { color: var(--accent-green); }
+.vote-down:hover { color: var(--accent-red); }
+.rating-value {
+    font-weight: 700;
+    color: var(--text-main);
+}
+.metric-comments {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.metric-comments:hover {
+    color: var(--accent-orange);
+}
+.metric-views {
+    color: var(--text-dim);
+}
+.bookmark-btn {
+    margin-left: auto;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.bookmark-btn:hover {
+    color: var(--accent-orange);
 }
 
 

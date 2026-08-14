@@ -45,6 +45,9 @@ include __DIR__ . '/includes/header.php';
     <?php foreach ($paginated['items'] as $index => $article): ?>
         <?php 
         $article_url = "/article.php?slug=" . urlencode($article['slug']); 
+        $rating = (($article['id'] * 7) % 35) + 12;
+        $comments = (($article['id'] * 3) % 8) + 2;
+        $views = (($article['id'] * 243) % 900) + 150;
         ?>
         <?php if ($index === 0 && $paginated['current'] === 1): ?>
             <!-- Featured Card span 7 -->
@@ -53,22 +56,50 @@ include __DIR__ . '/includes/header.php';
                     <?= get_card_icon($article['icon'] ?? 'chip') ?>
                 </div>
                 <div>
-                    <span class="tag">Выбор редакции</span>
+                    <div class="card-author-row">
+                        <span class="author-avatar-small"><?= get_avatar_char($article['author']) ?></span>
+                        <span class="author-name-small"><?= e($article['author']) ?></span>
+                        <span class="card-date-small"><?= e($article['date']) ?></span>
+                    </div>
+                    <span class="tag">Выбор редакции · <?= e($article['tag']) ?></span>
                     <h3><a href="<?= $article_url ?>" class="card-link"><?= e($article['title']) ?></a></h3>
                     <p><?= e($article['excerpt']) ?></p>
-                    <span class="read-more">Читать статью →</span>
+                    <div class="card-footer-metrics">
+                        <div class="metric-rating">
+                            <span class="vote-up">▲</span>
+                            <span class="rating-value">+<?= $rating ?></span>
+                            <span class="vote-down">▼</span>
+                        </div>
+                        <div class="metric-comments">💬 <?= $comments ?></div>
+                        <div class="metric-views">👁️ <?= $views ?></div>
+                        <span class="bookmark-btn">🔖</span>
+                    </div>
                 </div>
             </article>
         <?php else: ?>
             <!-- Regular Card span 5 or half -->
             <article class="card <?= ($index === 1 && $paginated['current'] === 1) ? '' : 'card-half' ?>" data-tag="<?= e($article['tag_key']) ?>">
+                <div class="card-author-row">
+                    <span class="author-avatar-small"><?= get_avatar_char($article['author']) ?></span>
+                    <span class="author-name-small"><?= e($article['author']) ?></span>
+                    <span class="card-date-small"><?= e($article['date']) ?></span>
+                </div>
                 <div class="card-img">
                     <?= get_card_icon($article['icon'] ?? 'tools') ?>
                 </div>
                 <span class="tag"><?= e($article['tag']) ?></span>
                 <h3><a href="<?= $article_url ?>" class="card-link"><?= e($article['title']) ?></a></h3>
                 <p><?= e($article['excerpt']) ?></p>
-                <span class="read-more">Читать статью →</span>
+                <div class="card-footer-metrics">
+                    <div class="metric-rating">
+                        <span class="vote-up">▲</span>
+                        <span class="rating-value">+<?= $rating ?></span>
+                        <span class="vote-down">▼</span>
+                    </div>
+                    <div class="metric-comments">💬 <?= $comments ?></div>
+                    <div class="metric-views">👁️ <?= $views ?></div>
+                    <span class="bookmark-btn">🔖</span>
+                </div>
             </article>
         <?php endif; ?>
     <?php endforeach; ?>

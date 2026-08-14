@@ -87,3 +87,16 @@ if (!function_exists('get_card_icon')) {
         return $icons[$icon] ?? $icons['chip'];
     }
 }
+
+if (!function_exists('get_avatar_char')) {
+    function get_avatar_char(string $name): string {
+        if (empty($name)) return '👤';
+        if (function_exists('mb_substr')) {
+            return mb_substr($name, 0, 1);
+        }
+        if (preg_match('/./u', $name, $match)) {
+            return $match[0];
+        }
+        return substr($name, 0, 1);
+    }
+}

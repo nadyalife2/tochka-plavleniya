@@ -198,13 +198,15 @@
     margin-bottom: 0.6rem;
 }
 
-/* CALLOUT BLOCKS & TL;DR */
+/* CALLOUT BLOCKS & TL;DR (Hand-Drawn Pencil / Felt Pen Note Effect) */
 .callout {
-    padding: 1.25rem 1.5rem;
-    border: var(--border-width) solid var(--border);
-    border-radius: 12px;
+    padding: 1.5rem 1.75rem;
     margin: 1.75rem 0;
-    box-shadow: 4px 4px 0px var(--shadow-color);
+    position: relative;
+    border: none !important;
+    background-size: 100% 100% !important;
+    background-repeat: no-repeat !important;
+    box-shadow: none !important;
 }
 .callout-title {
     font-family: var(--font-mono);
@@ -212,33 +214,47 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: 0.5rem;
-    display: flex;
+    margin-bottom: 0.6rem;
+    display: inline-flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 3px 10px;
+    background: linear-gradient(100deg, rgba(253, 224, 71, 0.85) 0%, rgba(250, 204, 21, 0.6) 100%);
+    border-radius: 3px 8px 4px 6px;
+    color: #1E293B;
+    transform: rotate(-0.5deg);
+    box-shadow: 0 1px 4px rgba(234, 179, 8, 0.2);
 }
 .callout.tldr {
-    background: var(--bg);
-    border-left: 6px solid var(--accent-orange);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M3,5 C35,2 65,3 97,4 C98,35 96,65 97,95 C65,98 35,96 5,97 C3,65 2,35 3,5' fill='%23FEFCE8' stroke='%23EAB308' stroke-width='1.5' stroke-linecap='round' fill-opacity='0.95'/><path d='M5,7 C38,4 62,5 95,6 C96,38 95,62 95,93 C62,95 38,94 7,95 C5,62 4,38 5,7' fill='none' stroke='%23FACC15' stroke-width='1' stroke-linecap='round' opacity='0.7'/></svg>") !important;
 }
 .callout.tldr .callout-title::before {
     content: '⚡';
 }
 .callout.important {
-    background: var(--accent-yellow);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M3,5 C35,2 65,3 97,4 C98,35 96,65 97,95 C65,98 35,96 5,97 C3,65 2,35 3,5' fill='%23FFFBEB' stroke='%23F59E0B' stroke-width='1.5' stroke-linecap='round' fill-opacity='0.95'/><path d='M5,7 C38,4 62,5 95,6 C96,38 95,62 95,93 C62,95 38,94 7,95 C5,62 4,38 5,7' fill='none' stroke='%23FBBF24' stroke-width='1' stroke-linecap='round' opacity='0.7'/></svg>") !important;
+}
+.callout.important .callout-title {
+    background: linear-gradient(100deg, rgba(251, 191, 36, 0.85) 0%, rgba(245, 158, 11, 0.6) 100%);
 }
 .callout.important .callout-title::before {
     content: '⚠️';
 }
 .callout.tip {
-    background: var(--accent-blue);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M3,5 C35,2 65,3 97,4 C98,35 96,65 97,95 C65,98 35,96 5,97 C3,65 2,35 3,5' fill='%23F0FDF4' stroke='%23047857' stroke-width='1.5' stroke-linecap='round' fill-opacity='0.95'/><path d='M5,7 C38,4 62,5 95,6 C96,38 95,62 95,93 C62,95 38,94 7,95 C5,62 4,38 5,7' fill='none' stroke='%2334D399' stroke-width='1' stroke-linecap='round' opacity='0.7'/></svg>") !important;
+}
+.callout.tip .callout-title {
+    background: linear-gradient(100deg, rgba(167, 243, 208, 0.85) 0%, rgba(52, 211, 153, 0.6) 100%);
 }
 .callout.tip .callout-title::before {
     content: '💡';
 }
 .callout.danger {
-    background: var(--accent-peach);
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'><path d='M3,5 C35,2 65,3 97,4 C98,35 96,65 97,95 C65,98 35,96 5,97 C3,65 2,35 3,5' fill='%23FEF2F2' stroke='%23EF4444' stroke-width='1.5' stroke-linecap='round' fill-opacity='0.95'/><path d='M5,7 C38,4 62,5 95,6 C96,38 95,62 95,93 C62,95 38,94 7,95 C5,62 4,38 5,7' fill='none' stroke='%23F87171' stroke-width='1' stroke-linecap='round' opacity='0.7'/></svg>") !important;
     color: var(--text-main);
+}
+.callout.danger .callout-title {
+    background: linear-gradient(100deg, rgba(254, 202, 202, 0.85) 0%, rgba(248, 113, 113, 0.6) 100%);
 }
 .callout.danger .callout-title::before {
     content: '🔥';

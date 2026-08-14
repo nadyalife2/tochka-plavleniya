@@ -54,8 +54,9 @@
 
                 <!-- Theme Switcher Selector -->
                 <select id="theme-select" class="theme-select" title="Выбор цветового режима" aria-label="Выбор цветового режима">
+                    <option value="minimal">⚪ Минимал (VC.ru / Habr)</option>
                     <option value="craft">📜 Крафт</option>
-                    <option value="blueprint">📐 Чертёж (Белый / Минимал)</option>
+                    <option value="blueprint">📐 Чертёж (Белый / Сетка)</option>
                     <option value="dark">🌙 Тёмная</option>
                     <option value="pcb">🌲 Текстолит</option>
                     <option value="pastel">🎨 Пастель</option>
