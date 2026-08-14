@@ -1,321 +1,1844 @@
-<!DOCTYPE html>
-<html lang="ru" data-theme="minimal">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Точка Плавления — Журнал и верстак инженера — Точка Плавления // ТЧП</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/style.css">
-    </head>
-<body>
-    <div class="container">
-        <header class="header">
-            <a href="/" class="logo">Точка<span>.</span>Плавления</a>
-            
-            <div class="header-right">
-                <!-- Custom PCB Command Search Console -->
-                <div class="header-search-container" id="header-search-container">
-                    <button type="button" class="search-trigger-btn" id="search-expand-btn" title="Поиск по сайту (Ctrl+K)" aria-label="Поиск по сайту">
-                        <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="10" cy="10" r="6" stroke-width="2" />
-                            <line x1="14.2" y1="14.2" x2="20" y2="20" stroke-width="2.6" />
-                            <!-- Перекрестие, выходящее за рамку линзы -->
-                            <line x1="10" y1="1.5" x2="10" y2="5.5" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <line x1="10" y1="14.5" x2="10" y2="18.5" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <line x1="1.5" y1="10" x2="5.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <line x1="14.5" y1="10" x2="18.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <circle cx="10" cy="10" r="1.2" fill="var(--accent-orange)" stroke="none" />
-                        </svg>
-                    </button>
-                    
-                    <div class="search-console-popover" id="search-console-popover">
-                        <div class="search-console-header">
-                            <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent-orange)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="10" cy="10" r="6.5" />
-                                <path d="M14.5 14.5 L20.5 20.5" stroke-width="2.8" />
-                            </svg>
-                            <input type="text" id="header-search-input" class="header-search-input" placeholder="Поиск по статьям (ESP32, BGA, флюс...)" autocomplete="off" aria-label="Поиск по сайту">
-                            <button type="button" class="search-close-x" id="search-close-x" title="Свернуть (ESC)" aria-label="Свернуть поиск">✕</button>
-                        </div>
-                        <div class="search-dropdown-results" id="header-search-results">
-                            <!-- Instant search results will render here -->
-                        </div>
-                    </div>
-                </div>
-
-                <nav class="nav">
-                    <a href="/">Статьи</a>
-                    <a href="/interactive.php">Инструменты</a>
-                    <a href="/cookies.php">Cookies</a>
-                </nav>
-
-                <!-- Theme Switcher Selector -->
-                <select id="theme-select" class="theme-select" title="Выбор цветового режима" aria-label="Выбор цветового режима">
-                    <option value="minimal">⚪ Минимал (VC.ru / Habr)</option>
-                    <option value="craft">📜 Крафт</option>
-                    <option value="blueprint">📐 Чертёж (Белый / Сетка)</option>
-                    <option value="dark">🌙 Тёмная</option>
-                    <option value="pcb">🌲 Текстолит</option>
-                    <option value="pastel">🎨 Пастель</option>
-                </select>
-
-                <!-- Mobile Burger Toggle Button -->
-                <button type="button" class="burger-btn" id="burger-trigger" aria-label="Открыть мобильное меню">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Mobile Drawer Navigation -->
-        <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true">
-            <div class="drawer-content">
-                <div class="drawer-header">
-                    <a href="/" class="logo" style="font-size: 1.3rem;">Точка<span>.</span>Плавления</a>
-                    <button type="button" class="drawer-close" id="drawer-close" aria-label="Закрыть меню">✕</button>
-                </div>
-                <nav class="drawer-nav">
-                    <a href="/">⚡ Статьи</a>
-                    <a href="/interactive.php">🧮 Инструменты</a>
-                    <a href="/cookies.php">📜 Cookies</a>
-                    <a href="/privacy.php">🔒 Privacy</a>
-                </nav>
-            </div>
-        </div>
-
-
-<section class="hero">
-    <div>
-        <h1>Паяем.<br><span>Проектируем.</span><br>Прошиваем.</h1>
-        <p>Блог и лаборатория о том, как превратить кучу компонентов в работающее устройство. Без воды, с интерактивными калькуляторами и справочниками.</p>
-        <a href="/interactive.php" class="btn-dark">Перейти к инструментам</a>
-    </div>
-    <div class="hero-img">
-        <svg viewBox="0 0 320 220" width="100%" height="100%" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round">
-            <rect x="20" y="20" width="280" height="180" rx="12" fill="#FFFFFF"/>
-            <polyline points="40,60 90,60 90,110 140,110" stroke="#1A1A1A" stroke-width="3"/>
-            <polyline points="190,60 190,90 160,90" stroke="#1A1A1A" stroke-width="3"/>
-            <rect x="90" y="75" width="80" height="70" rx="8" fill="#FFD447" stroke="#1A1A1A" stroke-width="3"/>
-            <text x="106" y="117" font-family="JetBrains Mono" font-size="14" font-weight="800" fill="#1A1A1A">IC-ТЧП</text>
-            <circle cx="40" cy="60" r="5" fill="#C8F0C0" stroke="#1A1A1A" stroke-width="2"/>
-            <circle cx="190" cy="60" r="5" fill="#FFB8A8" stroke="#1A1A1A" stroke-width="2"/>
-        </svg>
-    </div>
-</section>
-
-<div class="filters" id="article-filters">
-    <a href='/' class='pill active' data-filter='all'>Все статьи</a><a href='/?tag=basics' class='pill ' data-filter='basics'>Основы</a><a href='/?tag=smd' class='pill ' data-filter='smd'>SMD</a><a href='/?tag=tools' class='pill ' data-filter='tools'>Инструменты</a><a href='/?tag=materials' class='pill ' data-filter='materials'>Материалы</a></div>
-
-<div class="grid" id="articles-grid">
-                                <!-- Featured Card span 7 -->
-            <article class="card featured" data-tag="basics">
-                <div class="card-img">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v14M12 16a4 4 0 1 1-4 4h8a4 4 0 0 1-4-4z"/></svg>                </div>
-                <div>
-                    <div class="card-author-row">
-                        <span class="author-avatar-small">И</span>
-                        <span class="author-name-small">Иван Пайкин</span>
-                        <span class="card-date-small">10 авг 2026</span>
-                    </div>
-                    <span class="tag">Выбор редакции · Основы</span>
-                    <h3><a href="/article.php?slug=temperaturnye-profili" class="card-link">Температурные профили: как не перегреть плату за $300</a></h3>
-                    <p>Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат.</p>
-                    <div class="card-footer-metrics">
-                        <div class="metric-rating">
-                            <span class="vote-up">▲</span>
-                            <span class="rating-value">+19</span>
-                            <span class="vote-down">▼</span>
-                        </div>
-                        <div class="metric-comments">💬 5</div>
-                        <div class="metric-views">👁️ 393</div>
-                        <span class="bookmark-btn">🔖</span>
-                    </div>
-                </div>
-            </article>
-                                        <!-- Regular Card span 5 or half -->
-            <article class="card " data-tag="smd">
-                <div class="card-author-row">
-                    <span class="author-avatar-small">М</span>
-                    <span class="author-name-small">Мария Канифоль</span>
-                    <span class="card-date-small">05 авг 2026</span>
-                </div>
-                <div class="card-img">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>                </div>
-                <span class="tag">SMD</span>
-                <h3><a href="/article.php?slug=smd-0402-vs-0603" class="card-link">SMD 0402 vs 0603: что выбрать для прототипа</a></h3>
-                <p>Плотность монтажа против ремонтопригодности — вечный спор инженера при разводке печатных плат.</p>
-                <div class="card-footer-metrics">
-                    <div class="metric-rating">
-                        <span class="vote-up">▲</span>
-                        <span class="rating-value">+26</span>
-                        <span class="vote-down">▼</span>
-                    </div>
-                    <div class="metric-comments">💬 8</div>
-                    <div class="metric-views">👁️ 636</div>
-                    <span class="bookmark-btn">🔖</span>
-                </div>
-            </article>
-                                        <!-- Regular Card span 5 or half -->
-            <article class="card card-half" data-tag="materials">
-                <div class="card-author-row">
-                    <span class="author-avatar-small">И</span>
-                    <span class="author-name-small">Иван Пайкин</span>
-                    <span class="card-date-small">01 авг 2026</span>
-                </div>
-                <div class="card-img">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C12 2 5 9.5 5 14a7 7 0 0 0 14 0c0-4.5-7-12-7-12z"/></svg>                </div>
-                <span class="tag">Материалы</span>
-                <h3><a href="/article.php?slug=gid-po-flyusam" class="card-link">Гид по флюсам: RMA, NC и no-clean в шприце</a></h3>
-                <p>Какой флюс оставить, а какой обязательно смыть — и чем это грозит схеме через 6 месяцев эксплуатации.</p>
-                <div class="card-footer-metrics">
-                    <div class="metric-rating">
-                        <span class="vote-up">▲</span>
-                        <span class="rating-value">+33</span>
-                        <span class="vote-down">▼</span>
-                    </div>
-                    <div class="metric-comments">💬 3</div>
-                    <div class="metric-views">👁️ 879</div>
-                    <span class="bookmark-btn">🔖</span>
-                </div>
-            </article>
-                                        <!-- Regular Card span 5 or half -->
-            <article class="card card-half" data-tag="tools">
-                <div class="card-author-row">
-                    <span class="author-avatar-small">М</span>
-                    <span class="author-name-small">Мария Канифоль</span>
-                    <span class="card-date-small">28 июл 2026</span>
-                </div>
-                <div class="card-img">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>                </div>
-                <span class="tag">Инструменты</span>
-                <h3><a href="/article.php?slug=zhala-payalnika" class="card-link">Жала паяльника: T12 против JBC C245 на верстаке</a></h3>
-                <p>Сравниваем скорость нагрева, реальный ресурс монолитных картриджей и стоит ли переплачивать за оригинал.</p>
-                <div class="card-footer-metrics">
-                    <div class="metric-rating">
-                        <span class="vote-up">▲</span>
-                        <span class="rating-value">+40</span>
-                        <span class="vote-down">▼</span>
-                    </div>
-                    <div class="metric-comments">💬 6</div>
-                    <div class="metric-views">👁️ 222</div>
-                    <span class="bookmark-btn">🔖</span>
-                </div>
-            </article>
-                                        <!-- Regular Card span 5 or half -->
-            <article class="card card-half" data-tag="smd">
-                <div class="card-author-row">
-                    <span class="author-avatar-small">И</span>
-                    <span class="author-name-small">Иван Пайкин</span>
-                    <span class="card-date-small">20 июл 2026</span>
-                </div>
-                <div class="card-img">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>                </div>
-                <span class="tag">SMD</span>
-                <h3><a href="/article.php?slug=bga-rebolling" class="card-link">BGA-реболлинг в домашних условиях на фене</a></h3>
-                <p>Пошаговая инструкция по замене и накатке шаров на чипах под микроскопом без дорогой инфракрасной станции.</p>
-                <div class="card-footer-metrics">
-                    <div class="metric-rating">
-                        <span class="vote-up">▲</span>
-                        <span class="rating-value">+12</span>
-                        <span class="vote-down">▼</span>
-                    </div>
-                    <div class="metric-comments">💬 9</div>
-                    <div class="metric-views">👁️ 465</div>
-                    <span class="bookmark-btn">🔖</span>
-                </div>
-            </article>
-                                        <!-- Regular Card span 5 or half -->
-            <article class="card card-half" data-tag="materials">
-                <div class="card-author-row">
-                    <span class="author-avatar-small">М</span>
-                    <span class="author-name-small">Мария Канифоль</span>
-                    <span class="card-date-small">15 июл 2026</span>
-                </div>
-                <div class="card-img">
-                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C12 2 5 9.5 5 14a7 7 0 0 0 14 0c0-4.5-7-12-7-12z"/></svg>                </div>
-                <span class="tag">Материалы</span>
-                <h3><a href="/article.php?slug=splav-roze" class="card-link">Сплав Розе и Вуда: когда спасение, а когда костыль</a></h3>
-                <p>Сплавы с температурой плавления 94°C и 68°C. Как не оставить хрупкий сплав в рабочем контакте.</p>
-                <div class="card-footer-metrics">
-                    <div class="metric-rating">
-                        <span class="vote-up">▲</span>
-                        <span class="rating-value">+19</span>
-                        <span class="vote-down">▼</span>
-                    </div>
-                    <div class="metric-comments">💬 4</div>
-                    <div class="metric-views">👁️ 708</div>
-                    <span class="bookmark-btn">🔖</span>
-                </div>
-            </article>
-            </div>
-
-<!-- PAGINATION -->
-<nav class="pagination"><a href="/?theme=minimal&amp;page=1" class="page-btn active">1</a><a href="/?theme=minimal&amp;page=2" class="page-btn">2</a><a href="/?theme=minimal&amp;page=2" class="page-btn nav-btn">Вперед →</a></nav>
-        <footer class="footer">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <div class="footer-brand">Точка<span>.</span>Плавления</div>
-                    <p class="footer-desc">Независимый журнал и лаборатория о пайке, микроконтроллерах, ESP32 и AI в DIY-электронике. Проверено на реальном железе.</p>
-                </div>
-                <div class="footer-col">
-                    <div class="footer-title">Рубрики</div>
-                    <ul class="footer-list">
-                        <li><a href="/?tag=basics">Основы пайки</a></li>
-                        <li><a href="/?tag=smd">SMD и BGA монтаж</a></li>
-                        <li><a href="/?tag=tools">Инструменты & Жала</a></li>
-                        <li><a href="/?tag=materials">Флюсы & Припои</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <div class="footer-title">Инструменты</div>
-                    <ul class="footer-list">
-                        <li><a href="/interactive.php#calc">Калькулятор флюса</a></li>
-                        <li><a href="/interactive.php#divider">Делитель напряжения</a></li>
-                        <li><a href="/interactive.php#battery">Автономия ESP32</a></li>
-                    </ul>
-                </div>
-                <div class="footer-col">
-                    <div class="footer-title">Лицензия & Проект</div>
-                    <p class="footer-meta">Материалы доступны по лицензии <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>.</p>
-                    <div class="footer-links">
-                        <a href="/privacy.php">Конфиденциальность</a>
-                        <a href="/cookies.php">Cookies</a>
-                    </div>
-                    <button type="button" class="back-to-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Наверх ↑</button>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2026 ТЧП // Точка Плавления · Лаборатория практической электроники</p>
-            </div>
-        </footer>
-    </div> <!-- /.container -->
-
-    <!-- Global Search Modal -->
-    <div class="search-modal" id="search-modal" aria-hidden="true" role="dialog" aria-label="Поиск по статьям и калькуляторам">
-        <div class="search-modal-box">
-            <div class="search-modal-header">
-                <span style="font-size: 1.2rem;">🔍</span>
-                <input type="text" id="search-input" class="search-input" placeholder="Поиск статей, компонентов, кода..." autocomplete="off" autofocus>
-                <button type="button" class="search-close-btn" id="search-close-btn" aria-label="Закрыть поиск">ESC</button>
-            </div>
-            <div class="search-results" id="search-results">
-                <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.9rem;">
-                    Введите слово для поиска (например: <strong>пайка</strong>, <strong>ESP32</strong>, <strong>флюс</strong>)...
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script src="/assets/js/main.js"></script>
-        <div id="cookie-banner" class="cookie-banner" style="display: none;">
-    <div class="cookie-content">
-        <p>Мы используем куки, чтобы сайт работал быстро и без багов. <a href="/cookies/">Подробнее</a></p>
-        <button id="accept-cookies" class="btn-primary small">Принять</button>
-    </div>
-</div>
-</body>
-</html>
-
+<!DOCTYPE html>
+
+<html lang="ru" data-theme="minimal">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Точка Плавления — Журнал и верстак инженера — Точка Плавления // ТЧП</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300;600;800&display=swap" rel="stylesheet">
+
+    <style>
+/*
+ * style.css — Единая дизайн-система «Точка Плавления // ТЧП»
+ * Поддержка 4 цветовых режимов: Craft (default), Dark, PCB Emerald, Pastel
+ * Сбалансированный editorial-стиль («Технический Верстак»)
+ */
+
+/* ==========================================================================
+   COLOR THEMES (4 VARIANTS)
+   ========================================================================== */
+
+/* 0. EDITORIAL MINIMAL (Premium Journal Style - VC.ru / Habr) */
+[data-theme="minimal"] {
+    --bg: #f7f9fa;
+    --bg-card: #ffffff;
+    --text-main: #292520;
+    --text-muted: #655544;
+    --text-dim: #aca89e;
+
+    --accent-orange: #dd8b48; /* Burnt terracotta */
+    --accent-yellow: #dfd7c6; /* Warm concrete */
+    --accent-green: #395437;  /* Luxurious deep forest sage */
+    --accent-peach: #fcfbf9;
+    --accent-blue: #eef2f6;
+    --accent-red: #c2410c;
+
+    --border: #dfd7c6;
+    --border-width: 1px;
+    --shadow-color: rgba(223, 215, 198, 0.25);
+    --radius-card: 12px;
+    --radius-btn: 8px;
+    
+    --font-heading: 'Inter', system-ui, sans-serif;
+    --font-serif: 'Inter', system-ui, sans-serif;
+}
+
+body[data-theme="minimal"] {
+    background-image: none !important;
+    background-color: #F5F6F8 !important;
+}
+
+[data-theme="minimal"] .card {
+    border: 1px solid #E2E8F0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05) !important;
+    border-radius: 12px !important;
+}
+[data-theme="minimal"] .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    border-color: #CBD5E1 !important;
+}
+[data-theme="minimal"] .header {
+    border: 1px solid #dfd7c6 !important;
+    box-shadow: 0 2px 8px rgba(223, 215, 198, 0.15) !important;
+    border-radius: 12px !important;
+}
+[data-theme="minimal"] .card-img {
+    border: 1px solid #dfd7c6 !important;
+    box-shadow: none !important;
+    border-radius: 8px !important;
+    background: #fdfdfc !important;
+    height: 140px !important;
+    margin: 10px 0 !important;
+}
+
+/* 1. CRAFT (Default: Warm Muted Craft Paper) */
+:root, [data-theme="craft"] {
+    --bg: #F6F4EE;
+    --bg-card: #FFFFFF;
+    --text-main: #222222;
+    --text-muted: #5A5A5A;
+    --text-dim: #7A7A7A;
+
+    --accent-orange: #FC6C2B;
+    --accent-yellow: #E6C64D;
+    --accent-green: #B4D3B2;
+    --accent-peach: #EBA89B;
+    --accent-blue: #9BBBE3;
+    --accent-red: #E26D6D;
+
+    --border: #242424;
+    --border-width: 2px;
+    --shadow-color: #242424;
+
+    --font-heading: 'Hanken Grotesk', system-ui, sans-serif;
+    --font-serif: var(--font-heading);
+    --font-sans: 'Inter', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+}
+
+/* 2. DARK SOLDER (Sleek Dark Theme) */
+[data-theme="dark"] {
+    --bg: #0F131C;
+    --bg-card: #181E2A;
+    --text-main: #F0F4F8;
+    --text-muted: #94A3B8;
+    --text-dim: #64748B;
+
+    --accent-orange: #FC6C2B;
+    --accent-yellow: #E57C35;
+    --accent-green: #34D399;
+    --accent-peach: #F43F5E;
+    --accent-blue: #38BDF8;
+    --accent-red: #EF4444;
+
+    --border: #2D3748;
+    --shadow-color: #06080D;
+}
+
+/* 3. PCB EMERALD (Retro PCB Green Paper) */
+[data-theme="pcb"] {
+    --bg: #EAF2EC;
+    --bg-card: #FFFFFF;
+    --text-main: #142E1F;
+    --text-muted: #3D5A47;
+    --text-dim: #5E7E69;
+
+    --accent-orange: #E05A1F;
+    --accent-yellow: #D9A036;
+    --accent-green: #8ECDA0;
+    --accent-peach: #D97757;
+    --accent-blue: #84BDD6;
+    --accent-red: #C84B4B;
+
+    --border: #1B3B2B;
+    --shadow-color: #1B3B2B;
+}
+
+/* 4. PASTEL NEUBRUTALISM (Soft Muted Pastel) */
+[data-theme="pastel"] {
+    --bg: #F8F7F4;
+    --bg-card: #FFFFFF;
+    --text-main: #1E1E24;
+    --text-muted: #4B4B58;
+    --text-dim: #727284;
+
+    --accent-orange: #FC6C2B;
+    --accent-yellow: #E2C044;
+    --accent-green: #A3D9A5;
+    --accent-peach: #D8B4F8;
+    --accent-blue: #A3CEF1;
+    --accent-red: #F19C8C;
+
+    --border: #1E1E24;
+    --shadow-color: #1E1E24;
+}
+
+/* 5. BLUEPRINT MINIMAL (White Canvas with Distinct Colored Outlines) */
+[data-theme="blueprint"] {
+    --bg: #FFFFFF;
+    --bg-card: #FFFFFF;
+    --text-main: #0F172A;
+    --text-muted: #475569;
+    --text-dim: #94A3B8;
+
+    --accent-orange: #EA580C;
+    --accent-yellow: #D97706;
+    --accent-green: #059669;
+    --accent-peach: #DB2777;
+    --accent-blue: #2563EB;
+    --accent-red: #DC2626;
+
+    --border: #0F172A;
+    --shadow-color: #0F172A;
+}
+
+/* Blueprint mode overrides: Pure white surfaces with crisp colored outline highlights */
+[data-theme="blueprint"] body {
+    background-color: #FFFFFF;
+    background-image: radial-gradient(#CBD5E1 1.2px, transparent 1.2px);
+    background-size: 24px 24px;
+}
+
+[data-theme="blueprint"] .card,
+[data-theme="blueprint"] .card.featured {
+    background-color: #FFFFFF !important;
+    border-width: 2px !important;
+    border-style: solid !important;
+}
+
+/* Colored borders on cards */
+[data-theme="blueprint"] .card.featured { border-color: var(--accent-green) !important; box-shadow: 5px 5px 0px var(--accent-green) !important; }
+[data-theme="blueprint"] .card:nth-child(2) { border-color: var(--accent-blue) !important; box-shadow: 5px 5px 0px var(--accent-blue) !important; }
+[data-theme="blueprint"] .card:nth-child(3) { border-color: var(--accent-orange) !important; box-shadow: 5px 5px 0px var(--accent-orange) !important; }
+[data-theme="blueprint"] .card:nth-child(4) { border-color: var(--accent-yellow) !important; box-shadow: 5px 5px 0px var(--accent-yellow) !important; }
+[data-theme="blueprint"] .card:nth-child(5) { border-color: var(--accent-peach) !important; box-shadow: 5px 5px 0px var(--accent-peach) !important; }
+
+/* White card-img boxes with colored borders */
+[data-theme="blueprint"] .card-img {
+    background-color: #FFFFFF !important;
+    border-width: 2px !important;
+    border-style: solid !important;
+}
+[data-theme="blueprint"] .card.featured .card-img { border-color: var(--accent-green) !important; box-shadow: 3px 3px 0px var(--accent-green) !important; color: var(--accent-green) !important; }
+[data-theme="blueprint"] .card:nth-child(2) .card-img { border-color: var(--accent-blue) !important; box-shadow: 3px 3px 0px var(--accent-blue) !important; color: var(--accent-blue) !important; }
+[data-theme="blueprint"] .card:nth-child(3) .card-img { border-color: var(--accent-orange) !important; box-shadow: 3px 3px 0px var(--accent-orange) !important; color: var(--accent-orange) !important; }
+[data-theme="blueprint"] .card:nth-child(4) .card-img { border-color: var(--accent-yellow) !important; box-shadow: 3px 3px 0px var(--accent-yellow) !important; color: var(--accent-yellow) !important; }
+[data-theme="blueprint"] .card:nth-child(5) .card-img { border-color: var(--accent-peach) !important; box-shadow: 3px 3px 0px var(--accent-peach) !important; color: var(--accent-peach) !important; }
+
+/* Hero image and highlights in blueprint mode */
+[data-theme="blueprint"] .hero-img {
+    background-color: #FFFFFF !important;
+    border: 2px solid var(--accent-blue) !important;
+    box-shadow: 6px 6px 0px var(--accent-blue) !important;
+}
+
+[data-theme="blueprint"] .hero::before {
+    background: #FFFFFF !important;
+    border: 2px solid var(--accent-orange) !important;
+    box-shadow: 6px 6px 0px var(--accent-orange) !important;
+}
+
+[data-theme="blueprint"] .hero h1 span {
+    background: #FFFFFF !important;
+    color: var(--text-main) !important;
+    border: 2px solid var(--accent-orange) !important;
+    box-shadow: 5px 5px 0px var(--accent-orange) !important;
+}
+
+/* Pills and buttons outline styling */
+[data-theme="blueprint"] .pill {
+    background: #FFFFFF !important;
+    border: 2px solid var(--border) !important;
+    box-shadow: 3px 3px 0px var(--border) !important;
+}
+
+[data-theme="blueprint"] .pill.active,
+[data-theme="blueprint"] .pill:hover {
+    background: #FFFFFF !important;
+    color: var(--accent-orange) !important;
+    border-color: var(--accent-orange) !important;
+    box-shadow: 4px 4px 0px var(--accent-orange) !important;
+}
+
+
+
+/* ==========================================================================
+   BASE & RESET
+   ========================================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body { 
+    background-color: var(--bg); 
+    color: var(--text-main); 
+    font-family: var(--font-sans); 
+    line-height: 1.6; 
+    background-image: radial-gradient(var(--text-muted) 1px, transparent 1px);
+    background-size: 24px 24px;
+    min-height: 100vh;
+    transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+:focus-visible {
+    outline: 3px solid var(--accent-orange);
+    outline-offset: 2px;
+}
+
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+
+/* ===== HEADER ===== */
+.header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 1.25rem 0; 
+    border-bottom: var(--border-width) solid var(--border); 
+    margin-bottom: 2rem; 
+    background: var(--bg);
+    position: relative;
+    z-index: 100;
+}
+.logo { font-family: var(--font-serif); font-size: 1.75rem; font-weight: 800; text-decoration: none; color: var(--text-main); letter-spacing: -0.02em; }
+.logo span { color: #FFFFFF; background: var(--text-main); padding: 0 0.35rem; border-radius: 4px; transform: skew(-5deg); display: inline-block; }
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+.nav { display: flex; gap: 1.5rem; align-items: center; }
+.nav a { text-decoration: none; color: var(--text-main); font-size: 0.9rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; transition: 0.2s; }
+.nav a:hover { color: var(--accent-orange); text-decoration: underline; text-decoration-thickness: 2px; }
+
+/* PCB COMMAND SEARCH CONSOLE POPOVER */
+.header-search-container {
+    position: relative;
+    display: inline-block;
+}
+
+.soldering-loupe-icon {
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
+}
+
+.search-trigger-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: none;
+}
+
+.search-trigger-btn:hover {
+    background: rgba(252, 108, 43, 0.1);
+    color: var(--accent-orange);
+    transform: scale(1.12);
+}
+
+.search-trigger-btn:hover .soldering-loupe-icon {
+    transform: rotate(15deg);
+}
+
+.search-btn-kbd {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+.search-console-popover {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: calc(100% + 8px);
+    width: 440px;
+    max-width: 90vw;
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: 14px;
+    box-shadow: 8px 8px 0px var(--accent-orange);
+    z-index: 2000;
+    padding: 0.85rem;
+    animation: searchPopoverFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.header-search-container.active .search-console-popover {
+    display: block;
+}
+
+@keyframes searchPopoverFade {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.search-console-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: var(--bg);
+    border: var(--border-width) solid var(--border);
+    border-radius: 10px;
+}
+
+.header-search-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+}
+
+.search-close-x {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-main);
+    flex-shrink: 0;
+    transition: 0.15s;
+}
+
+.search-close-x:hover {
+    background: var(--accent-orange);
+    color: #FFFFFF;
+}
+
+.search-dropdown-results {
+    margin-top: 0.75rem;
+    max-height: 320px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.search-dropdown-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.75rem 0.85rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    text-decoration: none;
+    color: var(--text-main);
+    transition: all 0.15s ease;
+}
+
+.search-dropdown-item:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px var(--accent-orange);
+    border-color: var(--text-main);
+}
+
+.header-search-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+}
+
+.search-kbd {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-main);
+    flex-shrink: 0;
+}
+
+.search-close-x {
+    background: none;
+    border: 1.5px solid var(--border);
+    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    flex-shrink: 0;
+    transition: 0.15s;
+}
+
+.search-close-x:hover {
+    background: var(--accent-peach);
+    color: var(--text-main);
+}
+
+/* BURGER BUTTON (MOBILE) */
+.burger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 38px;
+    height: 38px;
+    padding: 6px;
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+}
+.burger-btn span {
+    width: 100%;
+    height: 3px;
+    background: var(--text-main);
+    border-radius: 2px;
+    transition: all 0.25s ease;
+}
+
+/* MOBILE NAV DRAWER */
+.drawer-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+.drawer-overlay.active {
+    display: block;
+    opacity: 1;
+}
+.drawer-content {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100vh;
+    background: var(--bg);
+    border-left: var(--border-width) solid var(--border);
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    z-index: 1001;
+    transition: right 0.3s ease;
+    box-shadow: -6px 0px 0px var(--shadow-color);
+}
+.drawer-overlay.active .drawer-content {
+    right: 0;
+}
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 1rem;
+}
+.drawer-close {
+    background: none;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+.drawer-nav a {
+    text-decoration: none;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+/* Theme Selector Control */
+.theme-select {
+    padding: 0.4rem 0.8rem;
+    border: var(--border-width) solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    outline: none;
+    transition: all 0.15s ease;
+}
+.theme-select:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    background: var(--accent-yellow);
+    color: var(--text-main);
+}
+
+/* ===== HERO ===== */
+.hero { 
+    display: grid; 
+    grid-template-columns: 1fr 1fr; 
+    gap: 3rem; 
+    align-items: center; 
+    padding: 2.5rem 0; 
+    position: relative; 
+}
+.hero::before { 
+    content: ''; 
+    position: absolute; 
+    top: -15px; 
+    right: -15px; 
+    width: 200px; 
+    height: 200px; 
+    background: var(--accent-yellow); 
+    border-radius: 50%; 
+    z-index: -1; 
+    border: var(--border-width) solid var(--border);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+}
+.hero h1 { 
+    font-family: var(--font-serif); 
+    font-size: clamp(2.5rem, 5vw, 4.5rem); 
+    font-weight: 800; 
+    line-height: 1.3; 
+    margin-bottom: 1.5rem; 
+    letter-spacing: -0.03em;
+}
+.hero h1 span { 
+    display: inline-block;
+    color: var(--text-main); 
+    font-style: italic; 
+    background: var(--accent-orange);
+    color: #FFFFFF;
+    padding: 4px 12px 14px;
+    border-radius: 6px;
+    border: var(--border-width) solid var(--border);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    line-height: 1;
+}
+.hero p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
+    font-weight: 500;
+    max-width: 90%;
+}
+.hero-img { 
+    height: 340px; 
+    background: var(--accent-peach); 
+    border-radius: 16px; 
+    transform: rotate(-1.5deg); 
+    border: var(--border-width) solid var(--border);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 700;
+    padding: 16px;
+}
+
+/* ===== BUTTONS & PILLS ===== */
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.6rem;
+    background: var(--accent-orange);
+    color: #FFFFFF;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: var(--border-width) solid var(--border);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+.btn-primary:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+}
+.btn-primary:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px var(--shadow-color);
+}
+.btn-primary.small { padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+
+.btn-dark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1.6rem;
+    background: var(--text-main);
+    color: var(--bg);
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: var(--border-width) solid var(--border);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.15s ease;
+    cursor: pointer;
+}
+.btn-dark:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--accent-orange);
+    background: var(--text-main);
+    color: var(--bg);
+}
+.btn-dark:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0px 0px 0px var(--shadow-color);
+}
+
+.filters-wrapper { 
+    margin: 3rem 0 2rem; 
+    display: flex; 
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+.filters { 
+    display: flex; 
+    gap: 0.75rem; 
+    flex-wrap: wrap; 
+    align-items: center;
+}
+.pill { 
+    font-family: var(--font-mono); 
+    font-size: 0.85rem; 
+    font-weight: 700; 
+    padding: 0.45rem 1.1rem; 
+    border: var(--border-width) solid var(--border); 
+    border-radius: 100px; 
+    background: var(--bg-card); 
+    color: var(--text-main); 
+    text-decoration: none; 
+    transition: all 0.15s ease; 
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    cursor: pointer;
+}
+.pill:hover, .pill.active { 
+    background: var(--text-main); 
+    color: var(--bg-card); 
+    border-color: var(--text-main); 
+    box-shadow: 3px 3px 0px var(--accent-orange); 
+    transform: translate(-1px, -1px); 
+}
+
+/* PROMINENT INLINE SEARCH BOX */
+.search-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: 12px;
+    padding: 0.55rem 1.1rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    transition: all 0.2s ease;
+    flex-grow: 1;
+    max-width: 440px;
+}
+.search-box:focus-within {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--accent-orange);
+    border-color: var(--text-main);
+}
+.search-box-icon {
+    font-size: 1.15rem;
+    margin-right: 0.6rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
+}
+.search-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+}
+.search-input::placeholder {
+    color: var(--text-dim);
+    font-weight: 500;
+}
+.search-box-kbd {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 0.15rem 0.45rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-main);
+    flex-shrink: 0;
+    box-shadow: 1px 1px 0px var(--shadow-color);
+}
+
+/* ===== GRID & CARDS ===== */
+.grid { 
+    display: grid; 
+    grid-template-columns: repeat(12, 1fr); 
+    gap: 1.75rem; 
+    margin-top: 2rem; 
+}
+.card { 
+    position: relative;
+    background: var(--bg-card); 
+    border: var(--border-width) solid var(--border); 
+    border-radius: 14px; 
+    padding: 1.5rem; 
+    display: flex; 
+    flex-direction: column; 
+    transition: all 0.2s ease; 
+    box-shadow: 4px 4px 0px var(--shadow-color); 
+    text-decoration: none; 
+    color: inherit; 
+}
+.card:hover { 
+    transform: translate(-2px, -2px); 
+    box-shadow: 6px 6px 0px var(--shadow-color); 
+}
+.card-link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: 14px;
+}
+
+.card.featured { 
+    grid-column: span 7; 
+    flex-direction: row; 
+    gap: 2rem; 
+    align-items: center; 
+    background: var(--accent-green); 
+}
+.card.featured .card-img { 
+    width: 40%; 
+    height: 240px; 
+    flex-shrink: 0; 
+    border-radius: 10px; 
+    background: var(--bg-card); 
+    border: var(--border-width) solid var(--border); 
+    box-shadow: 3px 3px 0px var(--shadow-color); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center;
+}
+.card:not(.featured) { grid-column: span 5; }
+.card.card-half { grid-column: span 6; }
+
+.card:not(.featured) .card-img { 
+    height: 180px; 
+    border-radius: 10px; 
+    margin-bottom: 1rem; 
+    border: var(--border-width) solid var(--border); 
+    box-shadow: 3px 3px 0px var(--shadow-color); 
+    background: var(--accent-blue); 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    font-family: var(--font-mono); 
+    font-weight: 700; 
+}
+.card:nth-child(3) .card-img { background: var(--accent-peach); }
+.card:nth-child(4) .card-img { background: var(--accent-yellow); }
+
+.tag { 
+    display: inline-block; 
+    padding: 0.25rem 0.75rem; 
+    background: var(--text-main); 
+    color: var(--bg-card); 
+    border-radius: 6px; 
+    font-family: var(--font-mono); 
+    font-size: 0.75rem; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    margin-bottom: 0.85rem; 
+    border: 1.5px solid var(--border); 
+    box-shadow: 2px 2px 0px var(--shadow-color); 
+    width: fit-content;
+    z-index: 3;
+    position: relative;
+}
+.card.featured .tag { background: var(--accent-orange); color: #FFFFFF; }
+.card h3 { font-family: var(--font-serif); font-size: 1.55rem; font-weight: 800; margin-bottom: 0.75rem; line-height: 1.2; }
+.card h3 a { color: inherit; text-decoration: none; }
+.card.featured h3 { font-size: 2.0rem; }
+.card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 1.25rem; font-weight: 500; }
+.read-more { margin-top: auto; font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700; text-decoration: none; border-bottom: 2px solid var(--accent-orange); color: var(--text-main); display: inline-block; width: fit-content; z-index: 3; position: relative; }
+
+/* ===== PAGINATION ===== */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin: 4rem 0 2rem;
+}
+.page-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    height: 42px;
+    padding: 0 14px;
+    border-radius: 8px;
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 800;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+.page-btn:hover, .page-btn.active {
+    background: var(--accent-orange);
+    color: #FFFFFF;
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+}
+.page-btn.nav-btn {
+    background: var(--accent-peach);
+    color: var(--text-main);
+}
+
+/* ===== SEARCH MODAL ===== */
+.search-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 19, 28, 0.7);
+    backdrop-filter: blur(6px);
+    z-index: 2000;
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 5vh;
+}
+.search-modal.active {
+    display: flex;
+}
+.search-modal-box {
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: 16px;
+    width: 90%;
+    max-width: 680px;
+    padding: 1.5rem;
+    box-shadow: 8px 8px 0px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 85vh;
+}
+.search-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.75rem;
+}
+.search-input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-main);
+    outline: none;
+}
+.search-close-btn {
+    background: none;
+    border: 2px solid var(--border);
+    border-radius: 6px;
+    padding: 0.2rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.search-results {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+.search-result-item {
+    padding: 0.85rem;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg);
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+}
+.search-result-item:hover {
+    background: var(--accent-yellow);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+}
+.search-result-title {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    font-weight: 800;
+    margin-bottom: 0.25rem;
+}
+.search-result-excerpt {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ===== COOKIE BANNER ===== */
+.cookie-banner { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--bg-card); border: var(--border-width) solid var(--border); border-radius: 12px; padding: 1.5rem; box-shadow: 6px 6px 0px var(--shadow-color); z-index: 1000; width: 90%; max-width: 600px; }
+.cookie-content { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+
+/* ===== FOOTER ===== */
+.footer { 
+    margin-top: 5rem; 
+    padding: 4rem 0 2rem; 
+    border-top: var(--border-width) solid var(--border); 
+    font-family: var(--font-sans);
+}
+.footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1.5fr;
+    gap: 2.5rem;
+    margin-bottom: 3rem;
+    text-align: left;
+}
+.footer-brand {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    font-weight: 800;
+    margin-bottom: 0.75rem;
+}
+.footer-brand span { color: var(--accent-orange); }
+.footer-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+}
+.footer-title {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-main);
+    margin-bottom: 1rem;
+}
+.footer-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.footer-list a {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: 0.15s;
+}
+.footer-list a:hover {
+    color: var(--accent-orange);
+    text-decoration: underline;
+}
+.footer-meta {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 1rem;
+}
+.footer-meta a { color: var(--text-main); font-weight: 600; }
+.footer-links { display: flex; gap: 1rem; margin-bottom: 1rem; }
+.footer-links a { color: var(--text-muted); font-size: 0.85rem; text-decoration: none; }
+.footer-links a:hover { color: var(--accent-orange); text-decoration: underline; }
+.back-to-top-btn {
+    background: var(--bg-card);
+    border: var(--border-width) solid var(--border);
+    border-radius: 8px;
+    padding: 0.4rem 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    transition: all 0.15s ease;
+}
+.back-to-top-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px var(--accent-orange);
+}
+.footer-bottom {
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .header { flex-wrap: wrap; gap: 0.75rem; }
+    .header-right { width: 100%; justify-content: space-between; order: 2; }
+    .header-search-bar { width: 100%; min-width: 0; order: 3; }
+    .header-search-bar kbd { display: none; }
+    .hero { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr; }
+    .card.featured, .card:not(.featured), .card.card-half { grid-column: span 12; flex-direction: column; }
+    .card.featured .card-img { width: 100%; height: 180px; }
+    .nav { display: none; }
+    .burger-btn { display: flex; }
+    .footer-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+}
+
+@media (max-width: 480px) {
+    .footer-grid { grid-template-columns: 1fr; }
+    .card { box-shadow: 2px 2px 0px var(--shadow-color); }
+}
+
+/* Card Author Header Row */
+.card-author-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.author-avatar-small {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--accent-orange);
+    color: #FFFFFF;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.75rem;
+}
+.author-name-small {
+    font-weight: 600;
+    color: var(--text-main);
+}
+.card-date-small {
+    color: var(--text-dim);
+    margin-left: auto;
+}
+
+/* Card Metrics Footer */
+.card-footer-metrics {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+.metric-rating {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--bg);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+}
+.vote-up, .vote-down {
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: color 0.2s;
+}
+.vote-up:hover { color: var(--accent-green); }
+.vote-down:hover { color: var(--accent-red); }
+.rating-value {
+    font-weight: 700;
+    color: var(--text-main);
+}
+.metric-comments {
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.metric-comments:hover {
+    color: var(--accent-orange);
+}
+.metric-views {
+    color: var(--text-dim);
+}
+.bookmark-btn {
+    margin-left: auto;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.bookmark-btn:hover {
+    color: var(--accent-orange);
+}
+
+
+
+</style>
+
+    </head>
+
+<body>
+
+    <div class="container">
+
+        <header class="header">
+
+            <a href="/" class="logo">Точка<span>.</span>Плавления</a>
+
+            
+
+            <div class="header-right">
+
+                <!-- Custom PCB Command Search Console -->
+
+                <div class="header-search-container" id="header-search-container">
+
+                    <button type="button" class="search-trigger-btn" id="search-expand-btn" title="Поиск по сайту (Ctrl+K)" aria-label="Поиск по сайту">
+
+                        <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+
+                            <circle cx="10" cy="10" r="6" stroke-width="2" />
+
+                            <line x1="14.2" y1="14.2" x2="20" y2="20" stroke-width="2.6" />
+
+                            <!-- Перекрестие, выходящее за рамку линзы -->
+
+                            <line x1="10" y1="1.5" x2="10" y2="5.5" stroke-width="1.3" stroke="var(--accent-orange)" />
+
+                            <line x1="10" y1="14.5" x2="10" y2="18.5" stroke-width="1.3" stroke="var(--accent-orange)" />
+
+                            <line x1="1.5" y1="10" x2="5.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
+
+                            <line x1="14.5" y1="10" x2="18.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
+
+                            <circle cx="10" cy="10" r="1.2" fill="var(--accent-orange)" stroke="none" />
+
+                        </svg>
+
+                    </button>
+
+                    
+
+                    <div class="search-console-popover" id="search-console-popover">
+
+                        <div class="search-console-header">
+
+                            <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent-orange)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+
+                                <circle cx="10" cy="10" r="6.5" />
+
+                                <path d="M14.5 14.5 L20.5 20.5" stroke-width="2.8" />
+
+                            </svg>
+
+                            <input type="text" id="header-search-input" class="header-search-input" placeholder="Поиск по статьям (ESP32, BGA, флюс...)" autocomplete="off" aria-label="Поиск по сайту">
+
+                            <button type="button" class="search-close-x" id="search-close-x" title="Свернуть (ESC)" aria-label="Свернуть поиск">✕</button>
+
+                        </div>
+
+                        <div class="search-dropdown-results" id="header-search-results">
+
+                            <!-- Instant search results will render here -->
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+                <nav class="nav">
+
+                    <a href="/">Статьи</a>
+
+                    <a href="/interactive.php">Инструменты</a>
+
+                    <a href="/cookies.php">Cookies</a>
+
+                </nav>
+
+
+
+                <!-- Theme Switcher Selector -->
+
+                <select id="theme-select" class="theme-select" title="Выбор цветового режима" aria-label="Выбор цветового режима">
+
+                    <option value="minimal">⚪ Минимал (VC.ru / Habr)</option>
+
+                    <option value="craft">📜 Крафт</option>
+
+                    <option value="blueprint">📐 Чертёж (Белый / Сетка)</option>
+
+                    <option value="dark">🌙 Тёмная</option>
+
+                    <option value="pcb">🌲 Текстолит</option>
+
+                    <option value="pastel">🎨 Пастель</option>
+
+                </select>
+
+
+
+                <!-- Mobile Burger Toggle Button -->
+
+                <button type="button" class="burger-btn" id="burger-trigger" aria-label="Открыть мобильное меню">
+
+                    <span></span>
+
+                    <span></span>
+
+                    <span></span>
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- Mobile Drawer Navigation -->
+
+        <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true">
+
+            <div class="drawer-content">
+
+                <div class="drawer-header">
+
+                    <a href="/" class="logo" style="font-size: 1.3rem;">Точка<span>.</span>Плавления</a>
+
+                    <button type="button" class="drawer-close" id="drawer-close" aria-label="Закрыть меню">✕</button>
+
+                </div>
+
+                <nav class="drawer-nav">
+
+                    <a href="/">⚡ Статьи</a>
+
+                    <a href="/interactive.php">🧮 Инструменты</a>
+
+                    <a href="/cookies.php">📜 Cookies</a>
+
+                    <a href="/privacy.php">🔒 Privacy</a>
+
+                </nav>
+
+            </div>
+
+        </div>
+
+
+
+
+
+<section class="hero">
+
+    <div>
+
+        <h1>Паяем.<br><span>Проектируем.</span><br>Прошиваем.</h1>
+
+        <p>Блог и лаборатория о том, как превратить кучу компонентов в работающее устройство. Без воды, с интерактивными калькуляторами и справочниками.</p>
+
+        <a href="/interactive.php" class="btn-dark">Перейти к инструментам</a>
+
+    </div>
+
+    <div class="hero-img">
+
+        <svg viewBox="0 0 320 220" width="100%" height="100%" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round">
+
+            <rect x="20" y="20" width="280" height="180" rx="12" fill="#FFFFFF"/>
+
+            <polyline points="40,60 90,60 90,110 140,110" stroke="#1A1A1A" stroke-width="3"/>
+
+            <polyline points="190,60 190,90 160,90" stroke="#1A1A1A" stroke-width="3"/>
+
+            <rect x="90" y="75" width="80" height="70" rx="8" fill="#FFD447" stroke="#1A1A1A" stroke-width="3"/>
+
+            <text x="106" y="117" font-family="JetBrains Mono" font-size="14" font-weight="800" fill="#1A1A1A">IC-ТЧП</text>
+
+            <circle cx="40" cy="60" r="5" fill="#C8F0C0" stroke="#1A1A1A" stroke-width="2"/>
+
+            <circle cx="190" cy="60" r="5" fill="#FFB8A8" stroke="#1A1A1A" stroke-width="2"/>
+
+        </svg>
+
+    </div>
+
+</section>
+
+
+
+<div class="filters" id="article-filters">
+
+    <a href='/' class='pill active' data-filter='all'>Все статьи</a><a href='/?tag=basics' class='pill ' data-filter='basics'>Основы</a><a href='/?tag=smd' class='pill ' data-filter='smd'>SMD</a><a href='/?tag=tools' class='pill ' data-filter='tools'>Инструменты</a><a href='/?tag=materials' class='pill ' data-filter='materials'>Материалы</a></div>
+
+
+
+<div class="grid" id="articles-grid">
+
+                                <!-- Featured Card span 7 -->
+
+            <article class="card featured" data-tag="basics">
+
+                <div class="card-img">
+
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2v14M12 16a4 4 0 1 1-4 4h8a4 4 0 0 1-4-4z"/></svg>                </div>
+
+                <div>
+
+                    <div class="card-author-row">
+
+                        <span class="author-avatar-small">И</span>
+
+                        <span class="author-name-small">Иван Пайкин</span>
+
+                        <span class="card-date-small">10 авг 2026</span>
+
+                    </div>
+
+                    <span class="tag">Выбор редакции · Основы</span>
+
+                    <h3><a href="/article.php?slug=temperaturnye-profili" class="card-link">Температурные профили: как не перегреть плату за $300</a></h3>
+
+                    <p>Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат.</p>
+
+                    <div class="card-footer-metrics">
+
+                        <div class="metric-rating">
+
+                            <span class="vote-up">▲</span>
+
+                            <span class="rating-value">+19</span>
+
+                            <span class="vote-down">▼</span>
+
+                        </div>
+
+                        <div class="metric-comments">💬 5</div>
+
+                        <div class="metric-views">👁️ 393</div>
+
+                        <span class="bookmark-btn">🔖</span>
+
+                    </div>
+
+                </div>
+
+            </article>
+
+                                        <!-- Regular Card span 5 or half -->
+
+            <article class="card " data-tag="smd">
+
+                <div class="card-author-row">
+
+                    <span class="author-avatar-small">М</span>
+
+                    <span class="author-name-small">Мария Канифоль</span>
+
+                    <span class="card-date-small">05 авг 2026</span>
+
+                </div>
+
+                <div class="card-img">
+
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>                </div>
+
+                <span class="tag">SMD</span>
+
+                <h3><a href="/article.php?slug=smd-0402-vs-0603" class="card-link">SMD 0402 vs 0603: что выбрать для прототипа</a></h3>
+
+                <p>Плотность монтажа против ремонтопригодности — вечный спор инженера при разводке печатных плат.</p>
+
+                <div class="card-footer-metrics">
+
+                    <div class="metric-rating">
+
+                        <span class="vote-up">▲</span>
+
+                        <span class="rating-value">+26</span>
+
+                        <span class="vote-down">▼</span>
+
+                    </div>
+
+                    <div class="metric-comments">💬 8</div>
+
+                    <div class="metric-views">👁️ 636</div>
+
+                    <span class="bookmark-btn">🔖</span>
+
+                </div>
+
+            </article>
+
+                                        <!-- Regular Card span 5 or half -->
+
+            <article class="card card-half" data-tag="materials">
+
+                <div class="card-author-row">
+
+                    <span class="author-avatar-small">И</span>
+
+                    <span class="author-name-small">Иван Пайкин</span>
+
+                    <span class="card-date-small">01 авг 2026</span>
+
+                </div>
+
+                <div class="card-img">
+
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C12 2 5 9.5 5 14a7 7 0 0 0 14 0c0-4.5-7-12-7-12z"/></svg>                </div>
+
+                <span class="tag">Материалы</span>
+
+                <h3><a href="/article.php?slug=gid-po-flyusam" class="card-link">Гид по флюсам: RMA, NC и no-clean в шприце</a></h3>
+
+                <p>Какой флюс оставить, а какой обязательно смыть — и чем это грозит схеме через 6 месяцев эксплуатации.</p>
+
+                <div class="card-footer-metrics">
+
+                    <div class="metric-rating">
+
+                        <span class="vote-up">▲</span>
+
+                        <span class="rating-value">+33</span>
+
+                        <span class="vote-down">▼</span>
+
+                    </div>
+
+                    <div class="metric-comments">💬 3</div>
+
+                    <div class="metric-views">👁️ 879</div>
+
+                    <span class="bookmark-btn">🔖</span>
+
+                </div>
+
+            </article>
+
+                                        <!-- Regular Card span 5 or half -->
+
+            <article class="card card-half" data-tag="tools">
+
+                <div class="card-author-row">
+
+                    <span class="author-avatar-small">М</span>
+
+                    <span class="author-name-small">Мария Канифоль</span>
+
+                    <span class="card-date-small">28 июл 2026</span>
+
+                </div>
+
+                <div class="card-img">
+
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>                </div>
+
+                <span class="tag">Инструменты</span>
+
+                <h3><a href="/article.php?slug=zhala-payalnika" class="card-link">Жала паяльника: T12 против JBC C245 на верстаке</a></h3>
+
+                <p>Сравниваем скорость нагрева, реальный ресурс монолитных картриджей и стоит ли переплачивать за оригинал.</p>
+
+                <div class="card-footer-metrics">
+
+                    <div class="metric-rating">
+
+                        <span class="vote-up">▲</span>
+
+                        <span class="rating-value">+40</span>
+
+                        <span class="vote-down">▼</span>
+
+                    </div>
+
+                    <div class="metric-comments">💬 6</div>
+
+                    <div class="metric-views">👁️ 222</div>
+
+                    <span class="bookmark-btn">🔖</span>
+
+                </div>
+
+            </article>
+
+                                        <!-- Regular Card span 5 or half -->
+
+            <article class="card card-half" data-tag="smd">
+
+                <div class="card-author-row">
+
+                    <span class="author-avatar-small">И</span>
+
+                    <span class="author-name-small">Иван Пайкин</span>
+
+                    <span class="card-date-small">20 июл 2026</span>
+
+                </div>
+
+                <div class="card-img">
+
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="7" y="7" width="10" height="10" rx="2"/><path d="M9 2v2M15 2v2M9 20v2M15 20v2M2 9h2M2 15h2M20 9h2M20 15h2"/></svg>                </div>
+
+                <span class="tag">SMD</span>
+
+                <h3><a href="/article.php?slug=bga-rebolling" class="card-link">BGA-реболлинг в домашних условиях на фене</a></h3>
+
+                <p>Пошаговая инструкция по замене и накатке шаров на чипах под микроскопом без дорогой инфракрасной станции.</p>
+
+                <div class="card-footer-metrics">
+
+                    <div class="metric-rating">
+
+                        <span class="vote-up">▲</span>
+
+                        <span class="rating-value">+12</span>
+
+                        <span class="vote-down">▼</span>
+
+                    </div>
+
+                    <div class="metric-comments">💬 9</div>
+
+                    <div class="metric-views">👁️ 465</div>
+
+                    <span class="bookmark-btn">🔖</span>
+
+                </div>
+
+            </article>
+
+                                        <!-- Regular Card span 5 or half -->
+
+            <article class="card card-half" data-tag="materials">
+
+                <div class="card-author-row">
+
+                    <span class="author-avatar-small">М</span>
+
+                    <span class="author-name-small">Мария Канифоль</span>
+
+                    <span class="card-date-small">15 июл 2026</span>
+
+                </div>
+
+                <div class="card-img">
+
+                    <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 2C12 2 5 9.5 5 14a7 7 0 0 0 14 0c0-4.5-7-12-7-12z"/></svg>                </div>
+
+                <span class="tag">Материалы</span>
+
+                <h3><a href="/article.php?slug=splav-roze" class="card-link">Сплав Розе и Вуда: когда спасение, а когда костыль</a></h3>
+
+                <p>Сплавы с температурой плавления 94°C и 68°C. Как не оставить хрупкий сплав в рабочем контакте.</p>
+
+                <div class="card-footer-metrics">
+
+                    <div class="metric-rating">
+
+                        <span class="vote-up">▲</span>
+
+                        <span class="rating-value">+19</span>
+
+                        <span class="vote-down">▼</span>
+
+                    </div>
+
+                    <div class="metric-comments">💬 4</div>
+
+                    <div class="metric-views">👁️ 708</div>
+
+                    <span class="bookmark-btn">🔖</span>
+
+                </div>
+
+            </article>
+
+            </div>
+
+
+
+<!-- PAGINATION -->
+
+<nav class="pagination"><a href="/?theme=minimal&amp;page=1" class="page-btn active">1</a><a href="/?theme=minimal&amp;page=2" class="page-btn">2</a><a href="/?theme=minimal&amp;page=2" class="page-btn nav-btn">Вперед →</a></nav>
+
+        <footer class="footer">
+
+            <div class="footer-grid">
+
+                <div class="footer-col">
+
+                    <div class="footer-brand">Точка<span>.</span>Плавления</div>
+
+                    <p class="footer-desc">Независимый журнал и лаборатория о пайке, микроконтроллерах, ESP32 и AI в DIY-электронике. Проверено на реальном железе.</p>
+
+                </div>
+
+                <div class="footer-col">
+
+                    <div class="footer-title">Рубрики</div>
+
+                    <ul class="footer-list">
+
+                        <li><a href="/?tag=basics">Основы пайки</a></li>
+
+                        <li><a href="/?tag=smd">SMD и BGA монтаж</a></li>
+
+                        <li><a href="/?tag=tools">Инструменты & Жала</a></li>
+
+                        <li><a href="/?tag=materials">Флюсы & Припои</a></li>
+
+                    </ul>
+
+                </div>
+
+                <div class="footer-col">
+
+                    <div class="footer-title">Инструменты</div>
+
+                    <ul class="footer-list">
+
+                        <li><a href="/interactive.php#calc">Калькулятор флюса</a></li>
+
+                        <li><a href="/interactive.php#divider">Делитель напряжения</a></li>
+
+                        <li><a href="/interactive.php#battery">Автономия ESP32</a></li>
+
+                    </ul>
+
+                </div>
+
+                <div class="footer-col">
+
+                    <div class="footer-title">Лицензия & Проект</div>
+
+                    <p class="footer-meta">Материалы доступны по лицензии <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener">CC BY-NC 4.0</a>.</p>
+
+                    <div class="footer-links">
+
+                        <a href="/privacy.php">Конфиденциальность</a>
+
+                        <a href="/cookies.php">Cookies</a>
+
+                    </div>
+
+                    <button type="button" class="back-to-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">Наверх ↑</button>
+
+                </div>
+
+            </div>
+
+            <div class="footer-bottom">
+
+                <p>© 2026 ТЧП // Точка Плавления · Лаборатория практической электроники</p>
+
+            </div>
+
+        </footer>
+
+    </div> <!-- /.container -->
+
+
+
+    <!-- Global Search Modal -->
+
+    <div class="search-modal" id="search-modal" aria-hidden="true" role="dialog" aria-label="Поиск по статьям и калькуляторам">
+
+        <div class="search-modal-box">
+
+            <div class="search-modal-header">
+
+                <span style="font-size: 1.2rem;">🔍</span>
+
+                <input type="text" id="search-input" class="search-input" placeholder="Поиск статей, компонентов, кода..." autocomplete="off" autofocus>
+
+                <button type="button" class="search-close-btn" id="search-close-btn" aria-label="Закрыть поиск">ESC</button>
+
+            </div>
+
+            <div class="search-results" id="search-results">
+
+                <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.9rem;">
+
+                    Введите слово для поиска (например: <strong>пайка</strong>, <strong>ESP32</strong>, <strong>флюс</strong>)...
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="/assets/js/main.js"></script>
+
+        <div id="cookie-banner" class="cookie-banner" style="display: none;">
+
+    <div class="cookie-content">
+
+        <p>Мы используем куки, чтобы сайт работал быстро и без багов. <a href="/cookies/">Подробнее</a></p>
+
+        <button id="accept-cookies" class="btn-primary small">Принять</button>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
+
+
+
