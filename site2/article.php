@@ -40,7 +40,7 @@ $faq_items = [
 <!-- Fonts & Icons -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;900&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,400&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
 <!-- Tailwind CSS -->
@@ -65,6 +65,7 @@ tailwind.config = {
         sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         serif: ['Newsreader', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
+        logo: ['"Hanken Grotesk"', 'sans-serif']
       }
     }
   }
@@ -96,6 +97,31 @@ tailwind.config = {
     background: #d3cdc2;
     border-radius: 2px;
   }
+
+  /* USER'S ORIGINAL BRAND LOGO */
+  .logo { 
+    font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
+    font-size: 1.25rem; 
+    font-weight: 900; 
+    text-decoration: none; 
+    color: #141414; 
+    letter-spacing: -0.02em; 
+    text-transform: uppercase; 
+    display: inline-flex; 
+    align-items: center; 
+    line-height: 1; 
+  }
+  .logo span { 
+    color: #ffffff; 
+    background: #ea580c; 
+    padding: 0.05rem 0.35rem; 
+    border-radius: 3px; 
+    transform: skew(-6deg); 
+    display: inline-block; 
+    margin: 0 0.15rem; 
+    font-size: 1.05em; 
+    line-height: 0.9; 
+  }
 </style>
 
 <!-- Schema.org JSON-LD -->
@@ -109,11 +135,8 @@ tailwind.config = {
   <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
     <!-- Brand mark & Title -->
     <div class="flex items-center gap-6">
-      <a class="flex items-center gap-2.5 text-ink font-semibold tracking-tight hover:opacity-80 transition-opacity" href="index.php">
-        <div class="w-5 h-5 border border-ink flex items-center justify-center font-mono text-[11px] font-bold leading-none bg-paper">
-          °
-        </div>
-        <span class="tracking-[-0.01em] text-sm uppercase font-mono font-medium">ТОЧКА ПЛАВЛЕНИЯ</span>
+      <a class="logo hover:opacity-85 transition-opacity" href="index.php">
+        ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
       </a>
       <!-- Desktop Nav -->
       <nav class="hidden md:flex items-center gap-5 text-[13.5px] text-ink-muted">
@@ -683,10 +706,12 @@ tailwind.config = {
 <footer class="w-full border-t border-paper-border bg-paper py-10 mt-12 text-ink-muted text-xs font-mono">
   <div class="max-w-[1140px] mx-auto px-5 sm:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
     <div class="space-y-1.5">
-      <div class="flex items-center gap-2 text-ink font-semibold">
-        <span class="uppercase">ТОЧКА ПЛАВЛЕНИЯ</span>
+      <div class="flex items-center gap-2">
+        <a class="logo text-sm hover:opacity-85 transition-opacity" href="index.php">
+          ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
+        </a>
         <span class="text-ink-faint">·</span>
-        <span class="text-[11px] font-normal text-ink-faint">Инженерный регламент v2.4</span>
+        <span class="text-[11px] font-normal text-ink-faint font-mono">Инженерный регламент v2.4</span>
       </div>
       <p class="text-[12px] text-ink-muted max-w-md">
         Инженерный справочник, регламенты поверхностного монтажа и открытая документация по пайке и теплофизике компонентов.
