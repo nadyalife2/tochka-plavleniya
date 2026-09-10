@@ -1,0 +1,363 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>КАК ПОСТРОИТЬ ИДЕАЛЬНЫЙ БЕНТО-МОДУЛЬ - Melting Point</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&amp;family=Inter:wght@400;700;800;900&amp;family=Hanken+Grotesk:wght@400;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary-fixed": "#1e1c00",
+                        "tertiary-fixed": "#e9e5b0",
+                        "secondary-container": "#fc6c2b",
+                        "surface-variant": "#e2e2e2",
+                        "inverse-surface": "#2f3131",
+                        "background": "#fcfaf7", /* Updated to paper white */
+                        "error-container": "#ffdad6",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-container": "#898658",
+                        "surface": "#fcfaf7",
+                        "surface-container": "#eeeeee",
+                        "surface-container-high": "#e8e8e8",
+                        "surface-dim": "#dadada",
+                        "on-secondary-fixed": "#370e00",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f4f3f3",
+                        "surface-bright": "#f9f9f9",
+                        "on-primary-fixed-variant": "#474747",
+                        "on-secondary-fixed-variant": "#7f2b00",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#4a4821",
+                        "secondary-fixed-dim": "#ffb599",
+                        "on-error": "#ffffff",
+                        "outline-variant": "#cfc4c5",
+                        "on-primary-fixed": "#1b1b1b",
+                        "secondary-fixed": "#ffdbce",
+                        "primary-fixed-dim": "#c6c6c6",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-container": "#848484",
+                        "secondary": "#a73a00",
+                        "surface-tint": "#5e5e5e",
+                        "on-surface-variant": "#4c4546",
+                        "error": "#ba1a1a",
+                        "tertiary-container": "#1e1c00",
+                        "inverse-on-surface": "#f1f1f1",
+                        "outline": "#7e7576",
+                        "on-background": "#1a1c1c",
+                        "tertiary-fixed-dim": "#cdc996",
+                        "on-secondary-container": "#5a1c00",
+                        "primary-container": "#1b1b1b",
+                        "primary": "#1a1a1a", /* Updated to ink black */
+                        "tertiary": "#000000",
+                        "primary-fixed": "#e2e2e2",
+                        "inverse-primary": "#c6c6c6",
+                        "on-surface": "#1a1c1c",
+                        "surface-container-highest": "#e2e2e2",
+                        "on-error-container": "#93000a",
+                        // Custom sketch colors added for prompt
+                        "sketch-tomato": "#e63946",
+                        "sketch-basil": "#2a9d8f",
+                        "sketch-gold": "#e9c46a",
+                        "sketch-ink": "#1a1a1a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "2rem",
+                        "stack-sm": "0.5rem",
+                        "stack-md": "1rem",
+                        "grid-gutter": "1rem",
+                        "grid-margin": "2rem",
+                        "bento-padding": "1.5rem"
+                    },
+                    "fontFamily": {
+                        "handwritten-lg": ["Caveat"],
+                        "body-lg": ["Hanken Grotesk"],
+                        "handwritten-sm": ["Caveat"],
+                        "headline-xl": ["Inter"],
+                        "headline-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "body-md": ["Hanken Grotesk"],
+                        "headline-xl-mobile": ["Inter"],
+                        "label-caps": ["Inter"]
+                    },
+                    "fontSize": {
+                        "handwritten-lg": ["24px", { "lineHeight": "1.2", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "handwritten-sm": ["18px", { "lineHeight": "1.1", "fontWeight": "400" }],
+                        "headline-xl": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "fontWeight": "800" }],
+                        "display-lg": ["72px", { "lineHeight": "1.0", "letterSpacing": "-0.04em", "fontWeight": "900" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-xl-mobile": ["32px", { "lineHeight": "1.1", "fontWeight": "800" }],
+                        "label-caps": ["12px", { "lineHeight": "1.0", "letterSpacing": "0.1em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .sketch-border { 
+            border: 3px solid #1a1a1a; 
+            border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
+        }
+        .sketch-border-heavy {
+            border: 4px solid #1a1a1a;
+            border-radius: 5px 255px 4px 15px / 255px 15px 225px 5px;
+            border-top-width: 3px;
+            border-right-width: 5px;
+            border-bottom-width: 4px;
+            border-left-width: 3px;
+        }
+        .sketch-border-bottom { border-bottom: 3px solid #1a1a1a; border-bottom-left-radius: 255px 15px; border-bottom-right-radius: 15px 255px; }
+        
+        .hard-shadow { box-shadow: 6px 6px 0px 0px #1a1a1a; }
+        .hard-shadow-sm { box-shadow: 4px 4px 0px 0px #1a1a1a; }
+        .hard-shadow-hover:hover { transform: translate(4px, 4px); box-shadow: 2px 2px 0px 0px #1a1a1a; }
+        
+        .marker-offset-tomato, .marker-offset-basil, .marker-offset-gold {
+            position: relative;
+            z-index: 1;
+        }
+        .marker-offset-tomato::after {
+            content: ''; position: absolute; left: -8px; top: -4px; width: calc(100% + 12px); height: calc(100% + 10px); 
+            background-color: theme('colors.sketch-tomato'); z-index: -1; transform: rotate(-1.5deg); opacity: 0.85; mix-blend-mode: multiply;
+        }
+        .marker-offset-basil::after {
+            content: ''; position: absolute; left: -4px; top: -6px; width: calc(100% + 14px); height: calc(100% + 8px); 
+            background-color: theme('colors.sketch-basil'); z-index: -1; transform: rotate(1deg); opacity: 0.85; mix-blend-mode: multiply;
+        }
+        .marker-offset-gold::after {
+            content: ''; position: absolute; left: -6px; top: -2px; width: calc(100% + 8px); height: calc(100% + 6px); 
+            background-color: theme('colors.sketch-gold'); z-index: -1; transform: rotate(-0.5deg); opacity: 0.85; mix-blend-mode: multiply;
+        }
+        
+        .tape { position: absolute; width: 60px; height: 22px; background-color: rgba(255, 255, 255, 0.65); box-shadow: 1px 1px 3px rgba(0,0,0,0.15); transform: rotate(-5deg); z-index: 10; border: 1px solid rgba(0,0,0,0.05); backdrop-filter: blur(1px); }
+        .tape-accent {
+            position: absolute;
+            background-color: theme('colors.sketch-gold');
+            opacity: 0.7;
+            mix-blend-mode: multiply;
+            z-index: 10;
+        }
+        
+        .paper-bg { 
+            background-color: #fcfaf7;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(0,0,0,0.05) 1px, transparent 0),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E"); 
+            background-size: 20px 20px, 100% 100%; 
+        }
+
+        .ink-bleed {
+            filter: drop-shadow(0px 0px 1px rgba(26, 26, 26, 0.4));
+        }
+    </style>
+</head>
+<body class="bg-background text-primary font-body-md antialiased paper-bg min-h-screen flex flex-col relative overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="bg-surface text-primary w-full border-b-[4px] border-primary shadow-[6px_6px_0px_0px_#1a1a1a] flex justify-between items-center px-grid-margin py-stack-md sticky top-0 z-50 sketch-border-bottom ink-bleed">
+<div class="font-headline-lg text-headline-lg font-black uppercase tracking-tighter text-primary">
+            Melting Point
+        </div>
+<nav class="hidden md:flex gap-6 items-center">
+<a class="text-secondary font-bold underline decoration-[3px] hover:bg-sketch-gold hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_#1a1a1a] transition-all px-2 py-1 sketch-border" href="#">Essays</a>
+<a class="text-primary hover:bg-sketch-gold hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_#1a1a1a] transition-all px-2 py-1" href="#">Tutorials</a>
+<a class="text-primary hover:bg-sketch-gold hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_#1a1a1a] transition-all px-2 py-1" href="#">Changelog</a>
+<a class="text-primary hover:bg-sketch-gold hover:translate-x-[4px] hover:translate-y-[4px] hover:shadow-[2px_2px_0px_0px_#1a1a1a] transition-all px-2 py-1" href="#">About</a>
+</nav>
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary hover:text-sketch-basil cursor-pointer transition-colors" data-icon="search" style="font-variation-settings: 'FILL' 0;">search</span>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-full font-body-md font-bold hover:bg-sketch-tomato transition-colors hard-shadow hard-shadow-hover sketch-border text-white">
+                Subscribe
+            </button>
+</div>
+</header>
+<!-- Main Container -->
+<main class="flex-grow w-full max-w-7xl mx-auto px-grid-margin py-stack-lg relative">
+<!-- Dense Background Doodles -->
+<div class="absolute -left-12 top-1/4 opacity-40 pointer-events-none hidden xl:flex flex-col gap-12 transform -rotate-3 w-64 ink-bleed">
+<img alt="Marginalia sketch" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUyD9WKtVo3GJ23z5Knybqvk6Fk8bf0ebY_A5qFx0nzbyGu5C7O98BT4n-GQbt0sGYJeLNtKnHyuBBG-9sNDY7ZuyHIkatzoVI6Dt5b-NhM7dQt-TZf6Bn77GgWJ_ovEIpCbqPYNpDSKrA9SUCh2CnXxNWtaWoO1qmaX_sEHCGj074aq7K8gZp1jIqCSbPBiHQ5OAw0ZHLQ-mi_pntzK2jsTcpQHTYH3gmmPqXRStA3JZnS-fFFaNwmIXffjVgbue-vdw">
+<div class="p-4 sketch-border border-dashed border-sketch-basil rotate-6">
+<p class="font-handwritten-sm text-sketch-tomato">Note: Check grid alignment! 📐</p>
+<svg class="mt-2 w-16 h-16 text-sketch-basil" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<svg class="w-24 h-24 text-sketch-gold opacity-60 -rotate-12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 100 100">
+<path d="M10,50 Q50,10 90,50 T90,90" fill="none"></path>
+<circle cx="90" cy="90" fill="currentColor" r="5"></circle>
+</svg>
+</div>
+<div class="absolute top-32 -right-8 opacity-40 pointer-events-none hidden lg:flex flex-col items-end gap-16 ink-bleed">
+<svg class="-rotate-6" height="150" viewBox="0 0 100 100" width="150" xmlns="http://www.w3.org/2000/svg">
+<path d="M10 10 L90 10 L90 90 L10 90 Z" fill="none" stroke="#e63946" stroke-dasharray="8,4" stroke-width="3"></path>
+<path d="M10 50 L90 50 M50 10 L50 90" fill="none" stroke="#1a1a1a" stroke-width="2"></path>
+<circle cx="50" cy="50" fill="none" r="15" stroke="#2a9d8f" stroke-width="3"></circle>
+</svg>
+<div class="transform rotate-3">
+<img alt="Technical sketch" class="w-72 h-auto sketch-border-heavy bg-white p-2 hard-shadow-sm" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDW40Ahk6djwU7cKu0CVQTiSWZH_XabcAUkF3qiLIdGHpsH81VJ4gklx-8bIengOH5Hv6j-Dzm92mESzjm0uRqUXXEQ1PvswwuAMCPIbpqlGdkbiaBEuycgiHa17Kvdw_wSEu2sVXdk_iKncGqXV7EGVTqA2IBJfdbPDkvs0RKb9pcVGgU5iX3FSwkjSaBDxg9FilwbBQ0X8SR-UZgMTUwG3jHDGXRaAHyCQKBjGMBMR-xqbpCwkdeg6Tt5fSKBJIgqTsw">
+<div class="tape -top-2 left-4 rotate-12"></div>
+</div>
+</div>
+<!-- Breadcrumbs -->
+<nav class="font-handwritten-sm text-handwritten-sm text-surface-tint mb-8 flex items-center gap-2 relative z-10">
+<a class="hover:text-sketch-tomato hover:underline underline-offset-4 decoration-2" href="#">Home</a>
+<svg class="w-4 h-4 text-sketch-basil" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<a class="hover:text-sketch-tomato hover:underline underline-offset-4 decoration-2" href="#">Articles</a>
+<svg class="w-4 h-4 text-sketch-basil" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<span class="text-primary font-bold">How to Build the Perfect Bento Module</span>
+</nav>
+<!-- Article Hero -->
+<div class="mb-16 relative z-10">
+<h1 class="font-display-lg text-display-lg md:text-display-lg text-primary mb-8 max-w-4xl marker-offset-gold inline-block">
+                КАК ПОСТРОИТЬ ИДЕАЛЬНЫЙ БЕНТО-МОДУЛЬ
+            </h1>
+<div class="flex flex-wrap gap-4 font-handwritten-sm text-handwritten-sm text-primary mt-6">
+<span class="sketch-border px-4 py-2 hard-shadow-sm transform -rotate-2 bg-sketch-basil text-white font-bold">12 min read</span>
+<span class="sketch-border px-4 py-2 bg-surface hard-shadow-sm transform rotate-1">Published March 12</span>
+<span class="sketch-border px-4 py-2 bg-surface hard-shadow-sm transform -rotate-1">Author: Ivan Ivanov</span>
+</div>
+</div>
+<!-- Author & Verification -->
+<div class="flex items-center flex-wrap gap-8 mb-16 border-t-[4px] border-b-[4px] border-primary py-6 sketch-border-bottom rounded-none">
+<div class="flex items-center gap-4">
+<div class="w-14 h-14 rounded-full sketch-border overflow-hidden bg-primary-fixed-dim hard-shadow-sm">
+<img alt="Author Avatar" class="w-full h-full object-cover grayscale contrast-125" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBk1nWUv-stoYCedtlLOASkueqE9RSZ6JkPehKvutbh-gmFROZyNT6tf9ckMI2vhKfRfXSnkvSL4xHTPc_-QD1iKcQneKIT7uKVIhsS26ZxGe9paZfSEzR-5GH6liqosgTwkNeoDf-yQQS0DO0MzWdwJ1c6pZb6N6fLWpJrET_Y4mX6r5-bOCy5PgJtvtMAnIO2CO3_x7RaBwd5-V0husuD2XCWKbVV37sP6_dYqMkSqktceD2iddf-Tg">
+</div>
+<div>
+<div class="font-body-md font-bold text-primary text-xl">Ivan Ivanov</div>
+<div class="font-handwritten-sm text-handwritten-sm text-surface-tint">Engineer</div>
+</div>
+</div>
+<div class="h-10 w-[3px] bg-primary transform rotate-12"></div>
+<div class="flex items-center gap-3 text-sketch-basil font-handwritten-lg text-handwritten-lg transform -rotate-3 border-[3px] border-sketch-basil px-4 py-2 rounded-lg bg-surface hard-shadow-sm relative" style="border-style: dashed;">
+<div class="tape-accent w-10 h-4 -top-2 -right-4 rotate-45"></div>
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">verified</span>
+                Laboratory Verified
+            </div>
+</div>
+<!-- 12-Column Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-grid-gutter relative z-10">
+<!-- Left Column: Main Content (8 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-10">
+<!-- TL;DR Sticky Note -->
+<div class="bg-sketch-gold p-8 sketch-border-heavy hard-shadow relative transform rotate-1 ink-bleed">
+<div class="tape -top-3 left-1/2 -translate-x-1/2 w-24 h-6 rotate-2"></div>
+<h3 class="font-handwritten-lg text-handwritten-lg font-bold mb-3 flex items-center gap-2 text-primary">
+<span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 0;">push_pin</span>
+                        TL;DR
+                    </h3>
+<p class="font-handwritten-sm text-handwritten-sm leading-relaxed text-xl">
+                        Бенто-модуль — это фундаментальный строительный блок нашего гибридного дизайна. Он объединяет структурную эффективность сеток с выразительной энергией брутализма. Главное правило: тяжелые границы, жесткие тени и аналоговые акценты.
+                    </p>
+<div class="absolute -right-16 -bottom-12 text-sketch-tomato transform rotate-[-15deg] flex flex-col items-center">
+<span class="font-handwritten-lg font-bold">Essential!</span>
+<svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M5 10l7-7m0 0l7 7m-7-7v18" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+</div>
+<!-- Body Text -->
+<article class="prose prose-lg max-w-none font-body-lg text-body-lg text-on-surface">
+<p class="mb-6 leading-loose">Проектирование пользовательских интерфейсов часто сводится к поиску баланса между <span class="marker-offset-basil">порядком и хаосом</span>. С одной стороны, нам нужна предсказуемость сетки, чтобы пользователи могли легко считывать информацию. С другой — мы хотим избежать стерильности, добавить "человечности" и тактильности. Именно здесь на помощь приходит гибридный подход: структура Бенто в сочетании со стилистикой скетча.</p>
+<div class="relative my-10 ml-12">
+<div class="absolute -left-16 top-2 text-sketch-tomato transform -rotate-6">
+<svg class="w-12 h-12" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<p class="font-bold text-primary text-2xl border-l-[4px] border-primary pl-6 py-2 marker-offset-gold inline-block contrast-125">
+                            Суть заключается в том, чтобы рассматривать каждый элемент как физический объект на рабочем столе.
+                        </p>
+</div>
+<p class="mb-6 leading-loose">Чтобы построить идеальный модуль, начните с <strong class="marker-offset-gold">контейнера</strong>. Используйте толстые рамки (3-5px) и жесткие тени без размытия. Это создает иллюзию объема, словно карточка вырезана из картона и лежит на столе.</p>
+<!-- Image Placeholder -->
+<div class="my-12 relative sketch-border-heavy hard-shadow bg-white p-3 transform -rotate-1 ink-bleed">
+<div class="tape -top-3 -right-6 rotate-[20deg] w-20"></div>
+<div class="tape -bottom-3 -left-4 -rotate-12 w-16"></div>
+<img alt="Bento Module Diagram" class="w-full h-auto border-2 border-dashed border-gray-300" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB9kih9XhSQaBHKYkW993XZDWUfiiVAykDpUKgg_QBn9TQd8EgrSddVU6QItAV9GIaaphBMZMmDg6KRqgITS9TuCxTXmASnhvHQTbJ96WSKMieoo8yLuO9wlDet0plqIQno-eyQqRHCOLRxIOiV1q7e0-xG5fZ5H3KN9ZYM_N8em8s8I4smhiqZuvYAB3MMGVCJrYh-ZiRsXDOOgxPqgEWku-JiHLeTy9a0cf3HdQ_yWSl_GID64O1k0Q">
+<p class="text-center font-handwritten-sm text-handwritten-sm text-surface-tint mt-4 text-lg">Рис 1. Анатомия базового модуля</p>
+</div>
+<!-- Callout Block -->
+<div class="bg-surface-container-high p-8 sketch-border-heavy border-l-[12px] border-l-sketch-tomato hard-shadow my-12 relative ink-bleed">
+<div class="tape-accent w-16 h-6 -bottom-3 -right-4 -rotate-[25deg]"></div>
+<div class="absolute -top-6 -left-6 text-sketch-tomato bg-white rounded-full p-2 sketch-border hard-shadow-sm transform -rotate-12">
+<span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">warning</span>
+</div>
+<h4 class="font-headline-lg text-headline-lg text-primary mb-4 mt-2 marker-offset-basil inline-block sketch-border-bottom">Важное замечание</h4>
+<p class="font-body-md text-lg leading-relaxed mt-2">
+                            Никогда не используйте оптические (мягкие) тени в этой системе. Глубина должна быть строго механической. При наведении (hover) объект должен физически смещаться вправо и вниз, имитируя нажатие.
+                        </p>
+</div>
+</article>
+</div>
+<!-- Right Column: Sidebar (4 cols) -->
+<aside class="lg:col-span-4 flex flex-col gap-10 hidden lg:flex">
+<!-- Table of Contents -->
+<div class="bg-white p-8 sketch-border-heavy hard-shadow sticky top-32 rotate-1 ink-bleed">
+<div class="tape -top-3 -left-6 rotate-[15deg] w-20"></div>
+<h3 class="font-handwritten-lg text-handwritten-lg font-bold mb-6 border-b-[4px] border-primary pb-3 text-2xl marker-offset-gold inline-block">Содержание</h3>
+<ul class="flex flex-col gap-4 font-handwritten-sm text-handwritten-sm text-lg mt-4">
+<li class="flex items-start gap-3 text-primary">
+<span class="material-symbols-outlined text-sketch-basil text-2xl" style="font-variation-settings: &quot;FILL&quot; 1;">check_box</span>
+<span class="font-bold underline decoration-2 underline-offset-4 decoration-sketch-basil">Концепция Гибридного Дизайна</span>
+</li>
+<li class="flex items-start gap-3 text-surface-tint hover:text-primary transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-2xl group-hover:text-sketch-tomato" style="font-variation-settings: 'FILL' 0;">check_box_outline_blank</span>
+<span class="group-hover:underline decoration-2 underline-offset-4 decoration-sketch-tomato">Анатомия Контейнера</span>
+</li>
+<li class="flex items-start gap-3 text-surface-tint hover:text-primary transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-2xl group-hover:text-sketch-tomato" style="font-variation-settings: 'FILL' 0;">check_box_outline_blank</span>
+<span class="group-hover:underline decoration-2 underline-offset-4 decoration-sketch-tomato">Механика Теней</span>
+</li>
+<li class="flex items-start gap-3 text-surface-tint hover:text-primary transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-2xl group-hover:text-sketch-tomato" style="font-variation-settings: 'FILL' 0;">check_box_outline_blank</span>
+<span class="group-hover:underline decoration-2 underline-offset-4 decoration-sketch-tomato">Типографика и Акценты</span>
+</li>
+</ul>
+</div>
+<!-- Related Articles -->
+<div class="flex flex-col gap-6 mt-8 relative">
+<div class="absolute -left-12 top-0 text-sketch-gold transform rotate-[120deg] opacity-60">
+<svg class="w-16 h-16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</div>
+<h3 class="font-label-caps text-label-caps text-surface-tint uppercase tracking-widest pl-4 sketch-border-bottom">Похожие материалы</h3>
+<a class="bg-surface-container-lowest p-5 sketch-border-heavy hard-shadow hard-shadow-hover transition-transform group relative block transform -rotate-1 ink-bleed" href="#">
+<div class="tape-accent -top-2 -right-2 w-10 h-4 rotate-45"></div>
+<h4 class="font-body-md font-bold group-hover:text-sketch-tomato transition-colors line-clamp-2 text-xl">Использование "Рваных" Границ в CSS</h4>
+<span class="font-handwritten-sm text-handwritten-sm text-surface-tint mt-3 block">5 min read</span>
+</a>
+<a class="bg-surface-container-lowest p-5 sketch-border-heavy hard-shadow hard-shadow-hover transition-transform group relative block transform rotate-1 mt-2 ink-bleed" href="#">
+<h4 class="font-body-md font-bold group-hover:text-sketch-tomato transition-colors line-clamp-2 text-xl">Типографика: Hanken Grotesk vs Inter</h4>
+<span class="font-handwritten-sm text-handwritten-sm text-surface-tint mt-3 block">8 min read</span>
+</a>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-primary text-on-primary w-full border-t-[5px] border-primary py-stack-lg px-grid-margin mt-stack-lg flex flex-col md:flex-row justify-between items-center gap-grid-gutter z-10 relative ink-bleed">
+<div class="absolute -top-16 right-12 font-handwritten-lg text-sketch-tomato transform -rotate-6 opacity-90 text-2xl font-bold bg-white px-4 py-2 sketch-border hard-shadow-sm">
+    Keep it messy! 🚀
+    <div class="tape -bottom-3 left-2 rotate-12 w-12"></div>
+</div>
+<div class="font-headline-lg text-headline-lg text-on-primary font-black uppercase tracking-tighter">
+            Melting Point
+        </div>
+<div class="font-handwritten-sm text-handwritten-sm text-on-primary opacity-80 text-center md:text-left text-lg">
+            © 2024 Melting Point Labs. Built for the brutalist web.
+        </div>
+<nav class="flex flex-wrap gap-6 font-handwritten-sm text-handwritten-sm text-lg">
+<a class="text-on-primary opacity-80 hover:text-sketch-gold hover:underline decoration-2 underline-offset-4 transition-all hover:translate-x-1" href="#">RSS Feed</a>
+<a class="text-on-primary opacity-80 hover:text-sketch-gold hover:underline decoration-2 underline-offset-4 transition-all hover:translate-x-1" href="#">GitHub</a>
+<a class="text-on-primary opacity-80 hover:text-sketch-gold hover:underline decoration-2 underline-offset-4 transition-all hover:translate-x-1" href="#">Discord</a>
+<a class="text-on-primary opacity-80 hover:text-sketch-gold hover:underline decoration-2 underline-offset-4 transition-all hover:translate-x-1" href="#">Twitter</a>
+<a class="text-on-primary opacity-80 hover:text-sketch-gold hover:underline decoration-2 underline-offset-4 transition-all hover:translate-x-1" href="#">Privacy</a>
+</nav>
+</footer>
+
+
+</body></html>

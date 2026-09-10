@@ -1,0 +1,55 @@
+
+    body {
+      background-color: theme('colors.surface');
+      background-image: theme('backgroundImage.grid-pattern');
+      color: theme('colors.primary');
+    }
+    
+    .bento-card {
+      background-color: white;
+      border: 3px solid black;
+      box-shadow: theme('boxShadow.brutal');
+      transition: all 0.2s ease-in-out;
+      position: relative;
+    }
+    
+    .bento-card:hover {
+      transform: translate(4px, 4px);
+      box-shadow: theme('boxShadow.brutal-hover');
+    }
+
+    .tape-piece {
+      position: absolute;
+      height: 24px;
+      width: 80px;
+      background-color: theme('colors.tape');
+      opacity: 0.9;
+      transform: rotate(-3deg);
+      z-index: 10;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .tape-top-center { top: -12px; left: 50%; transform: translateX(-50%) rotate(2deg); }
+    .tape-top-left { top: -10px; left: -10px; transform: rotate(-15deg); }
+    .tape-top-right { top: -10px; right: -10px; transform: rotate(15deg); }
+    
+    .tape-red { background-color: theme('colors.tape-red'); color: white; height: auto; padding: 4px 12px; font-weight: 800; font-size: 1.2rem; display: inline-block; transform: rotate(-2deg); box-shadow: 4px 4px 0px rgba(0,0,0,1); border: 2px solid black; }
+    .tape-yellow { background-color: theme('colors.tape-yellow'); padding: 4px 12px; font-weight: 700; transform: rotate(1deg); display: inline-block; box-shadow: 4px 4px 0px rgba(0,0,0,1); border: 2px solid black; }
+
+    .scribble-box {
+      border: 2px dashed black;
+      border-radius: 4px;
+      padding: 1rem;
+      position: relative;
+    }
+    
+    .scribble-box::before {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border: 1px solid black;
+      border-radius: 8px;
+      pointer-events: none;
+      transform: rotate(1deg);
+    }
+  

@@ -1,0 +1,424 @@
+<!DOCTYPE html><html class="light" lang="ru"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Температурные профили - Точка Плавления</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&amp;family=EB+Garamond:wght@400..800&amp;family=Manrope:wght@400..800&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "secondary-container": "#fe956a",
+                "on-error": "#ffffff",
+                "background": "#fcf9f8",
+                "copper-pot": "#b35a34",
+                "on-tertiary-fixed-variant": "#643f00",
+                "on-tertiary-fixed": "#2a1800",
+                "error-container": "#ffdad6",
+                "surface-variant": "#e5e2e1",
+                "inverse-on-surface": "#f3f0ef",
+                "tape-alpha": "rgba(179, 90, 52, 0.6)",
+                "on-surface-variant": "#42493e",
+                "outline": "#72796e",
+                "secondary": "#994622",
+                "surface-container": "#f0edec",
+                "on-secondary-container": "#762c08",
+                "on-primary": "#ffffff",
+                "primary-fixed-dim": "#a1d494",
+                "on-primary-container": "#7eaf73",
+                "on-primary-fixed": "#002201",
+                "error": "#ba1a1a",
+                "surface-dim": "#dcd9d9",
+                "outline-variant": "#c2c9bb",
+                "primary-fixed": "#bcf0ae",
+                "inverse-surface": "#313030",
+                "secondary-fixed": "#ffdbce",
+                "surface-container-high": "#ebe7e7",
+                "surface-container-lowest": "#ffffff",
+                "surface-container-highest": "#e5e2e1",
+                "ink-black": "#121212",
+                "on-surface": "#1c1b1b",
+                "primary-container": "#154212",
+                "tertiary-container": "#523300",
+                "inverse-primary": "#a1d494",
+                "tertiary": "#351f00",
+                "ochre-accent": "#d4963c",
+                "surface-tint": "#3b6934",
+                "on-tertiary": "#ffffff",
+                "secondary-fixed-dim": "#ffb599",
+                "on-tertiary-container": "#d5973d",
+                "surface": "#fcf9f8",
+                "surface-bright": "#fcf9f8",
+                "tertiary-fixed": "#ffddb5",
+                "on-secondary-fixed-variant": "#7a2f0c",
+                "primary": "#002b02",
+                "on-primary-fixed-variant": "#24501f",
+                "surface-container-low": "#f6f3f2",
+                "basil-green": "#2d5a27",
+                "paper-offwhite": "#fcfaf2",
+                "on-background": "#1c1b1b",
+                "pencil-graphite": "rgba(18, 18, 18, 0.8)",
+                "tertiary-fixed-dim": "#fdba5c",
+                "on-error-container": "#93000a",
+                "on-secondary": "#ffffff",
+                "on-secondary-fixed": "#370e00"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "gutter": "1.5rem",
+                "pencil-stroke": "3px",
+                "padding": "1.5rem",
+                "margin": "2rem",
+                "double-offset": "6px",
+                "unit-base": "4px",
+                "grid-margin": "2rem",
+                "grid-gutter": "1.5rem",
+                "card-padding": "1.5rem"
+        },
+        "fontFamily": {
+                "annotation": [
+                        "Caveat"
+                ],
+                "headline-lg": [
+                        "EB Garamond"
+                ],
+                "title-md": [
+                        "Manrope"
+                ],
+                "display-lg": [
+                        "EB Garamond"
+                ],
+                "marginalia-sm": [
+                        "Caveat"
+                ],
+                "headline-lg-mobile": [
+                        "EB Garamond"
+                ],
+                "body-lg": [
+                        "Manrope"
+                ],
+                "label-sm": [
+                        "Manrope"
+                ]
+        },
+        "fontSize": {
+                "annotation": [
+                        "22px",
+                        {
+                                "lineHeight": "1.1",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "40px",
+                        {
+                                "lineHeight": "1.2",
+                                "fontWeight": "500"
+                        }
+                ],
+                "title-md": [
+                        "20px",
+                        {
+                                "lineHeight": "1.4",
+                                "letterSpacing": "0.01em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "display-lg": [
+                        "64px",
+                        {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "marginalia-sm": [
+                        "16px",
+                        {
+                                "lineHeight": "1.0",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "32px",
+                        {
+                                "lineHeight": "1.2",
+                                "fontWeight": "500"
+                        }
+                ],
+                "body-lg": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-sm": [
+                        "12px",
+                        {
+                                "lineHeight": "1.0",
+                                "fontWeight": "800"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body {
+            background-color: #fcf9f8;
+            background-image: linear-gradient(#e5e2e1 1px, transparent 1px), linear-gradient(90deg, #e5e2e1 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        
+        .bento-card {
+            background-color: #fcf9f8;
+            border: 3px solid #121212;
+            box-shadow: 6px 6px 0px 0px #121212;
+            position: relative;
+        }
+        
+        .bento-card::after {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px; right: -3px; bottom: -3px;
+            border: 1px solid rgba(18, 18, 18, 0.3);
+            pointer-events: none;
+            transform: rotate(0.5deg);
+        }
+        
+        .brutalist-button {
+            border: 3px solid #121212;
+            box-shadow: 4px 4px 0px 0px #121212;
+            transition: all 0.1s;
+        }
+        
+        .brutalist-button:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0px 0px #121212;
+        }
+        
+        .tape-primary {
+            background-color: rgba(253, 199, 66, 0.4);
+            transform: rotate(-2deg);
+        }
+        
+        .tape-secondary {
+            background-color: rgba(179, 90, 52, 0.4);
+            transform: rotate(1deg);
+        }
+        
+        .marker-yellow {
+            background-color: rgba(253, 199, 66, 0.3);
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+        
+        .marker-mint {
+            background-color: rgba(161, 212, 148, 0.3);
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+        
+        .marker-orange {
+            background-color: rgba(179, 90, 52, 0.3);
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+        
+        .dashed-divider {
+            border-top: 2px dashed #121212;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body class="text-on-surface font-body-lg min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-surface dark:bg-inverse-surface docked full-width top-0 border-b-[3px] border-ink-black shadow-[6px_6px_0px_0px_rgba(18,18,18,1)] z-50">
+<div class="flex justify-between items-center w-full px-grid-margin py-4 max-w-full mx-auto">
+<div class="flex items-center gap-6">
+<a class="font-display-lg text-headline-lg-mobile md:text-headline-lg font-bold text-on-surface uppercase tracking-tight flex items-center gap-1 hover:translate-x-[2px] hover:translate-y-[2px] transition-transform" href="#">
+                    Точка<div class="w-2 h-2 bg-on-surface transform rotate-12 mx-0.5"></div>Плавления
+                </a>
+<div class="hidden md:flex items-center gap-6 ml-8">
+<a class="font-title-md text-title-md text-primary-container border-b-[3px] border-primary-container pb-1 hover:translate-x-[2px] hover:translate-y-[2px] transition-transform" href="#">Статьи</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-primary-container hover:translate-x-[2px] hover:translate-y-[2px] transition-transform" href="#">Инструменты</a>
+<a class="font-title-md text-title-md text-on-surface-variant hover:text-primary-container hover:translate-x-[2px] hover:translate-y-[2px] transition-transform" href="#">Cookies</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="md:hidden text-on-surface">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">menu</span>
+</button>
+</div>
+</div>
+</nav>
+<main class="flex-grow w-full max-w-[1400px] mx-auto px-4 md:px-grid-margin py-8">
+<!-- Breadcrumbs -->
+<div class="mb-8 font-annotation text-annotation font-bold flex items-center gap-2 text-on-surface-variant">
+<span>Главная</span>
+<span class="material-symbols-outlined text-sm">arrow_right_alt</span>
+<span>Основы</span>
+<span class="material-symbols-outlined text-sm">arrow_right_alt</span>
+<span class="text-on-surface">Температурные профили: как не перегреть плату за $300</span>
+</div>
+<!-- Article Header Bento -->
+<header class="bento-card p-6 md:p-8 mb-12 transform -rotate-[0.5deg]">
+<div class="absolute top-0 right-10 w-24 h-8 tape-primary z-10 -translate-y-4"></div>
+<span class="inline-block px-3 py-1 bg-primary-container text-on-primary font-label-sm text-label-sm uppercase rounded-full mb-6 transform rotate-1">Основы</span>
+<h1 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface leading-tight mb-8">Температурные профили: как не перегреть плату за $300</h1>
+<div class="flex flex-wrap gap-4 font-body-lg text-body-lg font-bold">
+<span class="marker-mint flex items-center gap-1"><span class="material-symbols-outlined text-sm">schedule</span> 8 мин чтения</span>
+<span class="marker-yellow flex items-center gap-1"><span class="material-symbols-outlined text-sm">calendar_today</span> 10 авг 2026</span>
+<span class="marker-orange flex items-center gap-1"><span class="material-symbols-outlined text-sm">person</span> Иван Пайкин</span>
+</div>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-grid-gutter relative">
+<!-- Left Marginalia (Desktop Only) -->
+<aside class="hidden md:flex col-span-2 flex-col relative h-full">
+<div class="sticky top-32 flex flex-col items-end pr-4">
+<div class="font-body-lg text-label-sm uppercase tracking-widest text-outline transform -rotate-90 origin-right absolute right-0 top-10 whitespace-nowrap">ЗАМЕТКИ НА ПОЛЯХ</div>
+<div class="mt-32 flex flex-col gap-12 font-annotation text-annotation text-copper-pot items-end text-right">
+<div class="relative transform rotate-2">
+<p>// FR-4 Текстолит - Береги от T-шока!</p>
+<svg class="absolute -right-6 top-2 w-8 h-8 text-copper-pot" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="relative transform -rotate-1">
+<p>Peak 245C - Измерь датчиком K-типа</p>
+<svg class="absolute -right-6 top-2 w-8 h-8 text-copper-pot" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<div class="relative transform rotate-3">
+<p>Проверено в лабе ТЧП</p>
+<svg class="absolute -right-6 top-2 w-8 h-8 text-copper-pot" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Center -->
+<article class="col-span-1 md:col-span-7 flex flex-col gap-8">
+<!-- Post-it TLDR -->
+<div class="bg-[#fdf0a6] p-6 border-2 border-ink-black shadow-[4px_4px_0px_0px_rgba(18,18,18,1)] relative transform rotate-[0.5deg]">
+<div class="absolute top-0 left-1/2 w-16 h-6 tape-primary z-10 -translate-x-1/2 -translate-y-3"></div>
+<p class="font-annotation text-annotation md:text-headline-lg-mobile text-on-surface leading-relaxed">
+<strong class="font-bold">TL;DR:</strong> Правильный профиль оплавления — это 4 стадии: прогрев, активация, оплавление и охлаждение. Ошибка на любой из них ведет к отслоению дорожек или "холодной" пайке.
+                    </p>
+</div>
+<!-- Section 1 -->
+<div class="bento-card p-6 md:p-8 mt-4 transform -rotate-[0.2deg]">
+<h2 class="font-title-md text-title-md md:text-headline-lg-mobile font-bold mb-4">1. Введение и проблематика</h2>
+<p class="mb-6 text-on-surface-variant">Современная электроника требует ювелирной точности. Когда вы собираете плату за несколько сотен долларов, один неверный температурный шаг в печи может превратить текстолит в обугленный мусор. Термошок — враг номер один для BGA компонентов.</p>
+<div class="my-6 p-4 border-l-4 border-copper-pot bg-surface-container-low font-body-lg italic">
+<span class="marker-orange font-bold not-italic">Важно знать!</span> Перегрев выше допустимой нормы разрушает межслойные соединения.
+                    </div>
+<p class="text-on-surface-variant">Мы разберем стандартный профиль, который спасет 90% ваших прототипов, и покажем, где чаще всего ошибаются новички.</p>
+</div>
+<!-- Section 2 -->
+<div class="bento-card p-6 md:p-8 transform rotate-[0.3deg]">
+<h2 class="font-title-md text-title-md md:text-headline-lg-mobile font-bold mb-6">2. График температурного профиля</h2>
+<div class="relative w-full h-64 border-2 border-ink-black bg-surface-container-lowest flex items-center justify-center overflow-hidden mb-6">
+<!-- Hand drawn chart simulation placeholder -->
+<div class="absolute inset-0 p-4 opacity-20" style="background-image: linear-gradient(#e5e2e1 1px, transparent 1px), linear-gradient(90deg, #e5e2e1 1px, transparent 1px); background-size: 20px 20px;"></div>
+<svg class="w-full h-full p-4 relative z-10" preserveAspectRatio="none" viewBox="0 0 400 200">
+<path d="M 10 180 Q 50 180, 100 120 T 200 120 Q 250 120, 280 40 Q 300 10, 320 40 Q 350 180, 390 180" fill="none" stroke="#121212" stroke-linecap="round" stroke-linejoin="round" stroke-width="4"></path>
+<path d="M 10 180 Q 50 180, 100 120 T 200 120 Q 250 120, 280 40 Q 300 10, 320 40 Q 350 180, 390 180" fill="none" stroke="#154212" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" transform="translate(1, -1)"></path>
+<!-- Annotations -->
+<text fill="#b35a34" font-family="Caveat" font-size="16" x="260" y="25">Peak 245C</text>
+<path d="M 270 30 L 280 40" fill="none" stroke="#b35a34" stroke-width="2"></path>
+<!-- Axes -->
+<path d="M 10 10 L 10 190 L 390 190" fill="none" stroke="#121212" stroke-width="3"></path>
+</svg>
+<div class="absolute top-2 left-2 w-12 h-4 tape-secondary z-20"></div>
+</div>
+<p class="text-on-surface-variant mb-4">Обратите внимание на крутизну подъема. Скорость нагрева не должна превышать 2-3°C в секунду. Если греть быстрее, флюс не успеет активироваться, а влага внутри компонентов может буквально разорвать их корпуса (эффект "попкорна").</p>
+</div>
+<!-- Section 3 -->
+<div class="bento-card p-6 md:p-8 transform -rotate-[0.1deg]">
+<h2 class="font-title-md text-title-md md:text-headline-lg-mobile font-bold mb-4">3. Заключение</h2>
+<p class="mb-6 text-on-surface-variant">Контроль температуры — это не магия, а физика. Запишите себе этот базовый профиль, купите нормальную термопару и прекратите жарить платы строительным феном на глаз.</p>
+<div class="p-4 border-2 border-dashed border-outline bg-surface-container my-6 relative">
+<div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-ochre-accent border-2 border-ink-black flex items-center justify-center font-bold font-annotation">!</div>
+<span class="marker-mint font-bold block w-max mb-2 text-primary-container">Инженерный совет:</span>
+<span class="font-annotation text-annotation">Используйте термопасту только с высоким коэффициентом теплопроводности для термопар при калибровке профиля.</span>
+</div>
+</div>
+<!-- Action Button -->
+<div class="mt-8 flex justify-center">
+<button class="brutalist-button bg-primary-container text-on-primary font-label-sm text-label-sm uppercase px-8 py-4 flex items-center gap-2 hover:bg-basil-green">
+<span class="material-symbols-outlined text-lg">content_copy</span>
+                        Скопировать ссылку
+                    </button>
+</div>
+</article>
+<!-- Right Sidebar -->
+<aside class="col-span-1 md:col-span-3 flex flex-col gap-6">
+<!-- Author Card -->
+<div class="bento-card p-5 flex flex-col items-center text-center transform rotate-[0.5deg]">
+<div class="w-20 h-20 rounded-full border-3 border-ink-black bg-surface-variant mb-4 overflow-hidden relative p-1" style="border: 3px solid #121212;">
+<img class="w-full h-full object-cover rounded-full border border-outline-variant" data-alt="A detailed pencil sketch style portrait of a male engineer, minimalist line art, high contrast black and white on a slight off-white background, subtle hatching, thoughtful expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4UidKHbnzDuN_NDG4DM7WGeRCsjSrfHx8z5Ng1Lo7nj0th7l8CpTsOBM58PUuClbYWcVTWlcyLqMelgTqmQI3vBttZVHdff2J_1iB2oPinMPDdbG8HCn66OA0DzFkIG-ULQFeQY1DNxRYHNNDTAuz0Q07rgl1bc19YP5T2XFyB9QlxQejhS4ygg80qXvacS1Tw9ktAqTpN4py4OlARW2_Z973WeSx53m8QjBqFaOyz6dUeCY96cvwul_qyy30HKcDnx_eR1wHf8DY">
+</div>
+<h3 class="font-title-md text-title-md font-bold mb-1">Иван Пайкин</h3>
+<p class="font-annotation text-annotation text-on-surface-variant mb-3">Главный технолог</p>
+<div class="marker-mint font-label-sm text-[10px] uppercase tracking-wide border border-ink-black border-opacity-20 px-2 py-1 text-primary-container">
+                        Проверено в лаборатории
+                    </div>
+</div>
+<!-- TOC -->
+<div class="bento-card p-5 transform -rotate-[0.5deg] sticky top-32">
+<h3 class="font-title-md text-title-md font-bold mb-4 border-b-2 border-dashed border-outline pb-2">Оглавление</h3>
+<ul class="space-y-3 font-body-lg text-sm text-on-surface-variant">
+<li class="hover:text-primary-container cursor-pointer hover:translate-x-1 transition-transform flex gap-2"><span class="text-primary-container font-bold">1.</span> Введение и проблематика</li>
+<li class="hover:text-primary-container cursor-pointer hover:translate-x-1 transition-transform flex gap-2"><span class="text-primary-container font-bold">2.</span> График профиля</li>
+<li class="hover:text-primary-container cursor-pointer pl-4 transition-transform flex gap-2"><span class="text-outline text-xs">-</span> Фаза активации</li>
+<li class="hover:text-primary-container cursor-pointer pl-4 transition-transform flex gap-2"><span class="text-outline text-xs">-</span> Пиковая температура</li>
+<li class="hover:text-primary-container cursor-pointer hover:translate-x-1 transition-transform flex gap-2"><span class="text-primary-container font-bold">3.</span> Заключение</li>
+</ul>
+</div>
+<!-- Related -->
+<div class="bento-card p-5 transform rotate-[0.2deg] bg-surface-container">
+<h3 class="font-title-md text-title-md font-bold mb-4">Похожие статьи</h3>
+<div class="space-y-4">
+<a class="block group" href="#">
+<h4 class="font-body-lg font-bold group-hover:text-primary-container underline decoration-2 decoration-transparent group-hover:decoration-primary-container transition-all">SMD 0402 VS 0603</h4>
+<p class="font-annotation text-sm text-on-surface-variant mt-1">Что выбрать для стартапа</p>
+</a>
+<div class="dashed-divider my-2"></div>
+<a class="block group" href="#">
+<h4 class="font-body-lg font-bold group-hover:text-primary-container underline decoration-2 decoration-transparent group-hover:decoration-primary-container transition-all">Гид по флюсам</h4>
+<p class="font-annotation text-sm text-on-surface-variant mt-1">От канифоли до безотмывочных</p>
+</a>
+<div class="dashed-divider my-2"></div>
+<a class="block group" href="#">
+<h4 class="font-body-lg font-bold group-hover:text-primary-container underline decoration-2 decoration-transparent group-hover:decoration-primary-container transition-all">Жала паяльника</h4>
+<p class="font-annotation text-sm text-on-surface-variant mt-1">Микроволна или конус?</p>
+</a>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container dark:bg-surface-container-highest w-full border-t-[3px] border-ink-black mt-12 z-10 relative">
+<div class="w-full px-grid-margin py-grid-gutter flex flex-col md:flex-row justify-between items-center max-w-[1400px] mx-auto gap-6">
+<div class="font-display-lg text-headline-lg text-on-surface flex items-center gap-1">
+                Точка<div class="w-2 h-2 bg-on-surface transform rotate-12 mx-0.5"></div>Плавления
+            </div>
+<p class="font-body-lg text-body-lg text-on-surface-variant text-center md:text-left">
+                © 2024 Точка Плавления. Сделано с душой и кодом.
+            </p>
+<div class="flex gap-6 font-annotation text-annotation">
+<a class="text-on-surface-variant hover:text-copper-pot transition-colors hover:rotate-2" href="#">RSS</a>
+<a class="text-on-surface-variant hover:text-copper-pot transition-colors hover:-rotate-2" href="#">Github</a>
+<a class="text-on-surface-variant hover:text-copper-pot transition-colors hover:rotate-1" href="#">Telegram</a>
+</div>
+</div>
+</footer>
+</body></html>

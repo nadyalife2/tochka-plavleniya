@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Точка Плавления - Лабораторный Журнал</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&amp;family=IBM+Plex+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#0030c6",
+                        "surface-variant": "#f7ddd5",
+                        "on-secondary-container": "#eaeaff",
+                        "primary-fixed-dim": "#ffb599",
+                        "surface-bright": "#fff8f6",
+                        "craft-paper": "#F6F4EE",
+                        "on-primary": "#ffffff",
+                        "background": "#fff8f6",
+                        "surface-dim": "#eed5cc",
+                        "outline-variant": "#e1bfb3",
+                        "primary-fixed": "#ffdbce",
+                        "on-error-container": "#93000a",
+                        "error-container": "#ffdad6",
+                        "on-surface": "#261813",
+                        "on-primary-container": "#5a1c00",
+                        "inverse-surface": "#3c2d27",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed-variant": "#004d67",
+                        "tape-green": "#8BA888",
+                        "surface-container-high": "#fce3da",
+                        "on-tertiary-container": "#003549",
+                        "on-primary-fixed-variant": "#7f2b00",
+                        "blueprint-blue": "#E6F0FF",
+                        "tertiary-fixed-dim": "#76d1ff",
+                        "secondary-container": "#3056ff",
+                        "on-secondary-fixed": "#00115a",
+                        "error": "#ba1a1a",
+                        "on-background": "#261813",
+                        "secondary": "#0039e4",
+                        "surface": "#fff8f6",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-fixed": "#c2e8ff",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-primary": "#ffb599",
+                        "surface-container": "#ffe9e2",
+                        "surface-container-low": "#fff1ec",
+                        "tertiary": "#006688",
+                        "on-error": "#ffffff",
+                        "tertiary-container": "#00a4d9",
+                        "primary-container": "#fc6c2b",
+                        "secondary-fixed": "#dee0ff",
+                        "on-tertiary-fixed": "#001e2c",
+                        "secondary-fixed-dim": "#bac3ff",
+                        "inverse-on-surface": "#ffede7",
+                        "surface-container-highest": "#f7ddd5",
+                        "emerald-circuit": "#142E1F",
+                        "outline": "#8d7167",
+                        "primary": "#a73a00",
+                        "on-primary-fixed": "#370e00",
+                        "on-surface-variant": "#594138",
+                        "tape-yellow": "#D4AF37",
+                        "surface-tint": "#a73a00",
+                        "ink-black": "#242424"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "unit": "4px",
+                        "margin": "32px",
+                        "bento-gap": "16px",
+                        "gutter": "28px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "label-caps": ["IBM Plex Mono"],
+                        "display-xl": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "code-sm": ["IBM Plex Mono"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "display-xl": ["72px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "800" }],
+                        "headline-md": ["24px", { "lineHeight": "1.4", "fontWeight": "700" }],
+                        "code-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "800" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F6F4EE; background-image: radial-gradient(#d1d1d1 1px, transparent 1px); background-size: 20px 20px; }
+        .brutal-border { border: 3px solid #242424; border-radius: 4px 6px 3px 5px; }
+        .brutal-shadow { box-shadow: 6px 6px 0px 0px #242424; }
+        .brutal-hover:hover { transform: translate(2px, 2px); box-shadow: 4px 4px 0px 0px #242424; }
+        .brutal-active:active { transform: translate(6px, 6px); box-shadow: 0px 0px 0px 0px #242424; }
+        
+        /* Interactive Console Search */
+        #search-console { display: none; }
+        #search-console.active { display: flex; }
+    </style>
+</head>
+<body class="font-body-md text-on-surface min-h-screen flex flex-col">
+<!-- Top Navigation (Generated from JSON constraints) -->
+<header class="bg-craft-paper dark:bg-emerald-circuit border-b-4 border-ink-black flex justify-between items-center w-full px-margin py-4 max-w-full sticky top-0 z-50">
+<div class="flex items-center gap-6">
+<div class="font-headline-lg text-headline-lg font-black text-ink-black dark:text-surface-container-lowest -rotate-2 border-2 border-ink-black bg-primary-container px-4 py-1 shadow-[4px_4px_0px_0px_rgba(36,36,36,1)]">
+                Точка Плавления
+            </div>
+<nav class="hidden md:flex gap-6 font-code-sm text-code-sm mt-2">
+<a class="text-primary font-bold border-b-2 border-primary pb-1" href="#">Лаборатория</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-transform hover:-translate-y-1" href="#">Чертежи</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-transform hover:-translate-y-1" href="#">Инструменты</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-transform hover:-translate-y-1" href="#">Архив</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 border-2 border-ink-black bg-white shadow-[2px_2px_0px_0px_rgba(36,36,36,1)] hover:bg-surface-container-highest transition-transform hover:-translate-y-1 flex items-center justify-center brutal-border" onclick="document.getElementById('search-console').classList.toggle('active')">
+<span class="material-symbols-outlined font-bold">search</span>
+</button>
+<button class="bg-primary-container text-on-primary-container font-code-sm text-code-sm font-bold px-6 py-2 border-2 border-ink-black shadow-[4px_4px_0px_0px_rgba(36,36,36,1)] hover:bg-surface-container-highest transition-transform hover:-translate-y-1 brutal-border">
+                Вход
+            </button>
+</div>
+</header>
+<!-- Search Console Overlay -->
+<div class="fixed inset-0 bg-white/80 backdrop-blur-md z-40 flex-col items-center pt-32 px-4 hidden" id="search-console">
+<div class="w-full max-w-3xl brutal-border bg-craft-paper p-8 brutal-shadow relative">
+<button class="absolute top-4 right-4 text-ink-black hover:text-primary" onclick="document.getElementById('search-console').classList.remove('active')">
+<span class="material-symbols-outlined text-3xl">close</span>
+</button>
+<div class="font-label-caps text-label-caps text-on-surface-variant mb-2">// КОНСОЛЬ ПОИСКА v1.2</div>
+<div class="flex items-center border-b-4 border-ink-black pb-2">
+<span class="material-symbols-outlined text-4xl mr-4">my_location</span>
+<input autofocus="" class="w-full bg-transparent border-none outline-none font-code-sm text-headline-md font-bold text-ink-black placeholder:text-outline" placeholder="Введите запрос или команду..." type="text"/>
+</div>
+<div class="mt-4 flex gap-2 font-code-sm text-code-sm">
+<span class="bg-tape-yellow px-2 py-1 rotate-1 border border-ink-black">#ESP32</span>
+<span class="bg-surface-variant px-2 py-1 -rotate-1 border border-ink-black">#Пайка</span>
+<span class="bg-blueprint-blue px-2 py-1 rotate-2 border border-ink-black">#Схемотехника</span>
+</div>
+</div>
+</div>
+<main class="flex-grow w-full max-w-[1440px] mx-auto px-margin py-12 flex flex-col gap-12">
+<!-- Hero Section -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center bg-white brutal-border brutal-shadow p-8 relative overflow-hidden">
+<div class="absolute -top-4 -left-4 bg-tape-yellow px-6 py-2 rotate-[-5deg] font-label-caps text-label-caps border-2 border-ink-black shadow-[2px_2px_0px_0px_rgba(36,36,36,1)] z-10">
+                REV 0.2 // STABLE
+            </div>
+<div class="flex flex-col gap-6 z-10">
+<h1 class="font-display-xl text-display-xl md:text-display-xl text-ink-black relative">
+                    Паяем.<br/>Проектируем.<br/>Прошиваем.
+                    <svg class="absolute -right-8 top-1/2 w-16 h-16 text-primary rotate-12" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path></svg>
+</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-md">
+                    Открытый лабораторный журнал для инженеров, мейкеров и тех, кто любит запах канифоли по утрам.
+                </p>
+<div class="flex gap-4 mt-4">
+<button class="bg-primary text-on-primary font-code-sm text-code-sm px-8 py-3 brutal-border brutal-shadow brutal-hover brutal-active transition-all">
+                        Начать проект
+                    </button>
+<button class="bg-white text-ink-black font-code-sm text-code-sm px-8 py-3 brutal-border brutal-shadow brutal-hover brutal-active transition-all flex items-center gap-2">
+<span class="material-symbols-outlined">terminal</span> Читать доки
+                    </button>
+</div>
+</div>
+<div class="bg-blueprint-blue brutal-border h-full min-h-[300px] flex items-center justify-center p-8 relative">
+<!-- Blueprint Schematic Placeholder -->
+<div class="w-full h-full border-2 border-dashed border-tertiary opacity-50 flex items-center justify-center relative">
+<div class="font-code-sm text-tertiary">SCHEMATIC_VIEW_XYZ</div>
+<div class="absolute w-8 h-8 border-t-2 border-l-2 border-tertiary top-4 left-4"></div>
+<div class="absolute w-8 h-8 border-b-2 border-r-2 border-tertiary bottom-4 right-4"></div>
+</div>
+<div class="absolute -bottom-6 -right-6 bg-white p-4 brutal-border shadow-[4px_4px_0px_0px_rgba(36,36,36,1)] rotate-3">
+<div class="font-label-caps text-label-caps text-on-surface-variant">СТАТУС:</div>
+<div class="font-headline-md text-code-sm font-bold text-tape-green">ALL SYSTEMS GO</div>
+</div>
+</div>
+</section>
+<!-- Interactive Filter Bar -->
+<section class="flex flex-wrap gap-4 items-center p-4 bg-surface-variant brutal-border shadow-[4px_4px_0px_0px_rgba(36,36,36,1)]">
+<span class="font-label-caps text-label-caps mr-4 hidden md:block">ФИЛЬТР:</span>
+<button class="bg-tape-yellow text-ink-black font-bold px-4 py-2 border-2 border-ink-black rotate-[-2deg] shadow-[2px_2px_0px_0px_rgba(36,36,36,1)] font-code-sm text-code-sm">
+                Все посты
+            </button>
+<button class="bg-white text-on-surface-variant px-4 py-2 border-2 border-ink-black hover:bg-surface-container-highest transition-colors font-code-sm text-code-sm brutal-border brutal-hover">
+                SMD Монтаж
+            </button>
+<button class="bg-white text-on-surface-variant px-4 py-2 border-2 border-ink-black hover:bg-surface-container-highest transition-colors font-code-sm text-code-sm brutal-border brutal-hover">
+                Микроконтроллеры
+            </button>
+<button class="bg-white text-on-surface-variant px-4 py-2 border-2 border-ink-black hover:bg-surface-container-highest transition-colors font-code-sm text-code-sm brutal-border brutal-hover">
+                Материалы
+            </button>
+</section>
+<!-- Bento Grid Main Content -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-bento-gap">
+<!-- Featured Card (span 7) -->
+<article class="md:col-span-7 bg-white brutal-border brutal-shadow p-6 flex flex-col relative group cursor-pointer transition-transform hover:-translate-y-1">
+<div class="absolute top-4 right-4 bg-primary text-on-primary font-label-caps text-label-caps px-3 py-1 border-2 border-ink-black rotate-3 z-10 shadow-[2px_2px_0px_0px_rgba(36,36,36,1)]">
+                    ВАЖНОЕ
+                </div>
+<div class="flex items-center gap-3 mb-4 border-b-2 border-ink-black pb-4">
+<div class="w-10 h-10 bg-secondary-container brutal-border flex items-center justify-center font-bold text-on-secondary-container">AL</div>
+<div class="font-code-sm text-code-sm">
+<span class="font-bold">Alexey D.</span> • 2 часа назад
+                    </div>
+</div>
+<div class="flex-grow flex flex-col md:flex-row gap-6">
+<div class="w-full md:w-1/2 bg-surface-container-high brutal-border flex items-center justify-center p-8 relative overflow-hidden group-hover:bg-primary-fixed transition-colors">
+<span class="material-symbols-outlined text-6xl text-ink-black" style="font-variation-settings: 'FILL' 1;">memory</span>
+</div>
+<div class="w-full md:w-1/2 flex flex-col justify-between">
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile font-bold mb-3">Основы трассировки высокочастотных плат в KiCad 7</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-4">
+                                Разбираем частые ошибки при проектировании импеданса и почему ваш сигнал превращается в шум. Практическое руководство с примерами из реальных проектов.
+                            </p>
+</div>
+<div class="flex gap-2 flex-wrap mb-4">
+<span class="bg-blueprint-blue px-2 py-1 font-code-sm text-[12px] border border-ink-black">#KiCad</span>
+<span class="bg-surface-variant px-2 py-1 font-code-sm text-[12px] border border-ink-black">#PCB</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t-2 border-ink-black flex justify-between items-center font-code-sm text-code-sm text-on-surface-variant">
+<div class="flex gap-4">
+<span class="flex items-center gap-1 hover:text-primary"><span class="material-symbols-outlined text-lg">thumb_up</span> 142</span>
+<span class="flex items-center gap-1 hover:text-primary"><span class="material-symbols-outlined text-lg">forum</span> 28</span>
+</div>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">visibility</span> 1.2k</span>
+</div>
+</article>
+<!-- Regular Card 1 (span 5) -->
+<article class="md:col-span-5 bg-surface-container-lowest brutal-border brutal-shadow p-6 flex flex-col relative group cursor-pointer transition-transform hover:-translate-y-1">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-8 h-8 bg-tertiary-container brutal-border flex items-center justify-center font-bold text-on-tertiary-container text-xs">MV</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">
+                        Mikhail V. • Вчера
+                    </div>
+</div>
+<h3 class="font-headline-md text-headline-md font-bold mb-3 group-hover:text-primary transition-colors">Выбор паяльной пасты для домашней лаборатории</h3>
+<div class="bg-craft-paper h-40 mb-4 brutal-border flex items-center justify-center relative overflow-hidden">
+<span class="material-symbols-outlined text-5xl text-on-surface-variant">precision_manufacturing</span>
+<!-- Decorative tape -->
+<div class="absolute top-2 left-2 w-16 h-4 bg-tape-green opacity-80 rotate-[-15deg] mix-blend-multiply"></div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow line-clamp-3">
+                    Сравнение популярных свинцовых и бессвинцовых паст. Как хранить, как наносить через трафарет и почему дешёвая паста с Ali может испортить вам выходные.
+                </p>
+<div class="mt-4 flex justify-between items-center font-code-sm text-code-sm border-t-2 border-ink-black pt-4">
+<span class="bg-surface-variant px-2 py-1 border border-ink-black">#Материалы</span>
+<span class="flex items-center gap-1 text-on-surface-variant"><span class="material-symbols-outlined text-lg">bolt</span> Активно</span>
+</div>
+</article>
+<!-- Interactive Tool Card (span 6) -->
+<article class="md:col-span-6 bg-tape-yellow brutal-border shadow-[8px_8px_0px_0px_rgba(36,36,36,1)] p-6 flex flex-col relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 bg-white/20 rounded-full blur-2xl pointer-events-none"></div>
+<div class="absolute -right-4 top-4 bg-white px-4 py-1 font-label-caps text-label-caps border-2 border-ink-black rotate-[15deg] shadow-[2px_2px_0px_0px_rgba(36,36,36,1)]">
+                    ИНСТРУМЕНТ
+                </div>
+<h3 class="font-headline-md text-headline-md font-bold mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined">calculate</span> Калькулятор делителя напряжения
+                </h3>
+<div class="flex-grow flex flex-col gap-6">
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="font-code-sm text-code-sm font-bold block mb-2">V(in) [В]</label>
+<input class="w-full bg-white brutal-border p-2 font-code-sm focus:outline-none focus:ring-2 focus:ring-primary shadow-[2px_2px_0px_0px_rgba(36,36,36,1)]" type="number" value="12"/>
+</div>
+<div>
+<label class="font-code-sm text-code-sm font-bold block mb-2">R1 [Ом]</label>
+<input class="w-full bg-white brutal-border p-2 font-code-sm focus:outline-none focus:ring-2 focus:ring-primary shadow-[2px_2px_0px_0px_rgba(36,36,36,1)]" type="number" value="10000"/>
+</div>
+<div>
+<label class="font-code-sm text-code-sm font-bold block mb-2">R2 [Ом]</label>
+<input class="w-full bg-white brutal-border p-2 font-code-sm focus:outline-none focus:ring-2 focus:ring-primary shadow-[2px_2px_0px_0px_rgba(36,36,36,1)]" type="number" value="4700"/>
+</div>
+</div>
+<div class="bg-white brutal-border p-4 flex justify-between items-center shadow-[4px_4px_0px_0px_rgba(36,36,36,1)] mt-auto">
+<span class="font-code-sm text-code-sm font-bold">V(out):</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">3.83 В</span>
+</div>
+</div>
+</article>
+<!-- Regular Card 2 (span 6) -->
+<article class="md:col-span-6 bg-white brutal-border brutal-shadow p-6 flex flex-col relative group cursor-pointer transition-transform hover:-translate-y-1">
+<div class="flex items-center gap-3 mb-4">
+<div class="w-8 h-8 bg-surface-variant brutal-border flex items-center justify-center font-bold text-on-surface text-xs">SYS</div>
+<div class="font-code-sm text-code-sm text-on-surface-variant">
+                        System Admin • 3 дня назад
+                    </div>
+</div>
+<h3 class="font-headline-md text-headline-md font-bold mb-3 group-hover:text-primary transition-colors">Обзор осциллографа Rigol DHO804</h3>
+<div class="bg-surface-container-high h-48 mb-4 brutal-border flex items-center justify-center relative">
+<span class="material-symbols-outlined text-6xl text-on-surface-variant" style="font-variation-settings: 'FILL' 1;">monitoring</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant flex-grow">
+                    Стоит ли переходить на 12-битные системы в бюджетном сегменте? Тестируем новинки от Rigol на реальных сигналах шины I2C и оцениваем уровень шума фронт-энда.
+                </p>
+<div class="mt-4 flex justify-between items-center font-code-sm text-code-sm border-t-2 border-ink-black pt-4">
+<span class="bg-surface-variant px-2 py-1 border border-ink-black">#Оборудование</span>
+<div class="flex gap-3 text-on-surface-variant">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-lg">thumb_up</span> 89</span>
+</div>
+</div>
+</article>
+</section>
+<!-- Pagination -->
+<section class="flex justify-center items-center gap-4 py-8">
+<button class="bg-white w-12 h-12 brutal-border shadow-[2px_2px_0px_0px_rgba(36,36,36,1)] hover:bg-surface-variant transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="bg-primary-container text-on-primary-container font-bold w-12 h-12 brutal-border shadow-[4px_4px_0px_0px_rgba(36,36,36,1)] rotate-[-3deg] flex items-center justify-center">
+                1
+            </button>
+<button class="bg-white font-code-sm w-12 h-12 brutal-border shadow-[2px_2px_0px_0px_rgba(36,36,36,1)] hover:bg-surface-variant transition-colors flex items-center justify-center">
+                2
+            </button>
+<button class="bg-white font-code-sm w-12 h-12 brutal-border shadow-[2px_2px_0px_0px_rgba(36,36,36,1)] hover:bg-surface-variant transition-colors flex items-center justify-center">
+                3
+            </button>
+<span class="font-code-sm">...</span>
+<button class="bg-white w-12 h-12 brutal-border shadow-[2px_2px_0px_0px_rgba(36,36,36,1)] hover:bg-surface-variant transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</section>
+</main>
+<!-- Footer (Generated from JSON constraints) -->
+<footer class="bg-ink-black dark:bg-on-background text-surface-container-lowest font-code-sm text-code-sm w-full py-12 px-margin mt-20 border-t-4 border-primary">
+<div class="max-w-[1440px] mx-auto flex flex-col md:flex-row justify-between items-center gap-bento-gap">
+<div class="flex flex-col gap-2">
+<div class="text-primary-fixed font-black text-xl tracking-tighter">ТОЧКА ПЛАВЛЕНИЯ</div>
+<div class="text-outline-variant">© 2024 ТОЧКА ПЛАВЛЕНИЯ — ЛАБОРАТОРНЫЙ ЖУРНАЛ</div>
+</div>
+<nav class="flex flex-wrap gap-6 justify-center">
+<a class="text-outline-variant hover:text-white hover:text-primary-container transition-colors" href="#">GitHub</a>
+<a class="text-outline-variant hover:text-white hover:text-primary-container transition-colors" href="#">Telegram</a>
+<a class="text-outline-variant hover:text-white hover:text-primary-container transition-colors" href="#">RSS</a>
+<a class="text-outline-variant hover:text-white hover:text-primary-container transition-colors" href="#">О проекте</a>
+</nav>
+<button class="bg-surface-container-lowest text-ink-black px-4 py-2 brutal-border flex items-center gap-2 hover:bg-primary-fixed transition-colors" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+                Наверх <span class="material-symbols-outlined">arrow_upward</span>
+</button>
+</div>
+</footer>
+</body></html>

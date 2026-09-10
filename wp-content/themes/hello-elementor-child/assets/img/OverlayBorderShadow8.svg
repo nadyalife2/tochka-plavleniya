@@ -1,0 +1,20 @@
+<svg viewBox="0 0 1164 302.33" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1164.000000" height="302.330078" fill="none" customFrame="#000000">
+	<defs>
+		<g id="pixso_custom_effect_1">
+			<effect x="6.000000" y="6.000000" visibility="visible" fill="rgb(25,25,25)" fill-opacity="1" effectType="dropShadow" stdDeviation="0" radius="0" />
+		</g>
+		<filter id="filter_1" width="1164.000000" height="302.330078" x="0.000000" y="0.000000" filterUnits="userSpaceOnUse" customEffect="url(#pixso_custom_effect_1)" color-interpolation-filters="sRGB">
+			<feFlood flood-opacity="0" result="BackgroundImageFix" />
+			<feColorMatrix result="hardAlpha" in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0 " />
+			<feOffset dx="6.000000" dy="6.000000" in="hardAlpha" />
+			<feComposite k2="-1" k3="1" in2="hardAlpha" operator="out" />
+			<feColorMatrix type="matrix" values="0 0 0 0 0.0980392 0 0 0 0 0.0980392 0 0 0 0 0.0980392 0 0 0 1 0 " />
+			<feBlend result="effect_dropShadow_1" in2="BackgroundImageFix" mode="normal" />
+			<feBlend result="shape" in="SourceGraphic" in2="effect_dropShadow_1" mode="normal" />
+		</filter>
+	</defs>
+	<g filter="url(#filter_1)">
+		<path id="Overlay+Border+Shadow" d="M0 0L1158 0L1158 296.33L0 296.33L0 0Z" fill="rgb(255,255,255)" fill-opacity="0.00200000009" fill-rule="nonzero" />
+		<path id="Overlay+Border+Shadow" d="M0 0L1158 0L1158 296.33L0 296.33L0 0ZM2 2L2 294.33L1156 294.33L1156 2L2 2Z" fill="rgb(25,25,25)" fill-rule="evenodd" />
+	</g>
+</svg>

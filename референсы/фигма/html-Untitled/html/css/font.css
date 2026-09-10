@@ -1,0 +1,57 @@
+
+@font-face {
+  font-family: 'Caveat-Regular';
+  font-style: normal;
+  font-weight: 400 700;
+  src: url(../font/Caveat_wght__1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Manrope-Regular';
+  font-style: normal;
+  font-weight: 200 800;
+  src: url(../font/Manrope_wght__1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Manrope-Bold';
+  font-style: normal;
+  font-weight: 200 800;
+  src: url(../font/Manrope_wght__1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Caveat-Bold';
+  font-style: normal;
+  font-weight: 400 700;
+  src: url(../font/Caveat_wght__1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Inter-Extra Bold';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url(../font/Inter_1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Inter-Bold';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url(../font/Inter_1.ttf) format(truetype);
+}
+
+		
+@font-face {
+  font-family: 'Inter-Black';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url(../font/Inter_1.ttf) format(truetype);
+}
+
+		

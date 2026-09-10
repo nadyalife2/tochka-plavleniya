@@ -19,6 +19,11 @@
       "command": "node",
       "args": ["C:/mcp_servers/MCP-Stack-for-UI-UX-Designers/inspire-mcp/build/index.js"],
       "description": "Web UI layout & component inspiration scraper server"
+    },
+    "docker-mcp-gateway": {
+      "command": "docker",
+      "args": ["mcp", "gateway", "run"],
+      "description": "Docker MCP Gateway connecting to configured profiles and catalog"
     }
   }
 }

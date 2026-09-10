@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Точка Плавления - Visceral Bento Blog</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&amp;family=Caveat:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            surface: '#fff8f6',
+            'surface-dim': '#eed5cc',
+            primary: '#000000',
+            accent: '#fc6c2b',
+            tape: '#d3c9a3',
+            'tape-red': '#e05942',
+            'tape-yellow': '#efbf3f',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            hand: ['Caveat', 'cursive'],
+          },
+          boxShadow: {
+            'brutal': '6px 6px 0px 0px rgba(0,0,0,1)',
+            'brutal-hover': '2px 2px 0px 0px rgba(0,0,0,1)',
+            'brutal-lg': '10px 10px 0px 0px rgba(0,0,0,1)',
+          },
+          borderWidth: {
+            '3': '3px',
+          },
+          backgroundImage: {
+            'grid-pattern': "url('data:image/svg+xml,%3Csvg width=\"40\" height=\"40\" viewBox=\"0 0 40 40\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cpath d=\"M0 0h40v40H0V0zm1 1h38v38H1V1z\" fill=\"%23000\" fill-opacity=\"0.05\" fill-rule=\"evenodd\"/%3E%3C/svg%3E')",
+          }
+        }
+      }
+    }
+  </script>
+<style data-purpose="brutal-styles">
+    body {
+      background-color: theme('colors.surface');
+      background-image: theme('backgroundImage.grid-pattern');
+      color: theme('colors.primary');
+    }
+    
+    .bento-card {
+      background-color: white;
+      border: 3px solid black;
+      box-shadow: theme('boxShadow.brutal');
+      transition: all 0.2s ease-in-out;
+      position: relative;
+    }
+    
+    .bento-card:hover {
+      transform: translate(4px, 4px);
+      box-shadow: theme('boxShadow.brutal-hover');
+    }
+
+    .tape-piece {
+      position: absolute;
+      height: 24px;
+      width: 80px;
+      background-color: theme('colors.tape');
+      opacity: 0.9;
+      transform: rotate(-3deg);
+      z-index: 10;
+      box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .tape-top-center { top: -12px; left: 50%; transform: translateX(-50%) rotate(2deg); }
+    .tape-top-left { top: -10px; left: -10px; transform: rotate(-15deg); }
+    .tape-top-right { top: -10px; right: -10px; transform: rotate(15deg); }
+    
+    .tape-red { background-color: theme('colors.tape-red'); color: white; height: auto; padding: 4px 12px; font-weight: 800; font-size: 1.2rem; display: inline-block; transform: rotate(-2deg); box-shadow: 4px 4px 0px rgba(0,0,0,1); border: 2px solid black; }
+    .tape-yellow { background-color: theme('colors.tape-yellow'); padding: 4px 12px; font-weight: 700; transform: rotate(1deg); display: inline-block; box-shadow: 4px 4px 0px rgba(0,0,0,1); border: 2px solid black; }
+
+    .scribble-box {
+      border: 2px dashed black;
+      border-radius: 4px;
+      padding: 1rem;
+      position: relative;
+    }
+    
+    .scribble-box::before {
+      content: '';
+      position: absolute;
+      top: -4px; left: -4px; right: -4px; bottom: -4px;
+      border: 1px solid black;
+      border-radius: 8px;
+      pointer-events: none;
+      transform: rotate(1deg);
+    }
+  </style>
+</head>
+<body class="font-sans antialiased min-h-screen p-4 md:p-8 lg:p-12">
+<!-- BEGIN: MainHeader -->
+<header class="mb-12 relative max-w-6xl mx-auto">
+<div class="bento-card p-6 md:p-10 bg-white">
+<div class="tape-piece tape-top-center w-32" style="background-color: #E6C64D; clip-path: polygon(0% 10%, 100% 0%, 95% 90%, 5% 100%);"></div>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+<div>
+<div class="tape-red mb-4 uppercase tracking-tighter">01. Visceral Blog</div>
+<h1 class="text-5xl md:text-7xl font-black uppercase leading-none tracking-tighter mb-2">
+            Точка<br/>Плавления
+          </h1>
+<p class="font-hand text-2xl mt-4 max-w-md leading-tight text-gray-700">
+            Анти-идеальный веб. Структура обнажена. Искренность форм.
+          </p>
+</div>
+<nav class="flex flex-wrap gap-4 mt-6 md:mt-0 relative">
+<!-- Sketch Arrow -->
+<svg class="absolute -left-12 top-2 hidden md:block w-8 h-8 text-black transform -rotate-12" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<a class="font-bold border-2 border-black px-4 py-2 hover:bg-black hover:text-white transition-colors brutal-hover" href="#">Статьи</a>
+<a class="font-bold border-2 border-black px-4 py-2 hover:bg-black hover:text-white transition-colors brutal-hover" href="#">Проекты</a>
+<a class="font-bold border-2 border-black px-4 py-2 hover:bg-black hover:text-white transition-colors brutal-hover" href="#">О нас</a>
+</nav>
+</div>
+</div>
+</header>
+<!-- END: MainHeader -->
+<!-- BEGIN: MainContent -->
+<main class="max-w-6xl mx-auto">
+<!-- Bento Grid Container -->
+<div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 md:gap-8">
+<!-- Featured Anchor Article (Span 2 cols, 2 rows) -->
+<article class="bento-card col-span-1 md:col-span-2 lg:col-span-2 row-span-2 p-6 flex flex-col justify-between group">
+<div class="tape-piece tape-top-left"></div>
+<div>
+<div class="tape-yellow mb-4 bg-black text-white">Anchor Cell: Управляет фокусом</div>
+<img alt="Strict Bento Grid" class="w-full h-64 object-cover border-2 border-black mb-6 grayscale group-hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCsSFVDnfPTr9r-79tHRd8CtMl99KqY387MQqhwY6kIGAA9P_zqpaPkMaUy_eJWBaX7intq8rHhiuSp-yJK_SzrwBMwHO1KpLJkip73gDoGmUW8tBW84_c89oo-QMpBPubEPhVykaQ64UPE7WjLd-KdStq8MKHMSP8B2FSj93x1DwZaC2ZgNFUdwkJTDZdrHF1ozTrcUCZNH8s3xubTgWqKAn6DZwV4l5NvEacn8AQh3qcFPKdwN-cygol2zTqm9hrb-w"/>
+<h2 class="text-3xl font-black mb-4 leading-tight uppercase group-hover:text-accent transition-colors">Как построить идеальный Bento-Модуль</h2>
+<p class="text-lg mb-6">Навигация через пространственный вес. Каждый тайл автономен и решает ровно одну задачу. Отказ от бесконечной ленты в пользу осознанного потребления контента.</p>
+</div>
+<div class="flex items-center justify-between border-t-2 border-black pt-4">
+<span class="font-hand text-xl">12 Марта 2024</span>
+<svg class="w-8 h-8 text-accent absolute -left-10 -top-2 transform -rotate-12 opacity-70" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M3 12h18m-6-6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round"></path></svg><a class="inline-flex items-center font-bold hover:underline decoration-4 underline-offset-4" href="#">Читать <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewbox="0 0 24 24"><path d="M14 5l7 7m0 0l-7 7m7-7H3" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+</div>
+</article>
+<!-- Sidebar Note Widget -->
+<aside class="bento-card col-span-1 p-6 bg-surface-dim"><div class="absolute -top-2 -right-4 w-20 h-6 bg-[#B4D3B2] opacity-80 transform rotate-3 border border-black/20 z-10" style="clip-path: polygon(0% 0%, 100% 5%, 95% 100%, 5% 95%);"></div>
+<div class="tape-piece tape-top-center w-16"></div>
+<h3 class="text-xl font-bold mb-4 uppercase">Anti-perfect UI</h3>
+<p class="font-hand text-xl leading-relaxed mb-4">В эпоху стерильных дашбордов и вылизанных пикселей мы транслируем человечность, честность и крафт.</p>
+<div class="scribble-box mt-4">
+<p class="text-sm font-bold text-center">Интерфейс, который не скрывает свою структуру.</p>
+</div>
+</aside>
+<!-- Standard Article Card -->
+<article class="bento-card col-span-1 p-5 flex flex-col justify-between group bg-[#fce3da]">
+<div>
+<div class="w-full h-32 bg-gray-200 border-2 border-black mb-4 relative overflow-hidden">
+<!-- Placeholder for raw image -->
+<div class="absolute inset-0 flex items-center justify-center font-hand text-2xl text-gray-500">Image Area</div>
+<div class="absolute inset-0 border-4 border-black border-dashed opacity-20 transform -rotate-2 scale-110"></div>
+</div>
+<h3 class="text-xl font-black mb-2 uppercase group-hover:text-accent transition-colors">Обнаженный каркас</h3>
+<p class="text-sm mb-4">Метафора прозрачности процессов. Как показывать, а не рассказывать.</p>
+</div>
+<a class="text-sm font-bold border-2 border-black inline-block text-center py-1 hover:bg-black hover:text-white transition-colors" href="#">Подробнее</a>
+</article>
+<!-- Interactive Widget Card -->
+<div class="bento-card col-span-1 md:col-span-2 lg:col-span-1 row-span-1 p-6 flex flex-col items-center justify-center text-center bg-gray-100">
+<div class="tape-piece tape-top-right w-20"></div>
+<svg class="w-16 h-16 mb-4 animate-pulse" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+<h3 class="font-black uppercase mb-2">Настройки системы</h3>
+<p class="text-xs mb-4">Строгий DOM-порядок. Доступность как приоритет.</p>
+<svg class="absolute inset-x-4 inset-y-4 pointer-events-none text-accent opacity-40" preserveaspectratio="none" viewbox="0 0 100 40"><ellipse cx="50" cy="20" fill="none" rx="48" ry="18" stroke="currentColor" stroke-dasharray="5,5" stroke-width="2"></ellipse></svg><button class="w-full bg-black text-white font-bold py-2 border-2 border-black hover:bg-white hover:text-black transition-colors brutal-hover">Тест скорости</button>
+</div>
+<!-- Small Note Card -->
+<div class="bento-card col-span-1 p-5 flex flex-col justify-center bg-yellow-50">
+<div class="tape-piece tape-top-left w-12"></div>
+<p class="font-hand text-2xl text-center">
+          "Тренд 2026:<br/>Неидеальные тени и текстуры."
+        </p>
+</div>
+<!-- Wide Article Card -->
+<article class="bento-card col-span-1 md:col-span-3 lg:col-span-2 p-6 flex flex-col sm:flex-row gap-6 group"><div class="absolute -bottom-3 left-1/2 -translate-x-1/2 w-24 h-7 bg-[#E6C64D] opacity-90 transform -rotate-1 border border-black/10 z-10" style="clip-path: polygon(2% 0%, 98% 3%, 100% 97%, 0% 100%);"></div>
+<img alt="Visceral Sketch" class="w-full sm:w-1/3 h-48 sm:h-full object-cover border-2 border-black grayscale group-hover:grayscale-0 transition-all" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCow7ZgzJyxt4h5_ktjrcYvgImHbbDJ_lWMt7_vX3gz9X28xzdLOmnSfoVSwiskz-rnycowZinsla_OjJ6vRKQ7H9skkxaGVVQpbxUfuyorBiYyPZYzDeKAduLnEsuu8e4dM-9_CqNzNRvrIn3k_k7b3ENvQwJO1DDA3dZT0wzVpVQZQST4BRFr8dq8p1Tv9ojKqi-zp0cktDLFHcXOa4hsnq6rgl5cblEdoYAU6KiAkH_ElgHFbPCQR7n5KL_7eZvzmw"/>
+<div class="flex flex-col justify-between flex-grow">
+<div>
+<h2 class="text-2xl font-black mb-2 uppercase group-hover:text-accent transition-colors">RAW. HUMAN.</h2>
+<p class="text-sm mb-4">Искренность форм формирует доверие. Как мы пришли к чистому скетч-брутализму в новых проектах.</p>
+</div>
+<a class="self-end font-bold border-b-2 border-black pb-1 hover:text-accent hover:border-accent transition-colors" href="#">Читать кейс →</a>
+</div>
+</article>
+</div>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: Footer -->
+<footer class="max-w-6xl mx-auto mt-12 mb-8">
+<div class="bento-card p-6 flex flex-col md:flex-row justify-between items-center text-sm font-bold">
+<p class="mb-4 md:mb-0">© 2024 Точка Плавления. Anti-perfect.</p>
+<div class="flex gap-4">
+<a class="hover:underline" href="#">Telegram</a>
+<a class="hover:underline" href="#">GitHub</a>
+<a class="hover:underline" href="#">RSS</a>
+</div>
+</div>
+</footer>
+<!-- END: Footer -->
+</body></html>

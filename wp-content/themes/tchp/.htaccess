@@ -1,0 +1,10 @@
+RewriteEngine On
+RewriteBase /
+
+RewriteRule ^article/([a-z0-9-]+)/?$ article.php?slug=$1 [L,QSA]
+RewriteRule ^tag/([a-z0-9-]+)/?$ category.php?tag=$1 [L,QSA]
+RewriteRule ^interactive/?$ interactive.php [L]
+RewriteRule ^cookies/?$ cookies.php [L]
+RewriteRule ^privacy/?$ privacy.php [L]
+
+ErrorDocument 404 /404.php

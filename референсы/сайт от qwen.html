@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Точка Плавления — практические гайды по пайке</title>
+<meta name="description" content="Практические гайды по пайке для новичков и мастеров: инструменты, припои, флюсы, технологии, безопасность и разбор ошибок.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23fc6c2b'/><rect x='18' y='18' width='64' height='64' fill='none' stroke='black' stroke-width='10'/></svg>">
+<style>
+/* ============ FONTS (fontsource CDN) ============ */
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/cyrillic-700-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/cyrillic-800-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:900;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-900-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:900;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/cyrillic-900-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/cyrillic-400-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/cyrillic-700-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/cyrillic-400-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/cyrillic-700-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+
+/* ============ TOKENS ============ */
+:root{
+  --bg:#f9f9f9;
+  --card:#ffffff;
+  --ink:#1a1c1c;
+  --muted:#4c4546;
+  --accent:#fc6c2b;
+  --accent-deep:#a73a00;
+  --yellow:#fef9c3;
+  --peach:#ffeddb;
+  --cardboard:#d1cfc7;
+  --on-cardboard:#1a1c1c;
+  --on-sticky:#1a1c1c;
+  --shadow:#000000;
+  --tape:rgba(222,216,198,.8);
+  --bw:3px;
+  --head-font:'Inter',sans-serif;
+  --body-font:'Hanken Grotesk',sans-serif;
+  --hand-font:'Caveat',cursive;
+}
+[data-theme="dark"]{
+  --bg:#151616;
+  --card:#202222;
+  --ink:#f1f1f1;
+  --muted:#b6b0b1;
+  --shadow:#f1f1f1;
+  --cardboard:#2c2a27;
+  --on-cardboard:#f1f1f1;
+  --tape:rgba(255,255,255,.28);
+}
+
+/* ============ BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:96px}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body-font);
+  font-size:16px;line-height:1.55;
+  transition:background .25s,color .25s;
+  background-image:radial-gradient(var(--tape) 1px,transparent 1px);
+  background-size:26px 26px;
+}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font-family:inherit;color:inherit}
+.wrap{max-width:1220px;margin:0 auto;padding:0 2rem}
+.grid12{display:grid;grid-template-columns:repeat(12,1fr);gap:1rem}
+
+/* ============ BRUTAL PRIMITIVES ============ */
+.card{
+  position:relative;
+  background:var(--card);
+  border:var(--bw) solid var(--ink);
+  box-shadow:6px 6px 0 var(--shadow);
+}
+@media (hover:hover){
+  .shift{transition:transform .15s ease,box-shadow .15s ease}
+  .shift:hover{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--shadow)}
+}
+.tape{
+  position:absolute;width:96px;height:26px;background:var(--tape);
+  top:-14px;left:50%;transform:translateX(-50%) rotate(-3deg);z-index:2;
+  clip-path:polygon(2% 0,98% 5%,100% 32%,97% 55%,99% 80%,96% 100%,3% 95%,0 72%,4% 45%,1% 18%);
+}
+.tape.tl{left:14%;top:-12px;transform:rotate(-8deg)}
+.tape.tr{left:auto;right:8%;top:-12px;transform:rotate(6deg)}
+.chip{
+  display:inline-block;border:2px solid var(--ink);background:var(--card);
+  padding:.2rem .55rem;font-family:var(--head-font);font-weight:700;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;
+}
+.chip.acc{background:var(--accent);color:#1a1c1c}
+.chip.yel{background:var(--yellow);color:var(--on-sticky)}
+.btn{
+  display:inline-flex;align-items:center;gap:.6rem;cursor:pointer;
+  font-family:var(--body-font);font-weight:700;font-size:16px;
+  padding:.85rem 1.7rem;text-decoration:none;
+  border:var(--bw) solid var(--ink);
+  box-shadow:4px 4px 0 var(--shadow);
+  transition:transform .15s,box-shadow .15s,background .15s,color .15s;
+}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow)}
+.btn-pill{border-radius:999px;background:var(--ink);color:var(--bg)}
+.btn-ghost{background:transparent;color:var(--ink)}
+@media (hover:hover){
+  .btn:hover{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow);background:var(--accent);color:#1a1c1c}
+}
+.hand{font-family:var(--hand-font);font-size:20px;line-height:1.2}
+.hl{background:linear-gradient(180deg,transparent 58%,var(--accent) 58%,var(--accent) 92%,transparent 92%);padding:0 .15em}
+.hl-pink{background:linear-gradient(180deg,transparent 58%,#f3a5b0 58%,#f3a5b0 92%,transparent 92%);padding:0 .15em}
+.sec{padding:3.2rem 0 1rem}
+.sec-head{display:flex;align-items:end;justify-content:space-between;gap:1rem;margin-bottom:1.6rem;flex-wrap:wrap}
+.sec-title{
+  font-family:var(--head-font);font-weight:900;text-transform:uppercase;
+  letter-spacing:-.02em;font-size:clamp(26px,4vw,44px);line-height:1.05;
+}
+.sec-title::before{content:"";display:inline-block;width:.55em;height:.55em;background:var(--accent);border:3px solid var(--ink);margin-right:.45em;transform:translateY(.05em) rotate(8deg)}
+.sec-link{font-weight:700;text-decoration:none;border-bottom:3px solid var(--accent);padding-bottom:2px}
+.sec-link:hover{background:var(--accent);color:#1a1c1c}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.on{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+
+/* ============ HEADER ============ */
+.site-header{
+  position:sticky;top:0;z-index:50;background:var(--bg);
+  border-bottom:var(--bw) solid var(--ink);
+}
+.header-inner{display:flex;align-items:center;gap:1.4rem;padding:.9rem 2rem}
+.logo{font-family:var(--body-font);font-weight:700;font-size:22px;text-decoration:none;letter-spacing:-.01em;white-space:nowrap}
+.logo b{color:var(--accent-deep)}
+[data-theme="dark"] .logo b{color:var(--accent)}
+.logo-dot{display:inline-block;width:10px;height:10px;background:var(--accent);border:2px solid var(--ink);transform:rotate(12deg);margin:0 .18em}
+.main-nav{display:flex;gap:1.1rem;margin-left:auto;flex-wrap:wrap}
+.main-nav a{
+  text-decoration:none;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.06em;
+  font-family:var(--head-font);padding:.3rem .1rem;border-bottom:3px solid transparent;
+}
+.main-nav a:hover{border-bottom-color:var(--accent);background:var(--peach);color:#1a1c1c}
+.header-actions{display:flex;gap:.6rem;margin-left:.6rem}
+.icon-btn{
+  width:42px;height:42px;display:grid;place-items:center;cursor:pointer;
+  background:var(--card);border:var(--bw) solid var(--ink);box-shadow:3px 3px 0 var(--shadow);
+  transition:transform .12s,box-shadow .12s,background .12s;
+}
+@media (hover:hover){.icon-btn:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow);background:var(--accent)}}
+.icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+[data-theme="light"] .ic-sun{display:none}
+[data-theme="dark"] .ic-moon{display:none}
+.burger{display:none}
+.burger span{display:block;width:18px;height:3px;background:currentColor;margin:2.5px 0}
+.search-bar{border-top:var(--bw) dashed var(--ink);background:var(--card)}
+.search-bar .wrap{display:flex;gap:.8rem;padding:.9rem 2rem}
+.search-bar input{
+  flex:1;background:transparent;border:none;border-bottom:var(--bw) solid var(--ink);
+  font-family:var(--hand-font);font-size:22px;color:var(--ink);padding:.3rem .2rem;outline:none;
+}
+.search-bar input:focus{border-bottom-color:var(--accent)}
+
+/* ============ HERO ============ */
+.hero{padding:3.4rem 0 2.4rem}
+.hero-left{grid-column:span 6;display:flex;flex-direction:column;gap:1.4rem;position:relative}
+.hero-kicker{display:flex;gap:.6rem;flex-wrap:wrap}
+.hero-title{
+  font-family:var(--head-font);font-weight:900;text-transform:uppercase;
+  font-size:clamp(40px,6.4vw,76px);line-height:.98;letter-spacing:-.035em;
+}
+.hero-sub{max-width:46ch;color:var(--muted);font-size:18px}
+.hero-cta{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;position:relative}
+.hero-note{position:absolute;top:-52px;left:38%;transform:rotate(-6deg);color:var(--accent-deep)}
+[data-theme="dark"] .hero-note{color:var(--accent)}
+.hero-right{grid-column:span 6;position:relative}
+.hero-photo{padding:10px;background:var(--card);transform:rotate(1.2deg)}
+.hero-photo img{width:100%;height:420px;object-fit:cover;border:var(--bw) solid var(--ink)}
+.hero-photo figcaption{display:flex;justify-content:space-between;padding:.6rem .2rem 0;font-family:var(--head-font);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.hero-sticky{
+  position:absolute;left:-26px;bottom:34px;width:170px;padding:1rem 1rem 1.2rem;
+  background:var(--yellow);color:var(--on-sticky);border:var(--bw) solid var(--ink);
+  box-shadow:6px 6px 0 var(--shadow);transform:rotate(-4deg);
+}
+.hero-code{position:absolute;top:-16px;right:14px}
+
+/* ============ TICKER ============ */
+.ticker{border-top:var(--bw) solid var(--ink);border-bottom:var(--bw) solid var(--ink);background:var(--ink);color:var(--bg);overflow:hidden}
+.ticker-track{display:flex;width:max-content;animation:tick 26s linear infinite}
+.ticker-track span{padding:.55rem 0;font-family:var(--head-font);font-weight:800;font-size:13px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
+.ticker-track em{font-style:normal;color:var(--accent);padding:0 .8rem}
+@keyframes tick{to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.ticker-track{animation:none}}
+
+/* ============ BASICS ============ */
+.step-card{grid-column:span 3;padding:1.4rem;display:flex;flex-direction:column;gap:.8rem;text-decoration:none}
+.step-card:nth-child(odd){transform:rotate(-.6deg)}
+.step-card:nth-child(even){transform:rotate(.5deg)}
+.step-idx{
+  font-family:var(--head-font);font-weight:900;font-size:26px;
+  background:var(--peach);color:#1a1c1c;border:var(--bw) solid var(--ink);
+  display:inline-block;padding:.1rem .6rem;box-shadow:3px 3px 0 var(--shadow);width:max-content;
+}
+.step-card h3{font-family:var(--head-font);font-weight:800;text-transform:uppercase;font-size:18px;letter-spacing:-.01em}
+.step-card p{font-size:14px;color:var(--muted)}
+.step-card .go{margin-top:auto;font-weight:700;border-bottom:3px solid var(--accent);width:max-content}
+
+/* ============ ARTICLES ============ */
+.post-card{grid-column:span 3;display:flex;flex-direction:column;text-decoration:none}
+.post-thumb{border-bottom:var(--bw) solid var(--ink);aspect-ratio:16/10;overflow:hidden;background:var(--peach)}
+.post-thumb img{width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+@media (hover:hover){.post-card:hover .post-thumb img{transform:scale(1.05) rotate(.5deg)}}
+.post-body{padding:1.1rem;display:flex;flex-direction:column;gap:.6rem;flex:1}
+.post-meta{display:flex;justify-content:space-between;align-items:center;gap:.5rem}
+.post-date{font-family:var(--hand-font);font-size:17px;color:var(--muted)}
+.post-title{font-family:var(--head-font);font-weight:800;font-size:16px;text-transform:uppercase;line-height:1.25;letter-spacing:0}
+.post-ex{font-size:13.5px;color:var(--muted)}
+.post-go{margin-top:auto;padding-top:.7rem;border-top:2px dashed var(--ink);font-weight:700;font-size:14px}
+.post-go b{color:var(--accent-deep)}
+[data-theme="dark"] .post-go b{color:var(--accent)}
+
+/* ============ RATINGS ============ */
+.rating-box{grid-column:1/-1;background:var(--cardboard);color:var(--on-cardboard);border:var(--bw) solid var(--ink);box-shadow:6px 6px 0 var(--shadow);padding:1.6rem;position:relative}
+.rating-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1.2rem}
+.rate-card{background:var(--card);color:var(--ink);border:var(--bw) solid var(--ink);box-shadow:5px 5px 0 var(--shadow);text-decoration:none;display:flex;flex-direction:column}
+.rate-thumb{aspect-ratio:16/9;overflow:hidden;border-bottom:var(--bw) solid var(--ink)}
+.rate-thumb img{width:100%;height:100%;object-fit:cover}
+.rate-body{padding:1rem;display:flex;flex-direction:column;gap:.55rem;flex:1}
+.rate-body h3{font-family:var(--head-font);font-weight:800;font-size:17px;text-transform:uppercase;line-height:1.25}
+.rate-meta{font-size:13px;color:var(--muted)}
+.rate-badge{position:absolute;top:-18px;right:22px;transform:rotate(4deg)}
+.rating-note{position:absolute;top:-24px;left:26px;transform:rotate(-3deg);background:var(--yellow);color:var(--on-sticky);border:var(--bw) solid var(--ink);box-shadow:4px 4px 0 var(--shadow);padding:.4rem .9rem}
+
+/* ============ CATEGORIES ============ */
+.cat-tile{grid-column:span 2;text-decoration:none;display:flex;flex-direction:column;background:var(--card);border:var(--bw) solid var(--ink);box-shadow:6px 6px 0 var(--shadow)}
+.cat-img{aspect-ratio:1/1;overflow:hidden;border-bottom:var(--bw) solid var(--ink);background:#fff}
+.cat-img img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) contrast(1.05);transition:filter .35s ease}
+@media (hover:hover){.cat-tile:hover .cat-img img{filter:grayscale(0)}}
+.cat-body{padding:.9rem;display:flex;flex-direction:column;gap:.25rem}
+.cat-body h3{font-family:var(--head-font);font-weight:800;text-transform:uppercase;font-size:15px}
+.cat-body span{font-family:var(--hand-font);font-size:16px;color:var(--muted)}
+
+/* ============ POPULAR + SUBSCRIBE ============ */
+.pop-list-card{grid-column:span 7;padding:1.6rem}
+.pop-list{list-style:none;display:flex;flex-direction:column}
+.pop-list li{display:grid;grid-template-columns:auto 1fr auto;gap:1rem;align-items:center;padding:.95rem .2rem;border-bottom:2px dashed var(--ink)}
+.pop-list li:last-child{border-bottom:none}
+.pop-num{font-family:var(--head-font);font-weight:900;font-size:30px;color:var(--muted);min-width:1.4em}
+.pop-list li:first-child .pop-num{color:var(--accent);text-shadow:2px 2px 0 var(--shadow)}
+.pop-list a{text-decoration:none;font-weight:700}
+.pop-list a:hover{background:var(--yellow);color:#1a1c1c;box-shadow:2px 2px 0 var(--shadow)}
+.pop-views{font-family:var(--hand-font);font-size:17px;color:var(--muted);white-space:nowrap}
+.pop-side{grid-column:span 5;display:flex;flex-direction:column;gap:1.2rem}
+.pop-quote{background:var(--yellow);color:var(--on-sticky);border:var(--bw) solid var(--ink);box-shadow:6px 6px 0 var(--shadow);padding:1.5rem;transform:rotate(-1.2deg)}
+.pop-quote p{font-family:var(--hand-font);font-size:24px;line-height:1.25}
+.sub-card{background:var(--peach);color:#1a1c1c;border:var(--bw) solid var(--ink);box-shadow:6px 6px 0 var(--shadow);padding:1.5rem}
+.sub-card h3{font-family:var(--head-font);font-weight:800;text-transform:uppercase;font-size:18px;margin-bottom:.4rem}
+.sub-card p{font-size:14px;margin-bottom:1rem}
+.sub-card form{display:flex;gap:.7rem;flex-wrap:wrap}
+.sub-card input{
+  flex:1;min-width:170px;background:transparent;border:var(--bw) solid var(--ink);
+  padding:.7rem .8rem;font-family:var(--body-font);font-size:14px;color:#1a1c1c;outline:none;
+}
+.sub-card input:focus{border-color:var(--accent);background:#fff}
+.sub-ok{font-family:var(--hand-font);font-size:24px}
+
+/* ============ FAQ ============ */
+.faq-grid{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.faq-item{background:var(--card);border:var(--bw) solid var(--ink);box-shadow:6px 6px 0 var(--shadow)}
+.faq-item summary{
+  list-style:none;cursor:pointer;padding:1.1rem 1.2rem;display:flex;justify-content:space-between;gap:1rem;
+  font-family:var(--head-font);font-weight:800;font-size:15px;text-transform:uppercase;
+}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:"+";font-family:var(--head-font);font-weight:900;font-size:22px;color:var(--accent-deep);transition:transform .2s}
+[data-theme="dark"] .faq-item summary::after{color:var(--accent)}
+.faq-item[open] summary::after{content:"–";transform:rotate(0)}
+.faq-item[open] summary{background:var(--yellow);color:var(--on-sticky)}
+.faq-body{padding:1rem 1.2rem 1.2rem;border-top:2px dashed var(--ink);font-size:14.5px;color:var(--muted)}
+.faq-body a{color:var(--ink);font-weight:700}
+.faq-body a:hover{background:var(--accent);color:#1a1c1c}
+.faq-arrow{transform:rotate(-4deg);color:var(--accent-deep)}
+[data-theme="dark"] .faq-arrow{color:var(--accent)}
+
+/* ============ ABOUT ============ */
+.about-card{grid-column:1/-1;padding:2rem;display:grid;grid-template-columns:280px 1fr;gap:2rem;align-items:start}
+.about-photo{position:relative}
+.about-photo img{width:100%;aspect-ratio:1/1;object-fit:cover;border:var(--bw) solid var(--ink);filter:grayscale(.9);transition:filter .3s}
+@media (hover:hover){.about-card:hover .about-photo img{filter:grayscale(0)}}
+.about-photo .hand{position:absolute;bottom:-14px;left:8px;transform:rotate(-3deg);color:var(--accent-deep)}
+[data-theme="dark"] .about-photo .hand{color:var(--accent)}
+.about-body h3{font-family:var(--head-font);font-weight:900;text-transform:uppercase;font-size:clamp(20px,2.6vw,30px);margin-bottom:.7rem}
+.about-body p{color:var(--muted);max-width:70ch;margin-bottom:1rem}
+.check-list{list-style:none;display:flex;flex-direction:column;gap:.5rem;margin-bottom:1.3rem}
+.check-list li{display:flex;gap:.7rem;align-items:start;font-size:14.5px}
+.check-list li::before{content:"✓";flex:none;width:22px;height:22px;display:grid;place-items:center;background:var(--accent);color:#1a1c1c;border:2px solid var(--ink);font-weight:900}
+.stat-row{display:flex;gap:.8rem;flex-wrap:wrap}
+.stat{border:var(--bw) solid var(--ink);background:var(--card);box-shadow:4px 4px 0 var(--shadow);padding:.6rem 1rem;text-align:center}
+.stat b{display:block;font-family:var(--head-font);font-weight:900;font-size:22px}
+.stat span{font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-family:var(--head-font);font-weight:700;color:var(--muted)}
+
+/* ============ FOOTER ============ */
+.site-footer{margin-top:4rem;border-top:var(--bw) solid var(--ink);background:var(--ink);color:var(--bg)}
+.footer-inner{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;padding:2.4rem 2rem}
+.footer-logo{font-weight:700;font-size:20px}
+.footer-nav{display:flex;gap:1.4rem;flex-wrap:wrap}
+.footer-nav a{text-decoration:none;font-size:14px;font-weight:700;border-bottom:2px solid transparent}
+.footer-nav a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+.footer-note{font-family:var(--hand-font);font-size:20px;transform:rotate(-2deg);color:var(--accent)}
+.footer-bottom{border-top:2px dashed var(--bg);padding:1rem 2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:13px;opacity:.85}
+
+/* ============ TOAST ============ */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) rotate(-1.5deg);z-index:99;
+  background:var(--yellow);color:var(--on-sticky);border:var(--bw) solid var(--ink);
+  box-shadow:6px 6px 0 var(--shadow);padding:.8rem 1.4rem;font-family:var(--hand-font);font-size:20px;
+  opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:90vw;text-align:center;
+}
+.toast.show{opacity:1;transform:translateX(-50%) rotate(-1.5deg) translateY(-6px)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1080px){
+  .step-card{grid-column:span 6}
+  .post-card{grid-column:span 6}
+  .rating-grid{grid-template-columns:1fr 1fr}
+  .cat-tile{grid-column:span 4}
+  .pop-list-card{grid-column:span 12}
+  .pop-side{grid-column:span 12;flex-direction:row}
+  .pop-side>*{flex:1}
+  .about-card{grid-template-columns:220px 1fr}
+}
+@media (max-width:900px){
+  .main-nav{
+    position:fixed;inset:78px 0 auto 0;background:var(--bg);border-bottom:var(--bw) solid var(--ink);
+    flex-direction:column;padding:1.4rem 2rem;gap:1rem;display:none;
+  }
+  .main-nav.open{display:flex}
+  .burger{display:grid}
+  .hero-left,.hero-right{grid-column:1/-1}
+  .hero-photo img{height:320px}
+  .faq-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .wrap{padding:0 1.1rem}
+  .header-inner{padding:.8rem 1.1rem}
+  .step-card,.post-card{grid-column:span 12}
+  .rating-grid{grid-template-columns:1fr}
+  .cat-tile{grid-column:span 6}
+  .pop-side{flex-direction:column}
+  .about-card{grid-template-columns:1fr;padding:1.4rem}
+  .hero-sticky{left:auto;right:-8px}
+}
+</style>
+</head>
+<body id="top">
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="header-inner wrap" style="padding-left:2rem;padding-right:2rem">
+    <a class="logo" href="#top">Точка<span class="logo-dot"></span><b>Плавления</b></a>
+    <nav class="main-nav" id="mainNav" aria-label="Рубрики">
+      <a href="#rubriki">Инструменты</a>
+      <a href="#rubriki">Припои</a>
+      <a href="#rubriki">Флюсы</a>
+      <a href="#rubriki">Технологии</a>
+      <a href="#rubriki">Безопасность</a>
+      <a href="#rubriki">Ошибки</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="searchToggle" type="button" aria-label="Поиск">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.8 L21 21.2"/></svg>
+      </button>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему">
+        <svg class="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5 A8.5 8.5 0 1 1 9.5 4 A7 7 0 0 0 20 14.5 Z"/></svg>
+        <svg class="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+      </button>
+      <button class="icon-btn burger" id="menuToggle" type="button" aria-label="Меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="search-bar" id="searchBar" hidden>
+    <form class="wrap" id="searchForm">
+      <input type="search" id="searchInput" placeholder="что ищем? например: флюс для SMD…" aria-label="Поиск по сайту">
+      <button class="btn btn-pill" type="submit">Найти</button>
+    </form>
+  </div>
+</header>
+
+<main>
+<!-- ================= HERO ================= -->
+<section class="hero wrap">
+  <div class="grid12">
+    <div class="hero-left">
+      <div class="hero-kicker">
+        <span class="chip acc">Блог о пайке</span>
+        <span class="chip">IC-ТЧП v1.0</span>
+        <span class="chip yel">проверено жалом</span>
+      </div>
+      <h1 class="hero-title">Пайка — это <span class="hl">навык</span>,<br>а не талант.</h1>
+      <p class="hero-sub">Практические гайды по пайке для новичков и мастеров. Без воды: реальное жало, реальный припой, реальные ошибки и их исправления.</p>
+      <div class="hero-cta">
+        <span class="hand hero-note">начни здесь! ↘</span>
+        <a class="btn btn-pill" href="#statyi">Как паять в домашних условиях →</a>
+        <a class="btn btn-ghost" href="#osnovy">Начать с основ</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <figure class="hero-photo card shift">
+        <span class="tape tl"></span>
+        <span class="tape tr"></span>
+        <span class="chip hero-code">кадр // верстак №1</span>
+        <img src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1c1f6b86a-91ec-41fa-99fd-e3e2ca4548a9.png" alt="Реальный процесс пайки: жало касается платы, поднимается дымок">
+        <figcaption><span>350°C · ПОС-61</span><span>без ретуши</span></figcaption>
+      </figure>
+      <div class="hero-sticky">
+        <p class="hand">Не перегрей деталь! 2–3 сек на контакт ✔</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TICKER ================= -->
+<div class="ticker" aria-hidden="true">
+  <div class="ticker-track">
+    <span>Пайка<em>◆</em>Флюс<em>◆</em>Припой<em>◆</em>Канифоль<em>◆</em>350°C<em>◆</em>ПОС-61<em>◆</em>Жало 900M<em>◆</em>Оплоётка<em>◆</em>SMD<em>◆</em>Термопрофиль<em>◆</em>Безопасность<em>◆</em></span>
+    <span>Пайка<em>◆</em>Флюс<em>◆</em>Припой<em>◆</em>Канифоль<em>◆</em>350°C<em>◆</em>ПОС-61<em>◆</em>Жало 900M<em>◆</em>Оплоётка<em>◆</em>SMD<em>◆</em>Термопрофиль<em>◆</em>Безопасность<em>◆</em></span>
+  </div>
+</div>
+
+<!-- Порядок блоков: по утверждённому приоритету — Основы → Последние статьи → Рейтинги → Рубрики → Популярное → FAQ → О проекте -->
+
+<!-- ================= BASICS ================= -->
+<section class="sec wrap" id="osnovy">
+  <div class="sec-head">
+    <h2 class="sec-title">Начать с основ</h2>
+    <span class="hand faq-arrow">путь новичка, шаг за шагом ↓</span>
+  </div>
+  <div class="grid12">
+    <a class="step-card card shift reveal" href="#statyi">
+      <span class="tape"></span>
+      <span class="step-idx">01</span>
+      <h3>Что такое пайка</h3>
+      <p>Физика процесса: смачивание, диффузия, температура. Почему припой «течёт» и как этим управлять.</p>
+      <span class="go">Читать гайд →</span>
+    </a>
+    <a class="step-card card shift reveal" href="#rubriki">
+      <span class="step-idx">02</span>
+      <h3>Безопасность</h3>
+      <p>Дым, свинец, ожоги: организуем рабочее место с вытяжкой и привычками, которые берегут здоровье.</p>
+      <span class="go">Читать гайд →</span>
+    </a>
+    <a class="step-card card shift reveal" href="#rubriki">
+      <span class="step-idx">03</span>
+      <h3>Набор новичка</h3>
+      <p>Паяльник, припой, флюс, подставка и губка — минимальный комплект без лишних трат.</p>
+      <span class="go">Читать гайд →</span>
+    </a>
+    <a class="step-card card shift reveal" href="#faq">
+      <span class="step-idx">04</span>
+      <h3>Первые ошибки</h3>
+      <p>Холодная пайка, сопли и перегретые площадки: как распознать и не повторять.</p>
+      <span class="go">Читать гайд →</span>
+    </a>
+  </div>
+</section>
+
+<!-- ================= LATEST ARTICLES ================= -->
+<section class="sec wrap" id="statyi">
+  <div class="sec-head">
+    <h2 class="sec-title">Последние статьи</h2>
+    <a class="sec-link" href="#statyi">Все статьи →</a>
+  </div>
+  <div class="grid12">
+    <a class="post-card card shift reveal" href="#statyi">
+      <div class="post-thumb"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/13b081235-33ee-4b22-bc56-d705ec7d3cab.png" alt="Домашнее рабочее место для пайки"></div>
+      <div class="post-body">
+        <div class="post-meta"><span class="chip acc">Технологии</span><span class="post-date">2 марта 2026</span></div>
+        <h3 class="post-title">Как паять в домашних условиях: пошаговый гайд</h3>
+        <p class="post-ex">От первого включения паяльника до аккуратного шва: практика без воды и мифов.</p>
+        <span class="post-go">Читать <b>→</b> · 12 мин</span>
+      </div>
+    </a>
+    <a class="post-card card shift reveal" href="#statyi">
+      <div class="post-thumb"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/19085d6ab-8b91-4bb8-aab8-88de0d60a98e.png" alt="Макрофото холодной пайки с трещинами"></div>
+      <div class="post-body">
+        <div class="post-meta"><span class="chip">Ошибки</span><span class="post-date">26 февр. 2026</span></div>
+        <h3 class="post-title">Холодная пайка: почему держится «на честном слове»</h3>
+        <p class="post-ex">Как найти трещину в шве мультиметром и перепаять так, чтобы держалось вечно.</p>
+        <span class="post-go">Читать <b>→</b> · 8 мин</span>
+      </div>
+    </a>
+    <a class="post-card card shift reveal" href="#statyi">
+      <div class="post-thumb"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/15dd6dbde-db15-4e17-8fda-e3bb1a6afa8f.png" alt="Скетч: баночка флюса, флюс-пен и канифоль"></div>
+      <div class="post-body">
+        <div class="post-meta"><span class="chip">Флюсы</span><span class="post-date">19 февр. 2026</span></div>
+        <h3 class="post-title">Флюс без паники: канифоль, ЛТИ и гели — что к чему</h3>
+        <p class="post-ex">Разбираем активность и смываемость: когда достаточно канифоли, а когда нужен гель.</p>
+        <span class="post-go">Читать <b>→</b> · 10 мин</span>
+      </div>
+    </a>
+    <a class="post-card card shift reveal" href="#statyi">
+      <div class="post-thumb"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1cb217151-e6ef-4d7e-bafa-ad806b9ccce8.png" alt="Скетч: катушки припоя и шарики олова"></div>
+      <div class="post-body">
+        <div class="post-meta"><span class="chip">Припои</span><span class="post-date">12 февр. 2026</span></div>
+        <h3 class="post-title">ПОС-61, бессвинцовые и трубчатые: шпаргалка</h3>
+        <p class="post-ex">Сплавы, температуры плавления и выбор под задачу — в одной удобной таблице.</p>
+        <span class="post-go">Читать <b>→</b> · 7 мин</span>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ================= RATINGS ================= -->
+<section class="sec wrap" id="rating">
+  <div class="sec-head">
+    <h2 class="sec-title">Рейтинги и подборки</h2>
+    <span class="hand faq-arrow">тестируем на своём верстаке ✔</span>
+  </div>
+  <div class="grid12">
+    <div class="rating-box reveal">
+      <span class="rating-note hand">обновлено: март 2026!</span>
+      <span class="chip rate-badge">топ-10</span>
+      <div class="rating-grid">
+        <a class="rate-card shift" href="#rating">
+          <div class="rate-thumb"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/15481f3d5-278d-4a3f-89e3-dfbcf388c499.png" alt="Ряд паяльников для сравнительного обзора"></div>
+          <div class="rate-body">
+            <h3>Рейтинг паяльников 2026: топ-10 для дома и мастерской</h3>
+            <span class="rate-meta">18 моделей протестировано · от 900 ₽ до 9 000 ₽</span>
+            <span class="chip acc" style="width:max-content">Смотреть рейтинг</span>
+          </div>
+        </a>
+        <a class="rate-card shift" href="#rating">
+          <div class="rate-thumb"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1f4ec28c8-439d-40cf-8983-5fa646e6e7601.png" alt="Паяльная станция с дисплеем температуры"></div>
+          <div class="rate-body">
+            <h3>Паяльные станции 2026: 7 лучших для точного монтажа</h3>
+            <span class="rate-meta">12 моделей · термопрофили, обзор жал, ресурс нагревателей</span>
+            <span class="chip acc" style="width:max-content">Смотреть рейтинг</span>
+          </div>
+        </a>
+        <a class="rate-card shift" href="#rating">
+          <div class="rate-thumb"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1595a5892-46e3-4c98-8933-f4d54b07103f.png" alt="Баночки и флаконы с флюсами для обзора"></div>
+          <div class="rate-body">
+            <h3>Топ флюсов 2026: подборка редакции</h3>
+            <span class="rate-meta">15 образцов · смываемые и безотмывочные, SMD и монтаж</span>
+            <span class="chip acc" style="width:max-content">Смотреть рейтинг</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CATEGORIES ================= -->
+<section class="sec wrap" id="rubriki">
+  <div class="sec-head">
+    <h2 class="sec-title">По рубрикам</h2>
+    <span class="hand faq-arrow">наведи — скетч оживёт ↯</span>
+  </div>
+  <div class="grid12">
+    <a class="cat-tile shift reveal" href="#rubriki">
+      <div class="cat-img"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/13ef732a0-82c0-479d-b33d-95f053af92f7.png" alt="Скетч: паяльник, губка, пинцет, оловоотсос"></div>
+      <div class="cat-body"><h3>Инструменты</h3><span>24 статьи</span></div>
+    </a>
+    <a class="cat-tile shift reveal" href="#rubriki">
+      <div class="cat-img"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1cb217151-e6ef-4d7e-bafa-ad806b9ccce8.png" alt="Скетч: катушки припоя"></div>
+      <div class="cat-body"><h3>Припои</h3><span>14 статей</span></div>
+    </a>
+    <a class="cat-tile shift reveal" href="#rubriki">
+      <div class="cat-img"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/15dd6dbde-db15-4e17-8fda-e3bb1a6afa8f.png" alt="Скетч: флюсы и канифоль"></div>
+      <div class="cat-body"><h3>Флюсы</h3><span>12 статей</span></div>
+    </a>
+    <a class="cat-tile shift reveal" href="#rubriki">
+      <div class="cat-img"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1c86052dc-b2e1-4afd-a6e8-07e0a9d69e84.png" alt="Скетч: пайка компонента на плату"></div>
+      <div class="cat-body"><h3>Технологии пайки</h3><span>31 статья</span></div>
+    </a>
+    <a class="cat-tile shift reveal" href="#rubriki">
+      <div class="cat-img"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1ffa73894-ad5e-4a51-ac70-0f377a8fee2a.png" alt="Скетч: очки, вытяжка, перчатки"></div>
+      <div class="cat-body"><h3>Безопасность</h3><span>9 статей</span></div>
+    </a>
+    <a class="cat-tile shift reveal" href="#rubriki">
+      <div class="cat-img"><img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/11f3b31f3-98fe-4d77-8b2f-5fdf1fe092d7.png" alt="Скетч: дефектные焊-соединения с восклицательными знаками"></div>
+      <div class="cat-body"><h3>Ошибки</h3><span>17 статей</span></div>
+    </a>
+  </div>
+</section>
+
+<!-- ================= POPULAR + SUBSCRIBE ================= -->
+<section class="sec wrap" id="popular">
+  <div class="sec-head">
+    <h2 class="sec-title">Популярное / читаемое</h2>
+  </div>
+  <div class="grid12">
+    <div class="pop-list-card card reveal">
+      <span class="tape"></span>
+      <ol class="pop-list">
+        <li><span class="pop-num">01</span><a href="#statyi">Как паять в домашних условиях</a><span class="pop-views">12 400 👁</span></li>
+        <li><span class="pop-num">02</span><a href="#rating">Рейтинг паяльников 2026</a><span class="pop-views">9 150 👁</span></li>
+        <li><span class="pop-num">03</span><a href="#statyi">Холодная пайка: найти и исправить</a><span class="pop-views">7 800 👁</span></li>
+        <li><span class="pop-num">04</span><a href="#statyi">Чем паять алюминий и нержавейку</a><span class="pop-views">6 300 👁</span></li>
+        <li><span class="pop-num">05</span><a href="#statyi">Флюс из канифоли своими руками</a><span class="pop-views">5 900 👁</span></li>
+      </ol>
+    </div>
+    <div class="pop-side">
+      <div class="pop-quote reveal">
+        <span class="tape tl"></span>
+        <p>«Хороший шов — как хороший кофе: блестящий, ровный и без горечи. Перегрел — испоганил».</p>
+        <span class="hand" style="display:block;margin-top:.6rem">— из лабораторного журнала</span>
+      </div>
+      <div class="sub-card reveal" id="subBox">
+        <span class="tape tr"></span>
+        <h3>Паяльный дайджест</h3>
+        <p>Раз в две недели: новые гайды, обзоры инструментов и разбор косяков. Без спама.</p>
+        <form id="subForm">
+          <input type="email" required placeholder="ваш@email.ru" aria-label="Email для подписки">
+          <button class="btn btn-pill" type="submit">Подписаться</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section class="sec wrap" id="faq">
+  <div class="sec-head">
+    <h2 class="sec-title">Вопросы новичков</h2>
+    <span class="hand faq-arrow">жми на вопрос ↓</span>
+  </div>
+  <div class="grid12">
+    <div class="faq-grid reveal">
+      <details class="faq-item" open>
+        <summary>Какой паяльник выбрать для начала?</summary>
+        <div class="faq-body">Паяльник 25–40 Вт с медным жалом или станция на 900M-жало. Главное — регулировка или стабильная температура ~300–350°C. <a href="#rating">Подробный рейтинг паяльников →</a></div>
+      </details>
+      <details class="faq-item">
+        <summary>Можно ли паять без флюса?</summary>
+        <div class="faq-body">Практически нет: флюс убирает окислы и даёт припою растечься. Без него — «сопли» и холодные швы. <a href="#statyi">Гайд по флюсам →</a></div>
+      </details>
+      <details class="faq-item">
+        <summary>Насколько вредно паять дома?</summary>
+        <div class="faq-body">Главный риск — дым от флюса и свинцовая пыль. Решается вытяжкой, проветриванием и мытьём рук. <a href="#rubriki">Рубрика «Безопасность» →</a></div>
+      </details>
+      <details class="faq-item">
+        <summary>Почему припой не липнет к жалу?</summary>
+        <div class="faq-body">Жало окислилось или перегрето. Зачистить, залудить с канифолью, не держать паяльник сухим. <a href="#statyi">Разбор ошибки →</a></div>
+      </details>
+      <details class="faq-item">
+        <summary>Какая температура нужна для ПОС-61?</summary>
+        <div class="faq-body">Плавление ~183°C, но рабочая температура жала — 300–350°C, чтобы контакт прогревался за 2–3 секунды. <a href="#statyi">Шпаргалка по припоям →</a></div>
+      </details>
+      <details class="faq-item">
+        <summary>Нужна ли паяльная станция новичку?</summary>
+        <div class="faq-body">Не обязательно, но с станцией проще держать температуру и менять жала. Начните с простого — апгрейд придёт сам. <a href="#rating">Рейтинг станций →</a></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= ABOUT / E-E-A-T ================= -->
+<section class="sec wrap" id="about">
+  <div class="sec-head">
+    <h2 class="sec-title">О проекте</h2>
+  </div>
+  <div class="grid12">
+    <div class="about-card card reveal">
+      <span class="tape"></span>
+      <div class="about-photo">
+        <img loading="lazy" src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1b3261c74-3778-4a1d-a456-b9fd32b2b513.png" alt="Автор блога в мастерской с паяльником">
+        <span class="hand">это я, Сергей 🙂</span>
+      </div>
+      <div class="about-body">
+        <h3>Почему нам можно доверять</h3>
+        <p>Меня зовут Сергей, я инженер-радиотехник с 12-летней практикой монтажа и ремонта. «Точка Плавления» — это лабораторный журнал, а не контент-ферма: каждый совет сначала проходит через мой верстак.</p>
+        <ul class="check-list">
+          <li>Все рекомендации проверены на собственном верстаке, а не переписаны из чужих статей.</li>
+          <li>Инструменты из рейтингов тестируются минимум 2 недели реальной работы.</li>
+          <li>Без рекламных бюджетов, «джинсы» и партнёрских «проплат» в выводах.</li>
+        </ul>
+        <div class="stat-row">
+          <div class="stat"><b>12</b><span>лет практики</span></div>
+          <div class="stat"><b>120+</b><span>статей</span></div>
+          <div class="stat"><b>40k</b><span>читателей/мес</span></div>
+          <div class="stat"><b>18</b><span>жал протестировано</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="footer-inner wrap">
+    <div>
+      <div class="footer-logo">Точка<span style="color:var(--accent)">●</span>Плавления</div>
+      <p class="footer-note">Паяй с умом, не перегревай! 🔥</p>
+    </div>
+    <nav class="footer-nav" aria-label="Служебные ссылки">
+      <a href="#about">О сайте</a>
+      <a href="#about">Контакты</a>
+      <a href="#top">Политика конфиденциальности</a>
+      <a href="#top">Telegram</a>
+      <a href="#top">YouTube</a>
+      <a href="#top">RSS</a>
+    </nav>
+  </div>
+  <div class="footer-bottom wrap">
+    <span>© <span id="yearNow">2026</span> Точка Плавления. Структура обнажена. Искренность форм.</span>
+    <span>IC-ТЧП v1.0 · anti-perfect web</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var rootEl = document.documentElement;
+
+  /* ---- theme ---- */
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem('tp-theme'); } catch(e) {}
+  if (savedTheme === 'dark' || savedTheme === 'light') rootEl.setAttribute('data-theme', savedTheme);
+  var themeBtn = document.getElementById('themeToggle');
+  themeBtn.addEventListener('click', function(){
+    var next = rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    rootEl.setAttribute('data-theme', next);
+    try { localStorage.setItem('tp-theme', next); } catch(e) {}
+    showToast(next === 'dark' ? '🌙 тёмная тема: жало светится!' : '☀️ светлая тема: бумага и тушь!');
+  });
+
+  /* ---- toast ---- */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2600);
+  }
+
+  /* ---- search ---- */
+  var searchToggle = document.getElementById('searchToggle');
+  var searchBar = document.getElementById('searchBar');
+  var searchForm = document.getElementById('searchForm');
+  var searchInput = document.getElementById('searchInput');
+  searchToggle.addEventListener('click', function(){
+    searchBar.hidden = !searchBar.hidden;
+    if (!searchBar.hidden) searchInput.focus();
+  });
+  searchForm.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var q = searchInput.value.trim();
+    showToast('🔧 Полнотекстовый поиск скоро! Пока — рубрики ниже. Запрос: «' + q + '»');
+    searchBar.hidden = true;
+  });
+
+  /* ---- mobile menu ---- */
+  var menuToggle = document.getElementById('menuToggle');
+  var mainNav = document.getElementById('mainNav');
+  menuToggle.addEventListener('click', function(){
+    var open = mainNav.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  mainNav.addEventListener('click', function(ev){
+    if (ev.target.tagName === 'A') { mainNav.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); }
+  });
+
+  /* ---- subscribe ---- */
+  var subForm = document.getElementById('subForm');
+  subForm.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var box = document.getElementById('subBox');
+    box.innerHTML = '<span class="tape tr"></span><p class="sub-ok">Готово! Проверь почту ✔<br>первое письмо — уже в эту пятницу.</p>';
+    showToast('✉️ подписка оформлена!');
+  });
+
+  /* ---- reveal on scroll ---- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting) { en.target.classList.add('on'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.12 });
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('on'); });
+  }
+
+  /* ---- year ---- */
+  document.getElementById('yearNow').textContent = String(new Date().getFullYear());
+})();
+</script>
+</body>
+</html>

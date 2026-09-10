@@ -1,0 +1,301 @@
+/* ==========================================================================
+   Точка Плавления — Премиальный чистый стиль статьи (TochkiCamp DNA)
+   Шрифты: Inter + IBM Plex Mono
+   ========================================================================== */
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', monospace;
+  --accent-color: #ea580c;
+  --accent-soft: #fff7ed;
+  --text-main: #111827;
+  --text-muted: #4b5563;
+  --text-dim: #9ca3af;
+  --border-color: #e5e7eb;
+}
+
+body {
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 1. Полоса прогресса чтения */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: var(--accent-color);
+  width: 0%;
+  z-index: 9999;
+  transition: width 0.08s linear;
+}
+
+/* 2. Логотип (Оптимизированный по размеру) */
+.brand-logo {
+  font-family: 'Hanken Grotesk', 'Inter', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-decoration: none;
+  color: #111827;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+
+.brand-logo:hover {
+  opacity: 0.85;
+}
+
+.brand-logo span {
+  color: #ffffff;
+  background: var(--accent-color);
+  padding: 0.1rem 0.35rem;
+  border-radius: 3px;
+  transform: skew(-6deg);
+  display: inline-block;
+  margin: 0 0.15rem;
+  font-size: 1.05em;
+  line-height: 0.9;
+}
+
+/* 3. Липкое оглавление (TochkiCamp TOC Style) */
+.toc-sidebar {
+  position: sticky;
+  top: 84px;
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+  padding-left: 14px;
+  border-left: 1px solid var(--border-color);
+}
+
+.toc-link {
+  display: block;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  padding: 5px 0;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  position: relative;
+}
+
+.toc-link:hover {
+  color: var(--accent-color);
+}
+
+.toc-link.active {
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.toc-link.active::before {
+  content: "";
+  position: absolute;
+  left: -15px;
+  top: 7px;
+  bottom: 7px;
+  width: 2px;
+  background: var(--accent-color);
+  border-radius: 2px;
+}
+
+/* 4. Лид и цитаты-инсайты (TochkiCamp Lead & Punchlines) */
+.gd-lead {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: #1f2937;
+  font-weight: 400;
+  margin: 1.5rem 0 2rem;
+}
+
+.quote-punchline {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: #111827;
+  border-left: 2px solid var(--accent-color);
+  padding-left: 1rem;
+  margin: 2rem 0;
+}
+
+/* 5. Естественные редакционные примечания */
+.note-editorial {
+  margin: 1.75rem 0;
+  padding: 1rem 1.25rem;
+  background: #f9fafb;
+  border-left: 3px solid #d1d5db;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: #374151;
+}
+
+.note-editorial.note-warning {
+  border-left-color: #f59e0b;
+  background: #fffbeb;
+}
+
+.note-editorial.note-danger {
+  border-left-color: #ef4444;
+  background: #fef2f2;
+}
+
+.note-editorial strong {
+  color: #111827;
+}
+
+/* 6. Карточки температурных окон сплавов */
+.alloy-card {
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background: #ffffff;
+  padding: 1rem 1.15rem;
+  transition: all 0.15s ease;
+}
+
+.alloy-card:hover {
+  border-color: var(--accent-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+}
+
+.temp-badge {
+  font-family: var(--font-mono);
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--accent-color);
+}
+
+/* 7. Inline code / mono tags */
+.tag-mono {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #1f2937;
+}
+
+/* 8. Итоговый блок "Что запомнить" */
+.takeaways-box {
+  background: #f9fafb;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 2.5rem 0;
+}
+
+.takeaways-box h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* 9. FAQ Аккордеон */
+.faq-clean {
+  border-bottom: 1px solid var(--border-color);
+  padding: 1rem 0;
+}
+
+.faq-clean:first-child {
+  border-top: 1px solid var(--border-color);
+}
+
+.faq-clean-header {
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  color: #111827;
+  user-select: none;
+}
+
+.faq-clean-header:hover {
+  color: var(--accent-color);
+}
+
+.faq-clean-icon {
+  transition: transform 0.2s ease;
+  color: #9ca3af;
+}
+
+.faq-clean.open .faq-clean-icon {
+  transform: rotate(180deg);
+  color: var(--accent-color);
+}
+
+.faq-clean-body {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease-out, padding 0.25s ease;
+  color: #4b5563;
+  font-size: 0.875rem;
+  line-height: 1.65;
+}
+
+.faq-clean.open .faq-clean-body {
+  max-height: 400px;
+  padding-top: 0.75rem;
+}
+
+/* 10. Toast */
+#copy-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #111827;
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  opacity: 0;
+  transform: translateY(12px);
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 10000;
+}
+
+#copy-toast.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 11. Мобильное плавающее оглавление */
+.mobile-toc-fab {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  .mobile-toc-fab {
+    display: inline-flex;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #111827;
+    color: #ffffff;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    align-items: center;
+    gap: 6px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 900;
+    cursor: pointer;
+  }
+}

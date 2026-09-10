@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light" data-palette="markers">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Температурные профили: как не перегреть плату за $300 — Точка Плавления</title>
+<meta name="description" content="Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и многослойных плат. Конспект мастера v2.0.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23D9641F'/><rect x='18' y='18' width='64' height='64' fill='none' stroke='black' stroke-width='10'/></svg>">
+<style>
+/* ============ FONTS (fontsource CDN) ============ */
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/cyrillic-700-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-800-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:800;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/cyrillic-800-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Inter';font-style:normal;font-weight:900;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/latin-900-normal.woff2') format('woff2')}
+@font-face{font-family:'Inter';font-style:normal;font-weight:900;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/inter@latest/cyrillic-900-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/cyrillic-400-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Hanken Grotesk';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/hanken-grotesk@latest/cyrillic-700-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/latin-400-normal.woff2') format('woff2')}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:400;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/cyrillic-400-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/latin-700-normal.woff2') format('woff2')}
+@font-face{font-family:'Caveat';font-style:normal;font-weight:700;font-display:swap;src:url('https://cdn.jsdelivr.net/fontsource/fonts/caveat@latest/cyrillic-700-normal.woff2') format('woff2');unicode-range:U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+
+/* =====================================================================
+   ПАЛИТРЫ (v5): 5 вариантов гаммы, переключатель — «малярная» панель
+   слева внизу. По умолчанию — «маркеры» (новая, по референсам
+   janelip.art / скетчбук-рецептам: белая бумага на деревянном столе,
+   чёрный лайнер, медь/терракот, маркерная зелень, томатный, горчица).
+   ===================================================================== */
+:root{
+  --bg:#f9f9f9; --card:#ffffff; --ink:#1a1c1c; --muted:#4c4546; --pencil:#6e6864;
+  --grid:rgba(26,28,28,.055); --shadow:#000000; --tape:rgba(222,216,198,.85);
+  --accent:#FC6C2B; --accent-deep:#a73a00; --yellow:#FFF1A8; --peach:#FFDCCB; --mint:#BDEEE2;
+  --on-sticky:#1a1c1c;
+  --head-font:'Inter',sans-serif; --body-font:'Hanken Grotesk',sans-serif; --hand-font:'Caveat',cursive;
+}
+/* 1 · МАРКЕРЫ: берёзовый стол + белая бумага + медь/зелень (новый вариант) */
+[data-palette="markers"]{
+  --bg:#EAD3AC; --card:#FCFBF7; --ink:#191919; --muted:#5c5347; --pencil:#6f6a63;
+  --grid:rgba(92,63,32,.10); --shadow:#191919; --tape:rgba(255,255,255,.6);
+  --accent:#D9641F; --accent-deep:#8f3d12; --yellow:#FFD84D; --peach:#F5CBA2; --mint:#CBE5B5;
+}
+[data-palette="markers"][data-theme="dark"]{
+  --bg:#221912; --card:#2C241A; --ink:#F3EFE6; --muted:#C6B8A5; --pencil:#A79C8C;
+  --grid:rgba(243,239,230,.07); --shadow:#F3EFE6; --tape:rgba(243,239,230,.25);
+  --accent:#FF8A50; --accent-deep:#FFB289; --yellow:#FFD84D; --peach:#F5CBA2; --mint:#A9CF93;
+}
+/* 2 · КРАФТ: картон + кирпич */
+[data-palette="kraft"]{
+  --bg:#E9DFCB; --card:#F7EFDF; --ink:#2B2118; --muted:#6E6152; --pencil:#7C6F5E;
+  --grid:rgba(43,33,24,.09); --shadow:#2B2118; --tape:rgba(255,252,244,.65);
+  --accent:#D1491F; --accent-deep:#8f2f12; --yellow:#F9E27D; --peach:#F5C9A4; --mint:#B9D8C4;
+}
+[data-palette="kraft"][data-theme="dark"]{
+  --bg:#211910; --card:#2B2216; --ink:#F1E8DA; --muted:#C4B6A4; --pencil:#A2937F;
+  --grid:rgba(241,232,218,.07); --shadow:#F1E8DA; --tape:rgba(241,232,218,.25);
+  --accent:#FF7A45; --accent-deep:#FFA071;
+}
+/* 3 · КЛАССИКА: тушь + апельсин */
+[data-palette="classic"]{
+  --bg:#f9f9f9; --card:#ffffff; --ink:#1a1c1c; --muted:#4c4546; --pencil:#6e6864;
+  --grid:rgba(26,28,28,.055); --shadow:#000000; --tape:rgba(222,216,198,.85);
+  --accent:#FC6C2B; --accent-deep:#a73a00; --yellow:#FFF1A8; --peach:#FFDCCB; --mint:#BDEEE2;
+}
+[data-palette="classic"][data-theme="dark"]{
+  --bg:#151616; --card:#202222; --ink:#f1f1f1; --muted:#b6b0b1; --pencil:#a29c9c;
+  --grid:rgba(241,241,241,.06); --shadow:#f1f1f1; --tape:rgba(255,255,255,.28);
+  --accent:#FC6C2B; --accent-deep:#ff9d6b;
+}
+/* 4 · СИНЬКА: инженерный blueprint */
+[data-palette="blueprint"]{
+  --bg:#E3EEF5; --card:#F2F9FD; --ink:#123B57; --muted:#4A6472; --pencil:#5E7684;
+  --grid:rgba(18,59,87,.10); --shadow:#123B57; --tape:rgba(180,205,220,.7);
+  --accent:#E85D04; --accent-deep:#9c3d00; --yellow:#FFE08A; --peach:#FFD2B8; --mint:#BFE8DD;
+}
+[data-palette="blueprint"][data-theme="dark"]{
+  --bg:#0E2C41; --card:#123750; --ink:#EAF4F7; --muted:#A9BEC9; --pencil:#8FA9B8;
+  --grid:rgba(234,244,247,.08); --shadow:#071824; --tape:rgba(234,244,247,.25);
+  --accent:#FF8A3D; --accent-deep:#FFB27A;
+}
+/* 5 · РИЗОГРАФ: ультрамарин + флуо-розовый зин */
+[data-palette="riso"]{
+  --bg:#F7F3EA; --card:#FFFDF6; --ink:#202020; --muted:#5c5852; --pencil:#6f6f6f;
+  --grid:rgba(32,32,32,.06); --shadow:#202020; --tape:rgba(222,216,198,.85);
+  --accent:#3D5BC4; --accent-deep:#24357e; --yellow:#FFD845; --peach:#FF9DB0; --mint:#7ED8C3;
+}
+[data-palette="riso"][data-theme="dark"]{
+  --bg:#161616; --card:#202020; --ink:#F3EFE6; --muted:#b9b5ac; --pencil:#9a9a9a;
+  --grid:rgba(243,239,230,.07); --shadow:#F3EFE6; --tape:rgba(243,239,230,.25);
+  --accent:#8CA0FF; --accent-deep:#B4C2FF; --yellow:#FFD845; --peach:#FF9DB0; --mint:#7ED8C3;
+}
+
+/* ============ BASE ============ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scroll-padding-top:110px}
+body{
+  background-color:var(--bg);color:var(--ink);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:40px 40px;
+  font-family:var(--body-font);font-size:16px;line-height:1.6;
+  transition:background-color .25s,color .25s;
+}
+img{display:block;max-width:100%}
+a{color:inherit}
+button{font-family:inherit;color:inherit}
+.wrap{max-width:1220px;margin:0 auto;padding:0 2rem}
+.defs{position:absolute;width:0;height:0;overflow:hidden}
+
+/* ============ PENCIL MULTI-STROKE FRAMES ============ */
+.card{position:relative;background:var(--card);border:none;box-shadow:none}
+.card::before{content:"";position:absolute;inset:-1px;pointer-events:none;border:2.6px solid var(--ink);box-shadow:6px 6px 0 var(--shadow);filter:url(#pencilA)}
+.card::after{content:"";position:absolute;inset:-4px;pointer-events:none;border:1.7px solid var(--ink);opacity:.42;transform:rotate(.35deg);filter:url(#pencilB)}
+.s3{position:absolute;inset:-2px;pointer-events:none;border:1.6px solid var(--ink);opacity:.28;transform:rotate(-.45deg);filter:url(#pencilC)}
+.ov{position:absolute;width:36px;height:36px;pointer-events:none;filter:url(#pencilA);opacity:.85}
+.ov::before{content:"";position:absolute;left:-5px;right:-5px;top:17px;height:2.2px;background:var(--ink)}
+.ov::after{content:"";position:absolute;top:-5px;bottom:-5px;left:17px;width:2.2px;background:var(--ink)}
+.ov-tl{top:-18px;left:-18px}.ov-tr{top:-18px;right:-18px}.ov-bl{bottom:-18px;left:-18px}.ov-br{bottom:-18px;right:-18px}
+@media (hover:hover){
+  .shift{transition:transform .15s ease}
+  .shift:hover{transform:translate(4px,4px)}
+  .shift:hover::before{box-shadow:2px 2px 0 var(--shadow)}
+}
+.tape{position:absolute;width:96px;height:26px;background:var(--tape);top:-14px;left:50%;transform:translateX(-50%) rotate(-3deg);z-index:2;
+  clip-path:polygon(2% 0,98% 5%,100% 32%,97% 55%,99% 80%,96% 100%,3% 95%,0 72%,4% 45%,1% 18%)}
+.tape.tl{left:14%;top:-12px;transform:rotate(-8deg)}
+.tape.tr{left:auto;right:8%;top:-12px;transform:rotate(6deg)}
+.chip{display:inline-block;border:2px solid var(--ink);background:var(--card);padding:.2rem .55rem;font-family:var(--head-font);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none}
+.chip.acc{background:var(--accent);color:#1a1c1c}
+.chip.yel{background:var(--yellow);color:var(--on-sticky)}
+.chip.mint{background:var(--mint);color:#1a1c1c}
+.ribbon{display:inline-block;padding:.4rem .9rem;font-family:var(--head-font);font-weight:800;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--shadow);transform:rotate(-2deg)}
+.ribbon-orange{background:var(--accent);color:#1a1c1c}
+.ribbon-yellow{background:var(--yellow);color:var(--on-sticky)}
+.ribbon-mint{background:var(--mint);color:var(--on-sticky)}
+.btn{display:inline-flex;align-items:center;gap:.6rem;cursor:pointer;font-family:var(--body-font);font-weight:700;font-size:15px;padding:.75rem 1.5rem;text-decoration:none;border:3px solid var(--ink);box-shadow:4px 4px 0 var(--shadow);transition:transform .15s,box-shadow .15s,background .15s,color .15s}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow)}
+.btn-pill{border-radius:999px;background:var(--ink);color:var(--bg)}
+@media (hover:hover){.btn:hover{transform:translate(4px,4px);box-shadow:0 0 0 var(--shadow);background:var(--accent);color:#1a1c1c}}
+.hand{font-family:var(--hand-font);line-height:1.2}
+.hl{background:linear-gradient(180deg,transparent 58%,var(--accent) 58%,var(--accent) 92%,transparent 92%);padding:0 .15em}
+.hl-mint{background:linear-gradient(180deg,transparent 60%,var(--mint) 60%,var(--mint) 94%,transparent 94%);padding:0 .15em}
+.wash{display:inline-block;font-family:var(--hand-font);font-weight:700;font-size:20px;padding:.15rem .9rem;border:2.5px solid var(--ink);box-shadow:3px 3px 0 var(--shadow);color:var(--on-sticky)}
+.wash-mint{background:var(--mint)}
+.wash-yellow{background:var(--yellow)}
+.wash-peach{background:var(--peach)}
+.pencil{font-family:var(--hand-font);font-style:italic;color:var(--pencil);letter-spacing:.03em}
+.pencil-vertical{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--hand-font);font-style:italic;font-weight:400;font-size:19px;line-height:1.25;color:var(--pencil);letter-spacing:.04em}
+.reveal{opacity:0;transform:translateY(16px)}
+.reveal.on{opacity:1;transform:none;transition:opacity .5s ease,transform .5s ease}
+@media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
+
+/* ============ HEADER ============ */
+.site-header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:3px solid var(--ink)}
+.header-inner{display:flex;align-items:center;gap:1.4rem;padding:.9rem 2rem}
+.logo{font-family:var(--body-font);font-weight:700;font-size:22px;text-decoration:none;white-space:nowrap}
+.logo b{color:var(--accent-deep)}
+.logo-dot{display:inline-block;width:10px;height:10px;background:var(--accent);border:2px solid var(--ink);transform:rotate(12deg);margin:0 .18em}
+.main-nav{display:flex;gap:1.1rem;margin-left:auto;flex-wrap:wrap}
+.main-nav a{text-decoration:none;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--head-font);padding:.3rem .1rem;border-bottom:3px solid transparent}
+.main-nav a:hover{border-bottom-color:var(--accent);background:var(--peach);color:#1a1c1c}
+.header-actions{display:flex;gap:.6rem;margin-left:.6rem}
+.icon-btn{width:42px;height:42px;display:grid;place-items:center;cursor:pointer;background:var(--card);border:3px solid var(--ink);box-shadow:3px 3px 0 var(--shadow);transition:transform .12s,box-shadow .12s,background .12s}
+@media (hover:hover){.icon-btn:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow);background:var(--mint)}}
+.icon-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+[data-theme="light"] .ic-sun{display:none}
+[data-theme="dark"] .ic-moon{display:none}
+.burger{display:none}
+.burger span{display:block;width:18px;height:3px;background:currentColor;margin:2.5px 0}
+.search-bar{border-top:3px dashed var(--ink);background:var(--card)}
+.search-bar .wrap{display:flex;gap:.8rem;padding:.9rem 2rem}
+.search-bar input{flex:1;background:transparent;border:none;border-bottom:3px solid var(--ink);font-family:var(--hand-font);font-size:22px;color:var(--ink);padding:.3rem .2rem;outline:none}
+.search-bar input:focus{border-bottom-color:var(--accent)}
+
+/* ============ BREADCRUMBS ============ */
+.crumbs-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;padding:2rem 0 1.4rem}
+.crumbs{font-family:var(--hand-font);font-size:22px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.crumbs a{text-decoration:none}
+.crumbs a:hover{color:var(--accent);text-decoration:underline}
+.crumbs .cur{color:var(--ink);text-decoration:underline wavy var(--accent) 2px;text-underline-offset:5px}
+
+/* ============ TITLE BLOCK ============ */
+.title-card{padding:2rem 2.6rem 2rem 2.2rem;margin-bottom:2.2rem;transform:rotate(-.3deg)}
+.title-card h1{font-family:var(--head-font);font-weight:900;text-transform:uppercase;letter-spacing:-.03em;font-size:clamp(30px,4.8vw,60px);line-height:1.02;margin:1rem 0 1.4rem}
+.meta-row{display:flex;flex-wrap:wrap;gap:.9rem;align-items:center}
+.abs-right{position:absolute;top:18px;right:12px;max-height:calc(100% - 36px)}
+
+/* ============ LAYOUT ============ */
+.layout{display:grid;grid-template-columns:repeat(12,1fr);gap:1.6rem;align-items:start}
+.col-left{grid-column:span 1}
+.col-main{grid-column:span 8;display:flex;flex-direction:column;gap:1.8rem}
+.col-side{grid-column:span 3;display:flex;flex-direction:column;gap:1.6rem}
+.marginalia{position:sticky;top:110px;display:flex;flex-direction:column;align-items:center;gap:1.4rem;padding-top:1rem}
+.marg-vertical{writing-mode:vertical-rl;transform:rotate(180deg)}
+.marg-note{font-family:var(--hand-font);font-size:20px;font-weight:700;color:var(--accent-deep);transform:rotate(-6deg);text-align:center}
+.marg-arrow{width:26px;height:64px;stroke:var(--ink);fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;transform:rotate(10deg)}
+.marg-doodle{padding:6px;transform:rotate(2deg)}
+.marg-doodle img{width:100%;border:2px solid var(--ink);filter:grayscale(.7);transition:filter .3s}
+@media (hover:hover){.marg-doodle:hover img{filter:grayscale(0)}}
+.marg-doodle figcaption{font-family:var(--hand-font);font-style:italic;font-size:15px;color:var(--pencil);text-align:center;padding-top:.3rem}
+
+/* ============ ARTICLE ============ */
+.tldr{background:var(--yellow);color:var(--on-sticky);padding:1.5rem 1.7rem;transform:rotate(-.5deg)}
+.tldr h3{font-family:var(--hand-font);font-size:30px;font-weight:700;margin-bottom:.4rem}
+.tldr p{font-size:17px;font-weight:500}
+.figure{padding:10px;transform:rotate(.4deg)}
+.figure img{width:100%;border:2.5px solid var(--ink)}
+.figure figcaption{display:flex;justify-content:space-between;gap:1rem;padding:.6rem .2rem 0;font-family:var(--head-font);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.article-card{padding:2rem 2.4rem 2rem 2.8rem;display:flex;flex-direction:column;gap:2rem;font-size:17px}
+.abs-left{position:absolute;top:20px;left:10px;max-height:calc(100% - 40px)}
+.sec-head2{display:flex;align-items:center;gap:.8rem;margin-bottom:.9rem}
+.nbadge{flex:none;width:40px;height:40px;border:2.5px solid var(--ink);box-shadow:3px 3px 0 var(--shadow);display:grid;place-items:center;font-family:var(--hand-font);font-weight:700;font-size:24px;color:var(--on-sticky)}
+.nb-yellow{background:var(--yellow)}
+.nb-mint{background:var(--mint)}
+.nb-peach{background:var(--peach)}
+.sec-head2 h2{font-family:var(--head-font);font-weight:900;text-transform:uppercase;letter-spacing:-.02em;font-size:clamp(20px,2.6vw,30px);line-height:1.1}
+.callout{padding:1.3rem 1.5rem;color:var(--on-sticky);display:flex;gap:1rem;align-items:flex-start;position:relative}
+.callout-peach{background:var(--peach);transform:rotate(-.4deg)}
+.callout-mint{background:var(--mint);transform:rotate(.4deg)}
+.callout .ico{font-size:30px;line-height:1}
+.callout h4{font-family:var(--hand-font);font-size:28px;font-weight:700;margin-bottom:.2rem}
+.callout p{font-size:15.5px;font-weight:500;line-height:1.45}
+.graph-card{padding:1.2rem 1.2rem 1rem}
+.graph-cap{font-family:var(--hand-font);font-size:20px;font-weight:700;color:var(--muted);margin-bottom:.5rem}
+.graph-card svg{width:100%;height:auto;display:block;color:var(--ink)}
+.share-bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;border-top:3px dashed var(--ink);padding-top:1.4rem}
+.share-bar .hand{font-size:28px;font-weight:700}
+
+/* ============ SIDEBAR ============ */
+.author-card{padding:1.5rem;transform:rotate(.4deg)}
+.author-row{display:flex;align-items:center;gap:.9rem}
+.author-badge{flex:none;width:52px;height:52px;display:grid;place-items:center;background:var(--ink);color:var(--bg);font-family:var(--head-font);font-weight:900;font-size:14px;border:2.5px solid var(--ink);box-shadow:3px 3px 0 var(--shadow)}
+.author-name{font-weight:700;font-size:18px}
+.author-role{font-family:var(--hand-font);font-size:20px;color:var(--muted)}
+.author-card .divider{border-top:2px dashed var(--ink);margin:.9rem 0}
+.toc-card{padding:1.5rem;position:sticky;top:110px}
+.toc-card h3,.side-title{font-family:var(--head-font);font-weight:900;text-transform:uppercase;font-size:18px;letter-spacing:-.01em;border-bottom:3px solid var(--ink);padding-bottom:.6rem;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+.toc-list{list-style:none;display:flex;flex-direction:column;gap:.7rem}
+.toc-link{display:flex;align-items:center;gap:.7rem;text-decoration:none;font-weight:700;font-size:15px;padding:.35rem .5rem;border:2px solid transparent}
+.toc-link .cbx{flex:none;width:18px;height:18px;border:2px solid var(--ink);display:grid;place-items:center;font-size:12px;font-weight:900;background:var(--card);color:var(--on-sticky)}
+.toc-link:hover{background:var(--peach);color:#1a1c1c}
+.toc-link.active{background:var(--yellow);color:#1a1c1c;box-shadow:2px 2px 0 var(--shadow);border-color:var(--ink)}
+.toc-link.active .cbx{background:var(--mint)}
+.rel-card{display:block;text-decoration:none;padding:1rem;margin-bottom:1rem}
+.rel-card .cat{display:block;margin-bottom:.35rem}
+.rel-card h4{font-family:var(--head-font);font-weight:800;text-transform:uppercase;font-size:13.5px;line-height:1.3;margin-bottom:.35rem}
+.rel-card .date{font-family:var(--hand-font);font-size:17px;color:var(--muted)}
+@media (hover:hover){.rel-card:hover{background:var(--yellow);color:#1a1c1c}.rel-card:hover .date{color:#1a1c1c}}
+
+/* ============ PALETTE BAR ============ */
+.palette-bar{position:fixed;left:16px;bottom:16px;z-index:70;display:flex;flex-direction:column;gap:.55rem;background:var(--card);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--shadow);padding:.9rem 1rem;transform:rotate(-1deg)}
+.palette-bar .pb-title{font-family:var(--hand-font);font-style:italic;font-size:18px;color:var(--pencil)}
+.pal{display:flex;align-items:center;gap:.55rem;cursor:pointer;border:2px solid var(--ink);background:transparent;padding:.32rem .55rem;font-family:var(--hand-font);font-size:17px;font-weight:700;color:var(--ink);transition:transform .12s,box-shadow .12s,background .12s}
+.pal i{width:14px;height:14px;border:1.5px solid var(--ink);display:inline-block}
+.pal i+i{margin-left:-4px}
+@media (hover:hover){.pal:hover{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--shadow)}}
+.pal[aria-pressed="true"]{background:var(--yellow);color:#1a1c1c;box-shadow:2px 2px 0 var(--shadow)}
+@media (max-width:640px){.palette-bar{left:10px;bottom:10px;padding:.7rem .8rem;transform:rotate(0) scale(.92);transform-origin:left bottom}}
+
+/* ============ FOOTER ============ */
+.site-footer{margin-top:4rem;border-top:3px solid var(--ink);background:var(--ink);color:var(--bg)}
+.footer-inner{display:flex;justify-content:space-between;gap:2rem;flex-wrap:wrap;padding:2.2rem 2rem}
+.footer-logo{font-weight:700;font-size:20px}
+.footer-note{font-family:var(--hand-font);font-size:20px;transform:rotate(-2deg);color:var(--accent)}
+.footer-nav{display:flex;gap:1.4rem;flex-wrap:wrap}
+.footer-nav a{text-decoration:none;font-size:14px;font-weight:700;border-bottom:2px solid transparent}
+.footer-nav a:hover{border-bottom-color:var(--accent);color:var(--accent)}
+.footer-bottom{border-top:2px dashed var(--bg);padding:1rem 2rem;display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-size:13px;opacity:.85}
+
+/* ============ TOAST ============ */
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) rotate(-1.5deg);z-index:99;background:var(--yellow);color:var(--on-sticky);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--shadow);padding:.8rem 1.4rem;font-family:var(--hand-font);font-size:20px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) rotate(-1.5deg) translateY(-6px)}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1200px){
+  .col-left{display:none}
+  .col-main{grid-column:span 9}
+  .col-side{grid-column:span 3}
+  .abs-right{display:none}
+}
+@media (max-width:980px){
+  .col-main,.col-side{grid-column:1/-1}
+  .toc-card{position:static}
+  .main-nav{position:fixed;inset:78px 0 auto 0;background:var(--bg);border-bottom:3px solid var(--ink);flex-direction:column;padding:1.4rem 2rem;gap:1rem;display:none}
+  .main-nav.open{display:flex}
+  .burger{display:grid}
+}
+@media (max-width:640px){
+  .wrap{padding:0 1.1rem}
+  .header-inner{padding:.8rem 1.1rem}
+  .title-card,.article-card{padding:1.4rem}
+  .abs-left,.ov{display:none}
+}
+</style>
+</head>
+<body id="top">
+
+<!-- карандашные фильтры -->
+<svg class="defs" aria-hidden="true" focusable="false">
+  <filter id="pencilA" x="-6%" y="-6%" width="112%" height="112%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="4" seed="3" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.8"/>
+  </filter>
+  <filter id="pencilB" x="-6%" y="-6%" width="112%" height="112%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.028" numOctaves="4" seed="8" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="3.6"/>
+  </filter>
+  <filter id="pencilC" x="-6%" y="-6%" width="112%" height="112%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="14" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="2.2"/>
+  </filter>
+</svg>
+
+<!--
+=====================================================================
+ПАЛИТРЫ v5 · переключатель в левом нижнем углу:
+· markers   — НОВАЯ по референсам: берёзовый стол #EAD3AC, белая бумага
+              #FCFBF7, чёрный лайнер #191919, медь #D9641F, маркерная
+              зелень #CBE5B5, горчица #FFD84D, светлая медь #F5CBA2
+· kraft     — картон + кирпич
+· classic   — тушь + апельсин (исходная по скиллу)
+· blueprint — синька
+· riso      — ризограф
+У каждой палитры есть light/dark через data-theme.
+=====================================================================
+-->
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="header-inner wrap">
+    <a class="logo" href="index.html">Точка<span class="logo-dot"></span><b>Плавления</b></a>
+    <nav class="main-nav" id="mainNav" aria-label="Навигация">
+      <a href="index.html">Статьи</a>
+      <a href="interactive.html">Инструменты</a>
+      <a href="cookies.html">Cookies</a>
+    </nav>
+    <div class="header-actions">
+      <button class="icon-btn" id="searchToggle" type="button" aria-label="Поиск">
+        <svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.8 L21 21.2"/></svg>
+      </button>
+      <button class="icon-btn" id="themeToggle" type="button" aria-label="Переключить тему">
+        <svg class="ic-moon" viewBox="0 0 24 24"><path d="M20 14.5 A8.5 8.5 0 1 1 9.5 4 A7 7 0 0 0 20 14.5 Z"/></svg>
+        <svg class="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></svg>
+      </button>
+      <button class="icon-btn burger" id="menuToggle" type="button" aria-label="Меню" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="search-bar" id="searchBar" hidden>
+    <form class="wrap" id="searchForm">
+      <input type="search" id="searchInput" placeholder="что ищем? например: термопрофиль BGA…" aria-label="Поиск по сайту">
+      <button class="btn btn-pill" type="submit">Найти</button>
+    </form>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- Breadcrumbs + ribbon -->
+  <div class="crumbs-row">
+    <nav class="crumbs" aria-label="Хлебные крошки">
+      <a href="index.html">Главная</a><span>➔</span>
+      <a href="index.html?tag=basics">Основы</a><span>➔</span>
+      <span class="cur">Температурные профили: как не перегреть плату за $300</span>
+    </nav>
+    <span class="ribbon ribbon-orange">Конспект мастера v2.0</span>
+  </div>
+
+  <!-- Title block -->
+  <div class="title-card card reveal">
+    <i class="s3"></i>
+    <i class="ov ov-tl"></i><i class="ov ov-tr"></i><i class="ov ov-bl"></i><i class="ov ov-br"></i>
+    <span class="tape tl"></span>
+    <span class="tape tr"></span>
+    <span class="pencil-vertical abs-right">конспект v2.0 · карандашом на полях · не перегревай! ·</span>
+    <span class="chip yel">Основы</span>
+    <h1>Температурные профили: как не <span class="hl">перегреть</span> плату за <span class="hl-mint">$300</span></h1>
+    <div class="meta-row">
+      <span class="wash wash-mint">⏱️ 8 мин чтения</span>
+      <span class="wash wash-yellow">📅 10 авг 2026</span>
+      <span class="wash wash-peach">👤 Иван Пайкин</span>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- ===== Left marginalia ===== -->
+    <aside class="col-left" aria-hidden="true">
+      <div class="marginalia">
+        <span class="ribbon ribbon-yellow marg-vertical">Введение</span>
+        <span class="pencil-vertical">карандашом: медь греется быстрее дорожки · жало луди перед паузой · дым уводит вытяжка, а не нос ·</span>
+        <span class="marg-note">✏️ заметки<br>на полях</span>
+        <svg class="marg-arrow" viewBox="0 0 24 48"><path d="M12 0v40m-8-8l8 8 8-8"/></svg>
+        <figure class="marg-doodle card">
+          <img src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1554d11ec-d188-471c-abf6-1717cecf37e8.png" alt="Скетч: карандаш обводит рамку в два прохода, линии с перекрестиями в углах">
+          <figcaption>рамка: 2 прохода</figcaption>
+        </figure>
+        <span class="chip mint">IC-ТЧП-02</span>
+      </div>
+    </aside>
+
+    <!-- ===== Main column ===== -->
+    <div class="col-main">
+
+      <figure class="figure card shift reveal">
+        <span class="tape tl"></span>
+        <span class="tape tr"></span>
+        <img src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1dac4df59-7c91-4cd1-90bd-4eec5b1f3d16.png" alt="Скетч: кривая температурного профиля с зонами прогрева, полки и пика, жало паяльника на BGA-чипе">
+        <figcaption><span>Рис. 0 // кривая профиля</span><span>прегрев → полка → пик → охлаждение</span></figcaption>
+      </figure>
+
+      <div class="tldr card reveal">
+        <span class="tape tr"></span>
+        <h3>📌 В двух словах (TL;DR)</h3>
+        <p><strong>Ключевая мысль:</strong> разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат.</p>
+      </div>
+
+      <article class="article-card card reveal">
+        <i class="s3"></i>
+        <i class="ov ov-tl"></i><i class="ov ov-tr"></i><i class="ov ov-bl"></i><i class="ov ov-br"></i>
+        <span class="pencil-vertical abs-left">поля: теплоёмкость текстолита · полка 60–90 сек · пик 245°C максимум · охлаждение плавно ·</span>
+
+        <section id="sec-1">
+          <div class="sec-head2">
+            <span class="nbadge nb-yellow">1</span>
+            <h2>Введение и проблематика</h2>
+          </div>
+          <p class="pencil" style="margin-bottom:.9rem;font-size:18px">Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат.</p>
+          <p>Качество пайки печатных плат и долговечность поверхностных компонентов напрямую зависят от строгой дисциплины процесса. Ошибки на этапе нагрева приводят к микротрещинам и отслоению медных дорожек.</p>
+        </section>
+
+        <div class="callout callout-peach card">
+          <span class="ico">⚠️</span>
+          <div>
+            <h4>Важно знать!</h4>
+            <p>Перегрев выше допустимой нормы вызывает термический шок кристаллов полупроводников и расслоение (деламинацию) многослойного стеклотекстолита.</p>
+          </div>
+        </div>
+
+        <section id="sec-2">
+          <div class="sec-head2">
+            <span class="nbadge nb-mint">2</span>
+            <h2>График температурного профиля</h2>
+          </div>
+          <p style="margin-bottom:1rem">Ниже приведена типовая зависимость температуры монтажной зоны от времени обработки:</p>
+
+          <div class="graph-card card">
+            <div class="graph-cap">📈 схема нагрева: T°C / время (сек)</div>
+            <svg viewBox="0 0 560 250" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" role="img" aria-label="Скетч-график температурного профиля: прегрев, полка, пик, охлаждение">
+              <path d="M42 205 H520 M512 199 l8 6 -8 6" stroke-width="3"/>
+              <path d="M42 205 V28 M36 36 l6 -8 6 8" stroke-width="3"/>
+              <line x1="42" y1="120" x2="520" y2="120" stroke-dasharray="6 7" stroke-width="2"/>
+              <path d="M42 205 L150 122" style="stroke:var(--yellow)" stroke-width="9"/>
+              <path d="M150 122 H300" style="stroke:var(--accent)" stroke-width="9"/>
+              <path d="M300 122 Q330 44 360 44 Q392 44 420 122 Q450 190 505 196" style="stroke:var(--mint)" stroke-width="9"/>
+              <path d="M42 205 L150 122 H300 Q330 44 360 44 Q392 44 420 122 Q450 190 505 196" stroke-width="3.5"/>
+              <path d="M44 207 L152 125 H300 Q331 47 361 47 Q391 47 419 125 Q449 192 503 198" style="stroke:var(--pencil)" stroke-width="1.4" opacity=".55"/>
+              <line x1="150" y1="122" x2="150" y2="205" stroke-dasharray="5 6" stroke-width="2"/>
+              <line x1="360" y1="44" x2="360" y2="205" stroke-dasharray="5 6" stroke-width="2"/>
+              <line x1="470" y1="182" x2="470" y2="205" stroke-dasharray="5 6" stroke-width="2"/>
+              <rect x="142" y="114" width="16" height="16" style="fill:var(--yellow)" stroke-width="2.5"/>
+              <rect x="352" y="36" width="16" height="16" style="fill:var(--accent)" stroke-width="2.5"/>
+              <rect x="462" y="174" width="16" height="16" style="fill:var(--mint)" stroke-width="2.5"/>
+              <rect x="70" y="216" width="100" height="24" style="fill:var(--card);stroke:var(--yellow)" stroke-width="3"/>
+              <rect x="250" y="216" width="100" height="24" style="fill:var(--card);stroke:var(--accent)" stroke-width="3"/>
+              <rect x="430" y="216" width="90" height="24" style="fill:var(--card);stroke:var(--mint)" stroke-width="3"/>
+              <text x="96" y="104" font-family="Caveat, cursive" font-size="21" font-weight="700" style="fill:var(--ink)" stroke="none">Preheat</text>
+              <text x="330" y="26" font-family="Caveat, cursive" font-size="21" font-weight="700" style="fill:var(--accent-deep)" stroke="none">Peak ⚡</text>
+              <text x="452" y="162" font-family="Caveat, cursive" font-size="21" font-weight="700" style="fill:var(--ink)" stroke="none">Cool</text>
+              <text x="470" y="20" font-family="Inter, sans-serif" font-size="11" font-weight="800" letter-spacing="2" style="fill:var(--ink)" stroke="none">IC-ТЧП-02</text>
+            </svg>
+          </div>
+        </section>
+
+        <div class="callout callout-mint card">
+          <span class="ico">💡</span>
+          <div>
+            <h4>Инженерный совет</h4>
+            <p>Для отслеживания реальной температуры платы на верстаке применяйте внешний цифровой термопарный датчик K-типа.</p>
+          </div>
+        </div>
+
+        <figure class="figure card shift">
+          <span class="tape tl"></span>
+          <img src="https://image.qwenlm.ai/public_source/439a7a74-597a-4187-a71c-1abbf07ab726/1b90f5596-dd60-44c5-a1f4-aff19ac3d118.png" alt="Скетч: термопара K-типа прижата к плате, провод к метру с пустым дисплеем, рядом паяльник в подставке">
+          <figcaption><span>Рис. 2 // термопара K-типа</span><span>контроль на верстаке</span></figcaption>
+        </figure>
+
+        <section id="sec-3">
+          <div class="sec-head2">
+            <span class="nbadge nb-peach">3</span>
+            <h2>Заключение</h2>
+          </div>
+          <p>Грамотный выбор оборудования, качественные материалы и следование технологическим картам — гарант стабильной работы ваших DIY-устройств.</p>
+        </section>
+
+        <div class="share-bar">
+          <span class="hand">Понравился конспект? ↷</span>
+          <button class="btn btn-pill" id="copyBtn" type="button">Скопировать ссылку 🔗</button>
+        </div>
+      </article>
+    </div>
+
+    <!-- ===== Sidebar ===== -->
+    <aside class="col-side">
+
+      <div class="author-card card shift reveal">
+        <span class="tape tl"></span>
+        <div class="author-row">
+          <div class="author-badge">ТЧП</div>
+          <div>
+            <div class="author-name">Иван Пайкин</div>
+            <div class="author-role">инженер-практик</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <span class="ribbon ribbon-mint" style="font-size:.7rem">⚡ Проверено в лаборатории</span>
+      </div>
+
+      <div class="toc-card card reveal">
+        <h3>📌 Оглавление</h3>
+        <ul class="toc-list">
+          <li><a class="toc-link" href="#sec-1"><span class="cbx">✓</span>Введение</a></li>
+          <li><a class="toc-link" href="#sec-2"><span class="cbx"></span>Температурный профиль</a></li>
+          <li><a class="toc-link" href="#sec-3"><span class="cbx"></span>Заключение</a></li>
+        </ul>
+      </div>
+
+      <div class="reveal">
+        <h3 class="side-title">📚 Читайте также</h3>
+        <a class="rel-card card shift" href="article-v2.html?slug=smd-0402-vs-0603">
+          <span class="chip acc cat">SMD</span>
+          <h4>SMD 0402 vs 0603: что выбрать для прототипа</h4>
+          <span class="date">05 авг 2026</span>
+        </a>
+        <a class="rel-card card shift" href="article-v2.html?slug=gid-po-flyusam">
+          <span class="chip mint cat">Материалы</span>
+          <h4>Гид по флюсам: RMA, NC и no-clean в шприце</h4>
+          <span class="date">01 авг 2026</span>
+        </a>
+        <a class="rel-card card shift" href="article-v2.html?slug=zhala-payalnika">
+          <span class="chip yel cat">Инструменты</span>
+          <h4>Жала паяльника: T12 против JBC C245 на верстаке</h4>
+          <span class="date">28 июл 2026</span>
+        </a>
+      </div>
+
+    </aside>
+  </div>
+</main>
+
+<!-- ================= PALETTE SWITCHER ================= -->
+<div class="palette-bar" role="group" aria-label="Выбор палитры">
+  <span class="tape tl"></span>
+  <span class="pb-title">гамма на пробу ↓</span>
+  <button class="pal" type="button" data-pal="markers" aria-pressed="true">
+    <i style="background:#EAD3AC"></i><i style="background:#D9641F"></i><i style="background:#CBE5B5"></i>маркеры
+  </button>
+  <button class="pal" type="button" data-pal="kraft" aria-pressed="false">
+    <i style="background:#E9DFCB"></i><i style="background:#D1491F"></i><i style="background:#B9D8C4"></i>крафт
+  </button>
+  <button class="pal" type="button" data-pal="classic" aria-pressed="false">
+    <i style="background:#f9f9f9"></i><i style="background:#FC6C2B"></i><i style="background:#BDEEE2"></i>тушь
+  </button>
+  <button class="pal" type="button" data-pal="blueprint" aria-pressed="false">
+    <i style="background:#E3EEF5"></i><i style="background:#123B57"></i><i style="background:#E85D04"></i>синька
+  </button>
+  <button class="pal" type="button" data-pal="riso" aria-pressed="false">
+    <i style="background:#F7F3EA"></i><i style="background:#3D5BC4"></i><i style="background:#FF9DB0"></i>ризо
+  </button>
+</div>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="footer-inner wrap">
+    <div>
+      <div class="footer-logo">Точка<span style="color:var(--accent)">●</span>Плавления</div>
+      <p class="footer-note">Не перегревай плату! 🔥</p>
+    </div>
+    <nav class="footer-nav" aria-label="Служебные ссылки">
+      <a href="interactive.html">Инструменты</a>
+      <a href="cookies.html">Cookies</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+  </div>
+  <div class="footer-bottom wrap">
+    <span>© 2026 Точка Плавления. Anti-perfect Handcraft.</span>
+    <span>IC-ТЧП v1.0 · структура обнажена</span>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  'use strict';
+  var rootEl = document.documentElement;
+  var PALETTES = ['markers','kraft','classic','blueprint','riso'];
+  var PAL_NAMES = {
+    markers:'маркер-скетч (дерево, медь, зелень)',
+    kraft:'крафт и кирпич',
+    classic:'тушь и апельсин',
+    blueprint:'синька',
+    riso:'ризограф'
+  };
+
+  /* ---- palette ---- */
+  var savedPal = null;
+  try { savedPal = localStorage.getItem('tp-palette'); } catch(e) {}
+  if (PALETTES.indexOf(savedPal) > -1) rootEl.setAttribute('data-palette', savedPal);
+  var palBtns = document.querySelectorAll('.pal');
+  function syncPalBtns(){
+    var cur = rootEl.getAttribute('data-palette');
+    palBtns.forEach(function(b){ b.setAttribute('aria-pressed', b.getAttribute('data-pal') === cur ? 'true' : 'false'); });
+  }
+  palBtns.forEach(function(b){
+    b.addEventListener('click', function(){
+      var p = b.getAttribute('data-pal');
+      rootEl.setAttribute('data-palette', p);
+      try { localStorage.setItem('tp-palette', p); } catch(e) {}
+      syncPalBtns();
+      showToast('🎨 гамма: ' + PAL_NAMES[p]);
+    });
+  });
+  syncPalBtns();
+
+  /* ---- theme ---- */
+  var savedTheme = null;
+  try { savedTheme = localStorage.getItem('tp-theme'); } catch(e) {}
+  if (savedTheme === 'dark' || savedTheme === 'light') rootEl.setAttribute('data-theme', savedTheme);
+  var themeBtn = document.getElementById('themeToggle');
+  themeBtn.addEventListener('click', function(){
+    var next = rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    rootEl.setAttribute('data-theme', next);
+    try { localStorage.setItem('tp-theme', next); } catch(e) {}
+    showToast(next === 'dark' ? '🌙 тёмная тема: жало светится!' : '☀️ светлая тема: бумага и тушь!');
+  });
+
+  /* ---- toast ---- */
+  var toastEl = document.getElementById('toast');
+  var toastTimer = null;
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toastEl.classList.remove('show'); }, 2600);
+  }
+
+  /* ---- search ---- */
+  var searchToggle = document.getElementById('searchToggle');
+  var searchBar = document.getElementById('searchBar');
+  var searchForm = document.getElementById('searchForm');
+  var searchInput = document.getElementById('searchInput');
+  searchToggle.addEventListener('click', function(){
+    searchBar.hidden = !searchBar.hidden;
+    if (!searchBar.hidden) searchInput.focus();
+  });
+  searchForm.addEventListener('submit', function(ev){
+    ev.preventDefault();
+    var q = searchInput.value.trim();
+    showToast('🔧 Полнотекстовый поиск скоро! Запрос: «' + q + '»');
+    searchBar.hidden = true;
+  });
+
+  /* ---- mobile menu ---- */
+  var menuToggle = document.getElementById('menuToggle');
+  var mainNav = document.getElementById('mainNav');
+  menuToggle.addEventListener('click', function(){
+    var open = mainNav.classList.toggle('open');
+    menuToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  mainNav.addEventListener('click', function(ev){
+    if (ev.target.tagName === 'A') { mainNav.classList.remove('open'); menuToggle.setAttribute('aria-expanded','false'); }
+  });
+
+  /* ---- copy link ---- */
+  var copyBtn = document.getElementById('copyBtn');
+  copyBtn.addEventListener('click', function(){
+    var url = window.location.href;
+    function done(){ showToast('🔗 Ссылка скопирована!'); }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(done, function(){ fallbackCopy(url); done(); });
+    } else { fallbackCopy(url); done(); }
+  });
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e) {}
+    document.body.removeChild(ta);
+  }
+
+  /* ---- TOC scrollspy ---- */
+  var tocLinks = document.querySelectorAll('.toc-link');
+  var secEls = ['sec-1','sec-2','sec-3'].map(function(id){ return document.getElementById(id); });
+  function setActive(idx){
+    tocLinks.forEach(function(lk, i){
+      lk.classList.toggle('active', i === idx);
+      lk.querySelector('.cbx').textContent = (i === idx) ? '✓' : '';
+    });
+  }
+  if ('IntersectionObserver' in window) {
+    var spy = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting) { setActive(secEls.indexOf(en.target)); }
+      });
+    }, { rootMargin: '-30% 0px -55% 0px' });
+    secEls.forEach(function(s){ if (s) spy.observe(s); });
+  }
+  setActive(0);
+
+  /* ---- reveal on scroll ---- */
+  var revealEls = document.querySelectorAll('.reveal');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if (en.isIntersecting) { en.target.classList.add('on'); io.unobserve(en.target); }
+      });
+    }, { threshold: 0.1 });
+    revealEls.forEach(function(el){ io.observe(el); });
+  } else {
+    revealEls.forEach(function(el){ el.classList.add('on'); });
+  }
+})();
+</script>
+</body>
+</html>

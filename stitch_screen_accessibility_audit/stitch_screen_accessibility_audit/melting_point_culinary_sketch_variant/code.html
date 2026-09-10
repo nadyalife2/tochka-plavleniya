@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html lang="ru"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Как построить идеальный бенто-модуль - Точка Плавления</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+                    "primary-fixed-dim": "#c6c6c6",
+                    "on-error": "#ffffff",
+                    "tertiary": "#000000",
+                    "surface-container-low": "#f4f3f3",
+                    "outline-variant": "#cfc4c5",
+                    "on-primary-container": "#848484",
+                    "outline": "#7e7576",
+                    "tertiary-fixed-dim": "#cdc996",
+                    "on-background": "#1a1c1c",
+                    "on-secondary-fixed-variant": "#7f2b00",
+                    "on-primary": "#ffffff",
+                    "surface-container-high": "#e8e8e8",
+                    "surface-dim": "#dadada",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#4a4821",
+                    "surface-container-highest": "#e2e2e2",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#c6c6c6",
+                    "background": "#f9f9f9",
+                    "secondary": "#a73a00",
+                    "surface-container": "#eeeeee",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed-variant": "#474747",
+                    "on-tertiary-container": "#898658",
+                    "on-surface-variant": "#4c4546",
+                    "on-secondary-container": "#5a1c00",
+                    "on-surface": "#1a1c1c",
+                    "primary-fixed": "#e2e2e2",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-fixed": "#ffdbce",
+                    "secondary-container": "#fc6c2b",
+                    "on-primary-fixed": "#1b1b1b",
+                    "inverse-surface": "#2f3131",
+                    "error-container": "#ffdad6",
+                    "on-tertiary-fixed": "#1e1c00",
+                    "surface-variant": "#e2e2e2",
+                    "surface": "#f9f9f9",
+                    "tertiary-container": "#1e1c00",
+                    "surface-bright": "#f9f9f9",
+                    "on-secondary-fixed": "#370e00",
+                    "secondary-fixed-dim": "#ffb599",
+                    "tertiary-fixed": "#e9e5b0",
+                    "error": "#ba1a1a",
+                    "primary-container": "#1b1b1b",
+                    "primary": "#000000",
+                    "inverse-on-surface": "#f1f1f1",
+                    "surface-tint": "#5e5e5e"
+            },
+            borderRadius: {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            spacing: {
+                    "grid-gutter": "1rem",
+                    "stack-lg": "2rem",
+                    "bento-padding": "1.5rem",
+                    "grid-margin": "2rem",
+                    "stack-sm": "0.5rem",
+                    "stack-md": "1rem"
+            },
+            fontFamily: {
+                    "display-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-lg": ["Hanken Grotesk"],
+                    "headline-xl": ["Inter"],
+                    "body-md": ["Hanken Grotesk"],
+                    "handwritten-lg": ["Caveat"],
+                    "headline-lg": ["Inter"],
+                    "handwritten-sm": ["Caveat"],
+                    "headline-xl-mobile": ["Inter"]
+            },
+            fontSize: {
+                    "display-lg": ["72px", { lineHeight: "1.0", letterSpacing: "-0.04em", fontWeight: "900" }],
+                    "label-caps": ["12px", { lineHeight: "1.0", letterSpacing: "0.1em", fontWeight: "700" }],
+                    "body-lg": ["18px", { lineHeight: "1.6", fontWeight: "400" }],
+                    "headline-xl": ["48px", { lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800" }],
+                    "body-md": ["16px", { lineHeight: "1.5", fontWeight: "400" }],
+                    "handwritten-lg": ["24px", { lineHeight: "1.2", fontWeight: "400" }],
+                    "headline-lg": ["32px", { lineHeight: "1.2", fontWeight: "800" }],
+                    "handwritten-sm": ["18px", { lineHeight: "1.1", fontWeight: "400" }],
+                    "headline-xl-mobile": ["32px", { lineHeight: "1.1", fontWeight: "800" }]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Sketch Brutalist Custom Styles - Enhanced */
+        .paper-texture {
+            background-image: 
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E"),
+                url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M 0 100 Q 200 120 400 90 M 0 200 Q 150 180 400 210 M 0 300 Q 250 320 400 290' stroke='rgba(0,0,0,0.02)' fill='none' stroke-width='1'/%3E%3C/svg%3E");
+            background-color: #fdfaf4;
+        }
+        
+        .sketch-border {
+            border: 3px solid #1a1c1c;
+            border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.5' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='black'/%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.15' mix-blend-mode='multiply'/%3E%3C/svg%3E");
+        }
+        
+        .sketch-shadow {
+            box-shadow: 4px 5px 0px 0px rgba(26, 28, 28, 0.85), 6px 7px 4px -2px rgba(0,0,0,0.2);
+        }
+        
+        .sketch-shadow-hover:hover {
+            box-shadow: 2px 3px 0px 0px rgba(26, 28, 28, 0.9), 3px 4px 2px -1px rgba(0,0,0,0.3);
+            transform: translate(2px, 2px) rotate(0.5deg);
+        }
+        
+        .tape-corner {
+            position: absolute;
+            width: 85px;
+            height: 28px;
+            background: rgba(240, 235, 220, 0.85);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 2px solid rgba(0,0,0,0.05);
+            transform: rotate(-45deg);
+            top: -5px;
+            left: -25px;
+            z-index: 10;
+            box-shadow: 1px 2px 4px rgba(0,0,0,0.15);
+            backdrop-filter: blur(2px);
+            border-radius: 2px 4px 2px 4px;
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 100 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0,0 L100,2 Q98,15 100,30 L0,28 Q2,15 0,0 Z' fill='black'/%3E%3C/svg%3E");
+        }
+        
+        .tape-right {
+            transform: rotate(45deg);
+            top: -5px;
+            right: -25px;
+            left: auto;
+        }
+
+        .paperclip {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            width: 15px;
+            height: 45px;
+            border: 3px solid #64748b;
+            border-radius: 10px;
+            background: transparent;
+            z-index: 20;
+            box-shadow: 2px 2px 2px rgba(0,0,0,0.2);
+            transform: rotate(10deg);
+        }
+        
+        .post-it {
+            background-color: #fef08a;
+            box-shadow: 4px 4px 8px rgba(0,0,0,0.15);
+            border: 1px solid #eab308;
+            position: relative;
+        }
+
+        .marker-highlight {
+            position: relative;
+            display: inline-block;
+            z-index: 1;
+        }
+
+        .marker-highlight::before {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            left: -2px;
+            right: -4px;
+            height: 12px;
+            background-color: rgba(252, 108, 43, 0.4);
+            z-index: -1;
+            transform: rotate(-1deg);
+            border-radius: 2px;
+        }
+
+        .hatch-fill-tldr {
+            position: relative;
+            background-color: #fef08a;
+        }
+        
+        .hatch-fill-tldr::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            background-image: url("data:image/svg+xml,%3Csvg width='10' height='10' viewBox='0 0 10 10' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-1,1 l2,-2 M0,10 l10,-10 M9,11 l2,-2' stroke='%23eab308' stroke-width='1' opacity='0.3'/%3E%3C/svg%3E");
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .hatch-fill-toc {
+            position: relative;
+            background-color: #e5e1d8;
+        }
+        
+        .hatch-fill-toc::before {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            right: 4px;
+            bottom: 4px;
+            background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-1,1 l2,-2 M0,12 l12,-12 M11,13 l2,-2' stroke='%23d4cfc4' stroke-width='1.5' opacity='0.4'/%3E%3C/svg%3E");
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .ink-stamp {
+            border: 3px solid #a73a00;
+            border-radius: 6px;
+            padding: 4px 10px;
+            transform: rotate(-8deg);
+            display: inline-block;
+            opacity: 0.85;
+            color: #a73a00;
+            font-weight: bold;
+            mask-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='black'/%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.2' mix-blend-mode='multiply'/%3E%3C/svg%3E");
+        }
+
+        .ink-stamp-blue {
+            border-color: #0f766e;
+            color: #0f766e;
+            transform: rotate(5deg);
+        }
+
+        .icon-bloom {
+            transition: all 0.3s ease;
+        }
+        .icon-bloom:hover {
+            color: #fc6c2b;
+            text-shadow: 0 0 12px rgba(252, 108, 43, 0.6);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .marginalia {
+            position: absolute;
+            color: #1e3a8a; /* Deep ink blue */
+            font-family: 'Caveat', cursive;
+            transform: rotate(-10deg);
+            pointer-events: none;
+            opacity: 0.8;
+        }
+        
+        .offset-fill-teal {
+            position: relative;
+            z-index: 1;
+        }
+        .offset-fill-teal::before {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: -3px;
+            right: 4px;
+            bottom: -2px;
+            background-color: #ccfbf1;
+            z-index: -1;
+            border-radius: 8px 12px 6px 10px;
+        }
+    </style>
+</head>
+<body class="paper-texture text-on-background font-body-md min-h-screen flex flex-col" style="background-color: #fdfaf4; background-image: url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.12'/%3E%3C/svg%3E&quot;);">
+<!-- TopAppBar -->
+<header class="bg-[#fdfaf4] text-primary sketch-border w-full sketch-shadow grid grid-cols-4 gap-grid-gutter px-grid-margin py-stack-md sticky top-0 z-50 mb-8 mt-2 mx-auto max-w-[calc(100%-2rem)]">
+<div class="col-span-1 flex items-center">
+<span class="font-headline-lg text-headline-lg font-black text-primary">Точка Плавления</span>
+</div>
+<nav aria-label="Основная навигация" class="col-span-2 flex items-center justify-center gap-6">
+<a class="font-handwritten-lg text-handwritten-lg text-[#a73a00] font-bold hover:text-secondary-container transition-all duration-200" href="#">Articles</a>
+<a class="font-handwritten-lg text-handwritten-lg text-on-surface-variant hover:text-[#0f766e] transition-all duration-200" href="#">Tools</a>
+<a class="font-handwritten-lg text-handwritten-lg text-on-surface-variant hover:text-[#0f766e] transition-all duration-200" href="#">Cookies</a>
+</nav>
+<div class="col-span-1 flex items-center justify-end relative">
+<button class="sketch-border px-4 py-2 hover:bg-[#fef08a] hover:text-primary transition-all sketch-shadow-hover font-handwritten-lg text-handwritten-lg offset-fill-teal">
+                Menu
+            </button>
+<span class="marginalia text-lg" style="top: -15px; right: 80px;">click me! ↘</span>
+</div>
+</header>
+<main class="flex-grow container mx-auto px-grid-margin py-stack-lg max-w-7xl relative">
+<!-- Doodles -->
+<div class="marginalia text-2xl" style="top: 0px; left: -20px; transform: rotate(-25deg);">↑ Start here</div>
+<!-- Breadcrumbs -->
+<div class="absolute -left-16 top-0 w-12 h-12 opacity-80 pointer-events-none transform -rotate-12"><img alt="doodle" class="grayscale contrast-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5LbJ15bWicNgKWJX8UPLsApSB0d7b9LIwQciZbywusZEezmFUXnD6kjw25BLwZuKAmjAhsHtO7Jo5jB9-J6mFEp1LlD4BWBH59iIcek7lCT6S-ozJMxMgwgwP8m35iT30uXhULg2HGkcjKL9_RIs65UxVqzBPKDMgNlLQ7c7tbfrBNMIRatvq7hjSEYh_DKe-f8Ok6u-b_ksQejUpWymQuWSagFvWGAAvq7chKwvfwi6sn45bgUD8lA"/></div><nav aria-label="Хлебные крошки" class="mb-8 font-handwritten-sm text-handwritten-sm text-on-surface-variant flex items-center gap-2">
+<a class="hover:text-secondary hover:underline" href="#">Home</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<a class="hover:text-secondary hover:underline" href="#">Articles</a>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+<span class="text-primary font-bold marker-highlight">How to Build the Perfect Bento Module</span>
+</nav>
+<!-- Article Hero -->
+<div class="mb-12 sketch-border bg-[#e5e1d8] p-bento-padding sketch-shadow relative overflow-visible">
+<div class="tape-corner" style="width: 100px;"></div>
+<div class="tape-corner tape-right" style="top: -10px; right: 20px; width: 90px; transform: rotate(50deg);"></div>
+<div class="tape-corner" style="bottom: -10px; left: 40%; transform: rotate(5deg); width: 60px;"></div>
+<h1 class="font-headline-xl text-headline-xl text-primary mb-6 uppercase">КАК ПОСТРОИТЬ ИДЕАЛЬНЫЙ <span class="relative inline-block"><span class="absolute -inset-1 bg-[#e63946] opacity-30 -rotate-1 rounded-sm"></span><span class="relative">БЕНТО-МОДУЛЬ</span></span></h1>
+<div class="flex flex-wrap gap-4 mb-6 font-handwritten-sm text-handwritten-sm text-on-surface-variant">
+<span class="flex items-center gap-1 sketch-border px-2 py-1 bg-[#fdfaf4] offset-fill-teal"><span class="material-symbols-outlined text-[16px] icon-bloom">schedule</span> 12 мин. чтения</span>
+<span class="flex items-center gap-1 sketch-border px-2 py-1 bg-[#fdfaf4]"><span class="material-symbols-outlined text-[16px] icon-bloom">calendar_today</span> Опубликовано 12 марта 2024</span>
+<span class="flex items-center gap-1 sketch-border px-2 py-1 bg-[#fdfaf4]"><span class="material-symbols-outlined text-[16px] icon-bloom">person</span> Автор: Иван Иванов</span>
+</div>
+<div class="flex gap-3">
+<span class="sketch-border bg-[#1e3a8a] text-on-primary font-handwritten-sm text-handwritten-sm px-3 py-1 uppercase transform -rotate-1">Совместимость: IC-ТЧП v1.0</span>
+<span class="sketch-border bg-[#fef08a] text-on-secondary-container font-handwritten-sm text-handwritten-sm px-3 py-1 uppercase flex items-center gap-1 transform rotate-2"><span class="material-symbols-outlined text-[16px]">verified</span> Проверено человеком</span>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gutter relative">
+<!-- Main Content Column -->
+<article class="md:col-span-8 flex flex-col gap-stack-lg">
+<!-- Author Row -->
+<div class="flex items-center justify-between sketch-border p-4 bg-[#fdfaf4] sketch-shadow relative group cursor-pointer transition-all sketch-shadow-hover transform rotate-1">
+<div class="flex items-center gap-4">
+<div class="w-16 h-16 rounded-full sketch-border overflow-hidden bg-surface-variant flex items-center justify-center p-1 transform -rotate-3">
+<img class="w-full h-full object-cover rounded-full filter grayscale contrast-125 sepia-[.3]" data-alt="A detailed black and white high-contrast sketch style portrait of a fictional male developer named Ivan Ivanov, mid 30s, wearing thick-rimmed glasses and a simple dark t-shirt. The illustration should have visible, erratic sketch lines, hatching for shading, and a raw, almost brutalist aesthetic. The background should be stark white to emphasize the ink-like drawing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2pPMLYR37FxQpeYwNm3InVKxoKuYzE93_JOcaF9bd3k-ZmjPTZv9ucvn54mQjxe_fi3G3VXb5K-3pSYEnzyc8w8-LTrwUE2a7I6XyVPZFWsz7RmEv31c8BqSZzKy2AmilFHJrJetEZnUIyGI7vCy6hUh5a_Np2KWTsC_svVFbMX00ae6HLYXm9KcEzCAwOiUci_bqOPVVAG2j7NnC86oI9_NS5PrK0avlGb3RXoG5ncGrykqEJilHug"/>
+</div>
+<div>
+<div class="font-headline-lg text-headline-lg font-bold text-primary">Иван Иванов</div>
+<div class="font-handwritten-sm text-handwritten-sm text-on-surface-variant">Инженер-разработчик</div>
+</div>
+</div>
+<div class="font-handwritten-lg text-handwritten-lg ink-stamp group-hover:scale-105 transition-transform">
+                        Laboratory Verified
+                    </div>
+</div>
+<!-- Content blocks -->
+<div class="sketch-border post-it p-bento-padding sketch-shadow relative transform -rotate-2 mt-4 hatch-fill-tldr border-[#2a9d8f]">
+<div class="tape-corner" style="top: -15px; left: 50%; transform: translateX(-50%) rotate(-5deg); width: 110px; background: rgba(230, 240, 255, 0.8);"></div>
+<h3 class="font-headline-lg text-headline-lg mb-2 flex items-center gap-2 relative z-10"><span class="material-symbols-outlined icon-bloom text-[#a73a00]" data-weight="fill">bolt</span> TL;DR</h3><button aria-label="Поделиться" class="absolute top-4 right-4 p-2 sketch-border hover:bg-[#ccfbf1] hover:text-[#0f766e] sketch-shadow-hover transition-all focus:outline-none bg-[#fdfaf4] z-10 transform rotate-3"><span class="material-symbols-outlined text-[20px]">share</span></button>
+<p class="font-handwritten-lg text-handwritten-lg leading-relaxed relative z-10">Бенто-модуль — это базовый строительный блок <span class="marker-highlight">гибридного дизайна</span>. Он требует строгой сетки (12 колонок), жестких теней (6px) и четкой иерархии типографики. Не забывайте про отступы и 3px бордеры.</p>
+</div>
+<div class="prose prose-lg max-w-none font-body-lg text-body-lg leading-relaxed relative">
+<span class="marginalia text-xl" style="top: 20px; left: -60px;">Note ↲</span>
+<p class="">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+<div class="my-stack-md sketch-border pl-4 italic post-it p-4 relative transform rotate-1 my-8 bg-[#ccfbf1] border-[#2a9d8f]">
+<span class="material-symbols-outlined absolute -left-4 top-4 bg-[#fdfaf4] sketch-border rounded-full p-1 text-[#c2410c] text-[24px] transform -rotate-12">priority_high</span>
+<strong class="font-handwritten-lg">Important note:</strong> <span class="font-handwritten-lg">Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</span>
+</div>
+<p class="">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
+</div>
+<!-- Graphic Placeholder -->
+<div class="sketch-border p-bento-padding bg-[#fdfaf4] sketch-shadow mt-stack-lg relative transform rotate-1"><div class="tape-corner tape-right" style="background: rgba(255, 230, 230, 0.8);"></div><h4 class="font-headline-lg text-headline-lg mb-4 text-[#0f766e]">Оставить отзыв</h4><form class="flex flex-col gap-4"><div class="flex flex-col gap-2"><label class="font-handwritten-sm text-handwritten-sm font-bold" for="feedback-text">Ваш комментарий</label><textarea class="sketch-border p-3 font-handwritten-lg focus:outline-none focus:bg-[#fef08a] transition-all min-h-[120px] bg-transparent" id="feedback-text" placeholder="Что вы думаете о бенто-сетках?"></textarea></div><button class="self-start sketch-border bg-[#1e3a8a] text-on-primary px-6 py-3 font-handwritten-lg uppercase hover:bg-[#fef08a] hover:text-primary sketch-shadow-hover transition-all focus:outline-none transform -rotate-2" type="submit">Отправить</button></form></div>
+<!-- Feedback Form -->
+</article>
+<!-- Sidebar -->
+<aside class="md:col-span-4 flex flex-col gap-stack-lg">
+<!-- Table of Contents -->
+<div class="sketch-border bg-[#e5e1d8] p-bento-padding sketch-shadow sticky top-[100px] relative hatch-fill-toc transform -rotate-1">
+<div class="tape-corner" style="top: -5px; right: -10px; transform: rotate(30deg); width: 70px;"></div>
+<div class="tape-corner" style="bottom: -15px; left: -10px; transform: rotate(-60deg); width: 60px; background: rgba(230, 255, 240, 0.8);"></div>
+<h4 class="font-headline-lg text-headline-lg mb-4 text-[#a73a00] relative z-10"><span class="relative inline-block"><span class="absolute inset-x-0 bottom-1 h-4 bg-[#e9c46a] opacity-40 -rotate-1"></span><span class="relative">Содержание</span></span></h4>
+<ul class="flex flex-col gap-3 font-handwritten-lg text-handwritten-lg relative z-10">
+<li class=""><a class="hover:text-secondary-container flex items-center gap-2" href="#"><span class="material-symbols-outlined text-[16px] text-[#a73a00]">check_box</span> <span class="text-[#a73a00] font-bold marker-highlight">1. Введение</span></a></li>
+<li class=""><a class="hover:text-[#0f766e] flex items-center gap-2 text-on-surface-variant hover:translate-x-1 transition-transform" href="#"><span class="material-symbols-outlined text-[16px]">check_box_outline_blank</span> 2. Структура сетки</a></li>
+<li class=""><a class="hover:text-[#0f766e] flex items-center gap-2 text-on-surface-variant hover:translate-x-1 transition-transform" href="#"><span class="material-symbols-outlined text-[16px]">check_box_outline_blank</span> 3. Тени и отступы</a></li>
+<li class=""><a class="hover:text-[#0f766e] flex items-center gap-2 text-on-surface-variant hover:translate-x-1 transition-transform" href="#"><span class="material-symbols-outlined text-[16px]">check_box_outline_blank</span> 4. Типографика</a></li>
+</ul>
+</div>
+<!-- Related Articles -->
+<div class="relative mt-4">
+<h4 class="font-handwritten-lg text-handwritten-lg mb-4 uppercase text-[#1e3a8a] sketch-border border-x-0 border-t-0 border-b-3 pb-2 text-center transform rotate-1">Похожие статьи</h4>
+<div class="flex flex-col gap-6 mt-6 relative">
+<div class="absolute -top-8 left-4 text-[#e63946] transform rotate-45"><span class="material-symbols-outlined text-4xl">south_east</span></div>
+<div class="sketch-border bg-[#fdfaf4] p-4 sketch-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer group sketch-shadow-hover relative transform rotate-2 offset-fill-teal">
+<div class="font-headline-lg text-headline-lg font-bold group-hover:text-[#a73a00] transition-colors text-xl">Анатомия 3px бордера</div>
+<div class="font-handwritten-sm text-handwritten-sm text-on-surface-variant mt-2 ink-stamp ink-stamp-blue">Дизайн систем</div>
+</div>
+<div class="sketch-border bg-[#fdfaf4] p-4 sketch-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer group sketch-shadow-hover relative transform -rotate-2 mt-2">
+<div class="tape-corner tape-right" style="width: 50px; top: -5px; right: -15px; background: rgba(255, 240, 200, 0.8);"></div>
+<div class="font-headline-lg text-headline-lg font-bold group-hover:text-[#0f766e] transition-colors text-xl">Жесткие тени vs Мягкие</div>
+<div class="font-handwritten-sm text-handwritten-sm text-on-surface-variant mt-2 ink-stamp text-secondary border-secondary">UI/UX</div>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-[#fdfaf4] text-primary sketch-border w-full grid grid-cols-4 gap-grid-gutter px-grid-margin py-stack-lg mt-stack-lg max-w-[calc(100%-2rem)] mx-auto mb-4 relative transform rotate-1"><div class="absolute -top-6 right-10 w-10 h-10 opacity-70 transform rotate-12"><img alt="doodle" class="grayscale contrast-150" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYptO1arTwh-UWnRIP2pkfhQF_upYz47DLvhhW0IxGAg5ZdHsiFARrckL3W337xuDBBlJLFYYYwqDKu6Q61_fG2goRlISPTS-ZJpXiEK-igdHo4JsaK09csxYCvnfaOX--syRc6Qtv0mC0I_xRg4Df4unc4NJifERDUnImBU5AGYCJiiLEBkXfHEwBvqr8dTNxR_Yw3S8VVFNeKa5vLNQ5wjfnIZc55l-5LIhqTi_70nYoZ0lTqP5X1A"/></div>
+<div class="tape-corner" style="bottom: -10px; right: 40%; transform: rotate(-80deg); width: 80px;"></div>
+<div class="col-span-4 md:col-span-1 flex flex-col items-start justify-center gap-2">
+<span class="font-handwritten-sm text-handwritten-sm text-[#1e3a8a] font-bold">© 2024 Точка Плавления</span>
+</div>
+<div class="col-span-4 md:col-span-3 flex items-center justify-end gap-6 font-handwritten-lg text-handwritten-lg">
+<a class="text-on-surface-variant hover:text-[#a73a00] transition-colors scale-95 hover:scale-105 transition-transform" href="#">Telegram</a>
+<a class="text-on-surface-variant hover:text-[#0f766e] transition-colors scale-95 hover:scale-105 transition-transform" href="#">GitHub</a>
+<a class="text-on-surface-variant hover:text-[#c2410c] transition-colors scale-95 hover:scale-105 transition-transform" href="#">RSS</a>
+</div>
+</footer>
+</body></html>
