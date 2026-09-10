@@ -112,8 +112,8 @@ tailwind.config = {
     line-height: 1; 
   }
   .logo span { 
-    color: #ffffff; 
-    background: #ea580c; 
+    color: #141414; 
+    background: #facc15; 
     padding: 0.05rem 0.35rem; 
     border-radius: 3px; 
     transform: skew(-6deg); 

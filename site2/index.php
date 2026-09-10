@@ -108,8 +108,8 @@ $paginated_articles = array_slice($filtered_articles, $offset, $items_per_page);
       line-height: 1;
     }
     .logo span { 
-      color: #FFFFFF; 
-      background: #ea580c; 
+      color: #000000; 
+      background: #facc15; 
       padding: 0.05rem 0.35rem; 
       border-radius: 3px; 
       transform: skew(-6deg); 

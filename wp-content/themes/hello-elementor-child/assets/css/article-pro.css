@@ -54,9 +54,10 @@ body {
   opacity: 0.85;
 }
 
-.brand-logo span {
-  color: #ffffff;
-  background: var(--accent-color);
+.brand-logo span,
+.logo span {
+  color: #111827;
+  background: #facc15;
   padding: 0.1rem 0.35rem;
   border-radius: 3px;
   transform: skew(-6deg);
