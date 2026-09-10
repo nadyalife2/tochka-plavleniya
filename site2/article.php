@@ -100,30 +100,36 @@ tailwind.config = {
 
     <!-- Хлебные крошки -->
     <nav class="flex items-center gap-1.5 text-xs text-gray-400 mb-5 flex-wrap" aria-label="Breadcrumb">
-        <a href="index.php" class="hover:text-gray-700 transition-colors">Главная</a>
+        <a href="index.php" class="hover:text-gray-700 transition-colors font-mono">Главная</a>
         <span>→</span>
-        <a href="index.php?tag=<?= e($article['tag_key'] ?? 'bga') ?>" class="hover:text-gray-700 transition-colors">
+        <a href="index.php?tag=<?= e($article['tag_key'] ?? 'bga') ?>" class="hover:text-gray-700 transition-colors font-mono">
             <?= e($article['category'] ?? 'BGA & SMD') ?>
         </a>
         <span>→</span>
-        <span class="text-gray-700 truncate max-w-xs sm:max-w-md"><?= e($article['title']) ?></span>
+        <span class="text-gray-700 truncate max-w-xs sm:max-w-md font-mono"><?= e($article['title']) ?></span>
     </nav>
 
     <!-- Заголовок и метаданные (TochkiCamp Hero) -->
-    <header class="max-w-3xl mb-8">
-        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-gray-950 leading-[1.25] mb-3">
+    <header class="max-w-3xl mb-6">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-gray-950 leading-[1.2] mb-3">
             <?= e($article['title']) ?>
         </h1>
 
         <!-- Мета-строка в стиле TochkiCamp -->
-        <p class="text-xs text-gray-500 font-mono">
+        <p class="text-xs text-gray-500 font-mono mb-4">
             <?= e($article['author'] ?? 'Инженер Лаборатории ТЧП') ?> · Обновлено <time datetime="<?= e($article['date'] ?? '2026-08-20') ?>"><?= e($article['date'] ?? '20 августа 2026') ?></time>
         </p>
 
         <!-- Лид-абзац статьи -->
         <p class="gd-lead">
-            <?= e($article['excerpt']) ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как правильно выставить 4 фазы термопрофиля и не допустить коробления текстолита.
+            <?= e($article['excerpt']) ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.
         </p>
+
+        <!-- Блок "Как читать" в стиле TochkiCamp -->
+        <div class="gd-disclaimer">
+            <span class="gd-disclaimer__label">Как читать этот регламент</span>
+            <p>Это практический производственный регламент. Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a href="#step-2">симулятору 4 фаз</a> или <a href="#step-3">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами K-типа.</p>
+        </div>
     </header>
 
     <!-- Двухколоночный макет: Статья + Липкий TOC -->
@@ -138,20 +144,20 @@ tailwind.config = {
                     Шаг 1. Теплоемкость текстолита и почему фен всегда врет
                 </h2>
                 <p>
-                    Стандартная ошибка при пайке сложных чипов (процессоров, видеопамяти, чипсетов) — выставлять на термовоздушной станции фиксированные $350^\circ\text{C}$ и греть плату сверху. В реальности датчик станции измеряет температуру спирали внутри ручки, а на выходе сопла и тем более под корпусом BGA температура оказывается на <strong>80–120°C ниже</strong>.
+                    Стандартная ошибка при пайке сложных чипов — выставлять на станции фиксированные $350^\circ\text{C}$ и греть плату сверху. Датчик станции измеряет температуру спирали внутри фена, а на поверхности текстолита и тем более под корпусом BGA температура оказывается на <strong>80–120°C ниже</strong>.
                 </p>
 
                 <!-- Цитата-инсайт в стиле TochkiCamp -->
-                <p class="quote-punchline">
-                    Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую.
-                </p>
+                <blockquote class="gd-quote">
+                    <p>Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую.</p>
+                </blockquote>
 
                 <p>
-                    Плата состоит из 6–12 слоев стеклотекстолита FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: углы микросхемы перегреваются, текстолит изгибается «лодочкой» (<span class="tag-mono">warpage</span>), а центральные шарики слипаются в короткое замыкание.
+                    Плата состоит из 6–12 слоев FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: текстолит изгибается «лодочкой» (<span class="tag-mono">warpage</span>), а центральные шарики слипаются в короткое замыкание.
                 </p>
 
                 <!-- Инлайн-параметры для копирования -->
-                <div class="flex flex-wrap items-center gap-2 pt-1">
+                <div class="flex flex-wrap items-center gap-2 pt-2">
                     <span class="text-xs font-mono text-gray-400">Быстрые пороги:</span>
                     <button class="param-pill" data-copy="217°C" title="Нажмите для копирования">
                         <span>Ликвидус SAC305:</span>
@@ -168,18 +174,43 @@ tailwind.config = {
                 </div>
             </section>
 
+            <hr class="gd-divider">
+
             <!-- Шаг 2: Симулятор 4 фаз нагрева -->
             <section id="step-2">
                 <h2 class="text-lg sm:text-xl font-bold text-gray-950 tracking-tight mb-3">
                     Шаг 2. Четыре фазы кривой пайки (Интерактивный расчет)
                 </h2>
                 <p>
-                    Правильный термопрофиль по стандарту <span class="tag-mono">J-STD-020D</span> делится строго на 4 участка. Используйте симулятор ниже для переключения между фазами:
+                    Правильный термопрофиль по стандарту <span class="tag-mono">J-STD-020D</span> сводится к четырехступенчатому циклу:
                 </p>
+
+                <!-- Карта этапов в стиле TochkiCamp -->
+                <div class="gd-map" role="img" aria-label="Карта фаз термопрофиля">
+                    <div class="gd-map__cell">
+                        <span class="gd-map__verb">1. Прогрев (Preheat)</span>
+                        <span class="gd-map__what">Плавный подъем до 150°C со скоростью 1–3°C/сек</span>
+                    </div>
+                    <div class="gd-map__cell">
+                        <span class="gd-map__verb">2. Активация (Soak)</span>
+                        <span class="gd-map__what">Выравнивание температур и удаление оксидов 150–200°C</span>
+                    </div>
+                    <div class="gd-map__cell">
+                        <span class="gd-map__verb">3. Оплавление (Reflow)</span>
+                        <span class="gd-map__what">Пик 235–245°C, время TAL над ликвидусом 45–75 сек</span>
+                    </div>
+                    <div class="gd-map__cell">
+                        <span class="gd-map__verb">4. Охлаждение (Cooling)</span>
+                        <span class="gd-map__what">Контролируемый спад 2–4°C/сек для мелкозернистой галтели</span>
+                    </div>
+                </div>
+                <p class="gd-mock__cap">Инженерная модель 4 фаз пайки. Рассчитайте параметры в симуляторе ниже:</p>
 
                 <!-- Интерактивный виджет симулятора -->
                 <div id="thermal-simulator-widget"></div>
             </section>
+
+            <hr class="gd-divider">
 
             <!-- Шаг 3: Температурные окна сплавов -->
             <section id="step-3">
@@ -283,6 +314,8 @@ tailwind.config = {
                 </div>
             </section>
 
+            <hr class="gd-divider">
+
             <!-- Шаг 4: Типовые ошибки и защита от брака -->
             <section id="step-4">
                 <h2 class="text-lg sm:text-xl font-bold text-gray-950 tracking-tight mb-3">
@@ -305,7 +338,7 @@ tailwind.config = {
             <!-- Блок "Что запомнить" (TochkiCamp Summary Style) -->
             <div class="takeaways-box">
                 <h3>
-                    <span class="text-orange-600">■</span>
+                    <span class="text-orange-600 font-mono">■</span>
                     Что запомнить
                 </h3>
                 <ul class="space-y-2 text-xs sm:text-sm text-gray-700 list-disc list-inside leading-relaxed">
