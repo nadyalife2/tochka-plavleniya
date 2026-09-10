@@ -1,9 +1,36 @@
 {
   "mcpServers": {
     "ui-expert": {
-      "command": "node",
+      "command": "C:\\Program Files\\nodejs\\node.exe",
       "args": [
-        "C:/Projects/ui-expert-mcp/dist/index.js"
+        "C:\\Projects\\ui-expert-mcp\\dist\\index.js"
+      ]
+    },
+    "penpot": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@penpot/mcp@latest"
+      ]
+    },
+    "design-systems": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "design-systems-mcp"
+      ]
+    },
+    "playwright": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "@playwright/mcp@latest"
       ]
     }
   }
