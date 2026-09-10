@@ -32,6 +32,7 @@ tailwind.config = {
         sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         serif: ['Newsreader', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
+        logo: ['"Hanken Grotesk"', 'sans-serif']
       }
     }
   }
@@ -42,6 +43,29 @@ tailwind.config = {
   body {
     background-color: #faf8f5 !important;
     color: #141414 !important;
+  }
+  .logo { 
+    font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
+    font-size: 1.25rem; 
+    font-weight: 900; 
+    text-decoration: none; 
+    color: #141414; 
+    letter-spacing: -0.02em; 
+    text-transform: uppercase; 
+    display: inline-flex; 
+    align-items: center; 
+    line-height: 1; 
+  }
+  .logo span { 
+    color: #141414; 
+    background: #facc15; 
+    padding: 0.05rem 0.35rem; 
+    border-radius: 3px; 
+    transform: skew(-6deg); 
+    display: inline-block; 
+    margin: 0 0.15rem; 
+    font-size: 1.05em; 
+    line-height: 0.9; 
   }
 </style>
 
@@ -102,7 +126,7 @@ tailwind.config = {
         </header>
 
         <!-- Callout: "Как читать этот регламент" -->
-        <div class="border border-paper-border bg-callout p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
+        <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
           <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>

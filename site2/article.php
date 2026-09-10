@@ -98,7 +98,7 @@ tailwind.config = {
     border-radius: 2px;
   }
 
-  /* USER'S ORIGINAL BRAND LOGO */
+  /* USER'S ORIGINAL BRAND LOGO (YELLOW ACCENT) */
   .logo { 
     font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
     font-size: 1.25rem; 
@@ -151,7 +151,7 @@ tailwind.config = {
       <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="#simulator">
         [↓ к расчёту]
       </a>
-      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-ink text-[12.5px] font-mono font-medium rounded hover:bg-ink hover:text-paper transition-colors" href="https://t.me/" target="_blank" rel="noopener">
+      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-ink bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:bg-ink-muted transition-colors" href="https://t.me/" target="_blank" rel="noopener">
         <span>Клуб / Telegram</span>
         <span class="text-[10px]">↗</span>
       </a>
@@ -180,7 +180,7 @@ tailwind.config = {
         
         <!-- Retro Illustration / Stamp Badge -->
         <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
-          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24" width="24">
+          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="24">
             <rect height="18" rx="2" width="18" x="3" y="3"></rect>
             <path d="M8 7v10"></path>
             <path d="M16 7v10"></path>
@@ -217,7 +217,7 @@ tailwind.config = {
         </header>
 
         <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
-        <div class="border border-paper-border bg-callout p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
+        <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
           <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>
@@ -236,13 +236,24 @@ tailwind.config = {
           </p>
           
           <!-- Inline quote/highlight line -->
-          <div class="border-l-2 border-ink pl-4 py-1.5 my-3 text-[15px] font-serif italic text-ink/90">
+          <div class="border-l-4 border-paper-border-dark bg-paper-subtle/50 pr-3 rounded-r pl-4 py-2 my-3 text-[15px] font-serif italic text-ink/90">
             «Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую».
           </div>
 
           <p class="text-ink/85">
             Плата состоит из 6–12 слоев FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: текстолит изгибается «лодочкой» (<span class="font-mono text-[13px] bg-paper-subtle px-1 rounded">warpage</span>), а центральные шарики слипаются в короткое замыкание.
           </p>
+
+          <!-- Рис. 1: Эскиз термического градиента из Stitch -->
+          <figure class="my-6 rounded-lg border border-paper-border-dark bg-white/80 p-2.5 sm:p-3 shadow-sm space-y-2.5">
+            <div class="overflow-hidden rounded border border-paper-border bg-[#fdfcfa]">
+              <img src="https://lh3.googleusercontent.com/aida/AEtjO1VPsrSrCUy54hlNvHq3-Bi3BKtsJ-HwVhUxUONjwD8ZW0JSYUhhCuE48K8uFAbVhm1l6z5bcfKlnWxsiJr8i-lI5dRkG6Iq2l-n00la6L6BC75KwJkw-kUiJ47GXICVho8XMATZw8RLlRI3tpSAkvmZT52hn5vSTCl2e71Md3Q3zGQ48s2w26JMOB_rnaw7fgtN-WHJUqkwlP4tX_D5R9x006Zys-oVO1_EwhYmZFvSU24W0G04DQtmqfA" alt="Эскиз термического градиента при локальном нагреве соплом фена" class="w-full h-auto block object-cover" loading="lazy">
+            </div>
+            <figcaption class="px-1 text-xs font-mono text-ink-muted leading-relaxed flex items-center justify-between">
+              <span><span class="text-ink font-semibold">Рис. 1.</span> Эскиз термического градиента при локальном нагреве соплом фена.</span>
+              <span class="hidden sm:inline-block text-[11px] text-ink-faint uppercase">IPC/JEDEC</span>
+            </figcaption>
+          </figure>
 
           <!-- Minimal Specs Flow Chips -->
           <div class="py-2">
@@ -340,19 +351,19 @@ tailwind.config = {
 
             <!-- Phase Switcher Tabs -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left" id="stage-tabs">
-              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all" data-stage="0" type="button">
+              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="0" type="button">
                 <div class="text-[10px] font-mono text-ink-faint">01 ПРОГРЕВ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-0">25°C → 150°C</div>
               </button>
-              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all" data-stage="1" type="button">
+              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="1" type="button">
                 <div class="text-[10px] font-mono text-ink-faint">02 АКТИВАЦИЯ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-1">150°C → 190°C</div>
               </button>
-              <button class="stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all" data-stage="2" type="button">
+              <button class="stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all shadow-sm" data-stage="2" type="button">
                 <div class="text-[10px] font-mono text-ink font-semibold">03 ОПЛАВЛЕНИЕ *</div>
                 <div class="text-xs font-mono text-ink font-semibold mt-0.5" id="tab-temp-2">217°C → 240°C</div>
               </button>
-              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all" data-stage="3" type="button">
+              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="3" type="button">
                 <div class="text-[10px] font-mono text-ink-faint">04 ОХЛАЖДЕНИЕ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-3">240°C → 100°C</div>
               </button>
@@ -362,8 +373,8 @@ tailwind.config = {
             <div class="bg-paper p-4 rounded border border-paper-border space-y-4">
               <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-paper-border">
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-mono px-1.5 py-0.5 bg-ink text-paper rounded" id="detail-tag">ФАЗА 03</span>
-                  <span class="font-semibold text-ink text-[15px]" id="detail-title">Оплавление — 217°C → 240°C</span>
+                  <span class="text-xs font-mono px-1.5 py-0.5 bg-ink text-paper rounded font-bold" id="detail-tag">ФАЗА 03</span>
+                  <span class="font-semibold text-ink text-[15px]" id="detail-title">Оплавление (Reflow) — 217°C → 240°C</span>
                 </div>
                 <button class="font-mono text-xs text-ink-muted hover:text-ink underline decoration-paper-border-dark flex items-center gap-1" id="copy-stage-btn" type="button">
                   <span id="copy-btn-text">Скопировать параметры</span>
@@ -396,8 +407,9 @@ tailwind.config = {
                   <strong class="text-ink font-medium">Физика процесса:</strong>
                   <span id="detail-desc">Полный переход шариков в жидкую фазу, смачивание контактных площадок и диффузионный рост интерметаллического слоя Cu6Sn5.</span>
                 </div>
-                <div class="text-[#8c2d19] bg-[#fff6f5] p-2.5 rounded border border-[#f3d3ce] text-[12.5px] leading-snug">
-                  <strong class="font-medium">Ограничение:</strong> <span id="detail-warning">Превышение 248-250°C на кристалле ведет к деламинации кремниевой подложки и необратимому перегреву.</span>
+                <div class="p-3 rounded border border-paper-border bg-paper-subtle/50 text-[13px] leading-relaxed flex items-start gap-2.5 text-ink/85 mt-2">
+                  <span class="font-mono text-[11px] uppercase tracking-wider text-ink font-semibold shrink-0 pt-0.5">Внимание:</span>
+                  <span id="detail-warning" class="text-ink/80">Превышение 248–250°C на кристалле ведет к деламинации кремниевой подложки и необратимому перегреву.</span>
                 </div>
               </div>
             </div>
@@ -422,11 +434,11 @@ tailwind.config = {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             
             <!-- SAC305 -->
-            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
-              <div>
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3 shadow-sm">
+              <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase">Бессвинцовый стандарт</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Бессвинцовый стандарт</div>
                     <h3 class="font-bold text-base text-ink">SAC305</h3>
                     <div class="text-xs font-mono text-ink-muted">Sn96.5 Ag3.0 Cu0.5</div>
                   </div>
@@ -437,7 +449,7 @@ tailwind.config = {
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
-                  <span class="text-ink font-semibold">235°C — 245°C</span>
+                  <span class="px-2 py-0.5 rounded bg-paper-subtle text-ink font-bold border border-paper-border">235°C — 245°C</span>
                 </div>
                 <p class="text-[13px] text-ink-muted leading-relaxed">
                   Заводской монтаж BGA, современные материнские платы и видеокарты. Высокая механическая прочность.
@@ -451,11 +463,11 @@ tailwind.config = {
             </div>
 
             <!-- ПОС-61 -->
-            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
-              <div>
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3 shadow-sm">
+              <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase">Свинцовый эвтектик</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Свинцовый эвтектик</div>
                     <h3 class="font-bold text-base text-ink">ПОС-61 / Sn63Pb37</h3>
                     <div class="text-xs font-mono text-ink-muted">Sn63 Pb37</div>
                   </div>
@@ -466,7 +478,7 @@ tailwind.config = {
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
-                  <span class="text-ink font-semibold">210°C — 220°C</span>
+                  <span class="px-2 py-0.5 rounded bg-paper-subtle text-ink font-bold border border-paper-border">210°C — 220°C</span>
                 </div>
                 <p class="text-[13px] text-ink-muted leading-relaxed">
                   Сервисный ремонт, реболлинг на свинец, мягкая текучесть и зеркальная галтель без микротрещин.
@@ -480,11 +492,11 @@ tailwind.config = {
             </div>
 
             <!-- Sn42Bi58 -->
-            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
-              <div>
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3 shadow-sm">
+              <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase">Низкотемпературный</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Низкотемпературный</div>
                     <h3 class="font-bold text-base text-ink">Sn42Bi58</h3>
                     <div class="text-xs font-mono text-ink-muted">Sn42 Bi58 (Висмутовый)</div>
                   </div>
@@ -495,7 +507,7 @@ tailwind.config = {
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
-                  <span class="text-ink font-semibold">165°C — 175°C</span>
+                  <span class="px-2 py-0.5 rounded bg-paper-subtle text-ink font-bold border border-paper-border">165°C — 175°C</span>
                 </div>
                 <p class="text-[13px] text-ink-muted leading-relaxed">
                   Монтаж пластиковых FPC-разъемов, OLED-шлейфов и термочувствительных датчиков MEMS без коробления.
@@ -509,11 +521,11 @@ tailwind.config = {
             </div>
 
             <!-- Сплав Розе -->
-            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
-              <div>
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3 shadow-sm">
+              <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase">Сверхнизкоплавкий</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Сверхнизкоплавкий</div>
                     <h3 class="font-bold text-base text-ink">Сплав Розе</h3>
                     <div class="text-xs font-mono text-ink-muted">Bi50 Pb32 Sn18</div>
                   </div>
@@ -524,7 +536,7 @@ tailwind.config = {
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
-                  <span class="text-ink font-semibold">130°C — 140°C</span>
+                  <span class="px-2 py-0.5 rounded bg-paper-subtle text-ink font-bold border border-paper-border">130°C — 140°C</span>
                 </div>
                 <p class="text-[13px] text-ink-muted leading-relaxed">
                   Исключительно для безопасного демонтажа чипов (разбавление тугоплавкого припоя). В чистом виде запрещен!
@@ -556,10 +568,21 @@ tailwind.config = {
               </p>
             </div>
 
+            <!-- Рис. 2: Схема монтажа термопары К-типа из Stitch -->
+            <figure class="my-6 rounded-lg border border-paper-border-dark bg-white/80 p-2.5 sm:p-3 shadow-sm space-y-2.5">
+              <div class="overflow-hidden rounded border border-paper-border bg-[#fdfcfa]">
+                <img src="https://lh3.googleusercontent.com/aida/AEtjO1XPXO_7vFBi0-sZRVk7MH6OetXskpHt5Xcf3Ip6nfHDDYM7qdO0nERNQaH_49PYrri281JQZUD0JhgzliwsR7F5Ks8GvSMY32dTxDUIHzZ_P5Drz6niq2ZSyIRirmXvsdrZExlqKeZ_11m0Vf64Fa9fYCMG9SMrAAg0F5hGzsceoEP1ajdrLph6LgFKfgF6aLS30BF8hJJkW20S0l03CIQZ4uc7pmSJ_MFPJyqCHL4KNonVuGSJXGX1rAg" alt="Схема монтажа термопары К-типа возле галтелей шариковых выводов BGA" class="w-full h-auto block object-cover" loading="lazy">
+              </div>
+              <figcaption class="px-1 text-xs font-mono text-ink-muted leading-relaxed flex items-center justify-between">
+                <span><span class="text-ink font-semibold">Рис. 2.</span> Схема монтажа термопары К-типа возле галтелей шариковых выводов BGA.</span>
+                <span class="hidden sm:inline-block text-[11px] text-ink-faint uppercase">К-тип / Каптон</span>
+              </figcaption>
+            </figure>
+
             <div class="border border-paper-border bg-callout p-4 rounded space-y-1.5">
               <div class="flex items-center gap-2">
                 <span class="font-semibold text-ink text-sm">Влажность микросхем (MSL 3)</span>
-                <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-200/70 text-ink">ВАЖНО</span>
+                <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-paper-subtle text-ink-muted border border-paper-border font-medium">ВАЖНО</span>
               </div>
               <p class="text-[13.5px] text-ink-muted leading-relaxed">
                 Если BGA-компонент лежал на воздухе дольше 72 часов, влага в полимере закипает при 230°C и распирает корпус изнутри (<mark>«эффект попкорна»</mark>). Обязательно сушите чип 12–24 часа при 100–110°C перед пайкой.
@@ -633,7 +656,7 @@ tailwind.config = {
             <div class="font-semibold text-sm text-ink">Инженерный справочник по пайке BGA</div>
             <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в нашем канале.</p>
           </div>
-          <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-ink bg-ink text-paper text-xs font-mono font-medium rounded hover:bg-ink/85 transition-colors shrink-0" href="https://t.me/" target="_blank" rel="noopener">
+          <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-ink bg-ink text-paper text-xs font-mono font-medium rounded hover:bg-ink-muted transition-colors shrink-0 shadow-sm" href="https://t.me/" target="_blank" rel="noopener">
             <span>Забрать в Telegram →</span>
           </a>
         </div>
@@ -768,7 +791,7 @@ tailwind.config = {
           bottom: '170°C — 185°C',
           top: '255°C (35 л/мин)',
           desc: 'Полный переход шариков в жидкую фазу, смачивание контактных площадок и диффузионный рост интерметаллического слоя Cu6Sn5.',
-          warning: 'Превышение 248-250°C на кристалле ведет к деламинации кремниевой подложки и необратимому перегреву.'
+          warning: 'Превышение 248–250°C на кристалле ведет к деламинации кремниевой подложки и необратимому перегреву.'
         },
         {
           tabTemp: '240°C → 100°C',
@@ -901,7 +924,7 @@ tailwind.config = {
       const titleDiv = btn.querySelector('div:first-child');
       const tempDiv = btn.querySelector('div:last-child');
       if (idx === currentStage) {
-        btn.className = 'stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all';
+        btn.className = 'stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all shadow-sm';
         if (titleDiv) titleDiv.className = 'text-[10px] font-mono text-ink font-semibold';
         if (tempDiv) tempDiv.className = 'text-xs font-mono text-ink font-semibold mt-0.5';
       } else {
