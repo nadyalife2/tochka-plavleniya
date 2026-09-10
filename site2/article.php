@@ -17,470 +17,972 @@ $related_articles = array_slice($related_articles, 0, 3);
 
 // FAQ data for Schema.org & Accordion
 $faq_items = [
-    "Какая максимальная температура допустима для бессвинцовой пайки BGA?" => "Для бессвинцовых припоев группы SAC305 (Sn96.5Ag3.0Cu0.5) пиковая температура на поверхности чипа должна находиться строго в диапазоне 235°C – 245°C. Нагрев свыше 250°C ведет к разрушению кремниевого кристалла и необратимой деламинации (вздутию) текстолита.",
-    "Сколько секунд припой должен находиться в расплавленном состоянии (TAL)?" => "Оптимальное время над точкой ликвидуса (Time Above Liquidus, TAL) для SAC305 (217°C) составляет от 45 до 75 секунд. За это время флюс полностью удаляет окислы и формируется прочный интерметаллический слой толщиной 1–2 мкм.",
-    "Как избежать эффекта 'попкорна' при пайке влажных микросхем?" => "Микросхемы, хранившиеся вне герметичной влагозащитной упаковки (MSL 3 и выше), перед монтажом необходимо просушить в термошкафу при температуре 100°C – 125°C в течение 8–24 часов для постепенного удаления влаги из полимерного компаунда.",
-    "Какой флюс использовать для реболлинга BGA: RMA или No-Clean?" => "Для прецизионного реболлинга рекомендуется использовать среднеактивные гелевые флюсы класса ROL0 / REL0 (No-Clean) с высокой липкостью (tackiness), которые надежно удерживают шарики и не кипят при нагреве."
+    "Какая максимальная температура допустима для бессвинцовой пайки BGA?" => "По стандарту IPC/JEDEC J-STD-020D абсолютный пиковый предел для большинства полупроводниковых BGA-корпусов составляет 250°C (не более 10 секунд). Оптимальный рабочий пик оплавления — ровно 238–242°C.",
+    "Сколько секунд припой должен находиться в расплавленном состоянии (TAL)?" => "Время над ликвидусом (TAL) для сплава SAC305 (217°C) должно составлять от 45 до 75 секунд. Если TAL меньше 40 с — возможны непропаи («холодная пайка»). Если дольше 90 с — интерметаллический слой становится слишком толстым и хрупким, контакт отрывается при вибрации.",
+    "Как избежать эффекта 'попкорна' при пайке влажных микросхем?" => "Храните чипы в заводских вакуумных влагозащитных пакетах с индикатором влажности. Если пакет вскрыт, поместите микросхемы в конвекционную печь при 100–110°C на 12–24 часа до пайки.",
+    "Какой флюс использовать для реболлинга BGA: RMA или No-Clean?" => "Для реболлинга шаров рекомендуется канифольный среднеактивированный флюс (RMA или безотмывочный ROL0 с высокой вязкостью). Подложки BGA требуют тщательной промывки изопропанолом или спецраствором в ультразвуковой ванне после посадки."
 ];
 ?>
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title><?= e($article['title']) ?> | Точка Плавления</title>
-<meta name="description" content="<?= e($article['excerpt']) ?>">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title><?= e($article['title']) ?> — ТОЧКА ПЛАВЛЕНИЯ</title>
+<meta name="description" content="<?= e($article['excerpt']) ?>"/>
 
-<!-- OpenGraph Meta -->
-<meta property="og:type" content="article">
-<meta property="og:title" content="<?= e($article['title']) ?>">
-<meta property="og:description" content="<?= e($article['excerpt']) ?>">
-<meta property="og:site_name" content="Точка Плавления">
+<!-- OpenGraph -->
+<meta property="og:type" content="article"/>
+<meta property="og:title" content="<?= e($article['title']) ?>"/>
+<meta property="og:description" content="<?= e($article['excerpt']) ?>"/>
+<meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
 
-<!-- Tailwind & Fonts -->
+<!-- Fonts & Icons -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;900&family=IBM+Plex+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-
-<!-- Theme Custom Styles -->
-<link rel="stylesheet" href="assets/css/article-pro.css">
-
-<script id="tailwind-config">
+<script>
 tailwind.config = {
-    theme: {
-        extend: {
-            fontFamily: {
-                sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
-                mono: ["IBM Plex Mono", "monospace"],
-                logo: ["Hanken Grotesk", "sans-serif"]
-            }
-        }
+  theme: {
+    extend: {
+      colors: {
+        paper: '#faf8f5',
+        'paper-subtle': '#f3f0ea',
+        'paper-border': '#e6e2da',
+        'paper-border-dark': '#d3cdc2',
+        ink: '#141414',
+        'ink-muted': '#6b665f',
+        'ink-faint': '#9e988f',
+        highlight: '#fef9c3',
+        'highlight-strong': '#fef08a',
+        callout: '#fcfaf2'
+      },
+      fontFamily: {
+        sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
+      }
     }
-};
+  }
+}
 </script>
 
-<!-- Schema.org JSON-LD Microdata -->
+<style>
+  body {
+    background-color: #faf8f5;
+    color: #141414;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  ::selection {
+    background-color: #fef08a;
+    color: #141414;
+  }
+  mark {
+    background-color: #fef08a;
+    color: #141414;
+    padding: 0.1em 0.3em;
+    border-radius: 0.2rem;
+  }
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d3cdc2;
+    border-radius: 2px;
+  }
+</style>
+
+<!-- Schema.org JSON-LD -->
 <?= render_article_schema($article, $faq_items) ?>
 </head>
 
-<body class="min-h-screen flex flex-col bg-white text-gray-900 antialiased selection:bg-orange-100 selection:text-orange-900">
+<body class="font-sans min-h-screen flex flex-col justify-between text-[15px] leading-[1.65]">
 
-<!-- 1. Полоса прогресса чтения -->
-<div id="reading-progress"></div>
-
-<!-- 2. Шапка сайта (TochkiCamp style с оптимизированным логотипом) -->
-<header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
-        <a href="index.php" class="brand-logo">
-            Точка<span>.</span>Плавления
-        </a>
-
-        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-600">
-            <a href="index.php" class="hover:text-orange-600 transition-colors">Статьи</a>
-            <a href="interactive.php" class="hover:text-orange-600 transition-colors">Калькулятор флюсов</a>
-            <a href="interactive.php#solder-table" class="hover:text-orange-600 transition-colors">Таблица припоев</a>
-        </nav>
-
-        <div class="flex items-center gap-3">
-            <a href="interactive.php" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 bg-orange-50 text-orange-700 hover:bg-orange-100 border border-orange-200 rounded text-xs font-semibold transition-colors">
-                <span class="material-symbols-outlined text-xs">construction</span>
-                Верстак
-            </a>
-            <a href="index.php" class="text-xs font-medium text-gray-500 hover:text-gray-900 transition-colors">
-                ← К гайдам
-            </a>
+<!-- Top Minimal Header Bar (tochkicamp style) -->
+<header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
+  <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
+    <!-- Brand mark & Title -->
+    <div class="flex items-center gap-6">
+      <a class="flex items-center gap-2.5 text-ink font-semibold tracking-tight hover:opacity-80 transition-opacity" href="index.php">
+        <div class="w-5 h-5 border border-ink flex items-center justify-center font-mono text-[11px] font-bold leading-none bg-paper">
+          °
         </div>
+        <span class="tracking-[-0.01em] text-sm uppercase font-mono font-medium">ТОЧКА ПЛАВЛЕНИЯ</span>
+      </a>
+      <!-- Desktop Nav -->
+      <nav class="hidden md:flex items-center gap-5 text-[13.5px] text-ink-muted">
+        <a class="text-ink font-medium hover:text-ink transition-colors" href="index.php">Статьи</a>
+        <a class="hover:text-ink transition-colors" href="interactive.php">Калькулятор флюсов</a>
+        <a class="hover:text-ink transition-colors" href="interactive.php#solder-table">Таблица припоев</a>
+        <a class="hover:text-ink transition-colors" href="interactive.php">Инструменты</a>
+      </nav>
     </div>
+    <!-- Right Action -->
+    <div class="flex items-center gap-3">
+      <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="#simulator">
+        [↓ к расчёту]
+      </a>
+      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-ink text-[12.5px] font-mono font-medium rounded hover:bg-ink hover:text-paper transition-colors" href="https://t.me/" target="_blank" rel="noopener">
+        <span>Клуб / Telegram</span>
+        <span class="text-[10px]">↗</span>
+      </a>
+    </div>
+  </div>
 </header>
 
-<!-- 3. Основной контейнер статьи (760px текст + сайдбар) -->
-<main class="flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
-
-    <!-- Хлебные крошки -->
-    <nav class="flex items-center gap-1.5 text-xs text-gray-400 mb-5 flex-wrap" aria-label="Breadcrumb">
-        <a href="index.php" class="hover:text-gray-700 transition-colors font-mono">Главная</a>
-        <span>→</span>
-        <a href="index.php?tag=<?= e($article['tag_key'] ?? 'bga') ?>" class="hover:text-gray-700 transition-colors font-mono">
-            <?= e($article['category'] ?? 'BGA & SMD') ?>
-        </a>
-        <span>→</span>
-        <span class="text-gray-700 truncate max-w-xs sm:max-w-md font-mono"><?= e($article['title']) ?></span>
+<!-- Main Container -->
+<main class="w-full flex-grow pt-8 pb-20">
+  <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
+    
+    <!-- Breadcrumbs -->
+    <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap">
+      <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
+      <span>→</span>
+      <a class="hover:text-ink transition-colors" href="index.php?tag=<?= e($article['tag_key'] ?? 'bga') ?>">Гайды</a>
+      <span>→</span>
+      <span class="text-ink truncate max-w-xs sm:max-w-md"><?= e($article['title']) ?></span>
     </nav>
 
-    <!-- Заголовок и метаданные (TochkiCamp Hero) -->
-    <header class="max-w-3xl mb-6">
-        <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-gray-950 leading-[1.2] mb-3">
-            <?= e($article['title']) ?>
-        </h1>
-
-        <!-- Мета-строка в стиле TochkiCamp -->
-        <p class="text-xs text-gray-500 font-mono mb-4">
-            <?= e($article['author'] ?? 'Инженер Лаборатории ТЧП') ?> · Обновлено <time datetime="<?= e($article['date'] ?? '2026-08-20') ?>"><?= e($article['date'] ?? '20 августа 2026') ?></time>
-        </p>
-
-        <!-- Лид-абзац статьи -->
-        <p class="gd-lead">
-            <?= e($article['excerpt']) ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.
-        </p>
-
-        <!-- Блок "Как читать" в стиле TochkiCamp -->
-        <div class="gd-disclaimer">
-            <span class="gd-disclaimer__label">Как читать этот регламент</span>
-            <p>Это практический производственный регламент. Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a href="#step-2">симулятору 4 фаз</a> или <a href="#step-3">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами K-типа.</p>
+    <!-- Center Article + Table of Contents Layout -->
+    <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
+      
+      <!-- Central Editorial Column (740px wide max) -->
+      <div class="lg:col-span-8 max-w-[730px] space-y-9">
+        
+        <!-- Retro Illustration / Stamp Badge -->
+        <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
+          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24" width="24">
+            <rect height="18" rx="2" width="18" x="3" y="3"></rect>
+            <path d="M8 7v10"></path>
+            <path d="M16 7v10"></path>
+            <path d="M12 12h.01"></path>
+            <circle cx="12" cy="7" r="1"></circle>
+            <circle cx="12" cy="17" r="1"></circle>
+          </svg>
         </div>
-    </header>
 
-    <!-- Двухколоночный макет: Статья + Липкий TOC -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
+        <!-- Article Header Block -->
+        <header class="space-y-4">
+          <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
+            <?= e($article['title']) ?>
+          </h1>
 
-        <!-- Основной текст статьи (8 из 12 колонок) -->
-        <article class="lg:col-span-8 text-gray-800 text-[16px] leading-[1.75] space-y-6">
+          <!-- Meta line -->
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-muted font-mono pt-1 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[10px] flex items-center justify-center font-bold text-ink">ТП</span>
+              <span class="text-ink"><?= e($article['author'] ?? 'Инженер Лаборатории ТЧП') ?></span>
+            </div>
+            <span class="text-ink-faint">·</span>
+            <time datetime="<?= e($article['date'] ?? '2026-08-20') ?>">Обновлено <?= e($article['date'] ?? '20 августа 2026') ?></time>
+            <span class="text-ink-faint">·</span>
+            <span>~8 мин чтения</span>
+            <span class="text-ink-faint">·</span>
+            <span class="bg-paper-subtle px-1.5 py-0.5 rounded text-[11px] border border-paper-border">IPC/JEDEC J-STD-020D</span>
+          </div>
 
-            <!-- Шаг 1: Теплоемкость и датчики -->
-            <section id="step-1">
-                <h2 class="text-lg sm:text-xl font-bold text-gray-950 tracking-tight mb-3">
-                    Шаг 1. Теплоемкость текстолита и почему фен всегда врет
-                </h2>
-                <p>
-                    Стандартная ошибка при пайке сложных чипов — выставлять на станции фиксированные $350^\circ\text{C}$ и греть плату сверху. Датчик станции измеряет температуру спирали внутри фена, а на поверхности текстолита и тем более под корпусом BGA температура оказывается на <strong>80–120°C ниже</strong>.
-                </p>
+          <!-- Lead Paragraph -->
+          <p class="text-lg text-ink font-serif leading-[1.65] pt-2 text-[#242220]">
+            <?= e($article['excerpt']) ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.
+          </p>
+        </header>
 
-                <!-- Цитата-инсайт в стиле TochkiCamp -->
-                <blockquote class="gd-quote">
-                    <p>Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую.</p>
-                </blockquote>
+        <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
+        <div class="border border-paper-border bg-callout p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
+          <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
+            КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
+          </div>
+          <p class="text-ink/80">
+            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
+          </p>
+        </div>
 
-                <p>
-                    Плата состоит из 6–12 слоев FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: текстолит изгибается «лодочкой» (<span class="tag-mono">warpage</span>), а центральные шарики слипаются в короткое замыкание.
-                </p>
+        <!-- Section 1 -->
+        <section class="scroll-mt-20 pt-4 space-y-4" id="step-1">
+          <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
+            1. Теплоемкость текстолита и почему фен всегда врет
+          </h2>
+          <p class="text-ink/85">
+            Стандартная ошибка при пайке сложных чипов — выставлять на станции фиксированные 350°C и греть плату сверху. Датчик станции измеряет температуру спирали внутри фена, а на поверхности текстолита и тем более под корпусом BGA температура оказывается <mark>на 80–120°C ниже</mark>.
+          </p>
+          
+          <!-- Inline quote/highlight line -->
+          <div class="border-l-2 border-ink pl-4 py-1.5 my-3 text-[15px] font-serif italic text-ink/90">
+            «Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую».
+          </div>
 
-                <!-- Инлайн-параметры для копирования -->
-                <div class="flex flex-wrap items-center gap-2 pt-2">
-                    <span class="text-xs font-mono text-gray-400">Быстрые пороги:</span>
-                    <button class="param-pill" data-copy="217°C" title="Нажмите для копирования">
-                        <span>Ликвидус SAC305:</span>
-                        <span class="text-orange-600 font-bold">217°C</span>
-                    </button>
-                    <button class="param-pill" data-copy="183°C" title="Нажмите для копирования">
-                        <span>Эвтектика ПОС-61:</span>
-                        <span class="text-orange-600 font-bold">183°C</span>
-                    </button>
-                    <button class="param-pill" data-copy="45-75 сек" title="Нажмите для копирования">
-                        <span>Время TAL:</span>
-                        <span class="text-orange-600 font-bold">45–75с</span>
-                    </button>
-                </div>
-            </section>
+          <p class="text-ink/85">
+            Плата состоит из 6–12 слоев FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: текстолит изгибается «лодочкой» (<span class="font-mono text-[13px] bg-paper-subtle px-1 rounded">warpage</span>), а центральные шарики слипаются в короткое замыкание.
+          </p>
 
-            <hr class="gd-divider">
+          <!-- Minimal Specs Flow Chips -->
+          <div class="py-2">
+            <div class="text-[11px] font-mono text-ink-faint uppercase mb-2">Опорные значения стандарта IPC/JEDEC:</div>
+            <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
+              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">Ликвидус SAC305: <strong>217°C</strong></span>
+              <span class="text-ink-faint">→</span>
+              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">ПОС-61: <strong>183°C</strong></span>
+              <span class="text-ink-faint">→</span>
+              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">Окно TAL: <strong>45–75 с</strong></span>
+              <span class="text-ink-faint">→</span>
+              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">Пик: <strong>до 245°C</strong></span>
+            </div>
+          </div>
+        </section>
 
-            <!-- Шаг 2: Симулятор 4 фаз нагрева -->
-            <section id="step-2">
-                <h2 class="text-lg sm:text-xl font-bold text-gray-950 tracking-tight mb-3">
-                    Шаг 2. Четыре фазы кривой пайки (Интерактивный расчет)
-                </h2>
-                <p>
-                    Правильный термопрофиль по стандарту <span class="tag-mono">J-STD-020D</span> сводится к четырехступенчатому циклу:
-                </p>
+        <hr class="border-paper-border my-8"/>
 
-                <!-- Карта этапов в стиле TochkiCamp -->
-                <div class="gd-map" role="img" aria-label="Карта фаз термопрофиля">
-                    <div class="gd-map__cell">
-                        <span class="gd-map__verb">1. Прогрев (Preheat)</span>
-                        <span class="gd-map__what">Плавный подъем до 150°C со скоростью 1–3°C/сек</span>
-                    </div>
-                    <div class="gd-map__cell">
-                        <span class="gd-map__verb">2. Активация (Soak)</span>
-                        <span class="gd-map__what">Выравнивание температур и удаление оксидов 150–200°C</span>
-                    </div>
-                    <div class="gd-map__cell">
-                        <span class="gd-map__verb">3. Оплавление (Reflow)</span>
-                        <span class="gd-map__what">Пик 235–245°C, время TAL над ликвидусом 45–75 сек</span>
-                    </div>
-                    <div class="gd-map__cell">
-                        <span class="gd-map__verb">4. Охлаждение (Cooling)</span>
-                        <span class="gd-map__what">Контролируемый спад 2–4°C/сек для мелкозернистой галтели</span>
-                    </div>
-                </div>
-                <p class="gd-mock__cap">Инженерная модель 4 фаз пайки. Рассчитайте параметры в симуляторе ниже:</p>
+        <!-- Section 2: 4 Stages + Interactive Calculator -->
+        <section class="scroll-mt-20 space-y-6" id="step-2">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
+              2. Четыре фазы кривой пайки (Интерактивный расчет)
+            </h2>
+            <p class="text-ink/85 mt-2">
+              Правильный термопрофиль по стандарту <code class="font-mono text-xs bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border">J-STD-020D</code> сводится к четырехступенчатому контролируемому циклу:
+            </p>
+          </div>
 
-                <!-- Интерактивный виджет симулятора -->
-                <div id="thermal-simulator-widget"></div>
-            </section>
+          <!-- Clean 2x2 Minimal Stage Overview -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
+            <div class="p-3.5 rounded border border-paper-border bg-paper">
+              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
+                <span>ФАЗА 1</span>
+                <span>1–3°C/с</span>
+              </div>
+              <div class="font-semibold text-ink text-sm">Прогрев (Preheat)</div>
+              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+                Плавный подъем до 150°C для испарения легких фракций растворителя флюса.
+              </p>
+            </div>
+            <div class="p-3.5 rounded border border-paper-border bg-paper">
+              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
+                <span>ФАЗА 2</span>
+                <span>150–200°C</span>
+              </div>
+              <div class="font-semibold text-ink text-sm">Активация (Soak)</div>
+              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+                Выравнивание температурного поля чипа и платы, удаление поверхностных оксидов.
+              </p>
+            </div>
+            <div class="p-3.5 rounded border border-paper-border bg-paper">
+              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
+                <span>ФАЗА 3</span>
+                <span class="text-ink font-semibold">Пик 235–245°C</span>
+              </div>
+              <div class="font-semibold text-ink text-sm">Оплавление (Reflow)</div>
+              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+                Время TAL над ликвидусом 45–75 сек. Формирование интерметаллического слоя.
+              </p>
+            </div>
+            <div class="p-3.5 rounded border border-paper-border bg-paper">
+              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
+                <span>ФАЗА 4</span>
+                <span>2–4°C/с</span>
+              </div>
+              <div class="font-semibold text-ink text-sm">Охлаждение (Cooling)</div>
+              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+                Контролируемый спад для мелкозернистой кристаллической структуры галтели.
+              </p>
+            </div>
+          </div>
 
-            <hr class="gd-divider">
-
-            <!-- Шаг 3: Температурные окна сплавов -->
-            <section id="step-3">
-                <h2 class="text-lg sm:text-xl font-bold text-gray-950 tracking-tight mb-3">
-                    Шаг 3. Температурные окна основных паяльных сплавов
-                </h2>
-                <p>
-                    Подбирайте температурный коридор в зависимости от металлургии используемого припоя:
-                </p>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 my-4">
-                    
-                    <!-- SAC305 -->
-                    <div class="alloy-card">
-                        <div class="flex items-start justify-between gap-2 mb-2">
-                            <div>
-                                <span class="text-[10px] font-mono text-gray-400 uppercase block">Бессвинцовый стандарт</span>
-                                <h4 class="font-bold text-gray-900 text-sm">SAC305</h4>
-                                <span class="text-xs text-gray-500 font-mono">Sn96.5 Ag3.0 Cu0.5</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="temp-badge">217°C</span>
-                                <span class="text-[10px] text-gray-400 block font-mono">ликвидус</span>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600">
-                            <span>Окно пайки: <strong>235°C – 245°C</strong></span>
-                            <button class="text-orange-600 hover:text-orange-700 font-mono text-[11px]" data-copy="217°C SAC305: 235-245°C">копировать</button>
-                        </div>
-                        <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">
-                            Заводской монтаж BGA, современные материнские платы и видеокарты.
-                        </p>
-                    </div>
-
-                    <!-- ПОС-61 -->
-                    <div class="alloy-card">
-                        <div class="flex items-start justify-between gap-2 mb-2">
-                            <div>
-                                <span class="text-[10px] font-mono text-gray-400 uppercase block">Свинцовый эвтектик</span>
-                                <h4 class="font-bold text-gray-900 text-sm">ПОС-61 / Sn63Pb37</h4>
-                                <span class="text-xs text-gray-500 font-mono">Sn63 Pb37</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="temp-badge text-gray-900">183°C</span>
-                                <span class="text-[10px] text-gray-400 block font-mono">эвтектика</span>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600">
-                            <span>Окно пайки: <strong>210°C – 220°C</strong></span>
-                            <button class="text-orange-600 hover:text-orange-700 font-mono text-[11px]" data-copy="183°C ПОС-61: 210-220°C">копировать</button>
-                        </div>
-                        <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">
-                            Сервисный ремонт, реболлинг на свинец, мягкая текучесть и зеркальная галтель.
-                        </p>
-                    </div>
-
-                    <!-- Sn42Bi58 -->
-                    <div class="alloy-card">
-                        <div class="flex items-start justify-between gap-2 mb-2">
-                            <div>
-                                <span class="text-[10px] font-mono text-gray-400 uppercase block">Низкотемпературный</span>
-                                <h4 class="font-bold text-gray-900 text-sm">Sn42Bi58</h4>
-                                <span class="text-xs text-gray-500 font-mono">Sn42 Bi58</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="temp-badge text-blue-600">138°C</span>
-                                <span class="text-[10px] text-gray-400 block font-mono">эвтектика</span>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600">
-                            <span>Окно пайки: <strong>165°C – 175°C</strong></span>
-                            <button class="text-orange-600 hover:text-orange-700 font-mono text-[11px]" data-copy="138°C Sn42Bi58: 165-175°C">копировать</button>
-                        </div>
-                        <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">
-                            Монтаж пластиковых FPC-разъемов, OLED-дисплеев и термочувствительных датчиков.
-                        </p>
-                    </div>
-
-                    <!-- Сплав Розе -->
-                    <div class="alloy-card">
-                        <div class="flex items-start justify-between gap-2 mb-2">
-                            <div>
-                                <span class="text-[10px] font-mono text-gray-400 uppercase block">Сверхнизкоплавкий</span>
-                                <h4 class="font-bold text-gray-900 text-sm">Сплав Розе</h4>
-                                <span class="text-xs text-gray-500 font-mono">Bi50 Pb32 Sn18</span>
-                            </div>
-                            <div class="text-right">
-                                <span class="temp-badge text-emerald-600">96°C</span>
-                                <span class="text-[10px] text-gray-400 block font-mono">плавление</span>
-                            </div>
-                        </div>
-                        <div class="pt-2 border-t border-gray-100 flex items-center justify-between text-xs text-gray-600">
-                            <span>Окно пайки: <strong>130°C – 140°C</strong></span>
-                            <button class="text-orange-600 hover:text-orange-700 font-mono text-[11px]" data-copy="96°C Сплав Розе: 130-140°C">копировать</button>
-                        </div>
-                        <p class="text-[11px] text-gray-500 mt-1.5 leading-snug">
-                            Исключительно для безопасного демонтажа чипов (разбавление тугоплавкого припоя).
-                        </p>
-                    </div>
-
-                </div>
-            </section>
-
-            <hr class="gd-divider">
-
-            <!-- Шаг 4: Типовые ошибки и защита от брака -->
-            <section id="step-4">
-                <h2 class="text-lg sm:text-xl font-bold text-gray-950 tracking-tight mb-3">
-                    Шаг 4. Практические нюансы: термопары, влага и деламинация
-                </h2>
-
-                <div class="note-editorial">
-                    <strong>Точка замера температуры:</strong> Закрепляйте термопару типа K каптоновым скотчем непосредственно возле корпуса микросхемы на поверхности платы. Только это дает объективную температуру в зоне пайки.
-                </div>
-
-                <div class="note-editorial note-warning">
-                    <strong>Влажность микросхем (MSL 3):</strong> Если BGA-компонент лежал на воздухе дольше 72 часов, влага в полимере закипает при 230°C и распирает корпус изнутри. Обязательно сушите чип 12–24 часа при 100–110°C перед пайкой.
-                </div>
-
-                <div class="note-editorial note-danger">
-                    <strong>Критическая скорость нагрева:</strong> Скорость нарастания температуры быстрее 2.5–3.0°C/сек приводит к расслоению стеклотекстолита (деламинации) и обрыву внутренних переходных отверстий в плате.
-                </div>
-            </section>
-
-            <!-- Блок "Что запомнить" (TochkiCamp Summary Style) -->
-            <div class="takeaways-box">
-                <h3>
-                    <span class="text-orange-600 font-mono">■</span>
-                    Что запомнить
-                </h3>
-                <ul class="space-y-2 text-xs sm:text-sm text-gray-700 list-disc list-inside leading-relaxed">
-                    <li>Фен без нижнего преднагревателя гарантированно изгибает многослойную плату.</li>
-                    <li>Всегда фиксируйте термопару на плате — температура на выходе сопла фена завышена на 80–100°C.</li>
-                    <li>Оптимальное время над ликвидусом (TAL) для SAC305 составляет строго 45–75 секунд.</li>
-                    <li>Бессвинцовая пайка требует пика 235–245°C; нагрев свыше 250°C разрушает кристалл и плату.</li>
-                    <li>Влажные BGA-микросхемы перед монтажом обязательно требуют просушки 12 часов при 100°C.</li>
-                </ul>
+          <!-- SIMULATOR WIDGET (Minimal editorial aesthetic from Stitch) -->
+          <div class="border border-paper-border rounded-lg bg-paper-subtle/70 p-5 sm:p-6 space-y-5" id="simulator">
+            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 pb-2 border-b border-paper-border">
+              <div>
+                <div class="text-[11px] font-mono text-ink-faint uppercase tracking-wider">Инженерный калькулятор</div>
+                <h3 class="text-lg font-bold text-ink">Профиль термостола и фена</h3>
+              </div>
+              
+              <!-- Alloy pills -->
+              <div class="flex flex-wrap items-center gap-1.5 font-mono text-xs" id="alloy-selector">
+                <button class="alloy-btn px-2.5 py-1 rounded border border-ink bg-ink text-paper transition-all font-medium" data-alloy="sac305" type="button">
+                  SAC305 (217°C)
+                </button>
+                <button class="alloy-btn px-2.5 py-1 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all" data-alloy="pos61" type="button">
+                  ПОС-61 (183°C)
+                </button>
+                <button class="alloy-btn px-2.5 py-1 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all" data-alloy="sn42" type="button">
+                  Sn42Bi58 (138°C)
+                </button>
+              </div>
             </div>
 
-            <!-- Раздел FAQ -->
-            <section id="faq">
-                <h2 class="text-lg sm:text-xl font-bold text-gray-950 tracking-tight mb-3">
-                    Частые вопросы
-                </h2>
+            <!-- Phase Switcher Tabs -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left" id="stage-tabs">
+              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all" data-stage="0" type="button">
+                <div class="text-[10px] font-mono text-ink-faint">01 ПРОГРЕВ</div>
+                <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-0">25°C → 150°C</div>
+              </button>
+              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all" data-stage="1" type="button">
+                <div class="text-[10px] font-mono text-ink-faint">02 АКТИВАЦИЯ</div>
+                <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-1">150°C → 190°C</div>
+              </button>
+              <button class="stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all" data-stage="2" type="button">
+                <div class="text-[10px] font-mono text-ink font-semibold">03 ОПЛАВЛЕНИЕ *</div>
+                <div class="text-xs font-mono text-ink font-semibold mt-0.5" id="tab-temp-2">217°C → 240°C</div>
+              </button>
+              <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all" data-stage="3" type="button">
+                <div class="text-[10px] font-mono text-ink-faint">04 ОХЛАЖДЕНИЕ</div>
+                <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-3">240°C → 100°C</div>
+              </button>
+            </div>
+
+            <!-- Detailed parameters card -->
+            <div class="bg-paper p-4 rounded border border-paper-border space-y-4">
+              <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-paper-border">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono px-1.5 py-0.5 bg-ink text-paper rounded" id="detail-tag">ФАЗА 03</span>
+                  <span class="font-semibold text-ink text-[15px]" id="detail-title">Оплавление — 217°C → 240°C</span>
+                </div>
+                <button class="font-mono text-xs text-ink-muted hover:text-ink underline decoration-paper-border-dark flex items-center gap-1" id="copy-stage-btn" type="button">
+                  <span id="copy-btn-text">Скопировать параметры</span>
+                </button>
+              </div>
+
+              <!-- Numerical parameters grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                <div class="p-2 bg-paper-subtle rounded border border-paper-border">
+                  <div class="text-ink-faint text-[10px]">СКОРОСТЬ / TAL</div>
+                  <div class="text-ink font-semibold mt-1" id="detail-speed">TAL: 45 — 75 сек</div>
+                </div>
+                <div class="p-2 bg-paper-subtle rounded border border-paper-border">
+                  <div class="text-ink-faint text-[10px]">ДЛИТЕЛЬНОСТЬ</div>
+                  <div class="text-ink font-semibold mt-1" id="detail-duration">Пик: 10 — 20 сек</div>
+                </div>
+                <div class="p-2 bg-paper-subtle rounded border border-paper-border">
+                  <div class="text-ink-faint text-[10px]">НИЖНИЙ ПОДОГРЕВ</div>
+                  <div class="text-ink font-semibold mt-1" id="detail-bottom">170°C — 185°C</div>
+                </div>
+                <div class="p-2 bg-paper-subtle rounded border border-paper-border">
+                  <div class="text-ink-faint text-[10px]">СОПЛО ФЕНА</div>
+                  <div class="text-ink font-semibold mt-1" id="detail-top">255°C (35 л/мин)</div>
+                </div>
+              </div>
+
+              <!-- Text notes -->
+              <div class="text-[13px] text-ink-muted space-y-2 pt-1">
                 <div>
-                    <?php foreach ($faq_items as $question => $answer): ?>
-                        <div class="faq-clean">
-                            <div class="faq-clean-header">
-                                <span class="pr-2"><?= e($question) ?></span>
-                                <span class="material-symbols-outlined faq-clean-icon text-sm">expand_more</span>
-                            </div>
-                            <div class="faq-clean-body">
-                                <p><?= e($answer) ?></p>
-                            </div>
-                        </div>
-                    <?php endforeach; ?>
+                  <strong class="text-ink font-medium">Физика процесса:</strong>
+                  <span id="detail-desc">Полный переход шариков в жидкую фазу, смачивание контактных площадок и диффузионный рост интерметаллического слоя Cu6Sn5.</span>
                 </div>
-            </section>
-
-            <!-- CTA Playbook блок (TochkiCamp Style) -->
-            <div class="p-6 bg-gray-50 border border-gray-200 rounded-lg my-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                    <h4 class="font-bold text-sm text-gray-900">Инженерный справочник по пайке BGA</h4>
-                    <p class="text-xs text-gray-500 mt-0.5">Таблицы температурных профилей, допуски IPC-A-610 и подбор флюсов в Telegram.</p>
+                <div class="text-[#8c2d19] bg-[#fff6f5] p-2.5 rounded border border-[#f3d3ce] text-[12.5px] leading-snug">
+                  <strong class="font-medium">Ограничение:</strong> <span id="detail-warning">Превышение 248-250°C на кристалле ведет к деламинации кремниевой подложки и необратимому перегреву.</span>
                 </div>
-                <a href="https://t.me/" target="_blank" rel="noopener" class="px-4 py-2 bg-gray-900 hover:bg-black text-white text-xs font-semibold rounded transition-colors whitespace-nowrap">
-                    Забрать в Telegram →
-                </a>
+              </div>
             </div>
 
-            <!-- Связанные статьи -->
-            <div class="pt-6 border-t border-gray-200">
-                <h3 class="text-sm font-mono uppercase tracking-wider text-gray-400 font-semibold mb-4">
-                    Другие материалы
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <?php foreach ($related_articles as $rel): ?>
-                        <a href="article.php?slug=<?= e($rel['slug']) ?>" class="p-3.5 bg-white hover:bg-gray-50 border border-gray-200 rounded-lg transition-colors flex flex-col justify-between group">
-                            <div>
-                                <span class="text-[10px] font-mono font-medium text-orange-600 block mb-1">
-                                    <?= e($rel['category'] ?? 'Материал') ?>
-                                </span>
-                                <h5 class="font-medium text-xs text-gray-900 group-hover:text-orange-600 transition-colors line-clamp-2">
-                                    <?= e($rel['title']) ?>
-                                </h5>
-                            </div>
-                            <span class="text-[11px] font-mono text-gray-400 mt-2">
-                                Читать →
-                            </span>
-                        </a>
-                    <?php endforeach; ?>
+          </div>
+        </section>
+
+        <hr class="border-paper-border my-8"/>
+
+        <!-- Section 3: Alloy Temperature Windows -->
+        <section class="scroll-mt-20 space-y-5" id="alloys">
+          <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
+              3. Температурные окна основных паяльных сплавов
+            </h2>
+            <p class="text-ink/85 mt-2">
+              Подбирайте температурный коридор в зависимости от металлургии используемого припоя:
+            </p>
+          </div>
+
+          <!-- 4 Minimalist Alloy Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            
+            <!-- SAC305 -->
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase">Бессвинцовый стандарт</div>
+                    <h3 class="font-bold text-base text-ink">SAC305</h3>
+                    <div class="text-xs font-mono text-ink-muted">Sn96.5 Ag3.0 Cu0.5</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-mono text-lg font-bold text-ink leading-none">217°C</div>
+                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">ликвидус</div>
+                  </div>
                 </div>
-            </div>
-
-        </article>
-
-        <!-- Сайдбар (4 из 12) с липким оглавлением TochkiCamp -->
-        <aside class="lg:col-span-4 space-y-6">
-
-            <div class="toc-sidebar">
-                <div class="text-[11px] font-mono font-semibold text-gray-400 uppercase tracking-wider mb-2.5">
-                    Содержание
+                <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
+                  <span class="text-ink-faint uppercase">Окно пайки:</span>
+                  <span class="text-ink font-semibold">235°C — 245°C</span>
                 </div>
-                <nav class="space-y-0.5">
-                    <a href="#step-1" class="toc-link">Шаг 1. Теплоемкость и датчики</a>
-                    <a href="#step-2" class="toc-link">Шаг 2. Четыре фазы кривой</a>
-                    <a href="#step-3" class="toc-link">Шаг 3. Температурные окна</a>
-                    <a href="#step-4" class="toc-link">Шаг 4. Практика и защита от брака</a>
-                    <a href="#faq" class="toc-link">Частые вопросы</a>
-                </nav>
-            </div>
-
-            <!-- Краткая справка -->
-            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg text-xs">
-                <span class="font-semibold text-gray-900 block mb-1">Лаборатория ТЧП</span>
-                <p class="text-gray-500 mb-3 leading-relaxed">
-                    Практические заметки и температурные карты в нашем канале.
+                <p class="text-[13px] text-ink-muted leading-relaxed">
+                  Заводской монтаж BGA, современные материнские платы и видеокарты. Высокая механическая прочность.
                 </p>
-                <a href="https://t.me/" target="_blank" rel="noopener" class="inline-block w-full text-center py-1.5 px-3 bg-white hover:bg-gray-100 border border-gray-300 rounded font-medium text-gray-800 transition-colors">
-                    Канал в Telegram
-                </a>
+              </div>
+              <div class="pt-2 text-right">
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('SAC305 | Liquidus: 217C | Reflow Window: 235-245C | TAL: 45-75s'); this.innerText='скопировано!';" type="button">
+                  копировать
+                </button>
+              </div>
             </div>
 
-        </aside>
+            <!-- ПОС-61 -->
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase">Свинцовый эвтектик</div>
+                    <h3 class="font-bold text-base text-ink">ПОС-61 / Sn63Pb37</h3>
+                    <div class="text-xs font-mono text-ink-muted">Sn63 Pb37</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-mono text-lg font-bold text-ink leading-none">183°C</div>
+                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
+                  </div>
+                </div>
+                <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
+                  <span class="text-ink-faint uppercase">Окно пайки:</span>
+                  <span class="text-ink font-semibold">210°C — 220°C</span>
+                </div>
+                <p class="text-[13px] text-ink-muted leading-relaxed">
+                  Сервисный ремонт, реболлинг на свинец, мягкая текучесть и зеркальная галтель без микротрещин.
+                </p>
+              </div>
+              <div class="pt-2 text-right">
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('ПОС-61 | Eutectic: 183C | Reflow Window: 210-220C | TAL: 30-50s'); this.innerText='скопировано!';" type="button">
+                  копировать
+                </button>
+              </div>
+            </div>
+
+            <!-- Sn42Bi58 -->
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase">Низкотемпературный</div>
+                    <h3 class="font-bold text-base text-ink">Sn42Bi58</h3>
+                    <div class="text-xs font-mono text-ink-muted">Sn42 Bi58 (Висмутовый)</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-mono text-lg font-bold text-ink leading-none">138°C</div>
+                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
+                  </div>
+                </div>
+                <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
+                  <span class="text-ink-faint uppercase">Окно пайки:</span>
+                  <span class="text-ink font-semibold">165°C — 175°C</span>
+                </div>
+                <p class="text-[13px] text-ink-muted leading-relaxed">
+                  Монтаж пластиковых FPC-разъемов, OLED-шлейфов и термочувствительных датчиков MEMS без коробления.
+                </p>
+              </div>
+              <div class="pt-2 text-right">
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('Sn42Bi58 | Eutectic: 138C | Reflow Window: 165-175C | TAL: 30-45s'); this.innerText='скопировано!';" type="button">
+                  копировать
+                </button>
+              </div>
+            </div>
+
+            <!-- Сплав Розе -->
+            <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3">
+              <div>
+                <div class="flex items-start justify-between">
+                  <div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase">Сверхнизкоплавкий</div>
+                    <h3 class="font-bold text-base text-ink">Сплав Розе</h3>
+                    <div class="text-xs font-mono text-ink-muted">Bi50 Pb32 Sn18</div>
+                  </div>
+                  <div class="text-right">
+                    <div class="font-mono text-lg font-bold text-ink leading-none">96°C</div>
+                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">плавление</div>
+                  </div>
+                </div>
+                <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
+                  <span class="text-ink-faint uppercase">Окно пайки:</span>
+                  <span class="text-ink font-semibold">130°C — 140°C</span>
+                </div>
+                <p class="text-[13px] text-ink-muted leading-relaxed">
+                  Исключительно для безопасного демонтажа чипов (разбавление тугоплавкого припоя). В чистом виде запрещен!
+                </p>
+              </div>
+              <div class="pt-2 text-right">
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('Сплав Розе | Melting: 96C | Desoldering Window: 130-140C'); this.innerText='скопировано!';" type="button">
+                  копировать
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <hr class="border-paper-border my-8"/>
+
+        <!-- Section 4: Practical details -->
+        <section class="scroll-mt-20 space-y-4" id="step-4">
+          <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
+            4. Практические нюансы: термопары, влага и деламинация
+          </h2>
+          <div class="space-y-4">
+            
+            <div class="p-4 rounded border border-paper-border bg-paper space-y-1.5">
+              <div class="font-semibold text-ink text-sm">Точка замера температуры</div>
+              <p class="text-[13.5px] text-ink-muted leading-relaxed">
+                Закрепляйте термопару типа К каптоновым скотчем непосредственно возле корпуса микросхемы на поверхности платы. Только это дает объективную температуру в зоне пайки.
+              </p>
+            </div>
+
+            <div class="border border-paper-border bg-callout p-4 rounded space-y-1.5">
+              <div class="flex items-center gap-2">
+                <span class="font-semibold text-ink text-sm">Влажность микросхем (MSL 3)</span>
+                <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-amber-200/70 text-ink">ВАЖНО</span>
+              </div>
+              <p class="text-[13.5px] text-ink-muted leading-relaxed">
+                Если BGA-компонент лежал на воздухе дольше 72 часов, влага в полимере закипает при 230°C и распирает корпус изнутри (<mark>«эффект попкорна»</mark>). Обязательно сушите чип 12–24 часа при 100–110°C перед пайкой.
+              </p>
+            </div>
+
+            <div class="p-4 rounded border border-paper-border bg-paper space-y-1.5">
+              <div class="font-semibold text-ink text-sm">Критическая скорость нагрева</div>
+              <p class="text-[13.5px] text-ink-muted leading-relaxed">
+                Скорость нарастания температуры быстрее <strong class="text-ink">2.5–3.0°C/сек</strong> приводит к расслоению стеклотекстолита (деламинации) и обрыву внутренних переходных отверстий в плате.
+              </p>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- Summary Box ("Что запомнить") -->
+        <div class="border border-paper-border bg-paper p-5 sm:p-6 rounded-lg space-y-3 font-sans">
+          <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
+            <span>●</span> ЧТО ЗАПОМНИТЬ
+          </div>
+          <ul class="space-y-2 text-[13.5px] text-ink/85 leading-relaxed">
+            <li class="flex items-start gap-2.5">
+              <span class="text-ink-faint font-mono">—</span>
+              <span>Фен без нижнего подогревателя гарантированно изгибает многослойную плату.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-ink-faint font-mono">—</span>
+              <span>Всегда фиксируйте термопару на плате — температура на выходе сопла фена завышена на 80–100°C.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-ink-faint font-mono">—</span>
+              <span>Оптимальное время над ликвидусом (TAL) для SAC305 составляет строго <mark>45–75 секунд</mark>.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-ink-faint font-mono">—</span>
+              <span>Бессвинцовая пайка требует пика 235–245°C; нагрев свыше 250°C разрушает кристалл и текстолит.</span>
+            </li>
+            <li class="flex items-start gap-2.5">
+              <span class="text-ink-faint font-mono">—</span>
+              <span>Влажные BGA-микросхемы перед монтажом обязательно требуют просушки 12 часов при 100°C.</span>
+            </li>
+          </ul>
+        </div>
+
+        <hr class="border-paper-border my-8"/>
+
+        <!-- Section: FAQ Accordion -->
+        <section class="scroll-mt-20 space-y-4" id="faq">
+          <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
+            Частые вопросы
+          </h2>
+          <div class="border-t border-paper-border divide-y divide-paper-border">
+            <?php foreach ($faq_items as $question => $answer): ?>
+              <div class="py-3.5">
+                <button class="faq-toggle w-full text-left flex items-start justify-between gap-4 font-medium text-ink hover:text-ink-muted transition-colors text-[14.5px]" type="button">
+                  <span><?= e($question) ?></span>
+                  <span class="font-mono text-ink-faint text-xs mt-0.5 plus-icon">+</span>
+                </button>
+                <div class="faq-content hidden pt-2 text-[13.5px] text-ink-muted leading-relaxed">
+                  <?= e($answer) ?>
+                </div>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </section>
+
+        <!-- Telegram Pill Box (tochkicamp style bottom CTA) -->
+        <div class="border border-paper-border rounded-lg bg-paper p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="space-y-0.5">
+            <div class="font-semibold text-sm text-ink">Инженерный справочник по пайке BGA</div>
+            <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в нашем канале.</p>
+          </div>
+          <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-ink bg-ink text-paper text-xs font-mono font-medium rounded hover:bg-ink/85 transition-colors shrink-0" href="https://t.me/" target="_blank" rel="noopener">
+            <span>Забрать в Telegram →</span>
+          </a>
+        </div>
+
+        <!-- Related Reading -->
+        <div class="pt-4 space-y-3">
+          <div class="text-[11px] font-mono text-ink-faint uppercase">Другие материалы:</div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <?php foreach ($related_articles as $rel): ?>
+              <a class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-colors block" href="article.php?slug=<?= e($rel['slug']) ?>">
+                <div class="text-[10px] font-mono text-ink-faint uppercase"><?= e($rel['category'] ?? 'Материал') ?></div>
+                <div class="font-medium text-ink mt-1"><?= e($rel['title']) ?></div>
+              </a>
+            <?php endforeach; ?>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sticky Floating Table of Contents Sidebar (Desktop) -->
+      <aside class="hidden lg:block lg:col-span-4 sticky top-20 space-y-6">
+        
+        <!-- Table of Contents -->
+        <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
+          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+            <span>СОДЕРЖАНИЕ</span>
+            <span>4 раздела</span>
+          </div>
+          <nav class="space-y-1 text-[13px] font-mono" id="toc-nav">
+            <a class="toc-link block px-2 py-1 rounded text-ink font-semibold hover:bg-paper-subtle transition-colors" href="#step-1">
+              1. Теплоемкость и датчики
+            </a>
+            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#step-2">
+              2. Четыре фазы кривой
+            </a>
+            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#alloys">
+              3. Температурные окна
+            </a>
+            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#step-4">
+              4. Практика и защита от брака
+            </a>
+            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#faq">
+              Частые вопросы
+            </a>
+          </nav>
+        </div>
+
+        <!-- Telegram / Lab block -->
+        <div class="border border-paper-border bg-paper-subtle/50 p-4 rounded-lg space-y-2 text-xs">
+          <div class="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-ink">
+            <span class="w-2 h-2 bg-ink rounded-full inline-block"></span>
+            Лаборатория ТЧП
+          </div>
+          <p class="text-ink-muted leading-relaxed">
+            Практические заметки, профили реболлинга и тесты термоинтерфейсов в инженерном канале.
+          </p>
+          <a class="inline-block pt-1 font-mono text-[11.5px] font-semibold text-ink underline decoration-paper-border-dark" href="https://t.me/" target="_blank" rel="noopener">
+            Канал в Telegram →
+          </a>
+        </div>
+
+      </aside>
 
     </div>
 
+  </div>
 </main>
 
-<!-- Мобильное оглавление -->
-<button id="mobile-toc-fab" class="mobile-toc-fab">
-    <span class="material-symbols-outlined text-xs">list</span>
-    <span>Содержание</span>
-</button>
-
-<div id="mobile-toc-drawer" class="fixed inset-0 bg-black/40 z-[1000] hidden flex items-end">
-    <div class="bg-white border-t border-gray-200 w-full max-h-[70vh] overflow-y-auto p-5 rounded-t-xl shadow-xl">
-        <div class="flex items-center justify-between pb-3 border-b border-gray-200 mb-3">
-            <span class="font-bold text-sm text-gray-900">Содержание</span>
-            <button id="mobile-toc-close" class="text-gray-400 hover:text-gray-900 text-sm">✕</button>
-        </div>
-        <nav class="space-y-1 text-sm">
-            <a href="#step-1" class="block p-2 text-gray-700 hover:bg-gray-50 rounded">Шаг 1. Теплоемкость и датчики</a>
-            <a href="#step-2" class="block p-2 text-gray-700 hover:bg-gray-50 rounded">Шаг 2. Четыре фазы кривой</a>
-            <a href="#step-3" class="block p-2 text-gray-700 hover:bg-gray-50 rounded">Шаг 3. Температурные окна</a>
-            <a href="#step-4" class="block p-2 text-gray-700 hover:bg-gray-50 rounded">Шаг 4. Практика и защита от брака</a>
-            <a href="#faq" class="block p-2 text-gray-700 hover:bg-gray-50 rounded">Частые вопросы</a>
-        </nav>
+<!-- Editorial Minimal Footer (tochkicamp style) -->
+<footer class="w-full border-t border-paper-border bg-paper py-10 mt-12 text-ink-muted text-xs font-mono">
+  <div class="max-w-[1140px] mx-auto px-5 sm:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div class="space-y-1.5">
+      <div class="flex items-center gap-2 text-ink font-semibold">
+        <span class="uppercase">ТОЧКА ПЛАВЛЕНИЯ</span>
+        <span class="text-ink-faint">·</span>
+        <span class="text-[11px] font-normal text-ink-faint">Инженерный регламент v2.4</span>
+      </div>
+      <p class="text-[12px] text-ink-muted max-w-md">
+        Инженерный справочник, регламенты поверхностного монтажа и открытая документация по пайке и теплофизике компонентов.
+      </p>
+      <div class="text-ink-faint text-[11px] pt-1">
+        © 2026 ТОЧКА ПЛАВЛЕНИЯ. Все права защищены.
+      </div>
     </div>
-</div>
-
-<div id="copy-toast">Скопировано в буфер!</div>
-
-<!-- Подвал сайта -->
-<footer class="bg-gray-50 border-t border-gray-200 mt-16 py-8 text-xs text-gray-500">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-            <span class="font-semibold text-gray-900">Точка Плавления</span>
-            <span>·</span>
-            <span>Журнал и верстак инженера</span>
-        </div>
-        <div class="flex gap-4">
-            <a href="privacy.php" class="hover:text-gray-900">Конфиденциальность</a>
-            <a href="cookies.php" class="hover:text-gray-900">Cookies</a>
-        </div>
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
+      <a class="hover:text-ink transition-colors" href="index.php">Статьи</a>
+      <a class="hover:text-ink transition-colors" href="interactive.php#solder-table">Реестр сплавов</a>
+      <a class="hover:text-ink transition-colors" href="interactive.php">Калькулятор</a>
+      <a class="hover:text-ink transition-colors" href="privacy.php">Конфиденциальность</a>
+      <a class="hover:text-ink transition-colors" href="https://t.me/" target="_blank" rel="noopener">Telegram</a>
     </div>
+  </div>
 </footer>
 
-<script src="assets/js/article-ux.js"></script>
-<script src="assets/js/thermal-slider.js"></script>
+<!-- Interactive Simulator & UX Scripts (Stitch code) -->
+<script>
+(function() {
+  const alloyData = {
+    sac305: {
+      name: 'SAC305 (Sn96.5 Ag3.0 Cu0.5)',
+      stages: [
+        {
+          tabTemp: '25°C → 150°C',
+          tag: 'ФАЗА 01',
+          title: 'Прогрев (Preheat) — 25°C → 150°C',
+          speed: '1.0 — 2.5°C/сек',
+          duration: '60 — 90 сек',
+          bottom: '120°C — 140°C',
+          top: '180°C (25 л/мин)',
+          desc: 'Плавный подогрев многослойной платы для исключения термического удара и коробления текстолита.',
+          warning: 'Скорость свыше 3.0°C/с приводит к микротрещинам в керамических конденсаторах MLCC.'
+        },
+        {
+          tabTemp: '150°C → 190°C',
+          tag: 'ФАЗА 02',
+          title: 'Активация (Soak) — 150°C → 190°C',
+          speed: '0.5 — 1.0°C/сек',
+          duration: '60 — 120 сек',
+          bottom: '150°C — 160°C',
+          top: '210°C (30 л/мин)',
+          desc: 'Выравнивание температурного поля под чипом и по краям платы. Химическое травление оксидов меди флюсом.',
+          warning: 'Слишком долгий soak (>120с) полностью выжигает активность флюса до фазы оплавления.'
+        },
+        {
+          tabTemp: '217°C → 240°C',
+          tag: 'ФАЗА 03',
+          title: 'Оплавление (Reflow) — 217°C → 240°C',
+          speed: 'TAL: 45 — 75 сек',
+          duration: 'Пик: 10 — 20 сек',
+          bottom: '170°C — 185°C',
+          top: '255°C (35 л/мин)',
+          desc: 'Полный переход шариков в жидкую фазу, смачивание контактных площадок и диффузионный рост интерметаллического слоя Cu6Sn5.',
+          warning: 'Превышение 248-250°C на кристалле ведет к деламинации кремниевой подложки и необратимому перегреву.'
+        },
+        {
+          tabTemp: '240°C → 100°C',
+          tag: 'ФАЗА 04',
+          title: 'Охлаждение (Cooling) — 240°C → 100°C',
+          speed: '2.0 — 4.0°C/сек',
+          duration: '40 — 60 сек',
+          bottom: 'Отключен',
+          top: 'Остывание (обдув)',
+          desc: 'Быстрая контролируемая кристаллизация припоя, обеспечивающая мелкодисперсную пластичную структуру галтелей.',
+          warning: 'Охлаждение медленнее 1°C/с образует хрупкие игольчатые кристаллы интерметаллида.'
+        }
+      ]
+    },
+    pos61: {
+      name: 'ПОС-61 (Sn63 Pb37)',
+      stages: [
+        {
+          tabTemp: '25°C → 130°C',
+          tag: 'ФАЗА 01',
+          title: 'Прогрев (Preheat) — 25°C → 130°C',
+          speed: '1.0 — 2.0°C/сек',
+          duration: '60 — 80 сек',
+          bottom: '110°C — 120°C',
+          top: '160°C (25 л/мин)',
+          desc: 'Плавный подъем температуры для безопасного старта испарения растворителей флюса.',
+          warning: 'Избегайте локального нагрева: нижний подогрев обязателен для свинца на платах толще 1.2 мм.'
+        },
+        {
+          tabTemp: '130°C → 165°C',
+          tag: 'ФАЗА 02',
+          title: 'Активация (Soak) — 130°C → 165°C',
+          speed: '0.5 — 1.0°C/сек',
+          duration: '50 — 90 сек',
+          bottom: '135°C — 145°C',
+          top: '185°C (30 л/мин)',
+          desc: 'Равномерный прогрев шариков BGA и активация смоляных кислот флюса.',
+          warning: 'Не задерживайте температуру выше 170°C, чтобы не истощить флюс.'
+        },
+        {
+          tabTemp: '183°C → 215°C',
+          tag: 'ФАЗА 03',
+          title: 'Оплавление (Reflow) — 183°C → 215°C',
+          speed: 'TAL: 35 — 60 сек',
+          duration: 'Пик: 10 — 15 сек',
+          bottom: '150°C — 160°C',
+          top: '225°C (30 л/мин)',
+          desc: 'Мгновенный эвтектический переход в жидкость при 183°C, зеркальная галтель и самоцентрирование чипа.',
+          warning: 'Нагрев свыше 225°C не нужен и ускоряет окисление свинца.'
+        },
+        {
+          tabTemp: '215°C → 90°C',
+          tag: 'ФАЗА 04',
+          title: 'Охлаждение (Cooling) — 215°C → 90°C',
+          speed: '2.0 — 3.5°C/сек',
+          duration: '35 — 50 сек',
+          bottom: 'Отключен',
+          top: 'Остывание (обдув)',
+          desc: 'Формирование блестящей гладкой структуры паяного соединения без раковин.',
+          warning: 'Не допускайте резкого удара холодом из компрессора (термошок).'
+        }
+      ]
+    },
+    sn42: {
+      name: 'Sn42Bi58 (Низкотемпературный)',
+      stages: [
+        {
+          tabTemp: '25°C → 100°C',
+          tag: 'ФАЗА 01',
+          title: 'Прогрев (Preheat) — 25°C → 100°C',
+          speed: '1.0°C/сек',
+          duration: '50 — 70 сек',
+          bottom: '80°C — 90°C',
+          top: '130°C (20 л/мин)',
+          desc: 'Деликатный нагрев термопластичных шлейфов и тонких подложек.',
+          warning: 'Осторожно с давлением воздуха из сопла: пластик разъемов размягчается.'
+        },
+        {
+          tabTemp: '100°C → 125°C',
+          tag: 'ФАЗА 02',
+          title: 'Активация (Soak) — 100°C → 125°C',
+          speed: '0.4 — 0.8°C/сек',
+          duration: '40 — 60 сек',
+          bottom: '100°C — 110°C',
+          top: '145°C (25 л/мин)',
+          desc: 'Стабилизация температуры перед мгновенной эвтектикой висмута.',
+          warning: 'Не применяйте высокоактивные спирто-канифольные флюсы с высокой температурой активации.'
+        },
+        {
+          tabTemp: '138°C → 165°C',
+          tag: 'ФАЗА 03',
+          title: 'Оплавление (Reflow) — 138°C → 165°C',
+          speed: 'TAL: 30 — 45 сек',
+          duration: 'Пик: 8 — 12 сек',
+          bottom: '120°C — 130°C',
+          top: '175°C (25 л/мин)',
+          desc: 'Низкотемпературная посадка чувствительных кремниевых датчиков и светодиодов.',
+          warning: 'Висмут хрупок на изгиб: не используйте для плат с механической нагрузкой.'
+        },
+        {
+          tabTemp: '165°C → 80°C',
+          tag: 'ФАЗА 04',
+          title: 'Охлаждение (Cooling) — 165°C → 80°C',
+          speed: '1.5 — 2.5°C/сек',
+          duration: '30 — 40 сек',
+          bottom: 'Отключен',
+          top: 'Остывание (обдув)',
+          desc: 'Аккуратный естественный спад температуры без температурного шока полимеров.',
+          warning: 'Не подвергайте плату механическим вибрациям до полного затвердевания (130°C).'
+        }
+      ]
+    }
+  };
+
+  let currentAlloy = 'sac305';
+  let currentStage = 2; // Reflow active
+
+  function renderSimulator() {
+    const alloy = alloyData[currentAlloy];
+
+    // Update tab temps
+    for (let i = 0; i < 4; i++) {
+      const tabElem = document.getElementById('tab-temp-' + i);
+      if (tabElem) tabElem.textContent = alloy.stages[i].tabTemp;
+    }
+
+    // Style stage tabs
+    const stageButtons = document.querySelectorAll('.stage-btn');
+    stageButtons.forEach((btn, idx) => {
+      const titleDiv = btn.querySelector('div:first-child');
+      const tempDiv = btn.querySelector('div:last-child');
+      if (idx === currentStage) {
+        btn.className = 'stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all';
+        if (titleDiv) titleDiv.className = 'text-[10px] font-mono text-ink font-semibold';
+        if (tempDiv) tempDiv.className = 'text-xs font-mono text-ink font-semibold mt-0.5';
+      } else {
+        btn.className = 'stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark';
+        if (titleDiv) titleDiv.className = 'text-[10px] font-mono text-ink-faint';
+        if (tempDiv) tempDiv.className = 'text-xs font-mono text-ink mt-0.5';
+      }
+    });
+
+    // Update active stage details
+    const st = alloy.stages[currentStage];
+    document.getElementById('detail-tag').textContent = st.tag;
+    document.getElementById('detail-title').textContent = st.title;
+    document.getElementById('detail-speed').textContent = st.speed;
+    document.getElementById('detail-duration').textContent = st.duration;
+    document.getElementById('detail-bottom').textContent = st.bottom;
+    document.getElementById('detail-top').textContent = st.top;
+    document.getElementById('detail-desc').textContent = st.desc;
+    document.getElementById('detail-warning').textContent = st.warning;
+  }
+
+  // Alloy clicks
+  const alloyButtons = document.querySelectorAll('.alloy-btn');
+  alloyButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      currentAlloy = btn.getAttribute('data-alloy');
+      alloyButtons.forEach(b => {
+        b.className = 'alloy-btn px-2.5 py-1 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all';
+      });
+      btn.className = 'alloy-btn px-2.5 py-1 rounded border border-ink bg-ink text-paper transition-all font-medium';
+      renderSimulator();
+    });
+  });
+
+  // Stage tab clicks
+  const stageButtons = document.querySelectorAll('.stage-btn');
+  stageButtons.forEach((btn, idx) => {
+    btn.addEventListener('click', () => {
+      currentStage = idx;
+      renderSimulator();
+    });
+  });
+
+  // Copy stage parameters
+  const copyBtn = document.getElementById('copy-stage-btn');
+  const copyBtnText = document.getElementById('copy-btn-text');
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const st = alloyData[currentAlloy].stages[currentStage];
+      const text = `${alloyData[currentAlloy].name} | ${st.title} | Скорость/TAL: ${st.speed} | Стол: ${st.bottom} | Фен: ${st.top}`;
+      navigator.clipboard.writeText(text).then(() => {
+        copyBtnText.textContent = 'Скопировано в буфер!';
+        setTimeout(() => {
+          copyBtnText.textContent = 'Скопировать параметры';
+        }, 2000);
+      });
+    });
+  }
+
+  // FAQ accordion
+  const faqToggles = document.querySelectorAll('.faq-toggle');
+  faqToggles.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const content = btn.nextElementSibling;
+      const plus = btn.querySelector('.plus-icon');
+      const isClosed = content.classList.contains('hidden');
+      
+      if (isClosed) {
+        content.classList.remove('hidden');
+        if (plus) plus.textContent = '—';
+      } else {
+        content.classList.add('hidden');
+        if (plus) plus.textContent = '+';
+      }
+    });
+  });
+
+  // Highlight active TOC link on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const tocLinks = document.querySelectorAll('.toc-link');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(sec => {
+      const top = sec.offsetTop - 110;
+      if (window.pageYOffset >= top) {
+        current = sec.getAttribute('id');
+      }
+    });
+
+    tocLinks.forEach(link => {
+      const href = link.getAttribute('href').replace('#', '');
+      if (href === current) {
+        link.classList.add('text-ink', 'font-semibold', 'bg-paper-subtle');
+        link.classList.remove('text-ink-muted');
+      } else {
+        link.classList.remove('text-ink', 'font-semibold', 'bg-paper-subtle');
+        link.classList.add('text-ink-muted');
+      }
+    });
+  });
+
+  // Initial run
+  renderSimulator();
+})();
+</script>
 
 </body>
 </html>

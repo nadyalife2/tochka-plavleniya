@@ -1,134 +1,150 @@
 <?php
 /**
- * Professional Single Post Template for Tochka Plavleniya (ТЧП)
+ * Single Article Template - Tochka Plavleniya (Stitch / TochkiCamp Editorial Style)
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
+get_header();
+
+// Fetch article data / fallback
+$article_title = get_the_title();
+$article_date  = get_the_date('j F Y');
+$article_excerpt = get_the_excerpt() ?: 'Практический инженерный регламент пайки BGA и SMD компонентов.';
+?>
+
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        paper: '#faf8f5',
+        'paper-subtle': '#f3f0ea',
+        'paper-border': '#e6e2da',
+        'paper-border-dark': '#d3cdc2',
+        ink: '#141414',
+        'ink-muted': '#6b665f',
+        'ink-faint': '#9e988f',
+        highlight: '#fef9c3',
+        'highlight-strong': '#fef08a',
+        callout: '#fcfaf2'
+      },
+      fontFamily: {
+        sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        serif: ['Newsreader', 'Georgia', 'serif'],
+        mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
+      }
+    }
+  }
 }
-?>
-<!DOCTYPE html>
-<html <?php language_attributes(); ?>>
-<head>
-	<meta charset="<?php bloginfo( 'charset' ); ?>">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Hanken+Grotesk:wght@400;600;700;800;900&family=IBM+Plex+Mono:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-	<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-	<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-	<?php wp_head(); ?>
-</head>
-<body <?php body_class( 'min-h-screen flex flex-col antialiased bg-[#FCFAF7]' ); ?>>
+</script>
 
-<!-- Полоса прогресса чтения -->
-<div id="reading-progress"></div>
+<style>
+  body {
+    background-color: #faf8f5 !important;
+    color: #141414 !important;
+  }
+</style>
 
-<!-- Шапка -->
-<header class="sticky top-0 z-50 bg-[#FCFAF7] border-b-2 border-black/90 backdrop-blur-md bg-opacity-95">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="flex items-center gap-2 group">
-            <div class="w-9 h-9 bg-[#FC6C2B] border-2 border-black rounded flex items-center justify-center font-mono font-black text-white text-lg shadow-[2px_2px_0px_#000]">
-                ТЧП
-            </div>
-            <div class="flex flex-col">
-                <span class="font-['Hanken_Grotesk'] font-black text-lg tracking-tight leading-none"><?php bloginfo( 'name' ); ?></span>
-                <span class="font-mono text-[10px] text-gray-500 font-bold uppercase tracking-wider">Журнал & Верстак Инженера</span>
-            </div>
-        </a>
-
-        <nav class="hidden md:flex items-center gap-6 font-bold text-sm">
-            <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-[#FC6C2B] transition-colors">Статьи</a>
-            <a href="<?php echo esc_url( home_url( '/interactive/' ) ); ?>" class="hover:text-[#FC6C2B] transition-colors">Инструменты</a>
-        </nav>
-    </div>
-</header>
-
-<main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 w-full">
-
-<?php
-while ( have_posts() ) :
-	the_post();
-	$categories = get_the_category();
-	$cat_name = ! empty( $categories ) ? $categories[0]->name : 'Пайка и Монтаж';
-?>
-
-    <!-- Хлебные крошки -->
-    <nav class="flex items-center gap-2 text-xs font-mono font-bold text-gray-500 mb-6 flex-wrap">
-        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="hover:text-[#FC6C2B]">Главная</a>
-        <span>→</span>
-        <span><?php echo esc_html( $cat_name ); ?></span>
-        <span>→</span>
-        <span class="text-black font-semibold truncate max-w-[280px] sm:max-w-md"><?php the_title(); ?></span>
+<main class="w-full flex-grow pt-8 pb-20">
+  <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
+    
+    <!-- Breadcrumbs -->
+    <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap">
+      <a class="hover:text-ink transition-colors" href="<?php echo home_url('/'); ?>">Главная</a>
+      <span>→</span>
+      <a class="hover:text-ink transition-colors" href="<?php echo home_url('/category/bga/'); ?>">Гайды</a>
+      <span>→</span>
+      <span class="text-ink truncate max-w-xs sm:max-w-md"><?php echo esc_html($article_title); ?></span>
     </nav>
 
-    <!-- Заголовок и метаданные -->
-    <header class="mb-8">
-        <div class="flex flex-wrap items-center gap-2.5 mb-3">
-            <span class="callout-badge bg-[#FFDCCB] text-[#8a3808] px-3 py-1 font-bold text-xs uppercase border border-black rounded">
-                <?php echo esc_html( $cat_name ); ?>
-            </span>
-            <span class="bg-[#BDEEE2] text-[#0a5040] px-3 py-1 font-bold text-xs border border-black rounded">
-                ⏱ 7 мин чтения
-            </span>
-            <span class="bg-[#FFF1A8] text-[#5e4700] px-3 py-1 font-bold text-xs border border-black rounded">
-                Сложность: PRO
-            </span>
+    <!-- Center Article + Table of Contents Layout -->
+    <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
+      
+      <!-- Central Editorial Column (740px wide max) -->
+      <div class="lg:col-span-8 max-w-[730px] space-y-9">
+        
+        <!-- Retro Illustration / Stamp Badge -->
+        <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
+          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24" width="24">
+            <rect height="18" rx="2" width="18" x="3" y="3"></rect>
+            <path d="M8 7v10"></path>
+            <path d="M16 7v10"></path>
+            <path d="M12 12h.01"></path>
+            <circle cx="12" cy="7" r="1"></circle>
+            <circle cx="12" cy="17" r="1"></circle>
+          </svg>
         </div>
 
-        <h1 class="text-2xl sm:text-4xl md:text-5xl font-black font-['Hanken_Grotesk'] tracking-tight leading-[1.15] text-[#1A1A1A] mb-4">
-            <?php the_title(); ?>
-        </h1>
+        <!-- Article Header Block -->
+        <header class="space-y-4">
+          <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
+            <?php echo esc_html($article_title); ?>
+          </h1>
 
-        <div class="flex items-center gap-3 py-3 border-y-2 border-black/15 my-4">
-            <div class="w-10 h-10 bg-[#FC6C2B] border-2 border-black rounded-full flex items-center justify-center font-bold text-white shadow-[2px_2px_0px_#000]">
-                <?php echo esc_html( mb_substr( get_the_author(), 0, 1 ) ); ?>
+          <!-- Meta line -->
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-muted font-mono pt-1 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[10px] flex items-center justify-center font-bold text-ink">ТП</span>
+              <span class="text-ink"><?php the_author(); ?></span>
             </div>
-            <div>
-                <div class="font-bold text-sm text-black"><?php the_author(); ?></div>
-                <div class="text-xs text-gray-500 font-mono">
-                    Опубликовано: <time datetime="<?php echo esc_attr( get_the_date( 'c' ) ); ?>"><?php echo esc_html( get_the_date() ); ?></time>
-                </div>
-            </div>
+            <span class="text-ink-faint">·</span>
+            <time datetime="<?php echo get_the_date('c'); ?>">Обновлено <?php echo esc_html($article_date); ?></time>
+            <span class="text-ink-faint">·</span>
+            <span>~8 мин чтения</span>
+            <span class="text-ink-faint">·</span>
+            <span class="bg-paper-subtle px-1.5 py-0.5 rounded text-[11px] border border-paper-border">IPC/JEDEC J-STD-020D</span>
+          </div>
+
+          <!-- Lead Paragraph -->
+          <p class="text-lg text-ink font-serif leading-[1.65] pt-2 text-[#242220]">
+            <?php echo esc_html($article_excerpt); ?>
+          </p>
+        </header>
+
+        <!-- Callout: "Как читать этот регламент" -->
+        <div class="border border-paper-border bg-callout p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
+          <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
+            КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
+          </div>
+          <p class="text-ink/80">
+            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
+          </p>
         </div>
-    </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-        <article class="lg:col-span-8 text-[#1A1A1A] text-base leading-relaxed space-y-6 post-content">
-            <?php the_content(); ?>
-        </article>
+        <!-- WordPress Body Content -->
+        <div class="prose max-w-none text-ink/85 space-y-6">
+          <?php the_content(); ?>
+        </div>
 
-        <aside class="lg:col-span-4 space-y-6">
-            <div class="sketch-box p-5 bg-white toc-sidebar">
-                <div class="flex items-center justify-between pb-3 mb-3 border-b-2 border-black">
-                    <span class="font-['Hanken_Grotesk'] font-black text-base flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-sm text-[#FC6C2B]">format_list_bulleted</span>
-                        Содержание статьи
-                    </span>
-                </div>
-                <nav class="space-y-1">
-                    <a href="#section-basics" class="toc-link">1. Общие сведения</a>
-                    <a href="#section-simulator" class="toc-link">2. Симулятор термопрофиля</a>
-                    <a href="#section-callouts" class="toc-link">3. Советы и ошибки</a>
-                    <a href="#section-comparison" class="toc-link">4. Сравнительная таблица</a>
-                    <a href="#section-faq" class="toc-link">5. FAQ</a>
-                </nav>
-            </div>
-        </aside>
+      </div>
+
+      <!-- Sticky Floating Table of Contents Sidebar -->
+      <aside class="hidden lg:block lg:col-span-4 sticky top-20 space-y-6">
+        <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
+          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+            <span>СОДЕРЖАНИЕ</span>
+            <span>4 раздела</span>
+          </div>
+          <nav class="space-y-1 text-[13px] font-mono" id="toc-nav">
+            <a class="toc-link block px-2 py-1 rounded text-ink font-semibold hover:bg-paper-subtle transition-colors" href="#step-1">
+              1. Теплоемкость и датчики
+            </a>
+            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#step-2">
+              2. Четыре фазы кривой
+            </a>
+            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#alloys">
+              3. Температурные окна
+            </a>
+            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#step-4">
+              4. Практика и защита от брака
+            </a>
+          </nav>
+        </div>
+      </aside>
+
     </div>
 
-<?php endwhile; ?>
-
+  </div>
 </main>
 
-<div id="copy-toast">Скопировано в буфер!</div>
-
-<footer class="bg-[#1A1A1A] text-white border-t-4 border-black mt-16 py-8">
-    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-gray-400 font-mono">
-        © <?php echo date( 'Y' ); ?> <?php bloginfo( 'name' ); ?>. Все права защищены.
-    </div>
-</footer>
-
-<?php wp_footer(); ?>
-</body>
-</html>
+<?php get_footer(); ?>
