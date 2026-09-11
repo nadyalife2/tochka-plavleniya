@@ -75,6 +75,8 @@ tailwind.config = {
 <style>
   body {
     background-color: #faf8f5;
+    background-image: radial-gradient(#d3cdc2 0.9px, transparent 0.9px);
+    background-size: 20px 20px;
     color: #141414;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -236,8 +238,9 @@ tailwind.config = {
           </p>
           
           <!-- Inline quote/highlight line -->
-          <div class="border-l-4 border-paper-border-dark bg-paper-subtle/50 pr-3 rounded-r pl-4 py-2 my-3 text-[15px] font-serif italic text-ink/90">
-            «Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую».
+          <div class="relative border-l-4 border-ink bg-paper-subtle/70 pr-4 pl-5 py-3.5 my-4 rounded-r shadow-sm">
+            <div class="text-lg sm:text-[21px] font-serif italic text-ink leading-relaxed tracking-[-0.01em]">«Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую».</div>
+            <div class="mt-2 font-serif italic text-[13px] text-ink-muted flex items-center gap-1.5"><span class="font-mono not-italic text-xs text-ink">—</span> заметка на полях лабораторного журнала</div>
           </div>
 
           <p class="text-ink/85">
@@ -259,13 +262,13 @@ tailwind.config = {
           <div class="py-2">
             <div class="text-[11px] font-mono text-ink-faint uppercase mb-2">Опорные значения стандарта IPC/JEDEC:</div>
             <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
-              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">Ликвидус SAC305: <strong>217°C</strong></span>
+              <span class="px-2.5 py-1 text-ink bg-paper border border-paper-border rounded text-[12px]">Ликвидус SAC305: <span class="font-semibold">217°C</span></span>
               <span class="text-ink-faint">→</span>
-              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">ПОС-61: <strong>183°C</strong></span>
+              <span class="px-2.5 py-1 text-ink bg-paper border border-paper-border rounded text-[12px]">ПОС-61: <span class="font-semibold">183°C</span></span>
               <span class="text-ink-faint">→</span>
-              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">Окно TAL: <strong>45–75 с</strong></span>
+              <span class="px-2.5 py-1 text-ink bg-paper border border-paper-border rounded text-[12px]">Окно TAL: <span class="font-semibold">45–75 с</span></span>
               <span class="text-ink-faint">→</span>
-              <span class="px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink">Пик: <strong>до 245°C</strong></span>
+              <span class="px-2.5 py-1 text-ink bg-paper border border-paper-border rounded text-[12px]">Пик: <span class="font-semibold">до 245°C</span></span>
             </div>
           </div>
         </section>
@@ -279,39 +282,45 @@ tailwind.config = {
               2. Четыре фазы кривой пайки (Интерактивный расчет)
             </h2>
             <p class="text-ink/85 mt-2">
-              Правильный термопрофиль по стандарту <code class="font-mono text-xs bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border">J-STD-020D</code> сводится к четырехступенчатому контролируемому циклу:
+              Правильный термопрофиль по стандарту <code class="font-mono text-xs font-medium px-1.5 py-0.5 bg-paper-subtle border border-paper-border rounded text-ink">J-STD-020D</code> сводится к четырехступенчатому контролируемому циклу:
             </p>
+            <div class="my-3 inline-flex flex-wrap items-center gap-3 p-2.5 rounded border border-ink/40 bg-callout transform -rotate-[0.5deg] text-xs font-mono text-ink shadow-sm">
+              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[10px] font-bold tracking-wider uppercase"><span>QC PASSED</span><span>✓</span></div>
+              <div class="text-ink text-[11.5px] font-semibold tracking-tight">J-STD-020E // COMPLIANT</div>
+              <span class="text-ink-faint text-[10px] hidden sm:inline-block">|</span>
+              <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="text-[#854d0e] font-bold font-mono">⚠</span>ВНИМАНИЕ: ОПАСНОСТЬ ДЕЛАМИНАЦИИ ПРИ СКОРОСТИ > 3°C/с</div>
+            </div>
           </div>
 
           <!-- Clean 2x2 Minimal Stage Overview -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
-            <div class="p-3.5 rounded border border-paper-border bg-paper">
-              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
-                <span>ФАЗА 1</span>
-                <span>1–3°C/с</span>
+            <div class="p-4 bg-paper rounded border border-paper-border space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-mono pb-1">
+                <span class="px-1.5 py-0.5 text-[10px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 1</span>
+                <span class="text-ink-muted font-mono text-xs">1–3°C/с</span>
               </div>
               <div class="font-semibold text-ink text-sm">Прогрев (Preheat)</div>
-              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+              <p class="text-[13px] text-ink-muted leading-snug">
                 Плавный подъем до 150°C для испарения легких фракций растворителя флюса.
               </p>
             </div>
-            <div class="p-3.5 rounded border border-paper-border bg-paper">
-              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
-                <span>ФАЗА 2</span>
-                <span>150–200°C</span>
+            <div class="p-4 bg-paper rounded border border-paper-border space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-mono pb-1">
+                <span class="px-1.5 py-0.5 text-[10px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 2</span>
+                <span class="text-ink-muted font-mono text-xs">150–200°C</span>
               </div>
               <div class="font-semibold text-ink text-sm">Активация (Soak)</div>
-              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+              <p class="text-[13px] text-ink-muted leading-snug">
                 Выравнивание температурного поля чипа и платы, удаление поверхностных оксидов.
               </p>
             </div>
-            <div class="p-3.5 rounded border border-paper-border bg-paper">
-              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
-                <span>ФАЗА 3</span>
-                <span class="text-ink font-semibold">Пик 235–245°C</span>
+            <div class="p-4 bg-[#fcfaf2] rounded border border-ink/40 space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-mono pb-1">
+                <span class="inline-block px-1.5 py-0.5 text-[10px] uppercase font-mono font-semibold text-ink border transform -rotate-[0.5deg]" style="border-radius: 255px 15px 225px / 15px 225px 15px 255px; background-color: rgb(236, 233, 223); border-color: rgb(220, 215, 203); color: rgb(28, 25, 23);">ФАЗА 3 · КЛЮЧЕВАЯ</span>
+                <span class="font-semibold text-ink font-mono text-xs">Пик 235–245°C</span>
               </div>
               <div class="font-semibold text-ink text-sm">Оплавление (Reflow)</div>
-              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+              <p class="text-[13px] text-ink-muted leading-snug">
                 Время TAL над ликвидусом 45–75 сек. Формирование интерметаллического слоя.
               </p>
             </div>

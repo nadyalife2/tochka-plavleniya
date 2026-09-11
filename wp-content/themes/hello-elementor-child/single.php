@@ -42,6 +42,8 @@ tailwind.config = {
 <style>
   body {
     background-color: #faf8f5 !important;
+    background-image: radial-gradient(#d3cdc2 0.9px, transparent 0.9px) !important;
+    background-size: 20px 20px !important;
     color: #141414 !important;
   }
   .logo { 
