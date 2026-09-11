@@ -129,62 +129,77 @@ tailwind.config = {
     background-color: #fef08a;
     color: #141414;
   }
-  /* HAND-DRAWN SKETCH HIGHLIGHTERS & MARKER STROKES */
+  /* REALISTIC HAND-DRAWN FELT-TIP MARKER STROKES (Vecteezy / PNG style) */
   mark, .marker-yellow {
-    background: linear-gradient(104deg, rgba(254, 240, 138, 0) 0.5%, rgba(254, 240, 138, 0.9) 2.5%, rgba(254, 240, 138, 0.95) 97%, rgba(254, 240, 138, 0) 99.5%);
-    padding: 0.12em 0.45em;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    position: relative;
+    display: inline;
+    background: transparent;
+    color: #141414;
+    padding: 0.18em 0.55em 0.22em 0.5em;
+    margin: 0 -0.15em;
     box-decoration-break: clone;
     -webkit-box-decoration-break: clone;
-    color: #141414;
-    display: inline;
-    font-weight: 500;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0.5 4.5 C 18 2, 48 5.5, 98.5 2.5 C 100 11, 98 18.5, 99.5 22 C 75 23.5, 30 20.5, 1.5 22 C 0 16, 1.5 8.5, 0.5 4.5 Z' fill='%23fef08a' fill-opacity='0.9'/%3E%3Cpath d='M3 7.5 C 25 5.5, 68 6, 96.5 5 C 97.5 12.5, 95 18, 97 20 C 70 21.5, 28 19.5, 4 19.5 Z' fill='%23fde047' fill-opacity='0.55'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    font-weight: 600;
   }
   html.dark mark, html.dark .marker-yellow {
-    background: linear-gradient(104deg, rgba(202, 138, 4, 0) 0.5%, rgba(202, 138, 4, 0.45) 2.5%, rgba(202, 138, 4, 0.5) 97%, rgba(202, 138, 4, 0) 99.5%);
     color: #fef08a;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0.5 4.5 C 18 2, 48 5.5, 98.5 2.5 C 100 11, 98 18.5, 99.5 22 C 75 23.5, 30 20.5, 1.5 22 C 0 16, 1.5 8.5, 0.5 4.5 Z' fill='%23ca8a04' fill-opacity='0.45'/%3E%3Cpath d='M3 7.5 C 25 5.5, 68 6, 96.5 5 C 97.5 12.5, 95 18, 97 20 C 70 21.5, 28 19.5, 4 19.5 Z' fill='%23eab308' fill-opacity='0.3'/%3E%3C/svg%3E");
   }
 
+  /* Hand-drawn yellow marker pill */
   .sketch-pill-yellow {
-    background: #fef08a;
-    border: 1px solid #eab308;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    padding: 0.15rem 0.55rem;
+    position: relative;
     display: inline-flex;
     align-items: center;
-    box-shadow: 1px 1px 0px rgba(0,0,0,0.08);
-    transform: rotate(-0.8deg);
+    background: transparent;
+    color: #141414;
+    padding: 0.22rem 0.75rem 0.26rem 0.7rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 4 C 20 1.5, 68 3, 98 2 C 100 11.5, 98 19.5, 99 25.5 C 72 26.5, 26 24.5, 1 25.5 C 0 16.5, 1.5 8, 1.5 4 Z' fill='%23fef08a' fill-opacity='0.95' stroke='%23ca8a04' stroke-width='0.9' stroke-dasharray='40 1 20 1' stroke-linecap='round'/%3E%3Cpath d='M4 7 C 28 5, 72 5.5, 95.5 5 C 96.5 12, 94.5 18.5, 96 21.5 C 68 22.5, 26 21.5, 3 21.5 Z' fill='%23fde047' fill-opacity='0.65'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    transform: rotate(-0.9deg);
     transition: transform 0.15s ease;
   }
   .sketch-pill-yellow:hover {
-    transform: rotate(0deg) scale(1.02);
+    transform: rotate(0deg) scale(1.03);
   }
   html.dark .sketch-pill-yellow {
-    background: rgba(202, 138, 4, 0.3);
-    border-color: #ca8a04;
     color: #fef08a;
-    box-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 4 C 20 1.5, 68 3, 98 2 C 100 11.5, 98 19.5, 99 25.5 C 72 26.5, 26 24.5, 1 25.5 C 0 16.5, 1.5 8, 1.5 4 Z' fill='%23ca8a04' fill-opacity='0.4' stroke='%23eab308' stroke-width='0.9' stroke-dasharray='40 1 20 1' stroke-linecap='round'/%3E%3Cpath d='M4 7 C 28 5, 72 5.5, 95.5 5 C 96.5 12, 94.5 18.5, 96 21.5 C 68 22.5, 26 21.5, 3 21.5 Z' fill='%23a16207' fill-opacity='0.4'/%3E%3C/svg%3E");
   }
 
+  /* Hand-drawn light-gray felt marker pill */
   .sketch-pill-gray {
-    background: #f3f0ea;
-    border: 1px solid #d3cdc2;
-    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
-    padding: 0.15rem 0.55rem;
+    position: relative;
     display: inline-flex;
     align-items: center;
-    box-shadow: 1px 1px 0px rgba(0,0,0,0.06);
-    transform: rotate(0.5deg);
+    background: transparent;
+    color: #141414;
+    padding: 0.22rem 0.75rem 0.26rem 0.7rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23e9e5dc' fill-opacity='0.95' stroke='%23b8b1a2' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%23ded8cd' fill-opacity='0.6'/%3E%3C/svg%3E");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+    transform: rotate(0.6deg);
     transition: transform 0.15s ease;
   }
   .sketch-pill-gray:hover {
-    transform: rotate(0deg) scale(1.02);
+    transform: rotate(0deg) scale(1.03);
   }
   html.dark .sketch-pill-gray {
-    background: #1e2330;
-    border-color: #373e52;
-    color: #e5e7eb;
-    box-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+    color: #f3f4f6;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23222735' fill-opacity='0.95' stroke='%233e465c' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%232c3346' fill-opacity='0.6'/%3E%3C/svg%3E");
+  }
+
+  /* Hand-drawn marker underline */
+  .marker-underline {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 12' preserveAspectRatio='none'%3E%3Cpath d='M1 8 C 25 3, 60 10, 99 5 C 75 11, 30 7, 2 10 Z' fill='%23facc15' fill-opacity='0.85'/%3E%3C/svg%3E");
+    background-position: 0 100%;
+    background-size: 100% 0.35em;
+    background-repeat: no-repeat;
+    padding-bottom: 0.1em;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
