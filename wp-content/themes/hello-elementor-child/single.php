@@ -100,6 +100,64 @@ tailwind.config = {
     font-size: 1.05em; 
     line-height: 0.9; 
   }
+
+  /* HAND-DRAWN SKETCH HIGHLIGHTERS & MARKER STROKES */
+  mark, .marker-yellow {
+    background: linear-gradient(104deg, rgba(254, 240, 138, 0) 0.5%, rgba(254, 240, 138, 0.9) 2.5%, rgba(254, 240, 138, 0.95) 97%, rgba(254, 240, 138, 0) 99.5%);
+    padding: 0.12em 0.45em;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    color: #141414;
+    display: inline;
+    font-weight: 500;
+  }
+  html.dark mark, html.dark .marker-yellow {
+    background: linear-gradient(104deg, rgba(202, 138, 4, 0) 0.5%, rgba(202, 138, 4, 0.45) 2.5%, rgba(202, 138, 4, 0.5) 97%, rgba(202, 138, 4, 0) 99.5%);
+    color: #fef08a;
+  }
+
+  .sketch-pill-yellow {
+    background: #fef08a;
+    border: 1px solid #eab308;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    padding: 0.15rem 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 1px 1px 0px rgba(0,0,0,0.08);
+    transform: rotate(-0.8deg);
+    transition: transform 0.15s ease;
+  }
+  .sketch-pill-yellow:hover {
+    transform: rotate(0deg) scale(1.02);
+  }
+  html.dark .sketch-pill-yellow {
+    background: rgba(202, 138, 4, 0.3);
+    border-color: #ca8a04;
+    color: #fef08a;
+    box-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+  }
+
+  .sketch-pill-gray {
+    background: #f3f0ea;
+    border: 1px solid #d3cdc2;
+    border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+    padding: 0.15rem 0.55rem;
+    display: inline-flex;
+    align-items: center;
+    box-shadow: 1px 1px 0px rgba(0,0,0,0.06);
+    transform: rotate(0.5deg);
+    transition: transform 0.15s ease;
+  }
+  .sketch-pill-gray:hover {
+    transform: rotate(0deg) scale(1.02);
+  }
+  html.dark .sketch-pill-gray {
+    background: #1e2330;
+    border-color: #373e52;
+    color: #e5e7eb;
+    box-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+  }
 </style>
 
 <main class="w-full flex-grow pt-8 pb-20">

@@ -150,6 +150,64 @@ foreach ($articles as $article) {
     .sketch-border {
       border-radius: 255px 15px 225px / 15px 225px 15px 255px;
     }
+
+    /* HAND-DRAWN SKETCH HIGHLIGHTERS & MARKER STROKES */
+    mark, .marker-yellow {
+      background: linear-gradient(104deg, rgba(254, 240, 138, 0) 0.5%, rgba(254, 240, 138, 0.9) 2.5%, rgba(254, 240, 138, 0.95) 97%, rgba(254, 240, 138, 0) 99.5%);
+      padding: 0.12em 0.45em;
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+      color: #141414;
+      display: inline;
+      font-weight: 500;
+    }
+    html.dark mark, html.dark .marker-yellow {
+      background: linear-gradient(104deg, rgba(202, 138, 4, 0) 0.5%, rgba(202, 138, 4, 0.45) 2.5%, rgba(202, 138, 4, 0.5) 97%, rgba(202, 138, 4, 0) 99.5%);
+      color: #fef08a;
+    }
+
+    .sketch-pill-yellow {
+      background: #fef08a;
+      border: 1px solid #eab308;
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      padding: 0.15rem 0.55rem;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 1px 1px 0px rgba(0,0,0,0.08);
+      transform: rotate(-0.8deg);
+      transition: transform 0.15s ease;
+    }
+    .sketch-pill-yellow:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+    html.dark .sketch-pill-yellow {
+      background: rgba(202, 138, 4, 0.3);
+      border-color: #ca8a04;
+      color: #fef08a;
+      box-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+    }
+
+    .sketch-pill-gray {
+      background: #f3f0ea;
+      border: 1px solid #d3cdc2;
+      border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+      padding: 0.15rem 0.55rem;
+      display: inline-flex;
+      align-items: center;
+      box-shadow: 1px 1px 0px rgba(0,0,0,0.06);
+      transform: rotate(0.5deg);
+      transition: transform 0.15s ease;
+    }
+    .sketch-pill-gray:hover {
+      transform: rotate(0deg) scale(1.02);
+    }
+    html.dark .sketch-pill-gray {
+      background: #1e2330;
+      border-color: #373e52;
+      color: #e5e7eb;
+      box-shadow: 1px 1px 0px rgba(0,0,0,0.3);
+    }
   </style>
 </head>
 <body class="font-sans min-h-screen flex flex-col justify-between text-[15px] leading-[1.65]">
@@ -534,22 +592,22 @@ foreach ($articles as $article) {
             <div class="space-y-2 font-mono text-xs">
               <div class="flex items-center justify-between pb-1.5 border-b border-paper-border">
                 <span class="text-ink-muted">SAC305 (ликвидус)</span>
-                <span class="font-bold text-ink px-2 py-0.5 bg-paper-subtle border border-paper-border-dark text-[11px] inline-block sketch-border" style="transform: rotate(0.4deg);">217°C</span>
+                <span class="sketch-pill-gray text-ink font-bold text-[11px]">217°C</span>
               </div>
               <div class="flex items-center justify-between pb-1.5 border-b border-paper-border">
                 <span class="text-ink-muted">ПОС-61 (эвтектика)</span>
-                <span class="font-bold text-ink px-2 py-0.5 bg-[#fef08a] dark:bg-[#ca8a04]/40 border border-[#fde047] dark:border-[#ca8a04] text-[11px] inline-block sketch-border" style="transform: rotate(-0.5deg);">183°C</span>
+                <span class="sketch-pill-yellow text-ink font-bold text-[11px]">183°C</span>
               </div>
               <div class="flex items-center justify-between pb-1.5 border-b border-paper-border">
                 <span class="text-ink-muted">Sn42Bi58 (низкотемп.)</span>
-                <span class="font-medium text-ink text-[11px]">138°C</span>
+                <span class="sketch-pill-gray text-ink font-medium text-[11px]">138°C</span>
               </div>
               <div class="flex items-center justify-between p-2 bg-paper-subtle border border-paper-border rounded">
                 <span class="text-ink font-medium flex items-center gap-1.5">
                   <span class="w-1.5 h-1.5 rounded-full bg-ink"></span>
                   Макс. пик кристалла
                 </span>
-                <span class="font-bold text-ink px-2.5 py-0.5 bg-paper border border-paper-border-dark text-[11px] inline-block shadow-sm sketch-border" style="transform: rotate(-0.6deg);">245°C</span>
+                <span class="sketch-pill-gray text-ink font-bold text-[11px]">245°C</span>
               </div>
             </div>
 
