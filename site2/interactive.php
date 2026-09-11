@@ -1,98 +1,396 @@
 <?php
-$page_title = "Инструменты и Калькуляторы — ТЧП";
+$page_title = "Интерактивный верстак — Калькуляторы и реестр сплавов";
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/articles-data.php';
-
-$extra_css = ['article.css'];
-$extra_js  = ['flux-calc.js', 'solder-quiz.js', 'solder-table.js'];
-include __DIR__ . '/includes/header.php';
 ?>
+<!DOCTYPE html>
+<html lang="ru" class="light">
+<head>
+  <meta charset="UTF-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title><?= e($page_title) ?> — ТОЧКА ПЛАВЛЕНИЯ</title>
+  <meta name="description" content="Интерактивный верстак инженера: калькулятор расхода флюса, квиз по дефектам монтажа и интерактивная таблица припоев."/>
 
-<section class="article-hero" style="background:var(--accent-yellow);">
-    <span class="tag">Верстак ТЧП</span>
-    <h1 class="wavy-underline">Инструменты инженера</h1>
-    <p style="font-family:var(--font-mono); font-weight:700; margin-top:1rem;">Калькулятор расхода флюса, интерактивный тест и таблица припоев.</p>
-</section>
+  <!-- Immediate Theme Init Script -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('tp_theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+      } else {
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
 
-<!-- КАЛЬКУЛЯТОР ФЛЮСА -->
-<div class="interactive-widget" id="calculator" style="margin-top:0;">
-    <h2>🧮 01 / Калькулятор расхода флюса</h2>
-    <p style="margin-top:0.5rem; color:var(--text-muted);">Укажите площадь вашей платы и тип используемой химии.</p>
-    
-    <div class="widget-form">
-        <input type="number" id="flux-area" class="widget-input" placeholder="Площадь платы (см²)" min="1">
-        <select id="flux-type" class="widget-input">
-            <option value="rma">RMA-223 (канифольный)</option>
-            <option value="nc">NC-559 (безотмывочный)</option>
-        </select>
-        <button id="calc-flux-btn" class="widget-button">Рассчитать дозировку ⚡</button>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            paper: 'var(--color-paper)',
+            'paper-subtle': 'var(--color-paper-subtle)',
+            'paper-border': 'var(--color-paper-border)',
+            'paper-border-dark': 'var(--color-paper-border-dark)',
+            ink: 'var(--color-ink)',
+            'ink-muted': 'var(--color-ink-muted)',
+            'ink-faint': 'var(--color-ink-faint)',
+            accent: 'var(--color-accent)',
+            'accent-light': 'var(--color-accent-light)',
+            'accent-muted': 'var(--color-accent-muted)',
+          },
+          fontFamily: {
+            sans: ['Space Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+            serif: ['Newsreader', 'Georgia', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --color-paper: #faf8f5;
+      --color-paper-subtle: #f3f0ea;
+      --color-paper-border: #e6e2da;
+      --color-paper-border-dark: #d3cdc2;
+      --color-ink: #141414;
+      --color-ink-muted: #5c5850;
+      --color-ink-faint: #999388;
+      --color-accent: #2563eb;
+      --color-accent-light: #dbeafe;
+      --color-accent-muted: #1d4ed8;
+      --bg-color: #faf8f5;
+      --dot-color: #d3cdc2;
+      --card-bg: #ffffff;
+      --card-border: #e6e2da;
+    }
+
+    html.dark {
+      --color-paper: #18191b;
+      --color-paper-subtle: #202226;
+      --color-paper-border: #2e3238;
+      --color-paper-border-dark: #40454e;
+      --color-ink: #f3f4f6;
+      --color-ink-muted: #a3aab5;
+      --color-ink-faint: #6c7380;
+      --color-accent: #60a5fa;
+      --color-accent-light: #1e293b;
+      --color-accent-muted: #93c5fd;
+      --bg-color: #121315;
+      --dot-color: #2b2e34;
+      --card-bg: #1c1d21;
+      --card-border: #2e3238;
+    }
+
+    body {
+      background-color: var(--bg-color) !important;
+      background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px) !important;
+      background-size: 20px 20px !important;
+      color: var(--color-ink);
+      font-family: 'Space Grotesk', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .bg-card {
+      background-color: var(--card-bg);
+      border-color: var(--card-border);
+    }
+
+    .sketch-border {
+      border-radius: 255px 15px 225px / 15px 225px 15px 255px;
+    }
+
+    .sketch-pill-yellow {
+      background: linear-gradient(104deg, rgba(254, 240, 138, 0.4) 0%, rgba(254, 240, 138, 0.9) 15%, rgba(253, 224, 71, 0.95) 85%, rgba(254, 240, 138, 0.4) 100%);
+      border: 1px solid rgba(202, 138, 4, 0.5);
+      border-radius: 255px 15px 225px / 15px 225px 15px 255px;
+      padding: 0.15rem 0.6rem;
+      display: inline-block;
+    }
+    html.dark .sketch-pill-yellow {
+      background: linear-gradient(104deg, rgba(161, 98, 7, 0.3) 0%, rgba(161, 98, 7, 0.7) 15%, rgba(202, 138, 4, 0.8) 85%, rgba(161, 98, 7, 0.3) 100%);
+      border: 1px solid rgba(234, 179, 8, 0.4);
+      color: #fef08a !important;
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+      color: var(--color-ink);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+    .logo span {
+      color: #eab308;
+      margin: 0 1px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Header -->
+  <header class="w-full border-b border-paper-border bg-paper/90 sticky top-0 z-40 backdrop-blur-sm">
+    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-6">
+        <a class="logo" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
+        <nav class="hidden md:flex items-center gap-5 text-[13px] font-mono text-ink-muted">
+          <a class="hover:text-ink transition-colors" href="index.php#articles">Статьи</a>
+          <a class="text-ink font-semibold" href="interactive.php">Верстак</a>
+          <a class="hover:text-ink transition-colors" href="interactive.php#table">Сплавы</a>
+          <a class="hover:text-ink transition-colors" href="article.php#simulator">Симулятор BGA</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" type="button" class="p-1.5 px-2.5 rounded border border-paper-border bg-paper hover:border-paper-border-dark text-ink font-mono text-xs flex items-center gap-1.5 transition-colors" title="Переключить тему">
+          <span class="dark:hidden">🌙</span>
+          <span class="hidden dark:inline">☀️</span>
+          <span class="text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+        </button>
+
+        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="index.php">
+          <span>Журнал</span>
+          <span class="text-[10px]">↗</span>
+        </a>
+      </div>
     </div>
-    <div id="flux-result" class="callout tip" style="display:none; margin-top:1.5rem;"></div>
-</div>
+  </header>
 
-<!-- ТЕСТ ПО ПАЙКЕ -->
-<div class="article-content" id="quiz" style="margin-bottom:3rem;">
-    <h2>🎯 02 / Практический тест по пайке</h2>
-    <p>Проверьте свои знания верстачных ситуаций:</p>
-    
-    <div id="quiz-wrap" style="margin-top:1.5rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; font-family:var(--font-mono); font-size:0.85rem; color:var(--text-muted);">
-            <span id="quiz-counter">Вопрос 1 из 10</span>
-        </div>
-        <div style="width:100%; height:6px; background:var(--bg); border:1px solid var(--border); border-radius:3px; overflow:hidden; margin-bottom:1.5rem;">
-            <div id="quiz-progress" style="width:10%; height:100%; background:var(--accent-orange); transition:width 0.3s ease;"></div>
-        </div>
+  <!-- Main Container -->
+  <main class="w-full flex-grow pt-8 pb-20">
+    <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
+      
+      <!-- Breadcrumbs -->
+      <nav class="text-[12px] font-mono text-ink-faint mb-6 flex items-center gap-1.5">
+        <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
+        <span>→</span>
+        <span class="text-ink">Интерактивный верстак инженера</span>
+      </nav>
 
-        <div id="quiz-question" style="font-family:var(--font-serif); font-size:1.3rem; font-weight:800; margin-bottom:1.25rem;">
-            Загрузка вопроса...
+      <!-- Hero Header -->
+      <div class="border-b border-paper-border pb-8 mb-10 space-y-3">
+        <div class="flex items-center gap-2">
+          <span class="sketch-pill-yellow text-ink font-mono text-xs font-bold">LAB TOOLS v2.4</span>
+          <span class="text-xs font-mono text-ink-faint">ИНЖЕНЕРНЫЙ РАСЧЕТ И СПРАВОЧНИКИ</span>
         </div>
-        <div id="quiz-options" style="display:flex; flex-direction:column; gap:0.75rem;"></div>
-        <button id="quiz-next" class="btn-primary" style="display:none; margin-top:1.5rem;">Следующий вопрос →</button>
+        <h1 class="text-3xl sm:text-4xl font-bold text-ink tracking-tight font-sans">
+          Интерактивный верстак инженера-электронщика
+        </h1>
+        <p class="text-sm sm:text-base text-ink-muted max-w-2xl font-serif italic">
+          Быстрые инженерные расчеты расхода флюса, интерактивный поиск сплавов по ликвидусу и диагностика причин брака пайки.
+        </p>
+      </div>
+
+      <!-- Grid of Tools -->
+      <div class="space-y-12">
+
+        <!-- 01: Калькулятор флюса -->
+        <section id="calculator" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 relative">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-paper-border">
+            <div>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">01 // ДОЗИРОВКА ХИМИИ</span>
+              <h2 class="text-xl font-bold text-ink mt-0.5">Калькулятор расхода флюса и паяльной пасты</h2>
+            </div>
+            <span class="text-xs font-mono text-ink-faint">IPC-7095C Standard</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div>
+              <label class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Площадь платы (см²):</label>
+              <input type="number" id="flux-area" value="35" min="1" max="500" class="w-full px-3.5 py-2 rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm focus:outline-none focus:border-ink"/>
+              <span class="text-[11px] text-ink-faint font-mono mt-1 block">Пример: 35 см² (плата видеокарты / роутера)</span>
+            </div>
+
+            <div>
+              <label class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Тип флюса / монтажа:</label>
+              <select id="flux-type" class="w-full px-3.5 py-2 rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm focus:outline-none focus:border-ink">
+                <option value="bga_nc">Безотмывочный гель BGA (NC-559 / RMA-218)</option>
+                <option value="smd_rma">Канифольный средней активности (RMA-223)</option>
+                <option value="paste_sac">Паяльная паста SAC305 (Sn96.5Ag3Cu0.5)</option>
+                <option value="clean_ws">Водосмывной флюс высокой активности (WS)</option>
+              </select>
+              <span class="text-[11px] text-ink-faint font-mono mt-1 block">Выбор определяет удельную плотность слоя</span>
+            </div>
+
+            <div class="flex items-end">
+              <button id="calc-flux-btn" type="button" class="w-full px-4 py-2.5 bg-ink text-paper font-mono font-semibold text-xs rounded hover:opacity-90 transition-opacity border border-paper-border-dark">
+                Рассчитать дозировку ⚡
+              </button>
+            </div>
+          </div>
+
+          <!-- Result output -->
+          <div id="flux-result" class="p-4 rounded-lg bg-paper-subtle border border-paper-border font-mono text-xs space-y-2">
+            <div class="text-ink font-bold flex items-center justify-between">
+              <span>РЕЗУЛЬТАТ РАСЧЕТА ДОЗИРОВКИ:</span>
+              <span class="text-accent font-bold" id="res-volume">~0.18 мл</span>
+            </div>
+            <p class="text-ink-muted leading-relaxed" id="res-desc">
+              Для платы 35 см² при реболлинге BGA рекомендуется наносить тонкий слой толщиной 50-70 мкм. Избыток флюса вызывает вскипание и смещение чипа.
+            </p>
+          </div>
+        </section>
+
+        <!-- 02: Таблица сплавов -->
+        <section id="table" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+            <div>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">02 // СПРАВОЧНИК МЕТАЛЛОВ</span>
+              <h2 class="text-xl font-bold text-ink mt-0.5">Реестр сплавов и температур плавления</h2>
+            </div>
+            <div class="w-full sm:w-64">
+              <input type="text" id="solder-search" placeholder="Поиск (ПОС-61, SAC305, 183°C)..." class="w-full px-3 py-1.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-ink"/>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-mono text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-paper-border bg-paper-subtle text-ink">
+                  <th class="py-2.5 px-3">Марка сплава</th>
+                  <th class="py-2.5 px-3">Химический состав</th>
+                  <th class="py-2.5 px-3">T° солидус / ликвидус</th>
+                  <th class="py-2.5 px-3">Стандарт</th>
+                  <th class="py-2.5 px-3">Применение</th>
+                </tr>
+              </thead>
+              <tbody id="solder-tbody" class="divide-y divide-paper-border text-ink-muted">
+                <tr class="hover:bg-paper-subtle/50 transition-colors">
+                  <td class="py-2.5 px-3 font-bold text-ink">ПОС-61 (Эвтектика)</td>
+                  <td class="py-2.5 px-3">61% Sn, 39% Pb</td>
+                  <td class="py-2.5 px-3 font-bold text-ink">183°C</td>
+                  <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-paper border border-paper-border text-[10px]">ГОСТ 21931</span></td>
+                  <td class="py-2.5 px-3">Ремонт РЭА, монтаж THT и SMD компонентов</td>
+                </tr>
+                <tr class="hover:bg-paper-subtle/50 transition-colors">
+                  <td class="py-2.5 px-3 font-bold text-ink">SAC305 (Бессвинец)</td>
+                  <td class="py-2.5 px-3">96.5% Sn, 3.0% Ag, 0.5% Cu</td>
+                  <td class="py-2.5 px-3 font-bold text-ink">217°C – 220°C</td>
+                  <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-paper border border-paper-border text-[10px] text-green-700 dark:text-green-400">RoHS</span></td>
+                  <td class="py-2.5 px-3">Заводской монтаж BGA, материнские платы, смартфоны</td>
+                </tr>
+                <tr class="hover:bg-paper-subtle/50 transition-colors">
+                  <td class="py-2.5 px-3 font-bold text-ink">Sn42Bi58 (Низкотемп.)</td>
+                  <td class="py-2.5 px-3">42% Sn, 58% Bi</td>
+                  <td class="py-2.5 px-3 font-bold text-ink">138°C</td>
+                  <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-paper border border-paper-border text-[10px] text-green-700 dark:text-green-400">RoHS</span></td>
+                  <td class="py-2.5 px-3">Пайка термочувствительных LED-матриц и пластиковых разъемов</td>
+                </tr>
+                <tr class="hover:bg-paper-subtle/50 transition-colors">
+                  <td class="py-2.5 px-3 font-bold text-ink">Сплав Розе</td>
+                  <td class="py-2.5 px-3">50% Bi, 25% Pb, 25% Sn</td>
+                  <td class="py-2.5 px-3 font-bold text-ink">94°C</td>
+                  <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-paper border border-paper-border text-[10px]">ГОСТ 21931</span></td>
+                  <td class="py-2.5 px-3">Только демонтаж разъемов и лужение плат в кипятке</td>
+                </tr>
+                <tr class="hover:bg-paper-subtle/50 transition-colors">
+                  <td class="py-2.5 px-3 font-bold text-ink">Сплав Вуда</td>
+                  <td class="py-2.5 px-3">50% Bi, 25% Pb, 12.5% Sn, 12.5% Cd</td>
+                  <td class="py-2.5 px-3 font-bold text-ink">68°C – 72°C</td>
+                  <td class="py-2.5 px-3"><span class="px-1.5 py-0.5 rounded bg-paper border border-paper-border text-[10px] text-red-600">Toxic (Cd)</span></td>
+                  <td class="py-2.5 px-3">Специальный прецизионный демонтаж в вытяжном шкафу</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
     </div>
+  </main>
 
-    <div id="quiz-result" style="display:none; margin-top:1.5rem; text-align:center; padding:2rem; background:var(--bg-card); border:2px solid var(--border); border-radius:8px;">
-        <h3 style="font-size:1.5rem; margin-bottom:0.5rem;">Результат теста</h3>
-        <div id="quiz-score" style="font-family:var(--font-mono); font-size:2.5rem; font-weight:800; color:var(--accent-orange); margin-bottom:1rem;">10 / 10</div>
-        <p id="quiz-score-label" style="font-size:1rem; color:var(--text-muted); margin-bottom:1.5rem;"></p>
-        <button id="quiz-restart" class="btn-primary">Пройти заново 🔄</button>
+  <!-- Footer -->
+  <footer class="w-full border-t border-paper-border bg-paper py-8 text-ink-muted text-xs font-mono">
+    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-2">
+        <a class="logo text-sm" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
+        <span class="text-ink-faint">·</span>
+        <span class="text-ink-faint text-[11px]">Инженерная документация</span>
+      </div>
+      <div class="flex items-center gap-4 text-[12px]">
+        <a class="hover:text-ink transition-colors" href="index.php">Статьи</a>
+        <a class="hover:text-ink transition-colors" href="privacy.php">Конфиденциальность</a>
+        <a class="hover:text-ink transition-colors" href="terms.php">Соглашение</a>
+        <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
+      </div>
     </div>
-</div>
+  </footer>
 
-<!-- ТАБЛИЦА ПРИПОЕВ -->
-<div class="article-content" id="table">
-    <h2>📊 03 / Таблица свойств припоев</h2>
-    <input type="text" id="solder-search" class="widget-input" placeholder="Поиск по названию или составу…" style="margin:1rem 0; width:100%;">
+  <!-- Cookie Consent Banner -->
+  <?php require_once __DIR__ . '/includes/cookie-banner.php'; ?>
 
-    <table id="solder-table" style="width:100%; border-collapse:collapse; margin-top:1rem;">
-        <thead>
-            <tr style="background:var(--accent-yellow);">
-                <th style="padding:0.75rem; border:2px solid var(--border); text-align:left;">Марка</th>
-                <th style="padding:0.75rem; border:2px solid var(--border); text-align:left;">Состав</th>
-                <th style="padding:0.75rem; border:2px solid var(--border); text-align:left;">T° плавления</th>
-                <th style="padding:0.75rem; border:2px solid var(--border); text-align:left;">RoHS</th>
-            </tr>
-        </thead>
-        <tbody id="solder-rows">
-            <tr>
-                <td style="padding:0.75rem; border:2px solid var(--border);"><strong>ПОС-61</strong></td>
-                <td style="padding:0.75rem; border:2px solid var(--border);">63% Sn, 37% Pb</td>
-                <td style="padding:0.75rem; border:2px solid var(--border);">183°C</td>
-                <td style="padding:0.75rem; border:2px solid var(--border);"><span class="tag" style="background:var(--accent-peach); color:var(--text-main); margin:0;">Свинец</span></td>
-            </tr>
-            <tr>
-                <td style="padding:0.75rem; border:2px solid var(--border);"><strong>SAC305</strong></td>
-                <td style="padding:0.75rem; border:2px solid var(--border);">96.5% Sn, 3% Ag, 0.5% Cu</td>
-                <td style="padding:0.75rem; border:2px solid var(--border);">217°C</td>
-                <td style="padding:0.75rem; border:2px solid var(--border);"><span class="tag" style="background:var(--accent-green); color:var(--text-main); margin:0;">RoHS OK</span></td>
-            </tr>
-            <tr>
-                <td style="padding:0.75rem; border:2px solid var(--border);"><strong>Сплав Розе</strong></td>
-                <td style="padding:0.75rem; border:2px solid var(--border);">50% Bi, 25% Pb, 25% Sn</td>
-                <td style="padding:0.75rem; border:2px solid var(--border);">94°C</td>
-                <td style="padding:0.75rem; border:2px solid var(--border);"><span class="tag" style="background:var(--accent-peach); color:var(--text-main); margin:0;">Демонтаж</span></td>
-            </tr>
-        </tbody>
-    </table>
-</div>
+  <!-- Scripts -->
+  <script>
+    (function() {
+      // Theme Toggle
+      const toggle = document.getElementById('theme-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', function() {
+          const isDark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
+        });
+      }
 
-<?php include __DIR__ . '/includes/footer.php'; ?>
+      // Flux Calculator
+      const calcBtn = document.getElementById('calc-flux-btn');
+      if (calcBtn) {
+        calcBtn.addEventListener('click', function() {
+          const area = parseFloat(document.getElementById('flux-area').value) || 35;
+          const type = document.getElementById('flux-type').value;
+          let vol = 0;
+          let desc = '';
+
+          if (type === 'bga_nc') {
+            vol = (area * 0.005).toFixed(2);
+            desc = `Для ${area} см² (BGA реболлинг) требуется ~${vol} мл флюса-геля. Наносите равномерно шпателем толщиной 50-70 мкм.`;
+          } else if (type === 'smd_rma') {
+            vol = (area * 0.008).toFixed(2);
+            desc = `Для ${area} см² (SMD монтаж) требуется ~${vol} мл. Требуется обязательная отмывка изопропиловым спиртом после пайки.`;
+          } else if (type === 'paste_sac') {
+            vol = (area * 0.015).toFixed(2);
+            desc = `Для ${area} см² нанесения через трафарет потребуется ~${vol} г паяльной пасты SAC305.`;
+          } else {
+            vol = (area * 0.006).toFixed(2);
+            desc = `Для ${area} см² водосмывного флюса требуется ~${vol} мл. Обязательна деионизированная промывка в УЗ-ванне.`;
+          }
+
+          document.getElementById('res-volume').textContent = `~${vol} мл/г`;
+          document.getElementById('res-desc').textContent = desc;
+        });
+      }
+
+      // Solder Search Filter
+      const searchInput = document.getElementById('solder-search');
+      if (searchInput) {
+        searchInput.addEventListener('input', function() {
+          const q = this.value.toLowerCase().trim();
+          const rows = document.querySelectorAll('#solder-tbody tr');
+          rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(q) ? '' : 'none';
+          });
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>
