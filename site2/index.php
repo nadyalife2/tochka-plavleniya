@@ -261,9 +261,9 @@ foreach ($articles as $article) {
           <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono font-medium">Тема</span>
         </button>
 
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="https://t.me/" target="_blank" rel="noopener">
-          <span>Клуб / Telegram</span>
-          <span class="text-[10px]">↗</span>
+        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
+          <span>Верстак / Тулзы</span>
+          <span class="text-[10px]">⚙</span>
         </a>
       </div>
     </div>
@@ -574,13 +574,13 @@ foreach ($articles as $article) {
                 <span class="w-2 h-2 bg-ink rounded-full inline-block"></span>
                 Лаборатория ТЧП
               </div>
-              <span class="text-[10px] text-ink bg-paper-subtle border border-paper-border-dark px-2 py-0.5 font-mono font-bold inline-block sketch-border" style="transform: rotate(0.6deg);">LIVE</span>
+              <span class="text-[10px] text-ink bg-paper-subtle border border-paper-border-dark px-2 py-0.5 font-mono font-bold inline-block sketch-border" style="transform: rotate(0.6deg);">OPEN</span>
             </div>
             <p class="text-ink-muted leading-relaxed">
-              Практические замеры, отчеты дефектов пайки и тесты термоинтерфейсов в инженерном канале.
+              Практические замеры, отчеты дефектов пайки и тесты термоинтерфейсов в открытой базе знаний.
             </p>
-            <a class="inline-block pt-1 font-mono text-[11.5px] font-semibold text-ink underline decoration-ink decoration-2 hover:decoration-ink-muted" href="https://t.me/" target="_blank" rel="noopener">
-              Канал в Telegram →
+            <a class="inline-block pt-1 font-mono text-[11.5px] font-semibold text-ink underline decoration-ink decoration-2 hover:decoration-ink-muted" href="interactive.php">
+              Интерактивные расчеты →
             </a>
           </div>
 
@@ -648,14 +648,14 @@ foreach ($articles as $article) {
 
       </div>
 
-      <!-- Bottom Telegram CTA -->
+      <!-- Bottom Interactive CTA -->
       <div class="mt-12 border border-paper-border rounded-lg bg-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-0.5">
-          <div class="font-semibold text-sm text-ink">Инженерный справочник по пайке BGA</div>
-          <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в нашем канале.</p>
+          <div class="font-semibold text-sm text-ink">Инженерный справочник и калькуляторы ТЧП</div>
+          <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в интерактивном верстаке.</p>
         </div>
-        <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shrink-0 shadow-sm" href="https://t.me/" target="_blank" rel="noopener">
-          <span>Забрать в Telegram →</span>
+        <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shrink-0 shadow-sm" href="interactive.php">
+          <span>Открыть калькуляторы →</span>
         </a>
       </div>
 
@@ -683,7 +683,7 @@ foreach ($articles as $article) {
         <a class="hover:text-ink transition-colors" href="interactive.php#table">Реестр сплавов</a>
         <a class="hover:text-ink transition-colors" href="article.php#simulator">Калькулятор</a>
         <a class="hover:text-ink transition-colors" href="article.php">Регламенты</a>
-        <a class="hover:text-ink transition-colors" href="https://t.me/" target="_blank" rel="noopener">Telegram</a>
+        <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
       </div>
     </div>
   </footer>

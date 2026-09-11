@@ -272,9 +272,9 @@ tailwind.config = {
         <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono font-medium">Тема</span>
       </button>
 
-      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="https://t.me/" target="_blank" rel="noopener">
-        <span>Клуб / Telegram</span>
-        <span class="text-[10px]">↗</span>
+      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
+        <span>Верстак / Тулзы</span>
+        <span class="text-[10px]">⚙</span>
       </a>
     </div>
   </div>
@@ -778,14 +778,14 @@ tailwind.config = {
           </div>
         </section>
 
-        <!-- Telegram Pill Box (tochkicamp style bottom CTA) -->
+        <!-- Interactive Tools Box (tochkicamp style bottom CTA) -->
         <div class="border border-paper-border rounded-lg bg-paper p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="space-y-0.5">
-            <div class="font-semibold text-sm text-ink">Инженерный справочник по пайке BGA</div>
-            <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в нашем канале.</p>
+            <div class="font-semibold text-sm text-ink">Инженерный справочник и калькуляторы ТЧП</div>
+            <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в интерактивном верстаке.</p>
           </div>
-          <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-ink bg-ink text-paper text-xs font-mono font-medium rounded hover:bg-ink-muted transition-colors shrink-0 shadow-sm" href="https://t.me/" target="_blank" rel="noopener">
-            <span>Забрать в Telegram →</span>
+          <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-ink bg-ink text-paper text-xs font-mono font-medium rounded hover:bg-ink-muted transition-colors shrink-0 shadow-sm" href="interactive.php">
+            <span>Открыть калькуляторы →</span>
           </a>
         </div>
 
@@ -832,17 +832,17 @@ tailwind.config = {
           </nav>
         </div>
 
-        <!-- Telegram / Lab block -->
+        <!-- Open Lab block -->
         <div class="border border-paper-border bg-paper-subtle/50 p-4 rounded-lg space-y-2 text-xs">
           <div class="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-ink">
             <span class="w-2 h-2 bg-ink rounded-full inline-block"></span>
             Лаборатория ТЧП
           </div>
           <p class="text-ink-muted leading-relaxed">
-            Практические заметки, профили реболлинга и тесты термоинтерфейсов в инженерном канале.
+            Практические заметки, профили реболлинга и тесты термоинтерфейсов в открытой базе знаний.
           </p>
-          <a class="inline-block pt-1 font-mono text-[11.5px] font-semibold text-ink underline decoration-paper-border-dark" href="https://t.me/" target="_blank" rel="noopener">
-            Канал в Telegram →
+          <a class="inline-block pt-1 font-mono text-[11.5px] font-semibold text-ink underline decoration-paper-border-dark" href="interactive.php">
+            Интерактивные расчеты →
           </a>
         </div>
 
@@ -875,8 +875,8 @@ tailwind.config = {
       <a class="hover:text-ink transition-colors" href="index.php">Статьи</a>
       <a class="hover:text-ink transition-colors" href="interactive.php#solder-table">Реестр сплавов</a>
       <a class="hover:text-ink transition-colors" href="interactive.php">Калькулятор</a>
-      <a class="hover:text-ink transition-colors" href="privacy.php">Конфиденциальность</a>
-      <a class="hover:text-ink transition-colors" href="https://t.me/" target="_blank" rel="noopener">Telegram</a>
+      <a class="hover:text-ink transition-colors" href="index.php">О проекте</a>
+      <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
     </div>
   </div>
 </footer>
