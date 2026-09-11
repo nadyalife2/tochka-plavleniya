@@ -874,12 +874,15 @@ tailwind.config = {
     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
       <a class="hover:text-ink transition-colors" href="index.php">Статьи</a>
       <a class="hover:text-ink transition-colors" href="interactive.php#solder-table">Реестр сплавов</a>
-      <a class="hover:text-ink transition-colors" href="interactive.php">Калькулятор</a>
-      <a class="hover:text-ink transition-colors" href="index.php">О проекте</a>
+      <a class="hover:text-ink transition-colors" href="privacy.php">Конфиденциальность</a>
+      <a class="hover:text-ink transition-colors" href="terms.php">Соглашение</a>
       <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
     </div>
   </div>
 </footer>
+
+<!-- Cookie Consent Banner -->
+<?php require_once __DIR__ . '/includes/cookie-banner.php'; ?>
 
 <!-- Interactive Simulator & UX Scripts (Stitch code) -->
 <script>

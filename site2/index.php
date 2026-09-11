@@ -681,12 +681,15 @@ foreach ($articles as $article) {
       <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
         <a class="hover:text-ink transition-colors" href="index.php#articles">Статьи</a>
         <a class="hover:text-ink transition-colors" href="interactive.php#table">Реестр сплавов</a>
-        <a class="hover:text-ink transition-colors" href="article.php#simulator">Калькулятор</a>
-        <a class="hover:text-ink transition-colors" href="article.php">Регламенты</a>
+        <a class="hover:text-ink transition-colors" href="privacy.php">Конфиденциальность</a>
+        <a class="hover:text-ink transition-colors" href="terms.php">Соглашение</a>
         <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
       </div>
     </div>
   </footer>
+
+  <!-- Cookie Consent Banner -->
+  <?php require_once __DIR__ . '/includes/cookie-banner.php'; ?>
 
   <!-- Theme Toggle JS -->
   <script>
