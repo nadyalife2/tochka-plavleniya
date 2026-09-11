@@ -29,6 +29,19 @@ $faq_items = [
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title><?= e($article['title']) ?> — ТОЧКА ПЛАВЛЕНИЯ</title>
+
+<!-- Immediate Theme Init Script (Zero FOUC) -->
+<script>
+  (function() {
+    const saved = localStorage.getItem('tp_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  })();
+</script>
 <meta name="description" content="<?= e($article['excerpt']) ?>"/>
 
 <!-- OpenGraph -->
@@ -47,19 +60,21 @@ $faq_items = [
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script>
 tailwind.config = {
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        paper: '#faf8f5',
-        'paper-subtle': '#f3f0ea',
-        'paper-border': '#e6e2da',
-        'paper-border-dark': '#d3cdc2',
-        ink: '#141414',
-        'ink-muted': '#6b665f',
-        'ink-faint': '#9e988f',
+        paper: 'var(--color-paper)',
+        'paper-subtle': 'var(--color-paper-subtle)',
+        'paper-border': 'var(--color-paper-border)',
+        'paper-border-dark': 'var(--color-paper-border-dark)',
+        ink: 'var(--color-ink)',
+        'ink-muted': 'var(--color-ink-muted)',
+        'ink-faint': 'var(--color-ink-faint)',
         highlight: '#fef9c3',
         'highlight-strong': '#fef08a',
-        callout: '#fcfaf2'
+        callout: 'var(--color-callout)',
+        card: 'var(--color-card)'
       },
       fontFamily: {
         sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
@@ -73,13 +88,42 @@ tailwind.config = {
 </script>
 
 <style>
+  :root {
+    --color-paper: #faf8f5;
+    --color-paper-subtle: #f3f0ea;
+    --color-paper-border: #e6e2da;
+    --color-paper-border-dark: #d3cdc2;
+    --color-ink: #141414;
+    --color-ink-muted: #6b665f;
+    --color-ink-faint: #9e988f;
+    --color-callout: #fcfaf2;
+    --color-card: rgba(255, 255, 255, 0.75);
+    --dot-color: #d3cdc2;
+    --bg-color: #faf8f5;
+  }
+
+  html.dark {
+    --color-paper: #12141a;
+    --color-paper-subtle: #191c24;
+    --color-paper-border: #282d3b;
+    --color-paper-border-dark: #373e52;
+    --color-ink: #f3f4f6;
+    --color-ink-muted: #9ca3af;
+    --color-ink-faint: #6b7280;
+    --color-callout: #1b1f2b;
+    --color-card: rgba(24, 27, 36, 0.85);
+    --dot-color: #2b3142;
+    --bg-color: #12141a;
+  }
+
   body {
-    background-color: #faf8f5;
-    background-image: radial-gradient(#d3cdc2 0.9px, transparent 0.9px);
+    background-color: var(--bg-color);
+    background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px);
     background-size: 20px 20px;
-    color: #141414;
+    color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
   ::selection {
     background-color: #fef08a;
@@ -96,17 +140,17 @@ tailwind.config = {
     height: 4px;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #d3cdc2;
+    background: var(--color-paper-border-dark);
     border-radius: 2px;
   }
 
-  /* USER'S ORIGINAL BRAND LOGO (YELLOW ACCENT) */
+  /* USER'S ORIGINAL BRAND LOGO */
   .logo { 
     font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
     font-size: 1.25rem; 
     font-weight: 900; 
     text-decoration: none; 
-    color: #141414; 
+    color: var(--color-ink); 
     letter-spacing: -0.02em; 
     text-transform: uppercase; 
     display: inline-flex; 
@@ -153,7 +197,15 @@ tailwind.config = {
       <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="#simulator">
         [↓ к расчёту]
       </a>
-      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-ink bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:bg-ink-muted transition-colors" href="https://t.me/" target="_blank" rel="noopener">
+      
+      <!-- Theme Switcher Button -->
+      <button id="theme-toggle" type="button" class="p-1.5 px-2 rounded border border-paper-border bg-paper hover:border-paper-border-dark text-ink font-mono text-xs flex items-center gap-1.5 transition-colors" title="Переключить тему (Светлая / Тёмная)" aria-label="Переключить тему">
+        <span class="dark:hidden">🌙</span>
+        <span class="hidden dark:inline">☀️</span>
+        <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono font-medium">Тема</span>
+      </button>
+
+      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="https://t.me/" target="_blank" rel="noopener">
         <span>Клуб / Telegram</span>
         <span class="text-[10px]">↗</span>
       </a>
@@ -1038,6 +1090,15 @@ tailwind.config = {
 
   // Initial run
   renderSimulator();
+
+  // Theme Toggle listener
+  const toggleBtn = document.getElementById('theme-toggle');
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
+    });
+  }
 })();
 </script>
 

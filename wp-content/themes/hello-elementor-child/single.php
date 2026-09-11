@@ -14,19 +14,21 @@ $article_excerpt = get_the_excerpt() ?: 'Практический инженер
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script>
 tailwind.config = {
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        paper: '#faf8f5',
-        'paper-subtle': '#f3f0ea',
-        'paper-border': '#e6e2da',
-        'paper-border-dark': '#d3cdc2',
-        ink: '#141414',
-        'ink-muted': '#6b665f',
-        'ink-faint': '#9e988f',
+        paper: 'var(--color-paper)',
+        'paper-subtle': 'var(--color-paper-subtle)',
+        'paper-border': 'var(--color-paper-border)',
+        'paper-border-dark': 'var(--color-paper-border-dark)',
+        ink: 'var(--color-ink)',
+        'ink-muted': 'var(--color-ink-muted)',
+        'ink-faint': 'var(--color-ink-faint)',
         highlight: '#fef9c3',
         'highlight-strong': '#fef08a',
-        callout: '#fcfaf2'
+        callout: 'var(--color-callout)',
+        card: 'var(--color-card)'
       },
       fontFamily: {
         sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
@@ -40,18 +42,47 @@ tailwind.config = {
 </script>
 
 <style>
+  :root {
+    --color-paper: #faf8f5;
+    --color-paper-subtle: #f3f0ea;
+    --color-paper-border: #e6e2da;
+    --color-paper-border-dark: #d3cdc2;
+    --color-ink: #141414;
+    --color-ink-muted: #6b665f;
+    --color-ink-faint: #9e988f;
+    --color-callout: #fcfaf2;
+    --color-card: rgba(255, 255, 255, 0.75);
+    --dot-color: #d3cdc2;
+    --bg-color: #faf8f5;
+  }
+
+  html.dark {
+    --color-paper: #12141a;
+    --color-paper-subtle: #191c24;
+    --color-paper-border: #282d3b;
+    --color-paper-border-dark: #373e52;
+    --color-ink: #f3f4f6;
+    --color-ink-muted: #9ca3af;
+    --color-ink-faint: #6b7280;
+    --color-callout: #1b1f2b;
+    --color-card: rgba(24, 27, 36, 0.85);
+    --dot-color: #2b3142;
+    --bg-color: #12141a;
+  }
+
   body {
-    background-color: #faf8f5 !important;
-    background-image: radial-gradient(#d3cdc2 0.9px, transparent 0.9px) !important;
+    background-color: var(--bg-color) !important;
+    background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px) !important;
     background-size: 20px 20px !important;
-    color: #141414 !important;
+    color: var(--color-ink) !important;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
   .logo { 
     font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
     font-size: 1.25rem; 
     font-weight: 900; 
     text-decoration: none; 
-    color: #141414; 
+    color: var(--color-ink); 
     letter-spacing: -0.02em; 
     text-transform: uppercase; 
     display: inline-flex; 

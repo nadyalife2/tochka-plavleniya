@@ -18,6 +18,19 @@ foreach ($articles as $article) {
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>ТОЧКА ПЛАВЛЕНИЯ // Журнал и открытая лаборатория ТЧП</title>
   
+  <!-- Immediate Theme Init Script (Zero FOUC) -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('tp_theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
   <!-- Google Fonts: Inter, IBM Plex Sans, JetBrains Mono, Caveat, Newsreader, Hanken Grotesk -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
   <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
@@ -27,22 +40,22 @@ foreach ($articles as $article) {
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <script>
     tailwind.config = {
+      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            paper: '#faf8f5',
-            'paper-subtle': '#f3f0ea',
-            'paper-border': '#e6e2da',
-            'paper-border-dark': '#d3cdc2',
-            ink: '#141414',
-            'ink-muted': '#6b665f',
-            'ink-faint': '#9e988f',
+            paper: 'var(--color-paper)',
+            'paper-subtle': 'var(--color-paper-subtle)',
+            'paper-border': 'var(--color-paper-border)',
+            'paper-border-dark': 'var(--color-paper-border-dark)',
+            ink: 'var(--color-ink)',
+            'ink-muted': 'var(--color-ink-muted)',
+            'ink-faint': 'var(--color-ink-faint)',
+            callout: 'var(--color-callout)',
+            card: 'var(--color-card)',
             brand: {
               orange: '#eb5211',
               dark: '#0f0f0f',
-              bg: '#faf8f5',
-              tape: 'rgba(235, 222, 187, 0.85)',
-              tapeBorder: 'rgba(210, 195, 155, 0.7)',
               yellowNote: '#fcf282'
             }
           },
@@ -58,15 +71,44 @@ foreach ($articles as $article) {
     }
   </script>
 
-  <!-- Technical Grid Pattern, Tape Stickers, and Custom Logo -->
+  <!-- Technical Grid Pattern & Theme Variables -->
   <style>
+    :root {
+      --color-paper: #faf8f5;
+      --color-paper-subtle: #f3f0ea;
+      --color-paper-border: #e6e2da;
+      --color-paper-border-dark: #d3cdc2;
+      --color-ink: #141414;
+      --color-ink-muted: #6b665f;
+      --color-ink-faint: #9e988f;
+      --color-callout: #fcfaf2;
+      --color-card: rgba(255, 255, 255, 0.75);
+      --dot-color: #d3cdc2;
+      --bg-color: #faf8f5;
+    }
+
+    html.dark {
+      --color-paper: #12141a;
+      --color-paper-subtle: #191c24;
+      --color-paper-border: #282d3b;
+      --color-paper-border-dark: #373e52;
+      --color-ink: #f3f4f6;
+      --color-ink-muted: #9ca3af;
+      --color-ink-faint: #6b7280;
+      --color-callout: #1b1f2b;
+      --color-card: rgba(24, 27, 36, 0.85);
+      --dot-color: #2b3142;
+      --bg-color: #12141a;
+    }
+
     body {
-      background-color: #faf8f5;
-      background-image: radial-gradient(#d3cdc2 0.9px, transparent 0.9px);
+      background-color: var(--bg-color);
+      background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px);
       background-size: 20px 20px;
-      color: #141414;
+      color: var(--color-ink);
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      transition: background-color 0.2s ease, color 0.2s ease;
     }
 
     ::selection {
@@ -74,13 +116,13 @@ foreach ($articles as $article) {
       color: #141414;
     }
 
-    /* CUSTOM LOGO (Exact brand standard) */
+    /* BRAND LOGO */
     .logo { 
       font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
       font-size: 1.25rem; 
       font-weight: 900; 
       text-decoration: none; 
-      color: #141414; 
+      color: var(--color-ink); 
       letter-spacing: -0.02em; 
       text-transform: uppercase; 
       display: inline-flex; 
@@ -103,17 +145,6 @@ foreach ($articles as $article) {
       margin: 0 0.15rem; 
       font-size: 1.05em; 
       line-height: 0.9; 
-    }
-
-    /* Masking tape sticker component */
-    .masking-tape {
-      position: absolute;
-      background: rgba(234, 222, 184, 0.85);
-      backdrop-filter: blur(1.5px);
-      border-left: 2px dashed rgba(200, 185, 140, 0.6);
-      border-right: 2px dashed rgba(200, 185, 140, 0.6);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      z-index: 20;
     }
 
     .sketch-border {
@@ -144,12 +175,20 @@ foreach ($articles as $article) {
         </nav>
       </div>
 
-      <!-- Right Action / Telegram button -->
+      <!-- Right Action / Dark Mode Toggle & Telegram -->
       <div class="flex items-center gap-3">
         <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="article.php#simulator">
           [↓ к расчёту]
         </a>
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-ink bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:bg-ink-muted transition-colors" href="https://t.me/" target="_blank" rel="noopener">
+
+        <!-- Dark/Light Mode Switcher -->
+        <button id="theme-toggle" type="button" class="p-1.5 px-2 rounded border border-paper-border bg-paper hover:border-paper-border-dark text-ink font-mono text-xs flex items-center gap-1.5 transition-colors" title="Переключить тему (Светлая / Тёмная)" aria-label="Переключить тему">
+          <span class="dark:hidden">🌙</span>
+          <span class="hidden dark:inline">☀️</span>
+          <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono font-medium">Тема</span>
+        </button>
+
+        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="https://t.me/" target="_blank" rel="noopener">
           <span>Клуб / Telegram</span>
           <span class="text-[10px]">↗</span>
         </a>
@@ -174,8 +213,8 @@ foreach ($articles as $article) {
           
           <!-- Tape & Label Badge -->
           <div class="relative inline-block mb-1">
-            <div class="absolute -top-2 left-6 w-10 h-3 bg-[#ebdeb3]/80 border-l border-r border-[#d2c39b]/70 shadow-sm rotate-[-2deg] z-10 pointer-events-none" style="backdrop-filter: blur(1px);"></div>
-            <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#fef08a]/60 border border-[#fde047] text-ink font-mono text-[11px] shadow-sm rotate-[-1.2deg] sketch-border">
+            <div class="absolute -top-2 left-6 w-10 h-3 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-sm rotate-[-2deg] z-10 pointer-events-none" style="backdrop-filter: blur(1px);"></div>
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#fef08a]/60 dark:bg-[#ca8a04]/25 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-[11px] shadow-sm rotate-[-1.2deg] sketch-border">
               <span class="w-1.5 h-1.5 rounded-full bg-ink"></span>
               <span class="font-bold tracking-wider uppercase">ВЕРСТАК // QC PASSED 2026</span>
               <span class="text-ink-faint">|</span>
@@ -197,20 +236,20 @@ foreach ($articles as $article) {
           </h1>
 
           <!-- Lead text -->
-          <p class="text-lg sm:text-[19px] text-[#33302c] font-serif leading-[1.65]">
+          <p class="text-lg sm:text-[19px] text-ink/90 font-serif leading-[1.65]">
             Журнал и открытая документация о том, как превратить кучу разрозненных SMD/BGA компонентов в надежное устройство. Без воды, с интерактивными симуляторами термопрофилей, допусками IPC/JEDEC и проверенными режимами пайки.
           </p>
 
           <!-- CTA Buttons -->
           <div class="flex flex-wrap items-center gap-3 pt-2">
-            <a class="inline-flex items-center gap-2 px-4 py-2 border border-ink bg-ink text-paper text-xs font-mono font-medium rounded hover:bg-[#33302c] transition-colors" href="article.php">
+            <a class="inline-flex items-center gap-2 px-4 py-2 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="article.php">
               <span>Читать главный регламент</span>
               <span class="text-xs">→</span>
             </a>
-            <a class="inline-flex items-center gap-2 px-3.5 py-2 border border-paper-border bg-paper text-ink text-xs font-mono font-medium rounded hover:border-ink transition-colors" href="article.php#simulator">
+            <a class="inline-flex items-center gap-2 px-3.5 py-2 border border-paper-border bg-paper text-ink text-xs font-mono font-medium rounded hover:border-paper-border-dark transition-colors" href="article.php#simulator">
               <span>Инженерный калькулятор</span>
             </a>
-            <div class="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-ink bg-[#fef08a] border border-[#fde047] px-2.5 py-0.5 shadow-sm sketch-border" style="transform: rotate(-0.5deg);">
+            <div class="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-ink bg-[#fef08a] dark:bg-[#ca8a04]/30 border border-[#fde047] dark:border-[#ca8a04] px-2.5 py-0.5 shadow-sm sketch-border" style="transform: rotate(-0.5deg);">
               <span class="w-1.5 h-1.5 rounded-full bg-ink"></span>
               <span class="font-medium">rev 2.4.1 актуализирован</span>
             </div>
@@ -221,19 +260,19 @@ foreach ($articles as $article) {
 
       <!-- Category Filter Pills -->
       <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 font-mono text-xs" id="articles">
-        <a href="index.php?tag=all#articles" class="px-3 py-1 rounded <?= $tag_filter === 'all' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-ink hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=all#articles" class="px-3 py-1 rounded <?= $tag_filter === 'all' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Все материалы
         </a>
-        <a href="index.php?tag=basics#articles" class="px-3 py-1 rounded <?= $tag_filter === 'basics' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-ink hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=basics#articles" class="px-3 py-1 rounded <?= $tag_filter === 'basics' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Основы
         </a>
-        <a href="index.php?tag=smd#articles" class="px-3 py-1 rounded <?= $tag_filter === 'smd' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-ink hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=smd#articles" class="px-3 py-1 rounded <?= $tag_filter === 'smd' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           SMD и BGA
         </a>
-        <a href="index.php?tag=tools#articles" class="px-3 py-1 rounded <?= $tag_filter === 'tools' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-ink hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=tools#articles" class="px-3 py-1 rounded <?= $tag_filter === 'tools' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Инструменты
         </a>
-        <a href="index.php?tag=materials#articles" class="px-3 py-1 rounded <?= $tag_filter === 'materials' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-ink hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=materials#articles" class="px-3 py-1 rounded <?= $tag_filter === 'materials' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Сплавы и флюсы
         </a>
       </div>
@@ -245,7 +284,7 @@ foreach ($articles as $article) {
         <div class="lg:col-span-8 space-y-8">
           
           <!-- FEATURED MAIN ARTICLE (Hero Card) -->
-          <article class="border border-paper-border rounded-lg bg-white/70 p-6 sm:p-7 space-y-5 shadow-sm transition-all hover:border-paper-border-dark relative" id="featured">
+          <article class="border border-paper-border rounded-lg bg-card p-6 sm:p-7 space-y-5 shadow-sm transition-all hover:border-paper-border-dark relative" id="featured">
             
             <!-- Image Frame -->
             <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
@@ -272,19 +311,19 @@ foreach ($articles as $article) {
                   Температурные профили: как не перегреть плату за $300
                 </a>
               </h2>
-              <p class="text-[#242220] font-serif text-[16px] leading-relaxed">
+              <p class="text-ink/85 font-serif text-[16px] leading-relaxed">
                 Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат. Разбираем, почему стандартная пайка «по цифрам на табло фена» убивает платы, и как выставить 4 фазы термопрофиля.
               </p>
             </div>
 
             <!-- Technical Flow Strip -->
-            <div class="rounded border border-paper-border bg-[#fdfcfa] p-4 flex items-center justify-between font-mono text-xs text-ink-muted overflow-x-auto relative">
+            <div class="rounded border border-paper-border bg-paper-subtle p-4 flex items-center justify-between font-mono text-xs text-ink-muted overflow-x-auto relative">
               <div class="flex items-center gap-4 shrink-0">
-                <span class="text-[#52525b]">Ликвидус SAC305: <strong class="text-ink">217°C</strong></span>
+                <span class="text-ink-muted">Ликвидус SAC305: <strong class="text-ink">217°C</strong></span>
                 <span class="text-ink-faint">→</span>
-                <span class="text-[#52525b]">ПОС-61: <strong class="text-ink">183°C</strong></span>
+                <span class="text-ink-muted">ПОС-61: <strong class="text-ink">183°C</strong></span>
                 <span class="text-ink-faint">→</span>
-                <span class="text-[#52525b]">Окно TAL: <strong class="font-medium text-ink">45–75 с</strong></span>
+                <span class="text-ink-muted">Окно TAL: <strong class="font-medium text-ink">45–75 с</strong></span>
               </div>
               <span class="text-[11px] text-ink-faint font-mono">FIG. 4.1</span>
             </div>
@@ -308,7 +347,7 @@ foreach ($articles as $article) {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             
             <!-- Card 1: SMD 0402 vs 0603 -->
-            <article class="border border-paper-border rounded-lg bg-white/80 p-5 flex flex-col justify-between space-y-4 hover:border-ink transition-colors">
+            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors">
               <div class="overflow-hidden rounded border border-paper-border bg-paper">
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYi7MdtqY4d65d01YGA76Nb9UaAhDQ7QkjjWLOubwy90v1ERBKSlSZppwjkUC5jpi9kY1HdnQ5FHJR21MXRmgii-iF6CYNt9W4mNydzzoSQsgYTW_6wcWir8FOtb6ioNVbDgKW05RwHoKlGk90RvpJXFOV0hLsAaFjRijsi-njQlJ2_aoNGm_Q0M2v_1jGJM6d0HEoWjg1G2ov5xWDRXeKNl2a49NrjH0NmXjEyipzYiA6d1bDpnFu" alt="SMD 0402 vs 0603 сравнение" class="w-full h-36 object-cover object-center" loading="lazy">
               </div>
@@ -331,7 +370,7 @@ foreach ($articles as $article) {
             </article>
 
             <!-- Card 2: T12 vs JBC C245 -->
-            <article class="border border-paper-border rounded-lg bg-white/80 p-5 flex flex-col justify-between space-y-4 hover:border-ink transition-colors">
+            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors">
               <div class="overflow-hidden rounded border border-paper-border bg-paper">
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuChE9QvE8LozVtk7VrKxyYI-SrHgrPhImpEKRwWLy8fCBhxDhgQJbz22eBoGpZ97AEmkDILNPB6nXPLwk4Pq62v8qVL76AJmtm7Y3M86EKjJYmx-yPJkCc-vq1O-rNVWNo_vypZINr_lZHpl4QKTYJnCzMarAZm24hHEabOepCGf90eCac2R0yEBmu4eXa8cQtRGKfECNtCPUpfGFTV4N28XpeOWVBdpVriBQO9ZdB_yuU45CFoJi1n" alt="Картриджи жал T12 vs JBC C245 в разрезе" class="w-full h-36 object-cover object-center" loading="lazy">
               </div>
@@ -354,7 +393,7 @@ foreach ($articles as $article) {
             </article>
 
             <!-- Card 3: Гид по флюсам -->
-            <article class="border border-paper-border rounded-lg bg-white/80 p-5 flex flex-col justify-between space-y-4 hover:border-ink transition-colors">
+            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors">
               <div class="overflow-hidden rounded border border-paper-border bg-paper">
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDq0hH5xM39QDK1ZqCle8_Wk1nH4vsPEFi-qLOCIaH0mt5-NgDzrCsJkTQtjTFrNG8X9c4iXDGbdoYyxa9w9vsD5lhmodhFeYkAWkHXAFy0RloCfAkIN97lpnpFIzEqofnLwCZ_hIQ31MPvwYjr0YKml4OBALGI73SBp5g7T0cpRCK35Hp4utgd9ONG1OB3QN5BnZnqPkHXUtJPjiJgakBYuQhMka55il18DlWwDTGLTl5ZZrP1LM9R" alt="Дозатор флюс-геля для монтажа BGA" class="w-full h-36 object-cover object-center" loading="lazy">
               </div>
@@ -377,7 +416,7 @@ foreach ($articles as $article) {
             </article>
 
             <!-- Card 4: Симулятор термопрофиля -->
-            <article class="border border-paper-border rounded-lg bg-paper p-5 flex flex-col justify-between space-y-4 hover:border-ink transition-colors" id="calc">
+            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors" id="calc">
               <div class="overflow-hidden rounded border border-paper-border bg-paper">
                 <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz3EwM-yiiGuYAXSgycnw3IamGAkG45KS9762AyA9_0RrrlkIL1iHEpmka6kq84n028UCS8F5Fng_yDk-0oMCYSywnUmcfYDGuiLzBNmGEgPgYJ8ARSDGgl4mTd4p03iPJtH9_gFS7toreuV8Ud6t3Xmsz0WiLpKTjwhgbdra-vGgts3_XRkNXVfXR3rTGpqCpuw9nDyhp6gptDUKonPp2XCLgE7N0Aidcy7Pd8JuRU4TaqQqNEHPP" alt="Схема термовоздушной станции и профиля пайки" class="w-full h-36 object-cover object-center" loading="lazy">
               </div>
@@ -407,8 +446,8 @@ foreach ($articles as $article) {
         <aside class="lg:col-span-4 space-y-6">
           
           <!-- Post-it Note Sticker (Caveat font) -->
-          <div class="border border-[#fde047] bg-[#fef08a]/40 p-4 rounded-lg space-y-2 text-xs shadow-sm sketch-border">
-            <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink border-b border-[#fde047] pb-1.5">
+          <div class="border border-[#fde047] dark:border-[#ca8a04]/70 bg-[#fef08a]/40 dark:bg-[#ca8a04]/15 p-4 rounded-lg space-y-2 text-xs shadow-sm sketch-border">
+            <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink border-b border-[#fde047] dark:border-[#ca8a04]/50 pb-1.5">
               <span class="flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-ink"></span>
                 Заметка на верстак
@@ -417,9 +456,9 @@ foreach ($articles as $article) {
             </div>
             <div class="space-y-1.5">
               <p class="font-hand text-[17px] leading-snug text-ink italic font-semibold rotate-[-0.5deg]">
-                «Термопару фиксировать <span class="font-mono font-bold text-xs px-1.5 py-0.5 bg-[#fef08a] border border-[#fde047] not-italic inline-block">строго каптоном</span> прямо к галтелям BGA, иначе датчик меряет воздух фена!»
+                «Термопару фиксировать <span class="font-mono font-bold text-xs px-1.5 py-0.5 bg-[#fef08a] dark:bg-[#ca8a04]/40 border border-[#fde047] dark:border-[#ca8a04] not-italic inline-block">строго каптоном</span> прямо к галтелям BGA, иначе датчик меряет воздух фена!»
               </p>
-              <p class="font-serif italic text-[11.5px] text-[#52525b] border-t border-[#fde047]/60 pt-1">
+              <p class="font-serif italic text-[11.5px] text-ink-muted border-t border-[#fde047]/60 dark:border-[#ca8a04]/40 pt-1">
                 — из полевого блокнота инженера: структура обнажена, без идеализации
               </p>
             </div>
@@ -430,7 +469,7 @@ foreach ($articles as $article) {
           </div>
 
           <!-- Sections list -->
-          <div class="relative border border-paper-border rounded-lg bg-white/80 p-5 space-y-3.5 shadow-sm">
+          <div class="relative border border-paper-border rounded-lg bg-card p-5 space-y-3.5 shadow-sm">
             <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
               <span>Регламенты ТЧП</span>
               <span>Разделы</span>
@@ -473,21 +512,21 @@ foreach ($articles as $article) {
           </div>
 
           <!-- Tape & Caution Sketch Box -->
-          <div class="relative p-3.5 bg-[#fdfcfa] border-2 border-dashed border-ink/70 rotate-[1.2deg] shadow-sm space-y-1.5 sketch-border">
-            <div class="absolute -top-2.5 right-8 w-12 h-3.5 bg-[#ebdeb3]/80 border-l border-r border-[#d2c39b]/80 shadow-sm rotate-[-3deg] pointer-events-none" style="backdrop-filter: blur(1px);"></div>
+          <div class="relative p-3.5 bg-paper-subtle border-2 border-dashed border-ink/70 rotate-[1.2deg] shadow-sm space-y-1.5 sketch-border">
+            <div class="absolute -top-2.5 right-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/80 dark:border-[#968458]/70 shadow-sm rotate-[-3deg] pointer-events-none" style="backdrop-filter: blur(1px);"></div>
             <div class="flex items-center justify-between font-mono text-[10.5px] font-bold text-ink">
               <span class="flex items-center gap-1.5">
                 <span class="text-xs">⚡</span>НЕ ГРЕТЬ ВЫШЕ 245°C
               </span>
-              <span class="px-1.5 py-0.2 text-[9.5px] bg-paper-subtle border border-paper-border-dark">J-STD</span>
+              <span class="px-1.5 py-0.2 text-[9.5px] bg-paper border border-paper-border-dark">J-STD</span>
             </div>
-            <p class="font-mono text-[11px] text-[#52525b] leading-tight">
+            <p class="font-mono text-[11px] text-ink-muted leading-tight">
               Деградация подложки и интерметаллидов начинается через 8 секунд перегрева.
             </p>
           </div>
 
           <!-- Reference Temperatures Box -->
-          <div class="border border-paper-border rounded-lg bg-white/70 p-5 space-y-3 relative">
+          <div class="border border-paper-border rounded-lg bg-card p-5 space-y-3 relative">
             <div class="flex items-center justify-between">
               <div class="text-[11px] font-mono text-ink-faint uppercase">Опорные температуры:</div>
               <span class="font-mono text-[10px] text-ink-faint">FIG. 1.2 // REWORK</span>
@@ -499,18 +538,18 @@ foreach ($articles as $article) {
               </div>
               <div class="flex items-center justify-between pb-1.5 border-b border-paper-border">
                 <span class="text-ink-muted">ПОС-61 (эвтектика)</span>
-                <span class="font-bold text-ink px-2 py-0.5 bg-[#fef08a] border border-[#fde047] text-[11px] inline-block sketch-border" style="transform: rotate(-0.5deg);">183°C</span>
+                <span class="font-bold text-ink px-2 py-0.5 bg-[#fef08a] dark:bg-[#ca8a04]/40 border border-[#fde047] dark:border-[#ca8a04] text-[11px] inline-block sketch-border" style="transform: rotate(-0.5deg);">183°C</span>
               </div>
               <div class="flex items-center justify-between pb-1.5 border-b border-paper-border">
                 <span class="text-ink-muted">Sn42Bi58 (низкотемп.)</span>
                 <span class="font-medium text-ink text-[11px]">138°C</span>
               </div>
-              <div class="flex items-center justify-between p-2 bg-[#fdfcfa] border border-paper-border rounded">
+              <div class="flex items-center justify-between p-2 bg-paper-subtle border border-paper-border rounded">
                 <span class="text-ink font-medium flex items-center gap-1.5">
                   <span class="w-1.5 h-1.5 rounded-full bg-ink"></span>
                   Макс. пик кристалла
                 </span>
-                <span class="font-bold text-ink px-2.5 py-0.5 bg-paper-subtle border border-paper-border-dark text-[11px] inline-block shadow-sm sketch-border" style="transform: rotate(-0.6deg);">245°C</span>
+                <span class="font-bold text-ink px-2.5 py-0.5 bg-paper border border-paper-border-dark text-[11px] inline-block shadow-sm sketch-border" style="transform: rotate(-0.6deg);">245°C</span>
               </div>
             </div>
 
@@ -537,12 +576,12 @@ foreach ($articles as $article) {
       </div>
 
       <!-- Bottom Telegram CTA -->
-      <div class="mt-12 border border-paper-border rounded-lg bg-white/80 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div class="mt-12 border border-paper-border rounded-lg bg-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div class="space-y-0.5">
           <div class="font-semibold text-sm text-ink">Инженерный справочник по пайке BGA</div>
           <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в нашем канале.</p>
         </div>
-        <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-ink bg-ink text-paper text-xs font-mono font-medium rounded hover:bg-ink-muted transition-colors shrink-0 shadow-sm" href="https://t.me/" target="_blank" rel="noopener">
+        <a class="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shrink-0 shadow-sm" href="https://t.me/" target="_blank" rel="noopener">
           <span>Забрать в Telegram →</span>
         </a>
       </div>
@@ -575,6 +614,19 @@ foreach ($articles as $article) {
       </div>
     </div>
   </footer>
+
+  <!-- Theme Toggle JS -->
+  <script>
+    (function() {
+      const toggle = document.getElementById('theme-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', function() {
+          const isDark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
+        });
+      }
+    })();
+  </script>
 
 </body>
 </html>

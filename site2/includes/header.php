@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <a href="/" class="logo">Точка<span>.</span>Плавления</a>
+            <a href="/" class="logo">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
             
             <div class="header-right">
                 <!-- Custom PCB Command Search Console -->
