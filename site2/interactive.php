@@ -192,55 +192,117 @@ require_once __DIR__ . '/includes/articles-data.php';
 
             <!-- Sticky Note Engineer's Memo -->
             <div>
-              <div class="postit-yellow" id="engineer-memo" style="padding:1.25rem; border-radius:10px; border:1px solid var(--color-paper-border); box-shadow:3px 4px 16px rgba(0,0,0,0.12); transform:rotate(-1deg); transition:transform 0.2s ease; display:flex; flex-direction:column; gap:1rem;">
+              <!-- TRUE STICKY NOTE: sketch-border wavy outline + folded corner + Caveat font -->
+              <div id="engineer-memo" style="
+                position:relative;
+                padding:1.25rem 1.25rem 1.5rem;
+                background:#fef9c3;
+                transform:rotate(-1.2deg);
+                transition:transform 0.2s ease;
+                display:flex; flex-direction:column; gap:0.9rem;
+                box-shadow:3px 5px 18px rgba(0,0,0,0.13), -1px 1px 0 rgba(0,0,0,0.05);
+                border-radius:2px 2px 2px 2px;
+              ">
+                <!-- SVG sketch outline overlaid (same technique as .sketch-pill-yellow) -->
+                <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;" preserveAspectRatio="none" viewBox="0 0 200 260">
+                  <path d="M2 4 C 40 1.5, 140 3, 198 2.5 C 199.5 60, 199 140, 198.5 258 C 150 259.5, 55 258, 2.5 258.5 C 1.5 190, 1 80, 2 4 Z"
+                        fill="#fef9c3" fill-opacity="0" stroke="#eab308" stroke-width="1.2"
+                        stroke-dasharray="38 1.5 22 1" stroke-linecap="round"/>
+                </svg>
+                <!-- Folded corner triangle -->
+                <svg aria-hidden="true" style="position:absolute;bottom:0;right:0;width:22px;height:22px;pointer-events:none;" viewBox="0 0 22 22">
+                  <path d="M22 22 L0 22 L22 0 Z" fill="#e5d68a" opacity="0.7"/>
+                  <path d="M22 0 L0 22" stroke="#ca8a04" stroke-width="0.8" fill="none"/>
+                </svg>
+                <!-- Dark mode overlay -->
+                <style>
+                  html.dark #engineer-memo {
+                    background:#2a2818 !important;
+                    box-shadow:3px 5px 18px rgba(0,0,0,0.4), -1px 1px 0 rgba(0,0,0,0.2) !important;
+                  }
+                  html.dark #engineer-memo svg path[fill="#fef9c3"] { fill:#2a2818; }
+                  html.dark #engineer-memo svg path[fill="#e5d68a"] { fill:#4a4020; }
+                  html.dark #engineer-memo #res-volume { color:var(--color-accent) !important; }
+                  html.dark #engineer-memo #batch-note,
+                  html.dark #engineer-memo #res-desc,
+                  html.dark #engineer-memo #wash-tip { color:#fef08a !important; }
+                </style>
+
                 <!-- Pin header -->
-                <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:10px; border-bottom:1px solid rgba(0,0,0,0.1);">
-                  <span style="font-size:11px; font-family:monospace; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-ink);">📌 ЗАМЕТКА ИНЖЕНЕРА</span>
-                  <span class="handwriting" style="font-size:15px; color:var(--color-accent); font-weight:700;">IPC-A-610 Class 3</span>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:9px; border-bottom:1px dashed rgba(0,0,0,0.15);">
+                  <span class="handwriting" style="font-size:17px; font-weight:700; color:#78350f; letter-spacing:0.01em;">📌 Заметка инженера</span>
+                  <span style="font-size:10px; font-family:monospace; font-weight:700; color:#92400e; opacity:0.8; text-transform:uppercase; letter-spacing:0.06em;">IPC-A-610</span>
                 </div>
 
                 <!-- Dosage highlight -->
                 <div>
-                  <div style="font-size:10px; font-family:monospace; text-transform:uppercase; color:var(--color-ink-muted); margin-bottom:4px;">Рекомендуемая дозировка:</div>
+                  <div style="font-size:10px; font-family:monospace; text-transform:uppercase; color:#92400e; margin-bottom:3px; opacity:0.75;">Рекомендуемая дозировка:</div>
                   <div style="display:flex; align-items:baseline; gap:8px;">
-                    <span id="res-volume" style="font-size:2.25rem; font-family:monospace; font-weight:900; color:var(--color-accent); line-height:1;">~0.18 мл</span>
-                    <span id="batch-note" style="font-size:11px; font-family:monospace; color:var(--color-ink-muted);">(на 1 плату)</span>
+                    <span id="res-volume" class="handwriting" style="font-size:2.5rem; font-weight:700; color:var(--color-accent); line-height:1;">~0.18 мл</span>
+                    <span id="batch-note" style="font-size:11px; font-family:monospace; color:#92400e; opacity:0.75;">(на 1 плату)</span>
                   </div>
                 </div>
 
-                <!-- Live PCB visualizer -->
-                <div style="padding:10px 12px; background:rgba(0,0,0,0.04); border-radius:6px; border:1px dashed var(--color-paper-border-dark); display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+                <!-- Hand-drawn PCB sketch — same style as BGA doodle in index.php -->
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <svg id="pcb-svg" width="80" height="80" viewBox="0 0 80 80" fill="none"
+                       stroke="#78350f" stroke-linecap="round" stroke-linejoin="round"
+                       style="flex-shrink:0; transition:width 0.2s,height 0.2s; display:block; opacity:0.75;">
+                    <!-- PCB outline: wobbly pencil rectangle -->
+                    <rect x="5" y="5" width="70" height="70" rx="3"
+                          stroke-width="1.4" stroke-dasharray="2.5 1.5" fill="none"/>
+                    <!-- Mounting holes -->
+                    <circle cx="12" cy="12" r="2.2" stroke-width="1.1" fill="none"/>
+                    <circle cx="68" cy="12" r="2.2" stroke-width="1.1" fill="none"/>
+                    <circle cx="12" cy="68" r="2.2" stroke-width="1.1" fill="none"/>
+                    <circle cx="68" cy="68" r="2.2" stroke-width="1.1" fill="none"/>
+                    <!-- Central chip (BGA-style, dashed border) -->
+                    <rect x="26" y="26" width="28" height="28" rx="2"
+                          stroke-width="1.4" stroke-dasharray="3 1.5" fill="none"/>
+                    <!-- BGA ball grid 3×3 -->
+                    <circle cx="33" cy="33" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <circle cx="40" cy="33" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <circle cx="47" cy="33" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <circle cx="33" cy="40" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <circle cx="40" cy="40" r="1.8" fill="#78350f" stroke="none" opacity="0.8"/>
+                    <circle cx="47" cy="40" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <circle cx="33" cy="47" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <circle cx="40" cy="47" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <circle cx="47" cy="47" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                    <!-- Trace lines left -->
+                    <line x1="5" y1="33" x2="26" y2="33" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <line x1="5" y1="40" x2="26" y2="40" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <line x1="5" y1="47" x2="26" y2="47" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <!-- Trace lines right -->
+                    <line x1="54" y1="33" x2="75" y2="33" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <line x1="54" y1="40" x2="75" y2="40" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <line x1="54" y1="47" x2="75" y2="47" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <!-- Trace lines top -->
+                    <line x1="33" y1="5" x2="33" y2="26" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <line x1="47" y1="5" x2="47" y2="26" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
+                    <!-- Bottom label arrow -->
+                    <line x1="5" y1="77" x2="75" y2="77" stroke-width="0.7" stroke-dasharray="1 1" opacity="0.5"/>
+                    <line x1="5" y1="74" x2="5" y2="80" stroke-width="0.7" opacity="0.5"/>
+                    <line x1="75" y1="74" x2="75" y2="80" stroke-width="0.7" opacity="0.5"/>
+                  </svg>
                   <div>
-                    <div style="font-size:10px; font-family:monospace; text-transform:uppercase; font-weight:700; color:var(--color-ink-muted); margin-bottom:2px;">Визуализация платы:</div>
-                    <div id="pcb-dimensions" style="font-size:11px; font-family:monospace; font-weight:600; color:var(--color-ink);">59 × 59 мм (35 см²)</div>
-                    <div style="font-size:10px; font-family:monospace; color:var(--color-ink-faint); margin-top:2px;">Масштаб пропорционален площади</div>
-                  </div>
-                  <div style="width:72px; height:72px; display:flex; align-items:center; justify-content:center; background:var(--color-paper); border:1px dashed var(--color-paper-border-dark); border-radius:6px; flex-shrink:0;">
-                    <svg id="pcb-svg" width="56" height="56" viewBox="0 0 100 100" style="transition:width 0.2s,height 0.2s; display:block;">
-                      <rect x="5" y="5" width="90" height="90" rx="6" fill="#1b4d2c" stroke="#2e7d43" stroke-width="3"/>
-                      <circle cx="15" cy="15" r="4" fill="#d4af37"/>
-                      <circle cx="85" cy="15" r="4" fill="#d4af37"/>
-                      <circle cx="15" cy="85" r="4" fill="#d4af37"/>
-                      <circle cx="85" cy="85" r="4" fill="#d4af37"/>
-                      <rect x="35" y="35" width="30" height="30" rx="3" fill="#2d3748" stroke="#cbd5e1" stroke-width="1.5"/>
-                      <path d="M 25 35 L 35 35 M 25 50 L 35 50 M 25 65 L 35 65 M 65 35 L 75 35 M 65 50 L 75 50 M 65 65 L 75 65" stroke="#d4af37" stroke-width="1.5"/>
-                    </svg>
+                    <div style="font-size:10px; font-family:monospace; text-transform:uppercase; font-weight:700; color:#78350f; opacity:0.7; margin-bottom:2px;">Зарисовка платы:</div>
+                    <div id="pcb-dimensions" style="font-size:11px; font-family:monospace; font-weight:700; color:#78350f;">59 × 59 мм (35 см²)</div>
+                    <div style="font-size:10px; font-family:monospace; color:#78350f; opacity:0.6; margin-top:2px;">↑ масштаб к площади</div>
                   </div>
                 </div>
 
                 <!-- Process description -->
-                <p id="res-desc" style="font-size:12px; font-family:monospace; color:var(--color-ink-muted); line-height:1.55; margin:0;">
+                <p id="res-desc" style="font-size:12px; font-family:monospace; color:#78350f; line-height:1.55; margin:0; opacity:0.85;">
                   Для 35 см² при BGA реболлинге наносите тонкий слой 50-70 мкм. Избыток вызывает кипение и сдвиг чипа.
                 </p>
 
                 <!-- Wash tip -->
-                <div style="font-size:11px; font-family:monospace; font-weight:600; color:var(--color-ink); padding-top:8px; border-top:1px solid rgba(0,0,0,0.1); display:flex; align-items:center; gap:6px;">
+                <div style="font-size:11px; font-family:monospace; font-weight:600; color:#78350f; padding-top:8px; border-top:1px dashed rgba(0,0,0,0.15); display:flex; align-items:center; gap:6px; opacity:0.85;">
                   <span style="color:var(--color-accent);">ℹ</span>
                   <span id="wash-tip">Отмывка: опциональна (No-Clean)</span>
                 </div>
 
-                <!-- Copy button -->
-                <button type="button" id="copy-flux-btn" style="width:100%; padding:8px 12px; border-radius:6px; background:var(--color-ink); color:var(--color-paper); font-family:monospace; font-size:12px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:opacity 0.15s;">
                   <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                   </svg>
