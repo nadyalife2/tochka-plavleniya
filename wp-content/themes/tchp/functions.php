@@ -68,6 +68,16 @@ add_action('wp_enqueue_scripts', function () {
         );
     }
 
+    // Common Design Tokens, Logo, Markers & Editorial Components
+    if (file_exists(get_template_directory() . '/assets/css/common.css')) {
+        wp_enqueue_style(
+            'tchp-common',
+            get_template_directory_uri() . '/assets/css/common.css',
+            ['tchp-build'],
+            $theme_ver
+        );
+    }
+
     // Material Symbols Outlined Icons
     wp_enqueue_style(
         'tchp-material-symbols',
@@ -80,7 +90,7 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style(
         'tchp-theme',
         get_stylesheet_uri(),
-        ['tchp-build'],
+        ['tchp-common'],
         $theme_ver
     );
 

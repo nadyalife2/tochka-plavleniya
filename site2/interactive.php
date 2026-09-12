@@ -31,101 +31,8 @@ require_once __DIR__ . '/includes/articles-data.php';
   <link rel="stylesheet" href="assets/css/build.css">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --color-paper: #faf8f5;
-      --color-paper-subtle: #f3f0ea;
-      --color-paper-border: #e6e2da;
-      --color-paper-border-dark: #d3cdc2;
-      --color-ink: #141414;
-      --color-ink-muted: #5c5850;
-      --color-ink-faint: #999388;
-      --color-accent: #2563eb;
-      --color-accent-light: #dbeafe;
-      --color-accent-muted: #1d4ed8;
-      --bg-color: #faf8f5;
-      --dot-color: #d3cdc2;
-      --card-bg: #ffffff;
-      --card-border: #e6e2da;
-    }
-
-    html.dark {
-      --color-paper: #18191b;
-      --color-paper-subtle: #202226;
-      --color-paper-border: #2e3238;
-      --color-paper-border-dark: #40454e;
-      --color-ink: #f3f4f6;
-      --color-ink-muted: #a3aab5;
-      --color-ink-faint: #6c7380;
-      --color-accent: #60a5fa;
-      --color-accent-light: #1e293b;
-      --color-accent-muted: #93c5fd;
-      --bg-color: #121315;
-      --dot-color: #2b2e34;
-      --card-bg: #1c1d21;
-      --card-border: #2e3238;
-    }
-
-    body {
-      background-color: var(--bg-color) !important;
-      background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px) !important;
-      background-size: 20px 20px !important;
-      color: var(--color-ink);
-      font-family: 'Space Grotesk', sans-serif;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    .bg-card {
-      background-color: var(--card-bg);
-      border-color: var(--card-border);
-    }
-
-    .sketch-border {
-      border-radius: 255px 15px 225px / 15px 225px 15px 255px;
-    }
-
-    .sketch-pill-yellow {
-      background: linear-gradient(104deg, rgba(254, 240, 138, 0.4) 0%, rgba(254, 240, 138, 0.9) 15%, rgba(253, 224, 71, 0.95) 85%, rgba(254, 240, 138, 0.4) 100%);
-      border: 1px solid rgba(202, 138, 4, 0.5);
-      border-radius: 255px 15px 225px / 15px 225px 15px 255px;
-      padding: 0.15rem 0.6rem;
-      display: inline-block;
-    }
-    html.dark .sketch-pill-yellow {
-      background: linear-gradient(104deg, rgba(161, 98, 7, 0.3) 0%, rgba(161, 98, 7, 0.7) 15%, rgba(202, 138, 4, 0.8) 85%, rgba(161, 98, 7, 0.3) 100%);
-      border: 1px solid rgba(234, 179, 8, 0.4);
-      color: #fef08a !important;
-    }
-
-    /* CANONICAL BRAND LOGO — ТОЧКА ПЛАВЛЕНИЯ */
-    .logo {
-      font-family: 'Hanken Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 1.25rem;
-      font-weight: 900;
-      text-decoration: none;
-      color: var(--color-ink);
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      line-height: 1;
-      transition: opacity 0.15s ease;
-    }
-    .logo:hover {
-      opacity: 0.85;
-    }
-    .logo span {
-      color: #141414;
-      background: #facc15;
-      padding: 0.05rem 0.35rem;
-      border-radius: 3px;
-      transform: skew(-6deg);
-      display: inline-block;
-      margin: 0 0.18rem;
-      font-size: 1.05em;
-      line-height: 0.9;
-    }
-  </style>
+  <!-- Common Design Tokens & Base Styles -->
+  <link rel="stylesheet" href="assets/css/common.css">
 </head>
 <body class="min-h-screen flex flex-col">
 
@@ -307,25 +214,8 @@ require_once __DIR__ . '/includes/articles-data.php';
     </div>
   </main>
 
-  <!-- Footer -->
-  <footer class="w-full border-t border-paper-border bg-paper py-8 text-ink-muted text-xs font-mono">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div class="flex items-center gap-2">
-        <a class="logo text-sm" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-        <span class="text-ink-faint">·</span>
-        <span class="text-ink-faint text-[11px]">Инженерная документация</span>
-      </div>
-      <div class="flex items-center gap-4 text-[12px]">
-        <a class="hover:text-ink transition-colors" href="index.php">Статьи</a>
-        <a class="hover:text-ink transition-colors" href="privacy.php">Конфиденциальность</a>
-        <a class="hover:text-ink transition-colors" href="terms.php">Соглашение</a>
-        <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
-      </div>
-    </div>
-  </footer>
-
-  <!-- Cookie Consent Banner -->
-  <?php require_once __DIR__ . '/includes/cookie-banner.php'; ?>
+  <!-- Editorial Minimal Footer -->
+  <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
 
   <!-- Scripts -->
   <script>
