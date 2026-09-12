@@ -11,6 +11,12 @@ require_once __DIR__ . '/includes/articles-data.php';
   <title><?= e($page_title) ?> — ТОЧКА ПЛАВЛЕНИЯ</title>
   <meta name="description" content="Интерактивный верстак инженера: калькулятор расхода флюса, квиз по дефектам монтажа и интерактивная таблица припоев."/>
 
+  <!-- OpenGraph Meta -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="<?= e($page_title) ?> — ТОЧКА ПЛАВЛЕНИЯ"/>
+  <meta property="og:description" content="Интерактивный верстак инженера: калькулятор расхода флюса, квиз по дефектам монтажа и интерактивная таблица припоев."/>
+  <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
+
   <!-- Immediate Theme Init Script (Zero FOUC) -->
   <script>
     (function() {
@@ -23,6 +29,10 @@ require_once __DIR__ . '/includes/articles-data.php';
       }
     })();
   </script>
+
+  <!-- Preconnect for Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
   <link rel="stylesheet" href="assets/css/fonts.css">
@@ -63,7 +73,7 @@ require_once __DIR__ . '/includes/articles-data.php';
           <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="index.php">
+        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="index.php" aria-label="Перейти в журнал статей">
           <span>Журнал статей</span>
           <span class="material-symbols-outlined text-[13px]">menu_book</span>
         </a>

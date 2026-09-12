@@ -18,6 +18,12 @@ foreach ($articles as $article) {
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ</title>
   <meta name="description" content="Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ.">
+
+  <!-- OpenGraph Meta -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ"/>
+  <meta property="og:description" content="Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ."/>
+  <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
   
   <!-- Immediate Theme Init Script (Zero FOUC) -->
   <script>
@@ -31,6 +37,10 @@ foreach ($articles as $article) {
       }
     })();
   </script>
+
+  <!-- Preconnect for Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
   <link rel="stylesheet" href="assets/css/fonts.css">
@@ -75,7 +85,7 @@ foreach ($articles as $article) {
           <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
+        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php" aria-label="Открыть интерактивный верстак инженера">
           <span>Верстак / Тулзы</span>
           <span class="material-symbols-outlined text-[13px]">build</span>
         </a>

@@ -9,3 +9,8 @@ php_portable/
 .playwright-mcp/
 ux-mcp-server/
 wp-content/Qwen_*
+node_modules/
+package-lock.json
+.env
+.vscode/
+
