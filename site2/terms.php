@@ -128,11 +128,11 @@ require_once __DIR__ . '/includes/functions.php';
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
       <div class="flex items-center gap-6">
         <a class="logo" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-        <nav class="hidden md:flex items-center gap-5 text-[13px] font-mono text-ink-muted">
-          <a class="hover:text-ink transition-colors" href="index.php#articles">Статьи</a>
-          <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
-          <a class="hover:text-ink transition-colors" href="interactive.php#table">Сплавы</a>
-        </nav>
+        <!-- Desktop Nav -->
+        <?php 
+        $current_page = 'terms';
+        include __DIR__ . '/includes/header-nav.php'; 
+        ?>
       </div>
 
       <div class="flex items-center gap-3">

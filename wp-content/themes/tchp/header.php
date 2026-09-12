@@ -44,9 +44,10 @@
           ]);
           ?>
         <?php else : ?>
-          <a class="text-ink font-medium hover:text-ink transition-colors" href="<?php echo esc_url(home_url('/')); ?>">Статьи</a>
+          <a class="text-ink font-medium hover:text-ink transition-colors" href="<?php echo esc_url(home_url('/#articles')); ?>">Статьи</a>
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url(home_url('/interactive/#calculator')); ?>">Калькулятор флюсов</a>
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url(home_url('/interactive/#table')); ?>">Таблица припоев</a>
           <a class="hover:text-ink transition-colors" href="<?php echo esc_url(home_url('/interactive/')); ?>">Инструменты</a>
-          <a class="hover:text-ink transition-colors" href="<?php echo esc_url(home_url('/cookies/')); ?>">Cookies</a>
         <?php endif; ?>
       </nav>
     </div>

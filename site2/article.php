@@ -312,12 +312,10 @@ $faq_items = [
         ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
       </a>
       <!-- Desktop Nav -->
-      <nav class="hidden md:flex items-center gap-5 text-[13.5px] text-ink-muted">
-        <a class="text-ink font-medium hover:text-ink transition-colors" href="index.php">Статьи</a>
-        <a class="hover:text-ink transition-colors" href="interactive.php">Калькулятор флюсов</a>
-        <a class="hover:text-ink transition-colors" href="interactive.php#solder-table">Таблица припоев</a>
-        <a class="hover:text-ink transition-colors" href="interactive.php">Инструменты</a>
-      </nav>
+      <?php 
+      $current_page = 'article';
+      include __DIR__ . '/includes/header-nav.php'; 
+      ?>
     </div>
     <!-- Right Action -->
     <div class="flex items-center gap-3">

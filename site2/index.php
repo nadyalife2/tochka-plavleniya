@@ -240,12 +240,10 @@ foreach ($articles as $article) {
         <a class="logo" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
 
         <!-- Desktop Nav -->
-        <nav class="hidden md:flex items-center gap-5 text-[13.5px] text-ink-muted">
-          <a class="text-ink font-medium hover:text-ink transition-colors" href="index.php#articles">Статьи</a>
-          <a class="hover:text-ink transition-colors" href="interactive.php#calculator">Калькулятор флюсов</a>
-          <a class="hover:text-ink transition-colors" href="interactive.php#table">Таблица припоев</a>
-          <a class="hover:text-ink transition-colors" href="interactive.php">Инструменты</a>
-        </nav>
+        <?php 
+        $current_page = 'index';
+        include __DIR__ . '/includes/header-nav.php'; 
+        ?>
       </div>
 
       <!-- Right Action / Dark Mode Toggle & Telegram -->

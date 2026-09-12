@@ -28,7 +28,10 @@ SYSTEM_INSTRUCTION = """Ты — ведущий инженер-технолог 
 - Инженерные плашки параметров: <span class="sketch-pill-yellow">T = 217°C</span> или <span class="sketch-pill-gray">SAC305</span>
 - Блоки предупреждений:
   <div class="border-l-4 border-ink bg-paper-subtle/70 p-4 my-4 rounded-r">
-    <div class="font-mono text-xs font-bold uppercase text-ink">⚠️ ВАЖНО / РЕГЛАМЕНТ IPC</div>
+    <div class="font-mono text-xs font-bold uppercase text-ink flex items-center gap-1.5">
+      <span class="material-symbols-outlined text-[15px] text-brand-orange">warning</span>
+      <span>ВАЖНО / РЕГЛАМЕНТ IPC</span>
+    </div>
     <p class="text-sm text-ink-muted mt-1">Текст предупреждения...</p>
   </div>
 - Таблицы характеристик:
