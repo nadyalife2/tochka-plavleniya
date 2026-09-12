@@ -139,32 +139,38 @@ require_once __DIR__ . '/includes/articles-data.php';
           </div>
 
           <!-- Workbench Grid: Controls + Sticky Note Result -->
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-            
-            <!-- Left 7 cols: Controls -->
-            <div class="lg:col-span-7 space-y-5">
+          <div style="display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:start;">
+            <style>
+              @media(min-width:1024px){
+                #calc-workbench-grid { grid-template-columns: 58% 40% !important; }
+              }
+            </style>
+            <div id="calc-workbench-grid" style="display:contents;">
+
+            <!-- Controls column -->
+            <div style="display:flex; flex-direction:column; gap:1.25rem;">
               <!-- Area Control (Slider + Number) -->
-              <div class="p-4 rounded-lg bg-paper-subtle border border-paper-border space-y-3">
-                <div class="flex items-center justify-between">
-                  <label for="flux-area-slider" class="text-xs font-mono font-semibold text-ink uppercase">Площадь монтажной зоны:</label>
-                  <div class="flex items-center gap-1.5">
-                    <input type="number" id="flux-area" value="35" min="1" max="500" class="w-20 px-2 py-1 text-right rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm font-bold focus:outline-none focus:border-accent"/>
-                    <span class="text-xs font-mono font-bold text-ink-muted">см²</span>
+              <div style="padding:1rem; border-radius:8px; background:var(--color-paper-subtle); border:1px solid var(--color-paper-border);">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+                  <label for="flux-area-slider" style="font-size:11px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); letter-spacing:0.05em;">Площадь монтажной зоны:</label>
+                  <div style="display:flex; align-items:center; gap:6px;">
+                    <input type="number" id="flux-area" value="35" min="1" max="500" style="width:72px; padding:4px 8px; text-align:right; border-radius:6px; background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:14px; font-weight:700; outline:none;"/>
+                    <span style="font-size:11px; font-family:monospace; font-weight:700; color:var(--color-ink-muted);">см²</span>
                   </div>
                 </div>
-                <input type="range" id="flux-area-slider" min="1" max="200" value="35" class="range-slider w-full cursor-pointer"/>
-                <div class="flex justify-between text-[10px] font-mono text-ink-faint">
-                  <span>1 см² (QFN/SOIC)</span>
+                <input type="range" id="flux-area-slider" min="1" max="200" value="35" class="range-slider" style="width:100%; cursor:pointer; margin-bottom:0.5rem;"/>
+                <div style="display:flex; justify-content:space-between; font-size:10px; font-family:monospace; color:var(--color-ink-faint);">
+                  <span>1 см²</span>
                   <span>50 см²</span>
                   <span>100 см²</span>
-                  <span>200 см² (Серверные платы)</span>
+                  <span>200 см²</span>
                 </div>
               </div>
 
               <!-- Chemistry Selector -->
               <div>
-                <label for="flux-type" class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Тип флюса / монтажа:</label>
-                <select id="flux-type" class="w-full px-3.5 py-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm focus:outline-none focus:border-accent">
+                <label for="flux-type" style="display:block; font-size:11px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Тип флюса / монтажа:</label>
+                <select id="flux-type" style="width:100%; padding:10px 14px; border-radius:6px; background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:13px; outline:none;">
                   <option value="bga_nc">Безотмывочный гель BGA (NC-559 / RMA-218) — 50-70 мкм</option>
                   <option value="smd_rma">Канифольный средней активности (RMA-223) — кисть/дозатор</option>
                   <option value="paste_sac">Паяльная паста SAC305 (Sn96.5Ag3Cu0.5) — трафарет 120 мкм</option>
@@ -174,43 +180,43 @@ require_once __DIR__ . '/includes/articles-data.php';
 
               <!-- Batch multiplier -->
               <div>
-                <label class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Объем партии плат (мультипликатор):</label>
-                <div class="flex flex-wrap gap-2">
-                  <button type="button" class="batch-btn active px-3 py-1.5 rounded text-xs font-mono border border-accent bg-paper font-bold text-accent" data-qty="1">1 плата</button>
-                  <button type="button" class="batch-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink" data-qty="5">5 плат</button>
-                  <button type="button" class="batch-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink" data-qty="10">10 плат</button>
-                  <button type="button" class="batch-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink" data-qty="50">50 плат (серия)</button>
+                <label style="display:block; font-size:11px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Объём партии плат:</label>
+                <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                  <button type="button" class="batch-btn" data-qty="1" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; font-weight:700; border:1px solid var(--color-accent); background:var(--color-paper); color:var(--color-accent); cursor:pointer;">1 плата</button>
+                  <button type="button" class="batch-btn" data-qty="5" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">5 плат</button>
+                  <button type="button" class="batch-btn" data-qty="10" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">10 плат</button>
+                  <button type="button" class="batch-btn" data-qty="50" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">50 плат (серия)</button>
                 </div>
               </div>
             </div>
 
-            <!-- Right 5 cols: Sticky Note Engineer's Memo -->
-            <div class="lg:col-span-5 space-y-4">
-              <div class="postit-yellow p-5 rounded-lg border border-paper-border shadow-md transform rotate-[-1deg] hover:rotate-0 transition-transform duration-200 space-y-4 text-ink">
+            <!-- Sticky Note Engineer's Memo -->
+            <div>
+              <div class="postit-yellow" id="engineer-memo" style="padding:1.25rem; border-radius:10px; border:1px solid var(--color-paper-border); box-shadow:3px 4px 16px rgba(0,0,0,0.12); transform:rotate(-1deg); transition:transform 0.2s ease; display:flex; flex-direction:column; gap:1rem;">
                 <!-- Pin header -->
-                <div class="flex items-center justify-between border-b border-paper-border/30 pb-2.5">
-                  <span class="text-[11px] font-mono font-bold tracking-wider uppercase text-ink">📌 ЗАМЕТКА ИНЖЕНЕРА</span>
-                  <span class="handwriting text-accent font-bold text-sm">IPC-A-610 Class 3</span>
+                <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:10px; border-bottom:1px solid rgba(0,0,0,0.1);">
+                  <span style="font-size:11px; font-family:monospace; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--color-ink);">📌 ЗАМЕТКА ИНЖЕНЕРА</span>
+                  <span class="handwriting" style="font-size:15px; color:var(--color-accent); font-weight:700;">IPC-A-610 Class 3</span>
                 </div>
 
                 <!-- Dosage highlight -->
                 <div>
-                  <div class="text-[11px] font-mono text-ink-muted uppercase">Рекомендуемая дозировка:</div>
-                  <div class="flex items-baseline gap-2 mt-0.5">
-                    <span id="res-volume" class="text-3xl font-mono font-black text-accent tracking-tight">~0.18 мл</span>
-                    <span id="batch-note" class="text-xs font-mono text-ink-faint">(на 1 плату)</span>
+                  <div style="font-size:10px; font-family:monospace; text-transform:uppercase; color:var(--color-ink-muted); margin-bottom:4px;">Рекомендуемая дозировка:</div>
+                  <div style="display:flex; align-items:baseline; gap:8px;">
+                    <span id="res-volume" style="font-size:2.25rem; font-family:monospace; font-weight:900; color:var(--color-accent); line-height:1;">~0.18 мл</span>
+                    <span id="batch-note" style="font-size:11px; font-family:monospace; color:var(--color-ink-muted);">(на 1 плату)</span>
                   </div>
                 </div>
 
                 <!-- Live PCB visualizer -->
-                <div class="p-3 bg-paper/60 rounded border border-paper-border/40 flex items-center justify-between gap-4">
-                  <div class="space-y-1">
-                    <div class="text-[10px] font-mono uppercase text-ink-muted font-bold">Визуализация масштаба:</div>
-                    <div id="pcb-dimensions" class="text-xs font-mono font-semibold text-ink">59 × 59 мм (35 см²)</div>
-                    <div class="text-[10px] font-mono text-ink-faint">Пропорция 1:1 к площади</div>
+                <div style="padding:10px 12px; background:rgba(0,0,0,0.04); border-radius:6px; border:1px dashed var(--color-paper-border-dark); display:flex; align-items:center; justify-content:space-between; gap:1rem;">
+                  <div>
+                    <div style="font-size:10px; font-family:monospace; text-transform:uppercase; font-weight:700; color:var(--color-ink-muted); margin-bottom:2px;">Визуализация платы:</div>
+                    <div id="pcb-dimensions" style="font-size:11px; font-family:monospace; font-weight:600; color:var(--color-ink);">59 × 59 мм (35 см²)</div>
+                    <div style="font-size:10px; font-family:monospace; color:var(--color-ink-faint); margin-top:2px;">Масштаб пропорционален площади</div>
                   </div>
-                  <div class="w-20 h-20 flex items-center justify-center bg-paper border border-dashed border-paper-border-dark rounded">
-                    <svg id="pcb-svg" width="60" height="60" viewBox="0 0 100 100" class="transition-all duration-200">
+                  <div style="width:72px; height:72px; display:flex; align-items:center; justify-content:center; background:var(--color-paper); border:1px dashed var(--color-paper-border-dark); border-radius:6px; flex-shrink:0;">
+                    <svg id="pcb-svg" width="56" height="56" viewBox="0 0 100 100" style="transition:width 0.2s,height 0.2s; display:block;">
                       <rect x="5" y="5" width="90" height="90" rx="6" fill="#1b4d2c" stroke="#2e7d43" stroke-width="3"/>
                       <circle cx="15" cy="15" r="4" fill="#d4af37"/>
                       <circle cx="85" cy="15" r="4" fill="#d4af37"/>
@@ -223,19 +229,19 @@ require_once __DIR__ . '/includes/articles-data.php';
                 </div>
 
                 <!-- Process description -->
-                <p id="res-desc" class="text-xs font-mono text-ink-muted leading-relaxed">
+                <p id="res-desc" style="font-size:12px; font-family:monospace; color:var(--color-ink-muted); line-height:1.55; margin:0;">
                   Для 35 см² при BGA реболлинге наносите тонкий слой 50-70 мкм. Избыток вызывает кипение и сдвиг чипа.
                 </p>
 
                 <!-- Wash tip -->
-                <div class="text-[11px] font-mono font-semibold text-ink pt-1 border-t border-paper-border/30 flex items-center gap-1.5">
-                  <span class="text-accent">ℹ</span>
+                <div style="font-size:11px; font-family:monospace; font-weight:600; color:var(--color-ink); padding-top:8px; border-top:1px solid rgba(0,0,0,0.1); display:flex; align-items:center; gap:6px;">
+                  <span style="color:var(--color-accent);">ℹ</span>
                   <span id="wash-tip">Отмывка: опциональна (No-Clean)</span>
                 </div>
 
                 <!-- Copy button -->
-                <button type="button" id="copy-flux-btn" class="w-full py-2 px-3 rounded bg-ink text-paper font-mono text-xs font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 border border-paper-border-dark">
-                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button type="button" id="copy-flux-btn" style="width:100%; padding:8px 12px; border-radius:6px; background:var(--color-ink); color:var(--color-paper); font-family:monospace; font-size:12px; font-weight:700; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; transition:opacity 0.15s;">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                   </svg>
                   <span id="copy-flux-text">Скопировать параметры в журнал</span>
@@ -243,7 +249,32 @@ require_once __DIR__ . '/includes/articles-data.php';
               </div>
             </div>
 
+            </div><!-- /#calc-workbench-grid -->
           </div>
+          <script>
+            (function(){
+              var g = document.getElementById('calc-workbench-grid');
+              var memo = document.getElementById('engineer-memo');
+              function applyGrid(){
+                if(window.innerWidth >= 1024){
+                  g.style.display='grid';
+                  g.style.gridTemplateColumns='58% 40%';
+                  g.style.gap='1.5rem';
+                  g.style.alignItems='start';
+                } else {
+                  g.style.display='flex';
+                  g.style.flexDirection='column';
+                  g.style.gap='1.25rem';
+                }
+              }
+              applyGrid();
+              window.addEventListener('resize', applyGrid);
+              if(memo){
+                memo.addEventListener('mouseenter', function(){ this.style.transform='rotate(0deg)'; });
+                memo.addEventListener('mouseleave', function(){ this.style.transform='rotate(-1deg)'; });
+              }
+            })();
+          </script>
 
           <!-- Bottom: Chemical Comparison Matrix -->
           <div class="pt-4 border-t border-paper-border space-y-3">
