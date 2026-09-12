@@ -50,42 +50,10 @@ $faq_items = [
 <meta property="og:description" content="<?= e($article['excerpt']) ?>"/>
 <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
 
-<!-- Fonts & Icons -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;900&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,400&display=swap" rel="stylesheet"/>
+<!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
+<link rel="stylesheet" href="assets/css/fonts.css"/>
+<link rel="stylesheet" href="assets/css/build.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-<!-- Tailwind CSS -->
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        paper: 'var(--color-paper)',
-        'paper-subtle': 'var(--color-paper-subtle)',
-        'paper-border': 'var(--color-paper-border)',
-        'paper-border-dark': 'var(--color-paper-border-dark)',
-        ink: 'var(--color-ink)',
-        'ink-muted': 'var(--color-ink-muted)',
-        'ink-faint': 'var(--color-ink-faint)',
-        highlight: '#fef9c3',
-        'highlight-strong': '#fef08a',
-        callout: 'var(--color-callout)',
-        card: 'var(--color-card)'
-      },
-      fontFamily: {
-        sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        serif: ['Newsreader', 'Georgia', 'serif'],
-        mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
-        logo: ['"Hanken Grotesk"', 'sans-serif']
-      }
-    }
-  }
-}
-</script>
 
 <style>
   :root {
@@ -95,7 +63,8 @@ tailwind.config = {
     --color-paper-border-dark: #d3cdc2;
     --color-ink: #141414;
     --color-ink-muted: #6b665f;
-    --color-ink-faint: #9e988f;
+    /* WCAG AA Compliance: >= 4.7:1 contrast on #faf8f5 */
+    --color-ink-faint: #666159;
     --color-callout: #fcfaf2;
     --color-card: rgba(255, 255, 255, 0.75);
     --dot-color: #d3cdc2;
@@ -109,11 +78,20 @@ tailwind.config = {
     --color-paper-border-dark: #373e52;
     --color-ink: #f3f4f6;
     --color-ink-muted: #9ca3af;
-    --color-ink-faint: #6b7280;
+    --color-ink-faint: #9ca3af;
     --color-callout: #1b1f2b;
     --color-card: rgba(24, 27, 36, 0.85);
     --dot-color: #2b3142;
     --bg-color: #12141a;
+  }
+
+  html, body {
+    overflow-x: clip;
+  }
+
+  :focus-visible {
+    outline: 2px solid #eb5211 !important;
+    outline-offset: 2px !important;
   }
 
   body {
@@ -211,14 +189,14 @@ tailwind.config = {
     border-radius: 2px;
   }
 
-  /* USER'S ORIGINAL BRAND LOGO */
+  /* BRAND LOGO */
   .logo { 
-    font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
+    font-family: 'IBM Plex Sans', sans-serif; 
     font-size: 1.25rem; 
-    font-weight: 900; 
+    font-weight: 800; 
     text-decoration: none; 
     color: var(--color-ink); 
-    letter-spacing: -0.02em; 
+    letter-spacing: -0.03em; 
     text-transform: uppercase; 
     display: inline-flex; 
     align-items: center; 
@@ -323,7 +301,7 @@ tailwind.config = {
 <?= render_article_schema($article, $faq_items) ?>
 </head>
 
-<body class="font-sans min-h-screen flex flex-col justify-between text-[15px] leading-[1.65]">
+<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
 
 <!-- Top Minimal Header Bar (tochkicamp style) -->
 <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
@@ -361,7 +339,7 @@ tailwind.config = {
 
       <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
         <span>Верстак / Тулзы</span>
-        <span class="text-[10px]">⚙</span>
+        <span class="material-symbols-outlined text-[13px]">build</span>
       </a>
     </div>
   </div>
@@ -407,7 +385,7 @@ tailwind.config = {
           <!-- Meta line -->
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-muted font-mono pt-1 pb-2">
             <div class="flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[10px] flex items-center justify-center font-bold text-ink">ТП</span>
+              <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
               <span class="text-ink"><?= e($article['author'] ?? 'Инженер Лаборатории ТЧП') ?></span>
             </div>
             <span class="text-ink-faint">·</span>
@@ -431,6 +409,17 @@ tailwind.config = {
           </div>
           <p class="text-ink/80">
             Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
+          </p>
+        </div>
+
+        <!-- TL;DR Sticky Post-It Note (Yellow with dark mode parity) -->
+        <div class="postit-yellow p-5 rounded-lg relative my-6">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-xl text-brand-orange">push_pin</span>
+            <h3 class="font-hand text-2xl font-bold text-ink">В двух словах (TL;DR)</h3>
+          </div>
+          <p class="text-[16px] leading-relaxed text-ink/90">
+            <strong>Ключевая мысль:</strong> Нагрев должен быть двухсторонним (нижний подогрев 140–160°C обязателен). Без нижнего подогрева верхний фен перегревает чип до деструкции кремния, пока нижние слои меди остаются холодными.
           </p>
         </div>
 
@@ -491,10 +480,53 @@ tailwind.config = {
               Правильный термопрофиль по стандарту <code class="font-mono text-xs font-medium px-1.5 py-0.5 bg-paper-subtle border border-paper-border rounded text-ink">J-STD-020D</code> сводится к четырехступенчатому контролируемому циклу:
             </p>
             <div class="my-3 inline-flex flex-wrap items-center gap-3 p-2.5 rounded border border-ink/40 bg-callout transform -rotate-[0.5deg] text-xs font-mono text-ink shadow-sm">
-              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[10px] font-bold tracking-wider uppercase"><span>QC PASSED</span><span>✓</span></div>
+              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[11px] font-bold tracking-wider uppercase"><span>QC PASSED</span><span>✓</span></div>
               <div class="text-ink text-[11.5px] font-semibold tracking-tight">J-STD-020E // COMPLIANT</div>
-              <span class="text-ink-faint text-[10px] hidden sm:inline-block">|</span>
-              <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="text-[#854d0e] font-bold font-mono">⚠</span>ВНИМАНИЕ: ОПАСНОСТЬ ДЕЛАМИНАЦИИ ПРИ СКОРОСТИ > 3°C/с</div>
+              <span class="text-ink-faint text-[11px] hidden sm:inline-block">|</span>
+              <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-brand-orange align-middle">warning</span>ВНИМАНИЕ: ОПАСНОСТЬ ДЕЛАМИНАЦИИ ПРИ СКОРОСТИ > 3°C/с</div>
+            </div>
+          </div>
+
+          <!-- Hand-Drawn Sketch Graph SVG (Light & Dark Parity) -->
+          <div class="sketch-frame p-4 sm:p-6 my-6 relative overflow-hidden">
+            <div class="font-hand text-xl font-bold text-ink mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-lg text-brand-orange">show_chart</span>
+              Схема нагрева: T°C / Время (сек)
+            </div>
+            
+            <div class="w-full overflow-x-auto">
+              <svg viewBox="0 0 540 220" width="100%" height="auto" fill="none" class="max-w-full">
+                <!-- Background card -->
+                <rect width="540" height="220" rx="8" class="fill-paper-subtle/50 stroke-paper-border" stroke-width="1.5"/>
+                
+                <!-- Horizontal Guidelines -->
+                <line x1="40" y1="180" x2="500" y2="180" class="stroke-paper-border-dark" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <line x1="40" y1="110" x2="500" y2="110" class="stroke-paper-border-dark" stroke-width="1" stroke-dasharray="3 4"/>
+                <line x1="40" y1="50" x2="500" y2="50" class="stroke-paper-border-dark" stroke-width="1" stroke-dasharray="2 4"/>
+                
+                <!-- Sketch Curve -->
+                <path d="M40 180 Q120 160 180 110 T320 50 T440 80 T500 180" class="stroke-ink" stroke-width="3" stroke-linecap="round" fill="none"/>
+                
+                <!-- Data Points -->
+                <circle cx="180" cy="110" r="7" class="fill-[#fde047] stroke-ink" stroke-width="2"/>
+                <circle cx="320" cy="50" r="7" class="fill-brand-orange stroke-ink" stroke-width="2"/>
+                <circle cx="440" cy="80" r="7" class="fill-[#2dd4bf] stroke-ink" stroke-width="2"/>
+                
+                <!-- Hand-written Annotations -->
+                <text x="110" y="96" font-family="Caveat" font-size="19" font-weight="700" class="fill-ink">Preheat (150°C)</text>
+                <text x="280" y="36" font-family="Caveat" font-size="20" font-weight="700" class="fill-brand-orange">Peak (245°C) ★</text>
+                <text x="430" y="115" font-family="Caveat" font-size="19" font-weight="700" class="fill-ink">Cooling (6°C/s)</text>
+                
+                <!-- Axis Labels (≥11px) -->
+                <text x="40" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">0s</text>
+                <text x="170" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">90s (Soak)</text>
+                <text x="305" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">210s (Reflow)</text>
+                <text x="470" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">300s</text>
+              </svg>
+            </div>
+            <div class="mt-3 text-[11px] font-mono text-ink-faint flex items-center justify-between">
+              <span>Рис. 2. Нормированная кривая SAC305 (Liquidus 217°C)</span>
+              <span class="uppercase">IPC/JEDEC J-STD-020</span>
             </div>
           </div>
 
@@ -502,7 +534,7 @@ tailwind.config = {
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
             <div class="p-4 bg-paper rounded border border-paper-border space-y-1.5">
               <div class="flex items-center justify-between text-xs font-mono pb-1">
-                <span class="px-1.5 py-0.5 text-[10px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 1</span>
+                <span class="px-1.5 py-0.5 text-[11px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 1</span>
                 <span class="text-ink-muted font-mono text-xs">1–3°C/с</span>
               </div>
               <div class="font-semibold text-ink text-sm">Прогрев (Preheat)</div>
@@ -512,7 +544,7 @@ tailwind.config = {
             </div>
             <div class="p-4 bg-paper rounded border border-paper-border space-y-1.5">
               <div class="flex items-center justify-between text-xs font-mono pb-1">
-                <span class="px-1.5 py-0.5 text-[10px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 2</span>
+                <span class="px-1.5 py-0.5 text-[11px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 2</span>
                 <span class="text-ink-muted font-mono text-xs">150–200°C</span>
               </div>
               <div class="font-semibold text-ink text-sm">Активация (Soak)</div>
@@ -522,7 +554,7 @@ tailwind.config = {
             </div>
             <div class="p-4 bg-[#fcfaf2] rounded border border-ink/40 space-y-1.5">
               <div class="flex items-center justify-between text-xs font-mono pb-1">
-                <span class="inline-block px-1.5 py-0.5 text-[10px] uppercase font-mono font-semibold text-ink border transform -rotate-[0.5deg]" style="border-radius: 255px 15px 225px / 15px 225px 15px 255px; background-color: rgb(236, 233, 223); border-color: rgb(220, 215, 203); color: rgb(28, 25, 23);">ФАЗА 3 · КЛЮЧЕВАЯ</span>
+                <span class="inline-block px-1.5 py-0.5 text-[11px] uppercase font-mono font-semibold text-ink border transform -rotate-[0.5deg]" style="border-radius: 255px 15px 225px / 15px 225px 15px 255px; background-color: rgb(236, 233, 223); border-color: rgb(220, 215, 203); color: rgb(28, 25, 23);">ФАЗА 3 · КЛЮЧЕВАЯ</span>
                 <span class="font-semibold text-ink font-mono text-xs">Пик 235–245°C</span>
               </div>
               <div class="font-semibold text-ink text-sm">Оплавление (Reflow)</div>
@@ -567,19 +599,19 @@ tailwind.config = {
             <!-- Phase Switcher Tabs -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left" id="stage-tabs">
               <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="0" type="button">
-                <div class="text-[10px] font-mono text-ink-faint">01 ПРОГРЕВ</div>
+                <div class="text-[11px] font-mono text-ink-faint">01 ПРОГРЕВ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-0">25°C → 150°C</div>
               </button>
               <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="1" type="button">
-                <div class="text-[10px] font-mono text-ink-faint">02 АКТИВАЦИЯ</div>
+                <div class="text-[11px] font-mono text-ink-faint">02 АКТИВАЦИЯ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-1">150°C → 190°C</div>
               </button>
               <button class="stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all shadow-sm" data-stage="2" type="button">
-                <div class="text-[10px] font-mono text-ink font-semibold">03 ОПЛАВЛЕНИЕ *</div>
+                <div class="text-[11px] font-mono text-ink font-semibold">03 ОПЛАВЛЕНИЕ *</div>
                 <div class="text-xs font-mono text-ink font-semibold mt-0.5" id="tab-temp-2">217°C → 240°C</div>
               </button>
               <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="3" type="button">
-                <div class="text-[10px] font-mono text-ink-faint">04 ОХЛАЖДЕНИЕ</div>
+                <div class="text-[11px] font-mono text-ink-faint">04 ОХЛАЖДЕНИЕ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-3">240°C → 100°C</div>
               </button>
             </div>
@@ -599,19 +631,19 @@ tailwind.config = {
               <!-- Numerical parameters grid -->
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[10px]">СКОРОСТЬ / TAL</div>
+                  <div class="text-ink-faint text-[11px]">СКОРОСТЬ / TAL</div>
                   <div class="text-ink font-semibold mt-1" id="detail-speed">TAL: 45 — 75 сек</div>
                 </div>
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[10px]">ДЛИТЕЛЬНОСТЬ</div>
+                  <div class="text-ink-faint text-[11px]">ДЛИТЕЛЬНОСТЬ</div>
                   <div class="text-ink font-semibold mt-1" id="detail-duration">Пик: 10 — 20 сек</div>
                 </div>
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[10px]">НИЖНИЙ ПОДОГРЕВ</div>
+                  <div class="text-ink-faint text-[11px]">НИЖНИЙ ПОДОГРЕВ</div>
                   <div class="text-ink font-semibold mt-1" id="detail-bottom">170°C — 185°C</div>
                 </div>
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[10px]">СОПЛО ФЕНА</div>
+                  <div class="text-ink-faint text-[11px]">СОПЛО ФЕНА</div>
                   <div class="text-ink font-semibold mt-1" id="detail-top">255°C (35 л/мин)</div>
                 </div>
               </div>
@@ -659,7 +691,7 @@ tailwind.config = {
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">217°C</div>
-                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">ликвидус</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">ликвидус</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
@@ -688,7 +720,7 @@ tailwind.config = {
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">183°C</div>
-                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
@@ -717,7 +749,7 @@ tailwind.config = {
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">138°C</div>
-                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
@@ -746,7 +778,7 @@ tailwind.config = {
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">96°C</div>
-                    <div class="text-[10px] font-mono text-ink-faint uppercase mt-1">плавление</div>
+                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">плавление</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
@@ -797,7 +829,7 @@ tailwind.config = {
             <div class="border border-paper-border bg-callout p-4 rounded space-y-1.5">
               <div class="flex items-center gap-2">
                 <span class="font-semibold text-ink text-sm">Влажность микросхем (MSL 3)</span>
-                <span class="font-mono text-[10px] px-1.5 py-0.5 rounded bg-paper-subtle text-ink-muted border border-paper-border font-medium">ВАЖНО</span>
+                <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-paper-subtle text-ink-muted border border-paper-border font-medium">ВАЖНО</span>
               </div>
               <p class="text-[13.5px] text-ink-muted leading-relaxed">
                 Если BGA-компонент лежал на воздухе дольше 72 часов, влага в полимере закипает при 230°C и распирает корпус изнутри (<mark>«эффект попкорна»</mark>). Обязательно сушите чип 12–24 часа при 100–110°C перед пайкой.
@@ -847,7 +879,7 @@ tailwind.config = {
 
         <!-- In-Article Native RSYA Ad Container -->
         <div class="my-8 p-4 rounded border border-dashed border-paper-border bg-paper-subtle/40 text-center">
-          <div class="text-[10px] font-mono text-ink-faint uppercase mb-1">РЕКЛАМА / ПАРТНЕРСКИЙ БЛОК ЯНДЕКСА</div>
+          <div class="text-[11px] font-mono text-ink-faint uppercase mb-1">РЕКЛАМА / ПАРТНЕРСКИЙ БЛОК ЯНДЕКСА</div>
           <div id="yandex_rtb_in_article" class="min-h-[100px] flex items-center justify-center text-xs font-mono text-ink-muted border border-paper-border rounded bg-paper">
             [Контейнер РСЯ In-Article · Адаптивный блок]
           </div>
@@ -877,14 +909,14 @@ tailwind.config = {
         <section class="my-8 p-5 sm:p-6 rounded-lg border border-paper-border bg-card space-y-4">
           <div class="flex items-center justify-between border-b border-paper-border pb-3">
             <div class="flex items-center gap-2">
-              <span class="text-sm">🛠️</span>
+              <span class="material-symbols-outlined text-[16px] text-brand-orange">handyman</span>
               <h3 class="font-bold text-xs sm:text-sm text-ink uppercase font-mono">Проверенное оборудование и химия к статье</h3>
             </div>
-            <span class="text-[10px] font-mono text-ink-faint">МАРКЕТ / ЧИПДИП</span>
+            <span class="text-[11px] font-mono text-ink-faint">МАРКЕТ / ЧИПДИП</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans">
             <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
-              <div class="text-[10px] font-mono text-ink-faint uppercase">Термовоздушная станция</div>
+              <div class="text-[11px] font-mono text-ink-faint uppercase">Термовоздушная станция</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Quick 861DW (1000W)</div>
               <div class="text-[11px] text-ink-muted mt-1 leading-snug">Турбированный термофен для BGA чипов</div>
               <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
@@ -893,7 +925,7 @@ tailwind.config = {
               </div>
             </a>
             <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
-              <div class="text-[10px] font-mono text-ink-faint uppercase">Флюс-гель No-Clean</div>
+              <div class="text-[11px] font-mono text-ink-faint uppercase">Флюс-гель No-Clean</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Cyberflux RMA-218</div>
               <div class="text-[11px] text-ink-muted mt-1 leading-snug">Безотмывочный гель для бессвинца</div>
               <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
@@ -902,7 +934,7 @@ tailwind.config = {
               </div>
             </a>
             <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
-              <div class="text-[10px] font-mono text-ink-faint uppercase">Припой SAC305</div>
+              <div class="text-[11px] font-mono text-ink-faint uppercase">Припой SAC305</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">BGA Balls 0.45mm</div>
               <div class="text-[11px] text-ink-muted mt-1 leading-snug">Прецизионные шарики Sn96.5Ag3Cu0.5</div>
               <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
@@ -913,7 +945,7 @@ tailwind.config = {
           </div>
 
           <!-- 347-ФЗ Маркировка рекламы -->
-          <div class="pt-3 border-t border-paper-border flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-ink-faint">
+          <div class="pt-3 border-t border-paper-border flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-mono text-ink-faint">
             <span>Реклама · erid и данные о рекламодателях доступны по ссылкам перехода</span>
             <span>ООО «Яндекс», ИНН 7736207543 / ООО «Интернет Решения», ИНН 7704217370</span>
           </div>
@@ -923,7 +955,7 @@ tailwind.config = {
         <div class="my-8 p-5 rounded-lg border-2 border-paper-border-dark bg-paper-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 sketch-border">
           <div class="space-y-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="sketch-pill-yellow text-ink text-[10.5px] font-mono font-bold">СЕРВИСНЫЙ ЦЕНТР ТЧП</span>
+              <span class="sketch-pill-yellow text-ink text-[11px] font-mono font-bold">СЕРВИСНЫЙ ЦЕНТР ТЧП</span>
               <span class="text-xs font-bold text-ink">Нужен сложный BGA-ремонт платы?</span>
             </div>
             <p class="text-xs text-ink-muted max-w-lg leading-relaxed">
@@ -952,7 +984,7 @@ tailwind.config = {
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <?php foreach ($related_articles as $rel): ?>
               <a class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-colors block" href="article.php?slug=<?= e($rel['slug']) ?>">
-                <div class="text-[10px] font-mono text-ink-faint uppercase"><?= e($rel['category'] ?? 'Материал') ?></div>
+                <div class="text-[11px] font-mono text-ink-faint uppercase"><?= e($rel['category'] ?? 'Материал') ?></div>
                 <div class="font-medium text-ink mt-1"><?= e($rel['title']) ?></div>
               </a>
             <?php endforeach; ?>
@@ -991,7 +1023,7 @@ tailwind.config = {
 
         <!-- Sticky Sidebar РСЯ Slot -->
         <div class="border border-dashed border-paper-border bg-paper p-4 rounded-lg text-center space-y-2">
-          <div class="text-[10px] font-mono text-ink-faint uppercase">РЕКЛАМА РСЯ</div>
+          <div class="text-[11px] font-mono text-ink-faint uppercase">РЕКЛАМА РСЯ</div>
           <div id="yandex_rtb_sidebar" class="min-h-[220px] flex items-center justify-center text-xs font-mono text-ink-muted bg-paper-subtle rounded border border-paper-border">
             [РСЯ Сайдбар · 300x250]
           </div>
@@ -1221,11 +1253,11 @@ tailwind.config = {
       const tempDiv = btn.querySelector('div:last-child');
       if (idx === currentStage) {
         btn.className = 'stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all shadow-sm';
-        if (titleDiv) titleDiv.className = 'text-[10px] font-mono text-ink font-semibold';
+        if (titleDiv) titleDiv.className = 'text-[11px] font-mono text-ink font-semibold';
         if (tempDiv) tempDiv.className = 'text-xs font-mono text-ink font-semibold mt-0.5';
       } else {
         btn.className = 'stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark';
-        if (titleDiv) titleDiv.className = 'text-[10px] font-mono text-ink-faint';
+        if (titleDiv) titleDiv.className = 'text-[11px] font-mono text-ink-faint';
         if (tempDiv) tempDiv.className = 'text-xs font-mono text-ink mt-0.5';
       }
     });

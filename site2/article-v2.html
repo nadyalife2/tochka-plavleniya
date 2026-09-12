@@ -3,370 +3,353 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Температурные профили: как не перегреть плату за $300 (V2 Sketch) — Точка Плавления</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&amp;family=Inter:wght@400;500;700;800;900&amp;family=Hanken+Grotesk:wght@400;700;900&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<title>Температурные профили: как не перегреть плату за $300 — Точка Плавления</title>
 
-<script id="tailwind-config">
-tailwind.config = {
-    theme: {
-        extend: {
-            colors: {
-                "sketch-orange": "#FC6C2B",
-                "sketch-yellow": "#FFF1A8",
-                "sketch-mint": "#BDEEE2",
-                "sketch-peach": "#FFDCCB",
-                "sketch-ink": "#1A1A1A",
-                "sketch-paper": "#FCFAF7"
-            },
-            fontFamily: {
-                sans: ["Inter", "sans-serif"],
-                hand: ["Caveat", "cursive"],
-                logo: ["Hanken Grotesk", "sans-serif"]
-            }
-        }
+<!-- Immediate Theme Init Script (Zero FOUC) -->
+<script>
+  (function() {
+    const saved = localStorage.getItem('tp_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
     }
-};
+  })();
 </script>
 
-<style>
-/* Page Paper Texture Grid */
-body {
-    background-color: #FCFAF7;
-    background-image: url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm1 1h38v38H1V1z' fill='%23000' fill-opacity='0.04' fill-rule='evenodd'/%3E%3C/svg%3E");
-    color: #1A1A1A;
-}
-
-/* Organic Hand-Drawn Sketch Borders */
-.sketch-box {
-    border: 3px solid #1A1A1A;
-    border-radius: 2px 255px 3px 25px / 255px 5px 225px 3px;
-    background: #FFFFFF;
-    box-shadow: 5px 5px 0px 0px #1A1A1A;
-}
-
-.sketch-box-heavy {
-    border: 4px solid #1A1A1A;
-    border-radius: 5px 255px 4px 15px / 255px 15px 225px 5px;
-    box-shadow: 7px 7px 0px 0px #1A1A1A;
-}
-
-/* Marker Highlights & Washes (Handmade felt-tip style) */
-.marker-wash-orange {
-    position: relative;
-    background: #FFDCCB;
-    border: 2.5px solid #1A1A1A;
-    border-radius: 255px 15px 225px 15px/15px 225px 15px 255px;
-    box-shadow: 4px 4px 0px #1A1A1A;
-}
-
-.marker-wash-mint {
-    position: relative;
-    background: #BDEEE2;
-    border: 2.5px solid #1A1A1A;
-    border-radius: 15px 225px 15px 255px/255px 15px 225px 15px;
-    box-shadow: 4px 4px 0px #1A1A1A;
-}
-
-.marker-wash-yellow {
-    background: #FFF1A8;
-    border: 2.5px solid #1A1A1A;
-    border-radius: 255px 5px 225px 3px/5px 255px 3px 225px;
-    box-shadow: 4px 4px 0px #1A1A1A;
-}
-
-/* Vertical Ribbon Margins */
-.ribbon-tag {
-    display: inline-block;
-    padding: 6px 14px;
-    font-weight: 800;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    border: 2px solid #1A1A1A;
-    box-shadow: 3px 3px 0px #1A1A1A;
-    transform: rotate(-2deg);
-}
-.ribbon-orange { background-color: #FC6C2B; color: #FFFFFF; }
-.ribbon-yellow { background-color: #FFF1A8; color: #1A1A1A; }
-.ribbon-mint { background-color: #BDEEE2; color: #1A1A1A; }
-
-/* Tape Strips */
-.tape-strip {
-    position: absolute;
-    width: 75px;
-    height: 24px;
-    background-color: rgba(211, 201, 163, 0.85);
-    border: 1px dashed rgba(0,0,0,0.3);
-    box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
-    transform: rotate(-4deg);
-    z-index: 20;
-}
-
-/* Logo */
-.logo { 
-    font-family: 'Hanken Grotesk', sans-serif; 
-    font-size: 1.8rem; 
-    font-weight: 900; 
-    text-decoration: none; 
-    color: #000000; 
-    letter-spacing: -0.02em; 
-    text-transform: uppercase;
-    display: inline-block;
-}
-.logo span { 
-    color: #FFFFFF; 
-    background: #000000; 
-    padding: 0 0.35rem; 
-    border-radius: 4px; 
-    transform: skew(-5deg); 
-    display: inline-block; 
-    margin: 0 0.1rem;
-}
-</style>
+<!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/build.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
 </head>
 
-<body class="font-sans antialiased min-h-screen p-4 md:p-8 relative">
+<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7] antialiased">
 
-<!-- Header -->
-<header class="bg-white text-black w-full border-4 border-black shadow-[6px_6px_0px_0px_#1A1A1A] flex justify-between items-center px-6 py-4 sticky top-0 z-50 sketch-box max-w-7xl mx-auto mb-8">
-    <div>
-        <a href="index.html" class="logo">Точка<span>.</span>Плавления</a>
+<!-- Top Minimal Editorial Header -->
+<header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
+  <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
+    <div class="flex items-center gap-6">
+      <a class="logo" href="index.php">
+        ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
+      </a>
+      <nav class="hidden md:flex items-center gap-5 text-[13.5px] text-ink-muted">
+        <a class="text-ink font-medium hover:text-ink transition-colors" href="index.php">Статьи</a>
+        <a class="hover:text-ink transition-colors" href="interactive.php">Инструменты</a>
+        <a class="hover:text-ink transition-colors" href="cookies.php">Cookies</a>
+      </nav>
     </div>
-    <nav class="hidden md:flex gap-4 items-center">
-        <a class="font-bold border-2 border-black px-4 py-2 hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_#1A1A1A]" href="index.html">Статьи</a>
-        <a class="font-bold border-2 border-black px-4 py-2 hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_#1A1A1A]" href="interactive.html">Инструменты</a>
-        <a class="font-bold border-2 border-black px-4 py-2 hover:bg-black hover:text-white transition-all shadow-[2px_2px_0px_0px_#1A1A1A]" href="cookies.html">Cookies</a>
-    </nav>
+
+    <!-- Right Actions: Theme Toggle & Workbench Button -->
+    <div class="flex items-center gap-3">
+      <button id="theme-toggle" type="button" class="px-2.5 py-1 rounded border border-paper-border bg-paper-subtle text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer hover:border-ink/40" title="Сменить тему">
+        <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4.5"></circle>
+          <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
+        </svg>
+        <span class="hidden sm:inline text-[11px] text-ink-muted font-mono">Тема</span>
+      </button>
+
+      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
+        <span>Верстак / Тулзы</span>
+        <span class="material-symbols-outlined text-[14px]">build</span>
+      </a>
+    </div>
+  </div>
 </header>
 
 <!-- Main Workspace Layout -->
-<main class="w-full max-w-7xl mx-auto relative">
+<main class="w-full flex-grow pt-8 pb-16">
+  <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
 
-    <!-- Breadcrumbs & Quick Tags -->
-    <div class="flex items-center justify-between flex-wrap gap-4 mb-6 relative z-10">
-        <nav class="font-hand text-2xl text-gray-700 flex items-center gap-2 font-bold">
-            <a class="hover:text-sketch-orange hover:underline" href="index.html">Главная</a>
-            <span>➔</span>
-            <a class="hover:text-sketch-orange hover:underline" href="index.html?tag=basics">Основы</a>
-            <span>➔</span>
-            <span class="text-black underline decoration-wavy decoration-sketch-orange">Температурные профили: как не перегреть плату за $300</span>
-        </nav>
-        <span class="ribbon-tag ribbon-orange">Конспект мастера v2.0</span>
+    <!-- Breadcrumbs & Badge -->
+    <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+      <nav class="text-[12px] font-mono text-ink-faint flex items-center gap-1.5 flex-wrap">
+        <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
+        <span>→</span>
+        <a class="hover:text-ink transition-colors" href="index.php?tag=basics">Основы</a>
+        <span>→</span>
+        <span class="text-ink truncate max-w-xs sm:max-w-md">Температурные профили</span>
+      </nav>
+      <span class="pill-tag-orange text-xs font-mono font-medium">Конспект мастера v2.0</span>
     </div>
 
-    <!-- Title Block with Marker Offset -->
-    <div class="mb-10 relative z-10 sketch-box p-6 md:p-10 bg-white">
-        <div class="tape-strip -top-3 left-10 rotate-3"></div>
-        <div class="inline-block ribbon-tag ribbon-yellow mb-4">Основы</div>
-        
-        <h1 class="text-4xl md:text-6xl font-black uppercase text-black leading-tight mb-6 tracking-tight">
-            Температурные профили: как не перегреть плату за $300
-        </h1>
+    <!-- Title Block (Clean Editorial Style) -->
+    <div class="mb-10 space-y-4">
+      <div class="inline-block pill-tag-yellow font-mono text-xs mb-1">Основы пайки</div>
+      
+      <h1 class="text-3xl sm:text-5xl font-bold tracking-tight text-ink leading-[1.18] font-sans">
+        Температурные профили: как не перегреть плату за $300
+      </h1>
 
-        <!-- Hand-drawn Meta Info Row -->
-        <div class="flex flex-wrap gap-4 font-hand text-2xl text-black">
-            <span class="marker-wash-mint px-4 py-1 font-bold">⏱️ 8 мин чтения</span>
-            <span class="marker-wash-yellow px-4 py-1 font-bold">📅 10 авг 2026</span>
-            <span class="marker-wash-orange px-4 py-1 font-bold">👤 Иван Пайкин</span>
-        </div>
+      <!-- Meta Info Row (Vector icons instead of emojis) -->
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-[13px] text-ink-muted font-mono pt-1">
+        <span class="inline-flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-brand-orange">schedule</span>
+          8 мин чтения
+        </span>
+        <span class="text-ink-faint">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-ink-muted">calendar_today</span>
+          10 авг 2026
+        </span>
+        <span class="text-ink-faint">·</span>
+        <span class="inline-flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-ink-muted">person</span>
+          Иван Пайкин
+        </span>
+        <span class="text-ink-faint">·</span>
+        <span class="bg-paper-subtle px-1.5 py-0.5 rounded text-[11px] border border-paper-border">IPC/JEDEC J-STD-020D</span>
+      </div>
+
+      <!-- Lead Paragraph in 19px Serif -->
+      <p class="text-[19px] text-ink font-serif leading-[1.65] pt-3 text-ink/90 border-b border-paper-border pb-6">
+        Разбираем теплоёмкость стеклотекстолита и строим правильную термокривую нагрева для BGA-монтажа и многослойных печатных плат. Почему стандартный фен с фиксированными 350°C сжигает дорожки и как контролировать 4 фазы термопрофиля.
+      </p>
     </div>
 
-    <!-- Grid Container: Central Notebook Page + Marginalia Doodles -->
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
+    <!-- Grid Layout: Left Marginalia, Center Reading Column, Right Sidebar -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start relative">
 
-        <!-- Left Column / Marginalia Doodle Notes (Hidden on mobile) -->
-        <div class="hidden xl:block lg:col-span-1 relative">
-            <div class="sticky top-28 flex flex-col gap-8 items-center text-center">
-                <!-- Vertical Ribbon Markers -->
-                <div class="ribbon-tag ribbon-yellow transform -rotate-90 origin-center whitespace-nowrap mb-6">
-                    Введение
-                </div>
-                <div class="font-hand text-xl text-sketch-orange font-bold transform -rotate-6">
-                    ✏️ Заметки<br>на полях
-                </div>
-                <!-- Sketch Arrow -->
-                <svg class="w-10 h-16 text-black transform rotate-12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 48">
-                    <path d="M12 0v40m-8-8l8 8 8-8" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
+      <!-- Left Column / Sticky Marginalia Notes (Desktop) -->
+      <div class="hidden xl:block lg:col-span-1 relative">
+        <div class="sticky top-28 flex flex-col gap-6 items-center text-center">
+          <div class="pill-tag-yellow font-mono text-[11px] whitespace-nowrap">
+            Введение
+          </div>
+          <div class="font-hand text-xl text-brand-orange font-bold flex flex-col items-center">
+            <span class="material-symbols-outlined text-lg mb-1">edit_note</span>
+            Заметки<br>на полях
+          </div>
+          <!-- Sketched Arrow -->
+          <svg class="w-8 h-12 text-ink-muted transform rotate-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 48">
+            <path d="M12 2v38m-6-6l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Center Column: Main Article Body (8 cols) -->
+      <div class="lg:col-span-8 max-w-[740px] space-y-8">
+
+        <!-- TL;DR Sticky Post-It Note (Yellow with dark mode parity) -->
+        <div class="postit-yellow p-6 rounded-lg relative my-2">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="material-symbols-outlined text-xl text-brand-orange">push_pin</span>
+            <h3 class="font-hand text-2xl font-bold text-ink">В двух словах (TL;DR)</h3>
+          </div>
+          <p class="text-[16px] leading-relaxed text-ink/90">
+            <strong>Ключевая мысль:</strong> Нагрев должен быть плавным и двухсторонним (нижний подогрев 140–160°C обязателен). Без нижнего подогрева верхний фен перегревает чип до деструкции кремния, пока нижние слои меди остаются холодными.
+          </p>
         </div>
 
-        <!-- Center Column: Main Article Body (8 cols) -->
-        <div class="lg:col-span-8 flex flex-col gap-8">
+        <!-- Section 1 -->
+        <section class="space-y-4 pt-2">
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-full border border-paper-border-dark bg-paper-subtle font-mono text-xs font-bold flex items-center justify-center text-ink">1</span>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">Введение и проблематика</h2>
+          </div>
+          <p class="text-ink/85">
+            Качество пайки печатных плат и долговечность поверхностных компонентов напрямую зависят от строгой дисциплины процесса. Ошибки на этапе нагрева приводят к микротрещинам и отслоению медных проводников.
+          </p>
+          <p class="text-ink/85">
+            Стандартная ошибка при пайке сложных чипов — выставлять на станции фиксированные 350°C и греть плату сверху. Датчик станции измеряет температуру спирали внутри фена, а на поверхности текстолита и тем более под корпусом BGA температура оказывается значительно ниже.
+          </p>
+        </section>
 
-            <!-- TL;DR Sticky Note (Paper Post-It Style) -->
-            <div class="marker-wash-yellow p-6 relative">
-                <div class="tape-strip -top-3 right-8 -rotate-6"></div>
-                <div class="flex items-center gap-3 mb-2">
-                    <span class="text-3xl">📌</span>
-                    <h3 class="font-hand text-3xl font-bold text-black">В двух словах (TL;DR)</h3>
-                </div>
-                <p class="font-sans text-lg text-gray-900 leading-relaxed font-medium">
-                    <strong>Ключевая мысль:</strong> Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат.
-                </p>
+        <!-- Custom Callout: IMPORTANT (Peach / Safety with dark parity) -->
+        <div class="postit-peach p-5 rounded-lg my-6">
+          <div class="flex items-start gap-3.5">
+            <span class="material-symbols-outlined text-2xl text-brand-orange shrink-0">warning</span>
+            <div class="space-y-1">
+              <h4 class="font-hand text-2xl font-bold text-ink">Важно знать!</h4>
+              <p class="text-[15px] leading-relaxed text-ink/85">
+                Перегрев выше допустимой нормы вызывает термический шок кристаллов полупроводников и расслоение (деламинацию) многослойного стеклотекстолита. Не превышайте скорость нарастания температуры более 2–3°C в секунду.
+              </p>
             </div>
+          </div>
+        </div>
 
-            <!-- Main Content Container -->
-            <article class="sketch-box p-6 md:p-10 bg-white flex flex-col gap-8 text-lg leading-relaxed relative">
+        <!-- Section 2: SVG Graph -->
+        <section class="space-y-4 pt-2">
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-full border border-paper-border-dark bg-paper-subtle font-mono text-xs font-bold flex items-center justify-center text-ink">2</span>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">График температурного профиля</h2>
+          </div>
+          <p class="text-ink/85">
+            Ниже приведена типовая зависимость температуры монтажной зоны от времени термообработки по регламенту IPC/JEDEC J-STD-020D:
+          </p>
+
+          <!-- Refined Hand-Drawn Sketch Graph SVG (Light & Dark Parity) -->
+          <div class="sketch-frame p-4 sm:p-6 my-6 relative overflow-hidden">
+            <div class="font-hand text-xl font-bold text-ink mb-3 flex items-center gap-2">
+              <span class="material-symbols-outlined text-lg text-brand-orange">show_chart</span>
+              Схема нагрева: T°C / Время (сек)
+            </div>
+            
+            <div class="w-full overflow-x-auto">
+              <svg viewBox="0 0 540 220" width="100%" height="auto" fill="none" class="max-w-full">
+                <!-- Background card -->
+                <rect width="540" height="220" rx="8" class="fill-paper-subtle/50 stroke-paper-border" stroke-width="1.5"/>
                 
-                <!-- Section 1 -->
-                <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="w-8 h-8 rounded-full border-2 border-black bg-sketch-yellow font-bold text-center leading-7 font-hand text-2xl">1</span>
-                        <h2 class="text-3xl font-black uppercase tracking-tight">Введение и проблематика</h2>
-                    </div>
-                    <p class="mb-4">Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат.</p>
-                    <p>Качество пайки печатных плат и долговечность поверхностных компонентов напрямую зависят от строгой дисциплины процесса. Ошибки на этапе нагрева приводят к микротрещинам и отслоению медных дорожек.</p>
-                </div>
+                <!-- Horizontal Guidelines -->
+                <line x1="40" y1="180" x2="500" y2="180" class="stroke-paper-border-dark" stroke-width="1.5" stroke-dasharray="4 4"/>
+                <line x1="40" y1="110" x2="500" y2="110" class="stroke-paper-border-dark" stroke-width="1" stroke-dasharray="3 4"/>
+                <line x1="40" y1="50" x2="500" y2="50" class="stroke-paper-border-dark" stroke-width="1" stroke-dasharray="2 4"/>
+                
+                <!-- Sketch Curve -->
+                <path d="M40 180 Q120 160 180 110 T320 50 T440 80 T500 180" class="stroke-ink" stroke-width="3" stroke-linecap="round" fill="none"/>
+                
+                <!-- Data Points -->
+                <circle cx="180" cy="110" r="7" class="fill-[#fde047] stroke-ink" stroke-width="2"/>
+                <circle cx="320" cy="50" r="7" class="fill-brand-orange stroke-ink" stroke-width="2"/>
+                <circle cx="440" cy="80" r="7" class="fill-[#2dd4bf] stroke-ink" stroke-width="2"/>
+                
+                <!-- Hand-written Annotations -->
+                <text x="110" y="96" font-family="Caveat" font-size="19" font-weight="700" class="fill-ink">Preheat (150°C)</text>
+                <text x="280" y="36" font-family="Caveat" font-size="20" font-weight="700" class="fill-brand-orange">Peak (245°C) ★</text>
+                <text x="430" y="115" font-family="Caveat" font-size="19" font-weight="700" class="fill-ink">Cooling (6°C/s)</text>
+                
+                <!-- Axis Labels (≥11px) -->
+                <text x="40" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">0s</text>
+                <text x="170" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">90s (Soak)</text>
+                <text x="305" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">210s (Reflow)</text>
+                <text x="470" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">300s</text>
+              </svg>
+            </div>
+            <div class="mt-3 text-[11px] font-mono text-ink-faint flex items-center justify-between">
+              <span>Рис. 1. Нормированная кривая SAC305 (Liquidus 217°C)</span>
+              <span class="uppercase">IPC/JEDEC J-STD-020</span>
+            </div>
+          </div>
+        </section>
 
-                <!-- Custom Marker Callout: IMPORTANT (ВАЖНО ЗНАТЬ) -->
-                <div class="marker-wash-orange p-6 my-2 relative">
-                    <div class="flex items-start gap-4">
-                        <span class="text-4xl">⚠️</span>
-                        <div>
-                            <h4 class="font-hand text-3xl font-bold text-black mb-1">Важно знать!</h4>
-                            <p class="text-base font-medium text-gray-900 leading-snug">
-                                Перегрев выше допустимой нормы вызывает термический шок кристаллов полупроводников и расслоение (деламинацию) многослойного стеклотекстолита.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 2 -->
-                <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="w-8 h-8 rounded-full border-2 border-black bg-sketch-mint font-bold text-center leading-7 font-hand text-2xl">2</span>
-                        <h2 class="text-3xl font-black uppercase tracking-tight">График температурного профиля</h2>
-                    </div>
-                    <p class="mb-4">Ниже приведена типовая зависимость температуры монтажной зоны от времени обработки:</p>
-
-                    <!-- Hand-Drawn Sketch Graph SVG -->
-                    <div class="w-full sketch-box p-4 bg-white my-4 relative">
-                        <div class="font-hand text-xl font-bold text-gray-600 mb-2">📈 Схема нагрева: T°C / Время (сек)</div>
-                        <svg viewBox="0 0 540 220" width="100%" height="100%" fill="none" stroke="#1A1A1A" stroke-width="3" stroke-linecap="round">
-                            <rect width="540" height="220" rx="6" fill="#FFFFFF" stroke="#1A1A1A" stroke-width="3"/>
-                            <!-- Sketchy Curve -->
-                            <path d="M40 180 Q120 160 180 110 T320 50 T440 80 T500 180" stroke="#1A1A1A" stroke-width="4" fill="none"/>
-                            <!-- Marker Highlights on points -->
-                            <circle cx="180" cy="110" r="8" fill="#FFF1A8" stroke="#1A1A1A" stroke-width="2.5"/>
-                            <circle cx="320" cy="50" r="8" fill="#FC6C2B" stroke="#1A1A1A" stroke-width="2.5"/>
-                            <circle cx="440" cy="80" r="8" fill="#BDEEE2" stroke="#1A1A1A" stroke-width="2.5"/>
-                            <!-- Guidelines -->
-                            <line x1="40" y1="180" x2="500" y2="180" stroke="#1A1A1A" stroke-dasharray="6 6"/>
-                            <!-- Hand-written style labels inside graph -->
-                            <text x="140" y="100" font-family="Caveat" font-size="20" font-weight="700" fill="#1A1A1A">Preheat (150°C)</text>
-                            <text x="300" y="38" font-family="Caveat" font-size="20" font-weight="700" fill="#FC6C2B">Peak (245°C) ⚡</text>
-                        </svg>
-                    </div>
-                </div>
-
-                <!-- Custom Marker Callout: ENGINEER TIP (ИНЖЕНЕРНЫЙ СОВЕТ) -->
-                <div class="marker-wash-mint p-6 my-2 relative">
-                    <div class="flex items-start gap-4">
-                        <span class="text-4xl">💡</span>
-                        <div>
-                            <h4 class="font-hand text-3xl font-bold text-black mb-1">Инженерный совет</h4>
-                            <p class="text-base font-medium text-gray-900 leading-snug">
-                                Для отслеживания реальной температуры платы на верстаке применяйте внешний цифровой термопарный датчик K-типа.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section 3 -->
-                <div>
-                    <div class="flex items-center gap-3 mb-3">
-                        <span class="w-8 h-8 rounded-full border-2 border-black bg-sketch-peach font-bold text-center leading-7 font-hand text-2xl">3</span>
-                        <h2 class="text-3xl font-black uppercase tracking-tight">Заключение</h2>
-                    </div>
-                    <p>Грамотный выбор оборудования, качественные материалы и следование технологическим картам — гарант стабильной работы ваших DIY-устройств.</p>
-                </div>
-
-                <!-- Share / Copy Action Bar -->
-                <div class="flex flex-wrap items-center justify-between border-t-4 border-black pt-6 mt-4 gap-4">
-                    <span class="font-hand text-3xl font-bold">Понравился конспект?</span>
-                    <button onclick="navigator.clipboard.writeText(window.location.href); alert('Ссылка скопирована!');" class="bg-black text-white px-6 py-2 rounded-full font-bold sketch-box hover:bg-sketch-orange hover:text-black transition-all">
-                        Скопировать ссылку 🔗
-                    </button>
-                </div>
-
-            </article>
+        <!-- Custom Callout: ENGINEER TIP (Mint with dark parity) -->
+        <div class="postit-mint p-5 rounded-lg my-6">
+          <div class="flex items-start gap-3.5">
+            <span class="material-symbols-outlined text-2xl text-emerald-600 dark:text-emerald-400 shrink-0">lightbulb</span>
+            <div class="space-y-1">
+              <h4 class="font-hand text-2xl font-bold text-ink">Инженерный совет</h4>
+              <p class="text-[15px] leading-relaxed text-ink/85">
+                Для отслеживания реальной температуры платы на верстаке применяйте внешний цифровой термопарный датчик K-типа, закреплённый термоскотчем прямо у выводов микросхемы.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <!-- Right Column: Sidebar (3 cols) -->
-        <div class="lg:col-span-3 flex flex-col gap-8">
+        <!-- Section 3: Conclusion -->
+        <section class="space-y-4 pt-2">
+          <div class="flex items-center gap-3">
+            <span class="w-7 h-7 rounded-full border border-paper-border-dark bg-paper-subtle font-mono text-xs font-bold flex items-center justify-center text-ink">3</span>
+            <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink">Заключение</h2>
+          </div>
+          <p class="text-ink/85">
+            Грамотный выбор оборудования, качественные материалы и строгое следование технологическим картам — гарант стабильной работы ваших DIY-устройств без отрыва пятаков и внутреннего расслоения текстолита.
+          </p>
+        </section>
 
-            <!-- Author & Lab Stamp Badge (Sketchbook Style) -->
-            <div class="sketch-box p-6 bg-white flex flex-col gap-4 relative">
-                <div class="tape-strip -top-3 left-6 rotate-3"></div>
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-full border-2 border-black bg-black text-white font-bold flex items-center justify-center text-lg shadow-[2px_2px_0px_0px_#1A1A1A]">
-                        ТЧП
-                    </div>
-                    <div>
-                        <div class="font-bold text-black text-lg">Иван Пайкин</div>
-                        <div class="font-hand text-xl text-gray-600">Инженер-практик</div>
-                    </div>
-                </div>
-                <div class="border-t-2 border-dashed border-black pt-3">
-                    <span class="inline-block ribbon-tag ribbon-mint text-xs">
-                        ⚡ Проверено в лаборатории
-                    </span>
-                </div>
-            </div>
-
-            <!-- Table of Contents -->
-            <div class="sketch-box p-6 bg-white sticky top-24">
-                <h3 class="font-black text-xl uppercase mb-4 border-b-3 border-black pb-2 flex items-center gap-2">
-                    📌 Оглавление
-                </h3>
-                <ul class="flex flex-col gap-3 font-bold text-base">
-                    <li><a href="#" class="hover:text-sketch-orange hover:underline flex items-center gap-2"><span>①</span> Введение</a></li>
-                    <li><a href="#" class="hover:text-sketch-orange hover:underline flex items-center gap-2"><span>②</span> Температурный профиль</a></li>
-                    <li><a href="#" class="hover:text-sketch-orange hover:underline flex items-center gap-2"><span>③</span> Заключение</a></li>
-                </ul>
-            </div>
-
-            <!-- Related Articles -->
-            <div class="sketch-box p-6 bg-white flex flex-col gap-4">
-                <h3 class="font-black text-xl uppercase border-b-3 border-black pb-2 flex items-center gap-2">
-                    📚 Читайте также
-                </h3>
-                <a href="article-v2.html?slug=smd-0402-vs-0603" class="group block border-2 border-black p-3 hover:bg-sketch-yellow transition-all sketch-box">
-                    <span class="text-xs font-bold uppercase text-sketch-orange mb-1 block">SMD</span>
-                    <h4 class="font-bold text-sm uppercase group-hover:text-black transition-colors leading-tight mb-1">SMD 0402 VS 0603: ЧТО ВЫБРАТЬ ДЛЯ ПРОТОТИПА</h4>
-                    <span class="font-hand text-lg text-gray-600">05 авг 2026</span>
-                </a>
-                <a href="article-v2.html?slug=gid-po-flyusam" class="group block border-2 border-black p-3 hover:bg-sketch-yellow transition-all sketch-box">
-                    <span class="text-xs font-bold uppercase text-sketch-orange mb-1 block">Материалы</span>
-                    <h4 class="font-bold text-sm uppercase group-hover:text-black transition-colors leading-tight mb-1">ГИД ПО ФЛЮСАМ: RMA, NC И NO-CLEAN В ШПРИЦЕ</h4>
-                    <span class="font-hand text-lg text-gray-600">01 авг 2026</span>
-                </a>
-                <a href="article-v2.html?slug=zhala-payalnika" class="group block border-2 border-black p-3 hover:bg-sketch-yellow transition-all sketch-box">
-                    <span class="text-xs font-bold uppercase text-sketch-orange mb-1 block">Инструменты</span>
-                    <h4 class="font-bold text-sm uppercase group-hover:text-black transition-colors leading-tight mb-1">ЖАЛА ПАЯЛЬНИКА: T12 ПРОТИВ JBC C245 НА ВЕРСТАКЕ</h4>
-                    <span class="font-hand text-lg text-gray-600">28 июл 2026</span>
-                </a>
-            </div>
-
+        <!-- Share / Copy Action Bar -->
+        <div class="flex flex-wrap items-center justify-between border-t border-paper-border pt-6 mt-8 gap-4">
+          <span class="font-hand text-2xl font-bold text-ink">Понравился конспект?</span>
+          <button id="copy-btn" onclick="navigator.clipboard.writeText(window.location.href); this.innerText='Ссылка скопирована!';" class="inline-flex items-center gap-2 px-5 py-2.5 rounded border border-paper-border-dark bg-ink text-paper text-sm font-mono font-medium hover:opacity-90 transition-all cursor-pointer">
+            <span class="material-symbols-outlined text-base">link</span>
+            <span>Скопировать ссылку</span>
+          </button>
         </div>
+
+      </div>
+
+      <!-- Right Column: Sidebar (3 cols) -->
+      <div class="lg:col-span-4 space-y-6">
+
+        <!-- Author Card -->
+        <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle/50 space-y-3">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded border border-paper-border bg-ink text-paper font-mono font-bold flex items-center justify-center text-xs">
+              ТП
+            </div>
+            <div>
+              <div class="font-bold text-ink text-sm">Иван Пайкин</div>
+              <div class="font-hand text-lg text-ink-muted">Инженер-практик ТЧП</div>
+            </div>
+          </div>
+          <div class="border-t border-paper-border pt-2.5">
+            <span class="pill-tag-mint text-[11px] font-mono">
+              Верифицировано лабораторией
+            </span>
+          </div>
+        </div>
+
+        <!-- Table of Contents -->
+        <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle/40 sticky top-20 space-y-3">
+          <h3 class="font-mono text-xs uppercase tracking-wider font-semibold text-ink flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-brand-orange">push_pin</span>
+            Оглавление статьи
+          </h3>
+          <ul class="space-y-2 text-sm text-ink-muted font-sans">
+            <li><a href="#" class="hover:text-ink transition-colors flex items-center gap-2"><span>1.</span> Введение и проблематика</a></li>
+            <li><a href="#" class="hover:text-ink transition-colors flex items-center gap-2"><span>2.</span> График термопрофиля</a></li>
+            <li><a href="#" class="hover:text-ink transition-colors flex items-center gap-2"><span>3.</span> Заключение</a></li>
+          </ul>
+        </div>
+
+        <!-- Related Articles -->
+        <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle/30 space-y-3">
+          <h3 class="font-mono text-xs uppercase tracking-wider font-semibold text-ink flex items-center gap-2">
+            <span class="material-symbols-outlined text-sm text-brand-orange">menu_book</span>
+            Читайте также
+          </h3>
+          <div class="space-y-2.5">
+            <a href="article.php?slug=smd-0402-vs-0603" class="block p-3 rounded border border-paper-border bg-paper hover:border-ink/40 transition-all">
+              <span class="text-[11px] font-mono text-brand-orange uppercase block mb-1">SMD</span>
+              <h4 class="font-bold text-xs text-ink uppercase leading-snug">SMD 0402 vs 0603: что выбрать для прототипа</h4>
+              <span class="font-hand text-base text-ink-muted mt-1 block">05 авг 2026</span>
+            </a>
+            <a href="article.php?slug=gid-po-flyusam" class="block p-3 rounded border border-paper-border bg-paper hover:border-ink/40 transition-all">
+              <span class="text-[11px] font-mono text-brand-orange uppercase block mb-1">Материалы</span>
+              <h4 class="font-bold text-xs text-ink uppercase leading-snug">Гид по флюсам: RMA, NC и No-Clean в шприце</h4>
+              <span class="font-hand text-base text-ink-muted mt-1 block">01 авг 2026</span>
+            </a>
+            <a href="article.php?slug=zhala-payalnika" class="block p-3 rounded border border-paper-border bg-paper hover:border-ink/40 transition-all">
+              <span class="text-[11px] font-mono text-brand-orange uppercase block mb-1">Инструменты</span>
+              <h4 class="font-bold text-xs text-ink uppercase leading-snug">Жала паяльника: T12 против JBC C245 на верстаке</h4>
+              <span class="font-hand text-base text-ink-muted mt-1 block">28 июл 2026</span>
+            </a>
+          </div>
+        </div>
+
+      </div>
 
     </div>
 
+  </div>
 </main>
 
 <!-- Footer -->
-<footer class="max-w-7xl mx-auto mt-12 mb-8 w-full">
-    <div class="sketch-box p-6 flex flex-col md:flex-row justify-between items-center text-sm font-bold uppercase tracking-wider bg-white">
-        <p class="mb-4 md:mb-0">© 2026 Точка Плавления. Anti-perfect Handcraft.</p>
-        <div class="flex gap-6">
-            <a class="hover:text-sketch-orange transition-colors" href="interactive.html">Инструменты</a>
-            <a class="hover:text-sketch-orange transition-colors" href="cookies.html">Cookies</a>
-            <a class="hover:text-sketch-orange transition-colors" href="privacy.html">Privacy</a>
-        </div>
+<footer class="w-full border-t border-paper-border bg-paper-subtle/50 py-8 text-xs font-mono text-ink-muted">
+  <div class="max-w-[1140px] mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p>© 2026 Точка Плавления. Anti-perfect Handcraft.</p>
+    <div class="flex items-center gap-5">
+      <a class="hover:text-ink transition-colors" href="index.php">Статьи</a>
+      <a class="hover:text-ink transition-colors" href="interactive.php">Инструменты</a>
+      <a class="hover:text-ink transition-colors" href="cookies.php">Cookies</a>
+      <a class="hover:text-ink transition-colors" href="privacy.php">Privacy</a>
     </div>
+  </div>
 </footer>
+
+<script>
+  // Theme toggle functionality
+  const themeToggle = document.getElementById('theme-toggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
+    });
+  }
+</script>
 
 </body>
 </html>

@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!area || area <= 0) {
             resultDiv.style.display = 'block';
             resultDiv.className = 'callout important';
-            resultDiv.innerHTML = '<div class="callout-title">⚠️ Ошибка</div><p>Введите корректную площадь платы в см².</p>';
+            resultDiv.innerHTML = '<div class="callout-title"><span class="material-symbols-outlined text-[16px] align-middle mr-1 text-brand-orange">warning</span> Ошибка</div><p>Введите корректную площадь платы в см².</p>';
             return;
         }
 
@@ -26,6 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         resultDiv.style.display = 'block';
         resultDiv.className = 'callout tip';
-        resultDiv.innerHTML = `<div class="callout-title">💡 Результат расчёта</div><p>Вам понадобится примерно <strong>${amount} г</strong> флюса. ${tip}</p>`;
+        resultDiv.innerHTML = `<div class="callout-title"><span class="material-symbols-outlined text-[16px] align-middle mr-1 text-emerald-600">lightbulb</span> Результат расчёта</div><p>Вам понадобится примерно <strong>${amount} г</strong> флюса. ${tip}</p>`;
     });
 });

@@ -1,69 +1,100 @@
 <?php
 /**
- * cookies.php — Политика использования файлов cookie
- * Точка Плавления
+ * Template Name: Политика Cookie
+ *
+ * @package TCHP
+ * @version 2.1.0
  */
-require_once __DIR__ . '/includes/functions.php';
 
-$page_title   = 'Политика куки — Точка Плавления';
-$page_desc    = 'Информация об использовании файлов cookie на портале «Точка Плавления».';
-$current_page = 'cookies';
-$extra_css    = '/assets/css/article.css';
-
-require_once __DIR__ . '/includes/header.php';
+get_header();
 ?>
 
-<div class="section" style="max-width: 900px;">
-  <nav class="breadcrumbs">
-    <a href="/">Главная</a>
-    <span class="breadcrumb-sep">/</span>
-    <span>Политика куки</span>
-  </nav>
+<main class="w-full flex-grow pt-8 pb-16">
+  <div class="max-w-[840px] mx-auto px-5 sm:px-8 space-y-10">
 
-  <header class="article-hero">
-    <h1 class="hero-h1">Политика использования <span class="wavy">Cookie</span></h1>
-    <p class="hero-sub">Мы уважительно относимся к вашей приватности. Ниже описано, какие куки мы создаём и зачем.</p>
-  </header>
+    <!-- Breadcrumb -->
+    <nav class="text-[12px] font-mono text-ink-faint flex items-center gap-1.5 flex-wrap">
+      <a class="hover:text-ink transition-colors" href="<?php echo esc_url(home_url('/')); ?>">Главная</a>
+      <span>→</span>
+      <span class="text-ink">Политика Cookie</span>
+    </nav>
 
-  <article class="article-content">
-    <h2>1. Что такое файлы cookie?</h2>
-    <p>
-      Cookie (куки) — это небольшие текстовые фрагменты данных, которые ваш браузер сохраняет на устройстве при посещении веб-страниц. Они помогают сайту запомнить ваши предпочтения.
-    </p>
+    <!-- Header Section -->
+    <div class="space-y-3 border-b border-paper-border pb-6">
+      <div class="inline-block pill-tag-yellow font-mono text-xs">Технический регламент</div>
+      <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-ink font-sans">
+        Политика использования файлов Cookie и локального хранилища
+      </h1>
+      <p class="text-sm sm:text-base text-ink-muted leading-relaxed font-serif italic">
+        Мы уважительно относимся к вашей приватности. Ниже описано, какие технические данные и cookies сохраняются в браузере.
+      </p>
+    </div>
 
-    <h2>2. какие куки мы используем</h2>
-    <p>Наш портал использует минимальный технический набор cookie-файлов:</p>
+    <!-- Content Sections -->
+    <div class="space-y-6 text-[15px] text-ink/85 leading-relaxed">
 
-    <table>
-      <thead>
-        <tr>
-          <th>Имя Cookie</th>
-          <th>Назначение</th>
-          <th>Срок хранения</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>cookie_consent</code></td>
-          <td>Запоминает ваше согласие с показом баннера куки, чтобы не беспокоить вас повторно.</td>
-          <td>1 год</td>
-        </tr>
-        <tr>
-          <td><code>PHPSESSID</code></td>
-          <td>Техническая сессия для работы встроенной формы комментариев и тестов.</td>
-          <td>До закрытия браузера</td>
-        </tr>
-      </tbody>
-    </table>
+      <section class="border border-paper-border rounded-lg bg-paper-subtle/30 p-6 space-y-3">
+        <h2 class="text-base font-bold text-ink font-mono uppercase tracking-wider flex items-center gap-2">
+          <span class="text-brand-orange font-bold">01.</span> Что такое файлы Cookie?
+        </h2>
+        <p>
+          Cookie (куки) — это небольшие фрагменты текста, которые веб-сервер отправляет браузеру пользователя. При повторном посещении браузер передает эти данные сайту для восстановления персональных настроек отображения.
+        </p>
+      </section>
 
-    <h2>3. Как отключить cookie?</h2>
-    <p>
-      Вы можете запретить сохранение cookie в настройках любого браузера (Chrome, Firefox, Safari, Edge). Обратите внимание, что в этом случае баннер куки будет выводиться при каждом визите.
-    </p>
+      <section class="border border-paper-border rounded-lg bg-paper-subtle/30 p-6 space-y-4">
+        <h2 class="text-base font-bold text-ink font-mono uppercase tracking-wider flex items-center gap-2">
+          <span class="text-brand-orange font-bold">02.</span> Какие Cookie и параметры мы используем
+        </h2>
+        <p>Наш портал использует минимальный технический набор без сбора персональных данных:</p>
 
-    <h2>4. Контакты</h2>
-    <p>Если у вас есть вопросы по работе портала, напишите нам по адресу: <code>privacy@tochka-plavleniya.ru</code></p>
-  </article>
-</div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left font-mono text-xs border border-paper-border rounded">
+            <thead>
+              <tr class="bg-paper-subtle text-ink border-b border-paper-border">
+                <th class="p-3">Ключ</th>
+                <th class="p-3">Хранилище</th>
+                <th class="p-3">Назначение</th>
+                <th class="p-3">Срок</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-paper-border text-ink-muted">
+              <tr>
+                <td class="p-3 font-bold text-ink"><code>tp_theme</code></td>
+                <td class="p-3">localStorage</td>
+                <td class="p-3">Сохраняет выбранную тему оформления (светлая / тёмная) для предотвращения мерцания экрана.</td>
+                <td class="p-3">Постоянно</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-ink"><code>tp_cookie_consent</code></td>
+                <td class="p-3">localStorage</td>
+                <td class="p-3">Запоминает факт согласия с информационным баннером, чтобы не показывать его повторно.</td>
+                <td class="p-3">1 год</td>
+              </tr>
+              <tr>
+                <td class="p-3 font-bold text-ink"><code>_ym_uid</code></td>
+                <td class="p-3">Cookie</td>
+                <td class="p-3">Обезличенный идентификатор сессии Яндекс Метрики (агрегированная аналитика без PII).</td>
+                <td class="p-3">1 год</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
+      <section class="border border-paper-border rounded-lg bg-paper-subtle/30 p-6 space-y-3">
+        <h2 class="text-base font-bold text-ink font-mono uppercase tracking-wider flex items-center gap-2">
+          <span class="text-brand-orange font-bold">03.</span> Как управлять Cookie
+        </h2>
+        <p>
+          Вы можете в любой момент отключить или очистить сохраненные Cookie в настройках своего интернет-браузера (в разделах «Конфиденциальность и безопасность»). Отключение технических cookies может сбросить сохраненную тему сайта на светлую по умолчанию.
+        </p>
+      </section>
+
+    </div>
+
+  </div>
+</main>
+
+<?php
+get_footer();

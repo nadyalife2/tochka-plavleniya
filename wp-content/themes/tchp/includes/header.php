@@ -13,7 +13,7 @@
 <body>
     <div class="container">
         <header class="header">
-            <a href="/" class="logo">Точка<span>.</span>Плавления</a>
+            <a href="/" class="logo">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
             
             <div class="header-right">
                 <!-- Custom PCB Command Search Console -->
@@ -54,12 +54,12 @@
 
                 <!-- Theme Switcher Selector -->
                 <select id="theme-select" class="theme-select" title="Выбор цветового режима" aria-label="Выбор цветового режима">
-                    <option value="minimal">⚪ Минимал (VC.ru / Habr)</option>
-                    <option value="craft">📜 Крафт</option>
-                    <option value="blueprint">📐 Чертёж (Белый / Сетка)</option>
-                    <option value="dark">🌙 Тёмная</option>
-                    <option value="pcb">🌲 Текстолит</option>
-                    <option value="pastel">🎨 Пастель</option>
+                    <option value="minimal">Минимал (Светлая)</option>
+                    <option value="craft">Крафт (Инженерная)</option>
+                    <option value="blueprint">Чертёж (Белый / Сетка)</option>
+                    <option value="dark">Тёмная лаборатория</option>
+                    <option value="pcb">Текстолит (PCB)</option>
+                    <option value="pastel">Пастель</option>
                 </select>
 
                 <!-- Mobile Burger Toggle Button -->
@@ -75,14 +75,14 @@
         <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true">
             <div class="drawer-content">
                 <div class="drawer-header">
-                    <a href="/" class="logo" style="font-size: 1.3rem;">Точка<span>.</span>Плавления</a>
+                    <a href="/" class="logo">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
                     <button type="button" class="drawer-close" id="drawer-close" aria-label="Закрыть меню">✕</button>
                 </div>
                 <nav class="drawer-nav">
-                    <a href="/">⚡ Статьи</a>
-                    <a href="/interactive.php">🧮 Инструменты</a>
-                    <a href="/cookies.php">📜 Cookies</a>
-                    <a href="/privacy.php">🔒 Privacy</a>
+                    <a href="/">Статьи</a>
+                    <a href="/interactive.php">Инструменты</a>
+                    <a href="/cookies.php">Cookies</a>
+                    <a href="/privacy.php">Политика</a>
                 </nav>
             </div>
         </div>

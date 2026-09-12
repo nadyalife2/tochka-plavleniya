@@ -1,0 +1,206 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ==========================================================================
+   GLOBAL DESIGN TOKENS & FIXES
+   ========================================================================== */
+
+:root {
+  --color-paper: #faf8f5;
+  --color-paper-subtle: #f3f0ea;
+  --color-paper-border: #e6e2da;
+  --color-paper-border-dark: #d3cdc2;
+  --color-ink: #141414;
+  --color-ink-muted: #6b665f;
+  /* WCAG AA Compliance: #666159 on #faf8f5 is > 4.7:1 contrast ratio */
+  --color-ink-faint: #666159;
+  --color-callout: #fcfaf2;
+  --color-card: rgba(255, 255, 255, 0.75);
+  --dot-color: #d3cdc2;
+  --bg-color: #faf8f5;
+}
+
+html.dark {
+  --color-paper: #12141a;
+  --color-paper-subtle: #191c24;
+  --color-paper-border: #282d3b;
+  --color-paper-border-dark: #373e52;
+  --color-ink: #f3f4f6;
+  --color-ink-muted: #9ca3af;
+  --color-ink-faint: #9ca3af;
+  --color-callout: #1b1f2b;
+  --color-card: rgba(24, 27, 36, 0.85);
+  --dot-color: #2b3142;
+  --bg-color: #12141a;
+}
+
+/* Global Mobile Overflow Fix */
+html, body {
+  overflow-x: clip;
+}
+
+/* Global Focus-Visible States (Accessibility) */
+:focus-visible {
+  outline: 2px solid #eb5211 !important;
+  outline-offset: 2px !important;
+}
+
+/* Base Body Texture */
+body {
+  background-color: var(--bg-color);
+  background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px);
+  background-size: 20px 20px;
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background-color: #fef08a;
+  color: #141414;
+}
+
+/* Universal Brand Logo (IBM Plex Sans, no font zoo) */
+.logo {
+  font-family: "IBM Plex Sans", system-ui, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--color-ink);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+
+.logo:hover {
+  opacity: 0.85;
+}
+
+.logo span {
+  color: #141414;
+  background: #facc15;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  transform: skew(-6deg);
+  display: inline-block;
+  margin: 0 0.15rem;
+  font-size: 1.05em;
+  line-height: 0.9;
+}
+
+/* ==========================================================================
+   DARK THEME ACCENT PARITY (Yellow, Mint, Peach Pills & Post-Its)
+   ========================================================================== */
+
+/* Post-It Yellow Note (TL;DR) */
+.postit-yellow {
+  background-color: #fef9c3;
+  border: 1px solid #fde047;
+  color: #1c1917;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.04);
+}
+html.dark .postit-yellow {
+  background-color: rgba(202, 138, 4, 0.15);
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  color: #fef08a;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+}
+
+/* Post-It Mint Note (Engineer Tip) */
+.postit-mint {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #14532d;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.04);
+}
+html.dark .postit-mint {
+  background-color: rgba(13, 148, 136, 0.15);
+  border: 1px solid rgba(20, 184, 166, 0.3);
+  color: #5eead4;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+}
+
+/* Post-It Peach / Orange Note (Warning / Safety) */
+.postit-peach {
+  background-color: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #9a3412;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.04);
+}
+html.dark .postit-peach {
+  background-color: rgba(234, 88, 12, 0.15);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  color: #fdba74;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.25);
+}
+
+/* Subtle Sketch Outline for Graphs / Schemas */
+.sketch-frame {
+  border: 1.5px solid var(--color-paper-border-dark);
+  border-radius: 8px;
+  background: var(--color-card);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+html.dark .sketch-frame {
+  border-color: var(--color-paper-border);
+  background: rgba(24, 27, 36, 0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+/* Pill Badges with dark parity */
+.pill-tag-yellow {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #fef08a;
+  color: #713f12;
+  border: 1px solid #fde047;
+}
+html.dark .pill-tag-yellow {
+  background: rgba(202, 138, 4, 0.2);
+  color: #fef08a;
+  border-color: rgba(234, 179, 8, 0.3);
+}
+
+.pill-tag-mint {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #ccfbf1;
+  color: #115e59;
+  border: 1px solid #99f6e4;
+}
+html.dark .pill-tag-mint {
+  background: rgba(13, 148, 136, 0.2);
+  color: #5eead4;
+  border-color: rgba(20, 184, 166, 0.3);
+}
+
+.pill-tag-orange {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.65rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #ffedd5;
+  color: #9a3412;
+  border: 1px solid #fed7aa;
+}
+html.dark .pill-tag-orange {
+  background: rgba(234, 88, 12, 0.2);
+  color: #fdba74;
+  border-color: rgba(249, 115, 22, 0.3);
+}

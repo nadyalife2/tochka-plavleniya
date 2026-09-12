@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (matches.length === 0) {
             headerSearchResults.innerHTML = `
                 <div style="padding: 1rem; text-align: center; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.85rem;">
-                    Ничего не найдено по запросу «<strong>${query}</strong>» 🔍
+                    Ничего не найдено по запросу «<strong>${query}</strong>»
                 </div>
             `;
         } else {
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (visibleCount === 0 && query !== '') {
-            noResultsMsg.innerHTML = `🔍 Ничего не найдено по запросу «<strong>${query}</strong>»`;
+            noResultsMsg.innerHTML = `<span class="material-symbols-outlined text-[15px] align-middle mr-1 text-ink-muted">search</span> Ничего не найдено по запросу «<strong>${query}</strong>»`;
             noResultsMsg.style.display = 'block';
         } else {
             noResultsMsg.style.display = 'none';

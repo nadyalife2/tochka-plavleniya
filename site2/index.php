@@ -31,45 +31,10 @@ foreach ($articles as $article) {
     })();
   </script>
 
-  <!-- Google Fonts: Inter, IBM Plex Sans, JetBrains Mono, Caveat, Newsreader, Hanken Grotesk -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Hanken+Grotesk:wght@700;900&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,400&display=swap" rel="stylesheet">
-  
-  <!-- Tailwind CSS v3 -->
-  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            paper: 'var(--color-paper)',
-            'paper-subtle': 'var(--color-paper-subtle)',
-            'paper-border': 'var(--color-paper-border)',
-            'paper-border-dark': 'var(--color-paper-border-dark)',
-            ink: 'var(--color-ink)',
-            'ink-muted': 'var(--color-ink-muted)',
-            'ink-faint': 'var(--color-ink-faint)',
-            callout: 'var(--color-callout)',
-            card: 'var(--color-card)',
-            brand: {
-              orange: '#eb5211',
-              dark: '#0f0f0f',
-              yellowNote: '#fcf282'
-            }
-          },
-          fontFamily: {
-            sans: ['"IBM Plex Sans"', 'Inter', 'sans-serif'],
-            serif: ['Newsreader', 'Georgia', 'serif'],
-            mono: ['"JetBrains Mono"', 'monospace'],
-            hand: ['"Caveat"', 'cursive'],
-            logo: ['"Hanken Grotesk"', 'sans-serif']
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="assets/css/build.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
   <!-- Technical Grid Pattern & Theme Variables -->
   <style>
@@ -80,7 +45,8 @@ foreach ($articles as $article) {
       --color-paper-border-dark: #d3cdc2;
       --color-ink: #141414;
       --color-ink-muted: #6b665f;
-      --color-ink-faint: #9e988f;
+      /* WCAG AA Compliance: >= 4.7:1 contrast on #faf8f5 */
+      --color-ink-faint: #666159;
       --color-callout: #fcfaf2;
       --color-card: rgba(255, 255, 255, 0.75);
       --dot-color: #d3cdc2;
@@ -94,11 +60,20 @@ foreach ($articles as $article) {
       --color-paper-border-dark: #373e52;
       --color-ink: #f3f4f6;
       --color-ink-muted: #9ca3af;
-      --color-ink-faint: #6b7280;
+      --color-ink-faint: #9ca3af;
       --color-callout: #1b1f2b;
       --color-card: rgba(24, 27, 36, 0.85);
       --dot-color: #2b3142;
       --bg-color: #12141a;
+    }
+
+    html, body {
+      overflow-x: clip;
+    }
+
+    :focus-visible {
+      outline: 2px solid #eb5211 !important;
+      outline-offset: 2px !important;
     }
 
     body {
@@ -118,12 +93,12 @@ foreach ($articles as $article) {
 
     /* BRAND LOGO */
     .logo { 
-      font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
+      font-family: 'IBM Plex Sans', sans-serif; 
       font-size: 1.25rem; 
-      font-weight: 900; 
+      font-weight: 800; 
       text-decoration: none; 
       color: var(--color-ink); 
-      letter-spacing: -0.02em; 
+      letter-spacing: -0.03em; 
       text-transform: uppercase; 
       display: inline-flex; 
       align-items: center; 
@@ -293,7 +268,7 @@ foreach ($articles as $article) {
 
         <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
           <span>Верстак / Тулзы</span>
-          <span class="text-[10px]">⚙</span>
+          <span class="material-symbols-outlined text-[13px]">build</span>
         </a>
       </div>
     </div>
@@ -397,7 +372,7 @@ foreach ($articles as $article) {
             <!-- Image Frame -->
             <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
               <img src="https://lh3.googleusercontent.com/aida/AEtjO1XPXO_7vFBi0-sZRVk7MH6OetXskpHt5Xcf3Ip6nfHDDYM7qdO0nERNQaH_49PYrri281JQZUD0JhgzliwsR7F5Ks8GvSMY32dTxDUIHzZ_P5Drz6niq2ZSyIRirmXvsdrZExlqKeZ_11m0Vf64Fa9fYCMG9SMrAAg0F5hGzsceoEP1ajdrLph6LgFKfgF6aLS30BF8hJJkW20S0l03CIQZ4uc7pmSJ_MFPJyqCHL4KNonVuGSJXGX1rAg" alt="Схема термопрофиля пайки BGA и распределения тепла" class="w-full h-52 sm:h-60 object-cover object-center" loading="lazy">
-              <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-paper/90 border border-paper-border text-[10px] font-mono text-ink-muted rounded backdrop-blur-sm">
+              <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-paper/90 border border-paper-border text-[11px] font-mono text-ink-muted rounded backdrop-blur-sm">
                 FIG. 4.0 // SCHEMATIC
               </div>
             </div>
@@ -609,7 +584,7 @@ foreach ($articles as $article) {
                 <span class="w-2 h-2 bg-ink rounded-full inline-block"></span>
                 Лаборатория ТЧП
               </div>
-              <span class="text-[10px] text-ink bg-paper-subtle border border-paper-border-dark px-2 py-0.5 font-mono font-bold inline-block sketch-border" style="transform: rotate(0.6deg);">OPEN</span>
+              <span class="text-[11px] text-ink bg-paper-subtle border border-paper-border-dark px-2 py-0.5 font-mono font-bold inline-block sketch-border" style="transform: rotate(0.6deg);">OPEN</span>
             </div>
             <p class="text-ink-muted leading-relaxed">
               Практические замеры, отчеты дефектов пайки и тесты термоинтерфейсов в открытой базе знаний.
@@ -622,11 +597,11 @@ foreach ($articles as $article) {
           <!-- Tape & Caution Sketch Box -->
           <div class="relative p-3.5 bg-paper-subtle border-2 border-dashed border-ink/70 rotate-[1.2deg] shadow-sm space-y-1.5 sketch-border">
             <div class="absolute -top-2.5 right-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/80 dark:border-[#968458]/70 shadow-sm rotate-[-3deg] pointer-events-none" style="backdrop-filter: blur(1px);"></div>
-            <div class="flex items-center justify-between font-mono text-[10.5px] font-bold text-ink">
+            <div class="flex items-center justify-between font-mono text-[11px] font-bold text-ink">
               <span class="flex items-center gap-1.5">
                 <svg class="w-3.5 h-3.5 text-accent stroke-current inline-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>НЕ ГРЕТЬ ВЫШЕ 245°C
               </span>
-              <span class="px-1.5 py-0.2 text-[9.5px] bg-paper border border-paper-border-dark">J-STD</span>
+              <span class="px-1.5 py-0.5 text-[11px] bg-paper border border-paper-border-dark">J-STD</span>
             </div>
             <p class="font-mono text-[11px] text-ink-muted leading-tight">
               Деградация подложки и интерметаллидов начинается через 8 секунд перегрева.
@@ -637,7 +612,7 @@ foreach ($articles as $article) {
           <div class="border border-paper-border rounded-lg bg-card p-5 space-y-3 relative">
             <div class="flex items-center justify-between">
               <div class="text-[11px] font-mono text-ink-faint uppercase">Опорные температуры:</div>
-              <span class="font-mono text-[10px] text-ink-faint">FIG. 1.2 // REWORK</span>
+              <span class="font-mono text-[11px] text-ink-faint">FIG. 1.2 // REWORK</span>
             </div>
             <div class="space-y-2 font-mono text-xs">
               <div class="flex items-center justify-between pb-1.5 border-b border-paper-border">
@@ -662,7 +637,7 @@ foreach ($articles as $article) {
             </div>
 
             <!-- Hand drawn sketch doodle of BGA package with dimensions -->
-            <div class="pt-2 border-t border-paper-border flex items-center justify-between text-ink-faint font-mono text-[10px]">
+            <div class="pt-2 border-t border-paper-border flex items-center justify-between text-ink-faint font-mono text-[11px]">
               <div class="flex items-center gap-1.5">
                 <svg class="w-10 h-5 text-ink-muted" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.2" viewBox="0 0 50 24">
                   <rect height="14" stroke-dasharray="2 2" width="34" x="8" y="3"></rect>

@@ -199,8 +199,8 @@ def save_local_preview(article_data: Dict[str, Any], output_path: str) -> None:
 <head>
   <meta charset="UTF-8">
   <title>{article_data.get('title', 'Предпросмотр статьи')}</title>
-  <link rel="stylesheet" href="../site2/assets/css/article-pro.css">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="../site2/assets/css/fonts.css">
+  <link rel="stylesheet" href="../site2/assets/css/build.css">
 </head>
 <body class="p-8 max-w-4xl mx-auto bg-[#faf8f5]">
   <h1 class="text-3xl font-bold mb-4">{article_data.get('title')}</h1>

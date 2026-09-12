@@ -26,8 +26,9 @@ require_once __DIR__ . '/includes/header.php';
       <!-- Burnt trace crack -->
       <polyline points="50,100 80,100 95,85 110,85" stroke="#ef4444"/>
       <circle cx="80" cy="100" r="3" fill="#ef4444"/>
-      <!-- Skull / Warning icon -->
-      <text x="235" y="65" font-size="28" stroke="none">💀</text>
+      <!-- Warning trace node -->
+      <circle cx="245" cy="65" r="8" fill="rgba(239,68,68,0.2)" stroke="#ef4444" stroke-width="1.5"/>
+      <path d="M245 60v6m0 3v1" stroke="#ef4444" stroke-width="1.8" stroke-linecap="round"/>
     </svg>
   </div>
 

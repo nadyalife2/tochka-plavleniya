@@ -24,39 +24,10 @@ require_once __DIR__ . '/includes/functions.php';
     })();
   </script>
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            paper: 'var(--color-paper)',
-            'paper-subtle': 'var(--color-paper-subtle)',
-            'paper-border': 'var(--color-paper-border)',
-            'paper-border-dark': 'var(--color-paper-border-dark)',
-            ink: 'var(--color-ink)',
-            'ink-muted': 'var(--color-ink-muted)',
-            'ink-faint': 'var(--color-ink-faint)',
-            accent: 'var(--color-accent)',
-            'accent-light': 'var(--color-accent-light)',
-            'accent-muted': 'var(--color-accent-muted)',
-          },
-          fontFamily: {
-            sans: ['Space Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            serif: ['Newsreader', 'Georgia', 'serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          }
-        }
-      }
-    }
-  </script>
+  <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
+  <link rel="stylesheet" href="assets/css/fonts.css">
+  <link rel="stylesheet" href="assets/css/build.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -179,7 +150,7 @@ require_once __DIR__ . '/includes/functions.php';
 
         <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
           <span>Верстак</span>
-          <span class="text-[10px]">⚙</span>
+          <span class="material-symbols-outlined text-[13px]">build</span>
         </a>
       </div>
     </div>

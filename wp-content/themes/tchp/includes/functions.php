@@ -90,7 +90,7 @@ if (!function_exists('get_card_icon')) {
 
 if (!function_exists('get_avatar_char')) {
     function get_avatar_char(string $name): string {
-        if (empty($name)) return '👤';
+        if (empty($name)) return 'Т';
         if (function_exists('mb_substr')) {
             return mb_substr($name, 0, 1);
         }

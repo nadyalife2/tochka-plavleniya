@@ -41,7 +41,7 @@
     <div class="search-modal" id="search-modal" aria-hidden="true" role="dialog" aria-label="Поиск по статьям и калькуляторам">
         <div class="search-modal-box">
             <div class="search-modal-header">
-                <span style="font-size: 1.2rem;">🔍</span>
+                <span class="material-symbols-outlined text-lg text-ink-muted">search</span>
                 <input type="text" id="search-input" class="search-input" placeholder="Поиск статей, компонентов, кода..." autocomplete="off" autofocus>
                 <button type="button" class="search-close-btn" id="search-close-btn" aria-label="Закрыть поиск">ESC</button>
             </div>
