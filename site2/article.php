@@ -758,6 +758,14 @@ tailwind.config = {
 
         <hr class="border-paper-border my-8"/>
 
+        <!-- In-Article Native RSYA Ad Container -->
+        <div class="my-8 p-4 rounded border border-dashed border-paper-border bg-paper-subtle/40 text-center">
+          <div class="text-[10px] font-mono text-ink-faint uppercase mb-1">РЕКЛАМА / ПАРТНЕРСКИЙ БЛОК ЯНДЕКСА</div>
+          <div id="yandex_rtb_in_article" class="min-h-[100px] flex items-center justify-center text-xs font-mono text-ink-muted border border-paper-border rounded bg-paper">
+            [Контейнер РСЯ In-Article · Адаптивный блок]
+          </div>
+        </div>
+
         <!-- Section: FAQ Accordion -->
         <section class="scroll-mt-20 space-y-4" id="faq">
           <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
@@ -777,6 +785,62 @@ tailwind.config = {
             <?php endforeach; ?>
           </div>
         </section>
+
+        <!-- Affiliate Product Showcase (Yandex Market / Chip & Dip) -->
+        <section class="my-8 p-5 sm:p-6 rounded-lg border border-paper-border bg-card space-y-4">
+          <div class="flex items-center justify-between border-b border-paper-border pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm">🛠️</span>
+              <h3 class="font-bold text-xs sm:text-sm text-ink uppercase font-mono">Проверенное оборудование и химия к статье</h3>
+            </div>
+            <span class="text-[10px] font-mono text-ink-faint">МАРКЕТ / ЧИПДИП</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans">
+            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+              <div class="text-[10px] font-mono text-ink-faint uppercase">Термовоздушная станция</div>
+              <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Quick 861DW (1000W)</div>
+              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Турбированный термофен для BGA чипов</div>
+              <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
+                <span class="font-bold text-ink">от 24 500 ₽</span>
+                <span class="text-accent underline text-[11px]">Маркет →</span>
+              </div>
+            </a>
+            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+              <div class="text-[10px] font-mono text-ink-faint uppercase">Флюс-гель No-Clean</div>
+              <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Cyberflux RMA-218</div>
+              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Безотмывочный гель для бессвинца</div>
+              <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
+                <span class="font-bold text-ink">от 950 ₽</span>
+                <span class="text-accent underline text-[11px]">Маркет →</span>
+              </div>
+            </a>
+            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+              <div class="text-[10px] font-mono text-ink-faint uppercase">Припой SAC305</div>
+              <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">BGA Balls 0.45mm</div>
+              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Прецизионные шарики Sn96.5Ag3Cu0.5</div>
+              <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
+                <span class="font-bold text-ink">от 1 200 ₽</span>
+                <span class="text-accent underline text-[11px]">Маркет →</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- B2B / Lead-Gen Rework Module -->
+        <div class="my-8 p-5 rounded-lg border-2 border-paper-border-dark bg-paper-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 sketch-border">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="sketch-pill-yellow text-ink text-[10.5px] font-mono font-bold">СЕРВИСНЫЙ ЦЕНТР ТЧП</span>
+              <span class="text-xs font-bold text-ink">Нужен сложный BGA-ремонт платы?</span>
+            </div>
+            <p class="text-xs text-ink-muted max-w-lg leading-relaxed">
+              Диагностика и замена BGA-чипов, видеокарт и процессоров на оборудовании с термопрофилированием по IPC-A-610.
+            </p>
+          </div>
+          <a href="interactive.php" class="px-4 py-2 bg-ink text-paper text-xs font-mono font-semibold rounded hover:opacity-90 transition-opacity shrink-0 text-center border border-paper-border-dark shadow-sm">
+            Заказать диагностику →
+          </a>
+        </div>
 
         <!-- Interactive Tools Box (tochkicamp style bottom CTA) -->
         <div class="border border-paper-border rounded-lg bg-paper p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -830,6 +894,14 @@ tailwind.config = {
               Частые вопросы
             </a>
           </nav>
+        </div>
+
+        <!-- Sticky Sidebar РСЯ Slot -->
+        <div class="border border-dashed border-paper-border bg-paper p-4 rounded-lg text-center space-y-2">
+          <div class="text-[10px] font-mono text-ink-faint uppercase">РЕКЛАМА РСЯ</div>
+          <div id="yandex_rtb_sidebar" class="min-h-[220px] flex items-center justify-center text-xs font-mono text-ink-muted bg-paper-subtle rounded border border-paper-border">
+            [РСЯ Сайдбар · 300x250]
+          </div>
         </div>
 
         <!-- Open Lab block -->

@@ -1,45 +1,26 @@
 <?php
 /**
- * Single Article Template - Tochka Plavleniya (Stitch / TochkiCamp Editorial Style)
+ * Single post template — ТОЧКА ПЛАВЛЕНИЯ
+ * Экспертный инженерный верстак (Neo-Brutalism & Sketch Style)
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 get_header();
 
-// Fetch article data / fallback
-$article_title = get_the_title();
-$article_date  = get_the_date('j F Y');
-$article_excerpt = get_the_excerpt() ?: 'Практический инженерный регламент пайки BGA и SMD компонентов.';
+// Fetch dynamic metadata & AI fields
+$post_id          = get_the_ID();
+$article_title    = get_the_title();
+$article_excerpt  = get_the_excerpt() ?: 'Инженерный регламент, термические расчеты и допуски по стандартам IPC.';
+$article_date     = get_the_date('d.m.Y');
+$reading_time     = get_post_meta( $post_id, 'tchp_reading_time', true ) ?: '7';
+$difficulty       = get_post_meta( $post_id, 'tchp_difficulty', true ) ?: 'Инженерный уровень';
+$solder_alloy     = get_post_meta( $post_id, 'tchp_solder_alloy', true ) ?: 'SAC305 / ПОС-61';
+$tools_json       = get_post_meta( $post_id, 'tchp_tools_needed', true );
+$tools_list       = ! empty( $tools_json ) ? json_decode( $tools_json, true ) : [];
 ?>
-
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<script>
-tailwind.config = {
-  darkMode: 'class',
-  theme: {
-    extend: {
-      colors: {
-        paper: 'var(--color-paper)',
-        'paper-subtle': 'var(--color-paper-subtle)',
-        'paper-border': 'var(--color-paper-border)',
-        'paper-border-dark': 'var(--color-paper-border-dark)',
-        ink: 'var(--color-ink)',
-        'ink-muted': 'var(--color-ink-muted)',
-        'ink-faint': 'var(--color-ink-faint)',
-        highlight: '#fef9c3',
-        'highlight-strong': '#fef08a',
-        callout: 'var(--color-callout)',
-        card: 'var(--color-card)'
-      },
-      fontFamily: {
-        sans: ['"IBM Plex Sans"', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        serif: ['Newsreader', 'Georgia', 'serif'],
-        mono: ['"JetBrains Mono"', '"IBM Plex Mono"', 'monospace'],
-        logo: ['"Hanken Grotesk"', 'sans-serif']
-      }
-    }
-  }
-}
-</script>
 
 <style>
   :root {
@@ -48,26 +29,34 @@ tailwind.config = {
     --color-paper-border: #e6e2da;
     --color-paper-border-dark: #d3cdc2;
     --color-ink: #141414;
-    --color-ink-muted: #6b665f;
-    --color-ink-faint: #9e988f;
-    --color-callout: #fcfaf2;
-    --color-card: rgba(255, 255, 255, 0.75);
-    --dot-color: #d3cdc2;
+    --color-ink-muted: #5c5850;
+    --color-ink-faint: #999388;
+    --color-accent: #2563eb;
+    --color-accent-light: #dbeafe;
+    --color-accent-muted: #1d4ed8;
+    --color-callout: #fbf9f4;
     --bg-color: #faf8f5;
+    --dot-color: #d3cdc2;
+    --card-bg: #ffffff;
+    --card-border: #e6e2da;
   }
 
   html.dark {
-    --color-paper: #12141a;
-    --color-paper-subtle: #191c24;
-    --color-paper-border: #282d3b;
-    --color-paper-border-dark: #373e52;
+    --color-paper: #18191b;
+    --color-paper-subtle: #202226;
+    --color-paper-border: #2e3238;
+    --color-paper-border-dark: #40454e;
     --color-ink: #f3f4f6;
-    --color-ink-muted: #9ca3af;
-    --color-ink-faint: #6b7280;
-    --color-callout: #1b1f2b;
-    --color-card: rgba(24, 27, 36, 0.85);
-    --dot-color: #2b3142;
-    --bg-color: #12141a;
+    --color-ink-muted: #a3aab5;
+    --color-ink-faint: #6c7380;
+    --color-accent: #60a5fa;
+    --color-accent-light: #1e293b;
+    --color-accent-muted: #93c5fd;
+    --color-callout: #1a1b1f;
+    --bg-color: #121315;
+    --dot-color: #2b2e34;
+    --card-bg: #1c1d21;
+    --card-border: #2e3238;
   }
 
   body {
@@ -75,103 +64,49 @@ tailwind.config = {
     background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px) !important;
     background-size: 20px 20px !important;
     color: var(--color-ink) !important;
-    transition: background-color 0.2s ease, color 0.2s ease;
-  }
-  .logo { 
-    font-family: 'Hanken Grotesk', 'Inter', sans-serif; 
-    font-size: 1.25rem; 
-    font-weight: 900; 
-    text-decoration: none; 
-    color: var(--color-ink); 
-    letter-spacing: -0.02em; 
-    text-transform: uppercase; 
-    display: inline-flex; 
-    align-items: center; 
-    line-height: 1; 
-  }
-  .logo span { 
-    color: #141414; 
-    background: #facc15; 
-    padding: 0.05rem 0.35rem; 
-    border-radius: 3px; 
-    transform: skew(-6deg); 
-    display: inline-block; 
-    margin: 0 0.15rem; 
-    font-size: 1.05em; 
-    line-height: 0.9; 
+    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
-  /* REALISTIC HAND-DRAWN FELT-TIP MARKER STROKES (Vecteezy / PNG style) */
-  mark, .marker-yellow {
-    position: relative;
-    display: inline;
-    background: transparent;
-    color: #141414;
-    padding: 0.18em 0.55em 0.22em 0.5em;
-    margin: 0 -0.15em;
-    box-decoration-break: clone;
-    -webkit-box-decoration-break: clone;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0.5 4.5 C 18 2, 48 5.5, 98.5 2.5 C 100 11, 98 18.5, 99.5 22 C 75 23.5, 30 20.5, 1.5 22 C 0 16, 1.5 8.5, 0.5 4.5 Z' fill='%23fef08a' fill-opacity='0.9'/%3E%3Cpath d='M3 7.5 C 25 5.5, 68 6, 96.5 5 C 97.5 12.5, 95 18, 97 20 C 70 21.5, 28 19.5, 4 19.5 Z' fill='%23fde047' fill-opacity='0.55'/%3E%3C/svg%3E");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    font-weight: 600;
-  }
-  html.dark mark, html.dark .marker-yellow {
-    color: #fef08a;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0.5 4.5 C 18 2, 48 5.5, 98.5 2.5 C 100 11, 98 18.5, 99.5 22 C 75 23.5, 30 20.5, 1.5 22 C 0 16, 1.5 8.5, 0.5 4.5 Z' fill='%23ca8a04' fill-opacity='0.45'/%3E%3Cpath d='M3 7.5 C 25 5.5, 68 6, 96.5 5 C 97.5 12.5, 95 18, 97 20 C 70 21.5, 28 19.5, 4 19.5 Z' fill='%23eab308' fill-opacity='0.3'/%3E%3C/svg%3E");
+  .bg-card {
+    background-color: var(--card-bg);
+    border-color: var(--card-border);
   }
 
-  /* Hand-drawn yellow marker pill */
+  .sketch-border {
+    border-radius: 255px 15px 225px / 15px 225px 15px 255px;
+  }
+
   .sketch-pill-yellow {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    background: transparent;
-    color: #141414;
-    padding: 0.22rem 0.75rem 0.26rem 0.7rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 4 C 20 1.5, 68 3, 98 2 C 100 11.5, 98 19.5, 99 25.5 C 72 26.5, 26 24.5, 1 25.5 C 0 16.5, 1.5 8, 1.5 4 Z' fill='%23fef08a' fill-opacity='0.95' stroke='%23ca8a04' stroke-width='0.9' stroke-dasharray='40 1 20 1' stroke-linecap='round'/%3E%3Cpath d='M4 7 C 28 5, 72 5.5, 95.5 5 C 96.5 12, 94.5 18.5, 96 21.5 C 68 22.5, 26 21.5, 3 21.5 Z' fill='%23fde047' fill-opacity='0.65'/%3E%3C/svg%3E");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    transform: rotate(-0.9deg);
-    transition: transform 0.15s ease;
-  }
-  .sketch-pill-yellow:hover {
-    transform: rotate(0deg) scale(1.03);
+    background: linear-gradient(104deg, rgba(254, 240, 138, 0.4) 0%, rgba(254, 240, 138, 0.9) 15%, rgba(253, 224, 71, 0.95) 85%, rgba(254, 240, 138, 0.4) 100%);
+    border: 1px solid rgba(202, 138, 4, 0.5);
+    border-radius: 255px 15px 225px / 15px 225px 15px 255px;
+    padding: 0.15rem 0.6rem;
+    display: inline-block;
   }
   html.dark .sketch-pill-yellow {
-    color: #fef08a;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 4 C 20 1.5, 68 3, 98 2 C 100 11.5, 98 19.5, 99 25.5 C 72 26.5, 26 24.5, 1 25.5 C 0 16.5, 1.5 8, 1.5 4 Z' fill='%23ca8a04' fill-opacity='0.4' stroke='%23eab308' stroke-width='0.9' stroke-dasharray='40 1 20 1' stroke-linecap='round'/%3E%3Cpath d='M4 7 C 28 5, 72 5.5, 95.5 5 C 96.5 12, 94.5 18.5, 96 21.5 C 68 22.5, 26 21.5, 3 21.5 Z' fill='%23a16207' fill-opacity='0.4'/%3E%3C/svg%3E");
+    background: linear-gradient(104deg, rgba(161, 98, 7, 0.3) 0%, rgba(161, 98, 7, 0.7) 15%, rgba(202, 138, 4, 0.8) 85%, rgba(161, 98, 7, 0.3) 100%);
+    border: 1px solid rgba(234, 179, 8, 0.4);
+    color: #fef08a !important;
   }
 
-  /* Hand-drawn light-gray felt marker pill */
   .sketch-pill-gray {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    background: transparent;
-    color: #141414;
-    padding: 0.22rem 0.75rem 0.26rem 0.7rem;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23e9e5dc' fill-opacity='0.95' stroke='%23b8b1a2' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%23ded8cd' fill-opacity='0.6'/%3E%3C/svg%3E");
-    background-size: 100% 100%;
-    background-repeat: no-repeat;
-    transform: rotate(0.6deg);
-    transition: transform 0.15s ease;
-  }
-  .sketch-pill-gray:hover {
-    transform: rotate(0deg) scale(1.03);
-  }
-  html.dark .sketch-pill-gray {
-    color: #f3f4f6;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23222735' fill-opacity='0.95' stroke='%233e465c' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%232c3346' fill-opacity='0.6'/%3E%3C/svg%3E");
+    background: var(--color-paper-subtle);
+    border: 1px solid var(--color-paper-border-dark);
+    border-radius: 255px 15px 225px / 15px 225px 15px 255px;
+    padding: 0.15rem 0.6rem;
+    display: inline-block;
   }
 
-  /* Hand-drawn marker underline */
-  .marker-underline {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 12' preserveAspectRatio='none'%3E%3Cpath d='M1 8 C 25 3, 60 10, 99 5 C 75 11, 30 7, 2 10 Z' fill='%23facc15' fill-opacity='0.85'/%3E%3C/svg%3E");
-    background-position: 0 100%;
-    background-size: 100% 0.35em;
-    background-repeat: no-repeat;
-    padding-bottom: 0.1em;
+  mark, .marker-yellow {
+    background: linear-gradient(104deg, rgba(254, 240, 138, 0.1) 0%, rgba(254, 240, 138, 0.8) 10%, rgba(253, 224, 71, 0.9) 85%, rgba(254, 240, 138, 0.2) 100%);
+    padding: 0.08em 0.35em;
+    border-radius: 4px 1px 3px 2px;
+    box-decoration-break: clone;
+    color: inherit;
+  }
+  html.dark mark, html.dark .marker-yellow {
+    background: linear-gradient(104deg, rgba(161, 98, 7, 0.1) 0%, rgba(161, 98, 7, 0.7) 10%, rgba(202, 138, 4, 0.8) 85%, rgba(161, 98, 7, 0.2) 100%);
+    color: #fef08a;
   }
 </style>
 
@@ -182,7 +117,7 @@ tailwind.config = {
     <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap">
       <a class="hover:text-ink transition-colors" href="<?php echo home_url('/'); ?>">Главная</a>
       <span>→</span>
-      <a class="hover:text-ink transition-colors" href="<?php echo home_url('/category/bga/'); ?>">Гайды</a>
+      <a class="hover:text-ink transition-colors" href="<?php echo home_url('/category/guides/'); ?>">Инженерный журнал</a>
       <span>→</span>
       <span class="text-ink truncate max-w-xs sm:max-w-md"><?php echo esc_html($article_title); ?></span>
     </nav>
@@ -193,7 +128,7 @@ tailwind.config = {
       <!-- Central Editorial Column (740px wide max) -->
       <div class="lg:col-span-8 max-w-[730px] space-y-9">
         
-        <!-- Retro Illustration / Stamp Badge -->
+        <!-- Retro Stamp Badge -->
         <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
           <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24" width="24">
             <rect height="18" rx="2" width="18" x="3" y="3"></rect>
@@ -212,7 +147,7 @@ tailwind.config = {
           </h1>
 
           <!-- Meta line -->
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-muted font-mono pt-1 pb-2">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] text-ink-muted font-mono pt-1 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[10px] flex items-center justify-center font-bold text-ink">ТП</span>
               <span class="text-ink"><?php the_author(); ?></span>
@@ -220,24 +155,25 @@ tailwind.config = {
             <span class="text-ink-faint">·</span>
             <time datetime="<?php echo get_the_date('c'); ?>">Обновлено <?php echo esc_html($article_date); ?></time>
             <span class="text-ink-faint">·</span>
-            <span>~8 мин чтения</span>
+            <span class="sketch-pill-yellow text-ink font-bold text-[11px]">~<?php echo esc_html($reading_time); ?> мин чтения</span>
             <span class="text-ink-faint">·</span>
-            <span class="bg-paper-subtle px-1.5 py-0.5 rounded text-[11px] border border-paper-border">IPC/JEDEC J-STD-020D</span>
+            <span class="sketch-pill-gray text-ink text-[11px]"><?php echo esc_html($difficulty); ?></span>
           </div>
 
           <!-- Lead Paragraph -->
-          <p class="text-lg text-ink font-serif leading-[1.65] pt-2 text-[#242220]">
+          <p class="text-lg text-ink font-serif leading-[1.65] pt-2 italic text-ink/90">
             <?php echo esc_html($article_excerpt); ?>
           </p>
         </header>
 
         <!-- Callout: "Как читать этот регламент" -->
         <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
-          <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
-            КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
+          <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink flex items-center gap-2">
+            <span>⚡</span>
+            <span>ИНЖЕНЕРНЫЙ РЕГЛАМЕНТ ЛАБОРАТОРИИ ТЧП</span>
           </div>
           <p class="text-ink/80">
-            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
+            Все расчетные параметры и теплофизические модели проверены на контактных термопарах K-типа. Материал соответствует нормам IPC/JEDEC J-STD-020D и ГОСТ 21931.
           </p>
         </div>
 
@@ -246,30 +182,110 @@ tailwind.config = {
           <?php the_content(); ?>
         </div>
 
+        <!-- In-Article Native RSYA Ad Container -->
+        <div class="my-8 p-4 rounded border border-dashed border-paper-border bg-paper-subtle/40 text-center">
+          <div class="text-[10px] font-mono text-ink-faint uppercase mb-1">РЕКЛАМА / ПАРТНЕРСКИЙ БЛОК ЯНДЕКСА</div>
+          <div id="yandex_rtb_in_article" class="min-h-[100px] flex items-center justify-center text-xs font-mono text-ink-muted border border-paper-border rounded bg-paper">
+            <!-- Yandex.RTB R-A-XXXXXX Container -->
+            [Контейнер РСЯ In-Article · Адаптивный блок]
+          </div>
+        </div>
+
+        <!-- Affiliate Product Showcase (Yandex Market / Chip & Dip) -->
+        <section class="my-8 p-5 sm:p-6 rounded-lg border border-paper-border bg-card space-y-4">
+          <div class="flex items-center justify-between border-b border-paper-border pb-3">
+            <div class="flex items-center gap-2">
+              <span class="text-sm">🛠️</span>
+              <h3 class="font-bold text-xs sm:text-sm text-ink uppercase font-mono">Проверенное оборудование и химия</h3>
+            </div>
+            <span class="text-[10px] font-mono text-ink-faint">МАРКЕТ / ЧИПДИП</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans">
+            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+              <div class="text-[10px] font-mono text-ink-faint uppercase">Термовоздушная станция</div>
+              <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Quick 861DW (1000W)</div>
+              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Турбированный термофен для BGA</div>
+              <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
+                <span class="font-bold text-ink">от 24 500 ₽</span>
+                <span class="text-accent underline text-[11px]">Маркет →</span>
+              </div>
+            </a>
+            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+              <div class="text-[10px] font-mono text-ink-faint uppercase">Флюс-гель No-Clean</div>
+              <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Cyberflux RMA-218</div>
+              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Безотмывочный гель для бессвинца</div>
+              <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
+                <span class="font-bold text-ink">от 950 ₽</span>
+                <span class="text-accent underline text-[11px]">Маркет →</span>
+              </div>
+            </a>
+            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+              <div class="text-[10px] font-mono text-ink-faint uppercase">Припой SAC305</div>
+              <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">BGA Balls 0.45mm</div>
+              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Прецизионные шарики Sn96.5Ag3Cu0.5</div>
+              <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
+                <span class="font-bold text-ink">от 1 200 ₽</span>
+                <span class="text-accent underline text-[11px]">Маркет →</span>
+              </div>
+            </a>
+          </div>
+        </section>
+
+        <!-- B2B / Lead-Gen Rework Module -->
+        <div class="my-8 p-5 rounded-lg border-2 border-paper-border-dark bg-paper-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 sketch-border">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="sketch-pill-yellow text-ink text-[10.5px] font-mono font-bold">СЕРВИСНЫЙ ЦЕНТР ТЧП</span>
+              <span class="text-xs font-bold text-ink">Нужен сложный BGA-ремонт платы?</span>
+            </div>
+            <p class="text-xs text-ink-muted max-w-lg leading-relaxed">
+              Диагностика и замена BGA-чипов, видеокарт и процессоров на оборудовании с термопрофилированием по IPC-A-610.
+            </p>
+          </div>
+          <a href="<?php echo home_url('/interactive'); ?>" class="px-4 py-2 bg-ink text-paper text-xs font-mono font-semibold rounded hover:opacity-90 transition-opacity shrink-0 text-center border border-paper-border-dark shadow-sm">
+            Заказать диагностику →
+          </a>
+        </div>
+
       </div>
 
-      <!-- Sticky Floating Table of Contents Sidebar -->
+      <!-- Sticky Floating Sidebar -->
       <aside class="hidden lg:block lg:col-span-4 sticky top-20 space-y-6">
+        
+        <!-- Table of Contents -->
         <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
           <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
-            <span>СОДЕРЖАНИЕ</span>
-            <span>4 раздела</span>
+            <span>НАВИГАЦИЯ</span>
+            <span>РЕГЛАМЕНТ</span>
           </div>
-          <nav class="space-y-1 text-[13px] font-mono" id="toc-nav">
-            <a class="toc-link block px-2 py-1 rounded text-ink font-semibold hover:bg-paper-subtle transition-colors" href="#step-1">
-              1. Теплоемкость и датчики
-            </a>
-            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#step-2">
-              2. Четыре фазы кривой
-            </a>
-            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#alloys">
-              3. Температурные окна
-            </a>
-            <a class="toc-link block px-2 py-1 rounded text-ink-muted hover:text-ink hover:bg-paper-subtle transition-colors" href="#step-4">
-              4. Практика и защита от брака
-            </a>
-          </nav>
+          <div class="text-xs font-mono text-ink-muted space-y-2">
+            <div>Сплав: <strong class="text-ink"><?php echo esc_html($solder_alloy); ?></strong></div>
+            <div>Сложность: <strong class="text-ink"><?php echo esc_html($difficulty); ?></strong></div>
+          </div>
         </div>
+
+        <!-- Sticky Sidebar РСЯ Slot -->
+        <div class="border border-dashed border-paper-border bg-paper p-4 rounded-lg text-center space-y-2">
+          <div class="text-[10px] font-mono text-ink-faint uppercase">РЕКЛАМА РСЯ</div>
+          <div id="yandex_rtb_sidebar" class="min-h-[220px] flex items-center justify-center text-xs font-mono text-ink-muted bg-paper-subtle rounded border border-paper-border">
+            [РСЯ Сайдбар · 300x250]
+          </div>
+        </div>
+
+        <!-- Open Lab block -->
+        <div class="border border-paper-border bg-paper-subtle/50 p-4 rounded-lg space-y-2 text-xs">
+          <div class="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-ink">
+            <span class="w-2 h-2 bg-ink rounded-full inline-block"></span>
+            Лаборатория ТЧП
+          </div>
+          <p class="text-ink-muted leading-relaxed">
+            Открытые инженерные калькуляторы и таблицы термопрофилей.
+          </p>
+          <a class="inline-block pt-1 font-mono text-[11.5px] font-semibold text-ink underline decoration-paper-border-dark" href="<?php echo home_url('/interactive'); ?>">
+            Интерактивный верстак →
+          </a>
+        </div>
+
       </aside>
 
     </div>
