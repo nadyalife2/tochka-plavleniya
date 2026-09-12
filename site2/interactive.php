@@ -109,51 +109,166 @@ require_once __DIR__ . '/includes/articles-data.php';
       <!-- Grid of Tools -->
       <div class="space-y-12">
 
-        <!-- 01: Калькулятор флюса -->
-        <section id="calculator" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 relative">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-paper-border">
+        <!-- 01: Калькулятор флюса (Верстак инженера) -->
+        <section id="calculator" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 relative overflow-hidden">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
             <div>
-              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">01 // ДОЗИРОВКА ХИМИИ</span>
-              <h2 class="text-xl font-bold text-ink mt-0.5">Калькулятор расхода флюса и паяльной пасты</h2>
+              <div class="flex items-center gap-3">
+                <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">01 // ДОЗИРОВКА ХИМИИ</span>
+                <span class="handwriting text-accent font-bold text-base hidden sm:inline-block">✎ Толщина слоя: 50–70 мкм</span>
+              </div>
+              <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода флюса и паяльной пасты</h2>
             </div>
-            <span class="text-xs font-mono text-ink-faint">IPC-7095C Standard</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-            <div>
-              <label class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Площадь платы (см²):</label>
-              <input type="number" id="flux-area" value="35" min="1" max="500" class="w-full px-3.5 py-2 rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm focus:outline-none focus:border-ink"/>
-              <span class="text-[11px] text-ink-faint font-mono mt-1 block">Пример: 35 см² (плата видеокарты / роутера)</span>
-            </div>
-
-            <div>
-              <label class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Тип флюса / монтажа:</label>
-              <select id="flux-type" class="w-full px-3.5 py-2 rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm focus:outline-none focus:border-ink">
-                <option value="bga_nc">Безотмывочный гель BGA (NC-559 / RMA-218)</option>
-                <option value="smd_rma">Канифольный средней активности (RMA-223)</option>
-                <option value="paste_sac">Паяльная паста SAC305 (Sn96.5Ag3Cu0.5)</option>
-                <option value="clean_ws">Водосмывной флюс высокой активности (WS)</option>
-              </select>
-              <span class="text-[11px] text-ink-faint font-mono mt-1 block">Выбор определяет удельную плотность слоя</span>
-            </div>
-
-            <div class="flex items-end">
-              <button id="calc-flux-btn" type="button" class="w-full px-4 py-2.5 bg-ink text-paper font-mono font-semibold text-xs rounded hover:opacity-90 transition-opacity border border-paper-border-dark flex items-center justify-center gap-1.5">
-                <span>Рассчитать дозировку</span>
-                <span class="text-[11px]">→</span>
-              </button>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink-muted">IPC-7095C Standard</span>
             </div>
           </div>
 
-          <!-- Result output -->
-          <div id="flux-result" class="p-4 rounded-lg bg-paper-subtle border border-paper-border font-mono text-xs space-y-2">
-            <div class="text-ink font-bold flex items-center justify-between">
-              <span>РЕЗУЛЬТАТ РАСЧЕТА ДОЗИРОВКИ:</span>
-              <span class="text-accent font-bold" id="res-volume">~0.18 мл</span>
+          <!-- Presets bar -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-semibold text-ink-muted uppercase">Быстрые пресеты плат:</span>
+              <span class="text-[11px] font-mono text-ink-faint">Кликните для авто-подстановки</span>
             </div>
-            <p class="text-ink-muted leading-relaxed" id="res-desc">
-              Для платы 35 см² при реболлинге BGA рекомендуется наносить тонкий слой толщиной 50-70 мкм. Избыток флюса вызывает вскипание и смещение чипа.
-            </p>
+            <div class="flex flex-wrap gap-2">
+              <button type="button" class="preset-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors" data-area="9">Arduino Nano (9 см²)</button>
+              <button type="button" class="preset-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors" data-area="18">ESP32-WROOM (18 см²)</button>
+              <button type="button" class="preset-btn active px-3 py-1.5 rounded text-xs font-mono border border-accent bg-paper font-bold text-accent transition-colors" data-area="35">GPU VRAM (35 см²)</button>
+              <button type="button" class="preset-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors" data-area="120">ATX Motherboard (120 см²)</button>
+            </div>
+          </div>
+
+          <!-- Workbench Grid: Controls + Sticky Note Result -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left 7 cols: Controls -->
+            <div class="lg:col-span-7 space-y-5">
+              <!-- Area Control (Slider + Number) -->
+              <div class="p-4 rounded-lg bg-paper-subtle border border-paper-border space-y-3">
+                <div class="flex items-center justify-between">
+                  <label for="flux-area-slider" class="text-xs font-mono font-semibold text-ink uppercase">Площадь монтажной зоны:</label>
+                  <div class="flex items-center gap-1.5">
+                    <input type="number" id="flux-area" value="35" min="1" max="500" class="w-20 px-2 py-1 text-right rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm font-bold focus:outline-none focus:border-accent"/>
+                    <span class="text-xs font-mono font-bold text-ink-muted">см²</span>
+                  </div>
+                </div>
+                <input type="range" id="flux-area-slider" min="1" max="200" value="35" class="range-slider w-full cursor-pointer"/>
+                <div class="flex justify-between text-[10px] font-mono text-ink-faint">
+                  <span>1 см² (QFN/SOIC)</span>
+                  <span>50 см²</span>
+                  <span>100 см²</span>
+                  <span>200 см² (Серверные платы)</span>
+                </div>
+              </div>
+
+              <!-- Chemistry Selector -->
+              <div>
+                <label for="flux-type" class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Тип флюса / монтажа:</label>
+                <select id="flux-type" class="w-full px-3.5 py-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-sm focus:outline-none focus:border-accent">
+                  <option value="bga_nc">Безотмывочный гель BGA (NC-559 / RMA-218) — 50-70 мкм</option>
+                  <option value="smd_rma">Канифольный средней активности (RMA-223) — кисть/дозатор</option>
+                  <option value="paste_sac">Паяльная паста SAC305 (Sn96.5Ag3Cu0.5) — трафарет 120 мкм</option>
+                  <option value="clean_ws">Водосмывной высокой активности (WS) — для стойких оксидов</option>
+                </select>
+              </div>
+
+              <!-- Batch multiplier -->
+              <div>
+                <label class="block text-xs font-mono font-semibold text-ink uppercase mb-2">Объем партии плат (мультипликатор):</label>
+                <div class="flex flex-wrap gap-2">
+                  <button type="button" class="batch-btn active px-3 py-1.5 rounded text-xs font-mono border border-accent bg-paper font-bold text-accent" data-qty="1">1 плата</button>
+                  <button type="button" class="batch-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink" data-qty="5">5 плат</button>
+                  <button type="button" class="batch-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink" data-qty="10">10 плат</button>
+                  <button type="button" class="batch-btn px-3 py-1.5 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink" data-qty="50">50 плат (серия)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 5 cols: Sticky Note Engineer's Memo -->
+            <div class="lg:col-span-5 space-y-4">
+              <div class="postit-yellow p-5 rounded-lg border border-paper-border shadow-md transform rotate-[-1deg] hover:rotate-0 transition-transform duration-200 space-y-4 text-ink">
+                <!-- Pin header -->
+                <div class="flex items-center justify-between border-b border-paper-border/30 pb-2.5">
+                  <span class="text-[11px] font-mono font-bold tracking-wider uppercase text-ink">📌 ЗАМЕТКА ИНЖЕНЕРА</span>
+                  <span class="handwriting text-accent font-bold text-sm">IPC-A-610 Class 3</span>
+                </div>
+
+                <!-- Dosage highlight -->
+                <div>
+                  <div class="text-[11px] font-mono text-ink-muted uppercase">Рекомендуемая дозировка:</div>
+                  <div class="flex items-baseline gap-2 mt-0.5">
+                    <span id="res-volume" class="text-3xl font-mono font-black text-accent tracking-tight">~0.18 мл</span>
+                    <span id="batch-note" class="text-xs font-mono text-ink-faint">(на 1 плату)</span>
+                  </div>
+                </div>
+
+                <!-- Live PCB visualizer -->
+                <div class="p-3 bg-paper/60 rounded border border-paper-border/40 flex items-center justify-between gap-4">
+                  <div class="space-y-1">
+                    <div class="text-[10px] font-mono uppercase text-ink-muted font-bold">Визуализация масштаба:</div>
+                    <div id="pcb-dimensions" class="text-xs font-mono font-semibold text-ink">59 × 59 мм (35 см²)</div>
+                    <div class="text-[10px] font-mono text-ink-faint">Пропорция 1:1 к площади</div>
+                  </div>
+                  <div class="w-20 h-20 flex items-center justify-center bg-paper border border-dashed border-paper-border-dark rounded">
+                    <svg id="pcb-svg" width="60" height="60" viewBox="0 0 100 100" class="transition-all duration-200">
+                      <rect x="5" y="5" width="90" height="90" rx="6" fill="#1b4d2c" stroke="#2e7d43" stroke-width="3"/>
+                      <circle cx="15" cy="15" r="4" fill="#d4af37"/>
+                      <circle cx="85" cy="15" r="4" fill="#d4af37"/>
+                      <circle cx="15" cy="85" r="4" fill="#d4af37"/>
+                      <circle cx="85" cy="85" r="4" fill="#d4af37"/>
+                      <rect x="35" y="35" width="30" height="30" rx="3" fill="#2d3748" stroke="#cbd5e1" stroke-width="1.5"/>
+                      <path d="M 25 35 L 35 35 M 25 50 L 35 50 M 25 65 L 35 65 M 65 35 L 75 35 M 65 50 L 75 50 M 65 65 L 75 65" stroke="#d4af37" stroke-width="1.5"/>
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Process description -->
+                <p id="res-desc" class="text-xs font-mono text-ink-muted leading-relaxed">
+                  Для 35 см² при BGA реболлинге наносите тонкий слой 50-70 мкм. Избыток вызывает кипение и сдвиг чипа.
+                </p>
+
+                <!-- Wash tip -->
+                <div class="text-[11px] font-mono font-semibold text-ink pt-1 border-t border-paper-border/30 flex items-center gap-1.5">
+                  <span class="text-accent">ℹ</span>
+                  <span id="wash-tip">Отмывка: опциональна (No-Clean)</span>
+                </div>
+
+                <!-- Copy button -->
+                <button type="button" id="copy-flux-btn" class="w-full py-2 px-3 rounded bg-ink text-paper font-mono text-xs font-semibold hover:opacity-90 transition-opacity flex items-center justify-center gap-2 border border-paper-border-dark">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                  </svg>
+                  <span id="copy-flux-text">Скопировать параметры в журнал</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom: Chemical Comparison Matrix -->
+          <div class="pt-4 border-t border-paper-border space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-mono font-bold uppercase text-ink">Сравнение расхода по типам химии для текущей зоны (<span id="matrix-area" class="text-accent">35 см²</span>):</span>
+              <span class="text-[11px] font-mono text-ink-faint">Мгновенный пересчёт</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
+                <div class="text-[10px] font-mono text-ink-muted uppercase">BGA Гель (NC-559)</div>
+                <div id="matrix-bga" class="text-sm font-mono font-bold text-ink">0.18 мл</div>
+              </div>
+              <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
+                <div class="text-[10px] font-mono text-ink-muted uppercase">RMA-223 Канифоль</div>
+                <div id="matrix-rma" class="text-sm font-mono font-bold text-ink">0.28 мл</div>
+              </div>
+              <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
+                <div class="text-[10px] font-mono text-ink-muted uppercase">Паста SAC305 (120 мкм)</div>
+                <div id="matrix-paste" class="text-sm font-mono font-bold text-ink">0.53 г</div>
+              </div>
+              <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
+                <div class="text-[10px] font-mono text-ink-muted uppercase">Водосмывной (WS)</div>
+                <div id="matrix-ws" class="text-sm font-mono font-bold text-ink">0.21 мл</div>
+              </div>
+            </div>
           </div>
         </section>
 
