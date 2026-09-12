@@ -270,3 +270,171 @@ input[type="range"].range-slider::-moz-range-thumb {
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   WORKBENCH COLORFUL STICKERS, TAPES & HIGHLIGHTERS (Pink, Blue, Yellow, Orange)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tape Strips */
+.tape-strip {
+  position: absolute;
+  height: 14px;
+  border-left: 1px dashed rgba(0,0,0,0.2);
+  border-right: 1px dashed rgba(0,0,0,0.2);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  pointer-events: none;
+  z-index: 10;
+  backdrop-filter: blur(1px);
+}
+.tape-yellow { background: rgba(254, 240, 138, 0.85); }
+.tape-pink   { background: rgba(244, 114, 182, 0.75); }
+.tape-blue   { background: rgba(125, 211, 252, 0.8); }
+.tape-orange { background: rgba(251, 146, 60, 0.75); }
+
+/* Stickers & Post-its */
+.sticker-yellow {
+  background: #fef9c3;
+  border: 1px solid #facc15;
+  color: #713f12;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+}
+html.dark .sticker-yellow {
+  background: rgba(234, 179, 8, 0.12);
+  border-color: rgba(234, 179, 8, 0.5);
+  color: #fef08a;
+}
+
+.sticker-pink {
+  background: #fdf2f8;
+  border: 1px solid #f472b6;
+  color: #831843;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+}
+html.dark .sticker-pink {
+  background: rgba(236, 72, 153, 0.12);
+  border-color: rgba(244, 114, 182, 0.5);
+  color: #fbcfe8;
+}
+
+.sticker-blue {
+  background: #f0f9ff;
+  border: 1px solid #38bdf8;
+  color: #0369a1;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+}
+html.dark .sticker-blue {
+  background: rgba(14, 165, 233, 0.12);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: #bae6fd;
+}
+
+.sticker-orange {
+  background: #fff7ed;
+  border: 1px solid #fb923c;
+  color: #9a3412;
+  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+}
+html.dark .sticker-orange {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(251, 146, 60, 0.5);
+  color: #fed7aa;
+}
+
+/* Highlighters */
+.hl-yellow {
+  background: #fef08a;
+  color: #141414;
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+html.dark .hl-yellow {
+  background: #a16207;
+  color: #fefce8;
+}
+
+.hl-pink {
+  background: #fbcfe8;
+  color: #141414;
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+html.dark .hl-pink {
+  background: #be185d;
+  color: #fdf2f8;
+}
+
+.hl-blue {
+  background: #bae6fd;
+  color: #141414;
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+html.dark .hl-blue {
+  background: #0369a1;
+  color: #f0f9ff;
+}
+
+.hl-orange {
+  background: #fed7aa;
+  color: #141414;
+  padding: 0.1em 0.35em;
+  border-radius: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+html.dark .hl-orange {
+  background: #c2410c;
+  color: #fff7ed;
+}
+
+/* Tag Pills */
+.pill-pink {
+  background: #fdf2f8;
+  border: 1px solid #f472b6;
+  color: #db2777;
+}
+html.dark .pill-pink {
+  background: rgba(236, 72, 153, 0.2);
+  border-color: #f472b6;
+  color: #f472b6;
+}
+
+.pill-blue {
+  background: #f0f9ff;
+  border: 1px solid #38bdf8;
+  color: #0284c7;
+}
+html.dark .pill-blue {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #38bdf8;
+  color: #38bdf8;
+}
+
+.pill-yellow {
+  background: #fefce8;
+  border: 1px solid #eab308;
+  color: #a16207;
+}
+html.dark .pill-yellow {
+  background: rgba(234, 179, 8, 0.2);
+  border-color: #eab308;
+  color: #facc15;
+}
+
+.pill-orange {
+  background: #fff7ed;
+  border: 1px solid #f97316;
+  color: #ea580c;
+}
+html.dark .pill-orange {
+  background: rgba(249, 115, 22, 0.2);
+  border-color: #f97316;
+  color: #fb923c;
+}
+
+
