@@ -573,13 +573,63 @@ body {
     flex-direction: column;
     gap: 1.2rem;
 }
+.drawer-quick-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-bottom: 1.2rem;
+    margin-bottom: 0.4rem;
+    border-bottom: 2px dashed var(--border);
+}
+.drawer-cta-btn {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 0.6rem;
+    background: var(--accent-orange);
+    color: #ffffff !important;
+    font-family: var(--font-mono);
+    font-size: 0.88rem !important;
+    font-weight: 700;
+    padding: 0.65rem 0.9rem;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    text-decoration: none !important;
+    text-transform: none !important;
+    transition: transform 0.1s ease;
+}
+.drawer-cta-btn:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px var(--shadow-color);
+}
+.drawer-cta-btn--alt {
+    background: var(--accent-yellow);
+    color: var(--text-main) !important;
+}
 .drawer-nav a {
     text-decoration: none;
     color: var(--text-main);
     font-family: var(--font-mono);
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 700;
     text-transform: uppercase;
+    transition: color 0.15s ease;
+}
+.drawer-nav a.active {
+    color: var(--accent-orange);
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+}
+.drawer-footer-links {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 1rem;
+}
+.drawer-footer-links a {
+    font-size: 0.8rem !important;
+    opacity: 0.75;
 }
 
 /* Theme Selector Control */

@@ -46,11 +46,7 @@
                     </div>
                 </div>
 
-                <nav class="nav">
-                    <a href="/">Статьи</a>
-                    <a href="/interactive.php">Инструменты</a>
-                    <a href="/cookies.php">Cookies</a>
-                </nav>
+                <?php include __DIR__ . '/header-nav.php'; ?>
 
                 <!-- Theme Switcher Selector -->
                 <select id="theme-select" class="theme-select" title="Выбор цветового режима" aria-label="Выбор цветового режима">
@@ -78,11 +74,45 @@
                     <a href="/" class="logo">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
                     <button type="button" class="drawer-close" id="drawer-close" aria-label="Закрыть меню">✕</button>
                 </div>
-                <nav class="drawer-nav">
-                    <a href="/">Статьи</a>
-                    <a href="/interactive.php">Инструменты</a>
-                    <a href="/cookies.php">Cookies</a>
-                    <a href="/privacy.php">Политика</a>
+                <nav class="drawer-nav" aria-label="Мобильная навигация">
+                    <div class="drawer-quick-actions">
+                        <a href="/interactive.php#temp" class="drawer-cta-btn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/>
+                            </svg>
+                            Подобрать температуру
+                        </a>
+                        <a href="/interactive.php#defect" class="drawer-cta-btn drawer-cta-btn--alt">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            Найти ошибку пайки
+                        </a>
+                    </div>
+                    <?php 
+                    $nav_items = [
+                        ['href' => '/',                                  'label' => 'Главная',      'page' => 'index'],
+                        ['href' => '/category.php?slug=start',           'label' => 'Начать паять', 'page' => 'start'],
+                        ['href' => '/category.php?slug=materialy',       'label' => 'Материалы',    'page' => 'materialy'],
+                        ['href' => '/category.php?slug=praktika',        'label' => 'Практика',     'page' => 'praktika'],
+                        ['href' => '/category.php?slug=oshibki',         'label' => 'Проблемы',     'page' => 'oshibki'],
+                        ['href' => '/interactive.php',                   'label' => 'Калькуляторы', 'page' => 'interactive'],
+                    ];
+                    foreach ($nav_items as $item):
+                        $is_active = ($current_page === $item['page'])
+                                  || ($current_page === 'category' && isset($_GET['slug']) && $_GET['slug'] === $item['page']);
+                    ?>
+                        <a href="<?= $item['href'] ?>" <?= $is_active ? 'class="active" aria-current="page"' : '' ?>>
+                            <?= $item['label'] ?>
+                        </a>
+                    <?php endforeach; ?>
+                    <div class="drawer-footer-links">
+                        <a href="/privacy.php">Политика</a>
+                        <a href="/terms.php">Условия</a>
+                        <a href="/cookies.php">Cookies</a>
+                    </div>
                 </nav>
             </div>
         </div>
