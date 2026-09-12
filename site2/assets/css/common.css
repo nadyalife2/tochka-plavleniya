@@ -58,14 +58,14 @@ body {
   color: #141414;
 }
 
-/* CANONICAL BRAND LOGO — ТОЧКА ПЛАВЛЕНИЯ */
+/* CANONICAL BRAND LOGO — ТОЧКА ПЛАВЛЕНИЯ (Self-hosted IBM Plex Sans) */
 .logo {
-  font-family: 'Hanken Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   font-size: 1.25rem;
-  font-weight: 900;
+  font-weight: 800;
   text-decoration: none;
   color: var(--color-ink);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   text-transform: uppercase;
   display: inline-flex;
   align-items: center;

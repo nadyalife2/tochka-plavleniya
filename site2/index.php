@@ -59,8 +59,8 @@ foreach ($articles as $article) {
 
       <!-- Right Action / Dark Mode Toggle & Telegram -->
       <div class="flex items-center gap-3">
-        <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="article.php#simulator">
-          [↓ к расчёту]
+        <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="#articles">
+          [↓ к статьям]
         </a>
 
         <!-- Dark/Light Mode Switcher (Sketch Style) -->

@@ -47,6 +47,10 @@ require_once __DIR__ . '/includes/articles-data.php';
       </div>
 
       <div class="flex items-center gap-3">
+        <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="#calculator">
+          [↓ к расчёту]
+        </a>
+
         <!-- Theme Toggle (Sketch Style) -->
         <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
           <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -56,12 +60,12 @@ require_once __DIR__ . '/includes/articles-data.php';
             <circle cx="12" cy="12" r="4.5"></circle>
             <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
           </svg>
-          <span class="text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+          <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
         <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="index.php">
-          <span>Журнал</span>
-          <span class="text-[10px]">↗</span>
+          <span>Журнал статей</span>
+          <span class="material-symbols-outlined text-[13px]">menu_book</span>
         </a>
       </div>
     </div>
