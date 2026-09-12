@@ -32,7 +32,7 @@ require_once __DIR__ . '/includes/header.php';
   </div>
 
   <div class="hero-badge" style="background:rgba(239,68,68,0.15); border-color:rgba(239,68,68,0.4); color:#ef4444;">
-    ⚡ Ошибка 404: Короткое замыкание
+    Ошибка 404: Короткое замыкание
   </div>
 
   <h1 class="hero-h1" style="margin-bottom: 16px;">Плата <span class="wavy" style="background:linear-gradient(135deg, #ef4444, #ff6b2b); -webkit-background-clip:text;">не найдена</span></h1>

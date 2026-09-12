@@ -75,14 +75,14 @@
         <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true">
             <div class="drawer-content">
                 <div class="drawer-header">
-                    <a href="/" class="logo" style="font-size: 1.3rem;">Точка<span>.</span>Плавления</a>
+                    <a href="/" class="logo">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
                     <button type="button" class="drawer-close" id="drawer-close" aria-label="Закрыть меню">✕</button>
                 </div>
                 <nav class="drawer-nav">
-                    <a href="/">⚡ Статьи</a>
-                    <a href="/interactive.php">🧮 Инструменты</a>
-                    <a href="/cookies.php">📜 Cookies</a>
-                    <a href="/privacy.php">🔒 Privacy</a>
+                    <a href="/">Статьи</a>
+                    <a href="/interactive.php">Инструменты</a>
+                    <a href="/cookies.php">Cookies</a>
+                    <a href="/privacy.php">Политика</a>
                 </nav>
             </div>
         </div>

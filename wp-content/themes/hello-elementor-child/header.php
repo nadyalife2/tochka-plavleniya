@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -63,19 +63,33 @@ if ( ! defined( 'ABSPATH' ) ) {
   </script>
 
   <style>
+    /* CANONICAL BRAND LOGO — ТОЧКА ПЛАВЛЕНИЯ */
     .logo {
-      font-family: 'Space Grotesk', sans-serif;
-      font-weight: 700;
-      font-size: 17px;
-      letter-spacing: -0.02em;
-      color: var(--color-ink);
+      font-family: 'Hanken Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 900;
       text-decoration: none;
+      color: var(--color-ink);
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
       display: inline-flex;
       align-items: center;
+      line-height: 1;
+      transition: opacity 0.15s ease;
+    }
+    .logo:hover {
+      opacity: 0.85;
     }
     .logo span {
-      color: #eab308;
-      margin: 0 1px;
+      color: #141414;
+      background: #facc15;
+      padding: 0.05rem 0.35rem;
+      border-radius: 3px;
+      transform: skew(-6deg);
+      display: inline-block;
+      margin: 0 0.18rem;
+      font-size: 1.05em;
+      line-height: 0.9;
     }
   </style>
 
@@ -97,10 +111,15 @@ if ( ! defined( 'ABSPATH' ) ) {
       </div>
 
       <div class="flex items-center gap-3">
-        <!-- Theme Switcher Button -->
-        <button id="theme-toggle" type="button" class="p-1.5 px-2.5 rounded border border-paper-border bg-paper hover:border-paper-border-dark text-ink font-mono text-xs flex items-center gap-1.5 transition-colors" title="Переключить тему (Светлая / Тёмная)" aria-label="Переключить тему">
-          <span class="dark:hidden">🌙</span>
-          <span class="hidden dark:inline">☀️</span>
+        <!-- Theme Switcher Button (Sketch Style) -->
+        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+          <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
+          </svg>
           <span class="text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 

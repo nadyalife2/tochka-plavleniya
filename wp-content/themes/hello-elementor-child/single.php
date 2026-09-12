@@ -108,6 +108,88 @@ $tools_list       = ! empty( $tools_json ) ? json_decode( $tools_json, true ) : 
     background: linear-gradient(104deg, rgba(161, 98, 7, 0.1) 0%, rgba(161, 98, 7, 0.7) 10%, rgba(202, 138, 4, 0.8) 85%, rgba(161, 98, 7, 0.2) 100%);
     color: #fef08a;
   }
+
+  /* Safety & Caution Callouts (Safety First for DIY & High Voltage) */
+  .callout-safety {
+    border: 1px solid rgba(234, 88, 12, 0.35);
+    border-left: 4px solid #ea580c;
+    background: rgba(255, 247, 237, 0.8);
+    border-radius: 6px;
+    padding: 1rem 1.25rem;
+    margin: 1.5rem 0;
+    color: #9a3412;
+  }
+  .callout-safety strong {
+    color: #7c2d12;
+  }
+  html.dark .callout-safety {
+    border-color: rgba(234, 88, 12, 0.4);
+    border-left-color: #f97316;
+    background: rgba(67, 26, 7, 0.3);
+    color: #fed7aa;
+  }
+  html.dark .callout-safety strong {
+    color: #ffedd5;
+  }
+
+  /* Responsive BOM / Data Tables for DIY Articles */
+  .prose table,
+  .bom-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin: 1.5rem 0;
+    text-align: left;
+    border: 1px solid var(--color-paper-border);
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .prose thead th,
+  .bom-table th {
+    background: var(--color-paper-subtle);
+    padding: 0.65rem 0.85rem;
+    font-family: var(--font-mono, monospace);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-ink);
+    border-bottom: 2px solid var(--color-paper-border-dark);
+  }
+  .prose td,
+  .bom-table td {
+    padding: 0.65rem 0.85rem;
+    border-bottom: 1px solid var(--color-paper-border);
+    color: var(--color-ink-muted);
+  }
+  .prose tr:last-child td,
+  .bom-table tr:last-child td {
+    border-bottom: none;
+  }
+  .prose tr:hover td,
+  .bom-table tr:hover td {
+    background: rgba(0, 0, 0, 0.02);
+  }
+  html.dark .prose tr:hover td,
+  html.dark .bom-table tr:hover td {
+    background: rgba(255, 255, 255, 0.03);
+  }
+  .table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin: 1.5rem 0;
+  }
+
+  /* Responsive video player embeds (VK Видео / RuTube / WebM) */
+  .prose iframe,
+  .prose video {
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    border: 1px solid var(--color-paper-border);
+  }
 </style>
 
 <main class="w-full flex-grow pt-8 pb-20">
@@ -169,7 +251,10 @@ $tools_list       = ! empty( $tools_json ) ? json_decode( $tools_json, true ) : 
         <!-- Callout: "Как читать этот регламент" -->
         <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
           <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink flex items-center gap-2">
-            <span>⚡</span>
+            <svg class="w-3.5 h-3.5 text-accent stroke-current inline-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"></rect>
+              <path d="M8 7v10M16 7v10M12 12h.01"></path>
+            </svg>
             <span>ИНЖЕНЕРНЫЙ РЕГЛАМЕНТ ЛАБОРАТОРИИ ТЧП</span>
           </div>
           <p class="text-ink/80">
@@ -228,6 +313,12 @@ $tools_list       = ! empty( $tools_json ) ? json_decode( $tools_json, true ) : 
                 <span class="text-accent underline text-[11px]">Маркет →</span>
               </div>
             </a>
+          </div>
+
+          <!-- 347-ФЗ Маркировка рекламы -->
+          <div class="pt-3 border-t border-paper-border flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[10px] font-mono text-ink-faint">
+            <span>Реклама · erid и данные о рекламодателях доступны по ссылкам перехода</span>
+            <span>ООО «Яндекс», ИНН 7736207543 / ООО «Интернет Решения», ИНН 7704217370</span>
           </div>
         </section>
 

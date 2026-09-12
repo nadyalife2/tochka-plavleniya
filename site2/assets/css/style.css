@@ -269,8 +269,33 @@ body {
     position: relative;
     z-index: 100;
 }
-.logo { font-family: var(--font-serif); font-size: 1.75rem; font-weight: 800; text-decoration: none; color: var(--text-main); letter-spacing: -0.02em; }
-.logo span { color: #FFFFFF; background: var(--text-main); padding: 0 0.35rem; border-radius: 4px; transform: skew(-5deg); display: inline-block; }
+.logo {
+  font-family: 'Hanken Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-decoration: none;
+  color: var(--text-main, #111827);
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+.logo:hover {
+  opacity: 0.85;
+}
+.logo span {
+  color: #141414;
+  background: #facc15;
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  transform: skew(-6deg);
+  display: inline-block;
+  margin: 0 0.18rem;
+  font-size: 1.05em;
+  line-height: 0.9;
+}
 
 .header-right {
     display: flex;

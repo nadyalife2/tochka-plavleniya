@@ -223,6 +223,35 @@ foreach ($articles as $article) {
       background-repeat: no-repeat;
       padding-bottom: 0.1em;
     }
+
+    /* CANONICAL BRAND LOGO — ТОЧКА ПЛАВЛЕНИЯ */
+    .logo {
+      font-family: 'Hanken Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 1.25rem;
+      font-weight: 900;
+      text-decoration: none;
+      color: var(--color-ink);
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+      transition: opacity 0.15s ease;
+    }
+    .logo:hover {
+      opacity: 0.85;
+    }
+    .logo span {
+      color: #141414;
+      background: #facc15;
+      padding: 0.05rem 0.35rem;
+      border-radius: 3px;
+      transform: skew(-6deg);
+      display: inline-block;
+      margin: 0 0.18rem;
+      font-size: 1.05em;
+      line-height: 0.9;
+    }
   </style>
 </head>
 <body class="font-sans min-h-screen flex flex-col justify-between text-[15px] leading-[1.65]">
@@ -234,10 +263,6 @@ foreach ($articles as $article) {
       <!-- Brand mark & Title -->
       <div class="flex items-center gap-6">
         <a class="logo" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-        
-        <span class="hidden lg:inline-block font-hand italic text-ink-muted text-[15px] leading-none tracking-normal border-l border-paper-border pl-4 rotate-[-1deg]">
-          «Анти-идеальный веб. Структура обнажена. Искренность форм.»
-        </span>
 
         <!-- Desktop Nav -->
         <nav class="hidden md:flex items-center gap-5 text-[13.5px] text-ink-muted">
@@ -254,11 +279,16 @@ foreach ($articles as $article) {
           [↓ к расчёту]
         </a>
 
-        <!-- Dark/Light Mode Switcher -->
-        <button id="theme-toggle" type="button" class="p-1.5 px-2 rounded border border-paper-border bg-paper hover:border-paper-border-dark text-ink font-mono text-xs flex items-center gap-1.5 transition-colors" title="Переключить тему (Светлая / Тёмная)" aria-label="Переключить тему">
-          <span class="dark:hidden">🌙</span>
-          <span class="hidden dark:inline">☀️</span>
-          <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono font-medium">Тема</span>
+        <!-- Dark/Light Mode Switcher (Sketch Style) -->
+        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+          <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
+          </svg>
+          <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
         <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
@@ -312,6 +342,11 @@ foreach ($articles as $article) {
           <p class="text-lg sm:text-[19px] text-ink/90 font-serif leading-[1.65]">
             Журнал и открытая документация о том, как превратить кучу разрозненных SMD/BGA компонентов в надежное устройство. Без воды, с интерактивными симуляторами термопрофилей, допусками IPC/JEDEC и проверенными режимами пайки.
           </p>
+
+          <!-- Editorial Manifesto Note (Sketch Style) -->
+          <div class="font-hand text-lg sm:text-xl text-ink-muted/80 italic rotate-[-1deg] inline-flex items-center gap-2 pt-0.5 pb-1">
+            <span>«Анти-идеальный веб. Структура обнажена. Искренность форм.»</span>
+          </div>
 
           <!-- CTA Buttons -->
           <div class="flex flex-wrap items-center gap-3 pt-2">
@@ -589,7 +624,7 @@ foreach ($articles as $article) {
             <div class="absolute -top-2.5 right-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/80 dark:border-[#968458]/70 shadow-sm rotate-[-3deg] pointer-events-none" style="backdrop-filter: blur(1px);"></div>
             <div class="flex items-center justify-between font-mono text-[10.5px] font-bold text-ink">
               <span class="flex items-center gap-1.5">
-                <span class="text-xs">⚡</span>НЕ ГРЕТЬ ВЫШЕ 245°C
+                <svg class="w-3.5 h-3.5 text-accent stroke-current inline-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>НЕ ГРЕТЬ ВЫШЕ 245°C
               </span>
               <span class="px-1.5 py-0.2 text-[9.5px] bg-paper border border-paper-border-dark">J-STD</span>
             </div>

@@ -625,3 +625,83 @@ mark {
     cursor: pointer;
   }
 }
+
+/* 12. Адаптивные BOM-таблицы для DIY и списков деталей */
+.prose table,
+.bom-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+  margin: 1.5rem 0;
+  text-align: left;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.bom-table th,
+.prose table th {
+  background: #f9fafb;
+  padding: 0.65rem 0.85rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-main);
+  border-bottom: 2px solid var(--border-color);
+}
+
+.bom-table td,
+.prose table td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-muted);
+}
+
+.bom-table tr:last-child td,
+.prose table tr:last-child td {
+  border-bottom: none;
+}
+
+.bom-table tr:hover td,
+.prose table tr:hover td {
+  background: #fafaf9;
+}
+
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+}
+
+/* 13. Блоки техники безопасности (Safety / Danger Callouts) */
+.callout-safety,
+.note-safety {
+  margin: 1.75rem 0;
+  padding: 1rem 1.25rem;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-left: 4px solid #ea580c;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: #9a3412;
+}
+
+.callout-safety strong,
+.note-safety strong {
+  color: #7c2d12;
+}
+
+/* 14. Адаптивные видеоконтейнеры (VK Видео / RuTube) */
+.prose iframe,
+.prose video {
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+

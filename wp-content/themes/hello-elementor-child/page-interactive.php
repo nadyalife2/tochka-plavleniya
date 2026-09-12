@@ -131,8 +131,9 @@ get_header();
           </div>
 
           <div class="flex items-end">
-            <button id="calc-flux-btn" type="button" class="w-full px-4 py-2.5 bg-ink text-paper font-mono font-semibold text-xs rounded hover:opacity-90 transition-opacity border border-paper-border-dark shadow-sm">
-              Рассчитать дозировку ⚡
+            <button id="calc-flux-btn" type="button" class="w-full px-4 py-2.5 bg-ink text-paper font-mono font-semibold text-xs rounded hover:opacity-90 transition-opacity border border-paper-border-dark shadow-sm flex items-center justify-center gap-1.5">
+              <span>Рассчитать дозировку</span>
+              <span class="text-[11px]">→</span>
             </button>
           </div>
         </div>
