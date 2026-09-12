@@ -16,7 +16,8 @@ foreach ($articles as $article) {
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>ТОЧКА ПЛАВЛЕНИЯ // Журнал и открытая лаборатория ТЧП</title>
+  <title>Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ</title>
+  <meta name="description" content="Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ.">
   
   <!-- Immediate Theme Init Script (Zero FOUC) -->
   <script>

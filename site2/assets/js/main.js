@@ -1,25 +1,21 @@
-// ===== 1. THEME SWITCHER LOGIC =====
+// ===== 1. THEME SWITCHER LOGIC (Unified with tp_theme & Tailwind .dark class) =====
 (function() {
-    const savedTheme = localStorage.getItem('tchp_theme') || 'craft';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    document.body?.setAttribute('data-theme', savedTheme);
+    const saved = localStorage.getItem('tp_theme');
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.classList.add('dark');
+    } else {
+        document.documentElement.classList.remove('dark');
+    }
 })();
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Theme selector
-    const themeSelect = document.getElementById('theme-select');
-    const savedTheme = localStorage.getItem('tchp_theme') || 'craft';
-
-    if (themeSelect) {
-        themeSelect.value = savedTheme;
-        document.documentElement.setAttribute('data-theme', savedTheme);
-        document.body.setAttribute('data-theme', savedTheme);
-
-        themeSelect.addEventListener('change', (e) => {
-            const selected = e.target.value;
-            document.documentElement.setAttribute('data-theme', selected);
-            document.body.setAttribute('data-theme', selected);
-            localStorage.setItem('tchp_theme', selected);
+    // Theme toggle button
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const isDark = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
         });
     }
 

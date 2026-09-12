@@ -4,23 +4,21 @@ require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/articles-data.php';
 ?>
 <!DOCTYPE html>
-<html lang="ru" class="light">
+<html lang="ru">
 <head>
   <meta charset="UTF-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
   <title><?= e($page_title) ?> — ТОЧКА ПЛАВЛЕНИЯ</title>
   <meta name="description" content="Интерактивный верстак инженера: калькулятор расхода флюса, квиз по дефектам монтажа и интерактивная таблица припоев."/>
 
-  <!-- Immediate Theme Init Script -->
+  <!-- Immediate Theme Init Script (Zero FOUC) -->
   <script>
     (function() {
       const saved = localStorage.getItem('tp_theme');
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (saved === 'dark' || (!saved && prefersDark)) {
         document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
       } else {
-        document.documentElement.classList.add('light');
         document.documentElement.classList.remove('dark');
       }
     })();
@@ -158,7 +156,7 @@ require_once __DIR__ . '/includes/articles-data.php';
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left font-mono text-xs border-collapse">
+            <table id="solder-table" class="w-full text-left font-mono text-xs border-collapse">
               <thead>
                 <tr class="border-b border-paper-border bg-paper-subtle text-ink">
                   <th class="py-2.5 px-3">Марка сплава</th>
@@ -218,55 +216,15 @@ require_once __DIR__ . '/includes/articles-data.php';
   <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
 
   <!-- Scripts -->
+  <script src="assets/js/flux-calc.js"></script>
+  <script src="assets/js/solder-table.js"></script>
   <script>
     (function() {
-      // Theme Toggle
       const toggle = document.getElementById('theme-toggle');
       if (toggle) {
         toggle.addEventListener('click', function() {
           const isDark = document.documentElement.classList.toggle('dark');
           localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
-        });
-      }
-
-      // Flux Calculator
-      const calcBtn = document.getElementById('calc-flux-btn');
-      if (calcBtn) {
-        calcBtn.addEventListener('click', function() {
-          const area = parseFloat(document.getElementById('flux-area').value) || 35;
-          const type = document.getElementById('flux-type').value;
-          let vol = 0;
-          let desc = '';
-
-          if (type === 'bga_nc') {
-            vol = (area * 0.005).toFixed(2);
-            desc = `Для ${area} см² (BGA реболлинг) требуется ~${vol} мл флюса-геля. Наносите равномерно шпателем толщиной 50-70 мкм.`;
-          } else if (type === 'smd_rma') {
-            vol = (area * 0.008).toFixed(2);
-            desc = `Для ${area} см² (SMD монтаж) требуется ~${vol} мл. Требуется обязательная отмывка изопропиловым спиртом после пайки.`;
-          } else if (type === 'paste_sac') {
-            vol = (area * 0.015).toFixed(2);
-            desc = `Для ${area} см² нанесения через трафарет потребуется ~${vol} г паяльной пасты SAC305.`;
-          } else {
-            vol = (area * 0.006).toFixed(2);
-            desc = `Для ${area} см² водосмывного флюса требуется ~${vol} мл. Обязательна деионизированная промывка в УЗ-ванне.`;
-          }
-
-          document.getElementById('res-volume').textContent = `~${vol} мл/г`;
-          document.getElementById('res-desc').textContent = desc;
-        });
-      }
-
-      // Solder Search Filter
-      const searchInput = document.getElementById('solder-search');
-      if (searchInput) {
-        searchInput.addEventListener('input', function() {
-          const q = this.value.toLowerCase().trim();
-          const rows = document.querySelectorAll('#solder-tbody tr');
-          rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(q) ? '' : 'none';
-          });
         });
       }
     })();
