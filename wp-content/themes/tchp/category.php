@@ -228,7 +228,7 @@ $paginated = paginate($grid_articles, 4, $page_num);
         <span class="text-ink font-semibold"><?= e($current_rubric['title']) ?></span>
       </nav>
 
-      <!-- HERO SECTION (Calm, Engineering Aesthetics) -->
+      <!-- HERO SECTION (Calm, Engineering Aesthetics with Balanced Color Highlights) -->
       <section class="border-b border-paper-border pb-8">
         <div class="max-w-3xl space-y-4">
           
@@ -248,29 +248,40 @@ $paginated = paginate($grid_articles, 4, $page_num);
             <?= e($current_rubric['title']) ?>
           </h1>
 
-          <!-- Lead Paragraph (Clean, Legible Typography) -->
+          <!-- Lead Paragraph with Tasteful Colored Marker Highlights -->
           <p class="text-base sm:text-lg text-ink/90 font-serif leading-[1.65]">
-            <?= e($current_rubric['lead']) ?>
+            <?php if ($current_slug === 'materialy'): ?>
+              Разбираем металлургию и химию радиомонтажа: свойства припоев (<mark class="hl-orange font-mono text-[14px]">ПОС-61, SAC305</mark>, <mark class="hl-pink font-mono text-[14px]">сплав Розе</mark>), классификацию флюсов (<mark class="hl-yellow font-mono text-[14px]">RMA, No-Clean</mark>, водосмывные), реанимацию паяльных паст и <mark class="hl-blue font-mono text-[14px]">паразитные токи утечки</mark>.
+            <?php elseif ($current_slug === 'start'): ?>
+              Первые шаги в радиомонтаже, базовые принципы <mark class="hl-blue font-mono text-[14px]">смачиваемости</mark>, выбор <mark class="hl-orange font-mono text-[14px]">первого паяльника</mark> и <mark class="hl-yellow font-mono text-[14px]">безопасная организация</mark> рабочего места монтажника.
+            <?php elseif ($current_slug === 'praktika'): ?>
+              Техника ручного монтажа <mark class="hl-blue font-mono text-[14px]">SMD 0402–1206</mark>, пайка микросхем <mark class="hl-pink font-mono text-[14px]">QFN и BGA</mark>, прогрев <mark class="hl-orange font-mono text-[14px]">массивных полигонов</mark> и выбор геометрии жал.
+            <?php elseif ($current_slug === 'oshibki'): ?>
+              Диагностика и устранение типового брака: <mark class="hl-yellow font-mono text-[14px]">холодный шов</mark>, паразитные <mark class="hl-blue font-mono text-[14px]">перемычки</mark>, <mark class="hl-pink font-mono text-[14px]">отслоение дорожек</mark> и дефект <mark class="hl-orange font-mono text-[14px]">tombstoning</mark>.
+            <?php else: ?>
+              <?= e($current_rubric['lead']) ?>
+            <?php endif; ?>
           </p>
 
         </div>
       </section>
 
-      <!-- CATEGORY NAVIGATION PILLS -->
+      <!-- CATEGORY NAVIGATION PILLS WITH SUBTLE COLOR DOTS -->
       <div class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs">
         <?php
         $nav_pills = [
-            ['slug' => 'start',     'label' => 'Начать паять'],
-            ['slug' => 'materialy', 'label' => 'Материалы и сплавы'],
-            ['slug' => 'praktika',  'label' => 'Практика монтажа'],
-            ['slug' => 'oshibki',   'label' => 'Проблемы и дефекты'],
+            ['slug' => 'start',     'label' => 'Начать паять',     'dot' => 'bg-amber-400'],
+            ['slug' => 'materialy', 'label' => 'Материалы и сплавы', 'dot' => 'bg-sky-400'],
+            ['slug' => 'praktika',  'label' => 'Практика монтажа',   'dot' => 'bg-orange-400'],
+            ['slug' => 'oshibki',   'label' => 'Проблемы и дефекты', 'dot' => 'bg-pink-400'],
         ];
         foreach ($nav_pills as $pill):
             $is_curr = ($current_slug === $pill['slug']);
         ?>
           <a href="/category.php?slug=<?= $pill['slug'] ?>"
-             class="px-3.5 py-1.5 rounded transition-all whitespace-nowrap <?= $is_curr ? 'bg-ink text-paper font-bold shadow-sm' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?>">
-            <?= $pill['label'] ?>
+             class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded transition-all whitespace-nowrap <?= $is_curr ? 'bg-ink text-paper font-bold shadow-sm' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?>">
+            <span class="w-1.5 h-1.5 rounded-full <?= $pill['dot'] ?>"></span>
+            <span><?= $pill['label'] ?></span>
           </a>
         <?php endforeach; ?>
         <a href="/index.php#articles" class="px-3.5 py-1.5 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto">
@@ -286,10 +297,10 @@ $paginated = paginate($grid_articles, 4, $page_num);
           
           <!-- CONTEXTUAL INTERACTIVE CTA BANNER (Calm Workbench Style) -->
           <?php if (!empty($current_rubric['cta'])): ?>
-            <div class="border border-paper-border rounded-lg p-5 sm:p-6 bg-card shadow-sm space-y-3">
+            <div class="border border-paper-border rounded-lg p-5 sm:p-6 bg-card shadow-sm space-y-3 relative overflow-hidden">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                  <span class="text-xs font-mono font-bold uppercase tracking-wider text-accent">
+                  <span class="pill-blue text-[10.5px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded">
                     ★ ИНТЕРАКТИВНЫЙ ИНСТРУМЕНТ
                   </span>
                 </div>
@@ -306,7 +317,7 @@ $paginated = paginate($grid_articles, 4, $page_num);
 
               <div class="pt-2 flex flex-wrap items-center gap-3">
                 <?php if (!empty($current_rubric['cta']['link1'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-ink text-paper font-mono text-xs font-medium hover:opacity-90 transition-opacity">
+                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-ink text-paper font-mono text-xs font-medium hover:opacity-90 transition-opacity shadow-sm">
                     <span><?= e($current_rubric['cta']['lbl1']) ?></span>
                   </a>
                 <?php endif; ?>
@@ -335,8 +346,8 @@ $paginated = paginate($grid_articles, 4, $page_num);
                   <span class="text-ink-faint">·</span>
                   <span>~<?= e($featured_article['read_min'] ?? 8) ?> мин чтения</span>
                 </div>
-                <span class="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-paper-subtle border border-paper-border text-ink-muted">
-                  Флагман рубрики
+                <span class="pill-yellow px-2 py-0.5 rounded text-[10.5px] font-mono uppercase font-bold">
+                  ★ Флагман рубрики
                 </span>
               </div>
 
@@ -352,22 +363,22 @@ $paginated = paginate($grid_articles, 4, $page_num);
                 </p>
               </div>
 
-              <!-- Technical Info Strip -->
-              <div class="rounded border border-paper-border bg-paper-subtle p-3.5 flex items-center justify-between font-mono text-xs text-ink-muted overflow-x-auto">
+              <!-- Technical Info Strip with Clean Micro-Highlights -->
+              <div class="rounded border border-paper-border bg-paper-subtle p-3.5 flex items-center justify-between font-mono text-xs text-ink-muted overflow-x-auto gap-3">
                 <div class="flex items-center gap-3 shrink-0">
-                  <span>RMA-223: <strong class="text-ink">активность средняя</strong></span>
+                  <span>RMA-223: <span class="hl-yellow font-bold text-ink">средняя активность</span></span>
                   <span class="text-ink-faint">→</span>
-                  <span>NC-559: <strong class="text-ink">No-Clean гель</strong></span>
+                  <span>NC-559: <span class="hl-blue font-bold text-ink">No-Clean гель</span></span>
                   <span class="text-ink-faint">→</span>
-                  <span>WS: <strong class="text-ink">водосмывной</strong></span>
+                  <span>WS: <span class="hl-pink font-bold text-ink">водосмывной</span></span>
                 </div>
-                <span class="text-[10px] text-ink-faint font-mono ml-2">SPEC 02.1</span>
+                <span class="pill-orange text-[10px] font-mono font-bold px-1.5 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
               </div>
 
               <!-- Card Bottom Bar -->
               <div class="flex items-center justify-between pt-2 border-t border-paper-border font-mono text-xs text-ink-muted">
                 <div class="flex items-center gap-2">
-                  <span class="text-ink font-medium"><?= e($featured_article['tag']) ?></span>
+                  <span class="pill-orange px-2 py-0.5 rounded font-mono text-[11px] font-bold"><?= e($featured_article['tag']) ?></span>
                   <span class="text-ink-faint">·</span>
                   <span><?= e($featured_article['date'] ?? '2026') ?></span>
                 </div>
@@ -380,16 +391,20 @@ $paginated = paginate($grid_articles, 4, $page_num);
             </article>
           <?php endif; ?>
 
-          <!-- 2-COLUMN ARTICLE CARDS GRID -->
+          <!-- 2-COLUMN ARTICLE CARDS GRID WITH COLOR-BALANCED TAGS -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <?php 
+            $tag_palette = ['pill-blue', 'pill-orange', 'pill-pink', 'pill-yellow'];
+            $idx = 0;
             foreach ($paginated['items'] as $article): 
               $art_url = "/article.php?slug=" . urlencode($article['slug']);
+              $card_pill = $tag_palette[$idx % 4];
+              $idx++;
             ?>
               <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-all">
                 <div class="space-y-2">
                   <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint">
-                    <span class="uppercase font-medium text-ink border-b border-paper-border pb-0.5">
+                    <span class="<?= $card_pill ?> px-2 py-0.5 rounded text-[10.5px] font-mono font-bold uppercase">
                       <?= e($article['tag']) ?>
                     </span>
                     <span>~<?= e($article['read_min']) ?> мин</span>
@@ -434,10 +449,10 @@ $paginated = paginate($grid_articles, 4, $page_num);
 
         </div>
 
-        <!-- RIGHT COLUMN: SIDEBAR (Restrained, Tasteful Workbench Accents) -->
+        <!-- RIGHT COLUMN: SIDEBAR (Harmonious 4-Color Workbench Accents) -->
         <aside class="lg:col-span-4 space-y-6">
           
-          <!-- 💛 SINGLE AUTHENTIC YELLOW POST-IT (Caveat Handwriting) -->
+          <!-- 💛 YELLOW POST-IT NOTE: Solder Workshop Tip -->
           <div class="sticker-yellow p-4 rounded-lg space-y-2.5 relative sketch-border shadow-sm rotate-[-0.8deg]">
             <div class="tape-strip tape-yellow w-12 -top-2 left-6 rotate-[-2deg]"></div>
             
@@ -459,32 +474,32 @@ $paginated = paginate($grid_articles, 4, $page_num);
             </div>
           </div>
 
-          <!-- TECHNICAL SPECIFICATION: Solder liquidus (Clean Card) -->
-          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">
+          <!-- 💙 BLUE CARD: Solder liquidus Specification with Color-Coded Temperatures -->
+          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm relative">
             <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-2">
               <span class="flex items-center gap-1.5 text-ink">
-                <span class="material-symbols-outlined text-[15px] text-accent">thermostat</span>
+                <span class="material-symbols-outlined text-[15px] text-sky-600 dark:text-sky-400">thermostat</span>
                 Ликвидус металлов
               </span>
-              <span class="text-[10px] font-normal text-ink-faint">ГОСТ 21931</span>
+              <span class="pill-blue text-[10px] font-mono uppercase px-2 py-0.5 rounded">ГОСТ 21931</span>
             </div>
 
             <div class="space-y-1.5 font-mono text-xs">
               <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">ПОС-61 (Sn63Pb37)</span>
-                <strong class="text-accent font-bold">183 °C</strong>
+                <span class="hl-orange font-bold px-1.5 py-0.5 rounded text-[11px]">183 °C</span>
               </div>
               <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">SAC305 (RoHS)</span>
-                <strong class="text-ink font-bold">217–220 °C</strong>
+                <span class="hl-blue font-bold px-1.5 py-0.5 rounded text-[11px]">217–220 °C</span>
               </div>
               <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">Sn42Bi58 (Низкотемп.)</span>
-                <strong class="text-ink font-bold">138 °C</strong>
+                <span class="hl-yellow font-bold px-1.5 py-0.5 rounded text-[11px]">138 °C</span>
               </div>
               <div class="flex items-center justify-between py-1">
                 <span class="text-ink">Сплав Розе (Демонтаж)</span>
-                <strong class="text-ink font-bold">94 °C</strong>
+                <span class="hl-pink font-bold px-1.5 py-0.5 rounded text-[11px]">94 °C</span>
               </div>
             </div>
 
@@ -495,34 +510,57 @@ $paginated = paginate($grid_articles, 4, $page_num);
             </div>
           </div>
 
-          <!-- SUBTLE WARNING NOTE (Clean Alert) -->
-          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-2 border-l-4 border-l-amber-500 shadow-sm">
-            <div class="flex items-center gap-1.5 font-mono text-[11px] uppercase font-bold text-amber-700 dark:text-amber-400">
-              <span>⚠️</span>
-              Правило работы с Розе и Вудом
+          <!-- 🌸 PINK POST-IT NOTE: Critical Alloy Rule for Rose Alloy -->
+          <div class="sticker-pink p-4 rounded-lg space-y-2 relative sketch-border shadow-sm rotate-[0.7deg]">
+            <div class="tape-strip tape-pink w-12 -top-2 right-6 rotate-[2deg]"></div>
+            
+            <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold border-b border-[#f472b6]/40 pb-1.5">
+              <span class="flex items-center gap-1.5">
+                <span>⚠️</span>
+                Сплавы Розе и Вуда
+              </span>
+              <span class="pill-pink text-[9.5px] px-1.5 py-0.2 rounded font-mono font-bold">ОСТОРОЖНО</span>
             </div>
-            <p class="text-xs font-mono text-ink-muted leading-relaxed">
-              Сплав Розе (94°C) — строго для бережного демонтажа разъёмов. После снятия детали остатки сплава необходимо полностью удалить оплёткой перед повторной пайкой.
+
+            <p class="font-hand text-[16px] leading-snug italic font-semibold">
+              «Сплав Розе (94°C) — строго для демонтажа! После снятия разъёма остатки сплава нужно насухо вычистить оплёткой, иначе пайка рассыплется от малейшей вибрации.»
             </p>
+
+            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-[#f472b6]/30">
+              <span>Хрупкость шва</span>
+              <span class="font-bold">Бинарная эвтектика</span>
+            </div>
           </div>
 
-          <!-- WORKBENCH SHORTCUTS -->
+          <!-- 🧡 ORANGE & MULTI-ACCENT: Workbench Tool Shortcuts -->
           <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">
-            <div class="font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-2">
-              Шорткаты калькуляторов
+            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-2">
+              <span>Инструменты верстака</span>
+              <span class="pill-orange text-[10px] px-1.5 py-0.5 rounded">3 ТУЛЗЫ</span>
             </div>
-            <div class="space-y-1.5 font-mono text-xs">
-              <a href="/interactive.php#temp" class="block p-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
-                <div class="font-bold text-accent">🌡️ Термокалькулятор</div>
-                <div class="text-[11px] text-ink-muted">Подбор °C под провод и припой</div>
+            <div class="space-y-2 font-mono text-xs">
+              <a href="/interactive.php#temp" class="flex items-center justify-between p-2 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group">
+                <div>
+                  <div class="font-bold group-hover:text-accent transition-colors">🌡️ Термокалькулятор</div>
+                  <div class="text-[11px] text-ink-muted">Подбор °C под провод и припой</div>
+                </div>
+                <span class="pill-orange text-[10.5px] px-1.5 py-0.5 rounded font-bold">#temp</span>
               </a>
-              <a href="/interactive.php#iron" class="block p-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
-                <div class="font-bold text-ink">🔧 Подбор паяльника</div>
-                <div class="text-[11px] text-ink-muted">Станции T12, C245 под бюджет</div>
+
+              <a href="/interactive.php#iron" class="flex items-center justify-between p-2 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group">
+                <div>
+                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">🔧 Подбор паяльника</div>
+                  <div class="text-[11px] text-ink-muted">Станции T12, C245 под бюджет</div>
+                </div>
+                <span class="pill-blue text-[10.5px] px-1.5 py-0.5 rounded font-bold">#iron</span>
               </a>
-              <a href="/interactive.php#defect" class="block p-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
-                <div class="font-bold text-ink">🔍 Дерево дефектов</div>
-                <div class="text-[11px] text-ink-muted">Диагностика причин брака</div>
+
+              <a href="/interactive.php#defect" class="flex items-center justify-between p-2 rounded border border-paper-border bg-paper hover:border-yellow-400 text-ink transition-colors group">
+                <div>
+                  <div class="font-bold group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">🔍 Дерево дефектов</div>
+                  <div class="text-[11px] text-ink-muted">Диагностика причин брака</div>
+                </div>
+                <span class="pill-yellow text-[10.5px] px-1.5 py-0.5 rounded font-bold">#defect</span>
               </a>
             </div>
           </div>
