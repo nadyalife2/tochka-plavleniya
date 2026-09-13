@@ -432,8 +432,8 @@ function get_semantic_tag_pill(string $tag_key): string {
                   <span class="text-ink-faint">·</span>
                   <span><?= e($featured_article['date'] ?? '2026') ?></span>
                 </div>
-                <a class="text-ink font-semibold hover:underline flex items-center gap-1 group" href="<?= $f_url ?>">
-                  <span class="underline decoration-ink decoration-2 underline-offset-4">Читать статью полностью</span>
+                <a class="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300 hover:underline flex items-center gap-1 group" href="<?= $f_url ?>">
+                  <span class="underline decoration-blue-600 dark:decoration-blue-400 decoration-1 underline-offset-4">Читать статью полностью</span>
                   <span>→</span>
                 </a>
               </div>
@@ -469,7 +469,7 @@ function get_semantic_tag_pill(string $tag_key): string {
                   </div>
 
                   <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                    <a class="hover:underline" href="<?= $art_url ?>">
+                    <a class="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors" href="<?= $art_url ?>">
                       <?= e($article['title']) ?>
                     </a>
                   </h3>
@@ -480,8 +480,8 @@ function get_semantic_tag_pill(string $tag_key): string {
                 </div>
 
                 <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
-                  <span class="text-ink-faint font-hand text-base font-bold italic"><?= e($article['author'] ?? 'Мария Канифоль') ?></span>
-                  <a class="text-ink font-medium hover:underline flex items-center gap-0.5" href="<?= $art_url ?>">
+                  <span class="text-ink-muted font-hand text-base font-bold italic"><?= e($article['author'] ?? 'Мария Канифоль') ?></span>
+                  <a class="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300 hover:underline flex items-center gap-0.5" href="<?= $art_url ?>">
                     <span>Читать</span>
                     <span>→</span>
                   </a>
@@ -498,7 +498,7 @@ function get_semantic_tag_pill(string $tag_key): string {
             <div class="flex items-center justify-center gap-2 pt-4 font-mono text-xs">
               <?php for ($p = 1; $p <= $paginated['total_pages']; $p++): ?>
                 <a href="<?= $base_pag_url ?>&page=<?= $p ?>"
-                   class="w-8 h-8 rounded flex items-center justify-center border transition-colors <?= $p === $page_num ? 'bg-ink text-paper font-bold border-ink' : 'border-paper-border bg-paper text-ink hover:border-accent' ?>">
+                   class="w-8 h-8 rounded flex items-center justify-center border transition-colors <?= $p === $page_num ? 'bg-ink text-paper font-bold border-ink' : 'border-paper-border bg-paper text-ink hover:border-blue-500' ?>">
                   <?= $p ?>
                 </a>
               <?php endfor; ?>
@@ -514,21 +514,21 @@ function get_semantic_tag_pill(string $tag_key): string {
           <div class="sticker-yellow p-3.5 rounded-lg space-y-2 relative sketch-border shadow-sm rotate-[-0.8deg]">
             <div class="tape-strip tape-yellow w-8 -top-1.5 left-5 rotate-[-2deg]"></div>
             
-            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-[#facc15]/40 pb-1">
+            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-amber-300/50 pb-1 text-slate-700 dark:text-slate-300">
               <span class="flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[13px] text-amber-800 dark:text-amber-300">push_pin</span>
+                <span class="material-symbols-outlined text-[13px] text-amber-600 dark:text-amber-400">push_pin</span>
                 Заметка верстака // Химия
               </span>
               <span class="text-[10px] opacity-75">FLUX-QC</span>
             </div>
 
-            <p class="font-hand text-base leading-snug italic font-semibold">
+            <p class="font-hand text-base leading-snug italic font-semibold text-slate-800 dark:text-slate-100">
               «Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции, а не заливай всё флюсом!»
             </p>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-[#facc15]/35">
+            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-amber-300/40 text-slate-600 dark:text-slate-400">
               <span>Норма нагрева флюса</span>
-              <span class="font-bold">IPC-TM-650</span>
+              <span class="font-bold text-slate-800 dark:text-slate-200">IPC-TM-650</span>
             </div>
           </div>
 
@@ -536,7 +536,7 @@ function get_semantic_tag_pill(string $tag_key): string {
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm relative">
             <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
-                <span class="material-symbols-outlined text-[14px] text-accent">thermostat</span>
+                <span class="material-symbols-outlined text-[14px] text-blue-600 dark:text-blue-400">thermostat</span>
                 Ликвидус металлов
               </span>
               <span class="pill-blue text-[10px] font-mono uppercase px-1.5 py-0.5 rounded">ГОСТ 21931</span>
@@ -562,7 +562,7 @@ function get_semantic_tag_pill(string $tag_key): string {
             </div>
 
             <div class="pt-0.5 text-right">
-              <a href="/interactive.php#table" class="font-mono text-[11px] text-accent hover:underline font-bold">
+              <a href="/interactive.php#table" class="font-mono text-[11px] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline font-bold">
                 Вся таблица припоев (9 марок) →
               </a>
             </div>

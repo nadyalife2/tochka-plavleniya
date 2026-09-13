@@ -327,7 +327,7 @@ $faq_items = [
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>
           <p class="text-ink/80">
-            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-ink/40 underline-offset-2 hover:decoration-ink text-ink font-medium" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
+            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-blue-500/50 underline-offset-2 hover:decoration-blue-600 text-blue-600 dark:text-blue-400 font-medium transition-colors" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-blue-500/50 underline-offset-2 hover:decoration-blue-600 text-blue-600 dark:text-blue-400 font-medium transition-colors" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
           </p>
         </div>
 

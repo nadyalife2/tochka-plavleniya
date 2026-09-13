@@ -509,63 +509,63 @@ require_once __DIR__ . '/data/interactive-rules.php';
                 <div id="engineer-memo" style="
                   position:relative;
                   padding:1.25rem 1.25rem 1.5rem;
-                  background:#fef9c3;
+                  background:#fffdf5;
                   transform:rotate(-1.2deg);
                   transition:transform 0.2s ease;
                   display:flex; flex-direction:column; gap:0.9rem;
-                  box-shadow:3px 5px 18px rgba(0,0,0,0.13), -1px 1px 0 rgba(0,0,0,0.05);
-                  border-radius:2px 2px 2px 2px;
+                  box-shadow:0 6px 20px rgba(250, 204, 21, 0.1), 0 2px 6px rgba(0,0,0,0.04);
+                  border-radius:3px;
                 ">
                   <!-- SVG sketch outline -->
                   <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;" preserveAspectRatio="none" viewBox="0 0 200 260">
                     <path d="M2 4 C 40 1.5, 140 3, 198 2.5 C 199.5 60, 199 140, 198.5 258 C 150 259.5, 55 258, 2.5 258.5 C 1.5 190, 1 80, 2 4 Z"
-                          fill="#fef9c3" fill-opacity="0" stroke="#eab308" stroke-width="1.2"
+                          fill="#fffdf5" fill-opacity="0" stroke="#fde047" stroke-width="1.2"
                           stroke-dasharray="38 1.5 22 1" stroke-linecap="round"/>
                   </svg>
                   <!-- Folded corner triangle -->
                   <svg aria-hidden="true" style="position:absolute;bottom:0;right:0;width:22px;height:22px;pointer-events:none;" viewBox="0 0 22 22">
-                    <path d="M22 22 L0 22 L22 0 Z" fill="#e5d68a" opacity="0.7"/>
-                    <path d="M22 0 L0 22" stroke="#ca8a04" stroke-width="0.8" fill="none"/>
+                    <path d="M22 22 L0 22 L22 0 Z" fill="#fef08a" opacity="0.6"/>
+                    <path d="M22 0 L0 22" stroke="#eab308" stroke-width="0.8" fill="none"/>
                   </svg>
 
                   <!-- Pin header -->
-                  <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:9px; border-bottom:1px dashed rgba(0,0,0,0.15);">
-                    <span class="handwriting" style="font-size:17px; font-weight:700; color:#78350f; letter-spacing:0.01em; display:inline-flex; align-items:center; gap:4px;">
-                      <span class="material-symbols-outlined" style="font-size:16px;">push_pin</span>
+                  <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:9px; border-bottom:1px dashed rgba(0,0,0,0.12);">
+                    <span class="handwriting" style="font-size:17px; font-weight:700; color:#0f172a; letter-spacing:0.01em; display:inline-flex; align-items:center; gap:4px;">
+                      <span class="material-symbols-outlined text-amber-500" style="font-size:16px;">push_pin</span>
                       Заметка инженера
                     </span>
-                    <span style="font-size:10px; font-family:monospace; font-weight:700; color:#92400e; opacity:0.8; text-transform:uppercase; letter-spacing:0.06em;">IPC-A-610</span>
+                    <span style="font-size:10px; font-family:monospace; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">IPC-A-610</span>
                   </div>
 
                   <!-- Dosage highlight -->
                   <div>
-                    <div style="font-size:10px; font-family:monospace; text-transform:uppercase; color:#92400e; margin-bottom:3px; opacity:0.75;">Рекомендуемая дозировка:</div>
+                    <div style="font-size:10px; font-family:monospace; text-transform:uppercase; color:#64748b; margin-bottom:3px; font-weight:600;">Рекомендуемая дозировка:</div>
                     <div style="display:flex; align-items:baseline; gap:8px;">
                       <span id="res-volume" class="handwriting" style="font-size:2.5rem; font-weight:700; color:var(--color-accent); line-height:1;">~0.18 мл</span>
-                      <span id="batch-note" style="font-size:11px; font-family:monospace; color:#92400e; opacity:0.75;">(на 1 плату)</span>
+                      <span id="batch-note" style="font-size:11px; font-family:monospace; color:#64748b;">(на 1 плату)</span>
                     </div>
                   </div>
 
                   <!-- Hand-drawn PCB sketch -->
                   <div style="display:flex; align-items:center; gap:10px;">
                     <svg id="pcb-svg" width="80" height="80" viewBox="0 0 80 80" fill="none"
-                         stroke="#78350f" stroke-linecap="round" stroke-linejoin="round"
-                         style="flex-shrink:0; transition:width 0.2s,height 0.2s; display:block; opacity:0.75;">
+                         stroke="#475569" stroke-linecap="round" stroke-linejoin="round"
+                         style="flex-shrink:0; transition:width 0.2s,height 0.2s; display:block; opacity:0.85;">
                       <rect x="5" y="5" width="70" height="70" rx="3" stroke-width="1.4" stroke-dasharray="2.5 1.5" fill="none"/>
                       <circle cx="12" cy="12" r="2.2" stroke-width="1.1" fill="none"/>
                       <circle cx="68" cy="12" r="2.2" stroke-width="1.1" fill="none"/>
                       <circle cx="12" cy="68" r="2.2" stroke-width="1.1" fill="none"/>
                       <circle cx="68" cy="68" r="2.2" stroke-width="1.1" fill="none"/>
                       <rect x="26" y="26" width="28" height="28" rx="2" stroke-width="1.4" stroke-dasharray="3 1.5" fill="none"/>
-                      <circle cx="33" cy="33" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
-                      <circle cx="40" cy="33" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
-                      <circle cx="47" cy="33" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
-                      <circle cx="33" cy="40" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
-                      <circle cx="40" cy="40" r="1.8" fill="#78350f" stroke="none" opacity="0.8"/>
-                      <circle cx="47" cy="40" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
-                      <circle cx="33" cy="47" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
-                      <circle cx="40" cy="47" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
-                      <circle cx="47" cy="47" r="1.3" fill="#78350f" stroke="none" opacity="0.55"/>
+                      <circle cx="33" cy="33" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="40" cy="33" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="47" cy="33" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="33" cy="40" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="40" cy="40" r="1.8" fill="#0f172a" stroke="none" opacity="0.85"/>
+                      <circle cx="47" cy="40" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="33" cy="47" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="40" cy="47" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="47" cy="47" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
                       <line x1="5" y1="33" x2="26" y2="33" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
                       <line x1="5" y1="40" x2="26" y2="40" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
                       <line x1="5" y1="47" x2="26" y2="47" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
@@ -579,24 +579,24 @@ require_once __DIR__ . '/data/interactive-rules.php';
                       <line x1="75" y1="74" x2="75" y2="80" stroke-width="0.7" opacity="0.5"/>
                     </svg>
                     <div>
-                      <div style="font-size:10px; font-family:monospace; text-transform:uppercase; font-weight:700; color:#78350f; opacity:0.7; margin-bottom:2px;">Зарисовка платы:</div>
-                      <div id="pcb-dimensions" style="font-size:11px; font-family:monospace; font-weight:700; color:#78350f;">59 × 59 мм (35 см²)</div>
-                      <div style="font-size:10px; font-family:monospace; color:#78350f; opacity:0.6; margin-top:2px;">↑ масштаб к площади</div>
+                      <div style="font-size:10px; font-family:monospace; text-transform:uppercase; font-weight:700; color:#64748b; margin-bottom:2px;">Зарисовка платы:</div>
+                      <div id="pcb-dimensions" style="font-size:11px; font-family:monospace; font-weight:700; color:#0f172a;">59 × 59 мм (35 см²)</div>
+                      <div style="font-size:10px; font-family:monospace; color:#64748b; opacity:0.8; margin-top:2px;">↑ масштаб к площади</div>
                     </div>
                   </div>
 
                   <!-- Process description -->
-                  <p id="res-desc" style="font-size:12px; font-family:monospace; color:#78350f; line-height:1.55; margin:0; opacity:0.85;">
+                  <p id="res-desc" style="font-size:12px; font-family:monospace; color:#334155; line-height:1.55; margin:0;">
                     Для 35 см² при BGA реболлинге наносите тонкий слой 50-70 мкм. Избыток вызывает кипение и сдвиг чипа.
                   </p>
 
                   <!-- Wash tip -->
-                  <div style="font-size:11px; font-family:monospace; font-weight:600; color:#78350f; padding-top:8px; border-top:1px dashed rgba(0,0,0,0.15); display:flex; align-items:center; gap:6px; opacity:0.85;">
-                    <span style="color:var(--color-accent);">ℹ</span>
+                  <div style="font-size:11px; font-family:monospace; font-weight:600; color:#334155; padding-top:8px; border-top:1px dashed rgba(0,0,0,0.12); display:flex; align-items:center; gap:6px;">
+                    <span style="color:var(--color-accent); font-weight:bold;">ℹ</span>
                     <span id="wash-tip">Отмывка: опциональна (No-Clean)</span>
                   </div>
 
-                  <button type="button" id="copy-flux-btn" style="padding:6px 10px; border-radius:4px; border:1px solid #ca8a04; background:#fef08a; color:#78350f; font-family:monospace; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.15s;">
+                  <button type="button" id="copy-flux-btn" style="padding:7px 12px; border-radius:4px; border:1px solid #cbd5e1; background:#ffffff; color:#0f172a; font-family:monospace; font-size:11px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px; transition:all 0.15s; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
                     <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                     </svg>

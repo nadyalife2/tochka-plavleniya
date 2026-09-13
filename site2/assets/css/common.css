@@ -4,44 +4,48 @@
  */
 
 :root {
-  --color-paper: #faf8f5;
-  --color-paper-subtle: #f3f0ea;
-  --color-paper-border: #e6e2da;
-  --color-paper-border-dark: #d3cdc2;
-  --color-ink: #141414;
-  --color-ink-muted: #6b665f;
-  /* WCAG AA Compliance: >= 4.7:1 contrast on #faf8f5 */
-  --color-ink-faint: #666159;
-  --color-callout: #fcfaf2;
-  --color-card: rgba(255, 255, 255, 0.75);
-  --color-accent: #eb5211;
-  --dot-color: #d3cdc2;
-  --bg-color: #faf8f5;
+  --color-paper: #ffffff;
+  --color-paper-subtle: #f8fafc;
+  --color-paper-border: #e2e8f0;
+  --color-paper-border-dark: #cbd5e1;
+  --color-ink: #0f172a;       /* Глубокий графитовый (slate-900) вместо жесткого черного #000 */
+  --color-ink-muted: #64748b; /* Благородный нейтральный серый (slate-500) */
+  --color-ink-faint: #94a3b8; /* Мягкий серый для подписей и разделителей (slate-400) */
+  --color-callout: #f8fafc;
+  --color-card: rgba(255, 255, 255, 0.95);
+  --color-accent: #2563eb;    /* Глубокий технологичный синий для интерактива */
+  --color-link: #2563eb;
+  --color-link-hover: #1d4ed8;
+  --dot-color: #e2e8f0;
+  --bg-color: #ffffff;        /* Чистый белый фон страницы */
 
   /* Backward-compatible alias tokens */
   --bg-card: var(--color-card);
   --bg-paper: var(--color-paper);
   --text-main: var(--color-ink);
   --text-muted: var(--color-ink-muted);
-  --accent-yellow: #facc15;
-  --accent-orange: var(--color-accent);
+  --accent-yellow: #facc15;   /* Акцентный желтый (строго дозированно для логотипа и иконок) */
+  --accent-orange: #2563eb;
+  --accent-blue: #2563eb;
   --border: var(--color-paper-border);
   --border-dark: var(--color-paper-border-dark);
 }
 
 html.dark {
-  --color-paper: #12141a;
-  --color-paper-subtle: #191c24;
-  --color-paper-border: #282d3b;
-  --color-paper-border-dark: #373e52;
-  --color-ink: #f3f4f6;
-  --color-ink-muted: #9ca3af;
-  --color-ink-faint: #9ca3af;
-  --color-callout: #1b1f2b;
-  --color-card: rgba(24, 27, 36, 0.85);
-  --color-accent: #ff6b2b;
-  --dot-color: #2b3142;
-  --bg-color: #12141a;
+  --color-paper: #0b0f19;
+  --color-paper-subtle: #111827;
+  --color-paper-border: #1e293b;
+  --color-paper-border-dark: #334155;
+  --color-ink: #f8fafc;
+  --color-ink-muted: #94a3b8;
+  --color-ink-faint: #64748b;
+  --color-callout: #111827;
+  --color-card: rgba(17, 24, 39, 0.85);
+  --color-accent: #38bdf8;
+  --color-link: #38bdf8;
+  --color-link-hover: #60a5fa;
+  --dot-color: #1e293b;
+  --bg-color: #0b0f19;
 
   /* Backward-compatible alias tokens (Dark) */
   --bg-card: var(--color-card);
@@ -49,7 +53,8 @@ html.dark {
   --text-main: var(--color-ink);
   --text-muted: var(--color-ink-muted);
   --accent-yellow: #facc15;
-  --accent-orange: var(--color-accent);
+  --accent-orange: #38bdf8;
+  --accent-blue: #38bdf8;
   --border: var(--color-paper-border);
   --border-dark: var(--color-paper-border-dark);
 }
@@ -59,7 +64,7 @@ html, body {
 }
 
 :focus-visible {
-  outline: 2px solid #eb5211 !important;
+  outline: 2px solid #2563eb !important;
   outline-offset: 2px !important;
 }
 
@@ -191,15 +196,17 @@ html.dark .sketch-pill-gray {
 
 /* POST-IT NOTES */
 .postit-yellow {
-  background: #fef9c3;
-  border-left: 4px solid #eab308;
-  color: #1c1917;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  background: #fffdf5; /* ультрасветлый пастельный ваниль/крем-брюле */
+  border: 1px solid #fde047;
+  border-left: 4px solid #facc15;
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(250, 204, 21, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 html.dark .postit-yellow {
-  background: #2a2818;
-  border-left: 4px solid #eab308;
-  color: #fef08a;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  border-left: 4px solid #facc15;
+  color: #f8fafc;
 }
 
 .postit-mint {
@@ -317,46 +324,46 @@ input[type="range"].range-slider::-moz-range-thumb {
 .tape-blue   { background: rgba(125, 211, 252, 0.7); }
 .tape-orange { background: rgba(251, 146, 60, 0.65); }
 
-/* Stickers & Post-its */
+/* Stickers & Post-its (Ultra-light pastel ivory / vanilla for optimal readability) */
 .sticker-yellow {
-  background: #fef9c3;
-  border: 1px solid #facc15;
-  color: #713f12;
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+  background: #fffdf5; /* ультрасветлый пастельный крем-брюле/ваниль */
+  border: 1px solid #fde047; /* тонкая нежная рамка */
+  color: #0f172a; /* высококонтрастный графитовый текст */
+  box-shadow: 0 4px 14px rgba(250, 204, 21, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 html.dark .sticker-yellow {
-  background: rgba(234, 179, 8, 0.12);
-  border-color: rgba(234, 179, 8, 0.5);
-  color: #fef08a;
+  background: rgba(234, 179, 8, 0.06);
+  border: 1px solid rgba(234, 179, 8, 0.35);
+  color: #f8fafc;
 }
 
 .sticker-blue {
-  background: #f0f9ff;
-  border: 1px solid #38bdf8;
-  color: #0369a1;
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+  background: #f8fafc;
+  border: 1px solid #bfdbfe;
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 html.dark .sticker-blue {
-  background: rgba(14, 165, 233, 0.12);
-  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(14, 165, 233, 0.08);
+  border-color: rgba(56, 189, 248, 0.35);
   color: #bae6fd;
 }
 
 .sticker-orange {
-  background: #fff7ed;
-  border: 1px solid #fb923c;
-  color: #9a3412;
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
+  background: #fffdf5;
+  border: 1px solid #fed7aa;
+  color: #0f172a;
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
 }
 html.dark .sticker-orange {
-  background: rgba(249, 115, 22, 0.12);
-  border-color: rgba(251, 146, 60, 0.5);
+  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(251, 146, 60, 0.35);
   color: #fed7aa;
 }
 
 /* Highlighters (Reduced by 30%: sleek bottom-felt stroke, soft pastels) */
 .hl-yellow {
-  background: linear-gradient(180deg, transparent 35%, rgba(254, 240, 138, 0.85) 35%);
+  background: linear-gradient(180deg, transparent 40%, rgba(254, 240, 138, 0.7) 40%);
   color: inherit;
   padding: 0 0.22em;
   border-radius: 1px;
@@ -364,12 +371,12 @@ html.dark .sticker-orange {
   -webkit-box-decoration-break: clone;
 }
 html.dark .hl-yellow {
-  background: linear-gradient(180deg, transparent 35%, rgba(202, 138, 4, 0.45) 35%);
+  background: linear-gradient(180deg, transparent 40%, rgba(202, 138, 4, 0.35) 40%);
   color: #fef08a;
 }
 
 .hl-blue {
-  background: linear-gradient(180deg, transparent 35%, rgba(186, 230, 253, 0.85) 35%);
+  background: linear-gradient(180deg, transparent 40%, rgba(191, 219, 254, 0.7) 40%);
   color: inherit;
   padding: 0 0.22em;
   border-radius: 1px;
@@ -377,12 +384,12 @@ html.dark .hl-yellow {
   -webkit-box-decoration-break: clone;
 }
 html.dark .hl-blue {
-  background: linear-gradient(180deg, transparent 35%, rgba(14, 165, 233, 0.4) 35%);
+  background: linear-gradient(180deg, transparent 40%, rgba(14, 165, 233, 0.3) 40%);
   color: #bae6fd;
 }
 
 .hl-orange {
-  background: linear-gradient(180deg, transparent 35%, rgba(254, 215, 170, 0.85) 35%);
+  background: linear-gradient(180deg, transparent 40%, rgba(254, 215, 170, 0.7) 40%);
   color: inherit;
   padding: 0 0.22em;
   border-radius: 1px;
@@ -390,48 +397,70 @@ html.dark .hl-blue {
   -webkit-box-decoration-break: clone;
 }
 html.dark .hl-orange {
-  background: linear-gradient(180deg, transparent 35%, rgba(249, 115, 22, 0.4) 35%);
+  background: linear-gradient(180deg, transparent 40%, rgba(249, 115, 22, 0.3) 40%);
   color: #fed7aa;
 }
 
-/* Tag Pills (Reduced by 30% in padding & size) */
+/* Tag Pills — Crisp Outline & Deep Slate System (Never washed out) */
 .pill-blue {
-  background: rgba(240, 249, 255, 0.85);
-  border: 1px solid rgba(56, 189, 248, 0.55);
-  color: #0284c7;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1d4ed8;
   font-size: 10px;
-  padding: 0.1rem 0.38rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  letter-spacing: 0.03em;
+  border-radius: 3px;
 }
 html.dark .pill-blue {
-  background: rgba(14, 165, 233, 0.15);
-  border-color: rgba(56, 189, 248, 0.4);
-  color: #38bdf8;
+  background: rgba(37, 99, 235, 0.15);
+  border-color: rgba(59, 130, 246, 0.4);
+  color: #60a5fa;
 }
 
 .pill-yellow {
-  background: rgba(254, 252, 232, 0.85);
-  border: 1px solid rgba(234, 179, 8, 0.55);
-  color: #a16207;
+  background: #fefce8;
+  border: 1px solid #fef08a;
+  color: #854d0e;
   font-size: 10px;
-  padding: 0.1rem 0.38rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  letter-spacing: 0.03em;
+  border-radius: 3px;
 }
 html.dark .pill-yellow {
-  background: rgba(234, 179, 8, 0.15);
-  border-color: rgba(234, 179, 8, 0.4);
-  color: #facc15;
+  background: rgba(234, 179, 8, 0.12);
+  border-color: rgba(234, 179, 8, 0.35);
+  color: #fef08a;
 }
 
+/* Outline Slate-Blue Pill for Materials: собранный контур, не перетягивает внимание */
 .pill-orange {
-  background: rgba(255, 247, 237, 0.85);
-  border: 1px solid rgba(249, 115, 22, 0.55);
-  color: #ea580c;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  color: #334155;
   font-size: 10px;
-  padding: 0.1rem 0.38rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  letter-spacing: 0.03em;
+  border-radius: 3px;
 }
 html.dark .pill-orange {
-  background: rgba(249, 115, 22, 0.15);
-  border-color: rgba(249, 115, 22, 0.4);
-  color: #fb923c;
+  background: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+/* Global Interactive Link Utilities (Tech-Blue) */
+a.link-tech,
+.link-tech {
+  color: var(--color-link);
+  transition: color 0.15s ease;
+}
+a.link-tech:hover,
+.link-tech:hover {
+  color: var(--color-link-hover);
+  text-decoration: underline;
 }
 
 /* ==========================================================================
