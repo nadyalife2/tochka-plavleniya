@@ -504,37 +504,32 @@ function get_semantic_tag_pill(string $tag_key): string {
             </div>
           </div>
 
-          <!-- 💙 BLUE CARD: Engineering Specification (Liquidus ГОСТ 21931)
-               Thermal Color Logic:
-               - POS-61 (183°C) & SAC305 (217°C): Orange (standard soldering heat)
-               - Sn42Bi58 (138°C): Blue (low-temp cold range)
-               - Rose (94°C): Pink (danger/demount-only alloy)
-          -->
+          <!-- TECHNICAL SPECIFICATION: Solder liquidus (Clean Reference Card) -->
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm relative">
             <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
-                <span class="material-symbols-outlined text-[14px] text-sky-600 dark:text-sky-400">thermostat</span>
+                <span class="material-symbols-outlined text-[14px] text-accent">thermostat</span>
                 Ликвидус металлов
               </span>
               <span class="pill-blue text-[9.5px] font-mono uppercase px-1.5 py-0.2 rounded">ГОСТ 21931</span>
             </div>
 
             <div class="space-y-1 font-mono text-xs">
-              <div class="flex items-center justify-between py-0.5 border-b border-paper-border/50">
+              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">ПОС-61 (Sn63Pb37)</span>
-                <span class="hl-orange font-bold px-1 py-0.2 rounded text-[10.5px]">183 °C</span>
+                <span class="font-bold text-ink text-[11.5px]">183 °C</span>
               </div>
-              <div class="flex items-center justify-between py-0.5 border-b border-paper-border/50">
+              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">SAC305 (RoHS)</span>
-                <span class="hl-orange font-bold px-1 py-0.2 rounded text-[10.5px]">217–220 °C</span>
+                <span class="font-bold text-ink text-[11.5px]">217–220 °C</span>
               </div>
-              <div class="flex items-center justify-between py-0.5 border-b border-paper-border/50">
+              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">Sn42Bi58 (Низкотемп.)</span>
-                <span class="hl-blue font-bold px-1 py-0.2 rounded text-[10.5px]">138 °C</span>
+                <span class="font-bold text-ink text-[11.5px]">138 °C</span>
               </div>
-              <div class="flex items-center justify-between py-0.5">
+              <div class="flex items-center justify-between py-1">
                 <span class="text-ink">Сплав Розе (Демонтаж)</span>
-                <span class="hl-pink font-bold px-1 py-0.2 rounded text-[10.5px]">94 °C</span>
+                <span class="font-bold text-ink text-[11.5px]">94 °C</span>
               </div>
             </div>
 
