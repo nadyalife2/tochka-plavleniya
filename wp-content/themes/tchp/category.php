@@ -132,6 +132,23 @@ if (!$featured_article && !empty($grid_articles)) {
 
 $page_num = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $paginated = paginate($grid_articles, 4, $page_num);
+
+/**
+ * Strict Editorial Semantic Color Logic:
+ * - Orange (pill-orange / hl-orange): Thermal, soldering temperatures, copper, solder alloys, heating stations.
+ * - Yellow (pill-yellow / hl-yellow): Chemistry, rosin, active fluxes, workshop master notes (post-it).
+ * - Blue   (pill-blue   / hl-blue):   Standards (GOST, IPC), SMD precision, electronics, leakage currents.
+ * - Pink   (pill-pink   / hl-pink):   Critical defect warnings, damage risks, low-melt demount alloys (Rose).
+ */
+function get_semantic_tag_pill(string $tag_key): string {
+    return match(strtolower($tag_key)) {
+        'materials'          => 'pill-orange', // Металлы, сплавы, нагрев
+        'basics'             => 'pill-yellow', // База, флюсы, канифоль
+        'smd', 'tools'       => 'pill-blue',   // SMD компоненты, приборы, точность
+        'defects', 'oshibki' => 'pill-pink',   // Ошибки, брак, предупреждения
+        default              => 'pill-blue',
+    };
+}
 ?>
 <!DOCTYPE html>
 <html lang="ru">
@@ -228,11 +245,11 @@ $paginated = paginate($grid_articles, 4, $page_num);
         <span class="text-ink font-semibold"><?= e($current_rubric['title']) ?></span>
       </nav>
 
-      <!-- HERO SECTION (Calm, Engineering Aesthetics with Balanced, Delicate Highlights) -->
+      <!-- HERO SECTION (Calm, Engineering Aesthetics with Strict Semantic Highlights) -->
       <section class="border-b border-paper-border pb-8">
         <div class="max-w-3xl space-y-4">
           
-          <!-- Single Subtle Tape & Label Badge (Reduced by 30%) -->
+          <!-- Single Subtle Tape & Label Badge (Yellow = Workshop/Editorial Identity) -->
           <div class="relative inline-block mb-1">
             <div class="tape-strip tape-yellow w-7 -top-1.5 left-4 rotate-[-2deg]"></div>
             <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-[10.5px] shadow-sm rotate-[-0.8deg] sketch-border">
@@ -248,16 +265,21 @@ $paginated = paginate($grid_articles, 4, $page_num);
             <?= e($current_rubric['title']) ?>
           </h1>
 
-          <!-- Lead Paragraph with Subtle, Compact Marker Highlights (-30% visual weight) -->
+          <!-- Lead Paragraph: Semantic Color Mapping:
+               - Orange = Metallurgy, solder alloys, heating
+               - Yellow = Chemistry, fluxes, rosin
+               - Blue   = Electronic parameters, precision, standards
+               - Pink   = Damage risks, critical warnings, demount alloys
+          -->
           <p class="text-base sm:text-lg text-ink/90 font-serif leading-[1.65]">
             <?php if ($current_slug === 'materialy'): ?>
-              Разбираем металлургию и химию радиомонтажа: свойства припоев (<mark class="hl-orange">ПОС-61</mark>, SAC305, <mark class="hl-pink">сплав Розе</mark>), классификацию флюсов (<mark class="hl-yellow">RMA и No-Clean</mark>, водосмывные), реанимацию паяльных паст и <mark class="hl-blue">токи утечки</mark>.
+              Разбираем металлургию и химию радиомонтажа: свойства припоев (<mark class="hl-orange">ПОС-61, SAC305</mark>), химию флюсов (<mark class="hl-yellow">RMA и No-Clean</mark>), риск разрушения шва от <mark class="hl-pink">сплава Розе</mark> и защиту от <mark class="hl-blue">токов утечки</mark>.
             <?php elseif ($current_slug === 'start'): ?>
-              Первые шаги в радиомонтаже, базовые принципы <mark class="hl-blue">смачиваемости</mark>, выбор <mark class="hl-orange">первого паяльника</mark> и <mark class="hl-yellow">безопасная организация</mark> рабочего места монтажника.
+              Первые шаги в радиомонтаже: выбор <mark class="hl-orange">паяльной станции</mark>, основы работы с <mark class="hl-yellow">канифолью</mark>, физика <mark class="hl-blue">смачиваемости меди</mark> и защита от <mark class="hl-pink">перегрева дорожек</mark>.
             <?php elseif ($current_slug === 'praktika'): ?>
-              Техника ручного монтажа <mark class="hl-blue">SMD 0402–1206</mark>, пайка микросхем <mark class="hl-pink">QFN и BGA</mark>, прогрев <mark class="hl-orange">массивных полигонов</mark> и выбор геометрии жал.
+              Техника точного ручного монтажа: работа с компонентами <mark class="hl-blue">SMD 0402–1206</mark>, геометрия картриджей <mark class="hl-orange">T12 и C245</mark>, дозировка <mark class="hl-yellow">паяльной пасты</mark> и пайка термочувствительных <mark class="hl-pink">микросхем QFN</mark>.
             <?php elseif ($current_slug === 'oshibki'): ?>
-              Диагностика и устранение типового брака: <mark class="hl-yellow">холодный шов</mark>, паразитные <mark class="hl-blue">перемычки</mark>, <mark class="hl-pink">отслоение дорожек</mark> и дефект <mark class="hl-orange">tombstoning</mark>.
+              Диагностика и устранение типового брака: критический дефект <mark class="hl-pink">tombstoning и трещины</mark>, паразитные <mark class="hl-blue">оловянные перемычки</mark>, неактивированный флюс в <mark class="hl-yellow">холодном шве</mark> и сбои <mark class="hl-orange">термопрофиля</mark>.
             <?php else: ?>
               <?= e($current_rubric['lead']) ?>
             <?php endif; ?>
@@ -266,14 +288,19 @@ $paginated = paginate($grid_articles, 4, $page_num);
         </div>
       </section>
 
-      <!-- CATEGORY NAVIGATION PILLS WITH SUBTLE COLOR DOTS -->
+      <!-- CATEGORY NAVIGATION PILLS: Semantic Identity Color Coding:
+           - start: Yellow (Basics/Rosin)
+           - materialy: Orange (Alloys/Thermal)
+           - praktika: Blue (SMD/Instruments)
+           - oshibki: Pink (Defects/Damage)
+      -->
       <div class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs">
         <?php
         $nav_pills = [
             ['slug' => 'start',     'label' => 'Начать паять',     'dot' => 'bg-amber-400'],
-            ['slug' => 'materialy', 'label' => 'Материалы и сплавы', 'dot' => 'bg-sky-400'],
-            ['slug' => 'praktika',  'label' => 'Практика монтажа',   'dot' => 'bg-orange-400'],
-            ['slug' => 'oshibki',   'label' => 'Проблемы и дефекты', 'dot' => 'bg-pink-400'],
+            ['slug' => 'materialy', 'label' => 'Материалы и сплавы', 'dot' => 'bg-orange-500'],
+            ['slug' => 'praktika',  'label' => 'Практика монтажа',   'dot' => 'bg-sky-500'],
+            ['slug' => 'oshibki',   'label' => 'Проблемы и дефекты', 'dot' => 'bg-pink-500'],
         ];
         foreach ($nav_pills as $pill):
             $is_curr = ($current_slug === $pill['slug']);
@@ -295,7 +322,7 @@ $paginated = paginate($grid_articles, 4, $page_num);
         <!-- LEFT COLUMN: Articles + Contextual CTA (8 cols) -->
         <div class="lg:col-span-8 space-y-8">
           
-          <!-- CONTEXTUAL INTERACTIVE CTA BANNER (Calm Workbench Style) -->
+          <!-- CONTEXTUAL INTERACTIVE CTA BANNER (Blue = Engineering Standard / Tool) -->
           <?php if (!empty($current_rubric['cta'])): ?>
             <div class="border border-paper-border rounded-lg p-5 sm:p-6 bg-card shadow-sm space-y-3 relative overflow-hidden">
               <div class="flex items-center justify-between gap-2">
@@ -317,12 +344,12 @@ $paginated = paginate($grid_articles, 4, $page_num);
 
               <div class="pt-2 flex flex-wrap items-center gap-3">
                 <?php if (!empty($current_rubric['cta']['link1'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-ink text-paper font-mono text-xs font-medium hover:opacity-90 transition-opacity shadow-sm">
+                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-ink text-paper font-mono text-xs font-medium hover:opacity-90 transition-opacity shadow-sm">
                     <span><?= e($current_rubric['cta']['lbl1']) ?></span>
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($current_rubric['cta']['link2'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper hover:border-accent text-ink font-mono text-xs transition-colors">
+                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded border border-paper-border bg-paper hover:border-accent text-ink font-mono text-xs transition-colors">
                     <span><?= e($current_rubric['cta']['lbl2']) ?></span>
                     <span class="text-xs">→</span>
                   </a>
@@ -334,6 +361,7 @@ $paginated = paginate($grid_articles, 4, $page_num);
           <!-- FEATURED MAIN ARTICLE -->
           <?php if ($featured_article): 
             $f_url = "/article.php?slug=" . urlencode($featured_article['slug']);
+            $f_tag_pill = get_semantic_tag_pill($featured_article['tag_key'] ?? 'materials');
           ?>
             <article class="border border-paper-border rounded-lg bg-card p-6 sm:p-7 space-y-5 shadow-sm transition-all hover:border-paper-border-dark relative">
               
@@ -363,22 +391,26 @@ $paginated = paginate($grid_articles, 4, $page_num);
                 </p>
               </div>
 
-              <!-- Technical Info Strip with Sleeker Micro-Highlights -->
+              <!-- Technical Info Strip: Semantic Highlighting:
+                   - RMA / NC: Yellow (Chemistry & fluxes)
+                   - WS: Blue (Industrial wash precision)
+                   - SPEC 02.1: Blue (Engineering standard)
+              -->
               <div class="rounded border border-paper-border bg-paper-subtle p-3 flex items-center justify-between font-mono text-xs text-ink-muted overflow-x-auto gap-3">
                 <div class="flex items-center gap-3 shrink-0">
-                  <span>RMA-223: <span class="hl-yellow text-ink font-semibold">средняя активность</span></span>
+                  <span>RMA-223: <span class="hl-yellow text-ink font-semibold">активный флюс</span></span>
                   <span class="text-ink-faint">→</span>
-                  <span>NC-559: <span class="hl-blue text-ink font-semibold">No-Clean гель</span></span>
+                  <span>NC-559: <span class="hl-yellow text-ink font-semibold">No-Clean гель</span></span>
                   <span class="text-ink-faint">→</span>
-                  <span>WS: <span class="hl-pink text-ink font-semibold">водосмывной</span></span>
+                  <span>WS: <span class="hl-blue text-ink font-semibold">водосмывной</span></span>
                 </div>
-                <span class="pill-orange text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
+                <span class="pill-blue text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
               </div>
 
-              <!-- Card Bottom Bar -->
+              <!-- Card Bottom Bar: Tag color derived strictly from topic -->
               <div class="flex items-center justify-between pt-2 border-t border-paper-border font-mono text-xs text-ink-muted">
                 <div class="flex items-center gap-2">
-                  <span class="pill-orange px-1.5 py-0.5 rounded font-mono text-[10px] font-bold"><?= e($featured_article['tag']) ?></span>
+                  <span class="<?= $f_tag_pill ?> px-1.5 py-0.5 rounded font-mono text-[10px] font-bold"><?= e($featured_article['tag']) ?></span>
                   <span class="text-ink-faint">·</span>
                   <span><?= e($featured_article['date'] ?? '2026') ?></span>
                 </div>
@@ -391,15 +423,13 @@ $paginated = paginate($grid_articles, 4, $page_num);
             </article>
           <?php endif; ?>
 
-          <!-- 2-COLUMN ARTICLE CARDS GRID WITH DELICATE TAGS -->
+          <!-- 2-COLUMN ARTICLE CARDS GRID: Semantic Tag Color Assignment -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <?php 
-            $tag_palette = ['pill-blue', 'pill-orange', 'pill-pink', 'pill-yellow'];
-            $idx = 0;
             foreach ($paginated['items'] as $article): 
               $art_url = "/article.php?slug=" . urlencode($article['slug']);
-              $card_pill = $tag_palette[$idx % 4];
-              $idx++;
+              // Tag pill derived by semantic domain:
+              $card_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
             ?>
               <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-all">
                 <div class="space-y-2">
@@ -449,17 +479,17 @@ $paginated = paginate($grid_articles, 4, $page_num);
 
         </div>
 
-        <!-- RIGHT COLUMN: SIDEBAR (Compact, Harmonious 4-Color Workbench Accents) -->
+        <!-- RIGHT COLUMN: SIDEBAR (Strict Semantic Workbench Cards) -->
         <aside class="lg:col-span-4 space-y-5">
           
-          <!-- 💛 YELLOW POST-IT NOTE: Solder Workshop Tip (Reduced by 30%) -->
+          <!-- 💛 YELLOW POST-IT NOTE: Chemistry / Rosin / Workshop Master Note -->
           <div class="sticker-yellow p-3.5 rounded-lg space-y-2 relative sketch-border shadow-sm rotate-[-0.8deg]">
             <div class="tape-strip tape-yellow w-8 -top-1.5 left-5 rotate-[-2deg]"></div>
             
             <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-[#facc15]/40 pb-1">
               <span class="flex items-center gap-1.5">
                 <span class="w-1.5 h-1.5 rounded-full bg-[#854d0e] dark:bg-[#facc15]"></span>
-                📌 Заметка верстака
+                📌 Заметка верстака // Химия
               </span>
               <span class="text-[9.5px] opacity-75">FLUX-QC</span>
             </div>
@@ -469,12 +499,17 @@ $paginated = paginate($grid_articles, 4, $page_num);
             </p>
 
             <div class="pt-1 flex items-center justify-between font-mono text-[9.5px] opacity-80 border-t border-[#facc15]/35">
-              <span>Норма нагрева</span>
+              <span>Норма нагрева флюса</span>
               <span class="font-bold">IPC-TM-650</span>
             </div>
           </div>
 
-          <!-- 💙 BLUE CARD: Solder liquidus Specification with Compact Color-Coded Temperatures -->
+          <!-- 💙 BLUE CARD: Engineering Specification (Liquidus ГОСТ 21931)
+               Thermal Color Logic:
+               - POS-61 (183°C) & SAC305 (217°C): Orange (standard soldering heat)
+               - Sn42Bi58 (138°C): Blue (low-temp cold range)
+               - Rose (94°C): Pink (danger/demount-only alloy)
+          -->
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm relative">
             <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
@@ -491,11 +526,11 @@ $paginated = paginate($grid_articles, 4, $page_num);
               </div>
               <div class="flex items-center justify-between py-0.5 border-b border-paper-border/50">
                 <span class="text-ink">SAC305 (RoHS)</span>
-                <span class="hl-blue font-bold px-1 py-0.2 rounded text-[10.5px]">217–220 °C</span>
+                <span class="hl-orange font-bold px-1 py-0.2 rounded text-[10.5px]">217–220 °C</span>
               </div>
               <div class="flex items-center justify-between py-0.5 border-b border-paper-border/50">
                 <span class="text-ink">Sn42Bi58 (Низкотемп.)</span>
-                <span class="hl-yellow font-bold px-1 py-0.2 rounded text-[10.5px]">138 °C</span>
+                <span class="hl-blue font-bold px-1 py-0.2 rounded text-[10.5px]">138 °C</span>
               </div>
               <div class="flex items-center justify-between py-0.5">
                 <span class="text-ink">Сплав Розе (Демонтаж)</span>
@@ -510,14 +545,14 @@ $paginated = paginate($grid_articles, 4, $page_num);
             </div>
           </div>
 
-          <!-- 🌸 PINK POST-IT NOTE: Critical Alloy Rule for Rose Alloy (Reduced by 30%) -->
+          <!-- 🌸 PINK POST-IT NOTE: Critical Defect Warning (Rose Alloy Fragility Risk) -->
           <div class="sticker-pink p-3.5 rounded-lg space-y-1.5 relative sketch-border shadow-sm rotate-[0.7deg]">
             <div class="tape-strip tape-pink w-8 -top-1.5 right-5 rotate-[2deg]"></div>
             
             <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-[#f472b6]/35 pb-1">
               <span class="flex items-center gap-1.5">
                 <span>⚠️</span>
-                Сплавы Розе и Вуда
+                Риск брака // Сплав Розе
               </span>
               <span class="pill-pink text-[9px] px-1 py-0.2 rounded font-mono font-bold">ОСТОРОЖНО</span>
             </div>
@@ -532,11 +567,15 @@ $paginated = paginate($grid_articles, 4, $page_num);
             </div>
           </div>
 
-          <!-- 🧡 ORANGE & MULTI-ACCENT: Workbench Tool Shortcuts -->
+          <!-- WORKBENCH TOOLS: Semantically Coded Shortcuts:
+               - #temp:   Orange (Thermal window)
+               - #iron:   Blue   (Tooling/Stations)
+               - #defect: Pink   (Defects/Troubleshooting)
+          -->
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm">
             <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span>Инструменты верстака</span>
-              <span class="pill-orange text-[9.5px] px-1.5 py-0.2 rounded">3 ТУЛЗЫ</span>
+              <span class="pill-blue text-[9.5px] px-1.5 py-0.2 rounded">3 ТУЛЗЫ</span>
             </div>
             <div class="space-y-1.5 font-mono text-xs">
               <a href="/interactive.php#temp" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group">
@@ -555,12 +594,12 @@ $paginated = paginate($grid_articles, 4, $page_num);
                 <span class="pill-blue text-[10px] px-1.5 py-0.2 rounded font-bold">#iron</span>
               </a>
 
-              <a href="/interactive.php#defect" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-yellow-400 text-ink transition-colors group">
+              <a href="/interactive.php#defect" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-pink-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors text-[11.5px]">🔍 Дерево дефектов</div>
+                  <div class="font-bold group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors text-[11.5px]">🔍 Дерево дефектов</div>
                   <div class="text-[10.5px] text-ink-muted">Диагностика причин брака</div>
                 </div>
-                <span class="pill-yellow text-[10px] px-1.5 py-0.2 rounded font-bold">#defect</span>
+                <span class="pill-pink text-[10px] px-1.5 py-0.2 rounded font-bold">#defect</span>
               </a>
             </div>
           </div>
