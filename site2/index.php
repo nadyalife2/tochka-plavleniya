@@ -50,7 +50,7 @@ foreach ($articles as $article) {
   <!-- Common Design Tokens & Base Styles -->
   <link rel="stylesheet" href="assets/css/common.css">
 </head>
-<body class="font-sans min-h-screen flex flex-col justify-between text-[15px] leading-[1.65]">
+<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
 
   <!-- Top Minimal Header Bar -->
   <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">

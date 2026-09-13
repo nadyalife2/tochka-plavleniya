@@ -100,3 +100,101 @@ if (!function_exists('get_avatar_char')) {
         return substr($name, 0, 1);
     }
 }
+
+if (!function_exists('safe_strtoupper')) {
+    function safe_strtoupper($str): string {
+        return function_exists('mb_strtoupper') ? mb_strtoupper((string)$str) : strtoupper((string)$str);
+    }
+}
+
+if (!function_exists('get_reading_time')) {
+    function get_reading_time(string $text, int $wpm = 180): int {
+        $clean_text = strip_tags($text);
+        $word_count = count(preg_split('/\s+/u', trim($clean_text), -1, PREG_SPLIT_NO_EMPTY));
+        return max(3, (int) ceil($word_count / $wpm));
+    }
+}
+
+if (!function_exists('render_article_schema')) {
+    function render_article_schema(array $article, array $faq = []): string {
+        $url = "https://tochka-plavleniya.ru/article/" . ($article['slug'] ?? 'post');
+        $graph = [
+            [
+                "@type" => "TechArticle",
+                "@id" => $url . "/#article",
+                "headline" => $article['title'] ?? '',
+                "description" => $article['excerpt'] ?? '',
+                "inLanguage" => "ru",
+                "datePublished" => $article['date'] ?? '2026-08-20',
+                "dateModified" => date('Y-m-d'),
+                "author" => [
+                    "@type" => "Person",
+                    "name" => $article['author'] ?? 'Инженер Лаборатории ТЧП',
+                    "jobTitle" => "Ведущий инженер-технолог пайки и монтажа РЭА",
+                    "worksFor" => [
+                        "@type" => "Organization",
+                        "name" => "Точка Плавления // ТЧП",
+                        "url" => "https://tochka-plavleniya.ru/"
+                    ]
+                ],
+                "publisher" => [
+                    "@type" => "Organization",
+                    "name" => "Точка Плавления",
+                    "url" => "https://tochka-plavleniya.ru/"
+                ],
+                "mainEntityOfPage" => $url,
+                "proficiencyLevel" => $article['difficulty'] ?? "Expert / PRO"
+            ],
+            [
+                "@type" => "BreadcrumbList",
+                "itemListElement" => [
+                    [
+                        "@type" => "ListItem",
+                        "position" => 1,
+                        "name" => "Главная",
+                        "item" => "https://tochka-plavleniya.ru/"
+                    ],
+                    [
+                        "@type" => "ListItem",
+                        "position" => 2,
+                        "name" => "Статьи",
+                        "item" => "https://tochka-plavleniya.ru/#articles"
+                    ],
+                    [
+                        "@type" => "ListItem",
+                        "position" => 3,
+                        "name" => $article['title'] ?? '',
+                        "item" => $url
+                    ]
+                ]
+            ]
+        ];
+
+        if (!empty($faq)) {
+            $faqItems = [];
+            foreach ($faq as $q => $a) {
+                $faqItems[] = [
+                    "@type" => "Question",
+                    "name" => $q,
+                    "acceptedAnswer" => [
+                        "@type" => "Answer",
+                        "text" => $a
+                    ]
+                ];
+            }
+            $graph[] = [
+                "@type" => "FAQPage",
+                "mainEntity" => $faqItems
+            ];
+        }
+
+        $json = json_encode([
+            "@context" => "https://schema.org",
+            "@graph" => $graph
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+
+        return "<script type=\"application/ld+json\">\n" . $json . "\n</script>";
+    }
+}
+
+

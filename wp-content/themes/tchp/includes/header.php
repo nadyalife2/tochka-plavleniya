@@ -1,89 +1,97 @@
+<?php
+/**
+ * header.php — Единый шаблон шапки сайта ТОЧКА ПЛАВЛЕНИЯ (Editorial Lab)
+ * 
+ * Параметры:
+ * - $page_title (string): Заголовок страницы
+ * - $page_desc (string): Мета-описание (SEO)
+ * - $current_page (string): Активный пункт навигации ('index', 'article', 'interactive', 'start', etc.)
+ * - $extra_head (string): Дополнительные теги в <head>
+ */
+$page_title = $page_title ?? 'Точка Плавления // ТЧП';
+$page_desc  = $page_desc ?? 'Инженерный медиа-портал, открытые регламенты монтажа и интерактивный верстак инженера-электронщика.';
+$current_page = $current_page ?? '';
+?>
 <!DOCTYPE html>
-<html lang="ru" data-theme="craft">
+<html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($page_title) ? e($page_title) . ' — ' : '' ?>Точка Плавления // ТЧП</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;800&family=IBM+Plex+Mono:wght@500;700&family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,300;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/style.css">
-    <?php if (isset($extra_css)) foreach((array)$extra_css as $css) echo "<link rel='stylesheet' href='/assets/css/{$css}'>\n"; ?>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title><?= htmlspecialchars($page_title) ?></title>
+  <meta name="description" content="<?= htmlspecialchars($page_desc) ?>">
+
+  <!-- OpenGraph Meta -->
+  <meta property="og:type" content="website"/>
+  <meta property="og:title" content="<?= htmlspecialchars($page_title) ?>"/>
+  <meta property="og:description" content="<?= htmlspecialchars($page_desc) ?>"/>
+  <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
+
+  <!-- Immediate Theme Init Script (Zero FOUC) -->
+  <script>
+    (function() {
+      const saved = localStorage.getItem('tp_theme');
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
+  <!-- Preconnect for Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
+  <link rel="stylesheet" href="/assets/css/fonts.css">
+  <link rel="stylesheet" href="/assets/css/build.css">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+  <!-- Common Design Tokens & Base Styles -->
+  <link rel="stylesheet" href="/assets/css/common.css">
+
+  <?php if (!empty($extra_head)) echo $extra_head; ?>
 </head>
-<body>
-    <div class="container">
-        <header class="header">
-            <a href="/" class="logo">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-            
-            <div class="header-right">
-                <!-- Custom PCB Command Search Console -->
-                <div class="header-search-container" id="header-search-container">
-                    <button type="button" class="search-trigger-btn" id="search-expand-btn" title="Поиск по сайту (Ctrl+K)" aria-label="Поиск по сайту">
-                        <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="10" cy="10" r="6" stroke-width="2" />
-                            <line x1="14.2" y1="14.2" x2="20" y2="20" stroke-width="2.6" />
-                            <!-- Перекрестие, выходящее за рамку линзы -->
-                            <line x1="10" y1="1.5" x2="10" y2="5.5" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <line x1="10" y1="14.5" x2="10" y2="18.5" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <line x1="1.5" y1="10" x2="5.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <line x1="14.5" y1="10" x2="18.5" y2="10" stroke-width="1.3" stroke="var(--accent-orange)" />
-                            <circle cx="10" cy="10" r="1.2" fill="var(--accent-orange)" stroke="none" />
-                        </svg>
-                    </button>
-                    
-                    <div class="search-console-popover" id="search-console-popover">
-                        <div class="search-console-header">
-                            <svg class="soldering-loupe-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="var(--accent-orange)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="10" cy="10" r="6.5" />
-                                <path d="M14.5 14.5 L20.5 20.5" stroke-width="2.8" />
-                            </svg>
-                            <input type="text" id="header-search-input" class="header-search-input" placeholder="Поиск по статьям (ESP32, BGA, флюс...)" autocomplete="off" aria-label="Поиск по сайту">
-                            <button type="button" class="search-close-x" id="search-close-x" title="Свернуть (ESC)" aria-label="Свернуть поиск">✕</button>
-                        </div>
-                        <div class="search-dropdown-results" id="header-search-results">
-                            <!-- Instant search results will render here -->
-                        </div>
-                    </div>
-                </div>
+<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
 
-                <nav class="nav">
-                    <a href="/">Статьи</a>
-                    <a href="/interactive.php">Инструменты</a>
-                    <a href="/cookies.php">Cookies</a>
-                </nav>
+  <!-- Top Minimal Header Bar -->
+  <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
+    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
+      
+      <!-- Brand mark & Title -->
+      <div class="flex items-center gap-6">
+        <a class="logo" href="/">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
 
-                <!-- Theme Switcher Selector -->
-                <select id="theme-select" class="theme-select" title="Выбор цветового режима" aria-label="Выбор цветового режима">
-                    <option value="minimal">Минимал (Светлая)</option>
-                    <option value="craft">Крафт (Инженерная)</option>
-                    <option value="blueprint">Чертёж (Белый / Сетка)</option>
-                    <option value="dark">Тёмная лаборатория</option>
-                    <option value="pcb">Текстолит (PCB)</option>
-                    <option value="pastel">Пастель</option>
-                </select>
+        <!-- Desktop Nav -->
+        <?php include __DIR__ . '/header-nav.php'; ?>
+      </div>
 
-                <!-- Mobile Burger Toggle Button -->
-                <button type="button" class="burger-btn" id="burger-trigger" aria-label="Открыть мобильное меню">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </button>
-            </div>
-        </header>
+      <!-- Right Action / Dark Mode Toggle & Workbench link -->
+      <div class="flex items-center gap-3">
+        <!-- Dark/Light Mode Switcher (Sketch Style) -->
+        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+          <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4.5"></circle>
+            <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
+          </svg>
+          <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+        </button>
 
-        <!-- Mobile Drawer Navigation -->
-        <div class="drawer-overlay" id="drawer-overlay" aria-hidden="true">
-            <div class="drawer-content">
-                <div class="drawer-header">
-                    <a href="/" class="logo">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-                    <button type="button" class="drawer-close" id="drawer-close" aria-label="Закрыть меню">✕</button>
-                </div>
-                <nav class="drawer-nav">
-                    <a href="/">Статьи</a>
-                    <a href="/interactive.php">Инструменты</a>
-                    <a href="/cookies.php">Cookies</a>
-                    <a href="/privacy.php">Политика</a>
-                </nav>
-            </div>
-        </div>
-
+        <?php if ($current_page === 'interactive'): ?>
+          <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/#articles" aria-label="Читать статьи журнала">
+            <span>Журнал / Статьи</span>
+            <span class="material-symbols-outlined text-[13px]">menu_book</span>
+          </a>
+        <?php else: ?>
+          <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/interactive.php" aria-label="Открыть интерактивный верстак инженера">
+            <span>Верстак / Тулзы</span>
+            <span class="material-symbols-outlined text-[13px]">build</span>
+          </a>
+        <?php endif; ?>
+      </div>
+    </div>
+  </header>

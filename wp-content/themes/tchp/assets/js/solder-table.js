@@ -4,7 +4,7 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('solder-search');
-  const table = document.getElementById('solder-table');
+  const table = document.getElementById('solder-table-grid') || document.getElementById('solder-table');
 
   if (!table) return;
 
@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         rows.sort((a, b) => {
           const cellA = a.children[index];
-          const cellB = cellB = b.children[index];
+          const cellB = b.children[index];
           if (!cellA || !cellB) return 0;
 
           const valA = cellA.textContent.trim();

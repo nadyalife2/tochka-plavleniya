@@ -103,7 +103,8 @@ get_header();
     </section>
 
     <!-- 03: СПРАВОЧНАЯ ТАБЛИЦА ПРИПОЕВ -->
-    <section class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 shadow-sm" id="solder-table">
+    <section class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 shadow-sm relative scroll-mt-20" id="solder-table">
+      <a id="table" class="block absolute -top-24 pointer-events-none" aria-hidden="true"></a>
       <div class="border-b border-paper-border pb-4">
         <div class="inline-flex items-center gap-2 text-xs font-mono text-brand-orange uppercase mb-1">
           <span class="material-symbols-outlined text-base">table_chart</span>

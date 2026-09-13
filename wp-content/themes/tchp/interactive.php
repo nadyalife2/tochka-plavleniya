@@ -71,7 +71,7 @@ require_once __DIR__ . '/data/interactive-rules.php';
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
 
   <!-- Header -->
   <header class="w-full border-b border-paper-border bg-paper/95 sticky top-0 z-40 backdrop-blur-sm">
@@ -98,9 +98,9 @@ require_once __DIR__ . '/data/interactive-rules.php';
           <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/category.php?slug=start" aria-label="Рубрика для новичков">
-          <span>С чего начать</span>
-          <span class="material-symbols-outlined text-[13px]">arrow_forward</span>
+        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/index.php#articles" aria-label="Читать статьи журнала">
+          <span>Журнал / Статьи</span>
+          <span class="material-symbols-outlined text-[13px]">menu_book</span>
         </a>
       </div>
     </div>
@@ -613,9 +613,10 @@ require_once __DIR__ . '/data/interactive-rules.php';
 
 
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <!-- P1 ИНСТРУМЕНТ 5: РЕЕСТР СПЛАВОВ И ПРИПОЕВ (#table)                      -->
+      <!-- P1 ИНСТРУМЕНТ 5: РЕЕСТР СПЛАВОВ И ПРИПОЕВ (#table, #solder-table)        -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="table" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6">
+      <section id="table" class="scroll-mt-20 border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 relative">
+        <a id="solder-table" class="block absolute -top-24 pointer-events-none" aria-hidden="true"></a>
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">05 // СПРАВОЧНИК МЕТАЛЛОВ</span>
@@ -627,7 +628,7 @@ require_once __DIR__ . '/data/interactive-rules.php';
         </div>
 
         <div class="overflow-x-auto">
-          <table id="solder-table" class="w-full text-left font-mono text-xs border-collapse">
+          <table id="solder-table-grid" class="w-full text-left font-mono text-xs border-collapse">
             <thead>
               <tr class="border-b border-paper-border bg-paper-subtle text-ink">
                 <th class="py-2.5 px-3">Марка сплава</th>

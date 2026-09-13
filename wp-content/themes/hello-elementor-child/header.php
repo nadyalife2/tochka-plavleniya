@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <!DOCTYPE html>
-<html <?php language_attributes(); ?> class="light">
+<html <?php language_attributes(); ?>>
 <head>
   <meta charset="<?php bloginfo( 'charset' ); ?>"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -20,93 +20,39 @@ if ( ! defined( 'ABSPATH' ) ) {
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (saved === 'dark' || (!saved && prefersDark)) {
         document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
       } else {
-        document.documentElement.classList.add('light');
         document.documentElement.classList.remove('dark');
       }
     })();
   </script>
 
-  <!-- Google Fonts -->
+  <!-- Preconnect for Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400;1,6..72,500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            paper: 'var(--color-paper)',
-            'paper-subtle': 'var(--color-paper-subtle)',
-            'paper-border': 'var(--color-paper-border)',
-            'paper-border-dark': 'var(--color-paper-border-dark)',
-            ink: 'var(--color-ink)',
-            'ink-muted': 'var(--color-ink-muted)',
-            'ink-faint': 'var(--color-ink-faint)',
-            accent: 'var(--color-accent)',
-            'accent-light': 'var(--color-accent-light)',
-            'accent-muted': 'var(--color-accent-muted)',
-          },
-          fontFamily: {
-            sans: ['Space Grotesk', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-            serif: ['Newsreader', 'Georgia', 'serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          }
-        }
-      }
-    }
-  </script>
-
-  <style>
-    /* CANONICAL BRAND LOGO — ТОЧКА ПЛАВЛЕНИЯ */
-    .logo {
-      font-family: 'Hanken Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 1.25rem;
-      font-weight: 900;
-      text-decoration: none;
-      color: var(--color-ink);
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      display: inline-flex;
-      align-items: center;
-      line-height: 1;
-      transition: opacity 0.15s ease;
-    }
-    .logo:hover {
-      opacity: 0.85;
-    }
-    .logo span {
-      color: #141414;
-      background: #facc15;
-      padding: 0.05rem 0.35rem;
-      border-radius: 3px;
-      transform: skew(-6deg);
-      display: inline-block;
-      margin: 0 0.18rem;
-      font-size: 1.05em;
-      line-height: 0.9;
-    }
-  </style>
+  <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
+  <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/css/fonts.css"/>
+  <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/css/build.css"/>
+  <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/css/common.css"/>
 
   <?php wp_head(); ?>
 </head>
-<body <?php body_class( 'min-h-screen flex flex-col' ); ?>>
+<body <?php body_class( 'font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7] antialiased' ); ?>>
 <?php wp_body_open(); ?>
 
   <!-- Header -->
-  <header class="w-full border-b border-paper-border bg-paper/90 sticky top-0 z-40 backdrop-blur-sm">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-16 flex items-center justify-between">
+  <header class="w-full border-b border-paper-border bg-paper/95 sticky top-0 z-40 backdrop-blur-sm">
+    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
       <div class="flex items-center gap-6">
         <a class="logo" href="<?php echo esc_url( home_url( '/' ) ); ?>">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-        <nav class="hidden md:flex items-center gap-5 text-[13px] font-mono text-ink-muted">
-          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/' ) ); ?>">Статьи</a>
-          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/interactive' ) ); ?>">Верстак</a>
-          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/interactive#table' ) ); ?>">Реестр сплавов</a>
+        <nav class="hidden md:flex items-center gap-5 text-[13.5px] font-mono text-ink-muted">
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/#articles' ) ); ?>">Статьи</a>
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/category/start/' ) ); ?>">Начать паять</a>
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/category/materialy/' ) ); ?>">Материалы</a>
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/category/praktika/' ) ); ?>">Практика</a>
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/category/oshibki/' ) ); ?>">Проблемы</a>
+          <a class="hover:text-ink transition-colors" href="<?php echo esc_url( home_url( '/interactive/' ) ); ?>">Калькуляторы</a>
         </nav>
       </div>
 
@@ -123,9 +69,9 @@ if ( ! defined( 'ABSPATH' ) ) {
           <span class="text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?php echo esc_url( home_url( '/interactive' ) ); ?>">
-          <span>Верстак</span>
-          <span class="text-[10px]">⚙</span>
+        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?php echo esc_url( home_url( '/interactive/' ) ); ?>" aria-label="Открыть интерактивный верстак инженера">
+          <span>Верстак / Тулзы</span>
+          <span class="material-symbols-outlined text-[13px]">build</span>
         </a>
       </div>
     </div>

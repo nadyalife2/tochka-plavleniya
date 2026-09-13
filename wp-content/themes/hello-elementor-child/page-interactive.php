@@ -20,40 +20,32 @@ get_header();
     --color-paper-border: #e6e2da;
     --color-paper-border-dark: #d3cdc2;
     --color-ink: #141414;
-    --color-ink-muted: #5c5850;
-    --color-ink-faint: #999388;
-    --color-accent: #2563eb;
-    --color-accent-light: #dbeafe;
-    --color-accent-muted: #1d4ed8;
+    --color-ink-muted: #6b665f;
+    --color-ink-faint: #666159;
+    --color-accent: #eb5211;
+    --color-accent-light: #ffedd5;
+    --color-accent-muted: #ea580c;
     --bg-color: #faf8f5;
     --dot-color: #d3cdc2;
-    --card-bg: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.75);
     --card-border: #e6e2da;
   }
 
   html.dark {
-    --color-paper: #18191b;
-    --color-paper-subtle: #202226;
-    --color-paper-border: #2e3238;
-    --color-paper-border-dark: #40454e;
+    --color-paper: #12141a;
+    --color-paper-subtle: #191c24;
+    --color-paper-border: #282d3b;
+    --color-paper-border-dark: #373e52;
     --color-ink: #f3f4f6;
-    --color-ink-muted: #a3aab5;
-    --color-ink-faint: #6c7380;
-    --color-accent: #60a5fa;
-    --color-accent-light: #1e293b;
-    --color-accent-muted: #93c5fd;
-    --bg-color: #121315;
-    --dot-color: #2b2e34;
-    --card-bg: #1c1d21;
-    --card-border: #2e3238;
-  }
-
-  body {
-    background-color: var(--bg-color) !important;
-    background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px) !important;
-    background-size: 20px 20px !important;
-    color: var(--color-ink) !important;
-    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --color-ink-muted: #9ca3af;
+    --color-ink-faint: #9ca3af;
+    --color-accent: #ff6b2b;
+    --color-accent-light: rgba(249, 115, 22, 0.15);
+    --color-accent-muted: #fb923c;
+    --bg-color: #12141a;
+    --dot-color: #2b3142;
+    --card-bg: rgba(24, 27, 36, 0.85);
+    --card-border: #282d3b;
   }
 
   .bg-card {
@@ -151,7 +143,8 @@ get_header();
       </section>
 
       <!-- 02: Таблица сплавов -->
-      <section id="table" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6">
+      <section id="table" class="scroll-mt-20 border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 relative">
+        <a id="solder-table" class="block absolute -top-24 pointer-events-none" aria-hidden="true"></a>
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">02 // СПРАВОЧНИК МЕТАЛЛОВ</span>

@@ -4,7 +4,7 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('solder-search');
-  const table = document.getElementById('solder-table');
+  const table = document.getElementById('solder-table-grid') || document.getElementById('solder-table');
 
   if (!table) return;
 
