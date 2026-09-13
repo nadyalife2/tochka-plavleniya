@@ -144,7 +144,10 @@ require_once __DIR__ . '/data/interactive-rules.php';
           <!-- P0-1: Температура -->
           <a href="#temp" class="hub-card block p-4 sm:p-5 rounded-lg border border-paper-border bg-card text-decoration-none">
             <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">🌡️ P0 // ТЕРМОРЕЖИМ</span>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px] text-accent">thermostat</span>
+                P0 // ТЕРМОРЕЖИМ
+              </span>
               <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-paper-subtle border border-paper-border text-ink-muted">~30 сек</span>
             </div>
             <div class="text-base font-bold text-ink font-sans mb-1">Подбор температуры пайки</div>
@@ -157,7 +160,10 @@ require_once __DIR__ . '/data/interactive-rules.php';
           <!-- P0-2: Паяльник -->
           <a href="#iron" class="hub-card block p-4 sm:p-5 rounded-lg border border-paper-border bg-card text-decoration-none">
             <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">🔧 P0 // ВЫБОР ЖЕЛЕЗА</span>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px] text-accent">construction</span>
+                P0 // ВЫБОР ЖЕЛЕЗА
+              </span>
               <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-paper-subtle border border-paper-border text-ink-muted">~1 мин</span>
             </div>
             <div class="text-base font-bold text-ink font-sans mb-1">Конфигуратор паяльника</div>
@@ -170,7 +176,10 @@ require_once __DIR__ . '/data/interactive-rules.php';
           <!-- P0-3: Дефекты -->
           <a href="#defect" class="hub-card block p-4 sm:p-5 rounded-lg border border-paper-border bg-card text-decoration-none">
             <div class="flex items-center justify-between gap-2 mb-2">
-              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">🔍 P0 // ДИАГНОСТИКА</span>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider flex items-center gap-1.5">
+                <span class="material-symbols-outlined text-[15px] text-accent">troubleshoot</span>
+                P0 // ДИАГНОСТИКА
+              </span>
               <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-paper-subtle border border-paper-border text-ink-muted">~1 мин</span>
             </div>
             <div class="text-base font-bold text-ink font-sans mb-1">Дерево причин брака</div>
@@ -185,11 +194,13 @@ require_once __DIR__ . '/data/interactive-rules.php';
         <!-- Secondary P1 shortcut pills -->
         <div class="pt-2 flex flex-wrap items-center gap-3">
           <span class="text-xs font-mono text-ink-faint">Также на верстаке:</span>
-          <a href="#calculator" class="px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
-            🧪 Калькулятор дозировки флюса (IPC-7095C)
+          <a href="#calculator" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
+            <span class="material-symbols-outlined text-[14px] text-accent">science</span>
+            <span>Калькулятор дозировки флюса (IPC-7095C)</span>
           </a>
-          <a href="#table" class="px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
-            📋 Реестр точек плавления сплавов (ГОСТ 21931)
+          <a href="#table" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
+            <span class="material-symbols-outlined text-[14px] text-accent">table_chart</span>
+            <span>Реестр точек плавления сплавов (ГОСТ 21931)</span>
           </a>
         </div>
       </div>
@@ -275,7 +286,7 @@ require_once __DIR__ . '/data/interactive-rules.php';
 
             <!-- Warning Callout -->
             <div id="temp-warn-box" class="p-3 rounded bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 flex items-start gap-2">
-              <span class="text-amber-700 dark:text-amber-400 font-bold text-xs">⚠️</span>
+              <span class="material-symbols-outlined text-[16px] text-amber-700 dark:text-amber-400 shrink-0">warning</span>
               <span id="temp-warn-display" class="text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal">
                 Мостики? Сначала добавьте флюс, затем снимите оплёткой — не поднимайте температуру выше предела.
               </span>
@@ -331,7 +342,7 @@ require_once __DIR__ . '/data/interactive-rules.php';
 
             <!-- Avoid Alert -->
             <div id="iron-avoid-box" class="p-3 rounded bg-red-50 dark:bg-red-950/30 border border-red-300 dark:border-red-800 flex items-start gap-2" style="display:none;">
-              <span class="text-red-600 font-bold text-xs">🛑</span>
+              <span class="material-symbols-outlined text-[16px] text-red-600 shrink-0">report</span>
               <div>
                 <div class="text-[10px] font-mono uppercase font-bold text-red-700 dark:text-red-400">Чего избегать:</div>
                 <div id="iron-avoid-display" class="text-xs font-mono text-red-800 dark:text-red-300"></div>
@@ -414,7 +425,10 @@ require_once __DIR__ . '/data/interactive-rules.php';
           <div>
             <div class="flex items-center gap-3">
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04 // ДОЗИРОВКА ХИМИИ</span>
-              <span class="handwriting text-accent font-bold text-base hidden sm:inline-block">✎ Толщина слоя: 50–70 мкм</span>
+              <span class="handwriting text-accent font-bold text-base hidden sm:inline-flex items-center gap-1">
+                <span class="material-symbols-outlined text-[15px]">edit</span>
+                Толщина слоя: 50–70 мкм
+              </span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода флюса и паяльной пасты</h2>
           </div>
@@ -516,7 +530,10 @@ require_once __DIR__ . '/data/interactive-rules.php';
 
                   <!-- Pin header -->
                   <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:9px; border-bottom:1px dashed rgba(0,0,0,0.15);">
-                    <span class="handwriting" style="font-size:17px; font-weight:700; color:#78350f; letter-spacing:0.01em;">📌 Заметка инженера</span>
+                    <span class="handwriting" style="font-size:17px; font-weight:700; color:#78350f; letter-spacing:0.01em; display:inline-flex; align-items:center; gap:4px;">
+                      <span class="material-symbols-outlined" style="font-size:16px;">push_pin</span>
+                      Заметка инженера
+                    </span>
                     <span style="font-size:10px; font-family:monospace; font-weight:700; color:#92400e; opacity:0.8; text-transform:uppercase; letter-spacing:0.06em;">IPC-A-610</span>
                   </div>
 

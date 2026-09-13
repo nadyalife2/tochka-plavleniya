@@ -433,7 +433,7 @@ $faq_items = [
                 
                 <!-- Hand-written Annotations -->
                 <text x="110" y="96" font-family="Caveat" font-size="19" font-weight="700" class="fill-ink">Preheat (150°C)</text>
-                <text x="280" y="36" font-family="Caveat" font-size="20" font-weight="700" class="fill-brand-orange">Peak (245°C) ★</text>
+                <text x="280" y="36" font-family="Caveat" font-size="20" font-weight="700" class="fill-brand-orange">Peak (245°C) max</text>
                 <text x="430" y="115" font-family="Caveat" font-size="19" font-weight="700" class="fill-ink">Cooling (6°C/s)</text>
                 
                 <!-- Axis Labels (≥11px) -->

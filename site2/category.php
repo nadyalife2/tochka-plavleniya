@@ -333,8 +333,9 @@ function get_semantic_tag_pill(string $tag_key): string {
             <div class="border border-paper-border rounded-lg p-5 sm:p-6 bg-card shadow-sm space-y-3 relative overflow-hidden">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                  <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded">
-                    ★ ИНТЕРАКТИВНЫЙ ИНСТРУМЕНТ
+                  <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[13px] text-accent">construction</span>
+                    ИНТЕРАКТИВНЫЙ ИНСТРУМЕНТ
                   </span>
                 </div>
                 <span class="text-xs font-mono text-ink-faint">IPC-7095C / ГОСТ</span>
@@ -350,12 +351,12 @@ function get_semantic_tag_pill(string $tag_key): string {
 
               <div class="pt-2 flex flex-wrap items-center gap-3">
                 <?php if (!empty($current_rubric['cta']['link1'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-ink text-paper font-mono text-xs font-medium hover:opacity-90 transition-opacity shadow-sm">
+                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-ink text-paper font-mono text-xs font-medium hover:opacity-95 transition-opacity shadow-sm">
                     <span><?= e($current_rubric['cta']['lbl1']) ?></span>
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($current_rubric['cta']['link2'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded border border-paper-border bg-paper hover:border-accent text-ink font-mono text-xs transition-colors">
+                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent transition-colors">
                     <span><?= e($current_rubric['cta']['lbl2']) ?></span>
                     <span class="text-xs">→</span>
                   </a>
@@ -371,6 +372,16 @@ function get_semantic_tag_pill(string $tag_key): string {
           ?>
             <article class="border border-paper-border rounded-lg bg-card p-6 sm:p-7 space-y-5 shadow-sm transition-all hover:border-paper-border-dark relative">
               
+              <?php if (!empty($featured_article['image'])): ?>
+                <!-- Image Frame -->
+                <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
+                  <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-52 sm:h-64 object-cover object-center" loading="lazy">
+                  <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-paper/90 border border-paper-border text-[11px] font-mono text-ink-muted rounded backdrop-blur-sm">
+                    FIG. <?= e($featured_article['id'] ?? '1') ?>.0 // SCHEMATIC
+                  </div>
+                </div>
+              <?php endif; ?>
+
               <!-- Top Meta Line -->
               <div class="flex items-center justify-between font-mono text-xs text-ink-muted pt-1">
                 <div class="flex items-center gap-2">
@@ -380,8 +391,9 @@ function get_semantic_tag_pill(string $tag_key): string {
                   <span class="text-ink-faint">·</span>
                   <span>~<?= e($featured_article['read_min'] ?? 8) ?> мин чтения</span>
                 </div>
-                <span class="pill-yellow px-1.5 py-0.5 rounded text-xs font-mono uppercase font-bold">
-                  ★ Флагман рубрики
+                <span class="pill-yellow px-1.5 py-0.5 rounded text-xs font-mono uppercase font-bold flex items-center gap-1">
+                  <span class="material-symbols-outlined text-[13px] text-amber-600 dark:text-amber-400">stars</span>
+                  Флагман рубрики
                 </span>
               </div>
 
@@ -438,6 +450,16 @@ function get_semantic_tag_pill(string $tag_key): string {
               $card_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
             ?>
               <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-all">
+                <?php if (!empty($article['image'])): ?>
+                  <!-- Card Image Frame -->
+                  <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
+                    <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-cover object-center" loading="lazy">
+                    <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-paper/90 border border-paper-border text-[10px] font-mono text-ink-muted rounded backdrop-blur-sm">
+                      FIG. <?= e($article['id']) ?>.0 // SKETCH
+                    </div>
+                  </div>
+                <?php endif; ?>
+
                 <div class="space-y-2">
                   <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint">
                     <span class="<?= $card_pill ?> px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase">
@@ -488,14 +510,14 @@ function get_semantic_tag_pill(string $tag_key): string {
         <!-- RIGHT COLUMN: SIDEBAR (Strict Semantic Workbench Cards) -->
         <aside class="lg:col-span-4 space-y-5">
           
-          <!-- 💛 YELLOW POST-IT NOTE: Chemistry / Rosin / Workshop Master Note -->
+          <!-- YELLOW POST-IT NOTE: Chemistry / Rosin / Workshop Master Note -->
           <div class="sticker-yellow p-3.5 rounded-lg space-y-2 relative sketch-border shadow-sm rotate-[-0.8deg]">
             <div class="tape-strip tape-yellow w-8 -top-1.5 left-5 rotate-[-2deg]"></div>
             
             <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-[#facc15]/40 pb-1">
               <span class="flex items-center gap-1.5">
-                <span class="w-1.5 h-1.5 rounded-full bg-[#854d0e] dark:bg-[#facc15]"></span>
-                📌 Заметка верстака // Химия
+                <span class="material-symbols-outlined text-[13px] text-amber-800 dark:text-amber-300">push_pin</span>
+                Заметка верстака // Химия
               </span>
               <span class="text-[10px] opacity-75">FLUX-QC</span>
             </div>
@@ -546,11 +568,11 @@ function get_semantic_tag_pill(string $tag_key): string {
             </div>
           </div>
 
-          <!-- ⚠️ WARNING CALLOUT: Critical Defect Warning (Rose Alloy Fragility Risk) -->
+          <!-- WARNING CALLOUT: Critical Defect Warning (Rose Alloy Fragility Risk) -->
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-1.5 border-l-4 border-l-amber-500 shadow-sm">
             <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-paper-border pb-1">
               <span class="flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
-                <span>⚠️</span>
+                <span class="material-symbols-outlined text-[15px] text-amber-600 dark:text-amber-400">warning</span>
                 Риск брака // Сплав Розе
               </span>
               <span class="pill-orange text-[9px] px-1.5 py-0.2 rounded font-mono font-bold">ОСТОРОЖНО</span>
@@ -579,7 +601,10 @@ function get_semantic_tag_pill(string $tag_key): string {
             <div class="space-y-1.5 font-mono text-xs">
               <a href="/interactive.php#temp" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-accent transition-colors text-xs">🌡️ Термокалькулятор</div>
+                  <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-accent">thermostat</span>
+                    Термокалькулятор
+                  </div>
                   <div class="text-[11px] text-ink-muted">Подбор °C под провод и припой</div>
                 </div>
                 <span class="pill-orange text-[10px] px-1.5 py-0.2 rounded font-bold">#temp</span>
@@ -587,7 +612,10 @@ function get_semantic_tag_pill(string $tag_key): string {
 
               <a href="/interactive.php#iron" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-xs">🔧 Подбор паяльника</div>
+                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-xs flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-sky-600 dark:text-sky-400">construction</span>
+                    Подбор паяльника
+                  </div>
                   <div class="text-[11px] text-ink-muted">Станции T12, C245 под бюджет</div>
                 </div>
                 <span class="pill-blue text-[10px] px-1.5 py-0.2 rounded font-bold">#iron</span>
@@ -595,7 +623,10 @@ function get_semantic_tag_pill(string $tag_key): string {
 
               <a href="/interactive.php#defect" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-accent transition-colors text-xs">🔍 Дерево дефектов</div>
+                  <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[14px] text-accent">troubleshoot</span>
+                    Дерево дефектов
+                  </div>
                   <div class="text-[11px] text-ink-muted">Диагностика причин брака</div>
                 </div>
                 <span class="pill-orange text-[10px] px-1.5 py-0.2 rounded font-bold">#defect</span>
