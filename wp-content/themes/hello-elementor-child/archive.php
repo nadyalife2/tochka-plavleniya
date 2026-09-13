@@ -50,7 +50,7 @@ get_header();
     background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px) !important;
     background-size: 20px 20px !important;
     color: var(--color-ink) !important;
-    font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-sans, 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
   }
 
   .bg-card {

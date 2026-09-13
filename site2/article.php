@@ -776,7 +776,7 @@ $faq_items = [
             <span class="text-[11px] font-mono text-ink-faint">МАРКЕТ / ЧИПДИП</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans">
-            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+            <a href="https://market.yandex.ru" target="_blank" rel="sponsored nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
               <div class="text-[11px] font-mono text-ink-faint uppercase">Термовоздушная станция</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Quick 861DW (1000W)</div>
               <div class="text-[11px] text-ink-muted mt-1 leading-snug">Турбированный термофен для BGA чипов</div>
@@ -785,7 +785,7 @@ $faq_items = [
                 <span class="text-accent underline text-[11px]">Маркет →</span>
               </div>
             </a>
-            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+            <a href="https://market.yandex.ru" target="_blank" rel="sponsored nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
               <div class="text-[11px] font-mono text-ink-faint uppercase">Флюс-гель No-Clean</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Cyberflux RMA-218</div>
               <div class="text-[11px] text-ink-muted mt-1 leading-snug">Безотмывочный гель для бессвинца</div>
@@ -794,7 +794,7 @@ $faq_items = [
                 <span class="text-accent underline text-[11px]">Маркет →</span>
               </div>
             </a>
-            <a href="https://market.yandex.ru" target="_blank" rel="nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
+            <a href="https://market.yandex.ru" target="_blank" rel="sponsored nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
               <div class="text-[11px] font-mono text-ink-faint uppercase">Припой SAC305</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">BGA Balls 0.45mm</div>
               <div class="text-[11px] text-ink-muted mt-1 leading-snug">Прецизионные шарики Sn96.5Ag3Cu0.5</div>

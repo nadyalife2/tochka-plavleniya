@@ -193,8 +193,37 @@ if (!function_exists('render_article_schema')) {
             "@graph" => $graph
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
 
+
         return "<script type=\"application/ld+json\">\n" . $json . "\n</script>";
     }
 }
 
+/**
+ * Фильтр для автоматического добавления rel="sponsored nofollow noopener" к партнёрским ссылкам (347-ФЗ)
+ */
+if (!function_exists('tchp_filter_affiliate_links')) {
+    function tchp_filter_affiliate_links(string $content): string {
+        if (empty($content)) return $content;
 
+        $patterns = ['aliexpress.com', 'ya.cc', 'market.yandex.ru', 'ozon.ru', 'megamarket.ru'];
+        foreach ($patterns as $domain) {
+            $content = preg_replace_callback(
+                '/<a\s+([^>]*href=["\'][^"\']*' . preg_quote($domain, '/') . '[^"\']*["\'][^>]*)>/i',
+                function ($matches) {
+                    $tag = $matches[0];
+                    if (strpos($tag, 'rel=') === false) {
+                        return str_replace('<a ', '<a rel="sponsored nofollow noopener" ', $tag);
+                    } else {
+                        // If rel already exists, ensure sponsored is present
+                        if (strpos($tag, 'sponsored') === false) {
+                            return preg_replace('/rel=["\']([^"\']*)["\']/i', 'rel="$1 sponsored"', $tag);
+                        }
+                        return $tag;
+                    }
+                },
+                $content
+            );
+        }
+        return $content;
+    }
+}

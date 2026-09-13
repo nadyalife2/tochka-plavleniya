@@ -260,7 +260,7 @@ add_action( 'wp_head', 'tchp_output_article_schema', 10 );
  */
 function tchp_render_cookie_consent_banner() {
 	?>
-	<div id="cookie-consent-banner" style="display:none; position:fixed; bottom:16px; right:16px; max-width:420px; z-index:9999; background:var(--color-paper, #faf8f5); border:2px solid var(--color-paper-border-dark, #d3cdc2); border-radius:12px; padding:16px; box-shadow:0 10px 25px rgba(0,0,0,0.15); font-family:'Space Grotesk', sans-serif; color:var(--color-ink, #141414);">
+	<div id="cookie-consent-banner" style="display:none; position:fixed; bottom:16px; right:16px; max-width:420px; z-index:9999; background:var(--color-paper, #faf8f5); border:2px solid var(--color-paper-border-dark, #d3cdc2); border-radius:12px; padding:16px; box-shadow:0 10px 25px rgba(0,0,0,0.15); font-family:var(--font-sans, 'IBM Plex Sans', sans-serif); color:var(--color-ink, #141414);">
 		<div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
 			<div style="font-weight:700; font-size:13px; text-transform:uppercase; font-family:monospace;">🍪 Файлы Cookie и аналитика</div>
 			<button id="cookie-close-btn" style="background:none; border:none; cursor:pointer; font-size:14px; color:#888;">✕</button>
