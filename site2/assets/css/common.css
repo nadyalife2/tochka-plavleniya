@@ -17,6 +17,16 @@
   --color-accent: #eb5211;
   --dot-color: #d3cdc2;
   --bg-color: #faf8f5;
+
+  /* Backward-compatible alias tokens */
+  --bg-card: var(--color-card);
+  --bg-paper: var(--color-paper);
+  --text-main: var(--color-ink);
+  --text-muted: var(--color-ink-muted);
+  --accent-yellow: #facc15;
+  --accent-orange: var(--color-accent);
+  --border: var(--color-paper-border);
+  --border-dark: var(--color-paper-border-dark);
 }
 
 html.dark {
@@ -32,6 +42,16 @@ html.dark {
   --color-accent: #ff6b2b;
   --dot-color: #2b3142;
   --bg-color: #12141a;
+
+  /* Backward-compatible alias tokens (Dark) */
+  --bg-card: var(--color-card);
+  --bg-paper: var(--color-paper);
+  --text-main: var(--color-ink);
+  --text-muted: var(--color-ink-muted);
+  --accent-yellow: #facc15;
+  --accent-orange: var(--color-accent);
+  --border: var(--color-paper-border);
+  --border-dark: var(--color-paper-border-dark);
 }
 
 html, body {
@@ -159,6 +179,14 @@ html.dark .sketch-pill-gray {
 
 .sketch-border {
   border-radius: 255px 15px 225px / 15px 225px 15px 255px;
+}
+
+/* GPU-ACCELERATED SKETCH TRANSFORMS */
+.sketch-border, .sketch-pill-yellow, .sketch-pill-gray, 
+.tape-strip, [class*="rotate-"] {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
 }
 
 /* POST-IT NOTES */

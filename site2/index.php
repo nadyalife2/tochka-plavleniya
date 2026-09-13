@@ -70,14 +70,14 @@ foreach ($articles as $article) {
       <!-- Right Action / Search, Dark Mode Toggle & Workbench -->
       <div class="flex items-center gap-2 sm:gap-3">
         <!-- Global Search Trigger -->
-        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
+        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[44px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
           <span class="material-symbols-outlined text-[18px] text-accent">search</span>
           <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
           <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
         </button>
 
         <!-- Dark/Light Mode Switcher (Sketch Style) -->
-        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[44px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
           <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
@@ -88,7 +88,7 @@ foreach ($articles as $article) {
           <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
-        <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php" aria-label="Открыть интерактивный верстак инженера">
+        <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php" aria-label="Открыть интерактивный верстак инженера">
           <span>Верстак / Тулзы</span>
           <span class="material-symbols-outlined text-[14px]">build</span>
         </a>
@@ -163,21 +163,21 @@ foreach ($articles as $article) {
         </div>
       </section>
 
-      <!-- Category Filter Pills (WCAG 40px Touch Targets) -->
+      <!-- Category Filter Pills (WCAG 44px Touch Targets) -->
       <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 font-mono text-xs sm:text-sm scrollbar-none" id="articles">
-        <a href="index.php?tag=all#articles" class="inline-flex items-center px-4 py-2 min-h-[40px] rounded <?= $tag_filter === 'all' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=all#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'all' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Все материалы
         </a>
-        <a href="index.php?tag=basics#articles" class="inline-flex items-center px-4 py-2 min-h-[40px] rounded <?= $tag_filter === 'basics' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=basics#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'basics' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Основы
         </a>
-        <a href="index.php?tag=smd#articles" class="inline-flex items-center px-4 py-2 min-h-[40px] rounded <?= $tag_filter === 'smd' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=smd#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'smd' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           SMD и BGA
         </a>
-        <a href="index.php?tag=tools#articles" class="inline-flex items-center px-4 py-2 min-h-[40px] rounded <?= $tag_filter === 'tools' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=tools#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'tools' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Инструменты
         </a>
-        <a href="index.php?tag=materials#articles" class="inline-flex items-center px-4 py-2 min-h-[40px] rounded <?= $tag_filter === 'materials' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
+        <a href="index.php?tag=materials#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'materials' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
           Сплавы и флюсы
         </a>
       </div>
