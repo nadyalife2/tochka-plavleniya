@@ -3,6 +3,35 @@
  * Калькулятор флюса, квиз по пайке и фильтруемый справочник припоев
  */
 
+:root {
+  --bg-card: var(--color-card, #ffffff);
+  --text-main: var(--color-ink, #141414);
+  --text-muted: var(--color-ink-muted, #6b665f);
+  --border-dark: var(--color-paper-border-dark, #d3cdc2);
+  --border: var(--color-paper-border, #e6e2da);
+  --border-width: 1.5px;
+  --accent-yellow: var(--color-accent, #eb5211);
+  --accent-orange: var(--color-accent, #eb5211);
+  --accent-green: var(--color-paper-subtle, #f3f0ea);
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --radius-lg: 12px;
+  --shadow-hover: 4px 4px 0px var(--color-paper-border-dark, #d3cdc2);
+  --shadow-color: var(--color-paper-border-dark, #d3cdc2);
+}
+
+html.dark {
+  --bg-card: var(--color-card, rgba(24, 27, 36, 0.85));
+  --text-main: var(--color-ink, #f3f4f6);
+  --text-muted: var(--color-ink-muted, #9ca3af);
+  --border-dark: var(--color-paper-border-dark, #373e52);
+  --border: var(--color-paper-border, #282d3b);
+  --accent-green: var(--color-paper-subtle, #191c24);
+  --shadow-hover: 4px 4px 0px rgba(0, 0, 0, 0.4);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
 .interactive-hero {
   max-width: 1000px;
   margin: 40px auto 60px;

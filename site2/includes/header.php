@@ -67,29 +67,36 @@ $current_page = $current_page ?? '';
         <?php include __DIR__ . '/header-nav.php'; ?>
       </div>
 
-      <!-- Right Action / Dark Mode Toggle & Workbench link -->
-      <div class="flex items-center gap-3">
+      <!-- Right Action / Search, Dark Mode Toggle & Workbench link -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Global Search Trigger -->
+        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
+          <span class="material-symbols-outlined text-[18px] text-accent">search</span>
+          <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
+          <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
+        </button>
+
         <!-- Dark/Light Mode Switcher (Sketch Style) -->
-        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
-          <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+          <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
-          <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="w-4 h-4 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="4.5"></circle>
             <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
           </svg>
-          <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+          <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
         <?php if ($current_page === 'interactive'): ?>
-          <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/#articles" aria-label="Читать статьи журнала">
+          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/#articles" aria-label="Читать статьи журнала">
             <span>Журнал / Статьи</span>
-            <span class="material-symbols-outlined text-[13px]">menu_book</span>
+            <span class="material-symbols-outlined text-[14px]">menu_book</span>
           </a>
         <?php else: ?>
-          <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/interactive.php" aria-label="Открыть интерактивный верстак инженера">
+          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/interactive.php" aria-label="Открыть интерактивный верстак инженера">
             <span>Верстак / Тулзы</span>
-            <span class="material-symbols-outlined text-[13px]">build</span>
+            <span class="material-symbols-outlined text-[14px]">build</span>
           </a>
         <?php endif; ?>
       </div>

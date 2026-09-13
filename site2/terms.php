@@ -46,9 +46,16 @@ require_once __DIR__ . '/includes/functions.php';
         ?>
       </div>
 
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Search Trigger (Ctrl+K) -->
+        <button id="search-modal-trigger" type="button" class="min-h-[40px] px-2.5 sm:px-3 py-1.5 border border-paper-border-dark dark:border-paper-border bg-paper hover:bg-paper-subtle text-ink font-mono text-xs flex items-center gap-2 rounded transition-colors cursor-pointer" title="Поиск по справочнику (Ctrl+K)" aria-label="Поиск">
+          <span class="material-symbols-outlined text-[16px]">search</span>
+          <span class="hidden sm:inline text-ink-muted">Поиск</span>
+          <kbd class="hidden sm:inline-block px-1 py-0.5 text-[10px] bg-paper-subtle border border-paper-border rounded text-ink-faint">Ctrl K</kbd>
+        </button>
+
         <!-- Theme Toggle (Sketch Style) -->
-        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
           <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
@@ -56,10 +63,10 @@ require_once __DIR__ . '/includes/functions.php';
             <circle cx="12" cy="12" r="4.5"></circle>
             <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
           </svg>
-          <span class="text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+          <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
+        <a class="min-h-[40px] inline-flex items-center gap-1.5 px-3 py-1.5 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs sm:text-sm font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
           <span>Верстак</span>
           <span class="material-symbols-outlined text-[13px]">build</span>
         </a>
@@ -93,7 +100,7 @@ require_once __DIR__ . '/includes/functions.php';
       </div>
 
       <!-- Legal Content -->
-      <article class="space-y-8 text-[14.5px] text-ink-muted leading-relaxed">
+      <article class="space-y-8 text-sm sm:text-base text-ink-muted leading-relaxed">
 
         <!-- 1. Предмет -->
         <section class="border border-paper-border rounded-lg bg-card p-6 space-y-3">
@@ -162,6 +169,12 @@ require_once __DIR__ . '/includes/functions.php';
 
   <!-- Editorial Minimal Footer -->
   <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
+
+  <!-- Mobile Sticky Quick-Bar -->
+  <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
+
+  <!-- Global Engineering Search Modal -->
+  <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
   <!-- Theme Toggle JS -->
   <script>

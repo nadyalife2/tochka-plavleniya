@@ -406,4 +406,156 @@ html.dark .pill-orange {
   color: #fb923c;
 }
 
+/* ==========================================================================
+   GPU & Sub-pixel Anti-Aliasing for Rotated & Skewed Elements
+   ========================================================================== */
+.sketch-border, 
+.tape-strip, 
+.sketch-pill-yellow, 
+.sketch-pill-gray, 
+.logo,
+[class*="rotate-"],
+[style*="rotate"] {
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+}
 
+/* ==========================================================================
+   Mobile Quick Bar — Нижняя панель быстрого доступа для смартфонов (<= 640px)
+   ========================================================================== */
+.mobile-quick-bar {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .mobile-quick-bar {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background-color: var(--color-paper);
+    border-top: 1px solid var(--color-paper-border);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+    padding: 0.25rem 0.5rem;
+    align-items: center;
+    justify-content: space-around;
+  }
+}
+
+/* Header desktop nav hidden on mobile (handled by Mobile Quick Bar) */
+@media (max-width: 768px) {
+  header nav.nav {
+    display: none !important;
+  }
+}
+
+/* ==========================================================================
+   Global Engineering Search Modal (Ctrl+K)
+   ========================================================================== */
+#search-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5rem 1rem 2rem;
+  background-color: rgba(20, 20, 20, 0.65);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+#search-modal.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+#search-modal-box {
+  width: 100%;
+  max-width: 680px;
+  background-color: var(--color-paper);
+  border: 1.5px solid var(--color-paper-border-dark);
+  border-radius: 12px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transform: translateY(-12px) scale(0.98);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#search-modal.active #search-modal-box {
+  transform: translateY(0) scale(1);
+}
+
+@media (max-width: 640px) {
+  #search-modal {
+    padding: 2rem 0.75rem 1rem;
+  }
+}
+
+/* ==========================================================================
+   Print Stylesheet (@media print) — Оптимизация для печати регламентов на стену
+   ========================================================================== */
+@media print {
+  header, 
+  footer, 
+  aside.sm\:hidden,
+  .mobile-quick-bar,
+  #search-modal, 
+  #theme-toggle, 
+  .open-search-trigger, 
+  #cookie-consent-banner,
+  .no-print {
+    display: none !important;
+  }
+  
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+
+  a {
+    color: #000000 !important;
+    text-decoration: underline !important;
+  }
+
+  .bg-card, 
+  .bg-paper, 
+  .border, 
+  .sketch-border {
+    background: #ffffff !important;
+    border-color: #999999 !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    page-break-inside: avoid;
+  }
+
+  th, td {
+    border: 1px solid #666666 !important;
+    padding: 6px 10px !important;
+  }
+
+  img, svg {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+}

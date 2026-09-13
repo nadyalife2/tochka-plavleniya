@@ -1,12 +1,12 @@
 <!-- Cookie Consent Banner (Editorial Style / 152-ФЗ Zero-PII) -->
-<div id="cookie-consent-banner" class="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 transform transition-all duration-300 translate-y-0 opacity-100 hidden">
+<div id="cookie-consent-banner" class="fixed bottom-16 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 transform transition-all duration-300 translate-y-0 opacity-100 hidden">
   <div class="border border-paper-border-dark bg-paper dark:bg-[#1c1d21] p-4 sm:p-5 rounded-lg shadow-xl space-y-3 relative">
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-center gap-2">
         <span class="material-symbols-outlined text-[18px] text-brand-orange">cookie</span>
         <span class="font-mono text-xs font-bold uppercase text-ink tracking-wider">Файлы Cookie и аналитика</span>
       </div>
-      <button id="cookie-close-btn" type="button" class="text-ink-faint hover:text-ink font-mono text-xs px-1" aria-label="Закрыть">✕</button>
+      <button id="cookie-close-btn" type="button" class="text-ink-faint hover:text-ink font-mono text-xs min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer" aria-label="Закрыть">✕</button>
     </div>
 
     <p class="text-xs text-ink-muted leading-relaxed font-sans">
@@ -14,8 +14,8 @@
     </p>
 
     <div class="flex items-center justify-between gap-3 pt-2 border-t border-paper-border text-xs font-mono">
-      <a class="text-ink-muted hover:text-ink underline text-[11.5px]" href="<?php echo function_exists('home_url') ? esc_url(home_url('/privacy/')) : 'privacy.php'; ?>">Политика 152-ФЗ →</a>
-      <button id="cookie-accept-btn" type="button" class="px-4 py-1.5 bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shadow-sm border border-paper-border-dark dark:border-paper-border cursor-pointer">
+      <a class="text-ink-muted hover:text-ink underline text-xs" href="<?php echo function_exists('home_url') ? esc_url(home_url('/privacy/')) : 'privacy.php'; ?>">Политика 152-ФЗ →</a>
+      <button id="cookie-accept-btn" type="button" class="min-h-[40px] px-4 py-2 bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shadow-sm border border-paper-border-dark dark:border-paper-border cursor-pointer">
         Понятно
       </button>
     </div>

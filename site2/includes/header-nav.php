@@ -24,12 +24,12 @@ if (!function_exists('is_tchp_nav_active')) {
     }
 }
 ?>
-<nav class="nav flex items-center gap-3.5 sm:gap-5 overflow-x-auto py-1 text-[13px] sm:text-[13.5px] font-mono whitespace-nowrap scrollbar-none" aria-label="Основная навигация">
+<nav class="nav flex items-center gap-1 sm:gap-2 overflow-x-auto text-sm font-mono whitespace-nowrap scrollbar-none py-0.5" aria-label="Основная навигация">
     <?php foreach ($nav_items as $item): 
         $active = is_tchp_nav_active($item['page'], $current_page);
     ?>
         <a href="<?= htmlspecialchars($item['href']) ?>"
-           class="nav-link <?= $active ? 'active text-accent font-bold border-b-2 border-accent' : 'text-ink-muted hover:text-ink transition-colors' ?>"
+           class="nav-link inline-flex items-center min-h-[44px] px-2.5 sm:px-3 rounded transition-colors text-xs sm:text-sm <?= $active ? 'active text-accent font-bold border-b-2 border-accent bg-accent/5' : 'text-ink-muted hover:text-ink hover:bg-paper-border/30' ?>"
            <?php if ($active): ?>aria-current="page"<?php endif; ?>>
             <?= htmlspecialchars($item['label']) ?>
         </a>

@@ -50,6 +50,61 @@ $faq_items = [
 <meta property="og:description" content="<?= e($article['excerpt']) ?>"/>
 <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
 
+<!-- Schema.org TechArticle & HowTo JSON-LD for AI Search Engines & LLMs -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "TechArticle",
+      "@id": "https://tochka-plavleniya.ru/article.php#article",
+      "headline": <?= json_encode($article['title'], JSON_UNESCAPED_UNICODE) ?>,
+      "description": <?= json_encode($article['excerpt'], JSON_UNESCAPED_UNICODE) ?>,
+      "author": {
+        "@type": "Person",
+        "name": "Иван Пайкин"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "ТОЧКА ПЛАВЛЕНИЯ",
+        "url": "https://tochka-plavleniya.ru"
+      },
+      "inLanguage": "ru-RU",
+      "proficiencyLevel": "Expert",
+      "dependencies": "J-STD-020E, IPC-A-610H, ГОСТ 21931-76"
+    },
+    {
+      "@type": "HowTo",
+      "@id": "https://tochka-plavleniya.ru/article.php#howto",
+      "name": "Настройка 4 фаз термопрофиля пайки BGA и SMD компонентов",
+      "description": "Пошаговый инженерный регламент пайки без коробления текстолита и деламинации.",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "name": "Preheat (Преднагрев)",
+          "text": "Плавный подъем температуры со скоростью 1–3 °C/с до 150 °C для предотвращения термоудара."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Soak (Активация флюса)",
+          "text": "Выдержка 60–120 секунд при 150–200 °C для выпаривания растворителей флюса и выравнивания градиента."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Reflow (Плавление припоя)",
+          "text": "Пиковый нагрев до 235–245 °C с выдержкой Time Above Liquidus (TAL) 30–60 секунд."
+        },
+        {
+          "@type": "HowToStep",
+          "name": "Cooling (Контролируемое охлаждение)",
+          "text": "Снижение температуры со скоростью 2–4 °C/с для формирования мелкозернистой структуры галтели."
+        }
+      ]
+    }
+  ]
+}
+</script>
+
 <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
 <link rel="stylesheet" href="assets/css/fonts.css"/>
 <link rel="stylesheet" href="assets/css/build.css"/>
@@ -180,27 +235,30 @@ $faq_items = [
       include __DIR__ . '/includes/header-nav.php'; 
       ?>
     </div>
-    <!-- Right Action -->
-    <div class="flex items-center gap-3">
-      <a class="hidden sm:inline-block text-[12.5px] text-ink-muted hover:text-ink transition-colors font-mono" href="#simulator">
-        [↓ к расчёту]
-      </a>
-      
+    <!-- Right Action / Search, Dark Mode Toggle & Workbench -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Global Search Trigger -->
+      <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
+        <span class="material-symbols-outlined text-[18px] text-accent">search</span>
+        <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
+        <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
+      </button>
+
       <!-- Theme Switcher Button (Sketch Style) -->
-      <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
-        <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+        <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
         </svg>
-        <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg class="w-4 h-4 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="4.5"></circle>
           <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
         </svg>
-        <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+        <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
       </button>
 
-      <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
+      <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
         <span>Верстак / Тулзы</span>
-        <span class="material-symbols-outlined text-[13px]">build</span>
+        <span class="material-symbols-outlined text-[14px]">build</span>
       </a>
     </div>
   </div>
@@ -264,7 +322,7 @@ $faq_items = [
         </header>
 
         <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
-        <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-[13.5px] leading-relaxed space-y-2">
+        <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-sm leading-relaxed space-y-2">
           <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>
@@ -342,7 +400,7 @@ $faq_items = [
             </p>
             <div class="my-3 inline-flex flex-wrap items-center gap-3 p-2.5 rounded border border-ink/40 bg-callout transform -rotate-[0.5deg] text-xs font-mono text-ink shadow-sm">
               <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[11px] font-bold tracking-wider uppercase"><span>QC PASSED</span><span>✓</span></div>
-              <div class="text-ink text-[11.5px] font-semibold tracking-tight">J-STD-020E // COMPLIANT</div>
+              <div class="text-ink text-xs font-semibold tracking-tight">J-STD-020E // COMPLIANT</div>
               <span class="text-ink-faint text-[11px] hidden sm:inline-block">|</span>
               <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-brand-orange align-middle">warning</span>ВНИМАНИЕ: ОПАСНОСТЬ ДЕЛАМИНАЦИИ ПРИ СКОРОСТИ > 3°C/с</div>
             </div>
@@ -356,7 +414,7 @@ $faq_items = [
             </div>
             
             <div class="w-full overflow-x-auto">
-              <svg viewBox="0 0 540 220" width="100%" height="auto" fill="none" class="max-w-full">
+              <svg viewBox="0 0 540 220" class="w-full h-auto max-w-full" fill="none">
                 <!-- Background card -->
                 <rect width="540" height="220" rx="8" class="fill-paper-subtle/50 stroke-paper-border" stroke-width="1.5"/>
                 
@@ -671,7 +729,7 @@ $faq_items = [
             
             <div class="p-4 rounded border border-paper-border bg-paper space-y-1.5">
               <div class="font-semibold text-ink text-sm">Точка замера температуры</div>
-              <p class="text-[13.5px] text-ink-muted leading-relaxed">
+              <p class="text-sm text-ink-muted leading-relaxed">
                 Закрепляйте термопару типа К каптоновым скотчем непосредственно возле корпуса микросхемы на поверхности платы. Только это дает объективную температуру в зоне пайки.
               </p>
             </div>
@@ -692,14 +750,14 @@ $faq_items = [
                 <span class="font-semibold text-ink text-sm">Влажность микросхем (MSL 3)</span>
                 <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-paper-subtle text-ink-muted border border-paper-border font-medium">ВАЖНО</span>
               </div>
-              <p class="text-[13.5px] text-ink-muted leading-relaxed">
+              <p class="text-sm text-ink-muted leading-relaxed">
                 Если BGA-компонент лежал на воздухе дольше 72 часов, влага в полимере закипает при 230°C и распирает корпус изнутри (<mark>«эффект попкорна»</mark>). Обязательно сушите чип 12–24 часа при 100–110°C перед пайкой.
               </p>
             </div>
 
             <div class="p-4 rounded border border-paper-border bg-paper space-y-1.5">
               <div class="font-semibold text-ink text-sm">Критическая скорость нагрева</div>
-              <p class="text-[13.5px] text-ink-muted leading-relaxed">
+              <p class="text-sm text-ink-muted leading-relaxed">
                 Скорость нарастания температуры быстрее <strong class="text-ink">2.5–3.0°C/сек</strong> приводит к расслоению стеклотекстолита (деламинации) и обрыву внутренних переходных отверстий в плате.
               </p>
             </div>
@@ -712,7 +770,7 @@ $faq_items = [
           <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
             <span>●</span> ЧТО ЗАПОМНИТЬ
           </div>
-          <ul class="space-y-2 text-[13.5px] text-ink/85 leading-relaxed">
+          <ul class="space-y-2 text-sm text-ink/85 leading-relaxed">
             <li class="flex items-start gap-2.5">
               <span class="text-ink-faint font-mono">—</span>
               <span>Фен без нижнего подогревателя гарантированно изгибает многослойную плату.</span>
@@ -754,11 +812,11 @@ $faq_items = [
           <div class="border-t border-paper-border divide-y divide-paper-border">
             <?php foreach ($faq_items as $question => $answer): ?>
               <div class="py-3.5">
-                <button class="faq-toggle w-full text-left flex items-start justify-between gap-4 font-medium text-ink hover:text-ink-muted transition-colors text-[14.5px]" type="button">
+                <button class="faq-toggle w-full text-left flex items-start justify-between gap-4 font-medium text-ink hover:text-ink-muted transition-colors text-sm sm:text-base" type="button">
                   <span><?= e($question) ?></span>
                   <span class="font-mono text-ink-faint text-xs mt-0.5 plus-icon">+</span>
                 </button>
-                <div class="faq-content hidden pt-2 text-[13.5px] text-ink-muted leading-relaxed">
+                <div class="faq-content hidden pt-2 text-sm text-ink-muted leading-relaxed">
                   <?= e($answer) ?>
                 </div>
               </div>
@@ -899,7 +957,7 @@ $faq_items = [
           <p class="text-ink-muted leading-relaxed">
             Практические заметки, профили реболлинга и тесты термоинтерфейсов в открытой базе знаний.
           </p>
-          <a class="inline-block pt-1 font-mono text-[11.5px] font-semibold text-ink underline decoration-paper-border-dark" href="interactive.php">
+          <a class="inline-block pt-1 font-mono text-xs font-semibold text-ink underline decoration-paper-border-dark" href="interactive.php">
             Интерактивные расчеты →
           </a>
         </div>
@@ -1201,6 +1259,12 @@ $faq_items = [
   }
 })();
 </script>
+
+  <!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
+  <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
+
+  <!-- Global Engineering Search Modal (Ctrl+K) -->
+  <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
 </body>
 </html>

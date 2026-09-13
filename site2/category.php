@@ -210,23 +210,30 @@ function get_semantic_tag_pill(string $tag_key): string {
         ?>
       </div>
 
-      <!-- Right Action / Dark Mode Toggle & Workbench link -->
-      <div class="flex items-center gap-3">
+      <!-- Right Action / Search, Dark Mode Toggle & Workbench -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Global Search Trigger -->
+        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
+          <span class="material-symbols-outlined text-[18px] text-accent">search</span>
+          <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
+          <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
+        </button>
+
         <!-- Dark/Light Mode Switcher (Sketch Style) -->
-        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
-          <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+          <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
-          <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <svg class="w-4 h-4 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="4.5"></circle>
             <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
           </svg>
-          <span class="hidden sm:inline text-[11px] text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+          <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
 
-        <a class="inline-flex items-center gap-1.5 px-3 py-1 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-[12.5px] font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/interactive.php" aria-label="Открыть интерактивный верстак">
+        <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/interactive.php" aria-label="Открыть интерактивный верстак">
           <span>Верстак / Тулзы</span>
-          <span class="material-symbols-outlined text-[13px]">build</span>
+          <span class="material-symbols-outlined text-[14px]">build</span>
         </a>
       </div>
     </div>
@@ -252,11 +259,11 @@ function get_semantic_tag_pill(string $tag_key): string {
           <!-- Single Subtle Tape & Label Badge (Yellow = Workshop/Editorial Identity) -->
           <div class="relative inline-block mb-1">
             <div class="tape-strip tape-yellow w-7 -top-1.5 left-4 rotate-[-2deg]"></div>
-            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-[10.5px] shadow-sm rotate-[-0.8deg] sketch-border">
+            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-[11px] shadow-sm rotate-[-0.8deg] sketch-border">
               <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
               <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?></span>
               <span class="text-ink-faint">|</span>
-              <span class="text-[9.5px] text-ink-muted uppercase"><?= e($current_rubric['subbadge']) ?></span>
+              <span class="text-[10px] text-ink-muted uppercase"><?= e($current_rubric['subbadge']) ?></span>
             </div>
           </div>
 
@@ -326,11 +333,11 @@ function get_semantic_tag_pill(string $tag_key): string {
             <div class="border border-paper-border rounded-lg p-5 sm:p-6 bg-card shadow-sm space-y-3 relative overflow-hidden">
               <div class="flex items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                  <span class="pill-blue text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded">
+                  <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded">
                     ★ ИНТЕРАКТИВНЫЙ ИНСТРУМЕНТ
                   </span>
                 </div>
-                <span class="text-[11px] font-mono text-ink-faint">IPC-7095C / ГОСТ</span>
+                <span class="text-xs font-mono text-ink-faint">IPC-7095C / ГОСТ</span>
               </div>
 
               <h2 class="text-lg sm:text-xl font-bold text-ink font-sans">
@@ -373,19 +380,19 @@ function get_semantic_tag_pill(string $tag_key): string {
                   <span class="text-ink-faint">·</span>
                   <span>~<?= e($featured_article['read_min'] ?? 8) ?> мин чтения</span>
                 </div>
-                <span class="pill-yellow px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-bold">
+                <span class="pill-yellow px-1.5 py-0.5 rounded text-xs font-mono uppercase font-bold">
                   ★ Флагман рубрики
                 </span>
               </div>
 
               <!-- Title & Excerpt -->
-              <div class="space-y-3">
-                <h2 class="text-2xl sm:text-[28px] font-bold text-ink tracking-tight leading-[1.2]">
+              <div class="space-y-2">
+                <h2 class="text-2xl font-bold text-ink tracking-tight leading-snug">
                   <a class="hover:underline decoration-ink underline-offset-4" href="<?= $f_url ?>">
                     <?= e($featured_article['title']) ?>
                   </a>
                 </h2>
-                <p class="text-ink/85 font-serif text-[16px] leading-relaxed">
+                <p class="text-ink/85 font-serif text-base leading-relaxed">
                   <?= e($featured_article['excerpt']) ?>
                 </p>
               </div>
@@ -403,13 +410,13 @@ function get_semantic_tag_pill(string $tag_key): string {
                   <span class="text-ink-faint">→</span>
                   <span>WS: <span class="hl-blue text-ink font-semibold">водосмывной</span></span>
                 </div>
-                <span class="pill-blue text-[9.5px] font-mono font-bold px-1.5 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
+                <span class="pill-blue text-xs font-mono font-bold px-1.5 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
               </div>
 
               <!-- Card Bottom Bar: Tag color derived strictly from topic -->
               <div class="flex items-center justify-between pt-2 border-t border-paper-border font-mono text-xs text-ink-muted">
                 <div class="flex items-center gap-2">
-                  <span class="<?= $f_tag_pill ?> px-1.5 py-0.5 rounded font-mono text-[10px] font-bold"><?= e($featured_article['tag']) ?></span>
+                  <span class="<?= $f_tag_pill ?> px-1.5 py-0.5 rounded font-mono text-xs font-bold"><?= e($featured_article['tag']) ?></span>
                   <span class="text-ink-faint">·</span>
                   <span><?= e($featured_article['date'] ?? '2026') ?></span>
                 </div>
@@ -445,7 +452,7 @@ function get_semantic_tag_pill(string $tag_key): string {
                     </a>
                   </h3>
 
-                  <p class="text-[13.5px] text-ink-muted leading-relaxed">
+                  <p class="text-sm text-ink-muted leading-relaxed">
                     <?= e($article['excerpt']) ?>
                   </p>
                 </div>
@@ -490,14 +497,14 @@ function get_semantic_tag_pill(string $tag_key): string {
                 <span class="w-1.5 h-1.5 rounded-full bg-[#854d0e] dark:bg-[#facc15]"></span>
                 📌 Заметка верстака // Химия
               </span>
-              <span class="text-[9.5px] opacity-75">FLUX-QC</span>
+              <span class="text-[10px] opacity-75">FLUX-QC</span>
             </div>
 
-            <p class="font-hand text-[15.5px] leading-snug italic font-semibold">
+            <p class="font-hand text-base leading-snug italic font-semibold">
               «Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции, а не заливай всё флюсом!»
             </p>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-[9.5px] opacity-80 border-t border-[#facc15]/35">
+            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-[#facc15]/35">
               <span>Норма нагрева флюса</span>
               <span class="font-bold">IPC-TM-650</span>
             </div>
@@ -505,35 +512,35 @@ function get_semantic_tag_pill(string $tag_key): string {
 
           <!-- TECHNICAL SPECIFICATION: Solder liquidus (Clean Reference Card) -->
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm relative">
-            <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
+            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
                 <span class="material-symbols-outlined text-[14px] text-accent">thermostat</span>
                 Ликвидус металлов
               </span>
-              <span class="pill-blue text-[9.5px] font-mono uppercase px-1.5 py-0.2 rounded">ГОСТ 21931</span>
+              <span class="pill-blue text-[10px] font-mono uppercase px-1.5 py-0.5 rounded">ГОСТ 21931</span>
             </div>
 
             <div class="space-y-1 font-mono text-xs">
               <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">ПОС-61 (Sn63Pb37)</span>
-                <span class="font-bold text-ink text-[11.5px]">183 °C</span>
+                <span class="font-bold text-ink text-xs">183 °C</span>
               </div>
               <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">SAC305 (RoHS)</span>
-                <span class="font-bold text-ink text-[11.5px]">217–220 °C</span>
+                <span class="font-bold text-ink text-xs">217–220 °C</span>
               </div>
               <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
                 <span class="text-ink">Sn42Bi58 (Низкотемп.)</span>
-                <span class="font-bold text-ink text-[11.5px]">138 °C</span>
+                <span class="font-bold text-ink text-xs">138 °C</span>
               </div>
               <div class="flex items-center justify-between py-1">
                 <span class="text-ink">Сплав Розе (Демонтаж)</span>
-                <span class="font-bold text-ink text-[11.5px]">94 °C</span>
+                <span class="font-bold text-ink text-xs">94 °C</span>
               </div>
             </div>
 
             <div class="pt-0.5 text-right">
-              <a href="/interactive.php#table" class="font-mono text-[10.5px] text-accent hover:underline font-bold">
+              <a href="/interactive.php#table" class="font-mono text-[11px] text-accent hover:underline font-bold">
                 Вся таблица припоев (9 марок) →
               </a>
             </div>
@@ -553,7 +560,7 @@ function get_semantic_tag_pill(string $tag_key): string {
               «Сплав Розе (94°C) — строго для демонтажа! После снятия разъёма остатки сплава нужно насухо вычистить оплёткой, иначе пайка рассыплется от малейшей вибрации.»
             </p>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-[9.5px] opacity-80 border-t border-paper-border">
+            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-paper-border">
               <span>Хрупкость шва</span>
               <span class="font-bold">Бинарная эвтектика</span>
             </div>
@@ -565,31 +572,31 @@ function get_semantic_tag_pill(string $tag_key): string {
                - #defect: Orange (Defects/Troubleshooting)
           -->
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm">
-            <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
+            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span>Инструменты верстака</span>
-              <span class="pill-blue text-[9.5px] px-1.5 py-0.2 rounded">3 ТУЛЗЫ</span>
+              <span class="pill-blue text-[10px] px-1.5 py-0.5 rounded">3 ТУЛЗЫ</span>
             </div>
             <div class="space-y-1.5 font-mono text-xs">
               <a href="/interactive.php#temp" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-accent transition-colors text-[11.5px]">🌡️ Термокалькулятор</div>
-                  <div class="text-[10.5px] text-ink-muted">Подбор °C под провод и припой</div>
+                  <div class="font-bold group-hover:text-accent transition-colors text-xs">🌡️ Термокалькулятор</div>
+                  <div class="text-[11px] text-ink-muted">Подбор °C под провод и припой</div>
                 </div>
                 <span class="pill-orange text-[10px] px-1.5 py-0.2 rounded font-bold">#temp</span>
               </a>
 
               <a href="/interactive.php#iron" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-[11.5px]">🔧 Подбор паяльника</div>
-                  <div class="text-[10.5px] text-ink-muted">Станции T12, C245 под бюджет</div>
+                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-xs">🔧 Подбор паяльника</div>
+                  <div class="text-[11px] text-ink-muted">Станции T12, C245 под бюджет</div>
                 </div>
                 <span class="pill-blue text-[10px] px-1.5 py-0.2 rounded font-bold">#iron</span>
               </a>
 
               <a href="/interactive.php#defect" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-accent transition-colors text-[11.5px]">🔍 Дерево дефектов</div>
-                  <div class="text-[10.5px] text-ink-muted">Диагностика причин брака</div>
+                  <div class="font-bold group-hover:text-accent transition-colors text-xs">🔍 Дерево дефектов</div>
+                  <div class="text-[11px] text-ink-muted">Диагностика причин брака</div>
                 </div>
                 <span class="pill-orange text-[10px] px-1.5 py-0.2 rounded font-bold">#defect</span>
               </a>
@@ -605,6 +612,12 @@ function get_semantic_tag_pill(string $tag_key): string {
 
   <!-- Editorial Minimal Footer -->
   <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
+
+  <!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
+  <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
+
+  <!-- Global Engineering Search Modal (Ctrl+K) -->
+  <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
   <script>
     (function() {

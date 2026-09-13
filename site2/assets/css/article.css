@@ -1,3 +1,36 @@
+/*
+ * article.css — Регламенты и лонгриды «ТЧП»
+ */
+
+:root {
+  --bg-card: var(--color-card, #ffffff);
+  --text-main: var(--color-ink, #141414);
+  --text-muted: var(--color-ink-muted, #6b665f);
+  --border-dark: var(--color-paper-border-dark, #d3cdc2);
+  --border: var(--color-paper-border, #e6e2da);
+  --border-width: 1.5px;
+  --accent-yellow: var(--color-accent, #eb5211);
+  --accent-orange: var(--color-accent, #eb5211);
+  --accent-green: var(--color-paper-subtle, #f3f0ea);
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --radius-lg: 16px;
+  --shadow-hover: 6px 6px 0px var(--color-paper-border-dark, #d3cdc2);
+  --shadow-color: var(--color-paper-border-dark, #d3cdc2);
+}
+
+html.dark {
+  --bg-card: var(--color-card, rgba(24, 27, 36, 0.85));
+  --text-main: var(--color-ink, #f3f4f6);
+  --text-muted: var(--color-ink-muted, #9ca3af);
+  --border-dark: var(--color-paper-border-dark, #373e52);
+  --border: var(--color-paper-border, #282d3b);
+  --accent-green: var(--color-paper-subtle, #191c24);
+  --shadow-hover: 6px 6px 0px rgba(0, 0, 0, 0.4);
+  --shadow-color: rgba(0, 0, 0, 0.4);
+}
+
 /* ===== BREADCRUMB ===== */
 .breadcrumb {
     font-family: var(--font-mono);
@@ -154,9 +187,16 @@
 /* ===== ARTICLE LAYOUT ===== */
 .article-layout {
     display: grid;
-    grid-template-columns: 1fr 280px;
-    gap: 2.5rem;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 2rem;
     margin-bottom: 4rem;
+}
+
+@media (max-width: 1024px) {
+    .article-layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
 }
 
 /* ===== ARTICLE CONTENT ===== */
@@ -164,9 +204,16 @@
     background: var(--bg-card);
     border: var(--border-width) solid var(--border);
     border-radius: 16px;
-    padding: 2.5rem;
+    padding: 1.5rem;
     box-shadow: 6px 6px 0px var(--shadow-color);
 }
+
+@media (min-width: 768px) {
+    .article-content {
+        padding: 2.5rem;
+    }
+}
+
 .article-content h2 {
     font-family: var(--font-serif);
     font-size: 1.85rem;
@@ -184,8 +231,8 @@
 }
 .article-content p {
     font-size: 1.05rem;
-    line-height: 1.8;
-    margin-bottom: 1.4rem;
+    line-height: 1.65;
+    margin-bottom: 1.25rem;
     color: var(--text-main);
 }
 .article-content ul, .article-content ol {
@@ -194,8 +241,8 @@
 }
 .article-content li {
     font-size: 1.05rem;
-    line-height: 1.75;
-    margin-bottom: 0.6rem;
+    line-height: 1.65;
+    margin-bottom: 0.5rem;
 }
 
 /* CALLOUT BLOCKS & TL;DR (Hand-Drawn Pencil / Felt Pen Note Effect) */
