@@ -138,14 +138,14 @@ $paginated = paginate($grid_articles, 4, $page_num);
  * - Orange (pill-orange / hl-orange): Thermal, soldering temperatures, copper, solder alloys, heating stations.
  * - Yellow (pill-yellow / hl-yellow): Chemistry, rosin, active fluxes, workshop master notes (post-it).
  * - Blue   (pill-blue   / hl-blue):   Standards (GOST, IPC), SMD precision, electronics, leakage currents.
- * - Pink   (pill-pink   / hl-pink):   Critical defect warnings, damage risks, low-melt demount alloys (Rose).
+ * - Orange / Amber (pill-orange / hl-orange): Thermal, soldering temperatures, copper, solder alloys, heating stations, defect warnings.
  */
 function get_semantic_tag_pill(string $tag_key): string {
     return match(strtolower($tag_key)) {
         'materials'          => 'pill-orange', // Металлы, сплавы, нагрев
         'basics'             => 'pill-yellow', // База, флюсы, канифоль
         'smd', 'tools'       => 'pill-blue',   // SMD компоненты, приборы, точность
-        'defects', 'oshibki' => 'pill-pink',   // Ошибки, брак, предупреждения
+        'defects', 'oshibki' => 'pill-orange', // Ошибки, брак, предупреждения
         default              => 'pill-blue',
     };
 }
@@ -269,17 +269,16 @@ function get_semantic_tag_pill(string $tag_key): string {
                - Orange = Metallurgy, solder alloys, heating
                - Yellow = Chemistry, fluxes, rosin
                - Blue   = Electronic parameters, precision, standards
-               - Pink   = Damage risks, critical warnings, demount alloys
           -->
           <p class="text-base sm:text-lg text-ink/90 font-serif leading-[1.65]">
             <?php if ($current_slug === 'materialy'): ?>
-              Разбираем металлургию и химию радиомонтажа: свойства припоев (<mark class="hl-orange">ПОС-61, SAC305</mark>), химию флюсов (<mark class="hl-yellow">RMA и No-Clean</mark>), риск разрушения шва от <mark class="hl-pink">сплава Розе</mark> и защиту от <mark class="hl-blue">токов утечки</mark>.
+              Разбираем металлургию и химию радиомонтажа: свойства припоев (<mark class="hl-orange">ПОС-61, SAC305</mark>), химию флюсов (<mark class="hl-yellow">RMA и No-Clean</mark>), риск разрушения шва от сплава Розе и защиту от <mark class="hl-blue">токов утечки</mark>.
             <?php elseif ($current_slug === 'start'): ?>
-              Первые шаги в радиомонтаже: выбор <mark class="hl-orange">паяльной станции</mark>, основы работы с <mark class="hl-yellow">канифолью</mark>, физика <mark class="hl-blue">смачиваемости меди</mark> и защита от <mark class="hl-pink">перегрева дорожек</mark>.
+              Первые шаги в радиомонтаже: выбор <mark class="hl-orange">паяльной станции</mark>, основы работы с <mark class="hl-yellow">канифолью</mark>, физика <mark class="hl-blue">смачиваемости меди</mark> и защита от перегрева дорожек.
             <?php elseif ($current_slug === 'praktika'): ?>
-              Техника точного ручного монтажа: работа с компонентами <mark class="hl-blue">SMD 0402–1206</mark>, геометрия картриджей <mark class="hl-orange">T12 и C245</mark>, дозировка <mark class="hl-yellow">паяльной пасты</mark> и пайка термочувствительных <mark class="hl-pink">микросхем QFN</mark>.
+              Техника точного ручного монтажа: работа с компонентами <mark class="hl-blue">SMD 0402–1206</mark>, геометрия картриджей <mark class="hl-orange">T12 и C245</mark>, дозировка <mark class="hl-yellow">паяльной пасты</mark> и пайка термочувствительных микросхем QFN.
             <?php elseif ($current_slug === 'oshibki'): ?>
-              Диагностика и устранение типового брака: критический дефект <mark class="hl-pink">tombstoning и трещины</mark>, паразитные <mark class="hl-blue">оловянные перемычки</mark>, неактивированный флюс в <mark class="hl-yellow">холодном шве</mark> и сбои <mark class="hl-orange">термопрофиля</mark>.
+              Диагностика и устранение типового брака: критический дефект <mark class="hl-orange">tombstoning и трещины</mark>, паразитные <mark class="hl-blue">оловянные перемычки</mark>, неактивированный флюс в <mark class="hl-yellow">холодном шве</mark> и сбои термопрофиля.
             <?php else: ?>
               <?= e($current_rubric['lead']) ?>
             <?php endif; ?>
@@ -292,7 +291,7 @@ function get_semantic_tag_pill(string $tag_key): string {
            - start: Yellow (Basics/Rosin)
            - materialy: Orange (Alloys/Thermal)
            - praktika: Blue (SMD/Instruments)
-           - oshibki: Pink (Defects/Damage)
+           - oshibki: Amber (Defects/Damage)
       -->
       <div class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs">
         <?php
@@ -300,7 +299,7 @@ function get_semantic_tag_pill(string $tag_key): string {
             ['slug' => 'start',     'label' => 'Начать паять',     'dot' => 'bg-amber-400'],
             ['slug' => 'materialy', 'label' => 'Материалы и сплавы', 'dot' => 'bg-orange-500'],
             ['slug' => 'praktika',  'label' => 'Практика монтажа',   'dot' => 'bg-sky-500'],
-            ['slug' => 'oshibki',   'label' => 'Проблемы и дефекты', 'dot' => 'bg-pink-500'],
+            ['slug' => 'oshibki',   'label' => 'Проблемы и дефекты', 'dot' => 'bg-amber-500'],
         ];
         foreach ($nav_pills as $pill):
             $is_curr = ($current_slug === $pill['slug']);
@@ -540,23 +539,21 @@ function get_semantic_tag_pill(string $tag_key): string {
             </div>
           </div>
 
-          <!-- 🌸 PINK POST-IT NOTE: Critical Defect Warning (Rose Alloy Fragility Risk) -->
-          <div class="sticker-pink p-3.5 rounded-lg space-y-1.5 relative sketch-border shadow-sm rotate-[0.7deg]">
-            <div class="tape-strip tape-pink w-8 -top-1.5 right-5 rotate-[2deg]"></div>
-            
-            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-[#f472b6]/35 pb-1">
-              <span class="flex items-center gap-1.5">
+          <!-- ⚠️ WARNING CALLOUT: Critical Defect Warning (Rose Alloy Fragility Risk) -->
+          <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-1.5 border-l-4 border-l-amber-500 shadow-sm">
+            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-paper-border pb-1">
+              <span class="flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
                 <span>⚠️</span>
                 Риск брака // Сплав Розе
               </span>
-              <span class="pill-pink text-[9px] px-1 py-0.2 rounded font-mono font-bold">ОСТОРОЖНО</span>
+              <span class="pill-orange text-[9px] px-1.5 py-0.2 rounded font-mono font-bold">ОСТОРОЖНО</span>
             </div>
 
             <p class="font-hand text-[15px] leading-snug italic font-semibold">
               «Сплав Розе (94°C) — строго для демонтажа! После снятия разъёма остатки сплава нужно насухо вычистить оплёткой, иначе пайка рассыплется от малейшей вибрации.»
             </p>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-[9.5px] opacity-80 border-t border-[#f472b6]/25">
+            <div class="pt-1 flex items-center justify-between font-mono text-[9.5px] opacity-80 border-t border-paper-border">
               <span>Хрупкость шва</span>
               <span class="font-bold">Бинарная эвтектика</span>
             </div>
@@ -565,7 +562,7 @@ function get_semantic_tag_pill(string $tag_key): string {
           <!-- WORKBENCH TOOLS: Semantically Coded Shortcuts:
                - #temp:   Orange (Thermal window)
                - #iron:   Blue   (Tooling/Stations)
-               - #defect: Pink   (Defects/Troubleshooting)
+               - #defect: Orange (Defects/Troubleshooting)
           -->
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm">
             <div class="flex items-center justify-between font-mono text-[10.5px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
@@ -589,12 +586,12 @@ function get_semantic_tag_pill(string $tag_key): string {
                 <span class="pill-blue text-[10px] px-1.5 py-0.2 rounded font-bold">#iron</span>
               </a>
 
-              <a href="/interactive.php#defect" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-pink-400 text-ink transition-colors group">
+              <a href="/interactive.php#defect" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group">
                 <div>
-                  <div class="font-bold group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors text-[11.5px]">🔍 Дерево дефектов</div>
+                  <div class="font-bold group-hover:text-accent transition-colors text-[11.5px]">🔍 Дерево дефектов</div>
                   <div class="text-[10.5px] text-ink-muted">Диагностика причин брака</div>
                 </div>
-                <span class="pill-pink text-[10px] px-1.5 py-0.2 rounded font-bold">#defect</span>
+                <span class="pill-orange text-[10px] px-1.5 py-0.2 rounded font-bold">#defect</span>
               </a>
             </div>
           </div>

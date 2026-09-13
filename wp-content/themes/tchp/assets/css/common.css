@@ -271,10 +271,9 @@ input[type="range"].range-slider::-moz-range-thumb {
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   WORKBENCH COLORFUL STICKERS, TAPES & HIGHLIGHTERS (Pink, Blue, Yellow, Orange)
+   WORKBENCH TASTEFUL STICKERS, TAPES & HIGHLIGHTERS (Yellow, Blue, Orange)
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Tape Strips */
 /* Tape Strips (Reduced by 30%: height 10px, subtle dashed borders) */
 .tape-strip {
   position: absolute;
@@ -287,7 +286,6 @@ input[type="range"].range-slider::-moz-range-thumb {
   backdrop-filter: blur(1px);
 }
 .tape-yellow { background: rgba(254, 240, 138, 0.75); }
-.tape-pink   { background: rgba(244, 114, 182, 0.65); }
 .tape-blue   { background: rgba(125, 211, 252, 0.7); }
 .tape-orange { background: rgba(251, 146, 60, 0.65); }
 
@@ -302,18 +300,6 @@ html.dark .sticker-yellow {
   background: rgba(234, 179, 8, 0.12);
   border-color: rgba(234, 179, 8, 0.5);
   color: #fef08a;
-}
-
-.sticker-pink {
-  background: #fdf2f8;
-  border: 1px solid #f472b6;
-  color: #831843;
-  box-shadow: 2px 3px 10px rgba(0,0,0,0.06);
-}
-html.dark .sticker-pink {
-  background: rgba(236, 72, 153, 0.12);
-  border-color: rgba(244, 114, 182, 0.5);
-  color: #fbcfe8;
 }
 
 .sticker-blue {
@@ -354,19 +340,6 @@ html.dark .hl-yellow {
   color: #fef08a;
 }
 
-.hl-pink {
-  background: linear-gradient(180deg, transparent 35%, rgba(251, 207, 232, 0.85) 35%);
-  color: inherit;
-  padding: 0 0.22em;
-  border-radius: 1px;
-  box-decoration-break: clone;
-  -webkit-box-decoration-break: clone;
-}
-html.dark .hl-pink {
-  background: linear-gradient(180deg, transparent 35%, rgba(236, 72, 153, 0.4) 35%);
-  color: #fbcfe8;
-}
-
 .hl-blue {
   background: linear-gradient(180deg, transparent 35%, rgba(186, 230, 253, 0.85) 35%);
   color: inherit;
@@ -394,19 +367,6 @@ html.dark .hl-orange {
 }
 
 /* Tag Pills (Reduced by 30% in padding & size) */
-.pill-pink {
-  background: rgba(253, 242, 248, 0.85);
-  border: 1px solid rgba(244, 114, 182, 0.55);
-  color: #db2777;
-  font-size: 10px;
-  padding: 0.1rem 0.38rem;
-}
-html.dark .pill-pink {
-  background: rgba(236, 72, 153, 0.15);
-  border-color: rgba(244, 114, 182, 0.4);
-  color: #f472b6;
-}
-
 .pill-blue {
   background: rgba(240, 249, 255, 0.85);
   border: 1px solid rgba(56, 189, 248, 0.55);
