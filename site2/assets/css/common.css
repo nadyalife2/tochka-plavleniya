@@ -8,14 +8,16 @@
   --color-paper-subtle: #f8fafc;
   --color-paper-border: #e2e8f0;
   --color-paper-border-dark: #cbd5e1;
-  --color-ink: #0f172a;       /* Глубокий графитовый (slate-900) вместо жесткого черного #000 */
-  --color-ink-muted: #64748b; /* Благородный нейтральный серый (slate-500) */
+  --color-ink: #1e293b;       /* Глубокий графитовый (slate-800) вместо жесткого черного #000 */
+  --color-ink-muted: #64748b; /* Приглушенный серо-стальной (slate-500) */
   --color-ink-faint: #94a3b8; /* Мягкий серый для подписей и разделителей (slate-400) */
+  --color-tech-navy: #0f172a; /* Глубокий графитово-синий компаньон для шапки и тех-плашек */
   --color-callout: #f8fafc;
-  --color-card: rgba(255, 255, 255, 0.95);
-  --color-accent: #2563eb;    /* Глубокий технологичный синий для интерактива */
-  --color-link: #2563eb;
-  --color-link-hover: #1d4ed8;
+  --color-card: rgba(255, 255, 255, 0.98);
+  --color-accent: #facc15;    /* Фирменный золотисто-желтый акцент */
+  --color-accent-amber: #eab308;
+  --color-link: #1e3a8a;      /* Глубокий индиго-синий для акцентных ссылок */
+  --color-link-hover: #2563eb;
   --dot-color: #e2e8f0;
   --bg-color: #ffffff;        /* Чистый белый фон страницы */
 
@@ -24,7 +26,7 @@
   --bg-paper: var(--color-paper);
   --text-main: var(--color-ink);
   --text-muted: var(--color-ink-muted);
-  --accent-yellow: #facc15;   /* Акцентный желтый (строго дозированно для логотипа и иконок) */
+  --accent-yellow: #facc15;   /* Акцентный желтый (строго дозированно) */
   --accent-orange: #2563eb;
   --accent-blue: #2563eb;
   --border: var(--color-paper-border);
@@ -113,6 +115,109 @@ body {
   font-size: 1.05em;
   line-height: 0.9;
 }
+
+/* DEEP NAVY / INDIGO ENGINEERING HEADER (Companion Dark Anchor) */
+.header-tech-navy {
+  background-color: #0f172a !important;
+  border-bottom: 1px solid #1e293b !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.15);
+}
+.header-tech-navy .logo {
+  color: #f8fafc !important;
+}
+.header-tech-navy .logo:hover {
+  opacity: 0.9;
+}
+.header-tech-navy .logo span {
+  background: #facc15;
+  color: #0f172a;
+}
+.header-tech-navy .nav-link {
+  color: #94a3b8 !important;
+}
+.header-tech-navy .nav-link:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.07) !important;
+}
+.header-tech-navy .nav-link.active {
+  color: #facc15 !important;
+  border-bottom: 2px solid #facc15 !important;
+  background: rgba(250, 204, 21, 0.1) !important;
+}
+.header-tech-navy #search-modal-trigger {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #e2e8f0 !important;
+}
+.header-tech-navy #search-modal-trigger:hover {
+  border-color: #64748b !important;
+}
+.header-tech-navy #search-modal-trigger .material-symbols-outlined {
+  color: #facc15 !important;
+}
+.header-tech-navy #search-modal-trigger kbd {
+  background: #0f172a !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+.header-tech-navy #theme-toggle {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #facc15 !important;
+}
+.header-tech-navy #theme-toggle:hover {
+  border-color: #64748b !important;
+}
+.header-tech-navy .nav {
+  gap: 4px;
+}
+.header-tech-navy .nav-link {
+  font-size: 13px !important;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+.header-tech-navy .btn-workbench-nav {
+  background: #facc15 !important;
+  color: #0f172a !important;
+  border: 1px solid #eab308 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+}
+.header-tech-navy .btn-workbench-nav:hover {
+  background: #fde047 !important;
+  box-shadow: 0 0 14px rgba(250, 204, 21, 0.35);
+}
+
+/* TECHNICAL FLOW STRIP (Companion Navy Dark Plate) */
+.technical-strip-navy {
+  background-color: #0f172a !important;
+  border: 1px solid #1e293b !important;
+  color: #cbd5e1 !important;
+  border-radius: 8px;
+}
+.technical-strip-navy .tech-val {
+  color: #facc15 !important;
+  font-weight: 700;
+}
+.technical-strip-navy .tech-badge {
+  color: #facc15 !important;
+  background: rgba(250, 204, 21, 0.12) !important;
+  border: 1px solid rgba(250, 204, 21, 0.35) !important;
+}
+
+/* SOFT RED / TERRACOTTA CAUTION ALERT BOX */
+.box-caution-red {
+  background-color: #fef2f2 !important;
+  border: 2px dashed #fca5a5 !important;
+  color: #991b1b !important;
+}
+html.dark .box-caution-red {
+  background-color: rgba(153, 27, 27, 0.15) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+  color: #fca5a5 !important;
+}
+
 
 /* HAND-DRAWN FELT-TIP MARKER STROKES */
 mark, .marker-yellow {
