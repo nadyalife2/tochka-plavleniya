@@ -275,20 +275,21 @@ input[type="range"].range-slider::-moz-range-thumb {
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* Tape Strips */
+/* Tape Strips (Reduced by 30%: height 10px, subtle dashed borders) */
 .tape-strip {
   position: absolute;
-  height: 14px;
-  border-left: 1px dashed rgba(0,0,0,0.2);
-  border-right: 1px dashed rgba(0,0,0,0.2);
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  height: 10px;
+  border-left: 1px dashed rgba(0,0,0,0.18);
+  border-right: 1px dashed rgba(0,0,0,0.18);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
   pointer-events: none;
   z-index: 10;
   backdrop-filter: blur(1px);
 }
-.tape-yellow { background: rgba(254, 240, 138, 0.85); }
-.tape-pink   { background: rgba(244, 114, 182, 0.75); }
-.tape-blue   { background: rgba(125, 211, 252, 0.8); }
-.tape-orange { background: rgba(251, 146, 60, 0.75); }
+.tape-yellow { background: rgba(254, 240, 138, 0.75); }
+.tape-pink   { background: rgba(244, 114, 182, 0.65); }
+.tape-blue   { background: rgba(125, 211, 252, 0.7); }
+.tape-orange { background: rgba(251, 146, 60, 0.65); }
 
 /* Stickers & Post-its */
 .sticker-yellow {
@@ -339,101 +340,109 @@ html.dark .sticker-orange {
   color: #fed7aa;
 }
 
-/* Highlighters */
+/* Highlighters (Reduced by 30%: sleek bottom-felt stroke, soft pastels) */
 .hl-yellow {
-  background: #fef08a;
-  color: #141414;
-  padding: 0.1em 0.35em;
-  border-radius: 2px;
+  background: linear-gradient(180deg, transparent 35%, rgba(254, 240, 138, 0.85) 35%);
+  color: inherit;
+  padding: 0 0.22em;
+  border-radius: 1px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
 html.dark .hl-yellow {
-  background: #a16207;
-  color: #fefce8;
+  background: linear-gradient(180deg, transparent 35%, rgba(202, 138, 4, 0.45) 35%);
+  color: #fef08a;
 }
 
 .hl-pink {
-  background: #fbcfe8;
-  color: #141414;
-  padding: 0.1em 0.35em;
-  border-radius: 2px;
+  background: linear-gradient(180deg, transparent 35%, rgba(251, 207, 232, 0.85) 35%);
+  color: inherit;
+  padding: 0 0.22em;
+  border-radius: 1px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
 html.dark .hl-pink {
-  background: #be185d;
-  color: #fdf2f8;
+  background: linear-gradient(180deg, transparent 35%, rgba(236, 72, 153, 0.4) 35%);
+  color: #fbcfe8;
 }
 
 .hl-blue {
-  background: #bae6fd;
-  color: #141414;
-  padding: 0.1em 0.35em;
-  border-radius: 2px;
+  background: linear-gradient(180deg, transparent 35%, rgba(186, 230, 253, 0.85) 35%);
+  color: inherit;
+  padding: 0 0.22em;
+  border-radius: 1px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
 html.dark .hl-blue {
-  background: #0369a1;
-  color: #f0f9ff;
+  background: linear-gradient(180deg, transparent 35%, rgba(14, 165, 233, 0.4) 35%);
+  color: #bae6fd;
 }
 
 .hl-orange {
-  background: #fed7aa;
-  color: #141414;
-  padding: 0.1em 0.35em;
-  border-radius: 2px;
+  background: linear-gradient(180deg, transparent 35%, rgba(254, 215, 170, 0.85) 35%);
+  color: inherit;
+  padding: 0 0.22em;
+  border-radius: 1px;
   box-decoration-break: clone;
   -webkit-box-decoration-break: clone;
 }
 html.dark .hl-orange {
-  background: #c2410c;
-  color: #fff7ed;
+  background: linear-gradient(180deg, transparent 35%, rgba(249, 115, 22, 0.4) 35%);
+  color: #fed7aa;
 }
 
-/* Tag Pills */
+/* Tag Pills (Reduced by 30% in padding & size) */
 .pill-pink {
-  background: #fdf2f8;
-  border: 1px solid #f472b6;
+  background: rgba(253, 242, 248, 0.85);
+  border: 1px solid rgba(244, 114, 182, 0.55);
   color: #db2777;
+  font-size: 10px;
+  padding: 0.1rem 0.38rem;
 }
 html.dark .pill-pink {
-  background: rgba(236, 72, 153, 0.2);
-  border-color: #f472b6;
+  background: rgba(236, 72, 153, 0.15);
+  border-color: rgba(244, 114, 182, 0.4);
   color: #f472b6;
 }
 
 .pill-blue {
-  background: #f0f9ff;
-  border: 1px solid #38bdf8;
+  background: rgba(240, 249, 255, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.55);
   color: #0284c7;
+  font-size: 10px;
+  padding: 0.1rem 0.38rem;
 }
 html.dark .pill-blue {
-  background: rgba(14, 165, 233, 0.2);
-  border-color: #38bdf8;
+  background: rgba(14, 165, 233, 0.15);
+  border-color: rgba(56, 189, 248, 0.4);
   color: #38bdf8;
 }
 
 .pill-yellow {
-  background: #fefce8;
-  border: 1px solid #eab308;
+  background: rgba(254, 252, 232, 0.85);
+  border: 1px solid rgba(234, 179, 8, 0.55);
   color: #a16207;
+  font-size: 10px;
+  padding: 0.1rem 0.38rem;
 }
 html.dark .pill-yellow {
-  background: rgba(234, 179, 8, 0.2);
-  border-color: #eab308;
+  background: rgba(234, 179, 8, 0.15);
+  border-color: rgba(234, 179, 8, 0.4);
   color: #facc15;
 }
 
 .pill-orange {
-  background: #fff7ed;
-  border: 1px solid #f97316;
+  background: rgba(255, 247, 237, 0.85);
+  border: 1px solid rgba(249, 115, 22, 0.55);
   color: #ea580c;
+  font-size: 10px;
+  padding: 0.1rem 0.38rem;
 }
 html.dark .pill-orange {
-  background: rgba(249, 115, 22, 0.2);
-  border-color: #f97316;
+  background: rgba(249, 115, 22, 0.15);
+  border-color: rgba(249, 115, 22, 0.4);
   color: #fb923c;
 }
 
