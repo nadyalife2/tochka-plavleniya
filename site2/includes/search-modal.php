@@ -204,7 +204,7 @@
       badge: "Международный стандарт",
       desc: "Определяет требования к галтелям припоя, смачиваемости выводов и дефектам для изделий Класса 1, 2 и 3 (High Reliability).",
       url: "/article.php",
-      badgeColor: "bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-300"
+      badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     {
       title: "J-STD-020E (Классификация влагочувствительности MSL)",
@@ -212,7 +212,7 @@
       badge: "Reflow термопрофили",
       desc: "Регламентирует максимальные температуры пика (260°C) и времена выдержки для предотвращения эффекта попкорна в корпусах микросхем.",
       url: "/article.php#thermal-zones",
-      badgeColor: "bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-300"
+      badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     {
       title: "ГОСТ 21931-76 (Припои оловянно-свинцовые)",
@@ -220,7 +220,7 @@
       badge: "ГОСТ РФ // Сплавы",
       desc: "Государственный стандарт на химический состав, марки и температуры солидус/ликвидус отечественных припоев серии ПОС.",
       url: "/category.php?slug=materialy",
-      badgeColor: "bg-blue-100 dark:bg-blue-950/40 text-blue-800 dark:text-blue-300 border-blue-300"
+      badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     }
   ];
 

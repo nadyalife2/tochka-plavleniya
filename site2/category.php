@@ -150,94 +150,17 @@ function get_semantic_tag_pill(string $tag_key): string {
     };
 }
 ?>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title><?= e($page_title) ?> — Точка Плавления // ТЧП</title>
-  <meta name="description" content="<?= e($current_rubric['lead']) ?>">
-
-  <!-- OpenGraph Meta -->
-  <meta property="og:type" content="website"/>
-  <meta property="og:title" content="<?= e($page_title) ?>"/>
-  <meta property="og:description" content="<?= e($current_rubric['lead']) ?>"/>
-  <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
-  
-  <!-- Immediate Theme Init Script (Zero FOUC) -->
-  <script>
-    (function() {
-      const saved = localStorage.getItem('tp_theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (saved === 'dark' || (!saved && prefersDark)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    })();
-  </script>
-
-  <!-- Preconnect for Fonts & Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
-  <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/build.css">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-
-  <!-- Common Design Tokens & Base Styles -->
-  <link rel="stylesheet" href="assets/css/common.css">
-
+$page_desc = $current_rubric['lead'];
+$current_page = $current_slug;
+ob_start();
+?>
   <style>
     .font-hand { font-family: 'Caveat', cursive; }
   </style>
-</head>
-<body class="font-sans min-h-screen flex flex-col justify-between text-[15px] leading-[1.65]">
-
-  <!-- Top Minimal Header Bar (Consistent with index.php & interactive.php) -->
-  <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
-      
-      <!-- Brand mark & Navigation -->
-      <div class="flex items-center gap-6">
-        <a class="logo" href="/">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-
-        <!-- Desktop Nav -->
-        <?php 
-        $current_page = $current_slug;
-        include __DIR__ . '/includes/header-nav.php'; 
-        ?>
-      </div>
-
-      <!-- Right Action / Search, Dark Mode Toggle & Workbench -->
-      <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Global Search Trigger -->
-        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
-          <span class="material-symbols-outlined text-[18px] text-accent">search</span>
-          <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
-          <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
-        </button>
-
-        <!-- Dark/Light Mode Switcher (Sketch Style) -->
-        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
-          <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-          <svg class="w-4 h-4 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4.5"></circle>
-            <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
-          </svg>
-          <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
-        </button>
-
-        <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/interactive.php" aria-label="Открыть интерактивный верстак">
-          <span>Верстак / Тулзы</span>
-          <span class="material-symbols-outlined text-[14px]">build</span>
-        </a>
-      </div>
-    </div>
-  </header>
+<?php
+$extra_head = ob_get_clean();
+include __DIR__ . '/includes/header.php';
+?>
 
   <!-- Main Content -->
   <main class="w-full flex-grow pt-8 pb-16">
@@ -432,8 +355,8 @@ function get_semantic_tag_pill(string $tag_key): string {
                   <span class="text-ink-faint">·</span>
                   <span><?= e($featured_article['date'] ?? '2026') ?></span>
                 </div>
-                <a class="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300 hover:underline flex items-center gap-1 group" href="<?= $f_url ?>">
-                  <span class="underline decoration-blue-600 dark:decoration-blue-400 decoration-1 underline-offset-4">Читать статью полностью</span>
+                <a class="text-amber-600 dark:text-amber-500 font-semibold hover:text-amber-700 dark:hover:text-amber-400 hover:underline flex items-center gap-1 group" href="<?= $f_url ?>">
+                  <span class="underline decoration-amber-600 dark:decoration-amber-400 decoration-1 underline-offset-4">Читать статью полностью</span>
                   <span>→</span>
                 </a>
               </div>
@@ -469,7 +392,7 @@ function get_semantic_tag_pill(string $tag_key): string {
                   </div>
 
                   <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                    <a class="hover:text-blue-600 dark:hover:text-blue-400 hover:underline transition-colors" href="<?= $art_url ?>">
+                    <a class="hover:text-amber-600 dark:hover:text-amber-500 hover:underline transition-colors" href="<?= $art_url ?>">
                       <?= e($article['title']) ?>
                     </a>
                   </h3>
@@ -481,7 +404,7 @@ function get_semantic_tag_pill(string $tag_key): string {
 
                 <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-muted font-hand text-base font-bold italic"><?= e($article['author'] ?? 'Мария Канифоль') ?></span>
-                  <a class="text-blue-600 dark:text-blue-400 font-semibold hover:text-blue-700 dark:hover:text-blue-300 hover:underline flex items-center gap-0.5" href="<?= $art_url ?>">
+                  <a class="text-amber-600 dark:text-amber-500 font-semibold hover:text-amber-700 dark:hover:text-amber-400 hover:underline flex items-center gap-0.5" href="<?= $art_url ?>">
                     <span>Читать</span>
                     <span>→</span>
                   </a>
@@ -522,13 +445,13 @@ function get_semantic_tag_pill(string $tag_key): string {
               <span class="text-[10px] opacity-75">FLUX-QC</span>
             </div>
 
-            <p class="font-hand text-base leading-snug italic font-semibold text-slate-800 dark:text-slate-100">
+            <p class="font-hand text-base leading-snug italic font-semibold text-ink dark:text-slate-100">
               «Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции, а не заливай всё флюсом!»
             </p>
 
             <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-amber-300/40 text-slate-600 dark:text-slate-400">
               <span>Норма нагрева флюса</span>
-              <span class="font-bold text-slate-800 dark:text-slate-200">IPC-TM-650</span>
+              <span class="font-bold text-ink dark:text-slate-200">IPC-TM-650</span>
             </div>
           </div>
 
@@ -536,7 +459,7 @@ function get_semantic_tag_pill(string $tag_key): string {
           <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm relative">
             <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
-                <span class="material-symbols-outlined text-[14px] text-blue-600 dark:text-blue-400">thermostat</span>
+                <span class="material-symbols-outlined text-[14px] text-teal-600 dark:text-teal-400">thermostat</span>
                 Ликвидус металлов
               </span>
               <span class="pill-blue text-[10px] font-mono uppercase px-1.5 py-0.5 rounded">ГОСТ 21931</span>
@@ -562,7 +485,7 @@ function get_semantic_tag_pill(string $tag_key): string {
             </div>
 
             <div class="pt-0.5 text-right">
-              <a href="/interactive.php#table" class="font-mono text-[11px] text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 hover:underline font-bold">
+              <a href="/interactive.php#table" class="font-mono text-[11px] text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 hover:underline font-bold">
                 Вся таблица припоев (9 марок) →
               </a>
             </div>

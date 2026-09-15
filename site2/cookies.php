@@ -3,14 +3,11 @@
  * cookies.php — Политика использования файлов cookie
  * Точка Плавления
  */
-require_once __DIR__ . '/includes/functions.php';
-
-$page_title   = 'Политика куки — Точка Плавления';
-$page_desc    = 'Информация об использовании файлов cookie на портале «Точка Плавления».';
+$page_title = "Политика использования файлов cookie — ТОЧКА ПЛАВЛЕНИЯ";
+$page_desc = "Информация об использовании файлов cookie и аналогичных технологий на портале Точка Плавления.";
 $current_page = 'cookies';
-$extra_css    = '/assets/css/article.css';
-
-require_once __DIR__ . '/includes/header.php';
+$extra_head = '<link rel="stylesheet" href="/assets/css/article.css">';
+include __DIR__ . '/includes/header.php';
 ?>
 
 <div class="section" style="max-width: 900px;">

@@ -1,78 +1,11 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 ?>
-<!DOCTYPE html>
-<html lang="ru" class="light">
-<head>
-  <meta charset="UTF-8"/>
-  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>Пользовательское соглашение — ТОЧКА ПЛАВЛЕНИЯ</title>
-  <meta name="description" content="Пользовательское соглашение, условия использования материалов и инженерный отказ от ответственности портала Точка Плавления."/>
-
-  <!-- Immediate Theme Init Script -->
-  <script>
-    (function() {
-      const saved = localStorage.getItem('tp_theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (saved === 'dark' || (!saved && prefersDark)) {
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
-      } else {
-        document.documentElement.classList.add('light');
-        document.documentElement.classList.remove('dark');
-      }
-    })();
-  </script>
-
-  <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
-  <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/build.css">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-
-  <!-- Common Design Tokens & Base Styles -->
-  <link rel="stylesheet" href="assets/css/common.css">
-</head>
-<body class="min-h-screen flex flex-col">
-
-  <!-- Header -->
-  <header class="w-full border-b border-paper-border bg-paper/95 sticky top-0 z-40 backdrop-blur-sm">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
-      <div class="flex items-center gap-6">
-        <a class="logo" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-        <!-- Desktop Nav -->
-        <?php 
-        $current_page = 'terms';
-        include __DIR__ . '/includes/header-nav.php'; 
-        ?>
-      </div>
-
-      <div class="flex items-center gap-2 sm:gap-3">
-        <!-- Search Trigger (Ctrl+K) -->
-        <button id="search-modal-trigger" type="button" class="min-h-[40px] px-2.5 sm:px-3 py-1.5 border border-paper-border-dark dark:border-paper-border bg-paper hover:bg-paper-subtle text-ink font-mono text-xs flex items-center gap-2 rounded transition-colors cursor-pointer" title="Поиск по справочнику (Ctrl+K)" aria-label="Поиск">
-          <span class="material-symbols-outlined text-[16px]">search</span>
-          <span class="hidden sm:inline text-ink-muted">Поиск</span>
-          <kbd class="hidden sm:inline-block px-1 py-0.5 text-[10px] bg-paper-subtle border border-paper-border rounded text-ink-faint">Ctrl K</kbd>
-        </button>
-
-        <!-- Theme Toggle (Sketch Style) -->
-        <button id="theme-toggle" type="button" class="sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
-          <svg class="w-3.5 h-3.5 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-          <svg class="w-3.5 h-3.5 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4.5"></circle>
-            <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
-          </svg>
-          <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
-        </button>
-
-        <a class="min-h-[40px] inline-flex items-center gap-1.5 px-3 py-1.5 border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs sm:text-sm font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
-          <span>Верстак</span>
-          <span class="material-symbols-outlined text-[13px]">build</span>
-        </a>
-      </div>
-    </div>
-  </header>
+$page_title = "Пользовательское соглашение — ТОЧКА ПЛАВЛЕНИЯ";
+$page_desc = "Пользовательское соглашение, условия использования материалов и инженерный отказ от ответственности портала Точка Плавления.";
+$current_page = 'terms';
+include __DIR__ . '/includes/header.php';
+?>
 
   <!-- Main Content -->
   <main class="w-full flex-grow pt-8 pb-20">

@@ -10,91 +10,12 @@ foreach ($articles as $article) {
         $filtered_articles[] = $article;
     }
 }
+$page_title = "Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ";
+$page_desc = "Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ.";
+$current_page = 'index';
+include __DIR__ . '/includes/header.php';
 ?>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ</title>
-  <meta name="description" content="Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ.">
 
-  <!-- OpenGraph Meta -->
-  <meta property="og:type" content="website"/>
-  <meta property="og:title" content="Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ"/>
-  <meta property="og:description" content="Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ."/>
-  <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
-  
-  <!-- Immediate Theme Init Script (Zero FOUC) -->
-  <script>
-    (function() {
-      const saved = localStorage.getItem('tp_theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (saved === 'dark' || (!saved && prefersDark)) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    })();
-  </script>
-
-  <!-- Preconnect for Icons -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
-  <link rel="stylesheet" href="assets/css/fonts.css">
-  <link rel="stylesheet" href="assets/css/build.css">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-
-  <!-- Common Design Tokens & Base Styles -->
-  <link rel="stylesheet" href="assets/css/common.css">
-</head>
-<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
-
-  <!-- Top Minimal Header Bar -->
-  <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
-      
-      <!-- Brand mark & Title -->
-      <div class="flex items-center gap-6">
-        <a class="logo" href="index.php">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
-
-        <!-- Desktop Nav -->
-        <?php 
-        $current_page = 'index';
-        include __DIR__ . '/includes/header-nav.php'; 
-        ?>
-      </div>
-
-      <!-- Right Action / Search, Dark Mode Toggle & Workbench -->
-      <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-        <!-- Global Search Trigger -->
-        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[44px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
-          <span class="material-symbols-outlined text-[18px] text-accent">search</span>
-          <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
-          <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
-        </button>
-
-        <!-- Dark/Light Mode Switcher (Sketch Style) -->
-        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[44px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
-          <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-          </svg>
-          <svg class="w-4 h-4 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="4.5"></circle>
-            <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
-          </svg>
-          <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
-        </button>
-
-        <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php" aria-label="Открыть интерактивный верстак инженера">
-          <span>Верстак / Тулзы</span>
-          <span class="material-symbols-outlined text-[14px]">build</span>
-        </a>
-      </div>
-    </div>
-  </header>
 
   <!-- Main Container -->
   <main class="w-full flex-grow pt-8 pb-16">
@@ -115,7 +36,7 @@ foreach ($articles as $article) {
           <div class="relative inline-block mb-1">
             <div class="absolute -top-2 left-6 w-10 h-3 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-sm rotate-[-2deg] z-10 pointer-events-none" style="backdrop-filter: blur(1px);"></div>
             <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#fffdf5] dark:bg-[#ca8a04]/15 border border-[#fde047] dark:border-[#ca8a04]/40 text-ink font-mono text-[11px] shadow-sm rotate-[-1.2deg] sketch-border">
-              <span class="w-1.5 h-1.5 rounded-full bg-ink"></span>
+              <span class="w-2 h-2 rounded-full bg-[#2dd4bf] shadow-[0_0_6px_rgba(45,212,191,0.8)] inline-block"></span>
               <span class="font-bold tracking-wider uppercase">ВЕРСТАК // QC PASSED 2026</span>
               <span class="text-ink-faint">|</span>
               <span class="text-[10px] text-ink-muted">ПРАКТИКА БЕЗ ТЕОРИИ</span>
@@ -155,7 +76,7 @@ foreach ($articles as $article) {
               <span>Инженерный калькулятор</span>
             </a>
             <div class="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-ink bg-[#fffdf5] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/50 px-3 py-1 min-h-[36px] shadow-sm sketch-border" style="transform: rotate(-0.5deg);">
-              <span class="w-1.5 h-1.5 rounded-full bg-ink"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-[#2dd4bf] shadow-[0_0_6px_rgba(45,212,191,0.8)] inline-block"></span>
               <span class="font-medium">rev 2.4.1 актуализирован</span>
             </div>
           </div>
@@ -212,7 +133,7 @@ foreach ($articles as $article) {
             <!-- Title & Excerpt -->
             <div class="space-y-3">
               <h2 class="text-2xl sm:text-[28px] font-bold text-ink tracking-tight leading-[1.2]">
-                <a class="hover:text-[#2980b9] dark:hover:text-[#3498db] hover:underline decoration-[#2980b9] dark:decoration-[#3498db] decoration-1 underline-offset-4 transition-colors" href="article.php">
+                <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline decoration-[#d97706] dark:decoration-[#f59e0b] decoration-1 underline-offset-4 transition-colors" href="article.php">
                   Температурные профили: как не перегреть плату за $300
                 </a>
               </h2>
@@ -240,7 +161,7 @@ foreach ($articles as $article) {
                 <span class="text-ink-faint">·</span>
                 <span>10 авг 2026</span>
               </div>
-              <a class="text-[#2980b9] dark:text-[#3498db] font-bold hover:text-[#3498db] dark:hover:text-[#5dade2] hover:underline flex items-center gap-1.5 group" href="article.php">
+              <a class="text-ink font-bold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline flex items-center gap-1.5 group" href="article.php">
                 <span>Читать регламент →</span>
               </a>
             </div>
@@ -261,7 +182,7 @@ foreach ($articles as $article) {
                   <span>~4 мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#2980b9] dark:hover:text-[#3498db] hover:underline transition-colors" href="article.php">SMD 0402 vs 0603: что выбрать для прототипа</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php">SMD 0402 vs 0603: что выбрать для прототипа</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Плотность монтажа против ремонтопригодности — детальный анализ паразитных емкостей и удобства ручной пайки на верстаке.
@@ -269,7 +190,7 @@ foreach ($articles as $article) {
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">Компоненты</span>
-                <a class="text-[#2980b9] dark:text-[#3498db] font-semibold hover:text-[#3498db] dark:hover:text-[#5dade2] hover:underline" href="article.php">Подробнее →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php">Подробнее →</a>
               </div>
             </article>
 
@@ -284,7 +205,7 @@ foreach ($articles as $article) {
                   <span>~6 мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#2980b9] dark:hover:text-[#3498db] hover:underline transition-colors" href="article.php">Жала паяльника: T12 против JBC C245 на верстаке</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php">Жала паяльника: T12 против JBC C245 на верстаке</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Сравниваем скорость компенсации тепла на земляных полигонах, ресурс картриджей и экономику работы под микроскопом.
@@ -292,7 +213,7 @@ foreach ($articles as $article) {
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">Оборудование</span>
-                <a class="text-[#2980b9] dark:text-[#3498db] font-semibold hover:text-[#3498db] dark:hover:text-[#5dade2] hover:underline" href="article.php">Подробнее →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php">Подробнее →</a>
               </div>
             </article>
 
@@ -307,7 +228,7 @@ foreach ($articles as $article) {
                   <span>~5 мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#2980b9] dark:hover:text-[#3498db] hover:underline transition-colors" href="article.php">Гид по флюсам: RMA, NC и No-Clean в шприце</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php">Гид по флюсам: RMA, NC и No-Clean в шприце</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Какой флюс оставить, а какой смывать до блеска изопропиловым спиртом в УЗ-ванне, чтобы плата не деградировала через полгода.
@@ -315,7 +236,7 @@ foreach ($articles as $article) {
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">Химия</span>
-                <a class="text-[#2980b9] dark:text-[#3498db] font-semibold hover:text-[#3498db] dark:hover:text-[#5dade2] hover:underline" href="article.php">Подробнее →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php">Подробнее →</a>
               </div>
             </article>
 
@@ -330,7 +251,7 @@ foreach ($articles as $article) {
                   <span class="text-ink font-medium">Калькулятор</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#2980b9] dark:hover:text-[#3498db] hover:underline transition-colors" href="article.php#simulator">Симулятор термопрофиля фена и стола</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php#simulator">Симулятор термопрофиля фена и стола</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Расчет 4 фаз нагрева: Preheat, Soak, Reflow и Cooling под сплавы SAC305, ПОС-61 и Sn42Bi58 по контактной термопаре.
@@ -338,7 +259,7 @@ foreach ($articles as $article) {
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">SAC305 / ПОС-61</span>
-                <a class="text-[#2980b9] dark:text-[#3498db] font-semibold hover:text-[#3498db] dark:hover:text-[#5dade2] hover:underline" href="article.php#simulator">Открыть калькулятор →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php#simulator">Открыть калькулятор →</a>
               </div>
             </article>
 
@@ -352,15 +273,15 @@ foreach ($articles as $article) {
           <!-- Post-it Note Sticker (Caveat font) -->
           <div class="border border-[#fde047] dark:border-[#ca8a04]/40 bg-[#fffdf5] dark:bg-[#ca8a04]/10 p-4 rounded-lg space-y-2 text-xs shadow-sm sketch-border">
             <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink border-b border-[#fde047]/60 dark:border-[#ca8a04]/40 pb-1.5">
-              <span class="flex items-center gap-1.5 text-slate-800 dark:text-slate-200">
+              <span class="flex items-center gap-1.5 text-ink dark:text-slate-200">
                 <span class="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-amber-400"></span>
                 Заметка на верстак
               </span>
               <span class="text-[10px] text-ink-muted font-normal">LAB-QC</span>
             </div>
             <div class="space-y-1.5">
-              <p class="font-hand text-[17px] leading-snug text-slate-800 dark:text-slate-100 italic font-semibold rotate-[-0.5deg]">
-                «Термопару фиксировать <span class="font-mono font-bold text-xs px-1.5 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/30 border border-[#fde047] dark:border-[#ca8a04]/50 not-italic inline-block text-slate-900 dark:text-slate-100">строго каптоном</span> прямо к галтелям BGA, иначе датчик меряет воздух фена!»
+              <p class="font-hand text-[17px] leading-snug text-ink dark:text-slate-100 italic font-semibold rotate-[-0.5deg]">
+                «Термопару фиксировать <span class="font-mono font-bold text-xs px-1.5 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/30 border border-[#fde047] dark:border-[#ca8a04]/50 not-italic inline-block text-ink dark:text-slate-100">строго каптоном</span> прямо к галтелям BGA, иначе датчик меряет воздух фена!»
               </p>
               <p class="font-serif italic text-xs text-ink-muted border-t border-[#fde047]/60 dark:border-[#ca8a04]/40 pt-1">
                 — из полевого блокнота инженера: структура обнажена, без идеализации
@@ -368,7 +289,7 @@ foreach ($articles as $article) {
             </div>
             <div class="pt-1 flex items-center justify-between font-mono text-[10px] text-ink-muted">
               <span>Контроль t°C</span>
-              <span class="font-semibold text-slate-800 dark:text-slate-200">J-STD-020E</span>
+              <span class="font-semibold text-ink dark:text-slate-200">J-STD-020E</span>
             </div>
           </div>
 
@@ -379,19 +300,19 @@ foreach ($articles as $article) {
               <span>Разделы</span>
             </div>
             <div class="space-y-2 text-xs font-mono">
-              <a class="flex items-center justify-between py-1 text-ink hover:text-blue-600 dark:hover:text-blue-400 transition-colors" href="article.php#step-1">
+              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php#step-1">
                 <span>1. Профилирование BGA</span>
                 <span class="text-ink-faint">J-STD</span>
               </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-blue-600 dark:hover:text-blue-400 transition-colors" href="article.php#alloys">
+              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php#alloys">
                 <span>2. Металлургия сплавов</span>
                 <span class="text-ink-faint">Таблица</span>
               </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-blue-600 dark:hover:text-blue-400 transition-colors" href="article.php#step-4">
+              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php#step-4">
                 <span>3. Защита от влаги MSL</span>
                 <span class="text-ink-faint">Сушка</span>
               </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-blue-600 dark:hover:text-blue-400 transition-colors" href="interactive.php#calculator">
+              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="interactive.php#calculator">
                 <span>4. Выбор флюсов</span>
                 <span class="text-ink-faint">RMA/NC</span>
               </a>
@@ -410,7 +331,7 @@ foreach ($articles as $article) {
             <p class="text-ink-muted leading-relaxed">
               Практические замеры, отчеты дефектов пайки и тесты термоинтерфейсов в открытой базе знаний.
             </p>
-            <a class="inline-block pt-1 font-mono text-xs font-semibold text-[#2980b9] dark:text-[#3498db] hover:text-[#3498db] dark:hover:text-[#5dade2] hover:underline" href="interactive.php">
+            <a class="inline-block pt-1 font-mono text-xs font-semibold text-ink hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="interactive.php">
               Интерактивные расчеты →
             </a>
           </div>
@@ -467,7 +388,7 @@ foreach ($articles as $article) {
 
             <div class="pt-2 border-t border-paper-border/50 text-[11px] font-mono text-ink-muted flex items-center justify-between">
               <span>* Контактный замер</span>
-              <a href="interactive.php#table" class="text-[#2980b9] dark:text-[#3498db] hover:underline font-bold">Таблица →</a>
+              <a href="interactive.php#table" class="text-ink hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline font-bold">Таблица →</a>
             </div>
           </div>
 

@@ -6,7 +6,9 @@ require_once __DIR__ . '/includes/functions.php';
 $slug = $_GET['slug'] ?? 'temperaturnye-profili';
 $article = get_article_by_slug($slug);
 if (!$article) { 
-    $article = $articles[0]; 
+    http_response_code(404);
+    require __DIR__ . '/404.php';
+    exit;
 }
 
 // Related articles (pick 3 other articles)
@@ -22,34 +24,11 @@ $faq_items = [
     "Как избежать эффекта 'попкорна' при пайке влажных микросхем?" => "Храните чипы в заводских вакуумных влагозащитных пакетах с индикатором влажности. Если пакет вскрыт, поместите микросхемы в конвекционную печь при 100–110°C на 12–24 часа до пайки.",
     "Какой флюс использовать для реболлинга BGA: RMA или No-Clean?" => "Для реболлинга шаров рекомендуется канифольный среднеактивированный флюс (RMA или безотмывочный ROL0 с высокой вязкостью). Подложки BGA требуют тщательной промывки изопропанолом или спецраствором в ультразвуковой ванне после посадки."
 ];
+$page_title = $article['title'] . ' — ТОЧКА ПЛАВЛЕНИЯ';
+$page_desc = $article['excerpt'];
+$current_page = 'article';
+ob_start();
 ?>
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title><?= e($article['title']) ?> — ТОЧКА ПЛАВЛЕНИЯ</title>
-
-<!-- Immediate Theme Init Script (Zero FOUC) -->
-<script>
-  (function() {
-    const saved = localStorage.getItem('tp_theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (saved === 'dark' || (!saved && prefersDark)) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  })();
-</script>
-<meta name="description" content="<?= e($article['excerpt']) ?>"/>
-
-<!-- OpenGraph -->
-<meta property="og:type" content="article"/>
-<meta property="og:title" content="<?= e($article['title']) ?>"/>
-<meta property="og:description" content="<?= e($article['excerpt']) ?>"/>
-<meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
-
 <!-- Schema.org TechArticle & HowTo JSON-LD for AI Search Engines & LLMs -->
 <script type="application/ld+json">
 {
@@ -217,53 +196,10 @@ $faq_items = [
 
 <!-- Schema.org JSON-LD -->
 <?= render_article_schema($article, $faq_items) ?>
-</head>
-
-<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
-
-<!-- Top Minimal Header Bar (tochkicamp style) -->
-<header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
-  <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
-    <!-- Brand mark & Title -->
-    <div class="flex items-center gap-6">
-      <a class="logo hover:opacity-85 transition-opacity" href="index.php">
-        ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
-      </a>
-      <!-- Desktop Nav -->
-      <?php 
-      $current_page = 'article';
-      include __DIR__ . '/includes/header-nav.php'; 
-      ?>
-    </div>
-    <!-- Right Action / Search, Dark Mode Toggle & Workbench -->
-    <div class="flex items-center gap-2 sm:gap-3">
-      <!-- Global Search Trigger -->
-      <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
-        <span class="material-symbols-outlined text-[18px] text-accent">search</span>
-        <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
-        <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
-      </button>
-
-      <!-- Theme Switcher Button (Sketch Style) -->
-      <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
-        <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-        <svg class="w-4 h-4 hidden dark:inline stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="4.5"></circle>
-          <path d="M12 2.5v1.8M12 19.7v1.8M4.93 4.93l1.3 1.3M17.77 17.77l1.3 1.3M2.5 12h1.8M19.7 12h1.8M6.23 17.77l-1.3 1.3M19.07 4.93l-1.3 1.3"></path>
-        </svg>
-        <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
-      </button>
-
-      <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="interactive.php">
-        <span>Верстак / Тулзы</span>
-        <span class="material-symbols-outlined text-[14px]">build</span>
-      </a>
-    </div>
-  </div>
-</header>
-
+<?php
+$extra_head = ob_get_clean();
+include __DIR__ . '/includes/header.php';
+?>
 <!-- Main Container -->
 <main class="w-full flex-grow pt-8 pb-20">
   <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
@@ -281,7 +217,7 @@ $faq_items = [
     <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
       
       <!-- Central Editorial Column (740px wide max) -->
-      <div class="lg:col-span-8 max-w-[730px] space-y-9">
+      <div class="lg:col-span-8 max-w-[730px] space-y-9 bg-paper border border-paper-border rounded-lg p-5 sm:p-8 shadow-sm">
         
         <!-- Retro Illustration / Stamp Badge -->
         <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
@@ -316,7 +252,7 @@ $faq_items = [
           </div>
 
           <!-- Lead Paragraph -->
-          <p class="text-lg text-ink font-serif leading-[1.65] pt-2 text-[#242220]">
+          <p class="text-lg text-ink font-serif leading-[1.65] pt-2">
             <?= e($article['excerpt']) ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.
           </p>
         </header>
@@ -327,7 +263,7 @@ $faq_items = [
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>
           <p class="text-ink/80">
-            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-blue-500/50 underline-offset-2 hover:decoration-blue-600 text-blue-600 dark:text-blue-400 font-medium transition-colors" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-blue-500/50 underline-offset-2 hover:decoration-blue-600 text-blue-600 dark:text-blue-400 font-medium transition-colors" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
+            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-amber-500/50 underline-offset-2 hover:decoration-amber-600 text-amber-600 dark:text-amber-400 font-medium transition-colors" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-amber-500/50 underline-offset-2 hover:decoration-amber-600 text-amber-600 dark:text-amber-400 font-medium transition-colors" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
           </p>
         </div>
 
@@ -399,7 +335,7 @@ $faq_items = [
               Правильный термопрофиль по стандарту <code class="font-mono text-xs font-medium px-1.5 py-0.5 bg-paper-subtle border border-paper-border rounded text-ink">J-STD-020D</code> сводится к четырехступенчатому контролируемому циклу:
             </p>
             <div class="my-3 inline-flex flex-wrap items-center gap-3 p-2.5 rounded border border-ink/40 bg-callout transform -rotate-[0.5deg] text-xs font-mono text-ink shadow-sm">
-              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[11px] font-bold tracking-wider uppercase"><span>QC PASSED</span><span>✓</span></div>
+              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[11px] font-bold tracking-wider uppercase"><span class="w-1.5 h-1.5 rounded-full bg-[#2dd4bf] shadow-[0_0_8px_#2dd4bf]"></span><span>QC PASSED</span><span class="text-[#2dd4bf]">✓</span></div>
               <div class="text-ink text-xs font-semibold tracking-tight">J-STD-020E // COMPLIANT</div>
               <span class="text-ink-faint text-[11px] hidden sm:inline-block">|</span>
               <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-brand-orange align-middle">warning</span>ВНИМАНИЕ: ОПАСНОСТЬ ДЕЛАМИНАЦИИ ПРИ СКОРОСТИ > 3°C/с</div>
@@ -453,7 +389,7 @@ $faq_items = [
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 font-sans">
             <div class="p-4 bg-paper rounded border border-paper-border space-y-1.5">
               <div class="flex items-center justify-between text-xs font-mono pb-1">
-                <span class="px-1.5 py-0.5 text-[11px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 1</span>
+                <span class="pill-yellow">ФАЗА 1 // PREHEAT</span>
                 <span class="text-ink-muted font-mono text-xs">1–3°C/с</span>
               </div>
               <div class="font-semibold text-ink text-sm">Прогрев (Preheat)</div>
@@ -471,23 +407,23 @@ $faq_items = [
                 Выравнивание температурного поля чипа и платы, удаление поверхностных оксидов.
               </p>
             </div>
-            <div class="p-4 bg-[#fcfaf2] rounded border border-ink/40 space-y-1.5">
+            <div class="p-4 bg-[#fffaf5] dark:bg-[#431407]/20 rounded border border-[#fed7aa] dark:border-[#ea580c]/30 space-y-1.5">
               <div class="flex items-center justify-between text-xs font-mono pb-1">
-                <span class="inline-block px-1.5 py-0.5 text-[11px] uppercase font-mono font-semibold text-ink border transform -rotate-[0.5deg]" style="border-radius: 255px 15px 225px / 15px 225px 15px 255px; background-color: rgb(236, 233, 223); border-color: rgb(220, 215, 203); color: rgb(28, 25, 23);">ФАЗА 3 · КЛЮЧЕВАЯ</span>
-                <span class="font-semibold text-ink font-mono text-xs">Пик 235–245°C</span>
+                <span class="pill-orange">ФАЗА 3 // REFLOW</span>
+                <span class="font-semibold text-[#c2410c] dark:text-[#fdba74] font-mono text-xs">Пик 235–245°C</span>
               </div>
               <div class="font-semibold text-ink text-sm">Оплавление (Reflow)</div>
               <p class="text-[13px] text-ink-muted leading-snug">
                 Время TAL над ликвидусом 45–75 сек. Формирование интерметаллического слоя.
               </p>
             </div>
-            <div class="p-3.5 rounded border border-paper-border bg-paper">
-              <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1">
-                <span>ФАЗА 4</span>
-                <span>2–4°C/с</span>
+            <div class="p-4 bg-[#f0fdfa] dark:bg-[#042f2e]/20 rounded border border-[#99f6e4] dark:border-[#14b8a6]/40 space-y-1.5">
+              <div class="flex items-center justify-between text-xs font-mono pb-1">
+                <span class="pill-blue"><span class="dot-blue"></span>ФАЗА 4 // COOLING</span>
+                <span class="text-ink dark:text-[#5eead4] font-mono text-xs font-semibold">2–4°C/с</span>
               </div>
               <div class="font-semibold text-ink text-sm">Охлаждение (Cooling)</div>
-              <p class="text-[13px] text-ink-muted mt-1 leading-snug">
+              <p class="text-[13px] text-ink-muted leading-snug">
                 Контролируемый спад для мелкозернистой кристаллической структуры галтели.
               </p>
             </div>
