@@ -40,6 +40,20 @@
   --accent-blue: #0f172a;
   --border: var(--color-paper-border);
   --border-dark: var(--color-paper-border-dark);
+
+  /* Mini Design System: 60-30-10 & UI Kit Variables */
+  --color-surface-base: var(--bg-color);
+  --color-surface-card: var(--color-card);
+  --color-accent-primary: var(--accent-orange);
+  --color-status-error: #dc2626;
+  --color-status-success: #16a34a;
+  --color-status-warning: #f59e0b;
+  
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 html.dark {
@@ -79,6 +93,11 @@ html.dark {
   --accent-blue: #f8fafc;
   --border: var(--color-paper-border);
   --border-dark: var(--color-paper-border-dark);
+
+  /* Mini Design System: Dark Mode */
+  --color-status-error: #ef4444;
+  --color-status-success: #22c55e;
+  --color-status-warning: #fbbf24;
 }
 
 html, body {
@@ -103,6 +122,135 @@ body {
 ::selection {
   background-color: #fef08a;
   color: #141414;
+}
+
+/* ==========================================================================
+   MINI DESIGN SYSTEM: UNIVERSAL UI-KIT CLASSES
+   ========================================================================== */
+
+/* Buttons */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-accent-primary);
+  color: #ffffff !important;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: var(--color-paper-subtle);
+  color: var(--color-ink) !important;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease;
+  border: 1px solid var(--color-paper-border-dark);
+  cursor: pointer;
+}
+.btn-secondary:hover {
+  background-color: var(--color-paper-border);
+}
+
+/* Cards */
+.card-tool {
+  background-color: var(--color-surface-card);
+  border: 1px solid var(--color-paper-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+.badge.badge-neutral {
+  background-color: var(--color-paper-subtle);
+  color: var(--color-ink-muted);
+  border: 1px solid var(--color-paper-border);
+}
+
+/* Inputs */
+.input-base {
+  width: 100%;
+  padding: 0.625rem 0.75rem;
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-paper-border-dark);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-accent-primary);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.15);
+}
+.input-base.has-error {
+  border-color: var(--color-status-error);
+}
+
+/* Alerts */
+.alert-box {
+  padding: 1rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+.alert-warning {
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--color-status-warning);
+  color: #92400e;
+}
+html.dark .alert-warning {
+  color: #fcd34d;
+}
+.alert-error {
+  background-color: rgba(220, 38, 38, 0.1);
+  border: 1px solid var(--color-status-error);
+  color: #991b1b;
+}
+html.dark .alert-error {
+  color: #fca5a5;
+}
+.alert-success {
+  background-color: rgba(22, 163, 74, 0.1);
+  border: 1px solid var(--color-status-success);
+  color: #166534;
+}
+html.dark .alert-success {
+  color: #86efac;
 }
 
 /* CANONICAL BRAND LOGO — ТОЧКА ПЛАВЛЕНИЯ (Self-hosted IBM Plex Sans) */

@@ -301,18 +301,27 @@ include __DIR__ . '/includes/header.php';
           </h1>
 
           <!-- Meta line -->
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-ink-muted font-mono pt-1 pb-2">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-ink-muted font-mono pt-1 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
               <span class="text-ink"><?= e($article['author'] ?? 'Инженер Лаборатории ТЧП') ?></span>
             </div>
             <span class="text-ink-faint">·</span>
-            <time datetime="<?= e($article['date'] ?? '2026-08-20') ?>">Обновлено <?= e($article['date'] ?? '20 августа 2026') ?></time>
+            <time datetime="<?= e($article['date'] ?? '2026-08-20') ?>"><?= e($article['date'] ?? '20 августа 2026') ?></time>
             <span class="text-ink-faint">·</span>
-            <span>~8 мин чтения</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= e($article['read_min'] ?? 8) ?> мин чтения</span>
             <span class="text-ink-faint">·</span>
-            <span class="bg-paper-subtle px-1.5 py-0.5 rounded text-[11px] border border-paper-border">IPC/JEDEC J-STD-020D</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= e($article['difficulty'] ?? 'Инженер') ?></span>
           </div>
+
+          <?php if (!empty($article['required_tools'])): ?>
+          <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
+            <span class="text-ink-muted">Понадобится:</span>
+            <?php foreach ($article['required_tools'] as $tool): ?>
+              <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
 
           <!-- Lead Paragraph -->
           <p class="text-lg text-ink font-serif leading-[1.65] pt-2">
@@ -900,6 +909,25 @@ include __DIR__ . '/includes/header.php';
             Заказать диагностику →
           </a>
         </div>
+
+        <!-- Self-Check Block (Проверьте себя) -->
+        <section class="my-8 p-6 rounded-lg border border-accent bg-paper-subtle space-y-4">
+          <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined text-accent text-2xl">quiz</span>
+            <h2 class="text-xl font-bold text-ink">Проверьте себя</h2>
+          </div>
+          <p class="text-sm text-ink-muted">Готовы применить знания на практике? Воспользуйтесь нашими инструментами для расчета параметров.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <a href="interactive.php#temp" class="block p-4 rounded bg-paper border border-paper-border hover:border-accent transition-colors">
+              <div class="font-bold text-ink text-sm">Термокалькулятор</div>
+              <div class="text-xs text-ink-muted mt-1">Рассчитать режим жала</div>
+            </a>
+            <a href="interactive.php#defect" class="block p-4 rounded bg-paper border border-paper-border hover:border-accent transition-colors">
+              <div class="font-bold text-ink text-sm">Дерево дефектов</div>
+              <div class="text-xs text-ink-muted mt-1">Диагностика брака пайки</div>
+            </a>
+          </div>
+        </section>
 
         <!-- Interactive Tools Box (tochkicamp style bottom CTA) -->
         <div class="border border-paper-border rounded-lg bg-paper p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">

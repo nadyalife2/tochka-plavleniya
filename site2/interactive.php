@@ -1,12 +1,12 @@
 <?php
 $page_title = "Интерактивный верстак инженера — Калькуляторы и справочники";
+$page_desc = "Интерактивный верстак инженера: термокалькулятор пайки, конфигуратор инструмента, дерево диагностики брака, расчет флюса и реестр сплавов.";
+$current_page = 'interactive';
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/articles-data.php';
 require_once __DIR__ . '/data/solder-reference.php';
 require_once __DIR__ . '/data/interactive-rules.php';
-?>
-$page_desc = "Интерактивный верстак инженера: термокалькулятор пайки, конфигуратор инструмента, дерево диагностики брака, расчет флюса и реестр сплавов.";
-$current_page = 'interactive';
+
 ob_start();
 ?>
   <style>
@@ -41,28 +41,49 @@ include __DIR__ . '/includes/header.php';
 ?>
 
   <!-- Main Container -->
-  <main class="w-full flex-grow pt-6 pb-20">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 space-y-12">
+  <main class="w-full flex-grow pt-8 pb-16">
+    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 space-y-10">
       
       <!-- Breadcrumbs -->
-      <nav class="text-[12px] font-mono text-ink-faint flex items-center gap-1.5">
+      <nav class="text-[12px] font-mono text-ink-faint mb-6 flex items-center gap-1.5 flex-wrap" aria-label="Хлебные крошки">
         <a class="hover:text-ink transition-colors" href="/">Главная</a>
         <span>→</span>
-        <span class="text-ink">Интерактивный верстак инженера</span>
+        <span class="text-ink font-semibold">Интерактивный верстак инженера</span>
       </nav>
 
       <!-- HERO / HUB ZONE -->
-      <div class="border-b border-paper-border pb-8 space-y-4">
-        <div class="flex items-center gap-2">
-          <span class="sketch-pill-yellow text-ink font-mono text-xs font-bold">LAB TOOLS v3.0</span>
-          <span class="text-xs font-mono text-ink-faint">ИНЖЕНЕРНЫЙ ХАБ И КАЛЬКУЛЯТОРЫ</span>
+      <section class="border-b border-paper-border pb-10 space-y-5">
+        <div class="max-w-3xl space-y-4">
+          
+          <!-- Tape & Label Badge -->
+          <div class="relative inline-block mb-1">
+            <div class="absolute -top-2 left-6 w-10 h-3 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-sm rotate-[-2deg] z-10 pointer-events-none" style="backdrop-filter: blur(1px);"></div>
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#fffdf5] dark:bg-[#ca8a04]/15 border border-[#fde047] dark:border-[#ca8a04]/40 text-ink font-mono text-[11px] shadow-sm rotate-[-1.2deg] sketch-border">
+              <span class="w-2 h-2 rounded-full bg-accent inline-block shadow-[0_0_6px_rgba(235,82,17,0.8)]"></span>
+              <span class="font-bold tracking-wider uppercase">ВЕРСТАК // LAB TOOLS v3.0</span>
+              <span class="text-ink-faint">|</span>
+              <span class="text-[10px] text-ink-muted">7 КАЛЬКУЛЯТОРОВ И СПРАВОЧНИКОВ</span>
+            </div>
+          </div>
+
+          <!-- Metadata -->
+          <div class="flex items-center gap-2 font-mono text-xs text-ink-muted">
+            <span class="w-2 h-2 rounded-full bg-ink inline-block"></span>
+            <span class="uppercase tracking-wider font-semibold text-ink">Инженерный верстак v2.4</span>
+            <span>·</span>
+            <span>Расчеты по ГОСТ 21931 и IPC J-STD-006</span>
+          </div>
+
+          <!-- Headline -->
+          <h1 class="text-3xl sm:text-4xl lg:text-[46px] font-bold text-ink tracking-tight leading-[1.15] font-sans">
+            Интерактивный верстак инженера
+          </h1>
+
+          <!-- Lead text -->
+          <p class="text-base sm:text-lg text-ink/80 font-serif leading-relaxed">
+            Решение конкретных монтажных задач за 1 клик: расчет безопасного терморежима станции, подбор паяльного оборудования под бюджет, интерактивная диагностика причин брака и нормы расхода химии.
+          </p>
         </div>
-        <h1 class="text-2xl sm:text-4xl font-bold text-ink tracking-tight font-sans">
-          Интерактивный верстак монтажника
-        </h1>
-        <p class="text-sm sm:text-base text-ink-muted max-w-2xl font-serif italic">
-          Решение конкретных инженерных задач за 1 клик: подбор температуры жала станции, выбор паяльного оборудования, диагностика причин дефектов пайки и расчет химии.
-        </p>
 
         <!-- Quick Jump Hub Grid -->
         <div class="pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -137,22 +158,27 @@ include __DIR__ . '/includes/header.php';
             <span>Сплавы (ГОСТ)</span>
           </a>
         </div>
-      </div>
+      </section>
 
 
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P0 ИНСТРУМЕНТ 1: ТЕРМОКАЛЬКУЛЯТОР (#temp)                             -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="temp" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+      <section id="temp" class="card-tool space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">01 // ТЕРМОРЕЖИМ ПАЙКИ</span>
               <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">ГОСТ 21931-76 / IPC J-STD-006C</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор рабочей температуры станции</h2>
+            <p class="text-sm text-ink-muted mt-2">Определяет безопасную температуру жала в зависимости от припоя и типа работ, предотвращая термоудар компонентов и отслоение дорожек.</p>
+            <div class="mt-3 flex gap-2">
+              <span class="badge badge-neutral">Для новичков</span>
+              <span class="badge badge-neutral">~ 1 мин</span>
+            </div>
           </div>
-          <div class="text-xs font-mono text-ink-faint">
+          <div class="text-xs font-mono text-ink-faint hidden sm:block text-right">
             Динамический расчёт теплового окна
           </div>
         </div>
@@ -163,8 +189,9 @@ include __DIR__ . '/includes/header.php';
           <div class="space-y-4">
             <div>
               <label for="temp-solder" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Марка используемого припоя:</label>
-              <select id="temp-solder" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
-                <option value="pos61" selected>ПОС-61 (Sn63Pb37) — эвтектика 183 °C (стандарт РЭА)</option>
+              <select id="temp-solder" class="input-base font-mono">
+                <option value="" selected disabled>-- Выберите марку припоя --</option>
+                <option value="pos61">ПОС-61 (Sn63Pb37) — эвтектика 183 °C (стандарт РЭА)</option>
                 <option value="sac305">SAC305 (Sn96.5Ag3Cu0.5) — бессвинец RoHS 217–220 °C</option>
                 <option value="pos40">ПОС-40 (Sn40Pb60) — кабельный 183–238 °C</option>
                 <option value="sn42bi58">Sn42Bi58 — низкотемпературный 138 °C (термочувствительный)</option>
@@ -174,8 +201,9 @@ include __DIR__ . '/includes/header.php';
 
             <div>
               <label for="temp-work" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Тип детали и монтажной операции:</label>
-              <select id="temp-work" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
-                <option value="smd_medium" selected>SMD 0603–1206 / Микросхемы SOP, QFP (стандарт)</option>
+              <select id="temp-work" class="input-base font-mono">
+                <option value="" selected disabled>-- Выберите тип монтажа --</option>
+                <option value="smd_medium">SMD 0603–1206 / Микросхемы SOP, QFP (стандарт)</option>
                 <option value="smd_small">Мелкие SMD 0201–0402 (термочувствительные чипы)</option>
                 <option value="smd_large">Массивные SMD: QFN, DFN, силовые транзисторы D-PAK</option>
                 <option value="pth">Монтаж в металлизированные отверстия (THT / разъёмы)</option>
@@ -187,43 +215,52 @@ include __DIR__ . '/includes/header.php';
               </select>
             </div>
 
+            <button type="button" id="temp-calc-btn" class="btn-primary w-full mt-4">Рассчитать терморежим</button>
+
             <!-- Temperature Meter Scale -->
-            <div class="p-3.5 rounded border border-paper-border bg-paper-subtle space-y-2">
+            <div id="temp-meter-box" class="p-3.5 rounded border border-paper-border bg-paper-subtle space-y-2" style="display:none;">
               <div class="flex items-center justify-between text-[11px] font-mono">
                 <span class="text-ink-muted uppercase">Шкала температуры станции:</span>
                 <span class="text-ink-faint">100°C ───── 320°C ───── 450°C</span>
               </div>
               <div class="meter-bar">
-                <div id="temp-bar-fill" class="meter-fill" style="width: 55%; background-color: #eb5211;"></div>
+                <div id="temp-bar-fill" class="meter-fill" style="width: 55%; background-color: var(--color-accent);"></div>
               </div>
             </div>
           </div>
 
           <!-- Result Board -->
-          <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4">
-            <div>
-              <div class="text-[11px] font-mono uppercase text-ink-muted font-bold mb-1">Рекомендуемый диапазон жала:</div>
-              <div id="temp-range-display" class="text-3xl font-bold font-mono text-accent leading-none">
-                260 – 310 °C
-              </div>
+          <div id="temp-result-board" class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 relative overflow-hidden">
+            <div id="temp-empty-state" class="absolute inset-0 flex flex-col items-center justify-center bg-paper-subtle z-10 transition-opacity duration-300">
+              <span class="material-symbols-outlined text-[32px] text-ink-faint mb-2">thermostat</span>
+              <span class="text-xs font-mono text-ink-muted">Укажите параметры для расчета</span>
             </div>
-
-            <div class="pt-3 border-t border-paper-border space-y-2">
-              <div class="flex items-center gap-2">
-                <span class="material-symbols-outlined text-[16px] text-accent">hardware</span>
-                <span id="temp-tip-display" class="text-xs font-mono font-bold text-ink">Форма жала: скошенное или «ложка»</span>
+            
+            <div id="temp-result-content" class="opacity-0 transition-opacity duration-300 pointer-events-none space-y-4">
+              <div>
+                <div class="text-[11px] font-mono uppercase text-ink-muted font-bold mb-1">Рекомендуемый диапазон жала:</div>
+                <div id="temp-range-display" class="text-3xl font-bold font-mono text-accent leading-none">
+                  260 – 310 °C
+                </div>
               </div>
-              <p id="temp-advice-display" class="text-xs font-mono text-ink-muted leading-relaxed">
-                SOP/QFP: двигайтесь по выводам плавно. Флюс-гель помогает растечься припою между выводами без перемычек.
-              </p>
-            </div>
 
-            <!-- Warning Callout -->
-            <div id="temp-warn-box" class="p-3 rounded bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 flex items-start gap-2">
-              <span class="material-symbols-outlined text-[16px] text-amber-700 dark:text-amber-400 shrink-0">warning</span>
-              <span id="temp-warn-display" class="text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal">
-                Мостики? Сначала добавьте флюс, затем снимите оплёткой — не поднимайте температуру выше предела.
-              </span>
+              <div class="pt-3 border-t border-paper-border space-y-2">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[16px] text-accent">hardware</span>
+                  <span id="temp-tip-display" class="text-xs font-mono font-bold text-ink">Форма жала: скошенное или «ложка»</span>
+                </div>
+                <p id="temp-advice-display" class="text-xs font-mono text-ink-muted leading-relaxed">
+                  SOP/QFP: двигайтесь по выводам плавно. Флюс-гель помогает растечься припою между выводами без перемычек.
+                </p>
+              </div>
+
+              <!-- Warning Callout -->
+              <div id="temp-warn-box" class="p-3 rounded bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 flex items-start gap-2">
+                <span class="material-symbols-outlined text-[16px] text-amber-700 dark:text-amber-400 shrink-0">warning</span>
+                <span id="temp-warn-display" class="text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal">
+                  Мостики? Сначала добавьте флюс, затем снимите оплёткой — не поднимайте температуру выше предела.
+                </span>
+              </div>
             </div>
           </div>
 
@@ -234,7 +271,7 @@ include __DIR__ . '/includes/header.php';
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P0 ИНСТРУМЕНТ 2: КОНФИГУРАТОР ПАЯЛЬНИКА (#iron)                      -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="iron" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6">
+      <section id="iron" class="card-tool space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -254,7 +291,7 @@ include __DIR__ . '/includes/header.php';
           <div class="space-y-4">
             <div>
               <label for="iron-task" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Основной сценарий пайки:</label>
-              <select id="iron-task" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <select id="iron-task" class="input-base font-mono">
                 <option value="smd" selected>SMD компоненты (0603–1206, SOIC, базовый ремонт)</option>
                 <option value="smd_fine">Прецизионный SMD (0402, QFP с мелким шагом, IC микросхемы)</option>
                 <option value="boards_tht">Печатные платы, монтаж в отверстия (THT / разъёмы)</option>
@@ -267,7 +304,7 @@ include __DIR__ . '/includes/header.php';
 
             <div>
               <label for="iron-intensity" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Интенсивность и бюджет:</label>
-              <select id="iron-intensity" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <select id="iron-intensity" class="input-base font-mono">
                 <option value="rare">Редкий ремонт (1–2 раза в месяц, бюджетный сегмент)</option>
                 <option value="regular" selected>Регулярная мастерская / радиолюбитель (оптимум цена/качество)</option>
                 <option value="daily">Ежедневная профессиональная загрузка (сервисный центр)</option>
@@ -324,25 +361,26 @@ include __DIR__ . '/includes/header.php';
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P0 ИНСТРУМЕНТ 3: ДЕРЕВО ДИАГНОСТИКИ ДЕФЕКТОВ (#defect)                 -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="defect" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+      <section id="defect" class="card-tool space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">03 // ДИАГНОСТИКА БРАКА</span>
               <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">Дерево инженерных решений</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Интерактивный определитель дефектов монтажа</h2>
+            <p class="text-sm text-ink-muted mt-2">Выберите визуальный признак проблемы на плате или кабеле — алгоритм определит причину и выдаст пошаговую инструкцию по исправлению.</p>
+            <div class="mt-3 flex gap-2">
+              <span class="badge badge-neutral">Продвинутый</span>
+              <span class="badge badge-neutral">~ 3 мин</span>
+            </div>
           </div>
           <div>
-            <button type="button" id="defect-restart-btn" class="text-xs font-mono px-3 py-1 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors cursor-pointer" style="display:none;">
-              ↺ Начать сначала
+            <button type="button" id="defect-restart-btn" class="btn-secondary" style="display:none;">
+              <span class="material-symbols-outlined text-[16px]">refresh</span> Начать сначала
             </button>
           </div>
         </div>
-
-        <p class="text-xs sm:text-sm font-mono text-ink-muted">
-          Выберите визуальный признак проблемы на плате или кабеле — алгоритм определит причину и выдаст пошаговую инструкцию по исправлению.
-        </p>
 
         <!-- Dynamic Decision Tree Container -->
         <div id="defect-tree-container" class="min-h-[220px]">
@@ -354,8 +392,8 @@ include __DIR__ . '/includes/header.php';
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P1 ИНСТРУМЕНТ 4: КАЛЬКУЛЯТОР ФЛЮСА (#calculator)                       -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="calculator" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 relative overflow-hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+      <section id="calculator" class="card-tool relative overflow-hidden space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04 // ДОЗИРОВКА ХИМИИ</span>
@@ -365,9 +403,14 @@ include __DIR__ . '/includes/header.php';
               </span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода флюса и паяльной пасты</h2>
+            <p class="text-sm text-ink-muted mt-2">Рассчитывает объем материалов по стандарту IPC-7095C для партии плат или одиночного прототипа.</p>
+            <div class="mt-3 flex gap-2">
+              <span class="badge badge-neutral">Инженерный</span>
+              <span class="badge badge-neutral">~ 2 мин</span>
+            </div>
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-xs font-mono px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink-muted">IPC-7095C Standard</span>
+            <span class="badge badge-neutral">IPC-7095C Standard</span>
           </div>
         </div>
 
@@ -573,22 +616,27 @@ include __DIR__ . '/includes/header.php';
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P1 ИНСТРУМЕНТ 4.1: СЕЛЕКТОР ФЛЮСА (#flux-selector)                     -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="flux-selector" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 mt-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+      <section id="flux-selector" class="card-tool space-y-6 mt-8">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.1 // ПОДБОР ФЛЮСА</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Селектор флюса по задаче</h2>
+            <p class="text-sm text-ink-muted mt-2">Помогает подобрать тип флюса в зависимости от спаиваемых металлов, компонентов и необходимости отмывки.</p>
+            <div class="mt-3 flex gap-2">
+              <span class="badge badge-neutral">Для всех</span>
+              <span class="badge badge-neutral">~ 1 мин</span>
+            </div>
           </div>
-          <div class="text-xs font-mono text-ink-faint">Умный подбор химии</div>
+          <div class="text-xs font-mono text-ink-faint hidden sm:block text-right">Умный подбор химии</div>
         </div>
         
         <div class="tool-two-col">
           <div class="space-y-4">
             <div>
               <label for="flux-metal" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Металл поверхностей:</label>
-              <select id="flux-metal" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <select id="flux-metal" class="input-base font-mono">
                 <option value="copper">Медь, луженая медь, латунь (стандарт)</option>
                 <option value="oxidized">Окисленное железо, сталь</option>
                 <option value="aluminum">Алюминий</option>
@@ -596,7 +644,7 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div>
               <label for="flux-sensitivity" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Чувствительность схемы:</label>
-              <select id="flux-sensitivity" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <select id="flux-sensitivity" class="input-base font-mono">
                 <option value="high">Высокоомные цепи, SMD, цифровая электроника</option>
                 <option value="medium">Обычная электроника, THT</option>
                 <option value="low">Силовая электрика, провода, разъемы, трубы</option>
@@ -604,7 +652,7 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div>
               <label for="flux-wash" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Возможность отмывки:</label>
-              <select id="flux-wash" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <select id="flux-wash" class="input-base font-mono">
                 <option value="no">Нет отмывки (или труднодоступные места под чипами)</option>
                 <option value="yes">Есть отмывка (спирт, УЗ-ванна, спец. жидкости)</option>
               </select>
@@ -621,7 +669,7 @@ include __DIR__ . '/includes/header.php';
               <span id="flux-warn-display" class="text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal"></span>
             </div>
             <div id="flux-article-link" class="pt-3 border-t border-paper-border">
-              <a href="article.php?slug=gid-po-flyusam" class="inline-flex items-center gap-1.5 text-xs font-mono text-[#2563eb] hover:underline">
+              <a href="article.php?slug=gid-po-flyusam" class="inline-flex items-center gap-1.5 text-xs font-mono text-accent font-bold hover:underline">
                 <span class="material-symbols-outlined text-[14px]">menu_book</span>
                 <span>Читать подробный гид по флюсам</span>
               </a>
@@ -633,22 +681,27 @@ include __DIR__ . '/includes/header.php';
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P1 ИНСТРУМЕНТ 4.2: РАСХОД ПРИПОЯ (#solder-consumption)                 -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="solder-consumption" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 mt-8 mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+      <section id="solder-consumption" class="card-tool space-y-6 mt-8 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.2 // РАСХОД МАТЕРИАЛОВ</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода припоя</h2>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода трубчатого припоя</h2>
+            <p class="text-sm text-ink-muted mt-2">Оценивает необходимую длину проволочного припоя для монтажа выводных компонентов, SMD или лужения проводов.</p>
+            <div class="mt-3 flex gap-2">
+              <span class="badge badge-neutral">Сборщику</span>
+              <span class="badge badge-neutral">~ 1 мин</span>
+            </div>
           </div>
-          <div class="text-xs font-mono text-ink-faint">Запас +15%</div>
+          <div class="text-xs font-mono text-ink-faint hidden sm:block text-right">Запас +15%</div>
         </div>
         
         <div class="tool-two-col">
           <div class="space-y-4">
             <div>
               <label for="cons-type" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Характер работы:</label>
-              <select id="cons-type" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <select id="cons-type" class="input-base font-mono">
                 <option value="tht">Пайка выводов THT (стандартные точки)</option>
                 <option value="smd">SMD компоненты (дозирование проволоки)</option>
                 <option value="wire">Сращивание проводов / лужение</option>
@@ -656,7 +709,7 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div>
               <label for="cons-diam" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Диаметр припоя (проволока):</label>
-              <select id="cons-diam" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <select id="cons-diam" class="input-base font-mono">
                 <option value="0.5">0.5 мм</option>
                 <option value="0.8" selected>0.8 мм (оптимум)</option>
                 <option value="1.0">1.0 мм</option>
@@ -664,7 +717,7 @@ include __DIR__ . '/includes/header.php';
             </div>
             <div>
               <label for="cons-count" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Количество точек (или стыков):</label>
-              <input type="number" id="cons-count" value="100" min="1" max="10000" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+              <input type="number" id="cons-count" value="100" min="1" max="10000" class="input-base font-mono">
             </div>
           </div>
           
@@ -679,7 +732,7 @@ include __DIR__ . '/includes/header.php';
               </div>
             </div>
             <div class="pt-3 border-t border-paper-border text-center">
-              <a href="article.php?slug=temperaturnye-profili" class="inline-flex items-center gap-1.5 text-xs font-mono text-[#2563eb] hover:underline">
+              <a href="article.php?slug=temperaturnye-profili" class="inline-flex items-center gap-1.5 text-xs font-mono text-accent font-bold hover:underline">
                 <span class="material-symbols-outlined text-[14px]">menu_book</span>
                 <span>Как правильно дозировать припой</span>
               </a>
@@ -691,7 +744,7 @@ include __DIR__ . '/includes/header.php';
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P1 ИНСТРУМЕНТ 5: РЕЕСТР СПЛАВОВ И ПРИПОЕВ (#table, #solder-table)        -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <section id="table" class="scroll-mt-20 border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 relative">
+      <section id="table" class="scroll-mt-20 card-tool space-y-6 relative">
         <a id="solder-table" class="block absolute -top-24 pointer-events-none" aria-hidden="true"></a>
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
@@ -699,7 +752,7 @@ include __DIR__ . '/includes/header.php';
             <h2 class="text-xl font-bold text-ink mt-0.5">Реестр сплавов и температур плавления</h2>
           </div>
           <div class="w-full sm:w-64">
-            <input type="text" id="solder-search" placeholder="Поиск (ПОС-61, SAC305, 183°C)..." class="w-full px-3 py-1.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-ink"/>
+            <input type="text" id="solder-search" placeholder="Поиск (ПОС-61, SAC305, 183°C)..." class="input-base font-mono text-xs"/>
           </div>
         </div>
 
@@ -722,7 +775,7 @@ include __DIR__ . '/includes/header.php';
                     <?php if ($solder['type'] === 'leadfree'): ?>
                       <span class="ml-1 px-1 py-0.2 rounded bg-green-100 dark:bg-green-950/40 text-green-800 dark:text-green-300 text-[10px]">RoHS</span>
                     <?php elseif ($solder['type'] === 'lowtemp'): ?>
-                      <span class="ml-1 px-1 py-0.2 rounded bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 text-[10px]">Низкотемп.</span>
+                      <span class="ml-1 px-1 py-0.2 rounded bg-amber-100/80 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 text-[10px]">Низкотемп.</span>
                     <?php endif; ?>
                   </td>
                   <td class="py-2.5 px-3">

@@ -24,21 +24,46 @@ document.addEventListener('DOMContentLoaded', () => {
   const tempWarnBox = document.getElementById('temp-warn-box');
   const tempBarFill = document.getElementById('temp-bar-fill');
 
+  const tempEmptyState = document.getElementById('temp-empty-state');
+  const tempResultContent = document.getElementById('temp-result-content');
+  const tempCalcBtn = document.getElementById('temp-calc-btn');
+  const tempMeterBox = document.getElementById('temp-meter-box');
+
   function updateTempCalculator() {
     if (!tempSolder || !tempWork || !tempRangeDisplay) return;
 
     const sVal = tempSolder.value;
     const wVal = tempWork.value;
+    
+    // State: Ошибка / Не выбран
+    if (!sVal || !wVal) {
+      alert('Пожалуйста, выберите марку припоя и тип операции.');
+      return;
+    }
 
     const solderGroup = tempRules[sVal] || {};
     const item = solderGroup[wVal];
+
+    // State: Результат
+    if (tempEmptyState) tempEmptyState.style.opacity = '0';
+    if (tempEmptyState) tempEmptyState.style.pointerEvents = 'none';
+    if (tempResultContent) {
+      tempResultContent.style.opacity = '1';
+      tempResultContent.style.pointerEvents = 'auto';
+    }
+    if (tempMeterBox) tempMeterBox.style.display = 'block';
 
     if (!item || (item.t_min === 0 && item.t_max === 0)) {
       tempRangeDisplay.textContent = 'Не применяется';
       tempRangeDisplay.style.fontSize = '1.75rem';
       if (tempBarFill) tempBarFill.style.width = '0%';
       if (tempTipDisplay) tempTipDisplay.textContent = item?.tip || 'Паяльник не используется для этого сценария';
-      if (tempAdviceDisplay) tempAdviceDisplay.textContent = item?.advice || 'Для данной операции используется специализированное оборудование (горелка, преднагрев или фен).';
+      
+      // Структура вывода: Вывод + Практический шаг
+      if (tempAdviceDisplay) {
+        tempAdviceDisplay.innerHTML = `<strong>Вывод:</strong> Данная операция требует специализированного оборудования.<br><br><strong>Следующий шаг:</strong> Воспользуйтесь термофеном, инфракрасной станцией или газовой горелкой в зависимости от задачи.`;
+      }
+      
       if (tempWarnDisplay && tempWarnBox) {
         if (item?.warn) {
           tempWarnDisplay.textContent = item.warn;
@@ -72,7 +97,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (tempAdviceDisplay) {
-      tempAdviceDisplay.textContent = item.advice || 'Контролируйте время контакта — не более 2–3 секунд на точку.';
+      const adviceText = item.advice || 'Контролируйте время контакта — не более 2–3 секунд на точку.';
+      // Структура вывода: Вывод + Практический шаг
+      tempAdviceDisplay.innerHTML = `<strong>Вывод:</strong> Температура ${item.t_min}-${item.t_max} °C является оптимальной для данного припоя и теплоемкости детали.<br><br><strong>Следующий шаг:</strong> Установите температуру, нанесите флюс на контактную площадку и ${adviceText.toLowerCase()}`;
     }
 
     if (tempWarnDisplay && tempWarnBox) {
@@ -85,10 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (tempSolder && tempWork) {
-    tempSolder.addEventListener('change', updateTempCalculator);
-    tempWork.addEventListener('change', updateTempCalculator);
-    updateTempCalculator();
+  // State: До ввода
+  if (tempCalcBtn) {
+    tempCalcBtn.addEventListener('click', updateTempCalculator);
   }
 
 

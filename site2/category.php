@@ -149,7 +149,7 @@ function get_semantic_tag_pill(string $tag_key): string {
         default              => 'pill-blue',
     };
 }
-?>
+
 $page_desc = $current_rubric['lead'];
 $current_page = $current_slug;
 ob_start();
