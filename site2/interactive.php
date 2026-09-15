@@ -120,13 +120,21 @@ include __DIR__ . '/includes/header.php';
         <!-- Secondary P1 shortcut pills -->
         <div class="pt-2 flex flex-wrap items-center gap-3">
           <span class="text-xs font-mono text-ink-faint">Также на верстаке:</span>
+          <a href="#flux-selector" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
+            <span class="material-symbols-outlined text-[14px] text-accent">filter_alt</span>
+            <span>Селектор флюса</span>
+          </a>
+          <a href="#solder-consumption" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
+            <span class="material-symbols-outlined text-[14px] text-accent">calculate</span>
+            <span>Расход припоя</span>
+          </a>
           <a href="#calculator" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
             <span class="material-symbols-outlined text-[14px] text-accent">science</span>
-            <span>Калькулятор дозировки флюса (IPC-7095C)</span>
+            <span>Дозировка пасты</span>
           </a>
           <a href="#table" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors">
             <span class="material-symbols-outlined text-[14px] text-accent">table_chart</span>
-            <span>Реестр точек плавления сплавов (ГОСТ 21931)</span>
+            <span>Сплавы (ГОСТ)</span>
           </a>
         </div>
       </div>
@@ -562,6 +570,123 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- P1 ИНСТРУМЕНТ 4.1: СЕЛЕКТОР ФЛЮСА (#flux-selector)                     -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="flux-selector" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 mt-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+          <div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.1 // ПОДБОР ФЛЮСА</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Селектор флюса по задаче</h2>
+          </div>
+          <div class="text-xs font-mono text-ink-faint">Умный подбор химии</div>
+        </div>
+        
+        <div class="tool-two-col">
+          <div class="space-y-4">
+            <div>
+              <label for="flux-metal" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Металл поверхностей:</label>
+              <select id="flux-metal" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+                <option value="copper">Медь, луженая медь, латунь (стандарт)</option>
+                <option value="oxidized">Окисленное железо, сталь</option>
+                <option value="aluminum">Алюминий</option>
+              </select>
+            </div>
+            <div>
+              <label for="flux-sensitivity" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Чувствительность схемы:</label>
+              <select id="flux-sensitivity" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+                <option value="high">Высокоомные цепи, SMD, цифровая электроника</option>
+                <option value="medium">Обычная электроника, THT</option>
+                <option value="low">Силовая электрика, провода, разъемы, трубы</option>
+              </select>
+            </div>
+            <div>
+              <label for="flux-wash" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Возможность отмывки:</label>
+              <select id="flux-wash" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+                <option value="no">Нет отмывки (или труднодоступные места под чипами)</option>
+                <option value="yes">Есть отмывка (спирт, УЗ-ванна, спец. жидкости)</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 flex flex-col justify-center">
+            <div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-accent font-bold">Рекомендуемый класс флюса:</span>
+              <div id="flux-class-display" class="text-lg font-bold font-sans text-ink mt-0.5">RMA (Умеренно активный)</div>
+            </div>
+            <div id="flux-warn-box" class="p-3 rounded bg-amber-50 border border-amber-300 dark:border-amber-800 dark:bg-amber-950/30 flex items-start gap-2" style="display:none;">
+              <span class="material-symbols-outlined text-[16px] text-amber-700 dark:text-amber-400 shrink-0">warning</span>
+              <span id="flux-warn-display" class="text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal"></span>
+            </div>
+            <div id="flux-article-link" class="pt-3 border-t border-paper-border">
+              <a href="article.php?slug=gid-po-flyusam" class="inline-flex items-center gap-1.5 text-xs font-mono text-[#2563eb] hover:underline">
+                <span class="material-symbols-outlined text-[14px]">menu_book</span>
+                <span>Читать подробный гид по флюсам</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- P1 ИНСТРУМЕНТ 4.2: РАСХОД ПРИПОЯ (#solder-consumption)                 -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="solder-consumption" class="border border-paper-border rounded-lg bg-card p-6 sm:p-8 space-y-6 mt-8 mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
+          <div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.2 // РАСХОД МАТЕРИАЛОВ</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода припоя</h2>
+          </div>
+          <div class="text-xs font-mono text-ink-faint">Запас +15%</div>
+        </div>
+        
+        <div class="tool-two-col">
+          <div class="space-y-4">
+            <div>
+              <label for="cons-type" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Характер работы:</label>
+              <select id="cons-type" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+                <option value="tht">Пайка выводов THT (стандартные точки)</option>
+                <option value="smd">SMD компоненты (дозирование проволоки)</option>
+                <option value="wire">Сращивание проводов / лужение</option>
+              </select>
+            </div>
+            <div>
+              <label for="cons-diam" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Диаметр припоя (проволока):</label>
+              <select id="cons-diam" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+                <option value="0.5">0.5 мм</option>
+                <option value="0.8" selected>0.8 мм (оптимум)</option>
+                <option value="1.0">1.0 мм</option>
+              </select>
+            </div>
+            <div>
+              <label for="cons-count" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Количество точек (или стыков):</label>
+              <input type="number" id="cons-count" value="100" min="1" max="10000" class="w-full p-2.5 rounded bg-paper border border-paper-border-dark text-ink font-mono text-xs focus:outline-none focus:border-accent">
+            </div>
+          </div>
+          
+          <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 flex flex-col justify-center">
+            <div class="text-center">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-ink-muted font-bold block mb-2">Ориентировочный расход:</span>
+              <div id="cons-length" class="text-3xl font-bold font-mono text-ink">
+                ~ 120 см
+              </div>
+              <div id="cons-weight" class="text-sm font-mono text-ink-muted mt-1">
+                Вес: ~ 4.5 г
+              </div>
+            </div>
+            <div class="pt-3 border-t border-paper-border text-center">
+              <a href="article.php?slug=temperaturnye-profili" class="inline-flex items-center gap-1.5 text-xs font-mono text-[#2563eb] hover:underline">
+                <span class="material-symbols-outlined text-[14px]">menu_book</span>
+                <span>Как правильно дозировать припой</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P1 ИНСТРУМЕНТ 5: РЕЕСТР СПЛАВОВ И ПРИПОЕВ (#table, #solder-table)        -->

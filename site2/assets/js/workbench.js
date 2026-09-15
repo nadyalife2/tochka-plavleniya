@@ -311,4 +311,118 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // 4. СЕЛЕКТОР ФЛЮСА (#flux-selector)
+  // ───────────────────────────────────────────────────────────────────────────
+  const fluxMetal = document.getElementById('flux-metal');
+  const fluxSensitivity = document.getElementById('flux-sensitivity');
+  const fluxWash = document.getElementById('flux-wash');
+  const fluxClassDisplay = document.getElementById('flux-class-display');
+  const fluxWarnDisplay = document.getElementById('flux-warn-display');
+  const fluxWarnBox = document.getElementById('flux-warn-box');
+  const fluxArticleLink = document.getElementById('flux-article-link');
+
+  function updateFluxSelector() {
+    if (!fluxMetal || !fluxSensitivity || !fluxWash) return;
+    
+    const metal = fluxMetal.value;
+    const sens = fluxSensitivity.value;
+    const wash = fluxWash.value;
+
+    let fluxClass = 'RMA (Умеренно активный)';
+    let warning = '';
+    
+    if (metal === 'aluminum') {
+      fluxClass = 'Активный флюс для алюминия (Ф-64, ФИМ)';
+      warning = 'Требуется обязательная отмывка! Флюс вызывает коррозию.';
+    } else if (metal === 'oxidized') {
+      if (sens === 'high') {
+        fluxClass = 'RMA / Активный (точечно)';
+        warning = 'Для высокоомных цепей избегайте кислотных флюсов. Лучше механически зачистить окислы.';
+      } else {
+        fluxClass = 'Активный флюс (Ортофосфорная кислота, ЗИЛ-2)';
+        warning = 'Требуется обязательная отмывка! Флюс вызывает коррозию.';
+      }
+    } else {
+      // copper
+      if (sens === 'high') {
+        fluxClass = wash === 'no' ? 'No-Clean (Не требующий отмывки)' : 'No-Clean / Водосмывной (WS)';
+      } else {
+        fluxClass = wash === 'no' ? 'RMA (Канифольный умеренно активный)' : 'RMA / Водосмывной (WS)';
+      }
+    }
+
+    if (wash === 'no' && (metal === 'aluminum' || metal === 'oxidized')) {
+      warning = 'КРИТИЧНО: Данный металл требует активных флюсов, которые НЕДОПУСТИМО оставлять без отмывки!';
+    }
+
+    if (fluxClassDisplay) fluxClassDisplay.textContent = fluxClass;
+    if (fluxWarnBox && fluxWarnDisplay) {
+      if (warning) {
+        fluxWarnDisplay.textContent = warning;
+        fluxWarnBox.style.display = 'flex';
+      } else {
+        fluxWarnBox.style.display = 'none';
+      }
+    }
+    if (fluxArticleLink) fluxArticleLink.style.display = 'block';
+  }
+
+  if (fluxMetal && fluxSensitivity && fluxWash) {
+    fluxMetal.addEventListener('change', updateFluxSelector);
+    fluxSensitivity.addEventListener('change', updateFluxSelector);
+    fluxWash.addEventListener('change', updateFluxSelector);
+    updateFluxSelector();
+  }
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 5. РАСХОД ПРИПОЯ (#solder-consumption)
+  // ───────────────────────────────────────────────────────────────────────────
+  const consType = document.getElementById('cons-type');
+  const consDiam = document.getElementById('cons-diam');
+  const consCount = document.getElementById('cons-count');
+  const consLength = document.getElementById('cons-length');
+  const consWeight = document.getElementById('cons-weight');
+
+  function updateConsumption() {
+    if (!consType || !consDiam || !consCount || !consLength || !consWeight) return;
+
+    const type = consType.value;
+    const diam = parseFloat(consDiam.value);
+    const count = parseInt(consCount.value) || 1;
+
+    // mm per point for 0.8mm wire as baseline
+    let mmPerPoint = 10;
+    if (type === 'smd') mmPerPoint = 3;
+    if (type === 'wire') mmPerPoint = 20;
+
+    // Adjust for diameter (volume preservation: r^2 * h = const)
+    // base diam = 0.8, r = 0.4. V ~ 0.16 * h
+    // new diam = d, r = d/2. V ~ (d/2)^2 * h_new
+    // h_new = h_old * (0.8 / d)^2
+    const lengthMm = mmPerPoint * count * Math.pow(0.8 / diam, 2);
+    
+    // Add 15% margin
+    const totalLengthMm = lengthMm * 1.15;
+    
+    // Convert to cm
+    const totalLengthCm = totalLengthMm / 10;
+    
+    // Weight: density of POS-61 is ~8.5 g/cm3
+    // Vol in cm3 = pi * (diam/20)^2 * totalLengthCm
+    const rCm = diam / 20;
+    const volCm3 = Math.PI * rCm * rCm * totalLengthCm;
+    const weightG = volCm3 * 8.5;
+
+    consLength.textContent = `~ ${Math.ceil(totalLengthCm)} см`;
+    consWeight.textContent = `Вес: ~ ${weightG.toFixed(1)} г`;
+  }
+
+  if (consType && consDiam && consCount) {
+    consType.addEventListener('change', updateConsumption);
+    consDiam.addEventListener('change', updateConsumption);
+    consCount.addEventListener('input', updateConsumption);
+    updateConsumption();
+  }
+
 });

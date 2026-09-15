@@ -29,32 +29,94 @@ $page_desc = $article['excerpt'];
 $current_page = 'article';
 ob_start();
 ?>
-<!-- Schema.org TechArticle & HowTo JSON-LD for AI Search Engines & LLMs -->
+<?php
+// Convert "10 авг 2026" to ISO 8601 for GEO Schema
+$months_ru = ['янв' => 1, 'фев' => 2, 'мар' => 3, 'апр' => 4, 'май' => 5, 'июн' => 6, 'июл' => 7, 'авг' => 8, 'сен' => 9, 'окт' => 10, 'ноя' => 11, 'дек' => 12];
+$date_str = function_exists('mb_strtolower') ? mb_strtolower($article['date'], 'UTF-8') : $article['date'];
+$date_parts = explode(' ', $date_str);
+$day = str_pad($date_parts[0] ?? '01', 2, '0', STR_PAD_LEFT);
+$month_str = isset($date_parts[1]) ? (function_exists('mb_substr') ? mb_substr($date_parts[1], 0, 3, 'UTF-8') : preg_replace('/^(.{3}).*/us', '$1', $date_parts[1])) : 'янв';
+$month = str_pad($months_ru[$month_str] ?? 1, 2, '0', STR_PAD_LEFT);
+$year = $date_parts[2] ?? '2026';
+$iso_date = "{$year}-{$month}-{$day}T12:00:00+03:00"; // Assuming MSK time
+
+// Prepare FAQ schema
+$faq_schema_items = [];
+foreach ($faq_items as $q => $a) {
+    $faq_schema_items[] = [
+        "@type" => "Question",
+        "name" => $q,
+        "acceptedAnswer" => [
+            "@type" => "Answer",
+            "text" => $a
+        ]
+    ];
+}
+?>
+<!-- Schema.org Graph for GEO (Generative Engine Optimization) -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "TechArticle",
-      "@id": "https://tochka-plavleniya.ru/article.php#article",
+      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#article",
+      "mainEntityOfPage": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>",
       "headline": <?= json_encode($article['title'], JSON_UNESCAPED_UNICODE) ?>,
       "description": <?= json_encode($article['excerpt'], JSON_UNESCAPED_UNICODE) ?>,
+      "datePublished": "<?= $iso_date ?>",
+      "dateModified": "<?= $iso_date ?>",
       "author": {
         "@type": "Person",
-        "name": "Иван Пайкин"
+        "@id": "https://tochka-plavleniya.ru/author/<?= md5($article['author']) ?>",
+        "name": <?= json_encode($article['author'], JSON_UNESCAPED_UNICODE) ?>,
+        "sameAs": [
+          "https://t.me/tochkaplavleniya"
+        ]
       },
       "publisher": {
         "@type": "Organization",
+        "@id": "https://tochka-plavleniya.ru/#organization",
         "name": "ТОЧКА ПЛАВЛЕНИЯ",
         "url": "https://tochka-plavleniya.ru"
       },
       "inLanguage": "ru-RU",
-      "proficiencyLevel": "Expert",
-      "dependencies": "J-STD-020E, IPC-A-610H, ГОСТ 21931-76"
+      "proficiencyLevel": "Expert"
     },
     {
+      "@type": "BreadcrumbList",
+      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#breadcrumb",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Главная",
+          "item": "https://tochka-plavleniya.ru/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Гайды",
+          "item": "https://tochka-plavleniya.ru/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": <?= json_encode($article['title'], JSON_UNESCAPED_UNICODE) ?>,
+          "item": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>"
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#faq",
+      "mainEntity": <?= json_encode($faq_schema_items, JSON_UNESCAPED_UNICODE) ?>
+    }
+    <?php if ($slug === 'temperaturnye-profili'): ?>
+    ,
+    {
       "@type": "HowTo",
-      "@id": "https://tochka-plavleniya.ru/article.php#howto",
+      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#howto",
       "name": "Настройка 4 фаз термопрофиля пайки BGA и SMD компонентов",
       "description": "Пошаговый инженерный регламент пайки без коробления текстолита и деламинации.",
       "step": [
@@ -80,6 +142,7 @@ ob_start();
         }
       ]
     }
+    <?php endif; ?>
   ]
 }
 </script>
@@ -320,6 +383,22 @@ include __DIR__ . '/includes/header.php';
               <span class="text-ink-faint">→</span>
               <span class="sketch-pill-gray text-ink">Пик: <span class="font-bold">до 245°C</span></span>
             </div>
+          </div>
+
+          <!-- Interactive Widget Link -->
+          <div class="my-8 p-6 rounded-lg border border-accent bg-paper-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="material-symbols-outlined text-accent text-[18px]">build</span>
+                <span class="font-mono text-xs font-bold text-accent uppercase tracking-wider">Интерактивный верстак</span>
+              </div>
+              <h3 class="text-lg font-bold text-ink">Рассчитайте параметры для вашей платы</h3>
+              <p class="text-sm text-ink-muted mt-1">Используйте селектор флюса и калькулятор расхода припоя перед началом работы.</p>
+            </div>
+            <a href="interactive.php#solder-consumption" class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent-hover text-white rounded font-mono text-xs transition-colors shadow-sm w-full sm:w-auto">
+              <span>Открыть инструменты</span>
+              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
           </div>
         </section>
 
