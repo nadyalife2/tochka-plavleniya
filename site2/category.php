@@ -421,7 +421,7 @@ include __DIR__ . '/includes/header.php';
             <div class="flex items-center justify-center gap-2 pt-4 font-mono text-xs">
               <?php for ($p = 1; $p <= $paginated['total_pages']; $p++): ?>
                 <a href="<?= $base_pag_url ?>&page=<?= $p ?>"
-                   class="w-8 h-8 rounded flex items-center justify-center border transition-colors <?= $p === $page_num ? 'bg-ink text-paper font-bold border-ink' : 'border-paper-border bg-paper text-ink hover:border-blue-500' ?>">
+                   class="w-8 h-8 min-h-[36px] min-w-[36px] rounded flex items-center justify-center border transition-colors <?= $p === $page_num ? 'bg-ink text-paper font-bold border-ink' : 'border-paper-border bg-paper text-ink hover:border-accent' ?>">
                   <?= $p ?>
                 </a>
               <?php endfor; ?>

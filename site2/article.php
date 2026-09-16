@@ -1020,6 +1020,7 @@ include __DIR__ . '/includes/header.php';
 <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
 
 <!-- Interactive Simulator & UX Scripts (Stitch code) -->
+<script src="assets/js/ui-helpers.js"></script>
 <script>
 (function() {
   const alloyData = {
@@ -1241,12 +1242,16 @@ include __DIR__ . '/includes/header.php';
     copyBtn.addEventListener('click', () => {
       const st = alloyData[currentAlloy].stages[currentStage];
       const text = `${alloyData[currentAlloy].name} | ${st.title} | Скорость/TAL: ${st.speed} | Стол: ${st.bottom} | Фен: ${st.top}`;
-      navigator.clipboard.writeText(text).then(() => {
-        copyBtnText.textContent = 'Скопировано в буфер!';
-        setTimeout(() => {
-          copyBtnText.textContent = 'Скопировать параметры';
-        }, 2000);
-      });
+      if (window.TCHP_UI && window.TCHP_UI.copyToClipboard) {
+        window.TCHP_UI.copyToClipboard(text, copyBtnText, 'Скопировано в буфер!');
+      } else {
+        navigator.clipboard.writeText(text).then(() => {
+          copyBtnText.textContent = 'Скопировано в буфер!';
+          setTimeout(() => {
+            copyBtnText.textContent = 'Скопировать параметры';
+          }, 2000);
+        });
+      }
     });
   }
 

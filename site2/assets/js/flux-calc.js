@@ -159,14 +159,18 @@ document.addEventListener('DOMContentLoaded', () => {
       const volText = resVolumeEl ? resVolumeEl.textContent : '';
       const text = `ТОЧКА ПЛАВЛЕНИЯ // Расчет дозировки: Площадь: ${currentArea} см² | Состав: ${typeName} | Серия: ${currentBatch} шт | Дозировка: ${volText}`;
 
-      navigator.clipboard.writeText(text).then(() => {
-        if (copyText) {
-          copyText.textContent = 'Скопировано!';
-          setTimeout(() => {
-            copyText.textContent = 'Копировать';
-          }, 2000);
-        }
-      });
+      if (window.TCHP_UI && window.TCHP_UI.copyToClipboard) {
+        window.TCHP_UI.copyToClipboard(text, copyBtn, 'Скопировано!');
+      } else {
+        navigator.clipboard.writeText(text).then(() => {
+          if (copyText) {
+            copyText.textContent = 'Скопировано!';
+            setTimeout(() => {
+              copyText.textContent = 'Копировать';
+            }, 2000);
+          }
+        });
+      }
     });
   }
 

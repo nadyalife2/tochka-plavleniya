@@ -35,10 +35,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const sVal = tempSolder.value;
     const wVal = tempWork.value;
     
-    // State: Ошибка / Не выбран
-    if (!sVal || !wVal) {
-      alert('Пожалуйста, выберите марку припоя и тип операции.');
+    // State: Валидация выбора
+    if (!sVal) {
+      if (window.TCHP_UI) window.TCHP_UI.showFieldError(tempSolder, 'Выберите марку припоя');
       return;
+    } else if (window.TCHP_UI) {
+      window.TCHP_UI.clearFieldError(tempSolder);
+    }
+
+    if (!wVal) {
+      if (window.TCHP_UI) window.TCHP_UI.showFieldError(tempWork, 'Выберите тип монтажной операции');
+      return;
+    } else if (window.TCHP_UI) {
+      window.TCHP_UI.clearFieldError(tempWork);
     }
 
     const solderGroup = tempRules[sVal] || {};
@@ -115,6 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // State: До ввода
   if (tempCalcBtn) {
     tempCalcBtn.addEventListener('click', updateTempCalculator);
+  }
+  if (tempSolder) {
+    tempSolder.addEventListener('change', () => {
+      if (window.TCHP_UI) window.TCHP_UI.clearFieldError(tempSolder);
+    });
+  }
+  if (tempWork) {
+    tempWork.addEventListener('change', () => {
+      if (window.TCHP_UI) window.TCHP_UI.clearFieldError(tempWork);
+    });
   }
 
 

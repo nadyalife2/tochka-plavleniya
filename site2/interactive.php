@@ -834,6 +834,7 @@ include __DIR__ . '/includes/header.php';
   </script>
 
   <!-- Scripts -->
+  <script src="assets/js/ui-helpers.js"></script>
   <script src="assets/js/workbench.js"></script>
   <script src="assets/js/flux-calc.js"></script>
   <script src="assets/js/solder-table.js"></script>
