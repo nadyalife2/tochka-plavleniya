@@ -43,6 +43,9 @@ $current_page = $current_page ?? '';
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+  <!-- Design Tokens (Single Source of Truth) -->
+  <link rel="stylesheet" href="/assets/css/tokens.css">
+
   <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
   <link rel="stylesheet" href="/assets/css/fonts.css">
   <link rel="stylesheet" href="/assets/css/build.css">

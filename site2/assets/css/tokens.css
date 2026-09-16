@@ -1,0 +1,113 @@
+/**
+ * tokens.css — Единый источник дизайн-токенов «ТОЧКА ПЛАВЛЕНИЯ» (Editorial Lab / Blueprint)
+ *
+ * Все цвета, типографика, радиусы, тени и сетка определены здесь.
+ * Tailwind CSS и ручные стилевые файлы ссылаются на эти переменные.
+ */
+
+:root {
+  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Светлая тема: тёплая бумага) --- */
+  --color-bg: #faf8f5;
+  --color-paper: #faf8f5;
+  --color-paper-subtle: #f3f0ea;
+  --color-paper-border: #e6e2da;
+  --color-paper-border-dark: #d3cdc2;
+  --color-card: rgba(255, 255, 255, 0.85);
+  --color-card-solid: #ffffff;
+  --color-callout: #fcfaf2;
+  --dot-color: #d3cdc2;
+
+  /* --- 30% ТЕКСТ И СТРУКТУРА (Графит и металл) --- */
+  --color-ink: #141414;
+  --color-ink-muted: #6b665f;
+  /* WCAG AA Compliance (> 4.5:1 на #faf8f5) */
+  --color-ink-faint: #666159;
+
+  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Медно-янтарный термо-акцент) --- */
+  --color-accent: #eb5211;
+  --color-accent-hover: #d2450a;
+  --color-accent-subtle: rgba(235, 82, 17, 0.12);
+  --color-accent-border: rgba(235, 82, 17, 0.35);
+
+  /* Алиасы семантики */
+  --color-primary: var(--color-accent);
+  --color-primary-hover: var(--color-accent-hover);
+  --color-surface: var(--color-paper);
+  --color-surface-subtle: var(--color-paper-subtle);
+  --color-text: var(--color-ink);
+  --color-text-muted: var(--color-ink-muted);
+  --color-text-faint: var(--color-ink-faint);
+
+  /* Статусные цвета */
+  --color-danger: #b3261e;
+  --color-danger-bg: #fdecec;
+  --color-danger-border: #f8b4b4;
+  --color-success: #1a7f4c;
+  --color-success-bg: #e6f4ea;
+  --color-success-border: #a8dab5;
+  --color-warning: #d97706;
+  --color-warning-bg: #fef3c7;
+  --color-warning-border: #fcd34d;
+
+  /* Инженерные скетч-маркеры */
+  --color-sketch-yellow: #fde047;
+  --color-sketch-yellow-bg: #fffdf5;
+  --color-sketch-tape: rgba(235, 222, 179, 0.85);
+
+  /* --- ТИПОГРАФИКА --- */
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-serif: Newsreader, Georgia, serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-hand: Caveat, cursive;
+
+  --font-size-body: 17px;
+  --line-height-body: 1.7;
+
+  /* --- ФОРМА, СКРУГЛЕНИЯ И ТЕНИ --- */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 6px 18px rgba(0, 0, 0, 0.08);
+
+  /* --- СЕТКА И WCAG TOUCH TARGETS --- */
+  --container-width: 1140px;
+  --touch-target-min: 44px;
+}
+
+/* ТЁМНАЯ ТЕМА (Глубокий графит и тёмный флюс) */
+html.dark {
+  --color-bg: #12141a;
+  --color-paper: #12141a;
+  --color-paper-subtle: #191c24;
+  --color-paper-border: #282d3b;
+  --color-paper-border-dark: #373e52;
+  --color-card: rgba(24, 27, 36, 0.85);
+  --color-card-solid: #181b24;
+  --color-callout: #1b1f2b;
+  --dot-color: #2b3142;
+
+  --color-ink: #f3f4f6;
+  --color-ink-muted: #9ca3af;
+  --color-ink-faint: #9ca3af;
+
+  --color-accent: #f97316;
+  --color-accent-hover: #ea580c;
+  --color-accent-subtle: rgba(249, 115, 22, 0.15);
+  --color-accent-border: rgba(249, 115, 22, 0.4);
+
+  --color-danger-bg: rgba(179, 38, 30, 0.2);
+  --color-danger-border: rgba(248, 180, 180, 0.3);
+  --color-success-bg: rgba(26, 127, 76, 0.2);
+  --color-success-border: rgba(168, 218, 181, 0.3);
+  --color-warning-bg: rgba(217, 119, 6, 0.2);
+  --color-warning-border: rgba(252, 211, 77, 0.3);
+
+  --color-sketch-yellow-bg: rgba(202, 138, 4, 0.15);
+  --color-sketch-tape: rgba(120, 106, 72, 0.7);
+
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-card-hover: 0 6px 18px rgba(0, 0, 0, 0.5);
+}

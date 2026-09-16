@@ -147,6 +147,9 @@ foreach ($faq_items as $q => $a) {
 }
 </script>
 
+<!-- Design Tokens (Single Source of Truth) -->
+<link rel="stylesheet" href="assets/css/tokens.css"/>
+
 <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
 <link rel="stylesheet" href="assets/css/fonts.css"/>
 <link rel="stylesheet" href="assets/css/build.css"/>
