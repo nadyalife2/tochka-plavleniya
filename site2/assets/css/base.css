@@ -1,0 +1,474 @@
+/**
+ * base.css — Единая база стилей и UI-примитивов «ТОЧКА ПЛАВЛЕНИЯ» (Editorial Lab)
+ *
+ * Содержит:
+ * - Сбросы и базовые стили тела страницы
+ * - Универсальные UI-компоненты: .btn, .card, .field, .badge, .alert
+ * - Логотип, шапку, мобильную панель и модальное окно поиска
+ * - Инженерную эстетику (скетч-пилюли, скотч, маркеры, заметки)
+ * - Стили печати
+ */
+
+@import url('tokens.css');
+
+/* ==========================================================================
+   1. СБРОС И БАЗОВАЯ СТРУКТУРА
+   ========================================================================== */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html, body {
+  overflow-x: clip;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent) !important;
+  outline-offset: 2px !important;
+}
+
+body {
+  background-color: var(--color-bg);
+  background-image: radial-gradient(var(--dot-color) 0.9px, transparent 0.9px);
+  background-size: 20px 20px;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background-color: #fef08a;
+  color: #141414;
+}
+
+/* ==========================================================================
+   2. УНИВЕРСАЛЬНЫЙ UI-KIT (ПРИМИТИВЫ)
+   ========================================================================== */
+
+/* Кнопки */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--touch-target-min);
+  padding: 0.5rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  transition: opacity 0.15s ease, transform 0.1s ease, background-color 0.15s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn:hover {
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--touch-target-min);
+  background-color: var(--color-accent);
+  color: #ffffff !important;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  transition: opacity 0.2s ease, transform 0.1s ease;
+  border: 1px solid transparent;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  background-color: var(--color-accent-hover);
+  opacity: 0.95;
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: var(--touch-target-min);
+  background-color: var(--color-paper-subtle);
+  color: var(--color-ink) !important;
+  border-radius: var(--radius-md);
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  border: 1px solid var(--color-paper-border-dark);
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  background-color: var(--color-paper-border);
+  border-color: var(--color-ink-muted);
+}
+
+/* Карточки */
+.card {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-paper-border);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.card-tool {
+  background-color: var(--color-card);
+  border: 1px solid var(--color-paper-border);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Поля ввода и селекторы */
+.field,
+.input-base {
+  width: 100%;
+  min-height: var(--touch-target-min);
+  padding: 0.625rem 0.75rem;
+  background-color: var(--color-paper);
+  border: 1px solid var(--color-paper-border-dark);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field:focus-visible,
+.input-base:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+.field.has-error,
+.input-base.has-error {
+  border-color: var(--color-danger);
+}
+
+/* Бейджи */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+.badge.badge-neutral {
+  background-color: var(--color-paper-subtle);
+  color: var(--color-ink-muted);
+  border: 1px solid var(--color-paper-border);
+}
+.badge-level-beginner,
+.badge-beginner {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  border: 1px solid var(--color-success-border);
+}
+.badge-level-practice,
+.badge-practice {
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+  border: 1px solid var(--color-warning-border);
+}
+
+/* Сообщения и предупреждения */
+.alert,
+.alert-box {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  border-left: 4px solid;
+}
+.alert-warning {
+  background-color: var(--color-warning-bg);
+  border-left-color: var(--color-warning);
+  color: var(--color-ink);
+}
+.alert-safety,
+.alert-error,
+.alert-danger {
+  background-color: var(--color-danger-bg);
+  border-left-color: var(--color-danger);
+  color: var(--color-ink);
+}
+.alert-success {
+  background-color: var(--color-success-bg);
+  border-left-color: var(--color-success);
+  color: var(--color-ink);
+}
+
+/* ==========================================================================
+   3. ЛОГОТИП И НАВИГАЦИЯ
+   ========================================================================== */
+
+.logo {
+  font-family: var(--font-sans);
+  font-size: 1.25rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--color-ink);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  transition: opacity 0.15s ease;
+}
+.logo:hover {
+  opacity: 0.85;
+}
+.logo span {
+  color: #141414;
+  background: var(--color-accent);
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  transform: skew(-6deg);
+  display: inline-block;
+  margin: 0 0.18rem;
+  font-size: 1.05em;
+  line-height: 0.9;
+}
+
+.nav-link {
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+.nav-link.active {
+  color: var(--color-accent) !important;
+  border-bottom: 2px solid var(--color-accent) !important;
+  background: var(--color-accent-subtle) !important;
+  font-weight: 700 !important;
+}
+
+/* ==========================================================================
+   4. СКЕТЧ-ЭЛЕМЕНТЫ И ИНЖЕНЕРНАЯ ЭСТЕТИКА (EDITORIAL LAB)
+   ========================================================================== */
+
+.sketch-border {
+  border-radius: 255px 15px 225px / 15px 225px 15px 255px;
+}
+
+.sketch-pill-yellow {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: #141414;
+  padding: 0.22rem 0.75rem 0.26rem 0.7rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 4 C 20 1.5, 68 3, 98 2 C 100 11.5, 98 19.5, 99 25.5 C 72 26.5, 26 24.5, 1 25.5 C 0 16.5, 1.5 8, 1.5 4 Z' fill='%23fef08a' fill-opacity='0.95' stroke='%23ca8a04' stroke-width='0.9' stroke-dasharray='40 1 20 1' stroke-linecap='round'/%3E%3Cpath d='M4 7 C 28 5, 72 5.5, 95.5 5 C 96.5 12, 94.5 18.5, 96 21.5 C 68 22.5, 26 21.5, 3 21.5 Z' fill='%23fde047' fill-opacity='0.65'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transform: rotate(-0.9deg);
+  transition: transform 0.15s ease;
+}
+.sketch-pill-yellow:hover {
+  transform: rotate(0deg) scale(1.03);
+}
+html.dark .sketch-pill-yellow {
+  color: #fef08a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 4 C 20 1.5, 68 3, 98 2 C 100 11.5, 98 19.5, 99 25.5 C 72 26.5, 26 24.5, 1 25.5 C 0 16.5, 1.5 8, 1.5 4 Z' fill='%23ca8a04' fill-opacity='0.4' stroke='%23eab308' stroke-width='0.9' stroke-dasharray='40 1 20 1' stroke-linecap='round'/%3E%3Cpath d='M4 7 C 28 5, 72 5.5, 95.5 5 C 96.5 12, 94.5 18.5, 96 21.5 C 68 22.5, 26 21.5, 3 21.5 Z' fill='%23a16207' fill-opacity='0.4'/%3E%3C/svg%3E");
+}
+
+.sketch-pill-gray {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  color: var(--color-ink);
+  padding: 0.22rem 0.75rem 0.26rem 0.7rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23e9e5dc' fill-opacity='0.95' stroke='%23b8b1a2' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%23ded8cd' fill-opacity='0.6'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  transform: rotate(0.6deg);
+  transition: transform 0.15s ease;
+}
+.sketch-pill-gray:hover {
+  transform: rotate(0deg) scale(1.03);
+}
+html.dark .sketch-pill-gray {
+  color: #f3f4f6;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23222735' fill-opacity='0.95' stroke='%233e465c' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%232c3346' fill-opacity='0.6'/%3E%3C/svg%3E");
+}
+
+/* Скетч-маркеры текста */
+mark, .marker-yellow {
+  position: relative;
+  display: inline;
+  background: transparent;
+  color: #141414;
+  padding: 0.18em 0.55em 0.22em 0.5em;
+  margin: 0 -0.15em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0.5 4.5 C 18 2, 48 5.5, 98.5 2.5 C 100 11, 98 18.5, 99.5 22 C 75 23.5, 30 20.5, 1.5 22 C 0 16, 1.5 8.5, 0.5 4.5 Z' fill='%23fef08a' fill-opacity='0.9'/%3E%3Cpath d='M3 7.5 C 25 5.5, 68 6, 96.5 5 C 97.5 12.5, 95 18, 97 20 C 70 21.5, 28 19.5, 4 19.5 Z' fill='%23fde047' fill-opacity='0.55'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  font-weight: 600;
+}
+html.dark mark, html.dark .marker-yellow {
+  color: #fef08a;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 24' preserveAspectRatio='none'%3E%3Cpath d='M0.5 4.5 C 18 2, 48 5.5, 98.5 2.5 C 100 11, 98 18.5, 99.5 22 C 75 23.5, 30 20.5, 1.5 22 C 0 16, 1.5 8.5, 0.5 4.5 Z' fill='%23854d0e' fill-opacity='0.6'/%3E%3Cpath d='M3 7.5 C 25 5.5, 68 6, 96.5 5 C 97.5 12.5, 95 18, 97 20 C 70 21.5, 28 19.5, 4 19.5 Z' fill='%23a16207' fill-opacity='0.5'/%3E%3C/svg%3E");
+}
+
+/* Рукописный шрифт */
+.handwriting {
+  font-family: var(--font-hand);
+  line-height: 1.1;
+}
+
+/* Ползунок температуры/диапазона */
+input[type="range"].range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: var(--color-paper-border-dark);
+  border-radius: 3px;
+  outline: none;
+  transition: background 0.15s ease;
+}
+input[type="range"].range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  cursor: pointer;
+  border: 2px solid var(--color-paper);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  transition: transform 0.1s ease;
+}
+input[type="range"].range-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Сетки верстака */
+.tool-two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .tool-two-col {
+    grid-template-columns: 1.25fr 1fr;
+  }
+}
+
+/* ==========================================================================
+   5. МОБИЛЬНАЯ ПАНЕЛЬ И МОДАЛКА ПОИСКА
+   ========================================================================== */
+
+.mobile-quick-bar {
+  display: none !important;
+}
+@media (max-width: 640px) {
+  .mobile-quick-bar {
+    display: flex !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    background-color: var(--color-paper);
+    border-top: 1px solid var(--color-paper-border);
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06);
+    padding: 0.25rem 0.5rem;
+    align-items: center;
+    justify-content: space-around;
+  }
+}
+@media (max-width: 768px) {
+  header nav.nav {
+    display: none !important;
+  }
+}
+
+#search-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 5rem 1rem 2rem;
+  background-color: rgba(20, 20, 20, 0.65);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+#search-modal.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+#search-modal-box {
+  width: 100%;
+  max-width: 680px;
+  background-color: var(--color-paper);
+  border: 1.5px solid var(--color-paper-border-dark);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  transform: translateY(-12px) scale(0.98);
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#search-modal.active #search-modal-box {
+  transform: translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   6. СТИЛИ ПЕЧАТИ
+   ========================================================================== */
+@media print {
+  header, footer, aside, .mobile-quick-bar, #search-modal, #theme-toggle, .no-print {
+    display: none !important;
+  }
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 12pt !important;
+    line-height: 1.5 !important;
+  }
+  a {
+    color: #000000 !important;
+    text-decoration: underline !important;
+  }
+}

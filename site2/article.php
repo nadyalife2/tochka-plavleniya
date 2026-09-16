@@ -155,8 +155,9 @@ foreach ($faq_items as $q => $a) {
 <link rel="stylesheet" href="assets/css/build.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 
-<!-- Common Design Tokens & Base Styles -->
-<link rel="stylesheet" href="assets/css/common.css"/>
+<!-- Base UI Components & Reset -->
+<link rel="stylesheet" href="assets/css/base.css"/>
+<link rel="stylesheet" href="assets/css/article.css"/>
 
 <style>
   /* Hand-drawn marker underline */
