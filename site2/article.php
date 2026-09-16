@@ -1177,6 +1177,7 @@ include __DIR__ . '/includes/header.php';
   let currentStage = 2; // Reflow active
 
   function renderSimulator() {
+    if (!document.getElementById('simulator') || !document.getElementById('detail-tag')) return;
     const alloy = alloyData[currentAlloy];
 
     // Update tab temps
