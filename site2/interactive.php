@@ -781,8 +781,14 @@ include __DIR__ . '/includes/header.php';
                   <td class="py-2.5 px-3">
                     <?php
                     $comps = [];
-                    if ($solder['sn_pct'] > 0) $comps[] = $solder['sn_pct'] . '% Sn';
-                    if ($solder['pb_pct'] > 0) $comps[] = $solder['pb_pct'] . '% Pb';
+                    if (!empty($solder['sn_range'])) {
+                        $comps[] = $solder['sn_range'] . '% Sn';
+                    } elseif ($solder['sn_pct'] > 0) {
+                        $comps[] = $solder['sn_pct'] . '% Sn';
+                    }
+                    if ($solder['pb_pct'] > 0) {
+                        $comps[] = (!empty($solder['sn_range']) && $solder['id'] === 'pos61' ? 'ост. Pb (39–41%)' : $solder['pb_pct'] . '% Pb');
+                    }
                     if ($solder['ag_pct'] > 0) $comps[] = $solder['ag_pct'] . '% Ag';
                     if ($solder['bi_pct'] > 0) $comps[] = $solder['bi_pct'] . '% Bi';
                     if ($solder['cu_pct'] > 0) $comps[] = $solder['cu_pct'] . '% Cu';

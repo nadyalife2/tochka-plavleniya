@@ -532,10 +532,10 @@ include __DIR__ . '/includes/header.php';
               <!-- Alloy pills -->
               <div class="flex flex-wrap items-center gap-1.5 font-mono text-xs" id="alloy-selector">
                 <button class="alloy-btn px-2.5 py-1 rounded border border-ink bg-ink text-paper transition-all font-medium" data-alloy="sac305" type="button">
-                  SAC305 (217°C)
+                  SAC305 (217–220°C)
                 </button>
                 <button class="alloy-btn px-2.5 py-1 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all" data-alloy="pos61" type="button">
-                  ПОС-61 (183°C)
+                  ПОС-61 (183–190°C)
                 </button>
                 <button class="alloy-btn px-2.5 py-1 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all" data-alloy="sn42" type="button">
                   Sn42Bi58 (138°C)
@@ -1074,7 +1074,7 @@ include __DIR__ . '/includes/header.php';
       ]
     },
     pos61: {
-      name: 'ПОС-61 (Sn63 Pb37)',
+      name: 'ПОС-61 (ГОСТ 21930-76, 59–61% Sn)',
       stages: [
         {
           tabTemp: '25°C → 130°C',
@@ -1101,13 +1101,13 @@ include __DIR__ . '/includes/header.php';
         {
           tabTemp: '183°C → 215°C',
           tag: 'ФАЗА 03',
-          title: 'Оплавление (Reflow) — 183°C → 215°C',
-          speed: 'TAL: 35 — 60 сек',
+          title: 'Оплавление (Reflow) — 183°C (солидус) / 190°C (ликвидус) → 215°C',
+          speed: 'TAL (>190°C): 35 — 60 сек',
           duration: 'Пик: 10 — 15 сек',
           bottom: '150°C — 160°C',
           top: '225°C (30 л/мин)',
-          desc: 'Мгновенный эвтектический переход в жидкость при 183°C, зеркальная галтель и самоцентрирование чипа.',
-          warning: 'Нагрев свыше 225°C не нужен и ускоряет окисление свинца.'
+          desc: 'Переход через температурный интервал кристаллизации (солидус 183 °C, ликвидус 190 °C). Зеркальная блестящая галтель при температуре соединения выше 205 °C.',
+          warning: 'Нагрев свыше 225°C избыточен. В интервале 183–190 °C недопустимы механические колебания платы.'
         },
         {
           tabTemp: '215°C → 90°C',

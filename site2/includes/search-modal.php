@@ -59,18 +59,26 @@
   const KNOWLEDGE_BASE = [
     // Сплавы и припои
     {
-      title: "ПОС-61 (Sn63Pb37)",
+      title: "ПОС-61 (ГОСТ 21930-76)",
+      category: "сплавы",
+      badge: "183–190 °C // ГОСТ",
+      desc: "Отечественный оловянно-свинцовый припой (59–61% Sn, остальное Pb). Имеет интервал кристаллизации 7 °C (не эвтектика). Сортамент проволоки с флюсом — ГОСТ 21931-76.",
+      url: "/interactive.php#table",
+      badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
+    },
+    {
+      title: "Sn63Pb37 (IPC J-STD-006C)",
       category: "сплавы",
       badge: "183 °C // Эвтектика",
-      desc: "Классический оловянно-свинцовый эвтектический припой. Мгновенный переход из жидкого в твердое состояние без пластической фазы.",
-      url: "/interactive.php#calculator",
+      desc: "Зарубежный эвтектический оловянно-свинцовый припой (63% Sn / 37% Pb) с фиксированной точкой затвердевания 183 °C без пастообразного состояния.",
+      url: "/interactive.php#table",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
       title: "SAC305 (Sn96.5Ag3.0Cu0.5)",
       category: "сплавы",
-      badge: "217–221 °C // Lead-free",
-      desc: "Основной бессвинцовый промышленный стандарт. Требует точного соблюдения пика reflow и защиты от деградации текстолита.",
+      badge: "217–220 °C // Lead-Free",
+      desc: "Основной промышленный бессвинцовый стандарт (IPC J-STD-006C). Матовая сатинированная фактура галтели является естественной физической нормой.",
       url: "/article.php#simulator",
       badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
     },
