@@ -1,11 +1,34 @@
 /**
- * flux-calc.js — Интерактивный верстак: калькулятор расхода флюса и паяльной пасты (IPC-7095C)
- * Реактивный расчет в реальном времени, пресеты плат, масштабируемый SVG и буфер обмена
+ * flux-calc.js — Калькулятор расхода паяльной пасты и флюса
+ * Физическая модель апертурного переноса (Indium Corporation / IPC-7525B Stencil Design Guide)
+ * 
+ * Модель расчёта пасты:
+ *   S_board    = площадь платы / монтажной зоны (см²)
+ *   k_aperture = доля площади контактных площадок (~18% для типового SMD монтажа)
+ *   h_stencil  = толщина металлического трафарета (100, 120, 130, 150 мкм)
+ *   eta        = коэффициент выхода пасты из апертур (Transfer Efficiency ~80% по IPC-7525)
+ *   rho_paste  = плотность паяльной пасты:
+ *                - SAC305 (88.5% металл): ~4.35 г/см³
+ *                - Sn63Pb37 (90% металл): ~4.80 г/см³
+ *   k_waste    = технологический отход на ракеле, остаток на стенках и промывку (+20%, k = 1.20)
+ * 
+ *   V_theor = S_board * k_aperture * (h_stencil / 10000)   [см³ = мл]
+ *   V_dep   = V_theor * eta                                [см³ = мл]
+ *   M_board = V_dep * rho_paste * k_waste                  [г]
+ *   M_total = M_board * batch_count                        [г]
+ * 
+ * Модель дозирования флюсов:
+ *   - BGA реболлинг/монтаж чипов (NC-559, ROL0): равномерная пленка 50–70 мкм (0.006 мл/см²)
+ *   - SMD ручное нанесение RMA (ROM1): дозатор/кисть на площадки (0.008 мл/см²)
+ *   - Водосмывной жидкий/гель WS (ORH1): нанесение под смыв (0.006 мл/см²)
  */
+
 document.addEventListener('DOMContentLoaded', () => {
   const slider = document.getElementById('flux-area-slider');
   const numberInput = document.getElementById('flux-area');
   const typeSelect = document.getElementById('flux-type');
+  const stencilSelect = document.getElementById('stencil-thickness');
+  const stencilGroup = document.getElementById('stencil-thickness-group');
   const presetButtons = document.querySelectorAll('.preset-btn');
   const batchButtons = document.querySelectorAll('.batch-btn');
 
@@ -27,36 +50,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let currentArea = 35;
   let currentBatch = 1;
-  let currentType = 'bga_nc';
+  let currentType = 'paste_sac';
+  let currentStencilH = 120; // мкм
+
+  function calculatePasteMass(areaCm2, stencilHUm, alloyType, batchQty) {
+    // k_aperture = 0.18 (18% площадок от площади платы)
+    const kAperture = 0.18;
+    const hCm = stencilHUm / 10000; // мкм -> см
+    const etaTransfer = 0.80; // 80% per IPC-7525
+    const kWaste = 1.20; // +20% технологический отход на валике ракеля и смыв
+    const rho = alloyType === 'paste_sn63' ? 4.80 : 4.35; // г/см³
+
+    const vTheorCm3 = areaCm2 * kAperture * hCm;
+    const vDepCm3 = vTheorCm3 * etaTransfer;
+    const mBoardG = vDepCm3 * rho * kWaste;
+    return mBoardG * batchQty;
+  }
+
+  function calculateFluxVolume(areaCm2, rateMlPerCm2, batchQty) {
+    return areaCm2 * rateMlPerCm2 * batchQty;
+  }
 
   function updateCalculator() {
+    // Безопасное считывание числа без перезаписи на 35 при пустом/нулевом вводе
     if (numberInput) {
-      currentArea = parseFloat(numberInput.value) || 35;
+      const raw = numberInput.value.trim();
+      if (raw !== '') {
+        const parsed = parseFloat(raw);
+        if (!isNaN(parsed) && parsed > 0) {
+          currentArea = Math.min(500, Math.max(1, parsed));
+        }
+      }
     }
+
     if (typeSelect) {
       currentType = typeSelect.value;
     }
 
-    // Boundary constraints
-    if (currentArea < 1) currentArea = 1;
-    if (currentArea > 500) currentArea = 500;
+    if (stencilSelect) {
+      currentStencilH = parseInt(stencilSelect.value, 10) || 120;
+    }
 
-    // Rates per cm2
-    const rates = {
-      bga_nc: { rate: 0.005, unit: 'мл', name: 'Гель BGA (NC-559)', wash: 'Отмывка: опциональна (No-Clean)', desc: `Для ${currentArea} см² при BGA реболлинге наносите тонкий слой 50-70 мкм. Избыток вызывает кипение и сдвиг чипа.` },
-      smd_rma: { rate: 0.008, unit: 'мл', name: 'Канифольный (RMA-223)', wash: 'Отмывка: изопропиловый спирт (IPA 99.7%)', desc: `Для ${currentArea} см² SMD монтажа наносите кистью или дозатором. Обязательна отмывка от ионных остатков канифоли.` },
-      paste_sac: { rate: 0.015, unit: 'г', name: 'Паста SAC305', wash: 'Отмывка: по типу флюса в пасте', desc: `Для ${currentArea} см² через трафарет (толщина 120 мкм, апертура 85%) потребуется паяльная паста со сферическими частицами Type 4.` },
-      clean_ws: { rate: 0.006, unit: 'мл', name: 'Водосмывной WS', wash: 'Отмывка: деионизированная вода в УЗ-ванне (50°C)', desc: `Для ${currentArea} см² высокая активность смывает стойкие оксиды. Не оставляйте неотмытым более 2 часов (коррозия!).` }
-    };
+    const isPaste = currentType.startsWith('paste_');
+    if (stencilGroup) {
+      stencilGroup.style.display = isPaste ? 'block' : 'none';
+    }
 
-    const cfg = rates[currentType] || rates.bga_nc;
-    const singleVol = currentArea * cfg.rate;
-    const totalVol = singleVol * currentBatch;
+    let resultValueStr = '';
+    let resultUnit = '';
+    let resultDesc = '';
+    let washText = '';
+
+    if (currentType === 'paste_sac' || currentType === 'paste_sn63') {
+      const isLead = currentType === 'paste_sn63';
+      const alloyName = isLead ? 'Sn63Pb37 (эвтектика, 90% металла)' : 'SAC305 (Sn96.5Ag3Cu0.5, 88.5% металла)';
+      const massG = calculatePasteMass(currentArea, currentStencilH, currentType, currentBatch);
+      resultValueStr = massG < 1 ? massG.toFixed(2) : massG.toFixed(1);
+      resultUnit = 'г';
+      washText = isLead 
+        ? 'Отмывка: зависит от флюса в пасте (RMA — IPA 99.7%, No-Clean — по требованиям изделия)' 
+        : 'Отмывка: зависит от классификации флюса в пасте (ROL0 / REL0 обычно не требуют смыва)';
+      resultDesc = `Расчёт по модели Indium Corp для ${currentArea} см²: трафарет ${currentStencilH} мкм, апертурное покрытие 18%, перенос пасты η = 80%, тех. отход на ракеле +20%. Паста: ${alloyName}.`;
+    } else if (currentType === 'bga_nc') {
+      const volMl = calculateFluxVolume(currentArea, 0.006, currentBatch);
+      resultValueStr = volMl < 0.1 ? volMl.toFixed(3) : volMl.toFixed(2);
+      resultUnit = 'мл';
+      washText = 'Отмывка: опциональна для Class 1/2 (ROL0 / NC-559-V2); для Class 3 и перед лакированием — спирто-бензин или IPA';
+      resultDesc = `Для ${currentArea} см² BGA реболлинга и монтажа BGA/QFN: тонкий равномерный слой 50–70 мкм. Избыток геля вызывает смещение шариков и подрыв чипа.`;
+    } else if (currentType === 'smd_rma') {
+      const volMl = calculateFluxVolume(currentArea, 0.008, currentBatch);
+      resultValueStr = volMl < 0.1 ? volMl.toFixed(3) : volMl.toFixed(2);
+      resultUnit = 'мл';
+      washText = 'Отмывка: спирто-бензиновая смесь (1:1) или изопропиловый спирт 99.7%. В сухих условиях Class 1 канифоль химически инертна';
+      resultDesc = `Для ${currentArea} см² ручного монтажа: точечное дозирование на контактные площадки. Умеренная активация (ROM1) защищает от окисления.`;
+    } else if (currentType === 'clean_ws') {
+      const volMl = calculateFluxVolume(currentArea, 0.006, currentBatch);
+      resultValueStr = volMl < 0.1 ? volMl.toFixed(3) : volMl.toFixed(2);
+      resultUnit = 'мл';
+      washText = 'Отмывка: ОБЯЗАТЕЛЬНА деионизированной водой (50–60°C в УЗ-ванне) не позднее 2–4 часов после пайки!';
+      resultDesc = `Для ${currentArea} см² водосмывной химии (ORH1): водорастворимый флюс агрессивно смывает тяжелые оксиды. Неотмытые остатки гигроскопичны и электропроводны.`;
+    }
 
     // Output main results
     if (resVolumeEl) {
-      const volStr = totalVol < 0.1 ? totalVol.toFixed(3) : totalVol.toFixed(2);
-      resVolumeEl.textContent = `~${volStr} ${cfg.unit}`;
+      resVolumeEl.textContent = `~${resultValueStr} ${resultUnit}`;
     }
 
     if (batchNoteEl) {
@@ -64,11 +141,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (resDescEl) {
-      resDescEl.textContent = cfg.desc;
+      resDescEl.textContent = resultDesc;
     }
 
     if (washTipEl) {
-      washTipEl.textContent = cfg.wash;
+      washTipEl.textContent = washText;
     }
 
     // PCB Visualization update
@@ -78,21 +155,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (pcbSvg) {
-      // Dynamic SVG size between 50px and 125px
       const svgSize = Math.min(125, Math.max(50, 50 + (currentArea / 200) * 75));
       pcbSvg.setAttribute('width', Math.round(svgSize));
       pcbSvg.setAttribute('height', Math.round(svgSize));
     }
 
-    // Comparison matrix update
+    // Comparison matrix update (per current area and batch)
     if (matrixArea) matrixArea.textContent = `${currentArea} см²`;
-    if (matrixBga) matrixBga.textContent = `${(currentArea * rates.bga_nc.rate * currentBatch).toFixed(2)} мл`;
-    if (matrixRma) matrixRma.textContent = `${(currentArea * rates.smd_rma.rate * currentBatch).toFixed(2)} мл`;
-    if (matrixPaste) matrixPaste.textContent = `${(currentArea * rates.paste_sac.rate * currentBatch).toFixed(2)} г`;
-    if (matrixWs) matrixWs.textContent = `${(currentArea * rates.clean_ws.rate * currentBatch).toFixed(2)} мл`;
+    if (matrixBga) {
+      const bgaVol = calculateFluxVolume(currentArea, 0.006, currentBatch);
+      matrixBga.textContent = `${bgaVol < 0.1 ? bgaVol.toFixed(3) : bgaVol.toFixed(2)} мл`;
+    }
+    if (matrixRma) {
+      const rmaVol = calculateFluxVolume(currentArea, 0.008, currentBatch);
+      matrixRma.textContent = `${rmaVol < 0.1 ? rmaVol.toFixed(3) : rmaVol.toFixed(2)} мл`;
+    }
+    if (matrixPaste) {
+      const pasteM = calculatePasteMass(currentArea, currentStencilH, 'paste_sac', currentBatch);
+      matrixPaste.textContent = `${pasteM < 1 ? pasteM.toFixed(2) : pasteM.toFixed(1)} г`;
+    }
+    if (matrixWs) {
+      const wsVol = calculateFluxVolume(currentArea, 0.006, currentBatch);
+      matrixWs.textContent = `${wsVol < 0.1 ? wsVol.toFixed(3) : wsVol.toFixed(2)} мл`;
+    }
   }
 
-  // Slider events
+  // Slider and number events
   if (slider && numberInput) {
     slider.addEventListener('input', (e) => {
       numberInput.value = e.target.value;
@@ -101,15 +189,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     numberInput.addEventListener('input', (e) => {
-      slider.value = e.target.value;
+      const val = parseFloat(e.target.value);
+      if (!isNaN(val) && val >= 1 && val <= 500) {
+        if (slider) slider.value = Math.min(200, Math.max(1, val));
+        updateCalculator();
+        highlightActivePreset(val);
+      }
+    });
+
+    numberInput.addEventListener('blur', () => {
+      const raw = numberInput.value.trim();
+      if (raw === '' || isNaN(parseFloat(raw)) || parseFloat(raw) <= 0) {
+        numberInput.value = currentArea;
+      } else {
+        currentArea = Math.min(500, Math.max(1, parseFloat(raw)));
+        numberInput.value = currentArea;
+      }
+      if (slider) slider.value = Math.min(200, Math.max(1, currentArea));
       updateCalculator();
-      highlightActivePreset(e.target.value);
     });
   }
 
   // Type change
   if (typeSelect) {
     typeSelect.addEventListener('change', updateCalculator);
+  }
+
+  // Stencil thickness change
+  if (stencilSelect) {
+    stencilSelect.addEventListener('change', updateCalculator);
   }
 
   // Preset Buttons
@@ -127,9 +235,10 @@ document.addEventListener('DOMContentLoaded', () => {
   presetButtons.forEach(btn => {
     btn.addEventListener('click', () => {
       const areaVal = btn.getAttribute('data-area');
-      if (numberInput) numberInput.value = areaVal;
-      if (slider) slider.value = areaVal;
-      highlightActivePreset(areaVal);
+      currentArea = parseFloat(areaVal) || 35;
+      if (numberInput) numberInput.value = currentArea;
+      if (slider) slider.value = Math.min(200, currentArea);
+      highlightActivePreset(currentArea);
       updateCalculator();
     });
   });
@@ -149,15 +258,16 @@ document.addEventListener('DOMContentLoaded', () => {
   // Copy to clipboard
   if (copyBtn) {
     copyBtn.addEventListener('click', () => {
-      const rates = {
-        bga_nc: 'Гель BGA (NC-559)',
-        smd_rma: 'Канифольный (RMA-223)',
+      const types = {
         paste_sac: 'Паста SAC305',
-        clean_ws: 'Водосмывной WS'
+        paste_sn63: 'Паста Sn63Pb37',
+        bga_nc: 'Гель BGA (ROL0)',
+        smd_rma: 'Канифольный RMA (ROM1)',
+        clean_ws: 'Водосмывной WS (ORH1)'
       };
-      const typeName = rates[currentType] || currentType;
+      const typeName = types[currentType] || currentType;
       const volText = resVolumeEl ? resVolumeEl.textContent : '';
-      const text = `ТОЧКА ПЛАВЛЕНИЯ // Расчет дозировки: Площадь: ${currentArea} см² | Состав: ${typeName} | Серия: ${currentBatch} шт | Дозировка: ${volText}`;
+      const text = `ТОЧКА ПЛАВЛЕНИЯ // Дозировка материалов: Площадь монтажа: ${currentArea} см² | Тип: ${typeName} | Трафарет: ${currentStencilH} мкм | Серия: ${currentBatch} шт | Расход: ${volText}`;
 
       if (window.TCHP_UI && window.TCHP_UI.copyToClipboard) {
         window.TCHP_UI.copyToClipboard(text, copyBtn, 'Скопировано!');
@@ -166,7 +276,7 @@ document.addEventListener('DOMContentLoaded', () => {
           if (copyText) {
             copyText.textContent = 'Скопировано!';
             setTimeout(() => {
-              copyText.textContent = 'Копировать';
+              copyText.textContent = 'Скопировать параметры в журнал';
             }, 2000);
           }
         });

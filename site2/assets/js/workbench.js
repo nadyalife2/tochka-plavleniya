@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const tempRules = rules.temp || {};
   const ironRules = rules.iron || {};
   const defectTree = rules.defect || {};
+  const fluxRules = rules.flux || {};
 
   // ───────────────────────────────────────────────────────────────────────────
   // 1. ТЕРМОКАЛЬКУЛЯТОР (#temp)
@@ -62,21 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (tempMeterBox) tempMeterBox.style.display = 'block';
 
-    if (!item || (item.t_min === 0 && item.t_max === 0)) {
-      tempRangeDisplay.textContent = 'Не применяется';
-      tempRangeDisplay.style.fontSize = '1.75rem';
+    if (!item || item.no_recommendation || (item.t_min === 0 && item.t_max === 0)) {
+      tempRangeDisplay.textContent = 'Нет проверенной рекомендации';
+      tempRangeDisplay.style.fontSize = '1.35rem';
       if (tempBarFill) tempBarFill.style.width = '0%';
       if (tempTipDisplay) tempTipDisplay.textContent = item?.tip || 'Паяльник не используется для этого сценария';
       
-      // Структура вывода: Вывод + Практический шаг
+      const reasonText = item?.reason || item?.advice || 'Данная операция требует специализированного оборудования (термофен, ИК-станция или газовая горелка).';
       if (tempAdviceDisplay) {
-        tempAdviceDisplay.innerHTML = `<strong>Вывод:</strong> Данная операция требует специализированного оборудования.<br><br><strong>Следующий шаг:</strong> Воспользуйтесь термофеном, инфракрасной станцией или газовой горелкой в зависимости от задачи.`;
+        tempAdviceDisplay.innerHTML = `<strong>Технологическое ограничение:</strong> ${reasonText}`;
       }
       
       if (tempWarnDisplay && tempWarnBox) {
         if (item?.warn) {
           tempWarnDisplay.textContent = item.warn;
-          tempWarnBox.style.display = 'block';
+          tempWarnBox.style.display = 'flex';
         } else {
           tempWarnBox.style.display = 'none';
         }
@@ -106,9 +107,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (tempAdviceDisplay) {
-      const adviceText = item.advice || 'Контролируйте время контакта — не более 2–3 секунд на точку.';
-      // Структура вывода: Вывод + Практический шаг
-      tempAdviceDisplay.innerHTML = `<strong>Вывод:</strong> Температура ${item.t_min}-${item.t_max} °C является оптимальной для данного припоя и теплоемкости детали.<br><br><strong>Следующий шаг:</strong> Установите температуру, нанесите флюс на контактную площадку и ${adviceText.toLowerCase()}`;
+      const jointText = item.t_joint ? `<div class="mb-1.5 text-xs text-accent font-mono font-bold">Ожидаемая T в зоне контакта: ~${item.t_joint}</div>` : '';
+      const adviceText = item.advice || 'Контролируйте время контакта — достаточное для смачивания, но без перегрева.';
+      tempAdviceDisplay.innerHTML = `<strong>Уставка станции:</strong> ${item.t_min}–${item.t_max} °C (с учётом температурного градиента жало–припой).<br>${jointText}<strong>Практический шаг:</strong> ${adviceText}`;
     }
 
     if (tempWarnDisplay && tempWarnBox) {
@@ -360,62 +361,67 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. СЕЛЕКТОР ФЛЮСА (#flux-selector)
   // ───────────────────────────────────────────────────────────────────────────
   const fluxMetal = document.getElementById('flux-metal');
-  const fluxSensitivity = document.getElementById('flux-sensitivity');
+  const fluxProcess = document.getElementById('flux-process');
   const fluxWash = document.getElementById('flux-wash');
-  const fluxClassDisplay = document.getElementById('flux-class-display');
+  const fluxCodeDisplay = document.getElementById('flux-code-display');
+  const fluxTitleDisplay = document.getElementById('flux-title-display');
+  const fluxWashDisplay = document.getElementById('flux-wash-display');
   const fluxWarnDisplay = document.getElementById('flux-warn-display');
   const fluxWarnBox = document.getElementById('flux-warn-box');
   const fluxArticleLink = document.getElementById('flux-article-link');
 
   function updateFluxSelector() {
-    if (!fluxMetal || !fluxSensitivity || !fluxWash) return;
+    if (!fluxMetal || !fluxProcess || !fluxWash) return;
     
     const metal = fluxMetal.value;
-    const sens = fluxSensitivity.value;
+    const process = fluxProcess.value;
     const wash = fluxWash.value;
 
-    let fluxClass = 'RMA (Умеренно активный)';
-    let warning = '';
-    
-    if (metal === 'aluminum') {
-      fluxClass = 'Активный флюс для алюминия (Ф-64, ФИМ)';
-      warning = 'Требуется обязательная отмывка! Флюс вызывает коррозию.';
-    } else if (metal === 'oxidized') {
-      if (sens === 'high') {
-        fluxClass = 'RMA / Активный (точечно)';
-        warning = 'Для высокоомных цепей избегайте кислотных флюсов. Лучше механически зачистить окислы.';
+    const metalGroup = fluxRules[metal] || {};
+    const processGroup = metalGroup[process] || {};
+    const item = processGroup[wash];
+
+    if (!item) return;
+
+    if (fluxCodeDisplay) {
+      fluxCodeDisplay.textContent = item.class_code;
+      if (item.class_code === 'Недопустимо') {
+        fluxCodeDisplay.className = 'text-2xl font-bold font-mono text-red-600 dark:text-red-400 mt-0.5';
       } else {
-        fluxClass = 'Активный флюс (Ортофосфорная кислота, ЗИЛ-2)';
-        warning = 'Требуется обязательная отмывка! Флюс вызывает коррозию.';
-      }
-    } else {
-      // copper
-      if (sens === 'high') {
-        fluxClass = wash === 'no' ? 'No-Clean (Не требующий отмывки)' : 'No-Clean / Водосмывной (WS)';
-      } else {
-        fluxClass = wash === 'no' ? 'RMA (Канифольный умеренно активный)' : 'RMA / Водосмывной (WS)';
+        fluxCodeDisplay.className = 'text-2xl font-bold font-mono text-ink mt-0.5';
       }
     }
 
-    if (wash === 'no' && (metal === 'aluminum' || metal === 'oxidized')) {
-      warning = 'КРИТИЧНО: Данный металл требует активных флюсов, которые НЕДОПУСТИМО оставлять без отмывки!';
+    if (fluxTitleDisplay) {
+      fluxTitleDisplay.textContent = item.title;
     }
 
-    if (fluxClassDisplay) fluxClassDisplay.textContent = fluxClass;
+    if (fluxWashDisplay) {
+      fluxWashDisplay.textContent = item.wash_rule;
+    }
+
     if (fluxWarnBox && fluxWarnDisplay) {
-      if (warning) {
-        fluxWarnDisplay.textContent = warning;
+      if (item.warning) {
+        fluxWarnDisplay.textContent = item.warning;
+        if (item.hazard === 'high') {
+          fluxWarnBox.className = 'p-3 rounded bg-red-50 border border-red-300 dark:border-red-800 dark:bg-red-950/30 flex items-start gap-2';
+          fluxWarnDisplay.className = 'text-xs font-mono text-red-800 dark:text-red-300 leading-normal font-medium';
+        } else {
+          fluxWarnBox.className = 'p-3 rounded bg-amber-50 border border-amber-300 dark:border-amber-800 dark:bg-amber-950/30 flex items-start gap-2';
+          fluxWarnDisplay.className = 'text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal';
+        }
         fluxWarnBox.style.display = 'flex';
       } else {
         fluxWarnBox.style.display = 'none';
       }
     }
+
     if (fluxArticleLink) fluxArticleLink.style.display = 'block';
   }
 
-  if (fluxMetal && fluxSensitivity && fluxWash) {
+  if (fluxMetal && fluxProcess && fluxWash) {
     fluxMetal.addEventListener('change', updateFluxSelector);
-    fluxSensitivity.addEventListener('change', updateFluxSelector);
+    fluxProcess.addEventListener('change', updateFluxSelector);
     fluxWash.addEventListener('change', updateFluxSelector);
     updateFluxSelector();
   }

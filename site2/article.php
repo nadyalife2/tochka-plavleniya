@@ -424,13 +424,13 @@ include __DIR__ . '/includes/header.php';
               2. Четыре фазы кривой пайки (Интерактивный расчет)
             </h2>
             <p class="text-ink/85 mt-2">
-              Правильный термопрофиль по стандарту <code class="font-mono text-xs font-medium px-1.5 py-0.5 bg-paper-subtle border border-paper-border rounded text-ink">J-STD-020D</code> сводится к четырехступенчатому контролируемому циклу:
+              Технологический профиль пайки оплавлением регламентируется стандартом <code class="font-mono text-xs font-medium px-1.5 py-0.5 bg-paper-subtle border border-paper-border rounded text-ink">IPC-7530A</code> и TDS паяльных паст. Процесс сводится к четырёхступенчатому контролируемому циклу (не путать с квалификационным стресс-тестом компонентов по J-STD-020E):
             </p>
             <div class="my-3 inline-flex flex-wrap items-center gap-3 p-2.5 rounded border border-ink/40 bg-callout transform -rotate-[0.5deg] text-xs font-mono text-ink shadow-sm">
-              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[11px] font-bold tracking-wider uppercase"><span class="w-1.5 h-1.5 rounded-full bg-[#2dd4bf] shadow-[0_0_8px_#2dd4bf]"></span><span>QC PASSED</span><span class="text-[#2dd4bf]">✓</span></div>
-              <div class="text-ink text-xs font-semibold tracking-tight">J-STD-020E // COMPLIANT</div>
+              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[11px] font-bold tracking-wider uppercase"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span><span>IPC-7530A</span></div>
+              <div class="text-ink text-xs font-semibold tracking-tight">ПРОФИЛИРОВАНИЕ ОПЛАВЛЕНИЯ ПЕЧИ</div>
               <span class="text-ink-faint text-[11px] hidden sm:inline-block">|</span>
-              <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-brand-orange align-middle">warning</span>ВНИМАНИЕ: ОПАСНОСТЬ ДЕЛАМИНАЦИИ ПРИ СКОРОСТИ > 3°C/с</div>
+              <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-brand-orange align-middle">warning</span>ПРЕДЕЛ НАГРЕВА: НЕ БОЛЕЕ 2.0–2.5 °C/с (ОПАСНОСТЬ ДЕЛАМИНАЦИИ)</div>
             </div>
           </div>
 

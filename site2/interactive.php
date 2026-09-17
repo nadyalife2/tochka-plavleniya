@@ -179,7 +179,7 @@ include __DIR__ . '/includes/header.php';
             </div>
           </div>
           <div class="text-xs font-mono text-ink-faint hidden sm:block text-right">
-            Динамический расчёт теплового окна
+            Подбор стартового режима ручной пайки
           </div>
         </div>
 
@@ -191,7 +191,8 @@ include __DIR__ . '/includes/header.php';
               <label for="temp-solder" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Марка используемого припоя:</label>
               <select id="temp-solder" class="input-base font-mono">
                 <option value="" selected disabled>-- Выберите марку припоя --</option>
-                <option value="pos61">ПОС-61 (Sn63Pb37) — эвтектика 183 °C (стандарт РЭА)</option>
+                <option value="pos61">ПОС-61 (Sn 59–61%, ост. Pb) — 183–190 °C (ГОСТ 21930-76)</option>
+                <option value="sn63pb37">Sn63Pb37 — эвтектика 183 °C (IPC J-STD-006C / ASTM B32)</option>
                 <option value="sac305">SAC305 (Sn96.5Ag3Cu0.5) — бессвинец RoHS 217–220 °C</option>
                 <option value="pos40">ПОС-40 (Sn40Pb60) — кабельный 183–238 °C</option>
                 <option value="sn42bi58">Sn42Bi58 — низкотемпературный 138 °C (термочувствительный)</option>
@@ -396,21 +397,21 @@ include __DIR__ . '/includes/header.php';
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
-              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04 // ДОЗИРОВКА ХИМИИ</span>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04 // ДОЗИРОВКА МАТЕРИАЛОВ</span>
               <span class="handwriting text-accent font-bold text-base hidden sm:inline-flex items-center gap-1">
-                <span class="material-symbols-outlined text-[15px]">edit</span>
-                Толщина слоя: 50–70 мкм
+                <span class="material-symbols-outlined text-[15px]">straighten</span>
+                Апертурный расчёт (Indium Corp)
               </span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода флюса и паяльной пасты</h2>
-            <p class="text-sm text-ink-muted mt-2">Рассчитывает объем материалов по стандарту IPC-7095C для партии плат или одиночного прототипа.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Калькулятор расхода паяльной пасты и флюса</h2>
+            <p class="text-sm text-ink-muted mt-2">Физический расчёт объёма апертур и массы пасты по геометрии трафарета (S · k · h · η) с учётом эффективности переноса ~80% и расхода на ракеле.</p>
             <div class="mt-3 flex gap-2">
               <span class="badge badge-neutral">Инженерный</span>
               <span class="badge badge-neutral">~ 2 мин</span>
             </div>
           </div>
           <div class="flex items-center gap-2">
-            <span class="badge badge-neutral">IPC-7095C Standard</span>
+            <span class="badge badge-neutral">IPC-7525B / Indium Corp Model</span>
           </div>
         </div>
 
@@ -460,18 +461,30 @@ include __DIR__ . '/includes/header.php';
 
                 <!-- Chemistry Selector -->
                 <div>
-                  <label for="flux-type" style="display:block; font-size:11px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Тип флюса / монтажа:</label>
+                  <label for="flux-type" style="display:block; font-size:11px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Материал и технология нанесения:</label>
                   <select id="flux-type" style="width:100%; padding:10px 14px; border-radius:6px; background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:13px; outline:none;">
-                    <option value="bga_nc">Безотмывочный гель BGA (NC-559 / RMA-218) — 50-70 мкм</option>
-                    <option value="smd_rma">Канифольный средней активности (RMA-223) — кисть/дозатор</option>
-                    <option value="paste_sac">Паяльная паста SAC305 (Sn96.5Ag3Cu0.5) — трафарет 120 мкм</option>
-                    <option value="clean_ws">Водосмывной высокой активности (WS) — для стойких оксидов</option>
+                    <option value="paste_sac" selected>Паяльная паста SAC305 (Sn96.5Ag3Cu0.5, 88.5% металла) — трафарет</option>
+                    <option value="paste_sn63">Паяльная паста Sn63Pb37 (эвтектика, 90% металла) — трафарет</option>
+                    <option value="bga_nc">Безотмывочный гель BGA (NC-559 / ROL0) — тонкий слой 50–70 мкм</option>
+                    <option value="smd_rma">Канифольный гель средней активности RMA (ROM1) — кисть/дозатор</option>
+                    <option value="clean_ws">Водосмывной флюс высокой активности WS (ORH1) — смыв водой</option>
+                  </select>
+                </div>
+
+                <!-- Stencil Thickness Control (shown for solder pastes) -->
+                <div id="stencil-thickness-group">
+                  <label for="stencil-thickness" style="display:block; font-size:11px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Толщина трафарета (апертура 18%):</label>
+                  <select id="stencil-thickness" style="width:100%; padding:10px 14px; border-radius:6px; background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:13px; outline:none;">
+                    <option value="100">100 мкм (0.10 мм — тонкий шаг, QFN, BGA 0.5 мм)</option>
+                    <option value="120" selected>120 мкм (0.12 мм — стандартный SMD монтаж 0603/SOIC/QFP)</option>
+                    <option value="130">130 мкм (0.13 мм — универсальный стандарт)</option>
+                    <option value="150">150 мкм (0.15 мм — силовые платы, компоненты 0805–1206, разъёмы)</option>
                   </select>
                 </div>
 
                 <!-- Batch multiplier -->
                 <div>
-                  <label style="display:block; font-size:11px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Объём партии плат:</label>
+                  <span class="block text-[11px] font-mono font-bold uppercase text-ink mb-2 tracking-[0.05em]">Объём партии плат:</span>
                   <div style="display:flex; flex-wrap:wrap; gap:8px;">
                     <button type="button" class="batch-btn" data-qty="1" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; font-weight:700; border:1px solid var(--color-accent); background:var(--color-paper); color:var(--color-accent); cursor:pointer;">1 плата</button>
                     <button type="button" class="batch-btn" data-qty="5" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">5 плат</button>
@@ -594,19 +607,19 @@ include __DIR__ . '/includes/header.php';
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
-              <div class="text-[10px] font-mono text-ink-muted uppercase">BGA Гель (NC-559)</div>
-              <div id="matrix-bga" class="text-sm font-mono font-bold text-ink">0.18 мл</div>
+              <div class="text-[10px] font-mono text-ink-muted uppercase">Гель BGA (ROL0)</div>
+              <div id="matrix-bga" class="text-sm font-mono font-bold text-ink">0.21 мл</div>
             </div>
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
-              <div class="text-[10px] font-mono text-ink-muted uppercase">RMA-223 Канифоль</div>
+              <div class="text-[10px] font-mono text-ink-muted uppercase">RMA канифоль (ROM1)</div>
               <div id="matrix-rma" class="text-sm font-mono font-bold text-ink">0.28 мл</div>
             </div>
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
               <div class="text-[10px] font-mono text-ink-muted uppercase">Паста SAC305 (120 мкм)</div>
-              <div id="matrix-paste" class="text-sm font-mono font-bold text-ink">0.53 г</div>
+              <div id="matrix-paste" class="text-sm font-mono font-bold text-ink">0.37 г</div>
             </div>
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
-              <div class="text-[10px] font-mono text-ink-muted uppercase">Водосмывной (WS)</div>
+              <div class="text-[10px] font-mono text-ink-muted uppercase">Водосмывной WS (ORH1)</div>
               <div id="matrix-ws" class="text-sm font-mono font-bold text-ink">0.21 мл</div>
             </div>
           </div>
@@ -622,52 +635,65 @@ include __DIR__ . '/includes/header.php';
             <div class="flex items-center gap-3">
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.1 // ПОДБОР ФЛЮСА</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Селектор флюса по задаче</h2>
-            <p class="text-sm text-ink-muted mt-2">Помогает подобрать тип флюса в зависимости от спаиваемых металлов, компонентов и необходимости отмывки.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1">Селектор флюса по стандартам ГОСТ и IPC</h2>
+            <p class="text-sm text-ink-muted mt-2">Классификация по ГОСТ Р МЭК 61190-1-1-2020 и IPC J-STD-004B с правилами отмывки по IPC-A-610H.</p>
             <div class="mt-3 flex gap-2">
-              <span class="badge badge-neutral">Для всех</span>
+              <span class="badge badge-neutral">ГОСТ Р МЭК 61190 / J-STD-004B</span>
               <span class="badge badge-neutral">~ 1 мин</span>
             </div>
           </div>
-          <div class="text-xs font-mono text-ink-faint hidden sm:block text-right">Умный подбор химии</div>
+          <div class="text-xs font-mono text-ink-faint hidden sm:block text-right">Стандарты IPC-A-610 / J-STD-001</div>
         </div>
         
         <div class="tool-two-col">
           <div class="space-y-4">
             <div>
-              <label for="flux-metal" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Металл поверхностей:</label>
+              <label for="flux-metal" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Металл поверхности и окисление:</label>
               <select id="flux-metal" class="input-base font-mono">
-                <option value="copper">Медь, луженая медь, латунь (стандарт)</option>
-                <option value="oxidized">Окисленное железо, сталь</option>
-                <option value="aluminum">Алюминий</option>
+                <option value="enig_cu">Медь свежая / ENIG / HASL / иммерсионное Sn (заводская ПП)</option>
+                <option value="osp_oxidized">Окисленная медь / OSP после хранения / латунь</option>
+                <option value="steel_nickel">Сталь, нержавейка, никель (экраны, разъёмы, клеммы)</option>
+                <option value="aluminum">Алюминий и алюминиевые сплавы</option>
               </select>
             </div>
             <div>
-              <label for="flux-sensitivity" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Чувствительность схемы:</label>
-              <select id="flux-sensitivity" class="input-base font-mono">
-                <option value="high">Высокоомные цепи, SMD, цифровая электроника</option>
-                <option value="medium">Обычная электроника, THT</option>
-                <option value="low">Силовая электрика, провода, разъемы, трубы</option>
+              <label for="flux-process" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Технологическая операция:</label>
+              <select id="flux-process" class="input-base font-mono">
+                <option value="manual_smd">Ручной SMD монтаж / реболлинг BGA / замена чипов</option>
+                <option value="tht_wire">Выводной монтаж (THT) / пайка проводов и разъёмов</option>
+                <option value="stencil">Трафаретная печать паяльной пасты (конвекционная печь)</option>
+                <option value="heavy">Силовая пайка шин, клеммников и массивных радиаторов</option>
               </select>
             </div>
             <div>
-              <label for="flux-wash" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Возможность отмывки:</label>
+              <label for="flux-wash" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">3. Условия и возможность отмывки:</label>
               <select id="flux-wash" class="input-base font-mono">
-                <option value="no">Нет отмывки (или труднодоступные места под чипами)</option>
-                <option value="yes">Есть отмывка (спирт, УЗ-ванна, спец. жидкости)</option>
+                <option value="noclean">Безотмывочная технология (No-Clean, сухие условия)</option>
+                <option value="alcohol">Доступна смывка изопропиловым спиртом (IPA 99.7%)</option>
+                <option value="diwater">Промышленная отмывка деионизированной водой (УЗ-ванна)</option>
               </select>
             </div>
           </div>
           
           <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 flex flex-col justify-center">
             <div>
-              <span class="text-[10px] font-mono uppercase tracking-wider text-accent font-bold">Рекомендуемый класс флюса:</span>
-              <div id="flux-class-display" class="text-lg font-bold font-sans text-ink mt-0.5">RMA (Умеренно активный)</div>
+              <span class="text-[10px] font-mono uppercase tracking-wider text-accent font-bold">Класс по ГОСТ Р МЭК 61190 / J-STD-004B:</span>
+              <div id="flux-code-display" class="text-2xl font-bold font-mono text-ink mt-0.5">ROL0</div>
+              <div id="flux-title-display" class="text-xs font-mono font-bold text-ink mt-1">Безотмывочный канифольный гель (NC-559-V2-TF, Kester 959T)</div>
             </div>
+
+            <div class="space-y-1.5 pt-2 border-t border-paper-border">
+              <span class="text-[10px] font-mono uppercase tracking-wider text-ink-muted font-bold">Регламент отмывки (IPC-A-610H):</span>
+              <p id="flux-wash-display" class="text-xs font-mono text-ink leading-relaxed">
+                Отмывка опциональна: остатки химически инертны. Для Class 3 и под лакирование смывается IPA 99.7%.
+              </p>
+            </div>
+
             <div id="flux-warn-box" class="p-3 rounded bg-amber-50 border border-amber-300 dark:border-amber-800 dark:bg-amber-950/30 flex items-start gap-2" style="display:none;">
               <span class="material-symbols-outlined text-[16px] text-amber-700 dark:text-amber-400 shrink-0">warning</span>
               <span id="flux-warn-display" class="text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal"></span>
             </div>
+
             <div id="flux-article-link" class="pt-3 border-t border-paper-border">
               <a href="article.php?slug=gid-po-flyusam" class="inline-flex items-center gap-1.5 text-xs font-mono text-accent font-bold hover:underline">
                 <span class="material-symbols-outlined text-[14px]">menu_book</span>
@@ -752,7 +778,7 @@ include __DIR__ . '/includes/header.php';
             <h2 class="text-xl font-bold text-ink mt-0.5">Реестр сплавов и температур плавления</h2>
           </div>
           <div class="w-full sm:w-64">
-            <input type="text" id="solder-search" placeholder="Поиск (ПОС-61, SAC305, 183°C)..." class="input-base font-mono text-xs"/>
+            <input type="text" id="solder-search" aria-label="Поиск по реестру сплавов и припоев" placeholder="Поиск (ПОС-61, SAC305, 183°C)..." class="input-base font-mono text-xs"/>
           </div>
         </div>
 
@@ -835,7 +861,8 @@ include __DIR__ . '/includes/header.php';
     window.TCHP_RULES = {
       temp: <?= json_encode($TEMP_RULES, JSON_UNESCAPED_UNICODE) ?>,
       iron: <?= json_encode($IRON_RULES, JSON_UNESCAPED_UNICODE) ?>,
-      defect: <?= json_encode($DEFECT_TREE, JSON_UNESCAPED_UNICODE) ?>
+      defect: <?= json_encode($DEFECT_TREE, JSON_UNESCAPED_UNICODE) ?>,
+      flux: <?= json_encode($FLUX_RULES, JSON_UNESCAPED_UNICODE) ?>
     };
   </script>
 

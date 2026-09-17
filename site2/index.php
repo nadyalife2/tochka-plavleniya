@@ -36,10 +36,10 @@ include __DIR__ . '/includes/header.php';
           <div class="relative inline-block mb-1">
             <div class="absolute -top-2 left-6 w-10 h-3 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-sm rotate-[-2deg] z-10 pointer-events-none" style="backdrop-filter: blur(1px);"></div>
             <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#fffdf5] dark:bg-[#ca8a04]/15 border border-[#fde047] dark:border-[#ca8a04]/40 text-ink font-mono text-[11px] shadow-sm rotate-[-1.2deg] sketch-border">
-              <span class="w-2 h-2 rounded-full bg-[#2dd4bf] shadow-[0_0_6px_rgba(45,212,191,0.8)] inline-block"></span>
-              <span class="font-bold tracking-wider uppercase">ВЕРСТАК // QC PASSED 2026</span>
+              <span class="w-2 h-2 rounded-full bg-accent shadow-[0_0_6px_rgba(235,82,17,0.8)] inline-block"></span>
+              <span class="font-bold tracking-wider uppercase">ВЕРСТАК // LAB TOOLS 2026</span>
               <span class="text-ink-faint">|</span>
-              <span class="text-[10px] text-ink-muted">ПРАКТИКА БЕЗ ТЕОРИИ</span>
+              <span class="text-[10px] text-ink-muted">ИНЖЕНЕРНЫЕ РАСЧЁТЫ</span>
             </div>
           </div>
 

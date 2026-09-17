@@ -1,7 +1,11 @@
 /**
- * solder-table.js — Живой поиск и сортировка по таблице припоев
- * Единый скрипт для автономного стенда (site2) и темы WordPress (tchp)
+ * solder-table.js — Живой поиск и доступная сортировка по таблице припоев
+ * Стандарты доступности: WCAG 2.1 AA / WAI-ARIA 1.2
+ *   - Поддержка навигации с клавиатуры (tabindex="0", Enter, Space)
+ *   - Динамические атрибуты aria-sort ("ascending" / "descending" / "none")
+ *   - Поиск в реальном времени с фильтрацией строк
  */
+
 document.addEventListener('DOMContentLoaded', () => {
   const searchInput = document.getElementById('solder-search');
   const table = document.getElementById('solder-table-grid') || document.getElementById('solder-table');
@@ -24,16 +28,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // COLUMN SORTING
+  // ACCESSIBLE COLUMN SORTING
   if (headers && headers.length > 0 && tbody) {
     let currentSortCol = -1;
     let sortAsc = true;
 
     headers.forEach((th, index) => {
-      th.classList.add('cursor-pointer', 'select-none', 'hover:text-accent');
-      th.title = 'Нажмите для сортировки';
+      th.classList.add('cursor-pointer', 'select-none', 'hover:text-accent', 'transition-colors');
+      th.setAttribute('tabindex', '0');
+      th.setAttribute('role', 'columnheader');
+      th.setAttribute('aria-sort', 'none');
+      th.title = 'Нажмите Enter или пробел для сортировки';
 
-      th.addEventListener('click', () => {
+      // Save initial clean label text
+      const baseText = th.textContent.trim().replace(/[▲▼]/g, '').trim();
+
+      function triggerSort() {
         const rows = Array.from(tbody.querySelectorAll('tr'));
         if (rows.length === 0) return;
 
@@ -64,10 +74,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         rows.forEach(row => tbody.appendChild(row));
 
-        headers.forEach(h => {
-          h.textContent = h.textContent.replace(' ▲', '').replace(' ▼', '');
+        // Update aria-sort and visual indicator
+        headers.forEach((h, hIdx) => {
+          h.setAttribute('aria-sort', 'none');
+          const hClean = h.getAttribute('data-base-label') || h.textContent.trim().replace(/[▲▼]/g, '').trim();
+          h.setAttribute('data-base-label', hClean);
+          h.textContent = hClean;
         });
-        th.textContent += sortAsc ? ' ▲' : ' ▼';
+
+        th.setAttribute('aria-sort', sortAsc ? 'ascending' : 'descending');
+        th.textContent = `${baseText} ${sortAsc ? '▲' : '▼'}`;
+      }
+
+      th.addEventListener('click', triggerSort);
+
+      th.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          triggerSort();
+        }
       });
     });
   }
