@@ -284,7 +284,7 @@ include __DIR__ . '/includes/header.php';
     <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
       
       <!-- Central Editorial Column (740px wide max) -->
-      <div class="lg:col-span-8 max-w-[730px] space-y-9 bg-paper border border-paper-border rounded-lg p-5 sm:p-8 shadow-sm">
+      <div class="lg:col-span-8 max-w-[730px] space-y-9">
         
         <!-- Retro Illustration / Stamp Badge -->
         <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
