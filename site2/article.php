@@ -824,6 +824,7 @@ include __DIR__ . '/includes/header.php';
 
         <hr class="border-paper-border my-8"/>
 
+        <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: In-Article Native RSYA Ad Container */ ?>
         <!-- In-Article Native RSYA Ad Container -->
         <div class="my-8 p-4 rounded border border-dashed border-paper-border bg-paper-subtle/40 text-center">
           <div class="text-[11px] font-mono text-ink-faint uppercase mb-1">РЕКЛАМА / ПАРТНЕРСКИЙ БЛОК ЯНДЕКСА</div>
@@ -831,6 +832,7 @@ include __DIR__ . '/includes/header.php';
             [Контейнер РСЯ In-Article · Адаптивный блок]
           </div>
         </div>
+        <?php endif; ?>
 
         <!-- Section: FAQ Accordion -->
         <section class="scroll-mt-20 space-y-4" id="faq">
@@ -852,6 +854,7 @@ include __DIR__ . '/includes/header.php';
           </div>
         </section>
 
+        <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: Affiliate Product Showcase (Yandex Market / Chip & Dip) */ ?>
         <!-- Affiliate Product Showcase (Yandex Market / Chip & Dip) -->
         <section class="my-8 p-5 sm:p-6 rounded-lg border border-paper-border bg-card space-y-4">
           <div class="flex items-center justify-between border-b border-paper-border pb-3">
@@ -897,7 +900,9 @@ include __DIR__ . '/includes/header.php';
             <span>ООО «Яндекс», ИНН 7736207543 / ООО «Интернет Решения», ИНН 7704217370</span>
           </div>
         </section>
+        <?php endif; ?>
 
+        <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: B2B / Lead-Gen Rework Module */ ?>
         <!-- B2B / Lead-Gen Rework Module -->
         <div class="my-8 p-5 rounded-lg border-2 border-paper-border-dark bg-paper-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 sketch-border">
           <div class="space-y-1">
@@ -913,6 +918,7 @@ include __DIR__ . '/includes/header.php';
             Заказать диагностику →
           </a>
         </div>
+        <?php endif; ?>
 
         <!-- Self-Check Block (Проверьте себя) -->
         <section class="my-8 p-6 rounded-lg border border-accent bg-paper-subtle space-y-4">
@@ -987,6 +993,7 @@ include __DIR__ . '/includes/header.php';
           </nav>
         </div>
 
+        <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: Sticky Sidebar РСЯ Slot */ ?>
         <!-- Sticky Sidebar РСЯ Slot -->
         <div class="border border-dashed border-paper-border bg-paper p-4 rounded-lg text-center space-y-2">
           <div class="text-[11px] font-mono text-ink-faint uppercase">РЕКЛАМА РСЯ</div>
@@ -994,6 +1001,7 @@ include __DIR__ . '/includes/header.php';
             [РСЯ Сайдбар · 300x250]
           </div>
         </div>
+        <?php endif; ?>
 
         <!-- Open Lab block -->
         <div class="border border-paper-border bg-paper-subtle/50 p-4 rounded-lg space-y-2 text-xs">
