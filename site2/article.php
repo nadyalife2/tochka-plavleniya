@@ -284,22 +284,25 @@ include __DIR__ . '/includes/header.php';
     <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
       
       <!-- Central Editorial Column (740px wide max) -->
-      <div class="lg:col-span-8 max-w-[730px] space-y-9 bg-paper px-5 sm:px-8 py-6 sm:py-8">
+      <div class="lg:col-span-8 max-w-[730px] space-y-5">
         
-        <!-- Retro Illustration / Stamp Badge -->
-        <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
-          <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="24">
-            <rect height="18" rx="2" width="18" x="3" y="3"></rect>
-            <path d="M8 7v10"></path>
-            <path d="M16 7v10"></path>
-            <path d="M12 12h.01"></path>
-            <circle cx="12" cy="7" r="1"></circle>
-            <circle cx="12" cy="17" r="1"></circle>
-          </svg>
-        </div>
+        <!-- Article Header Card -->
+        <div class="bg-paper border border-paper-border rounded-lg p-5 sm:p-8 space-y-5 shadow-sm">
 
-        <!-- Article Header Block -->
-        <header class="space-y-4">
+          <!-- Retro Illustration / Stamp Badge -->
+          <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
+            <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="24">
+              <rect height="18" rx="2" width="18" x="3" y="3"></rect>
+              <path d="M8 7v10"></path>
+              <path d="M16 7v10"></path>
+              <path d="M12 12h.01"></path>
+              <circle cx="12" cy="7" r="1"></circle>
+              <circle cx="12" cy="17" r="1"></circle>
+            </svg>
+          </div>
+
+          <!-- Article Header Block -->
+          <header class="space-y-4">
           <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
             <?= e($article['title']) ?>
           </h1>
@@ -331,7 +334,8 @@ include __DIR__ . '/includes/header.php';
           <p class="text-lg text-ink font-serif leading-[1.65] pt-2">
             <?= e($article['excerpt']) ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.
           </p>
-        </header>
+          </header>
+        </div><!-- /Article Header Card -->
 
         <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
         <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-sm leading-relaxed space-y-2">
@@ -355,7 +359,7 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <!-- Section 1 -->
-        <section class="scroll-mt-20 pt-4 space-y-4" id="step-1">
+        <section class="scroll-mt-20 bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-4 shadow-sm" id="step-1">
           <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
             1. Теплоемкость текстолита и почему фен всегда врет
           </h2>
@@ -415,10 +419,8 @@ include __DIR__ . '/includes/header.php';
           </div>
         </section>
 
-        <hr class="border-paper-border my-8"/>
-
         <!-- Section 2: 4 Stages + Interactive Calculator -->
-        <section class="scroll-mt-20 space-y-6" id="step-2">
+        <section class="scroll-mt-20 bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-6 shadow-sm" id="step-2">
           <div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
               2. Четыре фазы кривой пайки (Интерактивный расчет)
@@ -611,10 +613,8 @@ include __DIR__ . '/includes/header.php';
           </div>
         </section>
 
-        <hr class="border-paper-border my-8"/>
-
         <!-- Section 3: Alloy Temperature Windows -->
-        <section class="scroll-mt-20 space-y-5" id="alloys">
+        <section class="scroll-mt-20 bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-5 shadow-sm" id="alloys">
           <div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
               3. Температурные окна основных паяльных сплавов
@@ -746,10 +746,8 @@ include __DIR__ . '/includes/header.php';
           </div>
         </section>
 
-        <hr class="border-paper-border my-8"/>
-
         <!-- Section 4: Practical details -->
-        <section class="scroll-mt-20 space-y-4" id="step-4">
+        <section class="scroll-mt-20 bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-4 shadow-sm" id="step-4">
           <h2 class="text-xl sm:text-2xl font-bold text-ink tracking-tight">
             4. Практические нюансы: термопары, влага и деламинация
           </h2>
@@ -822,7 +820,7 @@ include __DIR__ . '/includes/header.php';
           </ul>
         </div>
 
-        <hr class="border-paper-border my-8"/>
+
 
         <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: In-Article Native RSYA Ad Container */ ?>
         <!-- In-Article Native RSYA Ad Container -->
