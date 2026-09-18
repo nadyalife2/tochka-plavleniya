@@ -26,6 +26,11 @@ $current_page = $current_page ?? '';
   <meta property="og:description" content="<?= htmlspecialchars($page_desc) ?>"/>
   <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
 
+  <!-- Twitter Card Meta -->
+  <meta name="twitter:card" content="summary_large_image"/>
+  <meta name="twitter:title" content="<?= htmlspecialchars($page_title) ?>"/>
+  <meta name="twitter:description" content="<?= htmlspecialchars($page_desc) ?>"/>
+
   <!-- Immediate Theme Init Script (Zero FOUC) -->
   <script>
     (function() {

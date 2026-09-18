@@ -838,13 +838,18 @@ include __DIR__ . '/includes/header.php';
             Частые вопросы
           </h2>
           <div class="border-t border-paper-border divide-y divide-paper-border">
-            <?php foreach ($faq_items as $question => $answer): ?>
+            <?php 
+            $faq_idx = 0;
+            foreach ($faq_items as $question => $answer): 
+                $faq_idx++;
+                $faq_id = 'faq-item-' . $faq_idx;
+            ?>
               <div class="py-3.5">
-                <button class="faq-toggle w-full text-left flex items-start justify-between gap-4 font-medium text-ink hover:text-ink-muted transition-colors text-sm sm:text-base" type="button">
+                <button class="faq-toggle w-full text-left flex items-start justify-between gap-4 font-medium text-ink hover:text-ink-muted transition-colors text-sm sm:text-base" type="button" aria-expanded="false" aria-controls="<?= $faq_id ?>">
                   <span><?= e($question) ?></span>
-                  <span class="font-mono text-ink-faint text-xs mt-0.5 plus-icon">+</span>
+                  <span class="font-mono text-ink-faint text-xs mt-0.5 plus-icon" aria-hidden="true">+</span>
                 </button>
-                <div class="faq-content hidden pt-2 text-sm text-ink-muted leading-relaxed">
+                <div id="<?= $faq_id ?>" class="faq-content hidden pt-2 text-sm text-ink-muted leading-relaxed">
                   <?= e($answer) ?>
                 </div>
               </div>
@@ -1262,7 +1267,7 @@ include __DIR__ . '/includes/header.php';
     });
   }
 
-  // FAQ accordion
+  // FAQ accordion with accessible state
   const faqToggles = document.querySelectorAll('.faq-toggle');
   faqToggles.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1272,9 +1277,11 @@ include __DIR__ . '/includes/header.php';
       
       if (isClosed) {
         content.classList.remove('hidden');
+        btn.setAttribute('aria-expanded', 'true');
         if (plus) plus.textContent = '—';
       } else {
         content.classList.add('hidden');
+        btn.setAttribute('aria-expanded', 'false');
         if (plus) plus.textContent = '+';
       }
     });
