@@ -451,6 +451,29 @@ input[type="range"].range-slider::-webkit-slider-thumb:hover {
   }
 }
 
+/* ==========================================================================
+   Header & Footer Canonical Surfaces
+   ========================================================================== */
+header,
+.header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid var(--color-paper-border) !important;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+html.dark header,
+html.dark .header {
+  background-color: rgba(17, 24, 39, 0.96) !important;
+  border-bottom: 1px solid var(--color-paper-border) !important;
+}
+
+footer,
+.footer {
+  background-color: var(--color-paper) !important;
+  border-top: 1px solid var(--color-paper-border) !important;
+}
+
 #search-modal {
   position: fixed;
   top: 0;

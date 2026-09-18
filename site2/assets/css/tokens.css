@@ -6,16 +6,16 @@
  */
 
 :root {
-  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Светлая тема: тёплая бумага) --- */
+  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Каноническая чистая бумага) --- */
   --color-bg: #faf8f5;
-  --color-paper: #faf8f5;
-  --color-paper-subtle: #f3f0ea;
-  --color-paper-border: #e6e2da;
-  --color-paper-border-dark: #d3cdc2;
-  --color-card: rgba(255, 255, 255, 0.85);
+  --color-paper: #ffffff;
+  --color-paper-subtle: #f8fafc;
+  --color-paper-border: #e2e8f0;
+  --color-paper-border-dark: #cbd5e1;
+  --color-card: rgba(255, 255, 255, 0.95);
   --color-card-solid: #ffffff;
-  --color-callout: #fcfaf2;
-  --dot-color: #d3cdc2;
+  --color-callout: #f8fafc;
+  --dot-color: #cbd5e1;
 
   /* --- 30% ТЕКСТ И СТРУКТУРА (Графит и металл) --- */
   --color-ink: #141414;
@@ -79,15 +79,15 @@
 
 /* ТЁМНАЯ ТЕМА (Глубокий графит и тёмный флюс) */
 html.dark {
-  --color-bg: #12141a;
-  --color-paper: #12141a;
-  --color-paper-subtle: #191c24;
-  --color-paper-border: #282d3b;
-  --color-paper-border-dark: #373e52;
-  --color-card: rgba(24, 27, 36, 0.85);
-  --color-card-solid: #181b24;
-  --color-callout: #1b1f2b;
-  --dot-color: #2b3142;
+  --color-bg: #0b0f19;
+  --color-paper: #111827;
+  --color-paper-subtle: #1e293b;
+  --color-paper-border: #1e293b;
+  --color-paper-border-dark: #334155;
+  --color-card: rgba(17, 24, 39, 0.95);
+  --color-card-solid: #111827;
+  --color-callout: #161f30;
+  --dot-color: #1e293b;
 
   --color-ink: #f3f4f6;
   --color-ink-muted: #9ca3af;
