@@ -261,6 +261,9 @@ foreach ($faq_items as $q => $a) {
   }
 </style>
 
+<!-- Canonical URL -->
+<link rel="canonical" href="https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>"/>
+
 <!-- Schema.org JSON-LD -->
 <?= render_article_schema($article, $faq_items) ?>
 <?php
@@ -343,7 +346,7 @@ include __DIR__ . '/includes/header.php';
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>
           <p class="text-ink/80">
-            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-amber-500/50 underline-offset-2 hover:decoration-amber-600 text-amber-600 dark:text-amber-400 font-medium transition-colors" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-amber-500/50 underline-offset-2 hover:decoration-amber-600 text-amber-600 dark:text-amber-400 font-medium transition-colors" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
+            Если вы настраиваете термопрофиль под конкретный чип, сразу переходите к <a class="underline decoration-amber-500/50 underline-offset-2 hover:decoration-amber-700 text-amber-700 dark:text-amber-400 font-medium transition-colors" href="#simulator">симулятору 4 фаз</a> или <a class="underline decoration-amber-500/50 underline-offset-2 hover:decoration-amber-700 text-amber-700 dark:text-amber-400 font-medium transition-colors" href="#alloys">температурным окнам сплавов</a>. Все значения температур верифицированы контактными термопарами К-типа.
           </p>
         </div>
 
@@ -444,7 +447,8 @@ include __DIR__ . '/includes/header.php';
             </div>
             
             <div class="w-full overflow-x-auto">
-              <svg viewBox="0 0 540 220" class="w-full h-auto max-w-full" fill="none">
+              <svg viewBox="0 0 540 220" class="w-full h-auto max-w-full" fill="none" role="img" aria-label="График температурного профиля пайки: кривая температуры от времени для 4 фаз стандарта IPC/JEDEC">
+                <title>График температурного профиля пайки: кривая нагрева и охлаждения по 4 фазам</title>
                 <!-- Background card -->
                 <rect width="540" height="220" rx="8" class="fill-paper-subtle/50 stroke-paper-border" stroke-width="1.5"/>
                 
@@ -532,14 +536,14 @@ include __DIR__ . '/includes/header.php';
               </div>
               
               <!-- Alloy pills -->
-              <div class="flex flex-wrap items-center gap-1.5 font-mono text-xs" id="alloy-selector">
-                <button class="alloy-btn px-2.5 py-1 rounded border border-ink bg-ink text-paper transition-all font-medium" data-alloy="sac305" type="button">
+              <div class="flex flex-wrap items-center gap-2 font-mono text-xs" id="alloy-selector">
+                <button class="alloy-btn px-3.5 py-2 rounded border border-ink bg-ink text-paper transition-all font-medium inline-flex items-center justify-center" data-alloy="sac305" type="button">
                   SAC305 (217–220°C)
                 </button>
-                <button class="alloy-btn px-2.5 py-1 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all" data-alloy="pos61" type="button">
+                <button class="alloy-btn px-3.5 py-2 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all inline-flex items-center justify-center" data-alloy="pos61" type="button">
                   ПОС-61 (183–190°C)
                 </button>
-                <button class="alloy-btn px-2.5 py-1 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all" data-alloy="sn42" type="button">
+                <button class="alloy-btn px-3.5 py-2 rounded border border-paper-border bg-paper text-ink hover:border-ink transition-all inline-flex items-center justify-center" data-alloy="sn42" type="button">
                   Sn42Bi58 (138°C)
                 </button>
               </div>
