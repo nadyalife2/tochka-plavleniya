@@ -405,19 +405,21 @@ include __DIR__ . '/includes/header.php';
             </div>
           </div>
 
-          <!-- Interactive Widget Link -->
-          <div class="my-8 p-6 rounded-lg border border-accent bg-paper-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-              <div class="flex items-center gap-2 mb-1">
-                <span class="material-symbols-outlined text-accent text-[18px]">build</span>
-                <span class="font-mono text-xs font-bold text-accent uppercase tracking-wider">Интерактивный верстак</span>
+          <!-- Interactive Widget Link (Editorial Lab style) -->
+          <div class="my-6 p-4 sm:p-5 rounded-lg border border-paper-border bg-paper-subtle/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex-1 min-w-0 pr-4 space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded border border-paper-border bg-paper flex items-center justify-center text-ink text-xs font-mono shadow-xs">
+                  <span class="material-symbols-outlined text-[15px]">build</span>
+                </span>
+                <span class="font-mono text-[11px] font-bold text-ink uppercase tracking-wider">Интерактивный верстак</span>
               </div>
-              <h3 class="text-lg font-bold text-ink">Рассчитайте параметры для вашей платы</h3>
-              <p class="text-sm text-ink-muted mt-1">Используйте селектор флюса и калькулятор расхода припоя перед началом работы.</p>
+              <h3 class="text-base sm:text-lg font-bold text-ink pt-0.5">Рассчитайте параметры для вашей платы</h3>
+              <p class="text-xs sm:text-sm text-ink-muted leading-relaxed">Используйте селектор флюса и калькулятор расхода припоя перед началом работы.</p>
             </div>
-            <a href="interactive.php#solder-consumption" class="shrink-0 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-accent hover:bg-accent-hover text-white rounded font-mono text-xs transition-colors shadow-sm w-full sm:w-auto">
+            <a href="interactive.php#solder-consumption" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[40px] bg-ink hover:bg-ink-muted text-paper rounded font-mono text-xs font-medium transition-colors shadow-sm shrink-0 whitespace-nowrap text-center">
               <span>Открыть инструменты</span>
-              <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+              <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
             </a>
           </div>
         </section>

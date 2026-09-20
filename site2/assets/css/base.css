@@ -533,3 +533,25 @@ footer,
     text-decoration: underline !important;
   }
 }
+
+/* ==========================================================================
+   7. СЕМАНТИЧЕСКИЕ АКЦЕНТ-УТИЛИТЫ (ACCENT BRIDGE)
+   ========================================================================== */
+.bg-accent {
+  background-color: var(--color-accent) !important;
+  color: #ffffff !important;
+}
+.bg-accent:hover,
+.hover\:bg-accent-hover:hover {
+  background-color: var(--color-accent-hover) !important;
+}
+.text-accent {
+  color: var(--color-accent) !important;
+}
+.border-accent {
+  border-color: var(--color-accent) !important;
+}
+.border-accent-subtle {
+  border-color: var(--color-accent-border) !important;
+}
+
