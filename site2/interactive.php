@@ -8,310 +8,12 @@ require_once __DIR__ . '/data/solder-reference.php';
 require_once __DIR__ . '/data/interactive-rules.php';
 
 ob_start();
-?>
-  <style>
-    /* Smooth Anchor Scrolling with Offset */
-    html {
-      scroll-behavior: smooth;
-      scroll-padding-top: 5rem;
-    }
-    .meter-bar {
-      height: 8px;
-      border-radius: 4px;
-      background: var(--color-paper-border);
-      overflow: hidden;
-      position: relative;
-    }
-    .meter-fill {
-      height: 100%;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
-    }
-
-    /* Фоновая сетка миллиметровки */
-    .workbench-section {
-      background-color: #f8f7f3;
-      background-image: radial-gradient(#cbd5e1 1.2px, transparent 1.2px);
-      background-size: 18px 18px;
-      padding: 32px 24px 28px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
-    }
-    html.dark .workbench-section {
-      background-color: #15181e;
-      background-image: radial-gradient(#2d3340 1.2px, transparent 1.2px);
-      border-color: #272d3b;
-      box-shadow: none;
-    }
-
-    .workbench-container {
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .cards-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    /* Карточка в стиле референса */
-    .tech-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-    .tech-card:hover {
-      transform: translateY(-3px);
-      border-color: #0f172a;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-    }
-    html.dark .tech-card {
-      background: #1c202a;
-      border-color: #2b3240;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-    }
-    html.dark .tech-card:hover {
-      border-color: #f8fafc;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-    }
-
-    /* Шапка карточки */
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #f1f5f9;
-      padding-bottom: 10px;
-      margin-bottom: 14px;
-    }
-    html.dark .card-header {
-      border-bottom-color: #272d3b;
-    }
-    .card-title-group {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .card-title {
-      font-weight: 700;
-      font-size: 15px;
-      color: #0f172a;
-      letter-spacing: -0.01em;
-      font-family: var(--font-sans);
-    }
-    html.dark .card-title {
-      color: #f8fafc;
-    }
-
-    /* Чертёжный бейдж FIG. X.X */
-    .fig-badge {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      color: #475569;
-      background: #f8fafc;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      padding: 2px 7px;
-      letter-spacing: 0.04em;
-    }
-    html.dark .fig-badge {
-      background: #242a38;
-      border-color: #3b4458;
-      color: #94a3b8;
-    }
-
-    /* Блок схемы */
-    .card-diagram {
-      background: var(--color-paper);
-      border: 1px solid #f1f5f9;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 14px;
-      min-height: 180px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-    html.dark .card-diagram {
-      background: #ffffff; /* чертёжные схемы всегда на белом для контраста туши */
-      border-color: #272d3b;
-    }
-    .card-diagram img {
-      max-width: 100%;
-      max-height: 170px;
-      height: auto;
-      object-fit: contain;
-    }
-
-    /* Выпадающие списки и инфо-чипы внутри карточки */
-    .card-quick-inputs {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      gap: 6px;
-      margin-bottom: 14px;
-      background: #f8fafc;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: 1px solid #e2e8f0;
-      min-height: 56px;
-    }
-    html.dark .card-quick-inputs {
-      background: #161922;
-      border-color: #272d3b;
-    }
-    .input-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      font-family: var(--font-mono);
-      gap: 8px;
-    }
-    .input-row label, .input-row .row-label {
-      color: #64748b;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-    html.dark .input-row label, html.dark .input-row .row-label {
-      color: #94a3b8;
-    }
-    .input-row select {
-      font-size: 11px;
-      padding: 2px 6px;
-      border: 1px solid #cbd5e1;
-      border-radius: 4px;
-      background: var(--color-paper);
-      color: var(--color-ink);
-      font-family: var(--font-mono);
-      max-width: 62%;
-      cursor: pointer;
-    }
-    html.dark .input-row select {
-      background: #242a38;
-      border-color: #3b4458;
-      color: #f8fafc;
-    }
-
-    /* Текстовый блок */
-    .card-info {
-      margin-bottom: 16px;
-    }
-    .card-info h3 {
-      font-size: 13.5px;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      margin: 0 0 6px 0;
-      color: #0f172a;
-      font-family: var(--font-sans);
-    }
-    html.dark .card-info h3 {
-      color: #f8fafc;
-    }
-    .card-info p {
-      font-size: 12.5px;
-      line-height: 1.5;
-      color: #475569;
-      margin: 0;
-      font-family: var(--font-sans);
-    }
-    html.dark .card-info p {
-      color: #94a3b8;
-    }
-
-    /* Футер и солидная черная кнопка как в референсе */
-    .card-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid #f1f5f9;
-      padding-top: 14px;
-      margin-top: auto;
-    }
-    html.dark .card-footer {
-      border-top-color: #272d3b;
-    }
-    .spec-tag {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
-      background: #f1f5f9;
-      color: #475569;
-      padding: 3px 8px;
-      border-radius: 4px;
-      border: 1px solid #e2e8f0;
-      letter-spacing: 0.03em;
-    }
-    html.dark .spec-tag {
-      background: #242a38;
-      border-color: #374052;
-      color: #cbd5e1;
-    }
-    .card-btn {
-      font-size: 11.5px;
-      font-weight: 700;
-      font-family: var(--font-mono);
-      background: var(--color-paper);
-      color: var(--color-ink);
-      padding: 6px 12px;
-      border-radius: 4px;
-      border: 1px solid var(--color-paper-border-dark);
-      text-decoration: none;
-      transition: border-color 0.15s ease, color 0.15s ease;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .card-btn:hover {
-      border-color: var(--color-ink);
-      color: var(--color-ink);
-    }
-    html.dark .card-btn {
-      background: var(--color-paper-subtle);
-      color: var(--color-ink);
-      border-color: var(--color-paper-border);
-    }
-    html.dark .card-btn:hover {
-      border-color: var(--color-ink);
-    }
-    .icon-thermo, .icon-tools, .icon-search {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      color: #0f172a;
-    }
-    html.dark .icon-thermo, html.dark .icon-tools, html.dark .icon-search {
-      color: #f8fafc;
-    }
-
-    /* Адаптив для планшетов и телефонов */
-    @media (max-width: 900px) {
-      .cards-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-<?php
-$extra_head = ob_get_clean();
+$extra_head = '<link rel="stylesheet" href="/assets/css/workbench.css">';
 include __DIR__ . '/includes/header.php';
 ?>
 
   <!-- Main Container -->
-  <main class="w-full flex-grow pt-8 pb-16">
+  <main class="interactive w-full flex-grow pt-8 pb-16">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 space-y-10">
       
       <!-- Breadcrumbs -->
@@ -332,7 +34,7 @@ include __DIR__ . '/includes/header.php';
               <span class="w-2 h-2 rounded-full bg-accent inline-block shadow-[0_0_6px_rgba(235,82,17,0.8)]"></span>
               <span class="font-bold tracking-wider uppercase">ВЕРСТАК // LAB TOOLS v3.0</span>
               <span class="text-ink-faint">|</span>
-              <span class="text-[10px] text-ink-muted">7 КАЛЬКУЛЯТОРОВ И СПРАВОЧНИКОВ</span>
+              <span class="text-xs text-ink-muted">7 КАЛЬКУЛЯТОРОВ И СПРАВОЧНИКОВ</span>
             </div>
           </div>
 
@@ -370,7 +72,14 @@ include __DIR__ . '/includes/header.php';
                 <div class="card-header">
                   <div class="card-title-group">
                     <span class="icon-thermo">
-                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 12.5V3.5a1.8 1.8 0 0 1 3.6 0v9a3.6 3.6 0 1 1-3.6 0z"/>
+                        <path d="M10.8 8.5v3.5" stroke-width="2"/>
+                        <circle cx="10.8" cy="15.5" r="1.8" fill="currentColor" stroke="none"/>
+                        <line x1="12.6" y1="5" x2="15.5" y2="5" stroke-width="1.2"/>
+                        <line x1="12.6" y1="7.5" x2="14.5" y2="7.5" stroke-width="1"/>
+                        <line x1="12.6" y1="10" x2="15.5" y2="10" stroke-width="1.2"/>
+                      </svg>
                     </span>
                     <span class="card-title">Терморежим</span>
                   </div>
@@ -387,11 +96,11 @@ include __DIR__ . '/includes/header.php';
                   <div class="input-row">
                     <label for="quick-temp-work">Тип монтажа</label>
                     <select id="quick-temp-work" aria-label="Быстрый выбор типа монтажа">
-                      <option value="smd" selected>SMD 0603–1206</option>
-                      <option value="smd_fine">Прецизионный SMD</option>
-                      <option value="boards_tht">Выводной THT</option>
-                      <option value="wire">Провода / Разъемы</option>
-                      <option value="massive">Полигоны / Медь</option>
+                      <option value="smd_medium" selected>SMD 0603–1206</option>
+                      <option value="smd_small">Прецизионный SMD</option>
+                      <option value="pth">Выводной THT</option>
+                      <option value="wire_medium">Провода / Разъемы</option>
+                      <option value="smd_large">Полигоны / Медь</option>
                     </select>
                   </div>
                   <div class="input-row">
@@ -399,7 +108,7 @@ include __DIR__ . '/includes/header.php';
                     <select id="quick-temp-solder" aria-label="Быстрый выбор марки припоя">
                       <option value="sac305" selected>SAC305 (217–220 °C)</option>
                       <option value="pos61">ПОС-61 (183–190 °C)</option>
-                      <option value="pos63">ПОС-63 (183 °C)</option>
+                      <option value="sn63pb37">Sn63Pb37 (183 °C)</option>
                       <option value="sn42bi58">Sn42Bi58 (138 °C)</option>
                     </select>
                   </div>
@@ -532,8 +241,8 @@ include __DIR__ . '/includes/header.php';
               <span class="sketch-pill-yellow text-ink font-mono text-[11px] font-bold">01 // ТЕРМОРЕЖИМ ПАЙКИ</span>
               <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">ГОСТ 21931-76 / IPC J-STD-006C</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Калькулятор рабочей температуры станции</h2>
-            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Определяет безопасную температуру жала в зависимости от припоя и типа работ, предотвращая термоудар компонентов и отслоение дорожек.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Какую температуру выставить на паяльнике?</h2>
+            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Узнайте точный температурный режим для вашей задачи, чтобы не сжечь компоненты, не отслоить дорожки и получить надежный блестящий контакт.</p>
             <div class="mt-3 flex items-center gap-2">
               <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper-subtle border border-paper-border text-ink-muted">Для новичков</span>
               <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper-subtle border border-paper-border text-ink-muted">~ 1 мин</span>
@@ -549,31 +258,31 @@ include __DIR__ . '/includes/header.php';
           <!-- Controls -->
           <div class="space-y-4">
             <div>
-              <label for="temp-solder" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Марка используемого припоя:</label>
-              <select id="temp-solder" class="input-base font-mono">
-                <option value="" selected disabled>-- Выберите марку припоя --</option>
-                <option value="pos61">ПОС-61 (Sn 59–61%, ост. Pb) — 183–190 °C (ГОСТ 21930-76)</option>
-                <option value="sn63pb37">Sn63Pb37 — эвтектика 183 °C (IPC J-STD-006C / ASTM B32)</option>
-                <option value="sac305">SAC305 (Sn96.5Ag3Cu0.5) — бессвинец RoHS 217–220 °C</option>
-                <option value="pos40">ПОС-40 (Sn40Pb60) — кабельный 183–238 °C</option>
-                <option value="sn42bi58">Sn42Bi58 — низкотемпературный 138 °C (термочувствительный)</option>
-                <option value="roze">Сплав Розе (Bi50Pb25Sn25) — 94 °C (только демонтаж)</option>
+              <label for="temp-work" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Что вы собираетесь паять?</label>
+              <select id="temp-work" class="input-base font-mono">
+                <option value="" selected disabled>-- Выберите задачу --</option>
+                <option value="smd_medium">Обычные SMD детали (0603–1206) или микросхемы (SOP, QFP)</option>
+                <option value="smd_small">Очень мелкие SMD детали (0201–0402)</option>
+                <option value="smd_large">Крупные микросхемы или транзисторы с теплоотводом (QFN, D-PAK)</option>
+                <option value="pth">Детали в отверстия (выводной монтаж), штыревые разъемы</option>
+                <option value="wire_thin">Тонкие проводки и перемычки (до 0.5 мм²)</option>
+                <option value="wire_medium">Обычные провода (0.5 – 2.5 мм²)</option>
+                <option value="wire_heavy">Толстые силовые провода (больше 2.5 мм²)</option>
+                <option value="bga">BGA чипы (реболлинг или пайка феном)</option>
+                <option value="copper_pipe">Медные трубы</option>
               </select>
             </div>
 
             <div>
-              <label for="temp-work" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Тип детали и монтажной операции:</label>
-              <select id="temp-work" class="input-base font-mono">
-                <option value="" selected disabled>-- Выберите тип монтажа --</option>
-                <option value="smd_medium">SMD 0603–1206 / Микросхемы SOP, QFP (стандарт)</option>
-                <option value="smd_small">Мелкие SMD 0201–0402 (термочувствительные чипы)</option>
-                <option value="smd_large">Массивные SMD: QFN, DFN, силовые транзисторы D-PAK</option>
-                <option value="pth">Монтаж в металлизированные отверстия (THT / разъёмы)</option>
-                <option value="wire_thin">Тонкие провода и перемычки (до 0.5 мм²)</option>
-                <option value="wire_medium">Силовые монтажные провода (0.5 – 2.5 мм²)</option>
-                <option value="wire_heavy">Тяжёлые шины питания / провода более 2.5 мм²</option>
-                <option value="bga">BGA-реболлинг (пайка феном/станцией)</option>
-                <option value="copper_pipe">Медные трубы и фитинги (горелка)</option>
+              <label for="temp-solder" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Какой припой вы используете?</label>
+              <select id="temp-solder" class="input-base font-mono">
+                <option value="" selected disabled>-- Выберите припой --</option>
+                <option value="pos61">Свинцовый: ПОС-61 или аналог (183–190 °C)</option>
+                <option value="sn63pb37">Свинцовый: Sn63Pb37 / ПОС-63 (183 °C)</option>
+                <option value="sac305">Бессвинцовый: SAC305 или обычный без свинца (217–220 °C)</option>
+                <option value="pos40">Грубый свинцовый: ПОС-40 (183–238 °C)</option>
+                <option value="sn42bi58">Низкотемпературный (паста): Sn42Bi58 (138 °C)</option>
+                <option value="roze">Сплав Розе (только для выпаивания) (94 °C)</option>
               </select>
             </div>
 
@@ -591,44 +300,89 @@ include __DIR__ . '/includes/header.php';
             </div>
           </div>
 
-          <!-- Result Board (Post-it Memo Style) -->
-          <div id="temp-result-board" class="p-5 rounded-lg border border-[#fde047] dark:border-[#ca8a04]/40 bg-[#fffdf5] dark:bg-[#ca8a04]/15 space-y-4 relative overflow-hidden rotate-[-0.6deg] shadow-sm">
-            <!-- Folded corner triangle -->
-            <svg aria-hidden="true" class="absolute bottom-0 right-0 w-[22px] h-[22px] pointer-events-none" viewBox="0 0 22 22">
-              <path d="M22 22 L0 22 L22 0 Z" fill="#fef08a" class="dark:fill-[#ca8a04]" opacity="0.6"/>
-              <path d="M22 0 L0 22" stroke="#eab308" stroke-width="0.8" fill="none"/>
-            </svg>
+          <!-- Result Board (Sketch Post-It Memo) -->
+          <div class="relative pt-2">
+            <!-- Washi Tape sticker on top -->
+            <div class="sketch-washi-tape" style="top: 0px; left: 50%; transform: translateX(-50%) rotate(-1.2deg);" aria-hidden="true"></div>
 
-            <div id="temp-empty-state" class="absolute inset-0 flex flex-col items-center justify-center bg-[#fffdf5] dark:bg-[#1c1d21] z-10 transition-opacity duration-300 p-4 text-center">
-              <svg class="w-8 h-8 text-ink-faint mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
-              <span class="text-xs font-mono text-ink-muted">Укажите параметры для расчета</span>
-              <span class="font-hand text-base text-ink-muted/80 italic pt-1">«Стартовый режим станции»</span>
-            </div>
-            
-            <div id="temp-result-content" class="opacity-0 transition-opacity duration-300 pointer-events-none space-y-4">
-              <div>
-                <div class="text-[11px] font-mono uppercase text-ink-muted font-bold mb-1">Рекомендуемый диапазон жала:</div>
-                <div id="temp-range-display" class="text-3xl font-bold font-mono text-accent leading-none">
-                  260 – 310 °C
-                </div>
-              </div>
+            <div id="temp-result-board" class="sketch-sticky-note p-5 sm:p-6 space-y-4 transition-all">
+              <!-- Folded corner triangle (bottom-right) -->
+              <svg aria-hidden="true" class="sketch-corner-fold" viewBox="0 0 24 24" width="24" height="24">
+                <polygon points="0,24 24,0 24,24" class="sketch-corner-triangle"></polygon>
+                <line x1="0" y1="24" x2="24" y2="0" class="sketch-corner-crease"></line>
+              </svg>
 
-              <div class="pt-3 border-t border-[#fde047]/60 dark:border-[#ca8a04]/40 space-y-2">
+              <!-- Sticky Note Header -->
+              <div class="flex items-center justify-between pb-3 border-b sketch-divider">
                 <div class="flex items-center gap-2">
-                  <svg class="w-4 h-4 text-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-                  <span id="temp-tip-display" class="text-xs font-mono font-bold text-ink">Форма жала: скошенное или «ложка»</span>
+                  <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+                  <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">КАРТА ТЕРМОРЕЖИМА</span>
                 </div>
-                <p id="temp-advice-display" class="text-xs font-mono text-ink-muted leading-relaxed">
-                  SOP/QFP: двигайтесь по выводам плавно. Флюс-гель помогает растечься припою между выводами без перемычек.
-                </p>
+                <span class="font-mono text-[11px] text-ink-muted uppercase">IPC/JEDEC</span>
               </div>
 
-              <!-- Warning Callout -->
-              <div id="temp-warn-box" class="p-3 rounded bg-amber-50 dark:bg-amber-950/30 border border-amber-300 dark:border-amber-800 flex items-start gap-2">
-                <svg class="w-4 h-4 text-amber-700 dark:text-amber-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                <span id="temp-warn-display" class="text-xs font-mono text-amber-800 dark:text-amber-300 leading-normal">
-                  Мостики? Сначала добавьте флюс, затем снимите оплёткой — не поднимайте температуру выше предела.
-                </span>
+              <!-- State 1: Empty state (in flow, no overlapping absolute elements) -->
+              <div id="temp-empty-state" class="py-6 flex flex-col items-center justify-center text-center space-y-2">
+                <div class="sketch-icon-badge mb-1" title="Лабораторный калибровочный термометр">
+                  <svg class="w-7 h-7 text-accent" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <!-- Стеклянная колба термометра -->
+                    <path d="M10.5 14.5V4.5a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0z"></path>
+                    <!-- Столбик и мениск ртути/нагрева -->
+                    <path d="M12.5 10v6" stroke-width="2.2"></path>
+                    <circle cx="12.5" cy="18" r="2.2" fill="currentColor" stroke="none"></circle>
+                    <!-- Градуировочные риски шкалы температур -->
+                    <line x1="14.5" y1="6" x2="18.5" y2="6" stroke-width="1.3"></line>
+                    <line x1="14.5" y1="8.5" x2="17" y2="8.5" stroke-width="1"></line>
+                    <line x1="14.5" y1="11" x2="18.5" y2="11" stroke-width="1.3"></line>
+                    <line x1="14.5" y1="13.5" x2="17" y2="13.5" stroke-width="1"></line>
+                    <!-- Инженерная отметка градусов °C -->
+                    <circle cx="21" cy="6" r="1.1" stroke-width="1.1"></circle>
+                    <path d="M25.5 6.2a2 2 0 0 0-1.6-.9c-1.1 0-1.8.8-1.8 1.9s.7 1.9 1.8 1.9c.7 0 1.3-.4 1.6-.9" stroke-width="1.2"></path>
+                  </svg>
+                </div>
+                <div class="text-xs font-mono font-bold uppercase text-ink">Укажите параметры слева</div>
+                <p class="text-xs font-mono text-ink-muted max-w-xs leading-relaxed">
+                  Выберите задачу и марку припоя, чтобы рассчитать оптимальный диапазон жала
+                </p>
+                <div class="font-hand text-base text-ink-muted/90 italic pt-1" style="transform: rotate(-1deg);">
+                  «Стартовый режим станции и защита от перегрева»
+                </div>
+              </div>
+              
+              <!-- State 2: Result content (hidden by default, revealed on calculation) -->
+              <div id="temp-result-content" aria-live="polite" aria-atomic="true" class="hidden space-y-4">
+                <div>
+                  <span class="text-xs font-mono uppercase text-ink-muted font-bold block mb-1">Рекомендуемый диапазон уставки:</span>
+                  <div class="flex items-baseline gap-2 flex-wrap">
+                    <div id="temp-range-display" class="text-3xl sm:text-4xl font-bold font-mono text-accent leading-none">
+                      260 – 310 °C
+                    </div>
+                    <span class="text-xs font-mono text-ink-faint">на индикаторе станции</span>
+                  </div>
+                </div>
+
+                <!-- Tip & Geometry Note -->
+                <div class="sketch-tip-box p-3.5 space-y-2">
+                  <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
+                    <span id="temp-tip-display" class="text-xs font-mono font-bold text-ink">Форма жала: скошенное или «ложка»</span>
+                  </div>
+                  <div id="temp-advice-display" class="text-xs font-mono text-ink-muted leading-relaxed">
+                    SOP/QFP: двигайтесь по выводам плавно. Флюс-гель помогает растечься припою между выводами без перемычек.
+                  </div>
+                </div>
+
+                <!-- Warning Callout (margin-right prevents overlap with bottom-right folded corner) -->
+                <div id="temp-warn-box" class="sketch-warn-box p-3 flex items-start gap-2.5" style="display:none; margin-right: 28px;">
+                  <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                  <span id="temp-warn-display" class="text-xs font-mono leading-normal">
+                    Мостики? Сначала добавьте флюс, затем снимите оплёткой — не поднимайте температуру выше предела.
+                  </span>
+                </div>
+
+                <div class="font-hand text-base text-ink-muted/90 italic pt-2 border-t sketch-divider" style="padding-right: 28px; transform: rotate(-0.5deg);">
+                  «Время контакта с выводом: 1.5–2.5 секунды. Не давите жалом на контактную площадку!»
+                </div>
               </div>
             </div>
           </div>
@@ -651,8 +405,8 @@ include __DIR__ . '/includes/header.php';
               <span class="sketch-pill-gray text-ink font-mono text-[11px] font-bold">02 // КОНФИГУРАТОР ВЕРСТАКА</span>
               <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">Спецификация оборудования</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Подбор паяльника и картриджей под задачи</h2>
-            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Оптимальный подбор паяльного оборудования от домашней лаборатории до профессионального сервисного центра по IPC J-STD-001.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Что купить для пайки?</h2>
+            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Ответьте на два вопроса, и мы подскажем оптимальный класс оборудования: от недорогого паяльника для дома до профессиональной станции.</p>
           </div>
           <div class="font-hand text-base text-ink-muted/80 italic hidden sm:block text-right rotate-[0.5deg]">
             «Подбор картриджа под теплоёмкость»
@@ -664,24 +418,24 @@ include __DIR__ . '/includes/header.php';
           <!-- Selectors -->
           <div class="space-y-4">
             <div>
-              <label for="iron-task" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Основной сценарий пайки:</label>
+              <label for="iron-task" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Что вы будете паять чаще всего?</label>
               <select id="iron-task" class="input-base font-mono">
-                <option value="smd" selected>SMD компоненты (0603–1206, SOIC, базовый ремонт)</option>
-                <option value="smd_fine">Прецизионный SMD (0402, QFP с мелким шагом, IC микросхемы)</option>
-                <option value="boards_tht">Печатные платы, монтаж в отверстия (THT / разъёмы)</option>
-                <option value="wire">Провода, кабели, электромонтаж и бытовая пайка</option>
-                <option value="connectors">Силовые разъёмы (XT60/XT90), толстые клеммы и шины</option>
-                <option value="bga_rework">BGA чипы и микросхемы под компаундом</option>
-                <option value="pipes">Медные водопроводные трубы и холодильная техника</option>
+                <option value="wire">Обычные провода, кабели, бытовая пайка для дома</option>
+                <option value="boards_tht">Печатные платы (детали с ножками в отверстия)</option>
+                <option value="smd" selected>Платы с мелкими SMD-деталями (базовый ремонт электроники)</option>
+                <option value="smd_fine">Сложный ремонт: очень мелкие детали под микроскопом, телефоны</option>
+                <option value="connectors">Толстые силовые разъемы (дроны, авто), клеммы</option>
+                <option value="bga_rework">Замена BGA чипов (ноутбуки, видеокарты)</option>
+                <option value="pipes">Медные водопроводные трубы</option>
               </select>
             </div>
 
             <div>
-              <label for="iron-intensity" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Интенсивность и бюджет:</label>
+              <label for="iron-intensity" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Как часто планируете паять?</label>
               <select id="iron-intensity" class="input-base font-mono">
-                <option value="rare">Редкий ремонт (1–2 раза в месяц, бюджетный сегмент)</option>
-                <option value="regular" selected>Регулярная мастерская / радиолюбитель (оптимум цена/качество)</option>
-                <option value="daily">Ежедневная профессиональная загрузка (сервисный центр)</option>
+                <option value="rare">Пару раз в месяц (починить наушники, собрать гирлянду)</option>
+                <option value="regular" selected>Регулярно (хобби, радиолюбитель, сборка своих плат)</option>
+                <option value="daily">Ежедневно (работа в сервисном центре)</option>
               </select>
             </div>
 
@@ -689,7 +443,7 @@ include __DIR__ . '/includes/header.php';
             <div id="iron-avoid-box" class="p-3 rounded bg-red-50 dark:bg-red-950/30 border border-red-300 dark:border-red-800 flex items-start gap-2" style="display:none;">
               <svg class="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
               <div>
-                <div class="text-[10px] font-mono uppercase font-bold text-red-700 dark:text-red-400">Чего избегать:</div>
+                <div class="text-xs font-mono uppercase font-bold text-red-700 dark:text-red-400">Чего избегать:</div>
                 <div id="iron-avoid-display" class="text-xs font-mono text-red-800 dark:text-red-300"></div>
               </div>
             </div>
@@ -698,7 +452,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Recommendation Spec Card -->
           <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 shadow-xs">
             <div>
-              <span class="text-[10px] font-mono uppercase tracking-wider text-accent font-bold">Рекомендуемый класс станции:</span>
+              <span class="text-xs font-mono uppercase tracking-wider text-accent font-bold">Рекомендуемый класс станции:</span>
               <div id="iron-class-display" class="text-lg font-bold font-sans text-ink mt-0.5">
                 Паяльная станция + термофен
               </div>
@@ -706,11 +460,11 @@ include __DIR__ . '/includes/header.php';
 
             <div class="grid grid-cols-2 gap-3 pt-2 border-t border-paper-border text-xs font-mono">
               <div>
-                <span class="text-ink-muted block text-[10px] uppercase">Термоконтроль:</span>
+                <span class="text-ink-muted block text-xs uppercase">Термоконтроль:</span>
                 <span id="iron-control-display" class="font-bold text-ink">Цифровой термостат</span>
               </div>
               <div>
-                <span class="text-ink-muted block text-[10px] uppercase">Тип жал / картриджей:</span>
+                <span class="text-ink-muted block text-xs uppercase">Тип жал / картриджей:</span>
                 <span id="iron-tip-display" class="font-bold text-ink">Конус 0.2–0.5 мм, скос 45°</span>
               </div>
             </div>
@@ -746,8 +500,8 @@ include __DIR__ . '/includes/header.php';
               <span class="sketch-pill-yellow text-ink font-mono text-[11px] font-bold">03 // ДИАГНОСТИКА БРАКА</span>
               <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">Дерево инженерных решений</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Интерактивный определитель дефектов монтажа</h2>
-            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Выберите визуальный признак проблемы на плате или кабеле — алгоритм определит причину и выдаст пошаговую инструкцию по исправлению.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Пайка не получилась. Что делать?</h2>
+            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Укажите симптом брака, и мы шаг за шагом найдем причину и подскажем, как исправить ошибку без вреда для платы.</p>
             <div class="mt-3 flex items-center gap-2">
               <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper-subtle border border-paper-border text-ink-muted">Продвинутый</span>
               <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper-subtle border border-paper-border text-ink-muted">~ 3 мин</span>
@@ -765,7 +519,7 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <!-- Dynamic Decision Tree Container -->
-        <div id="defect-tree-container" class="min-h-[220px]">
+        <div id="defect-tree-container" aria-live="polite" class="min-h-[220px]">
           <!-- Rendered dynamically by workbench.js -->
         </div>
       </section>
@@ -784,8 +538,8 @@ include __DIR__ . '/includes/header.php';
                 «Апертурный расчёт (Indium Corp)»
               </span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Калькулятор расхода паяльной пасты и флюса</h2>
-            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Физический расчёт объёма апертур и массы пасты по геометрии трафарета (S · k · h · η) с учётом эффективности переноса ~80% и расхода на ракеле.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Сколько пасты или флюса наносить?</h2>
+            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Рассчитайте точную дозировку пасты или флюса для вашей платы, чтобы избежать замыканий из-за избытка материала.</p>
             <div class="mt-3 flex items-center gap-2">
               <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper-subtle border border-paper-border text-ink-muted">Инженерный</span>
               <span class="px-2 py-0.5 rounded text-[11px] font-mono bg-paper-subtle border border-paper-border text-ink-muted">~ 2 мин</span>
@@ -813,11 +567,6 @@ include __DIR__ . '/includes/header.php';
         <!-- Workbench Grid: Controls + Sticky Note Result -->
         <div id="calc-workbench-grid" style="display:flex; flex-direction:column; gap:1.5rem;">
           <div style="display:grid; grid-template-columns:1fr; gap:1.5rem; align-items:start;">
-            <style>
-              @media(min-width:1024px){
-                #calc-workbench-grid-inner { grid-template-columns: 58% 40% !important; display: grid !important; }
-              }
-            </style>
             <div id="calc-workbench-grid-inner" style="display:contents;">
 
               <!-- Controls column -->
@@ -876,67 +625,55 @@ include __DIR__ . '/includes/header.php';
               </div>
 
               <!-- Sticky Note Engineer's Memo -->
-              <div>
-                <div id="engineer-memo" style="
-                  position:relative;
-                  padding:1.25rem 1.25rem 1.5rem;
-                  background:#fffdf5;
-                  transform:rotate(-1.2deg);
-                  transition:transform 0.2s ease;
-                  display:flex; flex-direction:column; gap:0.9rem;
-                  box-shadow:0 6px 20px rgba(250, 204, 21, 0.1), 0 2px 6px rgba(0,0,0,0.04);
-                  border-radius:3px;
-                ">
-                  <!-- SVG sketch outline -->
-                  <svg aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible;" preserveAspectRatio="none" viewBox="0 0 200 260">
-                    <path d="M2 4 C 40 1.5, 140 3, 198 2.5 C 199.5 60, 199 140, 198.5 258 C 150 259.5, 55 258, 2.5 258.5 C 1.5 190, 1 80, 2 4 Z"
-                          fill="#fffdf5" fill-opacity="0" stroke="#fde047" stroke-width="1.2"
-                          stroke-dasharray="38 1.5 22 1" stroke-linecap="round"/>
-                  </svg>
-                  <!-- Folded corner triangle -->
-                  <svg aria-hidden="true" style="position:absolute;bottom:0;right:0;width:22px;height:22px;pointer-events:none;" viewBox="0 0 22 22">
-                    <path d="M22 22 L0 22 L22 0 Z" fill="#fef08a" opacity="0.6"/>
-                    <path d="M22 0 L0 22" stroke="#eab308" stroke-width="0.8" fill="none"/>
+              <div class="relative pt-2">
+                <!-- Washi Tape sticker on top -->
+                <div class="sketch-washi-tape" style="top: 0px; left: 50%; transform: translateX(-50%) rotate(1.2deg);" aria-hidden="true"></div>
+
+                <div id="engineer-memo" class="sketch-sticky-note p-5 sm:p-6 space-y-4 transition-all" style="transform: rotate(-1.2deg);">
+                  <!-- Folded corner triangle (bottom-right) -->
+                  <svg aria-hidden="true" class="sketch-corner-fold" viewBox="0 0 24 24" width="24" height="24">
+                    <polygon points="0,24 24,0 24,24" class="sketch-corner-triangle"></polygon>
+                    <line x1="0" y1="24" x2="24" y2="0" class="sketch-corner-crease"></line>
                   </svg>
 
                   <!-- Pin header -->
-                  <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:9px; border-bottom:1px dashed rgba(0,0,0,0.12);">
-                    <span class="handwriting" style="font-size:18px; font-weight:700; color:#0f172a; letter-spacing:0.01em; display:inline-flex; align-items:center; gap:6px;">
-                      <svg class="w-4 h-4 text-amber-600 shrink-0 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
+                  <div class="flex items-center justify-between pb-3 border-b sketch-divider">
+                    <span class="inline-flex items-center gap-2">
+                      <svg class="w-4 h-4 text-accent shrink-0 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
                       <span class="font-hand text-xl font-bold text-ink tracking-tight">Заметка инженера</span>
                     </span>
-                    <span style="font-size:10px; font-family:monospace; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.06em;">IPC-A-610</span>
+                    <span class="font-mono text-[10px] font-bold text-ink-muted uppercase tracking-wider">IPC-A-610</span>
                   </div>
 
                   <!-- Dosage highlight -->
                   <div>
-                    <div style="font-size:10px; font-family:monospace; text-transform:uppercase; color:#64748b; margin-bottom:3px; font-weight:600;">Рекомендуемая дозировка:</div>
-                    <div style="display:flex; align-items:baseline; gap:8px;">
-                      <span id="res-volume" class="handwriting" style="font-size:2.5rem; font-weight:700; color:var(--color-accent); line-height:1;">~0.18 мл</span>
-                      <span id="batch-note" style="font-size:11px; font-family:monospace; color:#64748b;">(на 1 плату)</span>
+                    <div class="text-[10px] font-mono font-bold uppercase text-ink-muted mb-1">Рекомендуемая дозировка:</div>
+                    <div class="flex items-baseline gap-2 flex-wrap">
+                      <span id="res-volume" class="font-mono text-3xl sm:text-4xl font-bold text-accent leading-none">~0.18 мл</span>
+                      <span id="batch-note" class="text-xs font-mono text-ink-faint">(на 1 плату)</span>
                     </div>
                   </div>
 
-                  <!-- Hand-drawn PCB sketch -->
-                  <div style="display:flex; align-items:center; gap:10px;">
-                    <svg id="pcb-svg" width="80" height="80" viewBox="0 0 80 80" fill="none"
-                         stroke="#475569" stroke-linecap="round" stroke-linejoin="round"
-                         style="flex-shrink:0; transition:width 0.2s,height 0.2s; display:block; opacity:0.85;">
+                  <!-- Hand-drawn PCB sketch card -->
+                  <div class="sketch-tip-box p-3 flex items-center gap-3">
+                    <svg id="pcb-svg" width="70" height="70" viewBox="0 0 80 80" fill="none"
+                         stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                         class="text-ink-muted shrink-0 transition-all duration-200" style="display:block; opacity:0.85;">
                       <rect x="5" y="5" width="70" height="70" rx="3" stroke-width="1.4" stroke-dasharray="2.5 1.5" fill="none"/>
                       <circle cx="12" cy="12" r="2.2" stroke-width="1.1" fill="none"/>
                       <circle cx="68" cy="12" r="2.2" stroke-width="1.1" fill="none"/>
                       <circle cx="12" cy="68" r="2.2" stroke-width="1.1" fill="none"/>
                       <circle cx="68" cy="68" r="2.2" stroke-width="1.1" fill="none"/>
                       <rect x="26" y="26" width="28" height="28" rx="2" stroke-width="1.4" stroke-dasharray="3 1.5" fill="none"/>
-                      <circle cx="33" cy="33" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
-                      <circle cx="40" cy="33" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
-                      <circle cx="47" cy="33" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
-                      <circle cx="33" cy="40" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
-                      <circle cx="40" cy="40" r="1.8" fill="#0f172a" stroke="none" opacity="0.85"/>
-                      <circle cx="47" cy="40" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
-                      <circle cx="33" cy="47" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
-                      <circle cx="40" cy="47" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
-                      <circle cx="47" cy="47" r="1.3" fill="#475569" stroke="none" opacity="0.6"/>
+                      <circle cx="33" cy="33" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
+                      <circle cx="40" cy="33" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
+                      <circle cx="47" cy="33" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
+                      <circle cx="33" cy="40" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
+                      <circle cx="40" cy="40" r="1.8" fill="var(--color-accent)" stroke="none" opacity="0.9"/>
+                      <circle cx="47" cy="40" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
+                      <circle cx="33" cy="47" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
+                      <circle cx="40" cy="47" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
+                      <circle cx="47" cy="47" r="1.3" fill="currentColor" stroke="none" opacity="0.6"/>
                       <line x1="5" y1="33" x2="26" y2="33" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
                       <line x1="5" y1="40" x2="26" y2="40" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
                       <line x1="5" y1="47" x2="26" y2="47" stroke-width="0.9" stroke-dasharray="1.5 1.2"/>
@@ -950,29 +687,32 @@ include __DIR__ . '/includes/header.php';
                       <line x1="75" y1="74" x2="75" y2="80" stroke-width="0.7" opacity="0.5"/>
                     </svg>
                     <div>
-                      <div style="font-size:10px; font-family:monospace; text-transform:uppercase; font-weight:700; color:#64748b; margin-bottom:2px;">Зарисовка платы:</div>
-                      <div id="pcb-dimensions" style="font-size:11px; font-family:monospace; font-weight:700; color:#0f172a;">59 × 59 мм (35 см²)</div>
-                      <div style="font-size:10px; font-family:monospace; color:#64748b; opacity:0.8; margin-top:2px;">↑ масштаб к площади</div>
+                      <div class="text-[10px] font-mono uppercase font-bold text-ink-muted mb-0.5">Зарисовка платы:</div>
+                      <div id="pcb-dimensions" class="text-xs font-mono font-bold text-ink">59 × 59 мм (35 см²)</div>
+                      <div class="text-[10px] font-mono text-ink-faint mt-0.5">↑ масштаб к площади</div>
                     </div>
                   </div>
 
                   <!-- Process description -->
-                  <p id="res-desc" style="font-size:12px; font-family:monospace; color:#334155; line-height:1.55; margin:0;">
+                  <p id="res-desc" class="text-xs font-mono text-ink-muted leading-relaxed">
                     Для 35 см² при BGA реболлинге наносите тонкий слой 50-70 мкм. Избыток вызывает кипение и сдвиг чипа.
                   </p>
 
                   <!-- Wash tip -->
-                  <div style="font-size:11px; font-family:var(--font-mono); font-weight:600; color:var(--color-ink-muted); padding-top:8px; border-top:1px dashed rgba(0,0,0,0.12); display:flex; align-items:center; gap:6px;">
-                    <svg class="w-3.5 h-3.5 shrink-0" style="color:var(--color-accent);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                    <span id="wash-tip">Отмывка: опциональна (No-Clean)</span>
+                  <div class="sketch-warn-box p-3 flex items-start gap-2 text-xs font-mono" style="margin-right: 28px;">
+                    <svg class="w-4 h-4 text-accent shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <span id="wash-tip" class="leading-normal">Отмывка: опциональна (No-Clean)</span>
                   </div>
 
-                  <button type="button" id="copy-flux-btn" class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded text-[11px] font-mono font-bold border border-paper-border-dark bg-paper text-ink hover:border-ink transition-colors cursor-pointer shadow-sm">
-                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="flex-shrink:0;">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
-                    </svg>
-                    <span id="copy-flux-text">Скопировать параметры в журнал</span>
-                  </button>
+                  <!-- Action copy button -->
+                  <div style="padding-right: 28px;">
+                    <button type="button" id="copy-flux-btn" class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded text-xs font-mono font-bold border border-paper-border-dark bg-paper text-ink hover:border-ink transition-colors cursor-pointer shadow-xs">
+                      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="shrink-0" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                      </svg>
+                      <span id="copy-flux-text" aria-live="polite">Скопировать параметры в журнал</span>
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -988,19 +728,19 @@ include __DIR__ . '/includes/header.php';
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
-              <div class="text-[10px] font-mono text-ink-muted uppercase">Гель BGA (ROL0)</div>
+              <div class="text-xs font-mono text-ink-muted uppercase">Гель BGA (ROL0)</div>
               <div id="matrix-bga" class="text-sm font-mono font-bold text-ink">0.21 мл</div>
             </div>
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
-              <div class="text-[10px] font-mono text-ink-muted uppercase">RMA канифоль (ROM1)</div>
+              <div class="text-xs font-mono text-ink-muted uppercase">RMA канифоль (ROM1)</div>
               <div id="matrix-rma" class="text-sm font-mono font-bold text-ink">0.28 мл</div>
             </div>
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
-              <div class="text-[10px] font-mono text-ink-muted uppercase">Паста SAC305 (120 мкм)</div>
+              <div class="text-xs font-mono text-ink-muted uppercase">Паста SAC305 (120 мкм)</div>
               <div id="matrix-paste" class="text-sm font-mono font-bold text-ink">0.37 г</div>
             </div>
             <div class="p-3 rounded border border-paper-border bg-paper-subtle space-y-1">
-              <div class="text-[10px] font-mono text-ink-muted uppercase">Водосмывной WS (ORH1)</div>
+              <div class="text-xs font-mono text-ink-muted uppercase">Водосмывной WS (ORH1)</div>
               <div id="matrix-ws" class="text-sm font-mono font-bold text-ink">0.21 мл</div>
             </div>
           </div>
@@ -1020,8 +760,8 @@ include __DIR__ . '/includes/header.php';
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.1 // ПОДБОР ФЛЮСА</span>
               <span class="sketch-pill-yellow">ГОСТ Р МЭК 61190</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1 font-serif">Селектор флюса по стандартам ГОСТ и IPC</h2>
-            <p class="text-sm text-ink-muted mt-2">Классификация по ГОСТ Р МЭК 61190-1-1-2020 и IPC J-STD-004B с правилами отмывки по IPC-A-610H.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1 font-serif">Какой флюс выбрать для работы?</h2>
+            <p class="text-sm text-ink-muted mt-2">Ответьте на три вопроса, и мы подберем правильный класс флюса по стандартам ГОСТ и IPC, который справится с задачей и не вызовет коррозию.</p>
             <div class="mt-3 flex items-center gap-2 flex-wrap">
               <span class="sketch-pill-gray">J-STD-004B</span>
               <span class="sketch-pill-gray">~ 1 мин</span>
@@ -1034,29 +774,30 @@ include __DIR__ . '/includes/header.php';
         <div class="tool-two-col">
           <div class="space-y-4">
             <div>
-              <label for="flux-metal" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Металл поверхности и окисление:</label>
+            <div>
+              <label for="flux-metal" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. В каком состоянии плата и детали?</label>
               <select id="flux-metal" class="input-base font-mono">
-                <option value="enig_cu">Медь свежая / ENIG / HASL / иммерсионное Sn (заводская ПП)</option>
-                <option value="osp_oxidized">Окисленная медь / OSP после хранения / латунь</option>
-                <option value="steel_nickel">Сталь, нержавейка, никель (экраны, разъёмы, клеммы)</option>
-                <option value="aluminum">Алюминий и алюминиевые сплавы</option>
+                <option value="enig_cu">Новые чистые детали и заводская плата (золото ENIG, HASL)</option>
+                <option value="osp_oxidized">Старая, окисленная медь или плата после долгого хранения</option>
+                <option value="steel_nickel">Сталь, нержавейка, никелированные клеммы или экраны</option>
+                <option value="aluminum">Алюминиевые провода или радиаторы</option>
               </select>
             </div>
             <div>
-              <label for="flux-process" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Технологическая операция:</label>
+              <label for="flux-process" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Как именно вы будете паять?</label>
               <select id="flux-process" class="input-base font-mono">
-                <option value="manual_smd">Ручной SMD монтаж / реболлинг BGA / замена чипов</option>
-                <option value="tht_wire">Выводной монтаж (THT) / пайка проводов и разъёмов</option>
-                <option value="stencil">Трафаретная печать паяльной пасты (конвекционная печь)</option>
-                <option value="heavy">Силовая пайка шин, клеммников и массивных радиаторов</option>
+                <option value="manual_smd">Ручной ремонт SMD, замена чипов, пайка феном или паяльником</option>
+                <option value="tht_wire">Пайка обычных проводов, разъемов и деталей с ножками (THT)</option>
+                <option value="stencil">Нанесение пасты через трафарет (для печи)</option>
+                <option value="heavy">Пайка толстых проводов, массивных клемм, где нужен сильный прогрев</option>
               </select>
             </div>
             <div>
-              <label for="flux-wash" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">3. Условия и возможность отмывки:</label>
+              <label for="flux-wash" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">3. Будете ли вы отмывать плату после пайки?</label>
               <select id="flux-wash" class="input-base font-mono">
-                <option value="noclean">Безотмывочная технология (No-Clean, сухие условия)</option>
-                <option value="alcohol">Доступна смывка изопропиловым спиртом (IPA 99.7%)</option>
-                <option value="diwater">Промышленная отмывка деионизированной водой (УЗ-ванна)</option>
+                <option value="noclean">Нет, хочу оставить как есть (нужен безотмывочный No-Clean)</option>
+                <option value="alcohol">Да, протру изопропиловым спиртом или специальной смывкой</option>
+                <option value="diwater">Да, буду мыть в ультразвуковой ванне с водой</option>
               </select>
             </div>
           </div>
@@ -1069,13 +810,13 @@ include __DIR__ . '/includes/header.php';
             </svg>
 
             <div>
-              <span class="text-[10px] font-mono uppercase tracking-wider text-accent font-bold">Класс по ГОСТ Р МЭК 61190 / J-STD-004B:</span>
+              <span class="text-xs font-mono uppercase tracking-wider text-accent font-bold">Класс по ГОСТ Р МЭК 61190 / J-STD-004B:</span>
               <div id="flux-code-display" class="text-2xl font-bold font-mono text-ink mt-0.5">ROL0</div>
               <div id="flux-title-display" class="text-xs font-mono font-bold text-ink mt-1">Безотмывочный канифольный гель (NC-559-V2-TF, Kester 959T)</div>
             </div>
 
             <div class="space-y-1.5 pt-2 border-t border-paper-border">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-ink-muted font-bold">Регламент отмывки (IPC-A-610H):</span>
+              <span class="text-xs font-mono uppercase tracking-wider text-ink-muted font-bold">Регламент отмывки (IPC-A-610H):</span>
               <p id="flux-wash-display" class="text-xs font-mono text-ink leading-relaxed">
                 Отмывка опциональна: остатки химически инертны. Для Class 3 и под лакирование смывается IPA 99.7%.
               </p>
@@ -1109,8 +850,8 @@ include __DIR__ . '/includes/header.php';
               <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.2 // РАСХОД МАТЕРИАЛОВ</span>
               <span class="sketch-pill-gray">Сборщику</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1 font-serif">Калькулятор расхода трубчатого припоя</h2>
-            <p class="text-sm text-ink-muted mt-2">Оценивает необходимую длину проволочного припоя для монтажа выводных компонентов, SMD или лужения проводов.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1 font-serif">Сколько припоя уйдет на работу?</h2>
+            <p class="text-sm text-ink-muted mt-2">Оцените расход проволочного припоя перед началом большой сборки, чтобы не пришлось докупать катушку в середине процесса.</p>
             <div class="mt-3 flex items-center gap-2 flex-wrap">
               <span class="sketch-pill-gray">~ 1 мин</span>
               <span class="font-hand text-base text-ink-muted font-semibold tracking-wide ml-2">«Закладывайте +15% на обрезки и очистку жала»</span>
@@ -1122,30 +863,30 @@ include __DIR__ . '/includes/header.php';
         <div class="tool-two-col">
           <div class="space-y-4">
             <div>
-              <label for="cons-type" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Характер работы:</label>
+              <label for="cons-type" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Что именно паяем?</label>
               <select id="cons-type" class="input-base font-mono">
-                <option value="tht">Пайка выводов THT (стандартные точки)</option>
-                <option value="smd">SMD компоненты (дозирование проволоки)</option>
-                <option value="wire">Сращивание проводов / лужение</option>
+                <option value="tht">Обычные детали с ножками в отверстия (THT)</option>
+                <option value="smd">SMD компоненты (дозирование проволоки вручную)</option>
+                <option value="wire">Сращивание и лужение проводов</option>
               </select>
             </div>
             <div>
-              <label for="cons-diam" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Диаметр припоя (проволока):</label>
+              <label for="cons-diam" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Какой толщины проволока припоя?</label>
               <select id="cons-diam" class="input-base font-mono">
                 <option value="0.5">0.5 мм</option>
-                <option value="0.8" selected>0.8 мм (оптимум)</option>
+                <option value="0.8" selected>0.8 мм (стандарт)</option>
                 <option value="1.0">1.0 мм</option>
               </select>
             </div>
             <div>
-              <label for="cons-count" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Количество точек (или стыков):</label>
+              <label for="cons-count" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">Сколько всего точек (или стыков) нужно запаять?</label>
               <input type="number" id="cons-count" value="100" min="1" max="10000" class="input-base font-mono">
             </div>
           </div>
           
           <div class="p-5 rounded-lg border border-paper-border bg-paper shadow-xs space-y-4 flex flex-col justify-center relative">
             <div class="text-center">
-              <span class="text-[10px] font-mono uppercase tracking-wider text-ink-muted font-bold block mb-2">Ориентировочный расход:</span>
+              <span class="text-xs font-mono uppercase tracking-wider text-ink-muted font-bold block mb-2">Ориентировочный расход:</span>
               <div id="cons-length" class="text-3xl font-bold font-mono text-ink">
                 ~ 120 см
               </div>
@@ -1204,9 +945,9 @@ include __DIR__ . '/includes/header.php';
                   <td class="py-2.5 px-3 font-bold text-ink whitespace-nowrap">
                     <?= e($solder['name']) ?>
                     <?php if ($solder['type'] === 'leadfree'): ?>
-                      <span class="ml-1 px-1.5 py-0.5 rounded border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-[10px]">RoHS</span>
+                      <span class="ml-1 px-1.5 py-0.5 rounded border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs">RoHS</span>
                     <?php elseif ($solder['type'] === 'lowtemp'): ?>
-                      <span class="ml-1 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 text-[10px]">Низкотемп.</span>
+                      <span class="ml-1 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 text-xs">Низкотемп.</span>
                     <?php endif; ?>
                   </td>
                   <td class="py-2.5 px-3">
@@ -1235,7 +976,7 @@ include __DIR__ . '/includes/header.php';
                     <?php endif; ?>
                   </td>
                   <td class="py-2.5 px-3">
-                    <span class="px-1.5 py-0.5 rounded bg-paper border border-paper-border text-[10px]">
+                    <span class="px-1.5 py-0.5 rounded bg-paper border border-paper-border text-xs">
                       <?= e($solder['std']) ?>
                     </span>
                   </td>
@@ -1292,17 +1033,27 @@ include __DIR__ . '/includes/header.php';
       const mainWork = document.getElementById('temp-work');
       const mainSolder = document.getElementById('temp-solder');
 
-      if (qWork && mainWork) {
-        qWork.addEventListener('change', function() {
-          mainWork.value = this.value;
+      const syncQuickToMain = () => {
+        if (qWork && mainWork && qWork.value) {
+          mainWork.value = qWork.value;
           mainWork.dispatchEvent(new Event('change'));
-        });
+        }
+        if (qSolder && mainSolder && qSolder.value) {
+          mainSolder.value = qSolder.value;
+          mainSolder.dispatchEvent(new Event('change'));
+        }
+      };
+
+      if (qWork && mainWork) {
+        qWork.addEventListener('change', syncQuickToMain);
       }
       if (qSolder && mainSolder) {
-        qSolder.addEventListener('change', function() {
-          mainSolder.value = this.value;
-          mainSolder.dispatchEvent(new Event('change'));
-        });
+        qSolder.addEventListener('change', syncQuickToMain);
+      }
+
+      const tempCardBtn = document.querySelector('a[href="#temp"].card-btn');
+      if (tempCardBtn) {
+        tempCardBtn.addEventListener('click', syncQuickToMain);
       }
     })();
   </script>

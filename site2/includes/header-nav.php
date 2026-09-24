@@ -10,6 +10,7 @@ $current_page = $current_page ?? '';
 $nav_items = [
     ['href' => '/',                                  'label' => 'Главная',      'page' => 'index'],
     ['href' => '/category.php?slug=start',           'label' => 'Начать паять', 'page' => 'start'],
+    ['href' => '/category.php?slug=instrumenty',     'label' => 'Инструменты',  'page' => 'instrumenty'],
     ['href' => '/category.php?slug=materialy',       'label' => 'Материалы',    'page' => 'materialy'],
     ['href' => '/category.php?slug=praktika',        'label' => 'Практика',     'page' => 'praktika'],
     ['href' => '/category.php?slug=oshibki',         'label' => 'Проблемы',     'page' => 'oshibki'],

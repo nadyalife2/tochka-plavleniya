@@ -42,7 +42,7 @@ html, body {
 
 /* Global Focus-Visible States (Accessibility) */
 :focus-visible {
-  outline: 2px solid #eb5211 !important;
+  outline: 2px solid var(--color-accent, #b9430d) !important;
   outline-offset: 2px !important;
 }
 

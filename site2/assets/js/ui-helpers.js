@@ -32,15 +32,20 @@
     showFieldError(inputElement, message) {
       if (!inputElement) return;
       inputElement.classList.add('has-error');
+      inputElement.setAttribute('aria-invalid', 'true');
 
       // Ищем или создаем контейнер сообщения об ошибке рядом с полем
       const parent = inputElement.parentElement;
       let errorEl = parent.querySelector('.field-error-msg');
+      const errId = inputElement.id ? `${inputElement.id}-error` : `err-${Math.random().toString(36).substr(2, 9)}`;
       if (!errorEl) {
         errorEl = document.createElement('div');
+        errorEl.id = errId;
         errorEl.className = 'field-error-msg text-xs font-mono text-red-600 dark:text-red-400 mt-1 flex items-center gap-1';
         parent.appendChild(errorEl);
       }
+      errorEl.setAttribute('role', 'alert');
+      inputElement.setAttribute('aria-describedby', errorEl.id);
       errorEl.innerHTML = `<span class="material-symbols-outlined text-[14px]">error</span> ${message}`;
       inputElement.focus();
     },
@@ -52,9 +57,13 @@
     clearFieldError(inputElement) {
       if (!inputElement) return;
       inputElement.classList.remove('has-error');
+      inputElement.removeAttribute('aria-invalid');
       const parent = inputElement.parentElement;
       const errorEl = parent.querySelector('.field-error-msg');
       if (errorEl) {
+        if (inputElement.getAttribute('aria-describedby') === errorEl.id) {
+          inputElement.removeAttribute('aria-describedby');
+        }
         errorEl.remove();
       }
     },

@@ -12,7 +12,8 @@
     <div class="flex items-center px-4 py-3.5 border-b border-paper-border bg-paper/50 dark:bg-paper/10">
       <span class="material-symbols-outlined text-accent text-2xl mr-3 select-none">search</span>
       <input type="text" id="global-search-input" 
-             class="w-full bg-transparent text-ink placeholder:text-ink-faint text-base sm:text-lg font-sans focus:outline-none" 
+             class="w-full bg-transparent text-ink placeholder:text-ink-faint text-base sm:text-lg font-sans focus:outline-none focus:ring-0" 
+             style="outline:none !important; box-shadow:none !important;"
              placeholder="Поиск: SAC305, RMA-218, надгробия, T12, IPC..." 
              autocomplete="off" 
              spellcheck="false">
@@ -25,18 +26,19 @@
     </div>
 
     <!-- Filter Category Badges -->
-    <div class="flex items-center gap-1.5 px-4 py-2 border-b border-paper-border/70 overflow-x-auto text-xs font-mono scrollbar-none bg-paper/30">
+    <div class="flex items-center gap-1.5 px-4 py-2 border-b border-paper-border/70 overflow-x-auto text-xs font-mono scrollbar-none bg-paper/30 relative">
       <span class="text-ink-faint text-[11px] uppercase mr-1 select-none">Раздел:</span>
-      <button type="button" data-filter="all" class="search-category-pill active px-2.5 py-1 rounded bg-ink text-paper font-semibold transition-all">Все</button>
+      <button type="button" data-filter="all" class="search-category-pill active px-2.5 py-1 rounded bg-[#fde047] dark:bg-[#ca8a04]/40 text-ink font-bold -rotate-1 transition-all">Все</button>
       <button type="button" data-filter="сплавы" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Сплавы</button>
       <button type="button" data-filter="флюсы" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Флюсы</button>
       <button type="button" data-filter="дефекты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Дефекты</button>
       <button type="button" data-filter="инструменты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Инструменты</button>
       <button type="button" data-filter="стандарты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Стандарты</button>
+      <div class="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#fde047] to-transparent opacity-50 dark:opacity-20"></div>
     </div>
 
     <!-- Live Search Results List -->
-    <div id="search-results-container" class="max-h-[60vh] sm:max-h-[420px] overflow-y-auto p-2 space-y-1 divide-y divide-paper-border/30">
+    <div id="search-results-container" role="region" aria-live="polite" aria-label="Результаты поиска" class="max-h-[60vh] sm:max-h-[420px] overflow-y-auto p-2 space-y-1 divide-y divide-paper-border/30">
       <!-- Injected by JavaScript -->
     </div>
 
@@ -79,7 +81,7 @@
       category: "сплавы",
       badge: "217–220 °C // Lead-Free",
       desc: "Основной промышленный бессвинцовый стандарт (IPC J-STD-006C). Матовая сатинированная фактура галтели является естественной физической нормой.",
-      url: "/article.php#simulator",
+      url: "/article.php?slug=temperaturnye-profili#simulator",
       badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
     },
     {
@@ -112,7 +114,7 @@
       category: "флюсы",
       badge: "ROL0 / Безотмывочный",
       desc: "Слабоактивированный канифольный гелевый флюс. Идеален для BGA, реболлинга и SMD микромонтажа. Не кипит и не разбрасывает шары при 240°C.",
-      url: "/article.php#materials-toolkit",
+      url: "/article.php?slug=temperaturnye-profili#materials-toolkit",
       badgeColor: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300"
     },
     {
@@ -169,7 +171,7 @@
       category: "дефекты",
       badge: "IPC-7095 Class 3",
       desc: "Газовые пустоты в шариковых выводах свыше 25% площади сечения. Вызваны недостаточным временем фазы Soak (выпаривания растворителей флюса).",
-      url: "/article.php#simulator",
+      url: "/article.php?slug=temperaturnye-profili#simulator",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -177,7 +179,7 @@
       category: "дефекты",
       badge: "Критический перегрев",
       desc: "Расслоение слоев FR-4 при превышении температуры стеклования Tg (130–170°C) без предварительного нижнего подогрева.",
-      url: "/article.php",
+      url: "/article.php?slug=temperaturnye-profili",
       badgeColor: "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300"
     },
     // Оборудование и инструменты
@@ -186,7 +188,7 @@
       category: "инструменты",
       badge: "Турбинный термофен",
       desc: "Эталонная термовоздушная станция с прямым потоком воздуха до 120 л/мин и керамическим нагревателем. Быстрый выход на режим за 3 секунды.",
-      url: "/article.php#materials-toolkit",
+      url: "/article.php?slug=temperaturnye-profili#materials-toolkit",
       badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
     },
     {
@@ -211,7 +213,7 @@
       category: "стандарты",
       badge: "Международный стандарт",
       desc: "Определяет требования к галтелям припоя, смачиваемости выводов и дефектам для изделий Класса 1, 2 и 3 (High Reliability).",
-      url: "/article.php",
+      url: "/article.php?slug=temperaturnye-profili",
       badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     {
@@ -219,7 +221,7 @@
       category: "стандарты",
       badge: "Reflow термопрофили",
       desc: "Регламентирует максимальные температуры пика (260°C) и времена выдержки для предотвращения эффекта попкорна в корпусах микросхем.",
-      url: "/article.php#thermal-zones",
+      url: "/article.php?slug=temperaturnye-profili#thermal-zones",
       badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     {
@@ -242,8 +244,11 @@
   const closeBtn = document.getElementById('search-modal-close');
   const categoryPills = document.querySelectorAll('.search-category-pill');
 
+  let lastFocusedElement = null;
+
   function openSearch() {
     if (!modal) return;
+    lastFocusedElement = document.activeElement;
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     setTimeout(() => {
@@ -258,6 +263,9 @@
     document.body.style.overflow = '';
     searchInput.value = '';
     activeIndex = -1;
+    if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+      lastFocusedElement.focus();
+    }
   }
 
   // Open triggers
@@ -296,11 +304,11 @@
   categoryPills.forEach(pill => {
     pill.addEventListener('click', () => {
       categoryPills.forEach(p => {
-        p.classList.remove('bg-ink', 'text-paper', 'font-semibold', 'active');
+        p.classList.remove('bg-[#fde047]', 'dark:bg-[#ca8a04]/40', 'text-ink', 'font-bold', 'active', '-rotate-1');
         p.classList.add('border', 'border-paper-border', 'text-ink-muted');
       });
       pill.classList.remove('border', 'border-paper-border', 'text-ink-muted');
-      pill.classList.add('bg-ink', 'text-paper', 'font-semibold', 'active');
+      pill.classList.add('bg-[#fde047]', 'dark:bg-[#ca8a04]/40', 'text-ink', 'font-bold', 'active', '-rotate-1');
       currentCategory = pill.dataset.filter;
       renderResults(searchInput.value.trim());
     });

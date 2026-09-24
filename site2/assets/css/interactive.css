@@ -10,8 +10,8 @@
   --border-dark: var(--color-paper-border-dark, #d3cdc2);
   --border: var(--color-paper-border, #e6e2da);
   --border-width: 1.5px;
-  --accent-yellow: var(--color-accent, #eb5211);
-  --accent-orange: var(--color-accent, #eb5211);
+  --accent-yellow: var(--color-accent, #b9430d);
+  --accent-orange: var(--color-accent, #b9430d);
   --accent-green: var(--color-paper-subtle, #f3f0ea);
   --font-mono: 'JetBrains Mono', monospace;
   --font-serif: 'Newsreader', Georgia, serif;

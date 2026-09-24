@@ -19,8 +19,15 @@ include __DIR__ . '/includes/header.php';
       </nav>
 
       <!-- Document Hero -->
-      <div class="border-b border-paper-border pb-6 mb-8 space-y-3">
-        <div class="flex items-center gap-2">
+      <div class="border-b border-paper-border pb-6 mb-8 space-y-3 relative">
+        <div class="relative inline-block mb-1">
+          <div class="sketch-washi-tape" style="top: -8px; left: 16px; width: 44px; height: 14px; transform: rotate(-2deg);" aria-hidden="true"></div>
+          <div class="sketch-sticky-note inline-flex items-center gap-2 px-2.5 py-1 text-ink font-mono text-[11px] shadow-sm rotate-[-1.2deg] rounded-sm">
+            <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+            <span class="font-bold tracking-wider uppercase">LEGAL // DOCUMENT</span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 mt-2">
           <span class="sketch-pill-yellow text-ink font-mono text-xs font-bold">152-ФЗ COMPLIANT</span>
           <span class="text-xs font-mono text-ink-faint">РЕВИЗИЯ: СЕНТЯБРЬ 2026</span>
         </div>
@@ -30,6 +37,9 @@ include __DIR__ . '/includes/header.php';
         <p class="text-sm sm:text-base text-ink-muted leading-relaxed font-serif italic max-w-2xl">
           Сайт «ТОЧКА ПЛАВЛЕНИЯ» функционирует в режиме открытого образовательного справочника. Мы принципиально не собираем персональные данные пользователей.
         </p>
+        <div class="font-hand text-base text-ink-muted/80 italic rotate-[-1deg] mt-3">
+          «Нулевой сбор данных — не маркетинг, а архитектура сайта»
+        </div>
       </div>
 
       <!-- Legal Sections -->
@@ -76,9 +86,9 @@ include __DIR__ . '/includes/header.php';
             3.1. Для удобства взаимодействия Сайт использует исключительно технические файлы <code>Cookie</code> и локальное хранилище браузера (<code>localStorage</code>):
           </p>
           <ul class="list-disc list-inside space-y-1.5 pl-2 font-mono text-xs text-ink-muted">
-            <li><code>tp_theme</code> — сохранение выбранной цветовой темы (светлая / тёмная);</li>
-            <li><code>tp_cookie_consent</code> — сохранение факта ознакомления с уведомлением о cookie;</li>
-            <li>Параметры состояния интерактивных калькуляторов в рамках текущей сессии браузера.</li>
+            <li><code>tp_theme</code> (localStorage) — сохранение выбранной цветовой темы (светлая / тёмная);</li>
+            <li><code>tp_cookie_consent</code> (Cookie / localStorage) — сохранение факта согласия с использованием cookie;</li>
+            <li>Параметры состояния интерактивных калькуляторов сохраняются локально.</li>
           </ul>
           <p>
             3.2. Указанные данные хранятся исключительно на устройстве пользователя и не передаются на сторонние серверы.

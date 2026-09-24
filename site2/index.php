@@ -4,12 +4,7 @@ require_once __DIR__ . '/includes/articles-data.php';
 
 // Filter by category
 $tag_filter = isset($_GET['tag']) ? $_GET['tag'] : 'all';
-$filtered_articles = [];
-foreach ($articles as $article) {
-    if ($tag_filter === 'all' || $article['tag_key'] === $tag_filter) {
-        $filtered_articles[] = $article;
-    }
-}
+$filtered_articles = get_articles_by_tag($tag_filter);
 $page_title = "Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ";
 $page_desc = "Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ.";
 $current_page = 'index';
@@ -66,19 +61,47 @@ include __DIR__ . '/includes/header.php';
             <span>«Анти-идеальный веб. Структура обнажена. Искренность форм.»</span>
           </div>
 
-          <!-- CTA Buttons -->
-          <div class="flex flex-wrap items-center gap-3 pt-2">
-            <a class="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="article.php">
-              <span>Читать главный регламент</span>
-              <span class="text-xs">→</span>
+          <!-- User Journeys (Task-based paths) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
+            <a href="category.php?slug=start" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">school</div>
+              <span class="font-mono text-xs text-ink-muted uppercase tracking-wide">Маршрут 01</span>
+              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Я паяю впервые</span>
+              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
+                <span>Базовый курс</span>
+                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
+              </span>
             </a>
-            <a class="inline-flex items-center gap-2 px-4 py-2.5 min-h-[44px] border border-paper-border bg-paper text-ink text-xs font-mono font-medium rounded hover:border-paper-border-dark transition-colors" href="article.php#simulator">
-              <span>Инженерный калькулятор</span>
+            
+            <a href="category.php?slug=instrumenty" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">hardware</div>
+              <span class="font-mono text-xs text-ink-muted uppercase tracking-wide">Маршрут 02</span>
+              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Что купить и чем паять?</span>
+              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
+                <span>Оборудование</span>
+                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
+              </span>
             </a>
-            <div class="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-ink bg-[#fffdf5] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/50 px-3 py-1 min-h-[36px] shadow-sm sketch-border" style="transform: rotate(-0.5deg);">
-              <span class="w-1.5 h-1.5 rounded-full bg-[#2dd4bf] shadow-[0_0_6px_rgba(45,212,191,0.8)] inline-block"></span>
-              <span class="font-medium">rev 2.4.1 актуализирован</span>
-            </div>
+            
+            <a href="category.php?slug=oshibki" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">bug_report</div>
+              <span class="font-mono text-xs text-ink-muted uppercase tracking-wide">Маршрут 03</span>
+              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Пайка не получается</span>
+              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
+                <span>Разбор дефектов</span>
+                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
+              </span>
+            </a>
+
+            <a href="interactive.php#temp" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
+              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">thermostat</div>
+              <span class="font-mono text-xs text-accent uppercase tracking-wide font-bold">Интерактивно</span>
+              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Подобрать температуру</span>
+              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
+                <span>Калькулятор t°C</span>
+                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
+              </span>
+            </a>
           </div>
 
         </div>
@@ -133,7 +156,7 @@ include __DIR__ . '/includes/header.php';
             <!-- Title & Excerpt -->
             <div class="space-y-3">
               <h2 class="text-2xl sm:text-[28px] font-bold text-ink tracking-tight leading-[1.2]">
-                <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline decoration-[#d97706] dark:decoration-[#f59e0b] decoration-1 underline-offset-4 transition-colors" href="article.php">
+                <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline decoration-[#d97706] dark:decoration-[#f59e0b] decoration-1 underline-offset-4 transition-colors" href="article.php?slug=temperaturnye-profili">
                   Температурные профили: как не перегреть плату за $300
                 </a>
               </h2>
@@ -161,7 +184,7 @@ include __DIR__ . '/includes/header.php';
                 <span class="text-ink-faint">·</span>
                 <span>10 авг 2026</span>
               </div>
-              <a class="text-ink font-bold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline flex items-center gap-1.5 group" href="article.php">
+              <a class="text-ink font-bold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline flex items-center gap-1.5 group" href="article.php?slug=temperaturnye-profili">
                 <span>Читать регламент →</span>
               </a>
             </div>
@@ -182,7 +205,7 @@ include __DIR__ . '/includes/header.php';
                   <span>~4 мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php">SMD 0402 vs 0603: что выбрать для прототипа</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=smd-0402-vs-0603">SMD 0402 vs 0603: что выбрать для прототипа</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Плотность монтажа против ремонтопригодности — детальный анализ паразитных емкостей и удобства ручной пайки на верстаке.
@@ -190,7 +213,7 @@ include __DIR__ . '/includes/header.php';
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">Компоненты</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php">Подробнее →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=smd-0402-vs-0603">Подробнее →</a>
               </div>
             </article>
 
@@ -205,7 +228,7 @@ include __DIR__ . '/includes/header.php';
                   <span>~6 мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php">Жала паяльника: T12 против JBC C245 на верстаке</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=zhala-payalnika">Жала паяльника: T12 против JBC C245 на верстаке</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Сравниваем скорость компенсации тепла на земляных полигонах, ресурс картриджей и экономику работы под микроскопом.
@@ -213,7 +236,7 @@ include __DIR__ . '/includes/header.php';
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">Оборудование</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php">Подробнее →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=zhala-payalnika">Подробнее →</a>
               </div>
             </article>
 
@@ -228,7 +251,7 @@ include __DIR__ . '/includes/header.php';
                   <span>~5 мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php">Гид по флюсам: RMA, NC и No-Clean в шприце</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=gid-po-flyusam">Гид по флюсам: RMA, NC и No-Clean в шприце</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Какой флюс оставить, а какой смывать до блеска изопропиловым спиртом в УЗ-ванне, чтобы плата не деградировала через полгода.
@@ -236,7 +259,7 @@ include __DIR__ . '/includes/header.php';
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">Химия</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php">Подробнее →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=gid-po-flyusam">Подробнее →</a>
               </div>
             </article>
 
@@ -251,7 +274,7 @@ include __DIR__ . '/includes/header.php';
                   <span class="text-ink font-medium">Калькулятор</span>
                 </div>
                 <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php#simulator">Симулятор термопрофиля фена и стола</a>
+                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=temperaturnye-profili#simulator">Симулятор термопрофиля фена и стола</a>
                 </h3>
                 <p class="text-sm text-ink-muted leading-relaxed">
                   Расчет 4 фаз нагрева: Preheat, Soak, Reflow и Cooling под сплавы SAC305, ПОС-61 и Sn42Bi58 по контактной термопаре.
@@ -259,7 +282,7 @@ include __DIR__ . '/includes/header.php';
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="text-ink-muted font-medium">SAC305 / ПОС-61</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php#simulator">Открыть калькулятор →</a>
+                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=temperaturnye-profili#simulator">Открыть калькулятор →</a>
               </div>
             </article>
 
@@ -300,15 +323,15 @@ include __DIR__ . '/includes/header.php';
               <span>Разделы</span>
             </div>
             <div class="space-y-2 text-xs font-mono">
-              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php#step-1">
+              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php?slug=temperaturnye-profili#step-1">
                 <span>1. Профилирование BGA</span>
                 <span class="text-ink-faint">J-STD</span>
               </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php#alloys">
+              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php?slug=temperaturnye-profili#alloys">
                 <span>2. Металлургия сплавов</span>
                 <span class="text-ink-faint">Таблица</span>
               </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php#step-4">
+              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php?slug=temperaturnye-profili#step-4">
                 <span>3. Защита от влаги MSL</span>
                 <span class="text-ink-faint">Сушка</span>
               </a>
@@ -338,7 +361,7 @@ include __DIR__ . '/includes/header.php';
 
           <!-- Tape & Caution Sketch Box (Orange #d35400 Status Alert) -->
           <div class="box-caution-orange relative p-3.5 rotate-[1.2deg] shadow-sm space-y-1.5 sketch-border">
-            <div class="absolute -top-2.5 right-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/80 dark:border-[#968458]/70 shadow-sm rotate-[-3deg] pointer-events-none" style="backdrop-filter: blur(1px);"></div>
+            <div class="sketch-washi-tape" style="top: -9px; right: 24px; transform: rotate(-3deg);"></div>
             <div class="flex items-center justify-between font-mono text-[11px] font-bold">
               <span class="flex items-center gap-1.5 text-[#d35400] dark:text-[#f39c12]">
                 <svg class="w-3.5 h-3.5 stroke-current inline-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>НЕ ГРЕТЬ ВЫШЕ 245°C

@@ -24,10 +24,10 @@
   --color-ink-faint: #666159;
 
   /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Медно-янтарный термо-акцент) --- */
-  --color-accent: #eb5211;
-  --color-accent-hover: #d2450a;
-  --color-accent-subtle: rgba(235, 82, 17, 0.12);
-  --color-accent-border: rgba(235, 82, 17, 0.35);
+  --color-accent: #b9430d;
+  --color-accent-hover: #9c380b;
+  --color-accent-subtle: rgba(185, 67, 13, 0.12);
+  --color-accent-border: rgba(185, 67, 13, 0.35);
 
   /* Алиасы семантики */
   --color-primary: var(--color-accent);
@@ -93,10 +93,10 @@ html.dark {
   --color-ink-muted: #9ca3af;
   --color-ink-faint: #9ca3af;
 
-  --color-accent: #f97316;
-  --color-accent-hover: #ea580c;
-  --color-accent-subtle: rgba(249, 115, 22, 0.15);
-  --color-accent-border: rgba(249, 115, 22, 0.4);
+  --color-accent: #e85d1c;
+  --color-accent-hover: #c74910;
+  --color-accent-subtle: rgba(232, 93, 28, 0.15);
+  --color-accent-border: rgba(232, 93, 28, 0.4);
 
   --color-danger-bg: rgba(179, 38, 30, 0.2);
   --color-danger-border: rgba(248, 180, 180, 0.3);

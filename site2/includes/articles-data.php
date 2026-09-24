@@ -143,6 +143,7 @@ $articles = [
         'difficulty' => 'Новичок',
         'required_tools' => ['Паяльник', 'Пинцет'],
         'featured' => false,
+        'draft'    => true,
         'date'     => '01 июл 2026',
         'author'   => 'Иван Пайкин',
         'icon'     => 'chip',
@@ -159,6 +160,7 @@ $articles = [
         'difficulty' => 'Новичок',
         'required_tools' => ['Паяльник', 'Пинцет'],
         'featured' => false,
+        'draft'    => true,
         'date'     => '25 июн 2026',
         'author'   => 'Иван Пайкин',
         'icon'     => 'thermometer',
@@ -166,7 +168,7 @@ $articles = [
     ],
     [
         'id'       => 11,
-        'title'    => 'SAC305 против ПОС-61: почему бессвинцовка паяется иначе',
+        'title'    => 'SAC305 против Sn63Pb37: почему бессвинцовка паяется иначе',
         'slug'     => 'sac305-vs-sn63pb37',
         'tag'      => 'Основы',
         'tag_key'  => 'basics',
@@ -175,6 +177,7 @@ $articles = [
         'difficulty' => 'Новичок',
         'required_tools' => ['Паяльник', 'Пинцет'],
         'featured' => false,
+        'draft'    => true,
         'date'     => '20 июн 2026',
         'author'   => 'Мария Канифоль',
         'icon'     => 'thermometer',
@@ -191,6 +194,7 @@ $articles = [
         'difficulty' => 'Новичок',
         'required_tools' => ['Паяльник', 'Пинцет'],
         'featured' => false,
+        'draft'    => true,
         'date'     => '15 июн 2026',
         'author'   => 'Иван Пайкин',
         'icon'     => 'drop',
@@ -203,16 +207,17 @@ function get_article_by_slug($slug) {
     foreach ($articles as $article) {
         if ($article['slug'] === $slug) return $article;
     }
-    return $articles[0] ?? null;
+    return null;
 }
 
 function get_featured_articles($limit = 3) {
     global $articles;
-    return array_slice(array_filter($articles, fn($a) => !empty($a['featured'])), 0, $limit);
+    return array_slice(array_filter($articles, fn($a) => !empty($a['featured']) && empty($a['draft'])), 0, $limit);
 }
 
 function get_articles_by_tag($tag_key) {
     global $articles;
-    if ($tag_key === 'all' || empty($tag_key)) return $articles;
-    return array_values(array_filter($articles, fn($a) => $a['tag_key'] === $tag_key));
+    $published = array_filter($articles, fn($a) => empty($a['draft']));
+    if ($tag_key === 'all' || empty($tag_key)) return array_values($published);
+    return array_values(array_filter($published, fn($a) => $a['tag_key'] === $tag_key));
 }

@@ -203,10 +203,10 @@ body {
   background-color: var(--color-accent-subtle);
   border: 1px solid var(--color-accent-border);
   color: var(--color-accent);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   border-radius: var(--radius-sm);
-  padding: 0.15rem 0.45rem;
+  padding: 0.18rem 0.5rem;
   font-family: var(--font-mono);
 }
 .pill-blue {
@@ -215,10 +215,10 @@ body {
   background-color: var(--color-paper-subtle);
   border: 1px solid var(--color-paper-border-dark);
   color: var(--color-ink-muted);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   border-radius: var(--radius-sm);
-  padding: 0.15rem 0.45rem;
+  padding: 0.18rem 0.5rem;
   font-family: var(--font-mono);
 }
 .pill-yellow {
@@ -227,10 +227,10 @@ body {
   background-color: var(--color-warning-bg);
   border: 1px solid var(--color-warning-border);
   color: var(--color-warning);
-  font-size: 10px;
+  font-size: 0.75rem;
   font-weight: 700;
   border-radius: var(--radius-sm);
-  padding: 0.15rem 0.45rem;
+  padding: 0.18rem 0.5rem;
   font-family: var(--font-mono);
 }
 
@@ -356,6 +356,13 @@ html.dark .sketch-pill-gray {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23222735' fill-opacity='0.95' stroke='%233e465c' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%232c3346' fill-opacity='0.6'/%3E%3C/svg%3E");
 }
 
+/* Скрытие переключателя темы в шапке на смартфонах (доступен в нижнем баре навигации) */
+@media (max-width: 768px) {
+  #theme-toggle {
+    display: none !important;
+  }
+}
+
 /* Скетч-маркеры текста */
 mark, .marker-yellow {
   position: relative;
@@ -429,7 +436,7 @@ input[type="range"].range-slider::-webkit-slider-thumb:hover {
 .mobile-quick-bar {
   display: none !important;
 }
-@media (max-width: 640px) {
+@media (max-width: 768px) {
   .mobile-quick-bar {
     display: flex !important;
     position: fixed;
@@ -554,4 +561,200 @@ footer,
 .border-accent-subtle {
   border-color: var(--color-accent-border) !important;
 }
+
+/* ==========================================================================
+   8. ИНЖЕНЕРНЫЕ СКЕТЧ-ЭЛЕМЕНТЫ (STICKERS, WASHI TAPE, CORNERS)
+   ========================================================================== */
+.sketch-sticky-note {
+  position: relative;
+  background-color: var(--color-sketch-yellow-bg);
+  border: 1px solid var(--color-sketch-yellow);
+  border-radius: var(--radius-md);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transform: rotate(-0.8deg);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+html.dark .sketch-sticky-note {
+  background-color: var(--color-sketch-yellow-bg);
+  border-color: rgba(202, 138, 4, 0.45);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Инженерный полупрозрачный скотч */
+.sketch-washi-tape,
+.washi-tape {
+  position: absolute;
+  width: 84px;
+  height: 18px;
+  background-color: var(--color-sketch-tape);
+  border-left: 2px dashed rgba(200, 185, 145, 0.8);
+  border-right: 2px dashed rgba(200, 185, 145, 0.8);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0.92;
+}
+
+html.dark .sketch-washi-tape,
+html.dark .washi-tape {
+  background-color: var(--color-sketch-tape);
+  border-left-color: rgba(140, 125, 85, 0.6);
+  border-right-color: rgba(140, 125, 85, 0.6);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* Загнутый уголок стикера (фиксированное позиционирование в правом нижнем углу) */
+.sketch-corner-fold {
+  position: absolute !important;
+  bottom: 0 !important;
+  right: 0 !important;
+  width: 24px !important;
+  height: 24px !important;
+  pointer-events: none !important;
+  z-index: 10 !important;
+}
+
+.sketch-corner-shadow {
+  fill: rgba(0, 0, 0, 0.08) !important;
+}
+
+html.dark .sketch-corner-shadow {
+  fill: rgba(0, 0, 0, 0.4) !important;
+}
+
+.sketch-corner-triangle {
+  fill: #fef08a !important;
+  stroke: none;
+}
+
+html.dark .sketch-corner-triangle {
+  fill: #ca8a04 !important;
+}
+
+.sketch-corner-crease {
+  stroke: #eab308 !important;
+  stroke-width: 0.9px !important;
+  fill: none;
+}
+
+html.dark .sketch-corner-crease {
+  stroke: rgba(202, 138, 4, 0.8) !important;
+}
+
+/* Круглый скетч-бейдж для иконок (лабораторный поверочный штамп) */
+.sketch-icon-badge {
+  width: 50px;
+  height: 50px;
+  border-radius: 9999px;
+  background-color: var(--color-sketch-yellow-bg);
+  border: 1.5px dashed var(--color-sketch-yellow);
+  box-shadow: inset 0 0 0 2px rgba(254, 240, 138, 0.4), 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent);
+  flex-shrink: 0;
+  transform: rotate(-1.5deg);
+  transition: transform 0.2s ease;
+}
+
+.sketch-icon-badge:hover {
+  transform: rotate(0deg) scale(1.04);
+}
+
+html.dark .sketch-icon-badge {
+  background-color: rgba(202, 138, 4, 0.18);
+  border-color: rgba(202, 138, 4, 0.55);
+  box-shadow: inset 0 0 0 2px rgba(202, 138, 4, 0.2), 0 2px 6px rgba(0, 0, 0, 0.25);
+  color: #f59e0b;
+}
+
+/* Разделитель на бумаге стикера */
+.sketch-divider {
+  border-color: rgba(253, 224, 71, 0.65) !important;
+}
+
+html.dark .sketch-divider {
+  border-color: rgba(202, 138, 4, 0.4) !important;
+}
+
+/* Внутренняя плашка подсказки на стикере */
+.sketch-tip-box {
+  background-color: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(253, 224, 71, 0.7);
+  border-radius: var(--radius-sm);
+}
+
+html.dark .sketch-tip-box {
+  background-color: rgba(20, 18, 14, 0.6);
+  border-color: rgba(202, 138, 4, 0.4);
+}
+
+/* Плашка предупреждения на стикере */
+.sketch-warn-box {
+  background-color: var(--color-warning-bg);
+  border: 1px solid var(--color-warning-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+}
+
+html.dark .sketch-warn-box {
+  background-color: var(--color-warning-bg);
+  border-color: var(--color-warning-border);
+  color: #fef08a;
+}
+
+/* Оранжевая статусная скетч-плашка (Caution Alert) */
+.box-caution-orange {
+  position: relative;
+  background-color: var(--color-accent-subtle);
+  border: 1px solid var(--color-accent-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+}
+
+html.dark .box-caution-orange {
+  background-color: rgba(232, 93, 28, 0.15);
+  border-color: rgba(232, 93, 28, 0.4);
+  color: var(--color-ink);
+}
+
+/* Алиасы для обратной совместимости старых классов */
+.sticker-yellow {
+  position: relative;
+  background-color: var(--color-sketch-yellow-bg);
+  border: 1px solid var(--color-sketch-yellow);
+  border-radius: var(--radius-md);
+  color: var(--color-ink);
+}
+
+html.dark .sticker-yellow {
+  background-color: var(--color-sketch-yellow-bg);
+  border-color: rgba(202, 138, 4, 0.45);
+}
+
+.tape-strip,
+.tape-yellow {
+  position: absolute;
+  height: 16px;
+  background-color: var(--color-sketch-tape);
+  border-left: 2px dashed rgba(200, 185, 145, 0.8);
+  border-right: 2px dashed rgba(200, 185, 145, 0.8);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0.92;
+}
+
+html.dark .tape-strip,
+html.dark .tape-yellow {
+  background-color: var(--color-sketch-tape);
+  border-left-color: rgba(140, 125, 85, 0.6);
+  border-right-color: rgba(140, 125, 85, 0.6);
+}
+
+
+
+
 

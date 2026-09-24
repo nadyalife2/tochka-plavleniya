@@ -3,64 +3,139 @@
  * cookies.php — Политика использования файлов cookie
  * Точка Плавления
  */
+require_once __DIR__ . '/includes/functions.php';
+
 $page_title = "Политика использования файлов cookie — ТОЧКА ПЛАВЛЕНИЯ";
 $page_desc = "Информация об использовании файлов cookie и аналогичных технологий на портале Точка Плавления.";
 $current_page = 'cookies';
-$extra_head = '<link rel="stylesheet" href="/assets/css/article.css">';
+
 include __DIR__ . '/includes/header.php';
 ?>
 
-<div class="section" style="max-width: 900px;">
-  <nav class="breadcrumbs">
-    <a href="/">Главная</a>
-    <span class="breadcrumb-sep">/</span>
-    <span>Политика куки</span>
-  </nav>
+  <!-- Main Content -->
+  <main class="w-full flex-grow pt-8 pb-20">
+    <div class="max-w-[960px] mx-auto px-5 sm:px-8">
+      
+      <!-- Breadcrumbs -->
+      <nav class="text-[12px] font-mono text-ink-faint mb-6 flex items-center gap-1.5" aria-label="Хлебные крошки">
+        <a class="hover:text-ink transition-colors" href="/">Главная</a>
+        <span>→</span>
+        <span class="text-ink">Политика использования файлов cookie</span>
+      </nav>
 
-  <header class="article-hero">
-    <h1 class="hero-h1">Политика использования <span class="wavy">Cookie</span></h1>
-    <p class="hero-sub">Мы уважительно относимся к вашей приватности. Ниже описано, какие куки мы создаём и зачем.</p>
-  </header>
+      <!-- Document Hero -->
+      <div class="border-b border-paper-border pb-6 mb-8 space-y-3">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="sketch-pill-yellow text-ink font-mono text-xs font-bold">COOKIE POLICY</span>
+          <span class="text-xs font-mono text-ink-faint">РЕВИЗИЯ: СЕНТЯБРЬ 2026</span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight">
+          Политика использования файлов cookie
+        </h1>
+        <p class="text-sm sm:text-base text-ink-muted leading-relaxed font-serif italic max-w-2xl">
+          Мы используем минимальный набор технических cookie и локальных настроек, чтобы сайт запоминал тему оформления и ваше согласие.
+        </p>
+      </div>
 
-  <article class="article-content">
-    <h2>1. Что такое файлы cookie?</h2>
-    <p>
-      Cookie (куки) — это небольшие текстовые фрагменты данных, которые ваш браузер сохраняет на устройстве при посещении веб-страниц. Они помогают сайту запомнить ваши предпочтения.
-    </p>
+      <!-- Legal Sections -->
+      <article class="space-y-8 text-sm sm:text-base text-ink-muted leading-relaxed">
 
-    <h2>2. какие куки мы используем</h2>
-    <p>Наш портал использует минимальный технический набор cookie-файлов:</p>
+        <!-- Section 1 -->
+        <section class="border border-paper-border rounded-lg bg-card p-6 space-y-3">
+          <h2 class="text-base font-bold text-ink font-mono uppercase tracking-wider flex items-center gap-2">
+            <span class="text-accent font-bold">01.</span> Что такое файлы cookie?
+          </h2>
+          <p>
+            Cookie (куки) — это небольшие текстовые фрагменты данных, которые ваш браузер сохраняет на устройстве при посещении веб-страниц. Они помогают сайту запомнить ваши предпочтения.
+          </p>
+        </section>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Имя Cookie</th>
-          <th>Назначение</th>
-          <th>Срок хранения</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>cookie_consent</code></td>
-          <td>Запоминает ваше согласие с показом баннера куки, чтобы не беспокоить вас повторно.</td>
-          <td>1 год</td>
-        </tr>
-        <tr>
-          <td><code>PHPSESSID</code></td>
-          <td>Техническая сессия для работы встроенной формы комментариев и тестов.</td>
-          <td>До закрытия браузера</td>
-        </tr>
-      </tbody>
-    </table>
+        <!-- Section 2 -->
+        <section class="border border-paper-border rounded-lg bg-card p-6 space-y-3">
+          <h2 class="text-base font-bold text-ink font-mono uppercase tracking-wider flex items-center gap-2">
+            <span class="text-accent font-bold">02.</span> Какие куки мы используем
+          </h2>
+          <p>Наш портал использует минимальный технический набор cookie-файлов и локальных хранилищ:</p>
+          
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-left border-collapse font-sans text-[13px]">
+              <thead>
+                <tr class="border-b border-paper-border-dark text-ink font-bold">
+                  <th class="py-2 px-3">Имя Cookie / Данных</th>
+                  <th class="py-2 px-3">Назначение</th>
+                  <th class="py-2 px-3">Срок хранения</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-paper-border">
+                <tr>
+                  <td class="py-3 px-3 font-mono text-ink">tp_cookie_consent</td>
+                  <td class="py-3 px-3">Хранит выбор согласия на использование необязательных технологий.</td>
+                  <td class="py-3 px-3">1 год</td>
+                </tr>
+                <tr>
+                  <td class="py-3 px-3 font-mono text-ink">tp_theme</td>
+                  <td class="py-3 px-3">Сохраняет выбранную тему (светлая/тёмная) в локальном хранилище (localStorage).</td>
+                  <td class="py-3 px-3">До очистки кэша</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
 
-    <h2>3. Как отключить cookie?</h2>
-    <p>
-      Вы можете запретить сохранение cookie в настройках любого браузера (Chrome, Firefox, Safari, Edge). Обратите внимание, что в этом случае баннер куки будет выводиться при каждом визите.
-    </p>
+        <!-- Section 3 -->
+        <section class="border border-paper-border rounded-lg bg-card p-6 space-y-3">
+          <h2 class="text-base font-bold text-ink font-mono uppercase tracking-wider flex items-center gap-2">
+            <span class="text-accent font-bold">03.</span> Как отключить cookie?
+          </h2>
+          <p>
+            Вы можете запретить сохранение cookie в настройках любого браузера (Chrome, Firefox, Safari, Edge). Обратите внимание, что в этом случае баннер куки будет выводиться при каждом визите, а выбранная тема оформления может не сохраняться.
+          </p>
+        </section>
 
-    <h2>4. Контакты</h2>
-    <p>Если у вас есть вопросы по работе портала, напишите нам по адресу: <code>privacy@tochka-plavleniya.ru</code></p>
-  </article>
-</div>
+        <!-- Section 4 -->
+        <section class="border border-paper-border rounded-lg bg-card p-6 space-y-3">
+          <h2 class="text-base font-bold text-ink font-mono uppercase tracking-wider flex items-center gap-2">
+            <span class="text-accent font-bold">04.</span> Контакты
+          </h2>
+          <p>
+            Если у вас есть вопросы по работе портала, напишите нам по адресу: <code class="font-mono text-ink bg-paper-subtle px-1 py-0.5 rounded border border-paper-border">privacy@tochka-plavleniya.ru</code>
+          </p>
+        </section>
 
-<?php require_once __DIR__ . '/includes/footer.php'; ?>
+      </article>
+
+      <div class="mt-10 pt-6 border-t border-paper-border flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-ink-faint">
+        <div>ТОЧКА ПЛАВЛЕНИЯ · 2026</div>
+        <div class="flex items-center gap-4">
+          <a class="text-ink hover:underline" href="terms.php">Пользовательское соглашение →</a>
+          <a class="text-ink hover:underline" href="privacy.php">Политика конфиденциальности →</a>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Editorial Minimal Footer -->
+  <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
+
+  <!-- Mobile Sticky Quick-Bar -->
+  <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
+
+  <!-- Global Engineering Search Modal -->
+  <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
+
+  <!-- Theme Toggle JS -->
+  <script>
+    (function() {
+      const toggle = document.getElementById('theme-toggle');
+      if (toggle) {
+        toggle.addEventListener('click', function() {
+          const isDark = document.documentElement.classList.toggle('dark');
+          localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>

@@ -104,14 +104,14 @@ if (isset($current_rubric['article_ids'])) {
     $matched_articles = [];
     foreach ($current_rubric['article_ids'] as $aid) {
         foreach ($articles as $art) {
-            if ($art['id'] === $aid) {
+            if ($art['id'] === $aid && empty($art['draft'])) {
                 $matched_articles[] = $art;
                 break;
             }
         }
     }
 } else {
-    $matched_articles = array_values(array_filter($articles, fn($a) => in_array($a['tag_key'], $current_rubric['filter_tags'])));
+    $matched_articles = array_values(array_filter($articles, fn($a) => empty($a['draft']) && in_array($a['tag_key'], $current_rubric['filter_tags'])));
 }
 
 // Separate featured article
@@ -181,7 +181,7 @@ include __DIR__ . '/includes/header.php';
           
           <!-- Single Subtle Tape & Label Badge (Yellow = Workshop/Editorial Identity) -->
           <div class="relative inline-block mb-1">
-            <div class="tape-strip tape-yellow w-7 -top-1.5 left-4 rotate-[-2deg]"></div>
+            <div class="sketch-washi-tape" style="top: -6px; left: 16px; width: 44px; height: 14px; transform: rotate(-2deg);" aria-hidden="true"></div>
             <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-[11px] shadow-sm rotate-[-0.8deg] sketch-border">
               <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
               <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?></span>
@@ -434,24 +434,24 @@ include __DIR__ . '/includes/header.php';
         <aside class="lg:col-span-4 space-y-5">
           
           <!-- YELLOW POST-IT NOTE: Chemistry / Rosin / Workshop Master Note -->
-          <div class="sticker-yellow p-3.5 rounded-lg space-y-2 relative sketch-border shadow-sm rotate-[-0.8deg]">
-            <div class="tape-strip tape-yellow w-8 -top-1.5 left-5 rotate-[-2deg]"></div>
+          <div class="sketch-sticky-note p-4 rounded-lg space-y-2 relative shadow-sm" style="transform: rotate(-0.8deg);">
+            <div class="sketch-washi-tape" style="top: 0px; left: 20px; width: 50px; height: 14px; transform: rotate(-2deg);" aria-hidden="true"></div>
             
-            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-amber-300/50 pb-1 text-slate-700 dark:text-slate-300">
+            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b sketch-divider pb-1 text-ink">
               <span class="flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[13px] text-amber-600 dark:text-amber-400">push_pin</span>
+                <span class="material-symbols-outlined text-[13px] text-accent">push_pin</span>
                 Заметка верстака // Химия
               </span>
               <span class="text-[10px] opacity-75">FLUX-QC</span>
             </div>
 
-            <p class="font-hand text-base leading-snug italic font-semibold text-ink dark:text-slate-100">
+            <p class="font-hand text-base leading-snug italic font-semibold text-ink">
               «Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции, а не заливай всё флюсом!»
             </p>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-amber-300/40 text-slate-600 dark:text-slate-400">
+            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t sketch-divider text-ink-muted">
               <span>Норма нагрева флюса</span>
-              <span class="font-bold text-ink dark:text-slate-200">IPC-TM-650</span>
+              <span class="font-bold text-ink">IPC-TM-650</span>
             </div>
           </div>
 

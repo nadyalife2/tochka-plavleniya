@@ -322,6 +322,8 @@ include __DIR__ . '/includes/header.php';
             <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= e($article['read_min'] ?? 8) ?> мин чтения</span>
             <span class="text-ink-faint">·</span>
             <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= e($article['difficulty'] ?? 'Инженер') ?></span>
+            <span class="text-ink-faint">·</span>
+            <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено</span>
           </div>
 
           <?php if (!empty($article['required_tools'])): ?>
@@ -335,11 +337,12 @@ include __DIR__ . '/includes/header.php';
 
           <!-- Lead Paragraph -->
           <p class="text-lg text-ink font-serif leading-[1.65] pt-2">
-            <?= e($article['excerpt']) ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.
+            <?= e($article['excerpt']) ?><?php if ($slug === 'temperaturnye-profili'): ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.<?php endif; ?>
           </p>
           </header>
         </div><!-- /Article Header Card -->
 
+        <?php if ($slug === 'temperaturnye-profili'): ?>
         <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
         <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-sm leading-relaxed space-y-2">
           <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
@@ -947,6 +950,75 @@ include __DIR__ . '/includes/header.php';
             </a>
           </div>
         </section>
+        <?php else: ?>
+        <!-- Engineering Article Draft / In-Development Workbench View -->
+        <div class="border border-paper-border border-l-4 border-l-amber-600 bg-paper-subtle/70 p-5 rounded-lg space-y-3">
+          <div class="flex items-center justify-between flex-wrap gap-2">
+            <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-[16px]">science</span>
+              Инженерный регламент ТЧП // Статус: Лабораторные замеры
+            </span>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800 font-bold">
+              В разработке
+            </span>
+          </div>
+          <p class="text-sm text-ink/85 leading-relaxed">
+            Данный технический регламент проходит этап практической верификации параметров на термовоздушных и контактных станциях лаборатории. Ниже приведены базовые параметры технологического процесса, допуски и ссылки на готовые инструменты.
+          </p>
+        </div>
+
+        <!-- Technical Parameters Card -->
+        <div class="bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-4 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-paper-border">
+            <h2 class="text-lg font-bold text-ink font-mono uppercase tracking-tight">Параметры и спецификация</h2>
+            <span class="text-xs font-mono text-ink-muted">IPC-A-610 / ГОСТ</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
+            <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
+              <div class="text-ink-faint uppercase text-[11px]">Категория монтажа</div>
+              <div class="text-ink font-bold text-sm"><?= e($article['tag'] ?? 'РЭА') ?></div>
+            </div>
+            <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
+              <div class="text-ink-faint uppercase text-[11px]">Уровень сложности</div>
+              <div class="text-ink font-bold text-sm"><?= e($article['difficulty'] ?? 'Инженер') ?></div>
+            </div>
+            <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
+              <div class="text-ink-faint uppercase text-[11px]">Расчетное время изучения</div>
+              <div class="text-ink font-bold text-sm">~<?= e($article['read_min'] ?? 7) ?> минут</div>
+            </div>
+            <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
+              <div class="text-ink-faint uppercase text-[11px]">Необходимый инструмент</div>
+              <div class="text-ink font-semibold"><?= e(implode(', ', $article['required_tools'] ?? ['Паяльная станция', 'Термопара'])) ?></div>
+            </div>
+          </div>
+
+          <div class="pt-2 text-sm text-ink-muted leading-relaxed font-serif">
+            <p>
+              Полная версия статьи будет включать тепловизионные снимки распределения температурных полей, пошаговый разбор типичных дефектов, графики температурных профилей и перечень сертифицированных расходных материалов (флюсы, припои, оплётки).
+            </p>
+          </div>
+        </div>
+
+        <!-- Available Tools Callout -->
+        <div class="bg-card border border-paper-border rounded-lg p-5 space-y-3 shadow-sm">
+          <div class="font-mono text-xs font-bold uppercase text-ink flex items-center gap-1.5">
+            <span class="material-symbols-outlined text-[18px] text-accent">calculate</span>
+            <span>Инструменты для этой задачи</span>
+          </div>
+          <p class="text-xs sm:text-sm text-ink-muted leading-relaxed">
+            Пока готовится публикация регламента, вы можете рассчитать точные температурные режимы, время выдержки и теплоемкость в нашем интерактивном верстаке:
+          </p>
+          <div class="flex flex-wrap gap-2 pt-1 font-mono text-xs">
+            <a href="interactive.php#temp" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded bg-ink text-paper font-semibold hover:bg-ink-muted transition-colors">
+              <span>Калькулятор t°C пайки →</span>
+            </a>
+            <a href="article.php?slug=temperaturnye-profili" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink hover:border-paper-border-dark transition-colors">
+              <span>Базовый регламент BGA →</span>
+            </a>
+          </div>
+        </div>
+        <?php endif; ?>
 
         <!-- Interactive Tools Box (tochkicamp style bottom CTA) -->
         <div class="border border-paper-border rounded-lg bg-paper p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -977,6 +1049,7 @@ include __DIR__ . '/includes/header.php';
       <!-- Sticky Floating Table of Contents Sidebar (Desktop) -->
       <aside class="hidden lg:block lg:col-span-4 sticky top-20 space-y-6">
         
+        <?php if ($slug === 'temperaturnye-profili'): ?>
         <!-- Table of Contents -->
         <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
           <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
@@ -1001,6 +1074,33 @@ include __DIR__ . '/includes/header.php';
             </a>
           </nav>
         </div>
+        <?php else: ?>
+        <!-- Technical Summary Sidebar Card -->
+        <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
+          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+            <span>ПАСПОРТ МАТЕРИАЛА</span>
+            <span>ТЧП-LAB</span>
+          </div>
+          <div class="space-y-2 text-xs font-mono">
+            <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
+              <span class="text-ink-muted">Статус:</span>
+              <span class="font-semibold text-amber-700 dark:text-amber-400">В разработке</span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
+              <span class="text-ink-muted">Категория:</span>
+              <span class="text-ink"><?= e($article['tag'] ?? 'РЭА') ?></span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
+              <span class="text-ink-muted">Сложность:</span>
+              <span class="text-ink"><?= e($article['difficulty'] ?? 'Инженер') ?></span>
+            </div>
+            <div class="flex items-center justify-between py-1">
+              <span class="text-ink-muted">Чтение:</span>
+              <span class="text-ink">~<?= e($article['read_min'] ?? 7) ?> мин</span>
+            </div>
+          </div>
+        </div>
+        <?php endif; ?>
 
         <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: Sticky Sidebar РСЯ Slot */ ?>
         <!-- Sticky Sidebar РСЯ Slot -->

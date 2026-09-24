@@ -55,11 +55,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const item = solderGroup[wVal];
 
     // State: Результат
-    if (tempEmptyState) tempEmptyState.style.opacity = '0';
-    if (tempEmptyState) tempEmptyState.style.pointerEvents = 'none';
+    if (tempEmptyState) {
+      tempEmptyState.classList.add('hidden');
+    }
     if (tempResultContent) {
-      tempResultContent.style.opacity = '1';
-      tempResultContent.style.pointerEvents = 'auto';
+      tempResultContent.classList.remove('hidden');
     }
     if (tempMeterBox) tempMeterBox.style.display = 'block';
 
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (avg < 200) {
         tempBarFill.style.backgroundColor = '#10b981'; // green / low temp
       } else if (avg <= 320) {
-        tempBarFill.style.backgroundColor = '#eb5211'; // standard soldering orange
+        tempBarFill.style.backgroundColor = '#b9430d'; // standard soldering high-contrast accent
       } else {
         tempBarFill.style.backgroundColor = '#ef4444'; // hot / caution red
       }
