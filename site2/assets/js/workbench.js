@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNoRec) {
       if (tempStatusBadge) {
         tempStatusBadge.textContent = 'НЕ ДЛЯ ЭТОГО';
-        tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-red-600 text-white';
+        tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase badge-danger';
       }
 
       tempRangeDisplay.textContent = 'Паяльник не подходит';

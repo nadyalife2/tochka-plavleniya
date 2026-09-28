@@ -340,7 +340,7 @@ include __DIR__ . '/includes/header.php';
                   <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
                   <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">КАРТА ТЕРМОРЕЖИМА</span>
                 </div>
-                <span id="temp-status-badge" class="font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-accent text-white">ОРИЕНТИР</span>
+                <span id="temp-status-badge" class="font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink">ОРИЕНТИР</span>
               </div>
 
               <!-- State 1: Empty state (in flow, no overlapping absolute elements) -->
@@ -517,8 +517,8 @@ include __DIR__ . '/includes/header.php';
               <span class="sketch-pill-yellow text-ink font-mono text-[11px] font-bold">03 // ЧЕК-ЛИСТ ПАЙКИ</span>
               <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">IPC-A-610 / ESD SAFE</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Чек-лист подготовки перед включением</h2>
-            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Пройдите 5 пунктов перед подачей питания, чтобы не вывести из строя микросхемы статикой или перегревом.</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Чек-лист подготовки рабочего места и жала</h2>
+            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Пройдите шаги безопасности до старта и обязательно залудите жало сразу в момент первого разогрева.</p>
           </div>
         </div>
 
@@ -541,7 +541,7 @@ include __DIR__ . '/includes/header.php';
           </label>
           <label class="flex items-start gap-3 p-3.5 rounded border border-paper-border bg-paper cursor-pointer hover:border-accent transition-colors">
             <input type="checkbox" class="mt-0.5 accent-[#FF6B2B] w-4 h-4 cursor-pointer">
-            <span><strong>5. Защита жала:</strong> Сразу после прогрева жало очищено и залужено свежим припоем (защищает рабочую поверхность от окисления и выгорания). При выключении станции жало также оставляют с каплей припоя.</span>
+            <span><strong>5. Защита и лужение жала:</strong> Жало лудят горячим, когда станция уже набрала рабочую температуру, а не холодным до включения (иначе обгорит защитное покрытие). Свежий припой покрывает рабочую зону и защищает никель-железный слой от окисления на воздухе. Перед выключением на кончике оставляют каплю припоя.</span>
           </label>
         </div>
       </section>
