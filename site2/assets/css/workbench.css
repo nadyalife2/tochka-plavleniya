@@ -331,3 +331,18 @@ svg.w-8, .interactive svg.w-8 { width: 32px; height: 32px; }
   outline-offset: 3px;
   border-radius: 4px;
 }
+
+/* Quick Task Selector button active contrast state (WCAG AA/AAA) */
+.quick-task-btn.bg-accent {
+  background-color: var(--color-accent) !important;
+  color: #1a1a1a !important;
+  border-color: #1a1a1a !important;
+  font-weight: 700 !important;
+}
+
+html.dark .quick-task-btn.bg-accent {
+  background-color: var(--color-accent) !important;
+  color: #141414 !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+

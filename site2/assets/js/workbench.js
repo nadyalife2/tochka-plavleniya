@@ -41,10 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     activeQuickTask = taskKey;
     quickTaskButtons.forEach(btn => {
       if (btn.dataset.task === taskKey) {
-        btn.classList.add('bg-accent', 'text-white');
-        btn.classList.remove('bg-paper');
+        btn.classList.add('bg-accent', 'text-ink');
+        btn.classList.remove('bg-paper', 'text-white');
       } else {
-        btn.classList.remove('bg-accent', 'text-white');
+        btn.classList.remove('bg-accent', 'text-ink');
         btn.classList.add('bg-paper');
       }
     });
@@ -168,13 +168,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Режим нормального ориентира
     if (tempStatusBadge) {
       tempStatusBadge.textContent = 'ОРИЕНТИР';
-      tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-accent text-white';
+      tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink';
     }
 
     tempRangeDisplay.style.fontSize = '';
     tempRangeDisplay.textContent = `${item.t_min} – ${item.t_max} °C`;
 
-    // Visual temperature meter gauge (чтение динамической CSS-переменной --color-accent)
+    // Visual temperature meter gauge (чтение динамических токенов)
     if (tempBarFill) {
       const avg = (item.t_min + item.t_max) / 2;
       const pct = Math.min(100, Math.max(10, ((avg - 100) / 300) * 100));
@@ -185,11 +185,11 @@ document.addEventListener('DOMContentLoaded', () => {
         .trim() || '#FF6B2B';
 
       if (avg < 200) {
-        tempBarFill.style.backgroundColor = '#10b981';
+        tempBarFill.style.backgroundColor = 'var(--color-success, #1A7F4C)';
       } else if (avg <= 320) {
         tempBarFill.style.backgroundColor = accent;
       } else {
-        tempBarFill.style.backgroundColor = '#ef4444';
+        tempBarFill.style.backgroundColor = 'var(--color-danger, #B3261E)';
       }
     }
 

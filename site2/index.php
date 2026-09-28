@@ -39,48 +39,36 @@ include __DIR__ . '/includes/header.php';
               <p class="text-xl sm:text-2xl font-bold text-ink font-sans">
                 Выберите, что нужно соединить
               </p>
-              <p class="text-sm sm:text-base text-ink-muted leading-relaxed font-serif max-w-xl">
-                Инженерный справочник без воды: быстрый выбор задачи перенесёт вас в готовый расчёт с предвыбранными параметрами температуры, формы жала и мер безопасности.
+              <p class="text-base sm:text-lg text-ink-muted leading-relaxed font-serif max-w-xl">
+                Нажмите свою задачу — откроется готовый ориентир.
               </p>
             </div>
 
-            <!-- Сетка 4 задач в 2 колонки -->
+            <!-- Сетка 4 задач в 2 колонки (крупные, без лишнего кода) -->
             <div class="hero-tasks-grid pt-1">
               
               <!-- Задача 1: Провод / кабель -->
-              <a href="interactive.php?tool=temp&task=wire" class="sketch-card p-4 flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <div class="space-y-1">
-                  <div class="font-mono text-[11px] text-accent font-bold uppercase tracking-wider">01 // ЭЛЕКТРОМОНТАЖ</div>
-                  <div class="text-base font-bold text-ink group-hover:text-accent transition-colors">Провод / кабель</div>
-                </div>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-lg">→</span>
+              <a href="interactive.php?tool=temp&task=wire" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
+                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Провод / кабель</span>
+                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
               </a>
 
               <!-- Задача 2: Печатная плата -->
-              <a href="interactive.php?tool=temp&task=pcb" class="sketch-card p-4 flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <div class="space-y-1">
-                  <div class="font-mono text-[11px] text-accent font-bold uppercase tracking-wider">02 // ЭЛЕКТРОНИКА</div>
-                  <div class="text-base font-bold text-ink group-hover:text-accent transition-colors">Печатная плата</div>
-                </div>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-lg">→</span>
+              <a href="interactive.php?tool=temp&task=pcb" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
+                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Печатная плата</span>
+                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
               </a>
 
               <!-- Задача 3: Медная труба -->
-              <a href="interactive.php?tool=temp&task=pipe" class="sketch-card p-4 flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <div class="space-y-1">
-                  <div class="font-mono text-[11px] text-accent font-bold uppercase tracking-wider">03 // САНТЕХНИКА</div>
-                  <div class="text-base font-bold text-ink group-hover:text-accent transition-colors">Медная труба</div>
-                </div>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-lg">→</span>
+              <a href="interactive.php?tool=temp&task=pipe" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
+                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Медная труба</span>
+                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
               </a>
 
-              <!-- Задача 4: Не знаю — помогите выбрать -->
-              <a href="interactive.php?tool=temp&task=unknown" class="sketch-card p-4 flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <div class="space-y-1">
-                  <div class="font-mono text-[11px] text-accent font-bold uppercase tracking-wider">04 // КОНСУЛЬТАЦИЯ</div>
-                  <div class="text-base font-bold text-ink group-hover:text-accent transition-colors">Не знаю — помогите выбрать</div>
-                </div>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-lg">→</span>
+              <!-- Задача 4: Не знаю — помочь -->
+              <a href="interactive.php?tool=temp&task=unknown" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
+                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Не знаю — помочь</span>
+                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
               </a>
 
             </div>
@@ -89,9 +77,8 @@ include __DIR__ . '/includes/header.php';
           <!-- Правая колонка: Инженерная схема жала -->
           <div class="flex flex-col items-center justify-center">
             <div class="sketch-card p-3.5 bg-paper w-full max-w-[440px] shadow-xs relative">
-              <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted pb-2 border-b border-paper-border mb-2.5">
-                <span class="font-bold text-ink uppercase tracking-wider">СХЕМА РАЗРЕЗА ЖАЛА</span>
-                <span>ГОСТ 2.303</span>
+              <div class="font-mono text-[11px] text-ink-muted pb-2 border-b border-paper-border mb-2.5">
+                <span class="font-bold text-ink uppercase tracking-wider">АНАТОМИЯ ЖАЛА</span>
               </div>
               <div class="w-full overflow-hidden rounded bg-white dark:bg-[#1a1f26] flex items-center justify-center border border-paper-border/60 p-1">
                 <img 
@@ -104,7 +91,7 @@ include __DIR__ . '/includes/header.php';
                 />
               </div>
               <p class="font-mono text-[11px] text-ink-muted mt-2.5 text-center leading-normal">
-                Медный сердечник проводит тепло, железный слой защищает от растворения в олове
+                Так устроено жало, которое греет соединение: медный сердечник передаёт тепло, защитный слой железа предотвращает растворение в олове
               </p>
             </div>
           </div>
@@ -218,7 +205,7 @@ include __DIR__ . '/includes/header.php';
               Какую температуру выставить для припоя ПОС-61?
             </h3>
             <p class="text-sm text-ink-muted font-serif leading-relaxed">
-              Припой ПОС-61 плавится при 183 °C. На паяльной станции выставляйте <strong>260–290 °C</strong>. Разница в 80–100 °C необходима, чтобы компенсировать отвод тепла в медные дорожки платы.
+              Припой ПОС-61 плавится в интервале 183–190 °C. На паяльной станции выставляйте <strong>260–290 °C</strong>. Это практический стартовый ориентир для мелкой пайки, а не норма ГОСТ: запас в 80–100 °C необходим, чтобы компенсировать отвод тепла в медные дорожки платы.
             </p>
           </div>
 
@@ -255,24 +242,6 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
-      <!-- Навигационная строка по разделам (лаконично, взамен громоздких 6 карточек) -->
-      <nav class="pt-4 border-t border-paper-border text-xs font-mono text-ink-muted flex flex-wrap items-center justify-between gap-3" aria-label="Рубрики справочника">
-        <span class="font-bold text-ink uppercase">Разделы справочника:</span>
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <a href="category.php?slug=start" class="hover:text-accent transition-colors">С чего начать</a>
-          <span class="text-ink-faint">·</span>
-          <a href="category.php?slug=instrumenty" class="hover:text-accent transition-colors">Инструменты и станции</a>
-          <span class="text-ink-faint">·</span>
-          <a href="category.php?slug=materialy" class="hover:text-accent transition-colors">Материалы и сплавы</a>
-          <span class="text-ink-faint">·</span>
-          <a href="category.php?slug=praktika" class="hover:text-accent transition-colors">Практика монтажа</a>
-          <span class="text-ink-faint">·</span>
-          <a href="category.php?slug=oshibki" class="hover:text-accent transition-colors">Проблемы и дефекты</a>
-          <span class="text-ink-faint">·</span>
-          <a href="interactive.php" class="hover:text-accent text-accent font-semibold transition-colors">Интерактивный верстак →</a>
-        </div>
-      </nav>
-
     </div>
   </main>
 
@@ -298,7 +267,7 @@ include __DIR__ . '/includes/header.php';
             "name": "Какую температуру выставить для припоя ПОС-61?",
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": "Припой ПОС-61 плавится при 183 °C. На паяльной станции выставляйте 260–290 °C. Разница в 80–100 °C необходима, чтобы компенсировать отвод тепла в медные дорожки платы."
+              "text": "Припой ПОС-61 плавится в интервале 183–190 °C. На паяльной станции выставляйте 260–290 °C. Это практический стартовый ориентир для мелкой пайки, а не норма ГОСТ: запас в 80–100 °C необходим, чтобы компенсировать отвод тепла в медные дорожки платы."
             }
           },
           {

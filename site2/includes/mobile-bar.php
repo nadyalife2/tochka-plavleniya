@@ -7,27 +7,21 @@
 <aside class="mobile-quick-bar select-none" aria-label="Быстрый мобильный доступ">
   
   <!-- 1. Global Search Trigger -->
-  <button type="button" class="open-search-trigger flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-ink-muted hover:text-ink active:scale-95 transition-all text-[11px] font-mono cursor-pointer" aria-label="Открыть поиск">
+  <button type="button" class="open-search-trigger flex flex-col items-center justify-center min-w-[72px] min-h-[48px] text-ink-muted hover:text-ink active:scale-95 transition-all text-[11px] font-mono cursor-pointer" aria-label="Открыть поиск">
     <span class="material-symbols-outlined text-[20px] text-accent">search</span>
     <span class="text-accent font-bold mt-0.5">Поиск</span>
   </button>
 
-  <!-- 2. Калькуляторы / Верстак -->
-  <a href="interactive.php" class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-ink-muted hover:text-ink active:scale-95 transition-all text-[11px] font-mono">
-    <span class="material-symbols-outlined text-[20px]">calculate</span>
-    <span class="mt-0.5 font-medium">Верстак</span>
+  <!-- 2. Задача (прямой переход к выбору сценария) -->
+  <a href="index.php#hero" class="flex flex-col items-center justify-center min-w-[72px] min-h-[48px] text-ink-muted hover:text-ink active:scale-95 transition-all text-[11px] font-mono">
+    <span class="material-symbols-outlined text-[20px]">tune</span>
+    <span class="mt-0.5 font-medium">Задача</span>
   </a>
 
-  <!-- 3. Практика -->
-  <a href="category.php?slug=praktika" class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-ink-muted hover:text-ink active:scale-95 transition-all text-[11px] font-mono">
-    <span class="material-symbols-outlined text-[20px]">construction</span>
-    <span class="mt-0.5 font-medium">Практика</span>
-  </a>
-
-  <!-- 4. Старт -->
-  <a href="category.php?slug=start" class="flex flex-col items-center justify-center min-w-[64px] min-h-[48px] text-ink-muted hover:text-ink active:scale-95 transition-all text-[11px] font-mono">
-    <span class="material-symbols-outlined text-[20px]">rocket_launch</span>
-    <span class="mt-0.5 font-medium">Старт</span>
+  <!-- 3. Статьи -->
+  <a href="index.php#articles" class="flex flex-col items-center justify-center min-w-[72px] min-h-[48px] text-ink-muted hover:text-ink active:scale-95 transition-all text-[11px] font-mono">
+    <span class="material-symbols-outlined text-[20px]">menu_book</span>
+    <span class="mt-0.5 font-medium">Статьи</span>
   </a>
 
 </aside>

@@ -104,10 +104,13 @@ html.dark {
   --color-accent-subtle: rgba(255, 107, 43, 0.18);
   --color-accent-border: rgba(255, 107, 43, 0.45);
 
+  --color-danger: #ef4444;
   --color-danger-bg: rgba(179, 38, 30, 0.25);
   --color-danger-border: rgba(248, 180, 180, 0.35);
+  --color-success: #22c55e;
   --color-success-bg: rgba(26, 127, 76, 0.25);
   --color-success-border: rgba(168, 218, 181, 0.35);
+  --color-warning: #f59e0b;
   --color-warning-bg: rgba(217, 119, 6, 0.25);
   --color-warning-border: rgba(252, 211, 77, 0.35);
 
