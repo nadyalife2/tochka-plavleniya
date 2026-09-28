@@ -4,8 +4,8 @@
 php_portable/
 *.zip
 *.log
-.DS_Store
 *.png
+!site2/assets/img/og-cover.png
 .playwright-mcp/
 ux-mcp-server/
 wp-content/Qwen_*

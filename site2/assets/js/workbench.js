@@ -35,7 +35,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const tempArticleTitle = document.getElementById('temp-article-title');
   const quickTaskButtons = document.querySelectorAll('.quick-task-btn');
 
+  let activeQuickTask = 'wire';
+
   function setQuickTask(taskKey) {
+    activeQuickTask = taskKey;
     quickTaskButtons.forEach(btn => {
       if (btn.dataset.task === taskKey) {
         btn.classList.add('bg-accent', 'text-white');
@@ -56,8 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (tempWork) tempWork.value = 'copper_pipe';
       if (tempSolder) tempSolder.value = 'pos61';
     } else if (taskKey === 'unknown') {
-      if (tempWork) tempWork.value = 'pth';
-      if (tempSolder) tempSolder.value = 'pos61';
+      if (tempWork) tempWork.value = '';
+      if (tempSolder) tempSolder.value = '';
     }
     updateTempCalculator();
   }
@@ -70,6 +73,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function updateTempCalculator() {
     if (!tempSolder || !tempWork || !tempRangeDisplay) return;
+
+    // Сценарий «Не знаю» — не выдавать температуру вслепую
+    if (activeQuickTask === 'unknown' && (!tempWork.value || !tempSolder.value)) {
+      if (tempEmptyState) tempEmptyState.classList.add('hidden');
+      if (tempResultContent) tempResultContent.classList.remove('hidden');
+      if (tempMeterBox) tempMeterBox.style.display = 'none';
+
+      if (tempStatusBadge) {
+        tempStatusBadge.textContent = 'ТРЕБУЕТСЯ ВЫБОР';
+        tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-ink/75 text-white';
+      }
+
+      tempRangeDisplay.textContent = 'Определите задачу';
+      tempRangeDisplay.style.fontSize = '1.35rem';
+      if (tempTipDisplay) tempTipDisplay.textContent = 'Зависит от размера детали и металла';
+
+      if (tempAdviceDisplay) {
+        tempAdviceDisplay.innerHTML = '<strong>С чего начать выбор:</strong><br>1. <strong>Что соединяем:</strong> провод, детали на плате или сантехнику?<br>2. <strong>Сечение и масса:</strong> для тонких SMD нужна точность, для толстых жил — широкое жало.<br>3. Выберите соответствующий пункт в выпадающем списке слева, чтобы получить расчёт.';
+      }
+
+      if (tempWarnDisplay && tempWarnBox) {
+        tempWarnDisplay.textContent = 'Не начинайте пайку вслепую на случайной температуре: для тонких дорожек перегрев выше 300 °C грозит отслоением меди, а для толстых проводов слабая температура приведёт к холодной пайке и залипанию жала.';
+        tempWarnBox.style.display = 'block';
+      }
+
+      if (tempArticleLink && tempArticleTitle) {
+        tempArticleLink.href = 'article.php?slug=chto-kupit-dlya-pervoj-payki';
+        tempArticleTitle.textContent = 'С чего начать: базовые правила пайки и безопасность';
+      }
+      return;
+    }
 
     const sVal = tempSolder.value;
     const wVal = tempWork.value;
@@ -101,7 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (tempMeterBox) tempMeterBox.style.display = 'block';
 
-    const isNoRec = !item || item.no_recommendation || (item.t_min === 0 && item.t_max === 0) || wVal === 'copper_pipe';
+    const isPipe = wVal === 'copper_pipe' || activeQuickTask === 'pipe';
+    const isNoRec = !item || item.no_recommendation || (item.t_min === 0 && item.t_max === 0) || isPipe;
 
     if (isNoRec) {
       if (tempStatusBadge) {
@@ -115,11 +150,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (tempTipDisplay) tempTipDisplay.textContent = 'Требуется газовая горелка';
       
       if (tempAdviceDisplay) {
-        tempAdviceDisplay.innerHTML = '<strong>Технологическое ограничение:</strong> Медные трубы и массивные фитинги обладают высокой теплоёмкостью. Пайка выполняется исключительно газовой горелкой с сантехническим припоем и пастой-флюсом (ГОСТ 52948-2008).';
+        tempAdviceDisplay.innerHTML = '<strong>Технологическое ограничение:</strong> Медные трубы и массивные фитинги обладают огромной теплоёмкостью. Пайка выполняется исключительно газовой горелкой с сантехническим мягким припоем и пастой-флюсом (ГОСТ 52948-2008).';
       }
       
       if (tempWarnDisplay && tempWarnBox) {
-        tempWarnDisplay.textContent = 'Категорически нельзя паять медные трубы радиомонтажным паяльником — он мгновенно остынет. Также категорически нельзя использовать активный сантехнический кислотный флюс на платах и электроприборах под 220 В — это гарантирует сквозную коррозию и замыкание!';
+        tempWarnDisplay.textContent = 'Категорически нельзя паять медные трубы радиомонтажным паяльником — он мгновенно остынет, припой застынет комком. Для медных труб нужна горелка и сантехнические материалы; калькулятор паяльника не применим. Сантехнический кислотный флюс категорически запрещено переносить на платы или радиоэлектронику!';
         tempWarnBox.style.display = 'block';
       }
 
@@ -139,15 +174,20 @@ document.addEventListener('DOMContentLoaded', () => {
     tempRangeDisplay.style.fontSize = '';
     tempRangeDisplay.textContent = `${item.t_min} – ${item.t_max} °C`;
 
-    // Visual temperature meter gauge (scaled from 100 to 450 °C)
+    // Visual temperature meter gauge (чтение динамической CSS-переменной --color-accent)
     if (tempBarFill) {
       const avg = (item.t_min + item.t_max) / 2;
       const pct = Math.min(100, Math.max(10, ((avg - 100) / 300) * 100));
       tempBarFill.style.width = `${pct}%`;
+
+      const accent = getComputedStyle(document.documentElement)
+        .getPropertyValue('--color-accent')
+        .trim() || '#FF6B2B';
+
       if (avg < 200) {
         tempBarFill.style.backgroundColor = '#10b981';
       } else if (avg <= 320) {
-        tempBarFill.style.backgroundColor = '#b9430d';
+        tempBarFill.style.backgroundColor = accent;
       } else {
         tempBarFill.style.backgroundColor = '#ef4444';
       }
@@ -157,20 +197,32 @@ document.addEventListener('DOMContentLoaded', () => {
       tempTipDisplay.textContent = item.tip ? `Форма жала: ${item.tip}` : 'Стандартное жало';
     }
 
+    // Разделение практических рекомендаций по сценарию
     if (tempAdviceDisplay) {
       const jointText = item.t_joint ? `<div class="mb-1.5 text-xs text-accent font-mono font-bold">Ожидаемая T в зоне контакта: ~${item.t_joint}</div>` : '';
-      const adviceText = item.advice || 'Контролируйте время контакта — достаточное для смачивания, но без перегрева.';
+      let adviceText = item.advice || 'Контролируйте время контакта — достаточное для смачивания, но без перегрева.';
+      
+      if (wVal.startsWith('wire')) {
+        adviceText = 'Нанесите каплю нейтрального флюса на проводник перед касанием жала. Используйте жало типа «клин» 2.4 мм для надежной теплопередачи.';
+      } else if (wVal.startsWith('smd') || wVal === 'pth') {
+        adviceText = 'Контролируйте время контакта — не более 2–3 секунд на площадку. При затрудненном плавлении увеличьте площадь жала, а не силу нажима.';
+      }
+      
       tempAdviceDisplay.innerHTML = `<strong>Уставка станции:</strong> ${item.t_min}–${item.t_max} °C (компенсирует тепловой градиент).<br>${jointText}<strong>Практический шаг:</strong> ${adviceText}`;
     }
 
+    // Разделение предупреждений по сценарию (Провод vs Плата)
     if (tempWarnDisplay && tempWarnBox) {
-      const baseWarn = item.warn || 'Не удерживать жало на контакте дольше 3 секунд.';
-      tempWarnDisplay.textContent = `${baseWarn} Категорически нельзя использовать активный кислотный флюс на печатных платах!`;
+      if (wVal.startsWith('wire')) {
+        tempWarnDisplay.textContent = 'Риск расплавить изоляцию: не удерживайте жало на жиле дольше 2–3 секунд. При пайке многожильного провода прогревайте жилу и контактную клемму одновременно, не пережигая канифоль в чёрный шлак.';
+      } else {
+        tempWarnDisplay.textContent = 'Активные кислотные флюсы строго запрещены (разрушают текстолит и вызывают замыкания). Нельзя давить жалом на контактную площадку — отрыв дорожки происходит от механического нажима при перегреве!';
+      }
       tempWarnBox.style.display = 'block';
     }
 
     if (tempArticleLink && tempArticleTitle) {
-      if (wVal.includes('wire')) {
+      if (wVal.startsWith('wire')) {
         tempArticleLink.href = 'article.php?slug=chto-kupit-dlya-pervoj-payki';
         tempArticleTitle.textContent = 'Что купить для первой пайки и как правильно лудить провод';
       } else {

@@ -25,11 +25,13 @@ $current_page = $current_page ?? '';
   <meta property="og:title" content="<?= htmlspecialchars($page_title) ?>"/>
   <meta property="og:description" content="<?= htmlspecialchars($page_desc) ?>"/>
   <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
+  <meta property="og:image" content="<?= htmlspecialchars($page_og_image ?? '/assets/img/og-cover.png') ?>"/>
 
   <!-- Twitter Card Meta -->
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="<?= htmlspecialchars($page_title) ?>"/>
   <meta name="twitter:description" content="<?= htmlspecialchars($page_desc) ?>"/>
+  <meta name="twitter:image" content="<?= htmlspecialchars($page_og_image ?? '/assets/img/og-cover.png') ?>"/>
 
   <!-- Immediate Theme Init Script (Zero FOUC) -->
   <script>

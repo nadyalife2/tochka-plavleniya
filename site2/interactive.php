@@ -43,7 +43,7 @@ include __DIR__ . '/includes/header.php';
             <span class="w-2 h-2 rounded-full bg-ink inline-block"></span>
             <span class="uppercase tracking-wider font-semibold text-ink">Инженерный верстак v2.4</span>
             <span>·</span>
-            <span>Расчеты по ГОСТ 21931 и IPC J-STD-006</span>
+            <span>Расчеты по ГОСТ 21930/21931 и спецификациям сплавов</span>
           </div>
 
           <!-- Headline -->
@@ -120,7 +120,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="card-footer">
-                  <span class="spec-tag">J-STD-020E</span>
+                  <span class="spec-tag">ОРИЕНТИР</span>
                   <a href="#temp" class="card-btn">Открыть калькулятор →</a>
                 </div>
               </div>
@@ -159,7 +159,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="card-footer">
-                  <span class="spec-tag">ГОСТ 21931</span>
+                  <span class="spec-tag">КОНФИГУРАТОР</span>
                   <a href="#iron" class="card-btn">Сконфигурировать →</a>
                 </div>
               </div>
@@ -541,7 +541,7 @@ include __DIR__ . '/includes/header.php';
           </label>
           <label class="flex items-start gap-3 p-3.5 rounded border border-paper-border bg-paper cursor-pointer hover:border-accent transition-colors">
             <input type="checkbox" class="mt-0.5 accent-[#FF6B2B] w-4 h-4 cursor-pointer">
-            <span><strong>5. Защита жала:</strong> На остывшее жало нанесён слой припоя перед нагревом (предотвращает выгорание никелевого слоя).</span>
+            <span><strong>5. Защита жала:</strong> Сразу после прогрева жало очищено и залужено свежим припоем (защищает рабочую поверхность от окисления и выгорания). При выключении станции жало также оставляют с каплей припоя.</span>
           </label>
         </div>
       </section>
