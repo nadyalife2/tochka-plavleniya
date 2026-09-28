@@ -2,433 +2,443 @@
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/articles-data.php';
 
-// Filter by category
-$tag_filter = isset($_GET['tag']) ? $_GET['tag'] : 'all';
-$filtered_articles = get_articles_by_tag($tag_filter);
-$page_title = "Журнал и открытая лаборатория — ТОЧКА ПЛАВЛЕНИЯ";
-$page_desc = "Инженерный журнал, открытые регламенты монтажа SMD/BGA компонентов, калькулятор флюсов и реестр сплавов — лаборатория ТОЧКА ПЛАВЛЕНИЯ.";
+$page_title = "Паяй уверенно — ТОЧКА ПЛАВЛЕНИЯ";
+$page_desc = "Инженерный справочник и открытая лаборатория: проверенные терморежимы, подбор паяльного оборудования и чек-листы радиомонтажа.";
 $current_page = 'index';
+
+// Берём только реальные статьи из базы знаний (без выдуманных данных)
+$recent_articles = array_slice($articles, 0, 4);
+
 include __DIR__ . '/includes/header.php';
 ?>
 
-
-  <!-- Main Container -->
+  <!-- Main Container: 64px vertical spacing between sections, strict 8-point grid -->
   <main class="w-full flex-grow pt-8 pb-16">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
-      
-      <!-- Breadcrumbs -->
-      <nav class="text-[12px] font-mono text-ink-faint mb-6 flex items-center gap-1.5 flex-wrap">
-        <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
-        <span>→</span>
-        <span class="text-ink">Журнал и открытая лаборатория ТЧП</span>
-      </nav>
+    <div class="max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
 
-      <!-- Hero Section -->
-      <section class="border-b border-paper-border pb-10 mb-10">
-        <div class="max-w-3xl space-y-5">
-          
-          <!-- Tape & Label Badge -->
-          <div class="relative inline-block mb-1">
-            <div class="absolute -top-2 left-6 w-10 h-3 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-sm rotate-[-2deg] z-10 pointer-events-none" style="backdrop-filter: blur(1px);"></div>
-            <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#fffdf5] dark:bg-[#ca8a04]/15 border border-[#fde047] dark:border-[#ca8a04]/40 text-ink font-mono text-[11px] shadow-sm rotate-[-1.2deg] sketch-border">
-              <span class="w-2 h-2 rounded-full bg-accent shadow-[0_0_6px_rgba(235,82,17,0.8)] inline-block"></span>
-              <span class="font-bold tracking-wider uppercase">ВЕРСТАК // LAB TOOLS 2026</span>
-              <span class="text-ink-faint">|</span>
-              <span class="text-[10px] text-ink-muted">ИНЖЕНЕРНЫЕ РАСЧЁТЫ</span>
-            </div>
+      <!-- 1. ПЕРВЫЙ ЭКРАН (HERO): Заголовок «Паяй уверенно», одна кнопка, скотч и пометка только здесь -->
+      <section class="relative pt-6 pb-4 border-b-2 border-ink/15 space-y-6" id="hero">
+        
+        <!-- Скотч и пометка (строго только у первого экрана) -->
+        <div class="relative inline-block">
+          <div class="sketch-washi-tape" style="top: -10px; left: 16px; transform: rotate(-2.5deg);" aria-hidden="true"></div>
+          <div class="sketch-sticky-note inline-flex items-center gap-2 px-3 py-1 text-ink font-mono text-xs shadow-sm rotate-[-1deg] rounded-sm">
+            <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+            <span class="font-bold tracking-wider uppercase">ОТК // ЛАБОРАТОРНЫЙ СПРАВОЧНИК 2026</span>
           </div>
+        </div>
 
-          <!-- Metadata -->
-          <div class="inline-flex items-center gap-2 font-mono text-xs text-ink-muted">
-            <span class="w-2 h-2 rounded-full bg-ink inline-block"></span>
-            <span class="uppercase tracking-wider font-semibold text-ink">Инженерный регламент v2.4</span>
-            <span>·</span>
-            <span>Лаборатория поверхностного монтажа</span>
-          </div>
-
-          <!-- Headline -->
-          <h1 class="text-4xl sm:text-5xl lg:text-[54px] font-bold text-ink tracking-[-0.03em] leading-[1.1] font-sans">
-            Паяем. Проектируем. Прошиваем.
+        <!-- Единственный h1 на странице -->
+        <div class="space-y-4 max-w-3xl">
+          <h1 class="text-4xl sm:text-5xl lg:text-6xl font-bold text-ink tracking-tight font-sans leading-[1.08]">
+            Паяй уверенно
           </h1>
-
-          <!-- Lead text -->
-          <p class="text-lg sm:text-[19px] text-ink/90 font-serif leading-[1.65]">
-            Журнал и открытая документация о том, как превратить кучу разрозненных SMD/BGA компонентов в надежное устройство. Без воды, с интерактивными симуляторами термопрофилей, допусками IPC/JEDEC и проверенными режимами пайки.
+          <p class="text-base sm:text-lg text-ink-muted leading-relaxed font-serif max-w-2xl">
+            Инженерный справочник без воды: точные ориентиры температуры жала, подбор инструмента под бюджет и правила монтажа без риска сжечь компоненты или отслоить дорожки.
           </p>
+        </div>
 
-          <!-- Editorial Manifesto Note (Sketch Style) -->
-          <div class="font-hand text-lg sm:text-xl text-ink-muted/80 italic rotate-[-1deg] inline-flex items-center gap-2 pt-0.5 pb-1">
-            <span>«Анти-идеальный веб. Структура обнажена. Искренность форм.»</span>
+        <!-- Ровно одна главная кнопка: высота не менее 48px, видна сразу без прокрутки -->
+        <div class="pt-2">
+          <a href="interactive.php" class="btn-primary">
+            Рассчитать задачу в калькуляторе →
+          </a>
+        </div>
+      </section>
+
+
+      <!-- 2. МАРШРУТ НОВИЧКА: Ровно 3 шага (не 6 карточек и не 4) -->
+      <section class="space-y-4" id="beginner-route">
+        <div class="space-y-1">
+          <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">БЫСТРЫЙ СТАРТ</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+            Маршрут новичка
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          
+          <!-- Шаг 1 -->
+          <a href="category.php?slug=instrumenty" class="sketch-card p-4 flex flex-col justify-between space-y-4 bg-card hover:border-accent transition-colors group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+                <span class="font-bold text-accent">ШАГ 01</span>
+                <span>ИНСТРУМЕНТ</span>
+              </div>
+              <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                Что купить для старта
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed font-serif">
+                Базовый паяльник, припой ПОС-61 и нейтральный флюс-гель. Без переплаты за лишнее оборудование.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-paper-border font-mono text-xs font-semibold text-ink flex items-center justify-between">
+              <span>Собрать верстак</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+          </a>
+
+          <!-- Шаг 2 -->
+          <a href="interactive.php#temp" class="sketch-card p-4 flex flex-col justify-between space-y-4 bg-card hover:border-accent transition-colors group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+                <span class="font-bold text-accent">ШАГ 02</span>
+                <span>ТЕМПЕРАТУРА</span>
+              </div>
+              <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                Первый контакт и нагрев
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed font-serif">
+                Как выставить температуру на станции, зачем лудить жало и почему нельзя греть плату дольше 3 секунд.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-paper-border font-mono text-xs font-semibold text-ink flex items-center justify-between">
+              <span>Рассчитать режим</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+          </a>
+
+          <!-- Шаг 3 -->
+          <a href="category.php?slug=oshibki" class="sketch-card p-4 flex flex-col justify-between space-y-4 bg-card hover:border-accent transition-colors group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+                <span class="font-bold text-accent">ШАГ 03</span>
+                <span>ДИАГНОСТИКА</span>
+              </div>
+              <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                Разбор ошибок и брака
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed font-serif">
+                Припой скатывается шариком? Дорожка отслоилась? Интерактивный определитель первопричин брака.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-paper-border font-mono text-xs font-semibold text-ink flex items-center justify-between">
+              <span>Найти ошибку</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+          </a>
+
+        </div>
+      </section>
+
+
+      <!-- 3. НОВЫЕ СТАТЬИ: Только реальные статьи из базы, без «120+» -->
+      <section class="space-y-4" id="articles">
+        <div class="flex items-end justify-between flex-wrap gap-2">
+          <div class="space-y-1">
+            <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">БАЗА ЗНАНИЙ</span>
+            <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+              Новые статьи
+            </h2>
+          </div>
+          <span class="font-mono text-xs text-ink-muted">Реальные замеры и лабораторные тесты</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          <?php foreach ($recent_articles as $article): ?>
+            <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted">
+                  <span class="pill-orange uppercase"><?= htmlspecialchars($article['tag']) ?></span>
+                  <span>~<?= (int)$article['read_min'] ?> мин</span>
+                </div>
+                <h3 class="text-base font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                  <a href="article.php?slug=<?= urlencode($article['slug']) ?>">
+                    <?= htmlspecialchars($article['title']) ?>
+                  </a>
+                </h3>
+                <p class="text-xs text-ink-muted leading-relaxed font-serif line-clamp-3">
+                  <?= htmlspecialchars($article['excerpt']) ?>
+                </p>
+              </div>
+
+              <div class="pt-3 border-t border-paper-border flex items-center justify-between font-mono text-xs">
+                <span class="text-ink-faint text-[11px]"><?= htmlspecialchars($article['author']) ?></span>
+                <a href="article.php?slug=<?= urlencode($article['slug']) ?>" class="text-ink font-bold group-hover:text-accent">
+                  Читать →
+                </a>
+              </div>
+            </article>
+          <?php endforeach; ?>
+        </div>
+      </section>
+
+
+      <!-- 4. ИНСТРУМЕНТЫ: Ровно 3 (Температура, Подбор, Чек-лист). Остальные спрятаны в «Практику» -->
+      <section class="space-y-4" id="tools">
+        <div class="space-y-1">
+          <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ИНТЕРАКТИВНЫЙ ВЕРСТАК</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+            Инструменты в 1 клик
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+          
+          <!-- Инструмент 1: Температура -->
+          <a href="interactive.php?tool=temp" class="sketch-card p-4 flex flex-col justify-between space-y-4 bg-card hover:border-accent transition-colors group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+                <span class="font-bold text-accent">01 // ТЕРМОРЕЖИМ</span>
+                <span>ГОСТ 21931</span>
+              </div>
+              <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                Температура жала
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed font-serif">
+                Точный ориентир уставки станции под ПОС-61, SAC305 и тип монтажа без перегрева полигонов.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-paper-border font-mono text-xs font-semibold text-accent flex items-center justify-between">
+              <span>Открыть расчёт</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+          </a>
+
+          <!-- Инструмент 2: Подбор паяльника -->
+          <a href="interactive.php?tool=iron" class="sketch-card p-4 flex flex-col justify-between space-y-4 bg-card hover:border-accent transition-colors group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+                <span class="font-bold text-accent">02 // ОБОРУДОВАНИЕ</span>
+                <span>T12 / C245</span>
+              </div>
+              <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                Подбор паяльника
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed font-serif">
+                Конфигуратор оборудования и геометрии картриджей под домашний верстак или сервисную мастерскую.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-paper-border font-mono text-xs font-semibold text-accent flex items-center justify-between">
+              <span>Сконфигурировать</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+          </a>
+
+          <!-- Инструмент 3: Чек-лист -->
+          <a href="interactive.php?tool=checklist" class="sketch-card p-4 flex flex-col justify-between space-y-4 bg-card hover:border-accent transition-colors group">
+            <div class="space-y-2">
+              <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+                <span class="font-bold text-accent">03 // БЕЗОПАСНОСТЬ</span>
+                <span>IPC-A-610</span>
+              </div>
+              <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                Чек-лист подготовки
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed font-serif">
+                Проверка платы перед включением: антистатика (ESD), очистка от окислов и выбор безопасного флюса.
+              </p>
+            </div>
+            <div class="pt-3 border-t border-paper-border font-mono text-xs font-semibold text-accent flex items-center justify-between">
+              <span>Пройти чек-лист</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+          </a>
+
+        </div>
+
+        <!-- Сноска: остальные 5 спрятаны в «Практику» -->
+        <div class="pt-2 text-xs font-mono text-ink-muted">
+          <span>Остальные 5 инструментов (дозировка пасты, расчет расхода припоя, таблица сплавов и дерево дефектов) собраны в разделе</span>
+          <a href="category.php?slug=praktika" class="text-ink font-bold hover:text-accent underline decoration-1 ml-1">Практика монтажа →</a>
+        </div>
+      </section>
+
+
+      <!-- 5. ШЕСТЬ РУБРИК -->
+      <section class="space-y-4" id="rubrics">
+        <div class="space-y-1">
+          <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">СТРУКТУРА</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+            Шесть рубрик
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+          
+          <!-- Рубрика 1 -->
+          <a href="category.php?slug=start" class="sketch-card p-4 bg-card hover:border-accent transition-colors group space-y-2">
+            <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+              <span class="font-bold text-ink">01 // СТАРТ</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <div class="text-base font-bold text-ink group-hover:text-accent">С чего начать</div>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Первые шаги, базовая физика смачивания и безопасная организация рабочего места.
+            </p>
+          </a>
+
+          <!-- Рубрика 2 -->
+          <a href="category.php?slug=instrumenty" class="sketch-card p-4 bg-card hover:border-accent transition-colors group space-y-2">
+            <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+              <span class="font-bold text-ink">02 // СТАНЦИИ</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <div class="text-base font-bold text-ink group-hover:text-accent">Инструменты и станции</div>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Паяльники T12/JBC, термовоздушные фены, нижние подогревы и монтажная оптика.
+            </p>
+          </a>
+
+          <!-- Рубрика 3 -->
+          <a href="category.php?slug=materialy" class="sketch-card p-4 bg-card hover:border-accent transition-colors group space-y-2">
+            <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+              <span class="font-bold text-ink">03 // ХИМИЯ</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <div class="text-base font-bold text-ink group-hover:text-accent">Материалы и сплавы</div>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Припои ПОС-61/SAC305, флюсы No-Clean/RMA, пасты и смывки по IPC J-STD-004.
+            </p>
+          </a>
+
+          <!-- Рубрика 4 -->
+          <a href="category.php?slug=praktika" class="sketch-card p-4 bg-card hover:border-accent transition-colors group space-y-2">
+            <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+              <span class="font-bold text-ink">04 // ТЕХНОЛОГИЯ</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <div class="text-base font-bold text-ink group-hover:text-accent">Практика монтажа</div>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Ручной монтаж SMD 0402–1206, пайка корпусов QFN, BGA-реболлинг и прогрев полигонов.
+            </p>
+          </a>
+
+          <!-- Рубрика 5 -->
+          <a href="category.php?slug=oshibki" class="sketch-card p-4 bg-card hover:border-accent transition-colors group space-y-2">
+            <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+              <span class="font-bold text-ink">05 // ДИАГНОСТИКА</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <div class="text-base font-bold text-ink group-hover:text-accent">Проблемы и дефекты</div>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Холодная пайка, перемычки припоя, отрыв дорожек и появление эффекта tombstoning.
+            </p>
+          </a>
+
+          <!-- Рубрика 6 -->
+          <a href="category.php?slug=materialy" class="sketch-card p-4 bg-card hover:border-accent transition-colors group space-y-2">
+            <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+              <span class="font-bold text-ink">06 // СТАНДАРТЫ</span>
+              <span class="group-hover:translate-x-1 transition-transform">→</span>
+            </div>
+            <div class="text-base font-bold text-ink group-hover:text-accent">Регламенты и стандарты</div>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Инженерные допуски ГОСТ 21931-76, критерии годности IPC-A-610 и профили J-STD-020E.
+            </p>
+          </a>
+
+        </div>
+      </section>
+
+
+      <!-- 6. КОРОТКИЙ FAQ ИЗ 4 ВОПРОСОВ -->
+      <section class="space-y-4" id="faq">
+        <div class="space-y-1">
+          <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ВОПРОС — ОТВЕТ</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+            Частые вопросы
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+          
+          <!-- Вопрос 1 -->
+          <div class="sketch-card p-4 bg-card space-y-2">
+            <h3 class="text-base font-bold text-ink leading-snug">
+              Какую температуру выставить для припоя ПОС-61?
+            </h3>
+            <p class="text-sm text-ink-muted font-serif leading-relaxed">
+              Припой ПОС-61 плавится при 183 °C. На паяльной станции выставляйте <strong>260–290 °C</strong>. Разница в 80–100 °C необходима, чтобы компенсировать отвод тепла в медные дорожки платы.
+            </p>
           </div>
 
-          <!-- User Journeys (Task-based paths) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-4">
-            <a href="category.php?slug=start" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
-              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">school</div>
-              <span class="font-mono text-xs text-ink-muted uppercase tracking-wide">Маршрут 01</span>
-              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Я паяю впервые</span>
-              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
-                <span>Базовый курс</span>
-                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
-              </span>
-            </a>
-            
-            <a href="category.php?slug=instrumenty" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
-              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">hardware</div>
-              <span class="font-mono text-xs text-ink-muted uppercase tracking-wide">Маршрут 02</span>
-              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Что купить и чем паять?</span>
-              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
-                <span>Оборудование</span>
-                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
-              </span>
-            </a>
-            
-            <a href="category.php?slug=oshibki" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
-              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">bug_report</div>
-              <span class="font-mono text-xs text-ink-muted uppercase tracking-wide">Маршрут 03</span>
-              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Пайка не получается</span>
-              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
-                <span>Разбор дефектов</span>
-                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
-              </span>
-            </a>
+          <!-- Вопрос 2 -->
+          <div class="sketch-card p-4 bg-card space-y-2">
+            <h3 class="text-base font-bold text-ink leading-snug">
+              Нужен ли новичку дорогой паяльник вроде JBC?
+            </h3>
+            <p class="text-sm text-ink-muted font-serif leading-relaxed">
+              Нет. Для старта достаточно станции на картриджах <strong>Hakko T12</strong> (или портативного USB-PD паяльника вроде Pinecil/T80). Они быстро греются и держат температуру благодаря встроенной в жало термопаре.
+            </p>
+          </div>
 
-            <a href="interactive.php#temp" class="group flex flex-col gap-2 p-4 border border-paper-border bg-paper rounded hover:border-[#d97706] dark:hover:border-[#f59e0b] transition-colors shadow-sm relative overflow-hidden">
-              <div class="absolute -right-4 -top-4 text-[60px] text-paper-border/30 group-hover:text-[#d97706]/10 dark:group-hover:text-[#f59e0b]/10 transition-colors material-symbols-outlined">thermostat</div>
-              <span class="font-mono text-xs text-accent uppercase tracking-wide font-bold">Интерактивно</span>
-              <span class="font-bold text-ink text-base sm:text-[17px] leading-tight relative z-10">Подобрать температуру</span>
-              <span class="text-xs text-ink-muted font-serif mt-auto pt-2 border-t border-paper-border group-hover:border-[#d97706]/30 dark:group-hover:border-[#f59e0b]/30 transition-colors relative z-10 flex items-center justify-between">
-                <span>Калькулятор t°C</span>
-                <span class="text-ink-muted group-hover:text-[#d97706] dark:group-hover:text-[#f59e0b]">→</span>
-              </span>
-            </a>
+          <!-- Вопрос 3 -->
+          <div class="sketch-card p-4 bg-card space-y-2">
+            <h3 class="text-base font-bold text-ink leading-snug">
+              Как не отслоить медную дорожку от текстолита?
+            </h3>
+            <p class="text-sm text-ink-muted font-serif leading-relaxed">
+              Главное правило: <strong>не более 2.5–3 секунд</strong> контакта жала с площадкой. Если припой не плавится за это время — увеличьте площадь контакта жала или используйте подогрев, но не давите на дорожку силой.
+            </p>
+          </div>
+
+          <!-- Вопрос 4 -->
+          <div class="sketch-card p-4 bg-card space-y-2">
+            <h3 class="text-base font-bold text-ink leading-snug">
+              Какой флюс выбрать для первого раза и надо ли его смывать?
+            </h3>
+            <p class="text-sm text-ink-muted font-serif leading-relaxed">
+              Выбирайте гелевый флюс класса <strong>No-Clean (ROL0)</strong>. Канифоль безопасна, но твердеет; водосмывные и активные флюсы новичкам брать нельзя — их остатки вызывают коррозию дорожек.
+            </p>
           </div>
 
         </div>
       </section>
 
-      <!-- Category Filter Pills (WCAG 44px Touch Targets) -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-4 mb-8 font-mono text-xs sm:text-sm scrollbar-none" id="articles">
-        <a href="index.php?tag=all#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'all' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
-          Все материалы
-        </a>
-        <a href="index.php?tag=basics#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'basics' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
-          Основы
-        </a>
-        <a href="index.php?tag=smd#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'smd' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
-          SMD и BGA
-        </a>
-        <a href="index.php?tag=tools#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'tools' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
-          Инструменты
-        </a>
-        <a href="index.php?tag=materials#articles" class="inline-flex items-center px-4 py-2 min-h-[44px] rounded <?= $tag_filter === 'materials' ? 'bg-ink text-paper font-medium' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?> transition-all">
-          Сплавы и флюсы
-        </a>
-      </div>
 
-      <!-- Main Layout: 8 cols Editorial + 4 cols Sidebar -->
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        <!-- Left Column: Articles -->
-        <div class="lg:col-span-8 space-y-8">
+      <!-- 7. БЛОК «КАК ПРОВЕРЯЕМ»: кто пишет, откуда цифры, что это ориентир + опасный совет со скотчем -->
+      <section class="space-y-4" id="how-we-verify">
+        <div class="space-y-1">
+          <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ПРОЗРАЧНОСТЬ ЛАБОРАТОРИИ</span>
+          <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+            Как мы проверяем данные
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
           
-          <!-- FEATURED MAIN ARTICLE (Hero Card) -->
-          <article class="border border-paper-border rounded-lg bg-card p-6 sm:p-7 space-y-5 shadow-sm transition-all hover:border-paper-border-dark relative" id="featured">
-            
-            <!-- Image Frame -->
-            <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
-              <img src="https://lh3.googleusercontent.com/aida/AEtjO1XPXO_7vFBi0-sZRVk7MH6OetXskpHt5Xcf3Ip6nfHDDYM7qdO0nERNQaH_49PYrri281JQZUD0JhgzliwsR7F5Ks8GvSMY32dTxDUIHzZ_P5Drz6niq2ZSyIRirmXvsdrZExlqKeZ_11m0Vf64Fa9fYCMG9SMrAAg0F5hGzsceoEP1ajdrLph6LgFKfgF6aLS30BF8hJJkW20S0l03CIQZ4uc7pmSJ_MFPJyqCHL4KNonVuGSJXGX1rAg" alt="Схема термопрофиля пайки BGA и распределения тепла" class="w-full h-52 sm:h-60 object-cover object-center" loading="lazy">
-              <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-paper/90 border border-paper-border text-[11px] font-mono text-ink-muted rounded backdrop-blur-sm">
-                FIG. 4.0 // SCHEMATIC
-              </div>
-            </div>
+          <div class="sketch-card p-4 bg-card space-y-2">
+            <div class="font-mono text-xs font-bold text-accent uppercase">01 // КТО ПИШЕТ</div>
+            <h3 class="text-base font-bold text-ink">Инженеры-практики</h3>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Материалы готовят мастера сервисных центров и радиомонтажники с опытом сборки многослойных плат, BGA-чипов и мелкосерийного SMD-монтажа.
+            </p>
+          </div>
 
-            <!-- Meta Top -->
-            <div class="flex items-center justify-between font-mono text-xs text-ink-muted pt-1">
-              <div class="flex items-center gap-2">
-                <span class="text-ink font-hand text-lg font-bold italic tracking-wide rotate-[-1.5deg] inline-block">Иван Пайкин</span>
-                <span class="text-ink-faint">·</span>
-                <span>~8 мин чтения</span>
-              </div>
-              <span class="text-[11px] text-ink-faint uppercase font-mono">IPC/JEDEC</span>
-            </div>
+          <div class="sketch-card p-4 bg-card space-y-2">
+            <div class="font-mono text-xs font-bold text-accent uppercase">02 // ОТКУДА ЦИФРЫ</div>
+            <h3 class="text-base font-bold text-ink">Реальные замеры и стандарты</h3>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Температуры и тепловые окна калибруются контактной термопарой на полигонах плат и сверяются со стандартами ГОСТ 21931-76 и IPC J-STD-004/006.
+            </p>
+          </div>
 
-            <!-- Title & Excerpt -->
-            <div class="space-y-3">
-              <h2 class="text-2xl sm:text-[28px] font-bold text-ink tracking-tight leading-[1.2]">
-                <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline decoration-[#d97706] dark:decoration-[#f59e0b] decoration-1 underline-offset-4 transition-colors" href="article.php?slug=temperaturnye-profili">
-                  Температурные профили: как не перегреть плату за $300
-                </a>
-              </h2>
-              <p class="text-ink/85 font-serif text-[16px] leading-relaxed">
-                Разбираем теплоёмкость текстолита и строим правильную кривую нагрева для BGA-монтажа и сложных многослойных плат. Разбираем, почему стандартная пайка «по цифрам на табло фена» убивает платы, и как выставить 4 фазы термопрофиля.
-              </p>
-            </div>
-
-            <!-- Technical Flow Strip -->
-            <div class="rounded border border-paper-border bg-paper-subtle p-4 flex items-center justify-between font-mono text-xs text-ink-muted overflow-x-auto relative">
-              <div class="flex items-center gap-4 shrink-0">
-                <span class="text-ink-muted">Ликвидус SAC305: <strong class="text-ink font-bold">217°C</strong></span>
-                <span class="text-ink-faint">→</span>
-                <span class="text-ink-muted">ПОС-61: <strong class="text-ink font-bold">183°C</strong></span>
-                <span class="text-ink-faint">→</span>
-                <span class="text-ink-muted">Окно TAL: <strong class="text-ink font-bold">45–75 с</strong></span>
-              </div>
-              <span class="text-[11px] text-ink-muted font-mono font-bold tracking-wider px-2 py-0.5 rounded bg-paper border border-paper-border-dark">FIG. 4.1</span>
-            </div>
-
-            <!-- Card Bottom Bar -->
-            <div class="flex items-center justify-between pt-2 border-t border-paper-border font-mono text-xs text-ink-muted">
-              <div class="flex items-center gap-2">
-                <span class="text-ink font-medium">Регламент BGA</span>
-                <span class="text-ink-faint">·</span>
-                <span>10 авг 2026</span>
-              </div>
-              <a class="text-ink font-bold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline flex items-center gap-1.5 group" href="article.php?slug=temperaturnye-profili">
-                <span>Читать регламент →</span>
-              </a>
-            </div>
-
-          </article>
-
-          <!-- 2x2 Secondary Articles Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            
-            <!-- Card 1: SMD 0402 vs 0603 -->
-            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors">
-              <div class="overflow-hidden rounded border border-paper-border bg-paper">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYi7MdtqY4d65d01YGA76Nb9UaAhDQ7QkjjWLOubwy90v1ERBKSlSZppwjkUC5jpi9kY1HdnQ5FHJR21MXRmgii-iF6CYNt9W4mNydzzoSQsgYTW_6wcWir8FOtb6ioNVbDgKW05RwHoKlGk90RvpJXFOV0hLsAaFjRijsi-njQlJ2_aoNGm_Q0M2v_1jGJM6d0HEoWjg1G2ov5xWDRXeKNl2a49NrjH0NmXjEyipzYiA6d1bDpnFu" alt="SMD 0402 vs 0603 сравнение" class="w-full h-36 object-cover object-center" loading="lazy">
-              </div>
-              <div class="space-y-2">
-                <div class="flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                  <span class="pill-orange uppercase">SMD</span>
-                  <span>~4 мин</span>
-                </div>
-                <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=smd-0402-vs-0603">SMD 0402 vs 0603: что выбрать для прототипа</a>
-                </h3>
-                <p class="text-sm text-ink-muted leading-relaxed">
-                  Плотность монтажа против ремонтопригодности — детальный анализ паразитных емкостей и удобства ручной пайки на верстаке.
-                </p>
-              </div>
-              <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
-                <span class="text-ink-muted font-medium">Компоненты</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=smd-0402-vs-0603">Подробнее →</a>
-              </div>
-            </article>
-
-            <!-- Card 2: T12 vs JBC C245 -->
-            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors">
-              <div class="overflow-hidden rounded border border-paper-border bg-paper">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuChE9QvE8LozVtk7VrKxyYI-SrHgrPhImpEKRwWLy8fCBhxDhgQJbz22eBoGpZ97AEmkDILNPB6nXPLwk4Pq62v8qVL76AJmtm7Y3M86EKjJYmx-yPJkCc-vq1O-rNVWNo_vypZINr_lZHpl4QKTYJnCzMarAZm24hHEabOepCGf90eCac2R0yEBmu4eXa8cQtRGKfECNtCPUpfGFTV4N28XpeOWVBdpVriBQO9ZdB_yuU45CFoJi1n" alt="Картриджи жал T12 vs JBC C245 в разрезе" class="w-full h-36 object-cover object-center" loading="lazy">
-              </div>
-              <div class="space-y-2">
-                <div class="flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                  <span class="pill-blue uppercase">Инструменты</span>
-                  <span>~6 мин</span>
-                </div>
-                <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=zhala-payalnika">Жала паяльника: T12 против JBC C245 на верстаке</a>
-                </h3>
-                <p class="text-sm text-ink-muted leading-relaxed">
-                  Сравниваем скорость компенсации тепла на земляных полигонах, ресурс картриджей и экономику работы под микроскопом.
-                </p>
-              </div>
-              <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
-                <span class="text-ink-muted font-medium">Оборудование</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=zhala-payalnika">Подробнее →</a>
-              </div>
-            </article>
-
-            <!-- Card 3: Гид по флюсам -->
-            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors">
-              <div class="overflow-hidden rounded border border-paper-border bg-paper">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDq0hH5xM39QDK1ZqCle8_Wk1nH4vsPEFi-qLOCIaH0mt5-NgDzrCsJkTQtjTFrNG8X9c4iXDGbdoYyxa9w9vsD5lhmodhFeYkAWkHXAFy0RloCfAkIN97lpnpFIzEqofnLwCZ_hIQ31MPvwYjr0YKml4OBALGI73SBp5g7T0cpRCK35Hp4utgd9ONG1OB3QN5BnZnqPkHXUtJPjiJgakBYuQhMka55il18DlWwDTGLTl5ZZrP1LM9R" alt="Дозатор флюс-геля для монтажа BGA" class="w-full h-36 object-cover object-center" loading="lazy">
-              </div>
-              <div class="space-y-2">
-                <div class="flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                  <span class="pill-orange uppercase">Материалы</span>
-                  <span>~5 мин</span>
-                </div>
-                <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=gid-po-flyusam">Гид по флюсам: RMA, NC и No-Clean в шприце</a>
-                </h3>
-                <p class="text-sm text-ink-muted leading-relaxed">
-                  Какой флюс оставить, а какой смывать до блеска изопропиловым спиртом в УЗ-ванне, чтобы плата не деградировала через полгода.
-                </p>
-              </div>
-              <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
-                <span class="text-ink-muted font-medium">Химия</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=gid-po-flyusam">Подробнее →</a>
-              </div>
-            </article>
-
-            <!-- Card 4: Симулятор термопрофиля -->
-            <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-colors" id="calc">
-              <div class="overflow-hidden rounded border border-paper-border bg-paper">
-                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCz3EwM-yiiGuYAXSgycnw3IamGAkG45KS9762AyA9_0RrrlkIL1iHEpmka6kq84n028UCS8F5Fng_yDk-0oMCYSywnUmcfYDGuiLzBNmGEgPgYJ8ARSDGgl4mTd4p03iPJtH9_gFS7toreuV8Ud6t3Xmsz0WiLpKTjwhgbdra-vGgts3_XRkNXVfXR3rTGpqCpuw9nDyhp6gptDUKonPp2XCLgE7N0Aidcy7Pd8JuRU4TaqQqNEHPP" alt="Схема термовоздушной станции и профиля пайки" class="w-full h-36 object-cover object-center" loading="lazy">
-              </div>
-              <div class="space-y-2">
-                <div class="flex items-center justify-between text-[11px] font-mono text-ink-muted">
-                  <span class="pill-blue uppercase">Интерактивно</span>
-                  <span class="text-ink font-medium">Калькулятор</span>
-                </div>
-                <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                  <a class="hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline transition-colors" href="article.php?slug=temperaturnye-profili#simulator">Симулятор термопрофиля фена и стола</a>
-                </h3>
-                <p class="text-sm text-ink-muted leading-relaxed">
-                  Расчет 4 фаз нагрева: Preheat, Soak, Reflow и Cooling под сплавы SAC305, ПОС-61 и Sn42Bi58 по контактной термопаре.
-                </p>
-              </div>
-              <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
-                <span class="text-ink-muted font-medium">SAC305 / ПОС-61</span>
-                <a class="text-ink font-semibold hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="article.php?slug=temperaturnye-profili#simulator">Открыть калькулятор →</a>
-              </div>
-            </article>
-
+          <div class="sketch-card p-4 bg-card space-y-2">
+            <div class="font-mono text-xs font-bold text-accent uppercase">03 // ЭТО ОРИЕНТИР</div>
+            <h3 class="text-base font-bold text-ink">Физический ориентир</h3>
+            <p class="text-xs text-ink-muted font-serif leading-relaxed">
+              Цифры на дисплее станции — ориентир для старта. Теплоёмкость полигонов и теплоотвод земляных слоев всегда требуют индивидуальной калибровки под конкретную плату.
+            </p>
           </div>
 
         </div>
 
-        <!-- Right Column: Sidebar -->
-        <aside class="lg:col-span-4 space-y-6">
-          
-          <!-- Post-it Note Sticker (Caveat font) -->
-          <div class="border border-[#fde047] dark:border-[#ca8a04]/40 bg-[#fffdf5] dark:bg-[#ca8a04]/10 p-4 rounded-lg space-y-2 text-xs shadow-sm sketch-border">
-            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink border-b border-[#fde047]/60 dark:border-[#ca8a04]/40 pb-1.5">
-              <span class="flex items-center gap-1.5 text-ink dark:text-slate-200">
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-amber-400"></span>
-                Заметка на верстак
-              </span>
-              <span class="text-[10px] text-ink-muted font-normal">LAB-QC</span>
-            </div>
-            <div class="space-y-1.5">
-              <p class="font-hand text-[17px] leading-snug text-ink dark:text-slate-100 italic font-semibold rotate-[-0.5deg]">
-                «Термопару фиксировать <span class="font-mono font-bold text-xs px-1.5 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/30 border border-[#fde047] dark:border-[#ca8a04]/50 not-italic inline-block text-ink dark:text-slate-100">строго каптоном</span> прямо к галтелям BGA, иначе датчик меряет воздух фена!»
-              </p>
-              <p class="font-serif italic text-xs text-ink-muted border-t border-[#fde047]/60 dark:border-[#ca8a04]/40 pt-1">
-                — из полевого блокнота инженера: структура обнажена, без идеализации
-              </p>
-            </div>
-            <div class="pt-1 flex items-center justify-between font-mono text-[10px] text-ink-muted">
-              <span>Контроль t°C</span>
-              <span class="font-semibold text-ink dark:text-slate-200">J-STD-020E</span>
-            </div>
+        <!-- Опасный совет: скотч и пометка-предупреждение (строго только здесь!) -->
+        <div class="box-caution-orange relative p-4 rotate-[0.4deg] shadow-sm space-y-2 sketch-border mt-6">
+          <div class="sketch-washi-tape" style="top: -9px; right: 28px; transform: rotate(-2deg);" aria-hidden="true"></div>
+          <div class="flex items-center justify-between font-mono text-xs font-bold">
+            <span class="flex items-center gap-1.5 text-[#d35400] dark:text-[#f39c12]">
+              <svg class="w-4 h-4 stroke-current inline-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+              ОПАСНЫЙ СОВЕТ // КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО
+            </span>
+            <span class="px-2 py-0.5 text-[10px] bg-paper text-ink border border-paper-border-dark rounded font-bold">СТОП</span>
           </div>
-
-          <!-- Sections list -->
-          <div class="relative border border-paper-border rounded-lg bg-card p-5 space-y-3.5 shadow-sm">
-            <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
-              <span>Регламенты ТЧП</span>
-              <span>Разделы</span>
-            </div>
-            <div class="space-y-2 text-xs font-mono">
-              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php?slug=temperaturnye-profili#step-1">
-                <span>1. Профилирование BGA</span>
-                <span class="text-ink-faint">J-STD</span>
-              </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php?slug=temperaturnye-profili#alloys">
-                <span>2. Металлургия сплавов</span>
-                <span class="text-ink-faint">Таблица</span>
-              </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="article.php?slug=temperaturnye-profili#step-4">
-                <span>3. Защита от влаги MSL</span>
-                <span class="text-ink-faint">Сушка</span>
-              </a>
-              <a class="flex items-center justify-between py-1 text-ink hover:text-amber-600 dark:hover:text-amber-500 transition-colors" href="interactive.php#calculator">
-                <span>4. Выбор флюсов</span>
-                <span class="text-ink-faint">RMA/NC</span>
-              </a>
-            </div>
-          </div>
-
-          <!-- Live Lab box -->
-          <div class="border border-paper-border bg-paper-subtle/60 p-5 rounded-lg space-y-2.5 text-xs relative">
-            <div class="flex items-center justify-between font-mono text-[11px] font-bold uppercase text-ink">
-              <div class="flex items-center gap-1.5">
-                <span class="w-2 h-2 bg-ink rounded-full inline-block"></span>
-                Лаборатория ТЧП
-              </div>
-              <span class="text-[11px] text-ink bg-paper-subtle border border-paper-border-dark px-2 py-0.5 font-mono font-bold inline-block sketch-border" style="transform: rotate(0.6deg);">OPEN</span>
-            </div>
-            <p class="text-ink-muted leading-relaxed">
-              Практические замеры, отчеты дефектов пайки и тесты термоинтерфейсов в открытой базе знаний.
-            </p>
-            <a class="inline-block pt-1 font-mono text-xs font-semibold text-ink hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline" href="interactive.php">
-              Интерактивные расчеты →
-            </a>
-          </div>
-
-          <!-- Tape & Caution Sketch Box (Orange #d35400 Status Alert) -->
-          <div class="box-caution-orange relative p-3.5 rotate-[1.2deg] shadow-sm space-y-1.5 sketch-border">
-            <div class="sketch-washi-tape" style="top: -9px; right: 24px; transform: rotate(-3deg);"></div>
-            <div class="flex items-center justify-between font-mono text-[11px] font-bold">
-              <span class="flex items-center gap-1.5 text-[#d35400] dark:text-[#f39c12]">
-                <svg class="w-3.5 h-3.5 stroke-current inline-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>НЕ ГРЕТЬ ВЫШЕ 245°C
-              </span>
-              <span class="px-1.5 py-0.5 text-[10px] bg-paper text-ink border border-paper-border-dark rounded font-bold">J-STD</span>
-            </div>
-            <p class="font-mono text-[11px] text-ink-muted leading-tight">
-              Деградация подложки и интерметаллидов начинается через 8 секунд перегрева.
-            </p>
-          </div>
-
-          <!-- Reference Temperatures Box -->
-          <div class="border border-paper-border rounded-lg bg-card p-5 space-y-3 relative">
-            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-2">
-              <span class="flex items-center gap-1.5 text-ink">
-                <span class="material-symbols-outlined text-[15px] text-accent">thermostat</span>
-                Ликвидус металлов
-              </span>
-              <span class="pill-blue text-[10px] font-mono uppercase px-1.5 py-0.5 rounded">ГОСТ 21931</span>
-            </div>
-
-            <div class="space-y-1.5 font-mono text-xs">
-              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                <span class="text-ink">ПОС-61 (Sn63Pb37)</span>
-                <span class="font-bold text-ink bg-paper-subtle px-1.5 py-0.5 rounded text-xs">183 °C</span>
-              </div>
-              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                <span class="text-ink">SAC305 (Бессвинец)</span>
-                <span class="font-bold text-ink bg-paper-subtle px-1.5 py-0.5 rounded text-xs">217 °C</span>
-              </div>
-              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                <span class="text-ink">Sn42Bi58 (Низкотемп.)</span>
-                <span class="font-bold text-ink bg-paper-subtle px-1.5 py-0.5 rounded text-xs">138 °C</span>
-              </div>
-              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                <span class="text-ink">Сплав Розе (Демонтаж)</span>
-                <span class="font-bold text-ink bg-paper-subtle px-1.5 py-0.5 rounded text-xs">94 °C</span>
-              </div>
-              <div class="flex items-center justify-between p-2 bg-paper-subtle border border-paper-border rounded">
-                <span class="text-ink font-medium flex items-center gap-1.5">
-                  <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>
-                  Макс. пик кристалла
-                </span>
-                <span class="font-bold text-ink bg-paper px-1.5 py-0.5 rounded text-xs border border-paper-border-dark">245 °C</span>
-              </div>
-            </div>
-
-            <div class="pt-2 border-t border-paper-border/50 text-[11px] font-mono text-ink-muted flex items-center justify-between">
-              <span>* Контактный замер</span>
-              <a href="interactive.php#table" class="text-ink hover:text-[#d97706] dark:hover:text-[#f59e0b] hover:underline font-bold">Таблица →</a>
-            </div>
-          </div>
-
-        </aside>
-
-      </div>
-
-      <!-- Bottom Interactive CTA (44px target) -->
-      <div class="mt-12 border border-paper-border rounded-lg bg-card p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div class="space-y-0.5">
-          <div class="font-semibold text-sm text-ink">Инженерный справочник и калькуляторы ТЧП</div>
-          <p class="text-xs text-ink-muted">Таблицы термопрофилей, допуски IPC-A-610 и подбор флюсов в интерактивном верстаке.</p>
+          <p class="font-mono text-xs text-ink leading-relaxed">
+            <strong>Никогда не используйте активную кислоту (паяльную кислоту, ортофосфорную) для пайки печатных плат!</strong> Кислота моментально впитывается в структуру стеклотекстолита FR-4, вызывает паразитные токи утечки и гарантированно съедает тонкие медные дорожки через 2–4 месяца. Для электроники допустимы исключительно нейтральные канифольные и No-Clean флюсы.
+          </p>
         </div>
-        <a class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shrink-0 shadow-sm" href="interactive.php">
-          <span>Открыть калькуляторы →</span>
-        </a>
-      </div>
+      </section>
 
     </div>
   </main>
@@ -436,7 +446,7 @@ include __DIR__ . '/includes/header.php';
   <!-- Editorial Minimal Footer -->
   <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
 
-  <!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
+  <!-- Mobile Sticky Quick Bar (Поиск, Практика, Старт) -->
   <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
 
   <!-- Global Engineering Search Modal (Ctrl+K) -->

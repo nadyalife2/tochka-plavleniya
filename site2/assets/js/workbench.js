@@ -29,6 +29,44 @@ document.addEventListener('DOMContentLoaded', () => {
   const tempResultContent = document.getElementById('temp-result-content');
   const tempCalcBtn = document.getElementById('temp-calc-btn');
   const tempMeterBox = document.getElementById('temp-meter-box');
+  const tempStatusBadge = document.getElementById('temp-status-badge');
+  const tempArticleBox = document.getElementById('temp-article-box');
+  const tempArticleLink = document.getElementById('temp-article-link');
+  const tempArticleTitle = document.getElementById('temp-article-title');
+  const quickTaskButtons = document.querySelectorAll('.quick-task-btn');
+
+  function setQuickTask(taskKey) {
+    quickTaskButtons.forEach(btn => {
+      if (btn.dataset.task === taskKey) {
+        btn.classList.add('bg-accent', 'text-white');
+        btn.classList.remove('bg-paper');
+      } else {
+        btn.classList.remove('bg-accent', 'text-white');
+        btn.classList.add('bg-paper');
+      }
+    });
+
+    if (taskKey === 'wire') {
+      if (tempWork) tempWork.value = 'wire_medium';
+      if (tempSolder) tempSolder.value = 'pos61';
+    } else if (taskKey === 'pcb') {
+      if (tempWork) tempWork.value = 'smd_medium';
+      if (tempSolder) tempSolder.value = 'pos61';
+    } else if (taskKey === 'pipe') {
+      if (tempWork) tempWork.value = 'copper_pipe';
+      if (tempSolder) tempSolder.value = 'pos61';
+    } else if (taskKey === 'unknown') {
+      if (tempWork) tempWork.value = 'pth';
+      if (tempSolder) tempSolder.value = 'pos61';
+    }
+    updateTempCalculator();
+  }
+
+  quickTaskButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      setQuickTask(btn.dataset.task);
+    });
+  });
 
   function updateTempCalculator() {
     if (!tempSolder || !tempWork || !tempRangeDisplay) return;
@@ -63,26 +101,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (tempMeterBox) tempMeterBox.style.display = 'block';
 
-    if (!item || item.no_recommendation || (item.t_min === 0 && item.t_max === 0)) {
-      tempRangeDisplay.textContent = 'Нет проверенной рекомендации';
+    const isNoRec = !item || item.no_recommendation || (item.t_min === 0 && item.t_max === 0) || wVal === 'copper_pipe';
+
+    if (isNoRec) {
+      if (tempStatusBadge) {
+        tempStatusBadge.textContent = 'НЕ ДЛЯ ЭТОГО';
+        tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-red-600 text-white';
+      }
+
+      tempRangeDisplay.textContent = 'Паяльник не подходит';
       tempRangeDisplay.style.fontSize = '1.35rem';
       if (tempBarFill) tempBarFill.style.width = '0%';
-      if (tempTipDisplay) tempTipDisplay.textContent = item?.tip || 'Паяльник не используется для этого сценария';
+      if (tempTipDisplay) tempTipDisplay.textContent = 'Требуется газовая горелка';
       
-      const reasonText = item?.reason || item?.advice || 'Данная операция требует специализированного оборудования (термофен, ИК-станция или газовая горелка).';
       if (tempAdviceDisplay) {
-        tempAdviceDisplay.innerHTML = `<strong>Технологическое ограничение:</strong> ${reasonText}`;
+        tempAdviceDisplay.innerHTML = '<strong>Технологическое ограничение:</strong> Медные трубы и массивные фитинги обладают высокой теплоёмкостью. Пайка выполняется исключительно газовой горелкой с сантехническим припоем и пастой-флюсом (ГОСТ 52948-2008).';
       }
       
       if (tempWarnDisplay && tempWarnBox) {
-        if (item?.warn) {
-          tempWarnDisplay.textContent = item.warn;
-          tempWarnBox.style.display = 'flex';
-        } else {
-          tempWarnBox.style.display = 'none';
-        }
+        tempWarnDisplay.textContent = 'Категорически нельзя паять медные трубы радиомонтажным паяльником — он мгновенно остынет. Также категорически нельзя использовать активный сантехнический кислотный флюс на платах и электроприборах под 220 В — это гарантирует сквозную коррозию и замыкание!';
+        tempWarnBox.style.display = 'block';
+      }
+
+      if (tempArticleLink && tempArticleTitle) {
+        tempArticleLink.href = 'article.php?slug=temperaturnye-profili';
+        tempArticleTitle.textContent = 'Температурные профили и ограничения оборудования';
       }
       return;
+    }
+
+    // Режим нормального ориентира
+    if (tempStatusBadge) {
+      tempStatusBadge.textContent = 'ОРИЕНТИР';
+      tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-accent text-white';
     }
 
     tempRangeDisplay.style.fontSize = '';
@@ -94,11 +145,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const pct = Math.min(100, Math.max(10, ((avg - 100) / 300) * 100));
       tempBarFill.style.width = `${pct}%`;
       if (avg < 200) {
-        tempBarFill.style.backgroundColor = '#10b981'; // green / low temp
+        tempBarFill.style.backgroundColor = '#10b981';
       } else if (avg <= 320) {
-        tempBarFill.style.backgroundColor = '#b9430d'; // standard soldering high-contrast accent
+        tempBarFill.style.backgroundColor = '#b9430d';
       } else {
-        tempBarFill.style.backgroundColor = '#ef4444'; // hot / caution red
+        tempBarFill.style.backgroundColor = '#ef4444';
       }
     }
 
@@ -109,15 +160,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tempAdviceDisplay) {
       const jointText = item.t_joint ? `<div class="mb-1.5 text-xs text-accent font-mono font-bold">Ожидаемая T в зоне контакта: ~${item.t_joint}</div>` : '';
       const adviceText = item.advice || 'Контролируйте время контакта — достаточное для смачивания, но без перегрева.';
-      tempAdviceDisplay.innerHTML = `<strong>Уставка станции:</strong> ${item.t_min}–${item.t_max} °C (с учётом температурного градиента жало–припой).<br>${jointText}<strong>Практический шаг:</strong> ${adviceText}`;
+      tempAdviceDisplay.innerHTML = `<strong>Уставка станции:</strong> ${item.t_min}–${item.t_max} °C (компенсирует тепловой градиент).<br>${jointText}<strong>Практический шаг:</strong> ${adviceText}`;
     }
 
     if (tempWarnDisplay && tempWarnBox) {
-      if (item.warn) {
-        tempWarnDisplay.textContent = item.warn;
-        tempWarnBox.style.display = 'flex';
+      const baseWarn = item.warn || 'Не удерживать жало на контакте дольше 3 секунд.';
+      tempWarnDisplay.textContent = `${baseWarn} Категорически нельзя использовать активный кислотный флюс на печатных платах!`;
+      tempWarnBox.style.display = 'block';
+    }
+
+    if (tempArticleLink && tempArticleTitle) {
+      if (wVal.includes('wire')) {
+        tempArticleLink.href = 'article.php?slug=chto-kupit-dlya-pervoj-payki';
+        tempArticleTitle.textContent = 'Что купить для первой пайки и как правильно лудить провод';
       } else {
-        tempWarnBox.style.display = 'none';
+        tempArticleLink.href = 'article.php?slug=temperaturnye-profili';
+        tempArticleTitle.textContent = 'Температурные профили: как не перегреть плату и компоненты';
       }
     }
   }
@@ -135,6 +193,28 @@ document.addEventListener('DOMContentLoaded', () => {
     tempWork.addEventListener('change', () => {
       if (window.TCHP_UI) window.TCHP_UI.clearFieldError(tempWork);
     });
+  }
+
+  // Handle URL query parameters (?tool=temp&task=wire, ?tool=iron, ?tool=checklist)
+  const urlParams = new URLSearchParams(window.location.search);
+  const toolParam = urlParams.get('tool');
+  const taskParam = urlParams.get('task');
+
+  if (taskParam) {
+    setQuickTask(taskParam);
+  } else if (toolParam === 'temp') {
+    setQuickTask('wire');
+  } else if (quickTaskButtons.length > 0) {
+    setQuickTask('wire');
+  }
+
+  if (toolParam) {
+    const targetElem = document.getElementById(toolParam);
+    if (targetElem) {
+      setTimeout(() => {
+        targetElem.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
   }
 
 

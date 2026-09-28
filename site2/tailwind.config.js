@@ -42,7 +42,7 @@ module.exports = {
         }
       },
       fontFamily: {
-        sans: ['"IBM Plex Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        sans: ['"Space Grotesk"', '"IBM Plex Sans"', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         serif: ['Newsreader', 'Georgia', 'serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
         hand: ['Caveat', 'cursive'],

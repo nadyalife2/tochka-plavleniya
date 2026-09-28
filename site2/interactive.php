@@ -253,6 +253,28 @@ include __DIR__ . '/includes/header.php';
           </div>
         </div>
 
+        <!-- Quick Task Selector: 1-Click for Провод, Плата, Труба, Не знаю -->
+        <div class="mb-4 p-3.5 rounded-md border border-paper-border bg-paper-subtle space-y-2 shadow-2xs">
+          <div class="flex items-center justify-between font-mono text-xs">
+            <span class="font-bold text-accent uppercase tracking-wider">БЫСТРЫЙ РАСЧЁТ В 1 КЛИК // ЧТО ПАЯЕТЕ?</span>
+            <span class="text-ink-muted hidden sm:inline text-[11px]">Выберите задачу для моментального ориентира:</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="quick-task-buttons">
+            <button type="button" data-task="wire" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
+              Провод
+            </button>
+            <button type="button" data-task="pcb" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
+              Плата
+            </button>
+            <button type="button" data-task="pipe" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
+              Труба
+            </button>
+            <button type="button" data-task="unknown" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
+              Не знаю
+            </button>
+          </div>
+        </div>
+
         <div class="tool-two-col">
           
           <!-- Controls -->
@@ -286,7 +308,7 @@ include __DIR__ . '/includes/header.php';
               </select>
             </div>
 
-            <button type="button" id="temp-calc-btn" class="btn-primary w-full mt-4">Рассчитать терморежим</button>
+            <button type="button" id="temp-calc-btn" class="btn-primary w-full mt-4 min-h-[48px]">Рассчитать терморежим</button>
 
             <!-- Temperature Meter Scale -->
             <div id="temp-meter-box" class="p-3.5 rounded border border-paper-border bg-paper-subtle space-y-2" style="display:none;">
@@ -318,24 +340,20 @@ include __DIR__ . '/includes/header.php';
                   <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
                   <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">КАРТА ТЕРМОРЕЖИМА</span>
                 </div>
-                <span class="font-mono text-[11px] text-ink-muted uppercase">IPC/JEDEC</span>
+                <span id="temp-status-badge" class="font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-accent text-white">ОРИЕНТИР</span>
               </div>
 
               <!-- State 1: Empty state (in flow, no overlapping absolute elements) -->
               <div id="temp-empty-state" class="py-6 flex flex-col items-center justify-center text-center space-y-2">
                 <div class="sketch-icon-badge mb-1" title="Лабораторный калибровочный термометр">
                   <svg class="w-7 h-7 text-accent" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <!-- Стеклянная колба термометра -->
                     <path d="M10.5 14.5V4.5a2 2 0 0 1 4 0v10a4 4 0 1 1-4 0z"></path>
-                    <!-- Столбик и мениск ртути/нагрева -->
                     <path d="M12.5 10v6" stroke-width="2.2"></path>
                     <circle cx="12.5" cy="18" r="2.2" fill="currentColor" stroke="none"></circle>
-                    <!-- Градуировочные риски шкалы температур -->
                     <line x1="14.5" y1="6" x2="18.5" y2="6" stroke-width="1.3"></line>
                     <line x1="14.5" y1="8.5" x2="17" y2="8.5" stroke-width="1"></line>
                     <line x1="14.5" y1="11" x2="18.5" y2="11" stroke-width="1.3"></line>
                     <line x1="14.5" y1="13.5" x2="17" y2="13.5" stroke-width="1"></line>
-                    <!-- Инженерная отметка градусов °C -->
                     <circle cx="21" cy="6" r="1.1" stroke-width="1.1"></circle>
                     <path d="M25.5 6.2a2 2 0 0 0-1.6-.9c-1.1 0-1.8.8-1.8 1.9s.7 1.9 1.8 1.9c.7 0 1.3-.4 1.6-.9" stroke-width="1.2"></path>
                   </svg>
@@ -349,40 +367,44 @@ include __DIR__ . '/includes/header.php';
                 </div>
               </div>
               
-              <!-- State 2: Result content (hidden by default, revealed on calculation) -->
-              <div id="temp-result-content" aria-live="polite" aria-atomic="true" class="hidden space-y-4">
-                <div>
-                  <span class="text-xs font-mono uppercase text-ink-muted font-bold block mb-1">Рекомендуемый диапазон уставки:</span>
-                  <div class="flex items-baseline gap-2 flex-wrap">
-                    <div id="temp-range-display" class="text-3xl sm:text-4xl font-bold font-mono text-accent leading-none">
+              <!-- State 2: Result content (Строго 3 строки: 1. Ориентир, 2. Нельзя, 3. Статья) -->
+              <div id="temp-result-content" aria-live="polite" aria-atomic="true" class="hidden space-y-3.5">
+                
+                <!-- Строка 1: Ориентир температуры -->
+                <div class="p-3 rounded border border-paper-border bg-paper space-y-1">
+                  <div class="flex items-center justify-between font-mono text-xs">
+                    <span class="text-ink-muted uppercase font-bold">1. ОРИЕНТИР ТЕМПЕРАТУРЫ:</span>
+                    <span id="temp-mode-label" class="text-[10px] font-mono text-ink-faint">УСТАВКА СТАНЦИИ</span>
+                  </div>
+                  <div class="flex items-baseline gap-2 flex-wrap pt-0.5">
+                    <div id="temp-range-display" class="text-2xl sm:text-3xl font-bold font-mono text-accent leading-none">
                       260 – 310 °C
                     </div>
-                    <span class="text-xs font-mono text-ink-faint">на индикаторе станции</span>
+                    <span id="temp-tip-display" class="text-xs font-mono text-ink-muted">на индикаторе</span>
                   </div>
+                  <div id="temp-advice-display" class="text-xs font-mono text-ink-muted pt-1"></div>
                 </div>
 
-                <!-- Tip & Geometry Note -->
-                <div class="sketch-tip-box p-3.5 space-y-2">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4 text-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"></path></svg>
-                    <span id="temp-tip-display" class="text-xs font-mono font-bold text-ink">Форма жала: скошенное или «ложка»</span>
+                <!-- Строка 2: «НЕЛЬЗЯ» (категорический запрет и опасный фактор) -->
+                <div id="temp-warn-box" class="p-3 rounded border-l-4 border-red-500 bg-red-500/10 space-y-1" style="margin-right: 28px;">
+                  <div class="flex items-center gap-1.5 font-mono text-xs font-bold text-red-600 dark:text-red-400">
+                    <svg class="w-4 h-4 shrink-0 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    <span>2. КАТЕГОРИЧЕСКИ НЕЛЬЗЯ:</span>
                   </div>
-                  <div id="temp-advice-display" class="text-xs font-mono text-ink-muted leading-relaxed">
-                    SOP/QFP: двигайтесь по выводам плавно. Флюс-гель помогает растечься припою между выводами без перемычек.
-                  </div>
+                  <p id="temp-warn-display" class="font-mono text-xs text-ink leading-relaxed">
+                    Не греть полигон дольше 3 секунд и не давить жалом на контактную площадку.
+                  </p>
                 </div>
 
-                <!-- Warning Callout (margin-right prevents overlap with bottom-right folded corner) -->
-                <div id="temp-warn-box" class="sketch-warn-box p-3 flex items-start gap-2.5" style="display:none; margin-right: 28px;">
-                  <svg class="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                  <span id="temp-warn-display" class="text-xs font-mono leading-normal">
-                    Мостики? Сначала добавьте флюс, затем снимите оплёткой — не поднимайте температуру выше предела.
-                  </span>
+                <!-- Строка 3: Ссылка на одну статью -->
+                <div id="temp-article-box" class="p-3 rounded border border-paper-border bg-paper space-y-1" style="margin-right: 28px;">
+                  <span class="text-[11px] font-mono text-ink-muted uppercase block font-bold">3. РУКОВОДСТВО:</span>
+                  <a id="temp-article-link" href="article.php?slug=temperaturnye-profili" class="text-xs font-mono font-bold text-ink hover:text-accent underline flex items-center justify-between group">
+                    <span id="temp-article-title">Температурные профили: как не перегреть плату</span>
+                    <span class="group-hover:translate-x-1 transition-transform">→</span>
+                  </a>
                 </div>
 
-                <div class="font-hand text-base text-ink-muted/90 italic pt-2 border-t sketch-divider" style="padding-right: 28px; transform: rotate(-0.5deg);">
-                  «Время контакта с выводом: 1.5–2.5 секунды. Не давите жалом на контактную площадку!»
-                </div>
               </div>
             </div>
           </div>
@@ -391,9 +413,6 @@ include __DIR__ . '/includes/header.php';
       </section>
 
 
-      <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <!-- P0 ИНСТРУМЕНТ 2: КОНФИГУРАТОР ПАЯЛЬНИКА (#iron)                      -->
-      <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P0 ИНСТРУМЕНТ 2: КОНФИГУРАТОР ПАЯЛЬНИКА (#iron)                      -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
@@ -488,16 +507,55 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <!-- P0 ИНСТРУМЕНТ 3: ЧЕК-ЛИСТ ПОДГОТОВКИ И БЕЗОПАСНОСТИ (#checklist)        -->
+      <!-- ═══════════════════════════════════════════════════════════════════════ -->
+      <section id="checklist" class="card-tool space-y-6 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
+          <div>
+            <div class="flex items-center gap-3">
+              <span class="sketch-pill-yellow text-ink font-mono text-[11px] font-bold">03 // ЧЕК-ЛИСТ ПАЙКИ</span>
+              <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">IPC-A-610 / ESD SAFE</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Чек-лист подготовки перед включением</h2>
+            <p class="text-sm text-ink-muted mt-1.5 leading-relaxed">Пройдите 5 пунктов перед подачей питания, чтобы не вывести из строя микросхемы статикой или перегревом.</p>
+          </div>
+        </div>
+
+        <div class="space-y-3 font-mono text-xs" id="checklist-items">
+          <label class="flex items-start gap-3 p-3.5 rounded border border-paper-border bg-paper cursor-pointer hover:border-accent transition-colors">
+            <input type="checkbox" class="mt-0.5 accent-[#FF6B2B] w-4 h-4 cursor-pointer">
+            <span><strong>1. Антистатика (ESD):</strong> Антистатический коврик подключен к заземлению, снята синтетическая одежда.</span>
+          </label>
+          <label class="flex items-start gap-3 p-3.5 rounded border border-paper-border bg-paper cursor-pointer hover:border-accent transition-colors">
+            <input type="checkbox" class="mt-0.5 accent-[#FF6B2B] w-4 h-4 cursor-pointer">
+            <span><strong>2. Вентиляция:</strong> Включена вытяжка или дымоуловитель (пары канифоли и аэрозоли флюса вредны при вдохе).</span>
+          </label>
+          <label class="flex items-start gap-3 p-3.5 rounded border border-paper-border bg-paper cursor-pointer hover:border-accent transition-colors">
+            <input type="checkbox" class="mt-0.5 accent-[#FF6B2B] w-4 h-4 cursor-pointer">
+            <span><strong>3. Безопасность питания:</strong> Плата полностью обесточена от сети 220V, высоковольтные конденсаторы разряжены.</span>
+          </label>
+          <label class="flex items-start gap-3 p-3.5 rounded border border-paper-border bg-paper cursor-pointer hover:border-accent transition-colors">
+            <input type="checkbox" class="mt-0.5 accent-[#FF6B2B] w-4 h-4 cursor-pointer">
+            <span><strong>4. Выбор флюса:</strong> Проверено отсутствие кислоты (только нейтральный флюс-гель No-Clean / ROL0 или чистая канифоль).</span>
+          </label>
+          <label class="flex items-start gap-3 p-3.5 rounded border border-paper-border bg-paper cursor-pointer hover:border-accent transition-colors">
+            <input type="checkbox" class="mt-0.5 accent-[#FF6B2B] w-4 h-4 cursor-pointer">
+            <span><strong>5. Защита жала:</strong> На остывшее жало нанесён слой припоя перед нагревом (предотвращает выгорание никелевого слоя).</span>
+          </label>
+        </div>
+      </section>
+
 
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <!-- P0 ИНСТРУМЕНТ 3: ДЕРЕВО ДИАГНОСТИКИ ДЕФЕКТОВ (#defect)                 -->
+      <!-- P0 ИНСТРУМЕНТ 4: ДЕРЕВО ДИАГНОСТИКИ ДЕФЕКТОВ (#defect)                 -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="defect" class="card-tool space-y-6 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
         <div class="absolute -top-2.5 left-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-2xs rotate-[-2deg] pointer-events-none"></div>
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
-              <span class="sketch-pill-yellow text-ink font-mono text-[11px] font-bold">03 // ДИАГНОСТИКА БРАКА</span>
+              <span class="sketch-pill-yellow text-ink font-mono text-[11px] font-bold">04 // ДИАГНОСТИКА БРАКА</span>
               <span class="text-xs font-mono text-ink-muted hidden sm:inline-block">Дерево инженерных решений</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink mt-2 font-serif">Пайка не получилась. Что делать?</h2>
@@ -526,14 +584,14 @@ include __DIR__ . '/includes/header.php';
 
 
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <!-- P1 ИНСТРУМЕНТ 4: КАЛЬКУЛЯТОР ФЛЮСА (#calculator)                       -->
+      <!-- P1 ИНСТРУМЕНТ 5: КАЛЬКУЛЯТОР ДОЗИРОВКИ ПАСТЫ И ФЛЮСА (#calculator)    -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="calculator" class="card-tool relative space-y-6 bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
         <div class="absolute -top-2.5 left-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-2xs rotate-[-1.5deg] pointer-events-none"></div>
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
-              <span class="sketch-pill-gray text-ink font-mono text-[11px] font-bold">04 // ДОЗИРОВКА МАТЕРИАЛОВ</span>
+              <span class="sketch-pill-gray text-ink font-mono text-[11px] font-bold">05 // ДОЗИРОВКА МАТЕРИАЛОВ</span>
               <span class="font-hand text-accent font-bold text-lg hidden sm:inline-flex items-center gap-1.5 italic rotate-[-1deg]">
                 «Апертурный расчёт (Indium Corp)»
               </span>
@@ -748,7 +806,7 @@ include __DIR__ . '/includes/header.php';
       </section>
 
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
-      <!-- P1 ИНСТРУМЕНТ 4.1: СЕЛЕКТОР ФЛЮСА (#flux-selector)                     -->
+      <!-- P1 ИНСТРУМЕНТ 6: СЕЛЕКТОР ФЛЮСА (#flux-selector)                       -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="flux-selector" class="card-tool space-y-6 mt-8 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
         <!-- Washi Tape Accent -->
@@ -757,7 +815,7 @@ include __DIR__ . '/includes/header.php';
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
-              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">04.1 // ПОДБОР ФЛЮСА</span>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">06 // ПОДБОР ФЛЮСА</span>
               <span class="sketch-pill-yellow">ГОСТ Р МЭК 61190</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-bold text-ink mt-1 font-serif">Какой флюс выбрать для работы?</h2>
@@ -915,7 +973,7 @@ include __DIR__ . '/includes/header.php';
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
-              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">05 // СПРАВОЧНИК МЕТАЛЛОВ</span>
+              <span class="text-xs font-mono font-bold text-accent uppercase tracking-wider">07 // СПРАВОЧНИК МЕТАЛЛОВ</span>
               <span class="sketch-pill-yellow">ГОСТ 21930-76</span>
             </div>
             <div class="flex items-baseline gap-3 flex-wrap mt-0.5">

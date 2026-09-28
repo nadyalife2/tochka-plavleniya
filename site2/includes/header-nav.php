@@ -8,13 +8,10 @@
 $current_page = $current_page ?? '';
 
 $nav_items = [
-    ['href' => '/',                                  'label' => 'Главная',      'page' => 'index'],
-    ['href' => '/category.php?slug=start',           'label' => 'Начать паять', 'page' => 'start'],
-    ['href' => '/category.php?slug=instrumenty',     'label' => 'Инструменты',  'page' => 'instrumenty'],
-    ['href' => '/category.php?slug=materialy',       'label' => 'Материалы',    'page' => 'materialy'],
-    ['href' => '/category.php?slug=praktika',        'label' => 'Практика',     'page' => 'praktika'],
-    ['href' => '/category.php?slug=oshibki',         'label' => 'Проблемы',     'page' => 'oshibki'],
-    ['href' => '/interactive.php',                   'label' => 'Калькуляторы', 'page' => 'interactive'],
+    ['href' => 'index.php#articles',                  'label' => 'Статьи',       'page' => 'articles'],
+    ['href' => 'interactive.php',                    'label' => 'Калькуляторы', 'page' => 'interactive'],
+    ['href' => 'category.php?slug=praktika',         'label' => 'Практика',     'page' => 'praktika'],
+    ['href' => 'category.php?slug=start',            'label' => 'С чего начать', 'page' => 'start'],
 ];
 
 if (!function_exists('is_tchp_nav_active')) {

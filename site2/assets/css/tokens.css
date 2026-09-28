@@ -6,28 +6,27 @@
  */
 
 :root {
-  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Каноническая чистая бумага) --- */
-  --color-bg: #faf8f5;
+  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Натуральная чертёжная бумага #F5F0E8) --- */
+  --color-bg: #F5F0E8;
   --color-paper: #ffffff;
-  --color-paper-subtle: #f8fafc;
-  --color-paper-border: #e2e8f0;
-  --color-paper-border-dark: #cbd5e1;
-  --color-card: rgba(255, 255, 255, 0.95);
+  --color-paper-subtle: #f8f5ee;
+  --color-paper-border: #ded8cb;
+  --color-paper-border-dark: #1A1A1A;
+  --color-card: #ffffff;
   --color-card-solid: #ffffff;
-  --color-callout: #f8fafc;
-  --dot-color: #cbd5e1;
+  --color-callout: #f8f5ee;
+  --dot-color: #ded8cb;
 
-  /* --- 30% ТЕКСТ И СТРУКТУРА (Графит и металл) --- */
-  --color-ink: #141414;
-  --color-ink-muted: #6b665f;
-  /* WCAG AA Compliance (> 4.5:1 на #faf8f5) */
-  --color-ink-faint: #666159;
+  /* --- 30% ТЕКСТ И СТРУКТУРА (Графит #1A1A1A) --- */
+  --color-ink: #1A1A1A;
+  --color-ink-muted: #575249;
+  --color-ink-faint: #787268;
 
-  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Медно-янтарный термо-акцент) --- */
-  --color-accent: #b9430d;
-  --color-accent-hover: #9c380b;
-  --color-accent-subtle: rgba(185, 67, 13, 0.12);
-  --color-accent-border: rgba(185, 67, 13, 0.35);
+  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Медно-янтарный #FF6B2B) --- */
+  --color-accent: #FF6B2B;
+  --color-accent-hover: #e05819;
+  --color-accent-subtle: rgba(255, 107, 43, 0.12);
+  --color-accent-border: rgba(255, 107, 43, 0.4);
 
   /* Алиасы семантики */
   --color-primary: var(--color-accent);
@@ -54,8 +53,8 @@
   --color-sketch-yellow-bg: #fffdf5;
   --color-sketch-tape: rgba(235, 222, 179, 0.85);
 
-  /* --- ТИПОГРАФИКА --- */
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  /* --- ТИПОГРАФИКА: Space Grotesk доминанта --- */
+  --font-sans: "Space Grotesk", "IBM Plex Sans", system-ui, -apple-system, sans-serif;
   --font-serif: Newsreader, Georgia, serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-hand: Caveat, cursive;
@@ -63,51 +62,60 @@
   --font-size-body: 17px;
   --line-height-body: 1.7;
 
-  /* --- ФОРМА, СКРУГЛЕНИЯ И ТЕНИ --- */
+  /* --- ФОРМА, СКРУГЛЕНИЯ, СЕТКА 8px И ЛЁГКАЯ БУМАЖНАЯ ПЛАСТИКА --- */
   --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
   --radius-full: 9999px;
 
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
-  --shadow-card-hover: 0 6px 18px rgba(0, 0, 0, 0.08);
+  --border-sketch: 1px solid var(--color-paper-border);
+  --shadow-sketch: 0 1px 3px rgba(20, 20, 20, 0.04);
+  --shadow-card: 0 1px 3px rgba(20, 20, 20, 0.04);
+  --shadow-card-hover: 0 3px 8px rgba(20, 20, 20, 0.07);
 
-  /* --- СЕТКА И WCAG TOUCH TARGETS --- */
+  /* Шаг сетки: 8, 16, 32, 64 */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 32px;
+  --space-lg: 64px;
+
   --container-width: 1140px;
-  --touch-target-min: 44px;
+  --touch-target-min: 48px;
 }
 
-/* ТЁМНАЯ ТЕМА (Глубокий графит и тёмный флюс) */
+/* ТЁМНАЯ ТЕМА: #242424 карточка, #E8E0D4 текст */
 html.dark {
-  --color-bg: #0b0f19;
-  --color-paper: #111827;
-  --color-paper-subtle: #1e293b;
-  --color-paper-border: #1e293b;
-  --color-paper-border-dark: #334155;
-  --color-card: rgba(17, 24, 39, 0.95);
-  --color-card-solid: #111827;
-  --color-callout: #161f30;
-  --dot-color: #1e293b;
+  --color-bg: #141414;
+  --color-paper: #242424;
+  --color-paper-subtle: #1c1c1c;
+  --color-paper-border: #383838;
+  --color-paper-border-dark: #4a4a4a;
+  --color-card: #242424;
+  --color-card-solid: #242424;
+  --color-callout: #1c1c1c;
+  --dot-color: #2b2b2b;
 
-  --color-ink: #f3f4f6;
-  --color-ink-muted: #9ca3af;
-  --color-ink-faint: #9ca3af;
+  --color-ink: #E8E0D4;
+  --color-ink-muted: #A39B8E;
+  --color-ink-faint: #7A7367;
 
-  --color-accent: #e85d1c;
-  --color-accent-hover: #c74910;
-  --color-accent-subtle: rgba(232, 93, 28, 0.15);
-  --color-accent-border: rgba(232, 93, 28, 0.4);
+  --color-accent: #FF6B2B;
+  --color-accent-hover: #ffa066;
+  --color-accent-subtle: rgba(255, 107, 43, 0.18);
+  --color-accent-border: rgba(255, 107, 43, 0.45);
 
-  --color-danger-bg: rgba(179, 38, 30, 0.2);
-  --color-danger-border: rgba(248, 180, 180, 0.3);
-  --color-success-bg: rgba(26, 127, 76, 0.2);
-  --color-success-border: rgba(168, 218, 181, 0.3);
-  --color-warning-bg: rgba(217, 119, 6, 0.2);
-  --color-warning-border: rgba(252, 211, 77, 0.3);
+  --color-danger-bg: rgba(179, 38, 30, 0.25);
+  --color-danger-border: rgba(248, 180, 180, 0.35);
+  --color-success-bg: rgba(26, 127, 76, 0.25);
+  --color-success-border: rgba(168, 218, 181, 0.35);
+  --color-warning-bg: rgba(217, 119, 6, 0.25);
+  --color-warning-border: rgba(252, 211, 77, 0.35);
 
-  --color-sketch-yellow-bg: rgba(202, 138, 4, 0.15);
+  --color-sketch-yellow-bg: rgba(202, 138, 4, 0.18);
   --color-sketch-tape: rgba(120, 106, 72, 0.7);
 
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.35);
-  --shadow-card-hover: 0 6px 18px rgba(0, 0, 0, 0.5);
+  --border-sketch: 1px solid var(--color-paper-border);
+  --shadow-sketch: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 3px 8px rgba(0, 0, 0, 0.45);
 }

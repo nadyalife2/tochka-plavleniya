@@ -79,23 +79,36 @@ body {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  min-height: var(--touch-target-min);
+  min-height: var(--touch-target-min, 48px);
   background-color: var(--color-accent);
   color: #ffffff !important;
   border-radius: var(--radius-md);
-  padding: 0.5rem 1.25rem;
-  font-weight: 600;
-  font-family: var(--font-mono);
-  font-size: 0.875rem;
-  transition: opacity 0.2s ease, transform 0.1s ease;
-  border: 1px solid transparent;
+  padding: 0.7rem 1.6rem;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+  border: 1px solid var(--color-accent-hover);
+  box-shadow: 0 1px 3px rgba(185, 67, 13, 0.25);
   cursor: pointer;
   text-decoration: none;
 }
 .btn-primary:hover {
   background-color: var(--color-accent-hover);
-  opacity: 0.95;
   transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(185, 67, 13, 0.35);
+}
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(185, 67, 13, 0.2);
+}
+
+html.dark .btn-primary {
+  border-color: rgba(255, 107, 43, 0.6);
+  box-shadow: 0 1px 4px rgba(255, 107, 43, 0.2);
+}
+html.dark .btn-primary:hover {
+  box-shadow: 0 4px 12px rgba(255, 107, 43, 0.35);
 }
 
 .btn-secondary {
@@ -565,6 +578,31 @@ footer,
 /* ==========================================================================
    8. ИНЖЕНЕРНЫЕ СКЕТЧ-ЭЛЕМЕНТЫ (STICKERS, WASHI TAPE, CORNERS)
    ========================================================================== */
+.sketch-card {
+  position: relative;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-paper-border);
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-md);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.sketch-card:hover {
+  border-color: var(--color-ink-muted);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card-hover);
+}
+
+html.dark .sketch-card {
+  border-color: var(--color-paper-border);
+  box-shadow: var(--shadow-card);
+}
+
+html.dark .sketch-card:hover {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-card-hover);
+}
+
 .sketch-sticky-note {
   position: relative;
   background-color: var(--color-sketch-yellow-bg);

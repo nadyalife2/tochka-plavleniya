@@ -16,9 +16,9 @@ $RUBRICS = [
             'icon'  => 'science',
             'title' => 'Реестр припоев и калькулятор расхода флюса',
             'desc'  => 'Расчёт дозировки флюса и паяльной пасты по площади платы (IPC-7095C) и справочник температур ликвидуса 9 марок сплавов по ГОСТ 21931.',
-            'link1' => '/interactive.php#calculator',
+            'link1' => 'interactive.php#calculator',
             'lbl1'  => 'Калькулятор расхода флюса →',
-            'link2' => '/interactive.php#table',
+            'link2' => 'interactive.php#table',
             'lbl2'  => 'Таблица сплавов'
         ]
     ],
@@ -34,9 +34,9 @@ $RUBRICS = [
             'icon'  => 'device_thermostat',
             'title' => 'Термокалькулятор монтажника',
             'desc'  => 'Подберите безопасное тепловое окно жала паяльной станции под марку припоя и тип соединяемых проводников.',
-            'link1' => '/interactive.php#temp',
+            'link1' => 'interactive.php#temp',
             'lbl1'  => 'Подобрать температуру →',
-            'link2' => '/interactive.php#iron',
+            'link2' => 'interactive.php#iron',
             'lbl2'  => 'Выбрать паяльник'
         ]
     ],
@@ -50,12 +50,14 @@ $RUBRICS = [
         'featured_id' => 4,
         'cta' => [
             'icon'  => 'construction',
-            'title' => 'Конфигуратор паяльного оборудования',
-            'desc'  => 'Спецификация инструмента под ваши задачи: выбор класса станции (T12, C245, USB-PD) и комплекта жал под бюджет.',
-            'link1' => '/interactive.php#iron',
-            'lbl1'  => 'Сконфигурировать верстак →',
-            'link2' => '/interactive.php#temp',
-            'lbl2'  => 'Терморежимы'
+            'title' => 'Интерактивные калькуляторы и верстак',
+            'desc'  => 'Быстрые расчеты под вашу задачу: безопасная температура жала станции, подбор паяльника и жал под бюджет, чек-лист безопасности монтажа.',
+            'link1' => 'interactive.php#temp',
+            'lbl1'  => 'Термокалькулятор жала →',
+            'link2' => 'interactive.php#iron',
+            'lbl2'  => 'Конфигуратор верстака',
+            'link3' => 'interactive.php#checklist',
+            'lbl3'  => 'Чек-лист пайки'
         ]
     ],
     'oshibki' => [
@@ -70,9 +72,9 @@ $RUBRICS = [
             'icon'  => 'search',
             'title' => 'Интерактивное дерево диагностики дефектов',
             'desc'  => 'Интерактивный определитель первопричин брака с пошаговыми действиями по устранению дефекта прямо на плате.',
-            'link1' => '/interactive.php#defect',
+            'link1' => 'interactive.php#defect',
             'lbl1'  => 'Диагностировать дефект →',
-            'link2' => '/interactive.php#temp',
+            'link2' => 'interactive.php#temp',
             'lbl2'  => 'Проверить температуру'
         ]
     ]
@@ -251,17 +253,18 @@ include __DIR__ . '/includes/header.php';
         <!-- LEFT COLUMN: Articles + Contextual CTA (8 cols) -->
         <div class="lg:col-span-8 space-y-8">
           
-          <!-- CONTEXTUAL INTERACTIVE CTA BANNER (Blue = Engineering Standard / Tool) -->
+          <!-- CONTEXTUAL INTERACTIVE CTA BANNER (Engineering Standard / Tool) -->
           <?php if (!empty($current_rubric['cta'])): ?>
-            <div class="border border-paper-border rounded-lg p-5 sm:p-6 bg-card shadow-sm space-y-3 relative overflow-hidden">
-              <div class="flex items-center justify-between gap-2">
+            <div class="sketch-card p-5 sm:p-6 bg-card space-y-3 relative overflow-hidden">
+              <div class="sketch-washi-tape" style="top: -8px; left: 24px; transform: rotate(-1.5deg);" aria-hidden="true"></div>
+              <div class="flex items-center justify-between gap-2 pt-1">
                 <div class="flex items-center gap-2">
                   <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[13px] text-accent">construction</span>
-                    ИНТЕРАКТИВНЫЙ ИНСТРУМЕНТ
+                    <span class="material-symbols-outlined text-[14px] text-accent">construction</span>
+                    ИНТЕРАКТИВНЫЙ ВЕРСТАК
                   </span>
                 </div>
-                <span class="text-xs font-mono text-ink-faint">IPC-7095C / ГОСТ</span>
+                <span class="text-xs font-mono text-ink-faint">IPC / ГОСТ</span>
               </div>
 
               <h2 class="text-lg sm:text-xl font-bold text-ink font-sans">
@@ -272,15 +275,21 @@ include __DIR__ . '/includes/header.php';
                 <?= e($current_rubric['cta']['desc']) ?>
               </p>
 
-              <div class="pt-2 flex flex-wrap items-center gap-3">
+              <div class="pt-2 flex flex-wrap items-center gap-2.5">
                 <?php if (!empty($current_rubric['cta']['link1'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded bg-ink text-paper font-mono text-xs font-medium hover:opacity-95 transition-opacity shadow-sm">
+                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono">
                     <span><?= e($current_rubric['cta']['lbl1']) ?></span>
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($current_rubric['cta']['link2'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent transition-colors">
+                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent hover:text-accent transition-colors shadow-2xs">
                     <span><?= e($current_rubric['cta']['lbl2']) ?></span>
+                    <span class="text-xs">→</span>
+                  </a>
+                <?php endif; ?>
+                <?php if (!empty($current_rubric['cta']['link3'])): ?>
+                  <a href="<?= e($current_rubric['cta']['link3']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent hover:text-accent transition-colors shadow-2xs">
+                    <span><?= e($current_rubric['cta']['lbl3']) ?></span>
                     <span class="text-xs">→</span>
                   </a>
                 <?php endif; ?>
