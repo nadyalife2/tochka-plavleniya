@@ -171,19 +171,24 @@ include __DIR__ . '/includes/header.php';
           </div>
         </div>
 
-        <!-- Опасный совет со скотчем (строго здесь) -->
-        <div class="box-caution-orange relative p-4 rotate-[0.4deg] shadow-xs space-y-2 sketch-border mt-4">
-          <div class="sketch-washi-tape" style="top: -9px; right: 28px; transform: rotate(-2deg);" aria-hidden="true"></div>
-          <div class="flex items-center justify-between font-mono text-xs font-bold">
-            <span class="flex items-center gap-1.5 text-[#d35400] dark:text-[#f39c12]">
-              <svg class="w-4 h-4 stroke-current inline-block" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
-              ОПАСНЫЙ СОВЕТ // КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО
-            </span>
-            <span class="px-2 py-0.5 text-[10px] bg-paper text-ink border border-paper-border-dark rounded font-bold">СТОП</span>
+        <!-- Заметка инженера: предостережение по кислоте -->
+        <div class="sketch-pencil-orange relative p-5 rounded-lg shadow-xs space-y-3 mt-5">
+          <div class="sketch-washi-tape" style="top: -9px; left: 50%; transform: translateX(-50%) rotate(-0.5deg);" aria-hidden="true"></div>
+          
+          <div class="flex items-center gap-2 text-amber-900 dark:text-amber-300">
+            <svg width="16" height="16" class="w-4 h-4 stroke-current shrink-0" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            </svg>
+            <span class="font-mono text-xs font-bold uppercase tracking-wider">Правило чистоты платы</span>
           </div>
-          <p class="font-mono text-xs text-ink leading-relaxed">
-            <strong>Никогда не используйте активную кислоту (паяльную кислоту, ортофосфорную) для пайки печатных плат!</strong> Кислота моментально впитывается в структуру стеклотекстолита FR-4, вызывает паразитные токи утечки и гарантированно съедает тонкие медные дорожки через 2–4 месяца. Для электроники допустимы исключительно нейтральные канифольные и No-Clean флюсы.
+
+          <p class="font-sans text-sm text-ink leading-relaxed">
+            <strong>Никогда не используйте активную кислоту (паяльную, ортофосфорную) для печатных плат.</strong> Кислота капиллярно впитывается в слои стеклотекстолита FR-4: смыть её полностью невозможно. Через 2–4 месяца она вызывает утечки по питанию и гарантированно разъедает дорожки. Для электроники допустимы только нейтральные канифольные и No-Clean флюсы.
           </p>
+
+          <div class="font-hand text-base text-ink-muted/80 italic">
+            «Кислота хороша для кастрюль и медных труб, но убивает электронику»
+          </div>
         </div>
       </section>
 

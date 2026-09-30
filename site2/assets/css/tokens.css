@@ -6,16 +6,16 @@
  */
 
 :root {
-  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Натуральная чертёжная бумага #F5F0E8) --- */
-  --color-bg: #F5F0E8;
+  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Мягкая молочная бумага #FAF8F5) --- */
+  --color-bg: #FAF8F5;
   --color-paper: #ffffff;
-  --color-paper-subtle: #f8f5ee;
-  --color-paper-border: #ded8cb;
+  --color-paper-subtle: #f5f2eb;
+  --color-paper-border: #e2ded5;
   --color-paper-border-dark: #1A1A1A;
   --color-card: #ffffff;
   --color-card-solid: #ffffff;
-  --color-callout: #f8f5ee;
-  --dot-color: #ded8cb;
+  --color-callout: #f5f2eb;
+  --dot-color: #dcd6cb;
 
   /* --- 30% ТЕКСТ И СТРУКТУРА (Графит #1A1A1A) --- */
   --color-ink: #1A1A1A;

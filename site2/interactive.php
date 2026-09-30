@@ -322,20 +322,11 @@ include __DIR__ . '/includes/header.php';
             </div>
           </div>
 
-          <!-- Result Board (Sketch Post-It Memo) -->
-          <div class="relative pt-2">
-            <!-- Washi Tape sticker on top -->
-            <div class="sketch-washi-tape" style="top: 0px; left: 50%; transform: translateX(-50%) rotate(-1.2deg);" aria-hidden="true"></div>
-
-            <div id="temp-result-board" class="sketch-sticky-note p-5 sm:p-6 space-y-4 transition-all">
-              <!-- Folded corner triangle (bottom-right) -->
-              <svg aria-hidden="true" class="sketch-corner-fold" viewBox="0 0 24 24" width="24" height="24">
-                <polygon points="0,24 24,0 24,24" class="sketch-corner-triangle"></polygon>
-                <line x1="0" y1="24" x2="24" y2="0" class="sketch-corner-crease"></line>
-              </svg>
-
-              <!-- Sticky Note Header -->
-              <div class="flex items-center justify-between pb-3 border-b sketch-divider">
+          <!-- Result Board (Specification Card) -->
+          <div>
+            <div id="temp-result-board" class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 shadow-xs transition-all">
+              <!-- Header -->
+              <div class="flex items-center justify-between pb-3 border-b border-paper-border">
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
                   <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">КАРТА ТЕРМОРЕЖИМА</span>
@@ -362,7 +353,7 @@ include __DIR__ . '/includes/header.php';
                 <p class="text-xs font-mono text-ink-muted max-w-xs leading-relaxed">
                   Выберите задачу и марку припоя, чтобы рассчитать оптимальный диапазон жала
                 </p>
-                <div class="font-hand text-base text-ink-muted/90 italic pt-1" style="transform: rotate(-1deg);">
+                <div class="font-hand text-base text-ink-muted/90 italic pt-1">
                   «Стартовый режим станции и защита от перегрева»
                 </div>
               </div>
@@ -371,7 +362,7 @@ include __DIR__ . '/includes/header.php';
               <div id="temp-result-content" aria-live="polite" aria-atomic="true" class="hidden space-y-3.5">
                 
                 <!-- Строка 1: Ориентир температуры -->
-                <div class="p-3 rounded border border-paper-border bg-paper space-y-1">
+                <div class="p-3.5 rounded border border-paper-border bg-paper space-y-1">
                   <div class="flex items-center justify-between font-mono text-xs">
                     <span class="text-ink-muted uppercase font-bold">1. ОРИЕНТИР ТЕМПЕРАТУРЫ:</span>
                     <span id="temp-mode-label" class="text-[10px] font-mono text-ink-faint">УСТАВКА СТАНЦИИ</span>
@@ -386,7 +377,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
 
                 <!-- Строка 2: «НЕЛЬЗЯ» (категорический запрет и опасный фактор) -->
-                <div id="temp-warn-box" class="p-3 rounded border-l-4 border-red-500 bg-red-500/10 space-y-1" style="margin-right: 28px;">
+                <div id="temp-warn-box" class="p-3.5 rounded border-l-4 border-red-500 bg-red-500/10 space-y-1">
                   <div class="flex items-center gap-1.5 font-mono text-xs font-bold text-red-600 dark:text-red-400">
                     <svg class="w-4 h-4 shrink-0 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                     <span>2. КАТЕГОРИЧЕСКИ НЕЛЬЗЯ:</span>
@@ -397,12 +388,16 @@ include __DIR__ . '/includes/header.php';
                 </div>
 
                 <!-- Строка 3: Ссылка на одну статью -->
-                <div id="temp-article-box" class="p-3 rounded border border-paper-border bg-paper space-y-1" style="margin-right: 28px;">
+                <div id="temp-article-box" class="p-3.5 rounded border border-paper-border bg-paper space-y-1">
                   <span class="text-[11px] font-mono text-ink-muted uppercase block font-bold">3. РУКОВОДСТВО:</span>
                   <a id="temp-article-link" href="article.php?slug=temperaturnye-profili" class="text-xs font-mono font-bold text-ink hover:text-accent underline flex items-center justify-between group">
                     <span id="temp-article-title">Температурные профили: как не перегреть плату</span>
                     <span class="group-hover:translate-x-1 transition-transform">→</span>
                   </a>
+                </div>
+
+                <div class="font-hand text-sm text-ink-muted/80 italic pt-1 border-t border-paper-border/60">
+                  «Припой должен плавиться от тепла вывода и дорожки, а не от прямого касания жала»
                 </div>
 
               </div>
@@ -682,25 +677,16 @@ include __DIR__ . '/includes/header.php';
                 </div>
               </div>
 
-              <!-- Sticky Note Engineer's Memo -->
-              <div class="relative pt-2">
-                <!-- Washi Tape sticker on top -->
-                <div class="sketch-washi-tape" style="top: 0px; left: 50%; transform: translateX(-50%) rotate(1.2deg);" aria-hidden="true"></div>
-
-                <div id="engineer-memo" class="sketch-sticky-note p-5 sm:p-6 space-y-4 transition-all" style="transform: rotate(-1.2deg);">
-                  <!-- Folded corner triangle (bottom-right) -->
-                  <svg aria-hidden="true" class="sketch-corner-fold" viewBox="0 0 24 24" width="24" height="24">
-                    <polygon points="0,24 24,0 24,24" class="sketch-corner-triangle"></polygon>
-                    <line x1="0" y1="24" x2="24" y2="0" class="sketch-corner-crease"></line>
-                  </svg>
-
-                  <!-- Pin header -->
-                  <div class="flex items-center justify-between pb-3 border-b sketch-divider">
+              <!-- Specification Card (Engineer's Memo) -->
+              <div>
+                <div id="engineer-memo" class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 shadow-xs transition-all">
+                  <!-- Header -->
+                  <div class="flex items-center justify-between pb-3 border-b border-paper-border">
                     <span class="inline-flex items-center gap-2">
                       <svg class="w-4 h-4 text-accent shrink-0 inline-block" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a1 1 0 0 0 0-2H8a1 1 0 0 0 0 2h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg>
-                      <span class="font-hand text-xl font-bold text-ink tracking-tight">Заметка инженера</span>
+                      <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">ТЕХНОЛОГИЧЕСКИЙ РЕГЛАМЕНТ</span>
                     </span>
-                    <span class="font-mono text-[10px] font-bold text-ink-muted uppercase tracking-wider">IPC-A-610</span>
+                    <span class="font-mono text-[10px] font-bold text-ink-muted uppercase tracking-wider px-2 py-0.5 rounded border border-paper-border bg-paper">IPC-A-610</span>
                   </div>
 
                   <!-- Dosage highlight -->
@@ -713,7 +699,7 @@ include __DIR__ . '/includes/header.php';
                   </div>
 
                   <!-- Hand-drawn PCB sketch card -->
-                  <div class="sketch-tip-box p-3 flex items-center gap-3">
+                  <div class="p-3 rounded border border-paper-border bg-paper flex items-center gap-3">
                     <svg id="pcb-svg" width="70" height="70" viewBox="0 0 80 80" fill="none"
                          stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
                          class="text-ink-muted shrink-0 transition-all duration-200" style="display:block; opacity:0.85;">
@@ -757,19 +743,23 @@ include __DIR__ . '/includes/header.php';
                   </p>
 
                   <!-- Wash tip -->
-                  <div class="sketch-warn-box p-3 flex items-start gap-2 text-xs font-mono" style="margin-right: 28px;">
+                  <div class="p-3 rounded border border-paper-border bg-paper flex items-start gap-2 text-xs font-mono">
                     <svg class="w-4 h-4 text-accent shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                     <span id="wash-tip" class="leading-normal">Отмывка: опциональна (No-Clean)</span>
                   </div>
 
                   <!-- Action copy button -->
-                  <div style="padding-right: 28px;">
-                    <button type="button" id="copy-flux-btn" class="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded text-xs font-mono font-bold border border-paper-border-dark bg-paper text-ink hover:border-ink transition-colors cursor-pointer shadow-xs">
+                  <div>
+                    <button type="button" id="copy-flux-btn" class="w-full inline-flex items-center justify-center gap-2 px-3 py-2.5 rounded text-xs font-mono font-bold border border-paper-border-dark bg-paper text-ink hover:border-ink transition-colors cursor-pointer shadow-xs">
                       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="shrink-0" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                       </svg>
                       <span id="copy-flux-text" aria-live="polite">Скопировать параметры в журнал</span>
                     </button>
+                  </div>
+
+                  <div class="font-hand text-sm text-ink-muted/80 italic pt-1 border-t border-paper-border/60">
+                    «Меньше флюса — меньше грязи и паразитных утечек по высокой частоте»
                   </div>
                 </div>
               </div>
@@ -860,12 +850,7 @@ include __DIR__ . '/includes/header.php';
             </div>
           </div>
           
-          <div class="p-5 rounded-lg border border-[#fde047] dark:border-amber-700/50 bg-[#fffdf5] dark:bg-card space-y-4 flex flex-col justify-center relative shadow-xs">
-            <!-- Corner fold decoration -->
-            <svg aria-hidden="true" class="absolute bottom-0 right-0 w-5 h-5 pointer-events-none" viewBox="0 0 20 20">
-              <path d="M20 20 L0 20 L20 0 Z" fill="#fef08a" opacity="0.6"/>
-              <path d="M20 0 L0 20" stroke="#eab308" stroke-width="0.8" fill="none"/>
-            </svg>
+          <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-4 flex flex-col justify-center shadow-xs">
 
             <div>
               <span class="text-xs font-mono uppercase tracking-wider text-accent font-bold">Класс по ГОСТ Р МЭК 61190 / J-STD-004B:</span>
@@ -942,7 +927,7 @@ include __DIR__ . '/includes/header.php';
             </div>
           </div>
           
-          <div class="p-5 rounded-lg border border-paper-border bg-paper shadow-xs space-y-4 flex flex-col justify-center relative">
+          <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle shadow-xs space-y-4 flex flex-col justify-center relative">
             <div class="text-center">
               <span class="text-xs font-mono uppercase tracking-wider text-ink-muted font-bold block mb-2">Ориентировочный расход:</span>
               <div id="cons-length" class="text-3xl font-bold font-mono text-ink">
