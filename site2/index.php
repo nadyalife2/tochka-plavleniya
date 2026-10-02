@@ -141,9 +141,50 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
+      <!-- 2.1 ПРИКЛАДНЫЕ МИКРОУРОКИ: 10 цеховых регламентов по 2–3 мин -->
+      <section class="space-y-4 scroll-mt-24" id="lessons">
+        <div class="flex items-end justify-between flex-wrap gap-2">
+          <div class="space-y-1">
+            <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ЦЕХОВОЙ ПРАКТИКУМ // 2–3 МИНУТЫ</span>
+            <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+              Прикладные микроуроки монтажа
+            </h2>
+          </div>
+          <span class="font-mono text-xs text-ink-muted">10 быстрых регламентов</span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+          <?php foreach (get_all_lessons() as $idx => $l): ?>
+            <article class="sketch-card p-3.5 flex flex-col justify-between space-y-2.5 bg-card hover:border-paper-border-dark transition-all rounded-lg group shadow-xs">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between font-mono text-[10px]">
+                  <span class="pill-orange uppercase font-bold tracking-tight">Урок <?= $l['read_min'] ?>м</span>
+                  <span class="text-ink-faint">#<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
+                </div>
+                <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug line-clamp-2">
+                  <a href="article.php?slug=<?= urlencode($l['slug']) ?>">
+                    <?= htmlspecialchars($l['title']) ?>
+                  </a>
+                </h3>
+                <p class="text-[11px] text-ink-muted leading-relaxed font-serif line-clamp-2">
+                  <?= htmlspecialchars($l['subtitle']) ?>
+                </p>
+              </div>
+
+              <div class="pt-2 border-t border-paper-border flex items-center justify-between font-mono text-[11px]">
+                <span class="text-ink-faint text-[10px] uppercase truncate max-w-[80px]"><?= htmlspecialchars($l['tag']) ?></span>
+                <a href="article.php?slug=<?= urlencode($l['slug']) ?>" class="text-ink font-bold group-hover:text-accent shrink-0">
+                  Открыть →
+                </a>
+              </div>
+            </article>
+          <?php endforeach; ?>
+        </div>
+      </section>
 
       <!-- 3. БЛОК ДОВЕРИЯ И ИСТОЧНИКОВ: честный и прозрачный -->
       <section class="space-y-4" id="trust">
+
         <div class="space-y-1">
           <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ПРОЗРАЧНОСТЬ И ИСТОЧНИКИ</span>
           <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">

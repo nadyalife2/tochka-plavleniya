@@ -231,6 +231,87 @@
       desc: "Государственный стандарт на химический состав, марки и температуры солидус/ликвидус отечественных припоев серии ПОС.",
       url: "/category.php?slug=materialy",
       badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
+    },
+    // 10 Прикладных микроуроков ТЧП (2–3 мин)
+    {
+      title: "Лужение провода без «деревянного» кончика",
+      category: "инструменты",
+      badge: "Урок 2 мин // Монтаж",
+      desc: "Физика капиллярного затекания: как защитить провод от ломкости под изоляцией и сохранить гибкость жил.",
+      url: "article.php?slug=luzhenie-provoda",
+      badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
+    },
+    {
+      title: "Замена Type-C и micro-USB разъёма без фена",
+      category: "инструменты",
+      badge: "Урок 3 мин // Ремонт",
+      desc: "Метод разбавления сплавом Розе: безопасный демонтаж разъемов без расплавления пластика и отрыва пятаков.",
+      url: "article.php?slug=zamena-razema-payalnikom",
+      badgeColor: "bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300"
+    },
+    {
+      title: "Подбор жала к массивному полигону (GND)",
+      category: "инструменты",
+      badge: "Урок 2 мин // Теплопередача",
+      desc: "Геометрия теплопередачи: почему игла типа I бесполезна на земляных шинах и как клин 2.4D решает проблему.",
+      url: "article.php?slug=podbor-zhala-k-polygonu",
+      badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
+    },
+    {
+      title: "Смывка флюса: почему No-Clean убивает мегаомы",
+      category: "флюсы",
+      badge: "Урок 3 мин // Химия",
+      desc: "Паразитные утечки в цепях ОУ и кварцев, белые разводы активаторов и двухстадийная отмывка изопропилом.",
+      url: "article.php?slug=smyvka-flyusa-pravila",
+      badgeColor: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300"
+    },
+    {
+      title: "Антистатика (ESD) на верстаке: спасаем затворы MOSFET",
+      category: "инструменты",
+      badge: "Урок 2 мин // Безопасность",
+      desc: "Почему невидимый разряд в 50 Вольт пробивает затворы полевиков и как организовать правильное заземление через 1 МОм.",
+      url: "article.php?slug=antistatika-esd-praktika",
+      badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
+    },
+    {
+      title: "Выпайка оплёткой без отрыва контактных площадок",
+      category: "дефекты",
+      badge: "Урок 2 мин // Демонтаж",
+      desc: "Механика поверхностного натяжения: почему нельзя тянуть остывающую медь и как синхронно уводить жало.",
+      url: "article.php?slug=vypayka-opletkoy",
+      badgeColor: "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300"
+    },
+    {
+      title: "Дозирование припоя и вогнутый мениск по IPC-A-610",
+      category: "стандарты",
+      badge: "Урок 2 мин // Контроль",
+      desc: "Анатомия идеальной пайки: почему выпуклый «шарик» считается браком и как получить правильный вогнутый мениск.",
+      url: "article.php?slug=dozirovanie-menisk-ipc",
+      badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
+    },
+    {
+      title: "Тепловое окно: правило 2–3 секунд",
+      category: "стандарты",
+      badge: "Урок 2 мин // Термодинамика",
+      desc: "Термическая деструкция связующего FR-4: почему долгий нагрев при 260 °C опаснее быстрого контакта при 320 °C.",
+      url: "article.php?slug=pravilo-treh-sekund",
+      badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
+    },
+    {
+      title: "Реанимация почерневшего необгораемого жала",
+      category: "инструменты",
+      badge: "Урок 2 мин // Оснастка",
+      desc: "Восстановление смачиваемости без наждачки и напильников: химический Tip Tinner, латунная стружка и консервация.",
+      url: "article.php?slug=reanimaciya-zhala",
+      badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
+    },
+    {
+      title: "Сращивание проводов и клеевая термоусадка",
+      category: "инструменты",
+      badge: "Урок 3 мин // Электромонтаж",
+      desc: "Скрутка Western Union (линкольн), пропайка по всей длине и 100% герметизация клеевой термоусадкой IP67.",
+      url: "article.php?slug=srashchivanie-provodov",
+      badgeColor: "bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300"
     }
   ];
 

@@ -223,13 +223,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (tempArticleLink && tempArticleTitle) {
       if (wVal.startsWith('wire')) {
-        tempArticleLink.href = 'article.php?slug=chto-kupit-dlya-pervoj-payki';
-        tempArticleTitle.textContent = 'Что купить для первой пайки и как правильно лудить провод';
+        tempArticleLink.href = 'article.php?slug=luzhenie-provoda';
+        tempArticleTitle.textContent = 'Микроурок: Лужение провода без «деревянного» кончика';
+      } else if (wVal === 'gnd' || wVal === 'pth' || wVal === 'smd_heavy') {
+        tempArticleLink.href = 'article.php?slug=podbor-zhala-k-polygonu';
+        tempArticleTitle.textContent = 'Микроурок: Подбор жала к массивному полигону (GND)';
       } else {
-        tempArticleLink.href = 'article.php?slug=temperaturnye-profili';
-        tempArticleTitle.textContent = 'Температурные профили: как не перегреть плату и компоненты';
+        tempArticleLink.href = 'article.php?slug=pravilo-treh-sekund';
+        tempArticleTitle.textContent = 'Микроурок: Тепловое окно и правило 2–3 секунд';
       }
     }
+
   }
 
   // State: До ввода

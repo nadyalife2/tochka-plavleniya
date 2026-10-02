@@ -202,6 +202,29 @@ $articles = [
     ]
 ];
 
+// Подключение 10 прикладных микроуроков
+require_once __DIR__ . '/../data/lessons-data.php';
+
+// Интеграция микроуроков в общий каталог
+foreach (get_all_lessons() as $lesson_item) {
+    $articles[] = [
+        'id'             => $lesson_item['id'],
+        'title'          => $lesson_item['title'],
+        'slug'           => $lesson_item['slug'],
+        'tag'            => $lesson_item['tag'],
+        'tag_key'        => $lesson_item['tag_key'],
+        'excerpt'        => $lesson_item['subtitle'],
+        'read_min'       => $lesson_item['read_min'],
+        'difficulty'     => $lesson_item['difficulty'],
+        'required_tools' => array_keys($lesson_item['required_tools']),
+        'featured'       => false,
+        'is_lesson'      => true,
+        'date'           => $lesson_item['date'],
+        'author'         => $lesson_item['author'],
+        'icon'           => 'school'
+    ];
+}
+
 function get_article_by_slug($slug) {
     global $articles;
     foreach ($articles as $article) {
@@ -221,3 +244,4 @@ function get_articles_by_tag($tag_key) {
     if ($tag_key === 'all' || empty($tag_key)) return array_values($published);
     return array_values(array_filter($published, fn($a) => $a['tag_key'] === $tag_key));
 }
+

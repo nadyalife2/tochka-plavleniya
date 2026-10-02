@@ -2,10 +2,11 @@
 require_once __DIR__ . '/includes/articles-data.php';
 require_once __DIR__ . '/includes/functions.php';
 
-// Select article
+// Select article or micro-lesson
 $slug = $_GET['slug'] ?? 'temperaturnye-profili';
+$lesson = get_lesson_by_slug($slug);
 $article = get_article_by_slug($slug);
-if (!$article) { 
+if (!$article && !$lesson) { 
     http_response_code(404);
     require __DIR__ . '/404.php';
     exit;
@@ -13,21 +14,28 @@ if (!$article) {
 
 // Related articles (pick 3 other articles)
 $related_articles = array_filter($articles, function($item) use ($article) {
-    return $item['id'] !== $article['id'];
+    return ($item['slug'] ?? '') !== ($article['slug'] ?? '');
 });
 $related_articles = array_slice($related_articles, 0, 3);
 
 // FAQ data for Schema.org & Accordion
-$faq_items = [
-    "Какая максимальная температура допустима для бессвинцовой пайки BGA?" => "По стандарту IPC/JEDEC J-STD-020D абсолютный пиковый предел для большинства полупроводниковых BGA-корпусов составляет 250°C (не более 10 секунд). Оптимальный рабочий пик оплавления — ровно 238–242°C.",
-    "Сколько секунд припой должен находиться в расплавленном состоянии (TAL)?" => "Время над ликвидусом (TAL) для сплава SAC305 (217°C) должно составлять от 45 до 75 секунд. Если TAL меньше 40 с — возможны непропаи («холодная пайка»). Если дольше 90 с — интерметаллический слой становится слишком толстым и хрупким, контакт отрывается при вибрации.",
-    "Как избежать эффекта 'попкорна' при пайке влажных микросхем?" => "Храните чипы в заводских вакуумных влагозащитных пакетах с индикатором влажности. Если пакет вскрыт, поместите микросхемы в конвекционную печь при 100–110°C на 12–24 часа до пайки.",
-    "Какой флюс использовать для реболлинга BGA: RMA или No-Clean?" => "Для реболлинга шаров рекомендуется канифольный среднеактивированный флюс (RMA или безотмывочный ROL0 с высокой вязкостью). Подложки BGA требуют тщательной промывки изопропанолом или спецраствором в ультразвуковой ванне после посадки."
-];
-$page_title = $article['title'] . ' — ТОЧКА ПЛАВЛЕНИЯ';
-$page_desc = $article['excerpt'];
+if ($lesson && !empty($lesson['faq'])) {
+    $faq_items = $lesson['faq'];
+    $page_title = $lesson['title'] . ' // Микроурок (' . $lesson['read_min'] . ' мин) — ТОЧКА ПЛАВЛЕНИЯ';
+    $page_desc = $lesson['subtitle'] . ' — ' . $lesson['tldr'];
+} else {
+    $faq_items = [
+        "Какая максимальная температура допустима для бессвинцовой пайки BGA?" => "По стандарту IPC/JEDEC J-STD-020D абсолютный пиковый предел для большинства полупроводниковых BGA-корпусов составляет 250°C (не более 10 секунд). Оптимальный рабочий пик оплавления — ровно 238–242°C.",
+        "Сколько секунд припой должен находиться в расплавленном состоянии (TAL)?" => "Время над ликвидусом (TAL) для сплава SAC305 (217°C) должно составлять от 45 до 75 секунд. Если TAL меньше 40 с — возможны непропаи («холодная пайка»). Если дольше 90 с — интерметаллический слой становится слишком толстым и хрупким, контакт отрывается при вибрации.",
+        "Как избежать эффекта 'попкорна' при пайке влажных микросхем?" => "Храните чипы в заводских вакуумных влагозащитных пакетах с индикатором влажности. Если пакет вскрыт, поместите микросхемы в конвекционную печь при 100–110°C на 12–24 часа до пайки.",
+        "Какой флюс использовать для реболлинга BGA: RMA или No-Clean?" => "Для реболлинга шаров рекомендуется канифольный среднеактивированный флюс (RMA или безотмывочный ROL0 с высокой вязкостью). Подложки BGA требуют тщательной промывки изопропанолом или спецраствором в ультразвуковой ванне после посадки."
+    ];
+    $page_title = $article['title'] . ' — ТОЧКА ПЛАВЛЕНИЯ';
+    $page_desc = $article['excerpt'];
+}
 $current_page = 'article';
 ob_start();
+
 ?>
 <?php
 // Convert "10 авг 2026" to ISO 8601 for GEO Schema
@@ -278,10 +286,17 @@ include __DIR__ . '/includes/header.php';
     <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap">
       <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
       <span>→</span>
-      <a class="hover:text-ink transition-colors" href="index.php?tag=<?= e($article['tag_key'] ?? 'bga') ?>">Гайды</a>
-      <span>→</span>
-      <span class="text-ink truncate max-w-xs sm:max-w-md"><?= e($article['title']) ?></span>
+      <?php if (!empty($lesson)): ?>
+        <a class="hover:text-ink transition-colors" href="index.php#lessons">Микроуроки</a>
+        <span>→</span>
+        <span class="text-ink truncate max-w-xs sm:max-w-md"><?= e($lesson['title']) ?></span>
+      <?php else: ?>
+        <a class="hover:text-ink transition-colors" href="index.php?tag=<?= e($article['tag_key'] ?? 'bga') ?>">Гайды</a>
+        <span>→</span>
+        <span class="text-ink truncate max-w-xs sm:max-w-md"><?= e($article['title']) ?></span>
+      <?php endif; ?>
     </nav>
+
 
     <!-- Center Article + Table of Contents Layout -->
     <div class="relative grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
@@ -307,26 +322,33 @@ include __DIR__ . '/includes/header.php';
           <!-- Article Header Block -->
           <header class="space-y-4">
           <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
-            <?= e($article['title']) ?>
+            <?= e($lesson ? $lesson['title'] : $article['title']) ?>
           </h1>
 
           <!-- Meta line -->
           <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-ink-muted font-mono pt-1 pb-2">
             <div class="flex items-center gap-2">
               <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
-              <span class="text-ink"><?= e($article['author'] ?? 'Инженер Лаборатории ТЧП') ?></span>
+              <span class="text-ink"><?= e($lesson ? $lesson['author'] : ($article['author'] ?? 'Инженер Лаборатории ТЧП')) ?></span>
             </div>
             <span class="text-ink-faint">·</span>
-            <time datetime="<?= e($article['date'] ?? '2026-08-20') ?>"><?= e($article['date'] ?? '20 августа 2026') ?></time>
+            <time datetime="<?= e($lesson ? $lesson['date'] : ($article['date'] ?? '2026-08-20')) ?>"><?= e($lesson ? $lesson['date'] : ($article['date'] ?? '20 августа 2026')) ?></time>
             <span class="text-ink-faint">·</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= e($article['read_min'] ?? 8) ?> мин чтения</span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= e($lesson ? $lesson['read_min'] : ($article['read_min'] ?? 8)) ?> мин чтения</span>
             <span class="text-ink-faint">·</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= e($article['difficulty'] ?? 'Инженер') ?></span>
+            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= e($lesson ? $lesson['difficulty'] : ($article['difficulty'] ?? 'Инженер')) ?></span>
             <span class="text-ink-faint">·</span>
             <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено</span>
           </div>
 
-          <?php if (!empty($article['required_tools'])): ?>
+          <?php if (!empty($lesson)): ?>
+          <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
+            <span class="text-ink-muted">Оснастка:</span>
+            <?php foreach (array_keys($lesson['required_tools']) as $tool): ?>
+              <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
+            <?php endforeach; ?>
+          </div>
+          <?php elseif (!empty($article['required_tools'])): ?>
           <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
             <span class="text-ink-muted">Понадобится:</span>
             <?php foreach ($article['required_tools'] as $tool): ?>
@@ -337,14 +359,240 @@ include __DIR__ . '/includes/header.php';
 
           <!-- Lead Paragraph -->
           <p class="text-lg text-ink font-serif leading-[1.65] pt-2">
-            <?= e($article['excerpt']) ?><?php if ($slug === 'temperaturnye-profili'): ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.<?php endif; ?>
+            <?= e($lesson ? $lesson['subtitle'] : $article['excerpt']) ?><?php if ($slug === 'temperaturnye-profili'): ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.<?php endif; ?>
           </p>
           </header>
+
         </div><!-- /Article Header Card -->
 
-        <?php if ($slug === 'temperaturnye-profili'): ?>
+        <?php if (!empty($lesson)): ?>
+        <!-- MICRO-LESSON COMPLETE APPLIED REGULATION -->
+
+        <!-- 1. TL;DR Rule Card -->
+        <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle space-y-2.5 shadow-xs">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-accent inline-block shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">ГЛАВНЫЙ ИНЖЕНЕРНЫЙ ПРИНЦИП // 10 СЕКУНД</span>
+          </div>
+          <p class="text-sm sm:text-base font-sans font-medium text-ink leading-relaxed">
+            <?= e($lesson['tldr']) ?>
+          </p>
+        </div>
+
+        <!-- 2. Technical Map & Tools -->
+        <section class="bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-4 shadow-sm">
+          <div class="flex items-center justify-between pb-3 border-b border-paper-border flex-wrap gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+              <h2 class="text-base sm:text-lg font-bold font-mono uppercase tracking-tight text-ink">Технологическая карта и оснастка</h2>
+            </div>
+            <span class="text-xs font-mono text-ink-muted">IPC-A-610 / ГОСТ</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Оснастка и инструмент -->
+            <div class="p-4 rounded-lg bg-paper-subtle border border-paper-border space-y-2.5">
+              <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-ink pb-1.5 border-b border-paper-border flex items-center justify-between">
+                <span>Инструмент и материалы</span>
+                <span class="text-accent text-[10px] font-bold">SPECS</span>
+              </div>
+              <dl class="space-y-2 text-xs font-mono">
+                <?php foreach ($lesson['required_tools'] as $tool_name => $tool_desc): ?>
+                  <div class="flex flex-col sm:flex-row sm:justify-between gap-0.5">
+                    <dt class="text-ink-muted"><?= e($tool_name) ?>:</dt>
+                    <dd class="font-bold text-ink sm:text-right"><?= e($tool_desc) ?></dd>
+                  </div>
+                <?php endforeach; ?>
+              </dl>
+            </div>
+
+            <!-- Режимы и допуски -->
+            <div class="p-4 rounded-lg bg-paper-subtle border border-paper-border space-y-2.5">
+              <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-ink pb-1.5 border-b border-paper-border flex items-center justify-between">
+                <span>Параметры техпроцесса</span>
+                <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">TOLERANCE</span>
+              </div>
+              <dl class="space-y-2 text-xs font-mono">
+                <?php foreach ($lesson['key_specs'] as $spec_name => $spec_val): ?>
+                  <div class="flex flex-col sm:flex-row sm:justify-between gap-0.5">
+                    <dt class="text-ink-muted"><?= e($spec_name) ?>:</dt>
+                    <dd class="font-bold text-ink sm:text-right"><?= e($spec_val) ?></dd>
+                  </div>
+                <?php endforeach; ?>
+              </dl>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Step-by-Step Procedure -->
+        <section class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="text-xl sm:text-2xl font-bold font-sans text-ink tracking-tight">Пошаговый регламент операции</h2>
+            <span class="font-mono text-xs text-ink-muted"><?= count($lesson['steps']) ?> шага</span>
+          </div>
+
+          <div class="space-y-3">
+            <?php foreach ($lesson['steps'] as $st): ?>
+              <div class="p-5 rounded-lg border border-paper-border bg-paper space-y-2 shadow-sm">
+                <div class="flex items-center gap-2.5">
+                  <span class="w-6 h-6 rounded border border-paper-border-dark bg-paper-subtle text-xs font-mono font-bold flex items-center justify-center text-ink shrink-0"><?= $st['num'] ?></span>
+                  <h3 class="text-base font-bold font-sans text-ink"><?= e($st['title']) ?></h3>
+                </div>
+                <p class="text-sm font-serif text-ink/85 leading-relaxed pl-8">
+                  <?= e($st['desc']) ?>
+                </p>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </section>
+
+        <!-- 4. Danger Rule Block (Authentic Pencil Shading) -->
+        <div class="box-caution-orange relative p-5 rounded-lg shadow-xs space-y-3 sketch-pencil-orange">
+          <div class="flex items-center justify-between font-mono text-xs font-bold">
+            <span class="flex items-center gap-1.5 text-[#d35400] dark:text-[#f39c12]">
+              <svg class="w-4 h-4 stroke-current inline-block shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО // ОПАСНОСТЬ БРАКА
+            </span>
+            <span class="px-2 py-0.5 text-[10px] bg-paper text-ink border border-paper-border-dark rounded font-bold uppercase">СТОП</span>
+          </div>
+          <h3 class="font-mono text-sm font-bold text-ink">
+            <?= e($lesson['danger_rule']['title']) ?>
+          </h3>
+          <p class="font-sans text-xs sm:text-sm text-ink leading-relaxed">
+            <?= e($lesson['danger_rule']['text']) ?>
+          </p>
+          <div class="font-hand text-base text-ink-muted italic pt-1 border-t border-paper-border/60">
+            <?= e($lesson['danger_rule']['hand']) ?>
+          </div>
+        </div>
+
+        <!-- 5. Interactive Checklist Card -->
+        <section class="bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-4 shadow-sm" id="lesson-checklist-section">
+          <div class="flex items-center justify-between flex-wrap gap-2 pb-3 border-b border-paper-border">
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-accent inline-block shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+              <h2 class="text-base sm:text-lg font-bold font-mono uppercase tracking-tight text-ink">Чек-лист готовности и контроля</h2>
+            </div>
+            <div class="text-xs font-mono text-ink-muted">
+              Прогресс: <span id="lesson-check-counter" class="font-bold text-accent">0/<?= count($lesson['checklist']) ?></span>
+            </div>
+          </div>
+
+          <div class="space-y-2.5">
+            <?php foreach ($lesson['checklist'] as $idx => $chk_item): ?>
+              <label class="flex items-start gap-3 p-3 rounded-lg border border-paper-border bg-paper-subtle hover:bg-paper cursor-pointer transition-all select-none">
+                <input type="checkbox" 
+                       class="lesson-step-checkbox mt-0.5 w-4 h-4 rounded border-paper-border-dark text-accent focus:ring-0 cursor-pointer"
+                       data-lesson-slug="<?= e($lesson['slug']) ?>"
+                       data-check-index="<?= $idx ?>">
+                <span class="text-xs sm:text-sm font-mono text-ink leading-normal flex-1 check-text">
+                  <?= e($chk_item) ?>
+                </span>
+              </label>
+            <?php endforeach; ?>
+          </div>
+        </section>
+
+        <!-- 6. Workbench Calculator Callout -->
+        <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
+          <div class="space-y-1">
+            <div class="font-mono text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
+              <span class="material-symbols-outlined text-base">construction</span>
+              <span>Интерактивный верстак ТЧП</span>
+            </div>
+            <h3 class="text-base sm:text-lg font-bold text-ink">Рассчитайте параметры для вашей задачи</h3>
+            <p class="text-xs sm:text-sm text-ink-muted">Используйте калькуляторы верстака для мгновенного подбора флюса, жала и расхода припоя.</p>
+          </div>
+          <a href="<?= e($lesson['interactive_link']['url']) ?>" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-ink hover:bg-ink-muted text-paper text-xs font-mono font-bold transition-colors shadow-sm shrink-0 sm:whitespace-nowrap text-center">
+            <span><?= e($lesson['interactive_link']['label']) ?></span>
+            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+          </a>
+        </div>
+
+        <!-- 7. FAQ Accordion / Cards -->
+        <?php if (!empty($lesson['faq'])): ?>
+        <section class="bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-4 shadow-sm" id="lesson-faq">
+          <div class="flex items-center gap-2 pb-3 border-b border-paper-border">
+            <span class="material-symbols-outlined text-accent text-xl">help_outline</span>
+            <h2 class="text-base sm:text-lg font-bold font-mono uppercase tracking-tight text-ink">Частые вопросы по регламенту</h2>
+          </div>
+
+          <div class="space-y-3">
+            <?php foreach ($lesson['faq'] as $question => $answer): ?>
+              <div class="p-4 rounded-lg bg-paper-subtle border border-paper-border space-y-1.5">
+                <h3 class="font-mono text-xs sm:text-sm font-bold text-ink flex items-start gap-2">
+                  <span class="text-accent font-bold">В:</span>
+                  <span><?= e($question) ?></span>
+                </h3>
+                <p class="font-serif text-xs sm:text-sm text-ink-muted leading-relaxed pl-5">
+                  <?= e($answer) ?>
+                </p>
+              </div>
+            <?php endforeach; ?>
+          </div>
+        </section>
+        <?php endif; ?>
+
+        <!-- Script for Interactive Checklist state -->
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          const checkboxes = document.querySelectorAll('.lesson-step-checkbox');
+          const counter = document.getElementById('lesson-check-counter');
+          const sidebarStatus = document.getElementById('sidebar-check-status');
+          if (!checkboxes.length) return;
+
+          const slug = checkboxes[0].dataset.lessonSlug;
+          const storageKey = 'tp_lesson_chk_' + slug;
+
+          function loadSaved() {
+            try {
+              const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
+              checkboxes.forEach((cb, idx) => {
+                if (saved.includes(idx)) {
+                  cb.checked = true;
+                  const textEl = cb.closest('label').querySelector('.check-text');
+                  if (textEl) textEl.classList.add('line-through', 'text-ink-muted');
+                }
+              });
+              updateCount();
+            } catch (e) {}
+          }
+
+          function updateCount() {
+            const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+            const total = checkboxes.length;
+            if (counter) counter.textContent = checked + '/' + total;
+            if (sidebarStatus) sidebarStatus.textContent = checked + '/' + total + ' выполнено';
+            
+            const checkedIndices = Array.from(checkboxes)
+              .map((cb, idx) => cb.checked ? idx : null)
+              .filter(idx => idx !== null);
+            localStorage.setItem(storageKey, JSON.stringify(checkedIndices));
+          }
+
+          checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+              const textEl = this.closest('label').querySelector('.check-text');
+              if (textEl) {
+                if (this.checked) {
+                  textEl.classList.add('line-through', 'text-ink-muted');
+                } else {
+                  textEl.classList.remove('line-through', 'text-ink-muted');
+                }
+              }
+              updateCount();
+            });
+          });
+
+          loadSaved();
+        });
+        </script>
+        <!-- /MICRO-LESSON -->
+
+        <?php elseif ($slug === 'temperaturnye-profili'): ?>
         <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
         <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-sm leading-relaxed space-y-2">
+
           <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>
@@ -1049,7 +1297,61 @@ include __DIR__ . '/includes/header.php';
       <!-- Sticky Floating Table of Contents Sidebar (Desktop) -->
       <aside class="hidden lg:block lg:col-span-4 sticky top-20 space-y-6">
         
-        <?php if ($slug === 'temperaturnye-profili'): ?>
+        <?php if (!empty($lesson)): ?>
+        <!-- Lesson Passport & Checklist Progress -->
+        <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
+          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+            <span>ПАСПОРТ УРОКА</span>
+            <span class="text-accent font-bold">2–3 МИН</span>
+          </div>
+          <div class="space-y-2 text-xs font-mono">
+            <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
+              <span class="text-ink-muted">Статус:</span>
+              <span class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> Регламент готов
+              </span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
+              <span class="text-ink-muted">Категория:</span>
+              <span class="text-ink font-bold"><?= e($lesson['tag']) ?></span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
+              <span class="text-ink-muted">Сложность:</span>
+              <span class="text-ink"><?= e($lesson['difficulty']) ?></span>
+            </div>
+            <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
+              <span class="text-ink-muted">Чтение:</span>
+              <span class="text-ink">~<?= e($lesson['read_min']) ?> мин</span>
+            </div>
+            <div class="flex items-center justify-between pt-1">
+              <span class="text-ink-muted">Чек-лист:</span>
+              <span id="sidebar-check-status" class="font-bold text-accent">0/<?= count($lesson['checklist']) ?> выполнено</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 Micro-lessons Series Navigation -->
+        <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
+          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+            <span>ВСЕ 10 МИКРОУРОКОВ</span>
+            <span>СЕРИЯ ТЧП</span>
+          </div>
+          <nav class="space-y-1 text-xs font-mono max-h-[360px] overflow-y-auto pr-1">
+            <?php foreach (get_all_lessons() as $idx => $l): ?>
+              <?php $is_curr = ($l['slug'] === $lesson['slug']); ?>
+              <a href="article.php?slug=<?= e($l['slug']) ?>" 
+                 class="block px-2.5 py-2 rounded transition-all <?= $is_curr ? 'bg-ink text-paper font-bold shadow-xs' : 'text-ink-muted hover:text-ink hover:bg-paper-subtle' ?>">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="truncate"><?= ($idx + 1) ?>. <?= e($l['title']) ?></span>
+                  <span class="text-[10px] <?= $is_curr ? 'text-paper/70' : 'text-ink-faint' ?> shrink-0"><?= $l['read_min'] ?>м</span>
+                </div>
+              </a>
+            <?php endforeach; ?>
+          </nav>
+        </div>
+
+        <?php elseif ($slug === 'temperaturnye-profili'): ?>
+
         <!-- Table of Contents -->
         <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
           <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
