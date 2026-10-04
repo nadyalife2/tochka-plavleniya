@@ -65,6 +65,11 @@ $current_page = $current_page ?? '';
 </head>
 <body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
 
+  <!-- Accessibility Skip Link (WCAG 2.1 AAA) -->
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-3 focus:left-3 focus:bg-accent focus:text-white focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs focus:shadow-md focus:outline-none">
+    Перейти к основному содержимому
+  </a>
+
   <!-- Top Minimal Header Bar -->
   <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">

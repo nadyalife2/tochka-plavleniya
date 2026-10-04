@@ -62,6 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (tempWork) tempWork.value = '';
       if (tempSolder) tempSolder.value = '';
     }
+    try {
+      localStorage.setItem('tp_temp_task', taskKey);
+      if (tempSolder) localStorage.setItem('tp_temp_solder', tempSolder.value);
+      if (tempWork) localStorage.setItem('tp_temp_work', tempWork.value);
+    } catch(e) {}
     updateTempCalculator();
   }
 
@@ -82,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (tempStatusBadge) {
         tempStatusBadge.textContent = 'ТРЕБУЕТСЯ ВЫБОР';
-        tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-ink/75 text-white';
+        tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-ink/75 text-white';
       }
 
       tempRangeDisplay.textContent = 'Определите задачу';
@@ -107,6 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const sVal = tempSolder.value;
     const wVal = tempWork.value;
+
+    try {
+      localStorage.setItem('tp_temp_solder', sVal);
+      localStorage.setItem('tp_temp_work', wVal);
+      localStorage.setItem('tp_temp_task', activeQuickTask);
+    } catch (e) {}
     
     // State: Валидация выбора
     if (!sVal) {
@@ -141,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (isNoRec) {
       if (tempStatusBadge) {
         tempStatusBadge.textContent = 'НЕ ДЛЯ ЭТОГО';
-        tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase badge-danger';
+        tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase badge-danger';
       }
 
       tempRangeDisplay.textContent = 'Паяльник не подходит';
@@ -168,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Режим нормального ориентира
     if (tempStatusBadge) {
       tempStatusBadge.textContent = 'ОРИЕНТИР';
-      tempStatusBadge.className = 'font-mono text-[11px] px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink';
+      tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink';
     }
 
     tempRangeDisplay.style.fontSize = '';
@@ -243,11 +254,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (tempSolder) {
     tempSolder.addEventListener('change', () => {
       if (window.TCHP_UI) window.TCHP_UI.clearFieldError(tempSolder);
+      try { localStorage.setItem('tp_temp_solder', tempSolder.value); } catch(e) {}
     });
   }
   if (tempWork) {
     tempWork.addEventListener('change', () => {
       if (window.TCHP_UI) window.TCHP_UI.clearFieldError(tempWork);
+      try { localStorage.setItem('tp_temp_work', tempWork.value); } catch(e) {}
     });
   }
 
@@ -260,8 +273,33 @@ document.addEventListener('DOMContentLoaded', () => {
     setQuickTask(taskParam);
   } else if (toolParam === 'temp') {
     setQuickTask('wire');
-  } else if (quickTaskButtons.length > 0) {
-    setQuickTask('wire');
+  } else {
+    let restored = false;
+    try {
+      const savedTask = localStorage.getItem('tp_temp_task');
+      const savedSolder = localStorage.getItem('tp_temp_solder');
+      const savedWork = localStorage.getItem('tp_temp_work');
+      if (savedTask && savedSolder && savedWork) {
+        activeQuickTask = savedTask;
+        quickTaskButtons.forEach(btn => {
+          if (btn.dataset.task === savedTask) {
+            btn.classList.add('bg-accent', 'text-ink');
+            btn.classList.remove('bg-paper', 'text-white');
+          } else {
+            btn.classList.remove('bg-accent', 'text-ink');
+            btn.classList.add('bg-paper');
+          }
+        });
+        if (tempSolder) tempSolder.value = savedSolder;
+        if (tempWork) tempWork.value = savedWork;
+        updateTempCalculator();
+        restored = true;
+      }
+    } catch(e) {}
+
+    if (!restored && quickTaskButtons.length > 0) {
+      setQuickTask('wire');
+    }
   }
 
   if (toolParam) {
@@ -293,6 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const tVal = ironTask.value;
     const iVal = ironIntensity.value;
+
+    try {
+      localStorage.setItem('tp_iron_task', tVal);
+      localStorage.setItem('tp_iron_intensity', iVal);
+    } catch(e) {}
 
     const taskGroup = ironRules[tVal] || {};
     const item = taskGroup[iVal];
@@ -349,6 +392,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (ironTask && ironIntensity) {
     ironTask.addEventListener('change', updateIronSelector);
     ironIntensity.addEventListener('change', updateIronSelector);
+
+    try {
+      const savedIronTask = localStorage.getItem('tp_iron_task');
+      const savedIronIntensity = localStorage.getItem('tp_iron_intensity');
+      if (savedIronTask && ironRules[savedIronTask]) ironTask.value = savedIronTask;
+      if (savedIronIntensity) ironIntensity.value = savedIronIntensity;
+    } catch(e) {}
+
     updateIronSelector();
   }
 
@@ -513,6 +564,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const process = fluxProcess.value;
     const wash = fluxWash.value;
 
+    try {
+      localStorage.setItem('tp_flux_metal', metal);
+      localStorage.setItem('tp_flux_process', process);
+      localStorage.setItem('tp_flux_wash', wash);
+    } catch(e) {}
+
     const metalGroup = fluxRules[metal] || {};
     const processGroup = metalGroup[process] || {};
     const item = processGroup[wash];
@@ -559,6 +616,31 @@ document.addEventListener('DOMContentLoaded', () => {
     fluxMetal.addEventListener('change', updateFluxSelector);
     fluxProcess.addEventListener('change', updateFluxSelector);
     fluxWash.addEventListener('change', updateFluxSelector);
+
+    try {
+      const savedFluxMetal = localStorage.getItem('tp_flux_metal');
+      const savedFluxProcess = localStorage.getItem('tp_flux_process');
+      const savedFluxWash = localStorage.getItem('tp_flux_wash');
+      if (savedFluxMetal && fluxRules[savedFluxMetal]) fluxMetal.value = savedFluxMetal;
+      if (savedFluxProcess) fluxProcess.value = savedFluxProcess;
+      if (savedFluxWash) fluxWash.value = savedFluxWash;
+    } catch(e) {}
+
+    // 1-Click Quick Scenario Presets
+    const quickChips = document.querySelectorAll('.flux-quick-chip');
+    quickChips.forEach(chip => {
+      chip.addEventListener('click', function() {
+        quickChips.forEach(c => {
+          c.classList.remove('border-accent', 'text-accent', 'font-bold');
+        });
+        this.classList.add('border-accent', 'text-accent', 'font-bold');
+        if (this.dataset.metal) fluxMetal.value = this.dataset.metal;
+        if (this.dataset.process) fluxProcess.value = this.dataset.process;
+        if (this.dataset.wash) fluxWash.value = this.dataset.wash;
+        updateFluxSelector();
+      });
+    });
+
     updateFluxSelector();
   }
 
@@ -577,6 +659,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const type = consType.value;
     const diam = parseFloat(consDiam.value);
     const count = parseInt(consCount.value) || 1;
+
+    try {
+      localStorage.setItem('tp_cons_type', type);
+      localStorage.setItem('tp_cons_diam', consDiam.value);
+      localStorage.setItem('tp_cons_count', consCount.value);
+    } catch(e) {}
 
     // mm per point for 0.8mm wire as baseline
     let mmPerPoint = 10;
@@ -609,7 +697,93 @@ document.addEventListener('DOMContentLoaded', () => {
     consType.addEventListener('change', updateConsumption);
     consDiam.addEventListener('change', updateConsumption);
     consCount.addEventListener('input', updateConsumption);
+
+    try {
+      const savedConsType = localStorage.getItem('tp_cons_type');
+      const savedConsDiam = localStorage.getItem('tp_cons_diam');
+      const savedConsCount = localStorage.getItem('tp_cons_count');
+      if (savedConsType) consType.value = savedConsType;
+      if (savedConsDiam) consDiam.value = savedConsDiam;
+      if (savedConsCount) consCount.value = savedConsCount;
+    } catch(e) {}
+
     updateConsumption();
   }
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // 6. SCROLL-SPY & QUICK RAIL TOC / MOBILE SUBNAV NAVIGATION
+  // ───────────────────────────────────────────────────────────────────────────
+  const toolSectionIds = ['temp', 'iron', 'checklist', 'defect', 'calculator', 'flux-selector', 'solder-consumption', 'table'];
+  const tocLinks = document.querySelectorAll('.workbench-toc-link');
+  const subnavChips = document.querySelectorAll('.workbench-subnav-chip');
+
+  function setActiveWorkbenchNav(activeId) {
+    tocLinks.forEach(link => {
+      const href = link.getAttribute('href');
+      if (href === `#${activeId}`) {
+        link.classList.add('active');
+        link.setAttribute('aria-current', 'true');
+      } else {
+        link.classList.remove('active');
+        link.removeAttribute('aria-current');
+      }
+    });
+
+    subnavChips.forEach(chip => {
+      const href = chip.getAttribute('href');
+      if (href === `#${activeId}`) {
+        chip.classList.add('active');
+        chip.setAttribute('aria-current', 'true');
+        chip.scrollIntoView({ behavior: 'smooth', inline: 'nearest', block: 'nearest' });
+      } else {
+        chip.classList.remove('active');
+        chip.removeAttribute('aria-current');
+      }
+    });
+  }
+
+  // Smooth scroll click handler
+  document.querySelectorAll('.workbench-toc-link, .workbench-subnav-chip').forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) return;
+      const targetId = href.substring(1);
+      const targetEl = document.getElementById(targetId);
+      if (targetEl) {
+        e.preventDefault();
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(null, '', href);
+        setActiveWorkbenchNav(targetId);
+      }
+    });
+  });
+
+  // IntersectionObserver Scroll-Spy
+  if ('IntersectionObserver' in window && toolSectionIds.length > 0) {
+    const observerState = new Map();
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        observerState.set(entry.target.id, entry.isIntersecting);
+      });
+
+      // Find first visible section in order
+      for (const id of toolSectionIds) {
+        if (observerState.get(id)) {
+          setActiveWorkbenchNav(id);
+          break;
+        }
+      }
+    }, {
+      rootMargin: '-15% 0px -65% 0px',
+      threshold: 0
+    });
+
+    toolSectionIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+  }
+
 });
+

@@ -227,3 +227,89 @@ if (!function_exists('tchp_filter_affiliate_links')) {
         return $content;
     }
 }
+
+/**
+ * Строгая семантическая цветовая классификация тегов ТЧП:
+ * - Orange: Тепловые режимы, припои, нагрев, предупреждения о дефектах
+ * - Yellow: Химия, флюсы, канифоль, заметки верстака
+ * - Blue: Стандарты (ГОСТ, IPC), SMD-монтаж, геометрия жал, приборы
+ */
+if (!function_exists('get_semantic_tag_pill')) {
+    function get_semantic_tag_pill(string $tag_key): string {
+        return match(strtolower($tag_key)) {
+            'materials'          => 'pill-orange', // Металлы, сплавы, нагрев
+            'basics'             => 'pill-yellow', // База, флюсы, канифоль
+            'smd', 'tools'       => 'pill-blue',   // SMD компоненты, приборы, точность
+            'defects', 'oshibki' => 'pill-orange', // Ошибки, брак, предупреждения
+            default              => 'pill-blue',
+        };
+    }
+}
+
+/**
+ * Schema.org микроразметка для страницы рубрики (CollectionPage + ItemList + BreadcrumbList)
+ */
+if (!function_exists('render_rubric_schema')) {
+    function render_rubric_schema(array $rubric, array $articles): string {
+        $canonical_url = "https://tochka-plavleniya.ru/category.php?slug=" . urlencode($rubric['slug'] ?? 'materialy');
+        $itemList = [];
+        $pos = 1;
+        foreach ($articles as $art) {
+            $itemList[] = [
+                "@type" => "ListItem",
+                "position" => $pos++,
+                "url" => "https://tochka-plavleniya.ru/article.php?slug=" . urlencode($art['slug'] ?? ''),
+                "name" => $art['title'] ?? ''
+            ];
+        }
+
+        $schema = [
+            "@context" => "https://schema.org",
+            "@graph" => [
+                [
+                    "@type" => "CollectionPage",
+                    "@id" => $canonical_url . "#webpage",
+                    "url" => $canonical_url,
+                    "name" => ($rubric['title'] ?? 'Рубрика') . " — Журнал ТОЧКА ПЛАВЛЕНИЯ",
+                    "description" => $rubric['lead'] ?? '',
+                    "inLanguage" => "ru",
+                    "isPartOf" => [
+                        "@type" => "WebSite",
+                        "@id" => "https://tochka-plavleniya.ru/#website",
+                        "url" => "https://tochka-plavleniya.ru/",
+                        "name" => "ТОЧКА ПЛАВЛЕНИЯ // ТЧП"
+                    ],
+                    "mainEntity" => [
+                        "@type" => "ItemList",
+                        "itemListElement" => $itemList
+                    ]
+                ],
+                [
+                    "@type" => "BreadcrumbList",
+                    "itemListElement" => [
+                        [
+                            "@type" => "ListItem",
+                            "position" => 1,
+                            "name" => "Главная",
+                            "item" => "https://tochka-plavleniya.ru/"
+                        ],
+                        [
+                            "@type" => "ListItem",
+                            "position" => 2,
+                            "name" => "Рубрики журнала",
+                            "item" => "https://tochka-plavleniya.ru/#articles"
+                        ],
+                        [
+                            "@type" => "ListItem",
+                            "position" => 3,
+                            "name" => $rubric['title'] ?? 'Рубрика',
+                            "item" => $canonical_url
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        return "<script type=\"application/ld+json\">\n" . json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "\n</script>";
+    }
+}

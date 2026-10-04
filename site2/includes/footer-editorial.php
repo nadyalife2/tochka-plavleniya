@@ -7,12 +7,12 @@
           ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
         </a>
         <span class="text-ink-faint">·</span>
-        <span class="text-[11px] font-normal text-ink-faint">Инженерный регламент v2.4</span>
+        <span class="text-xs font-normal text-ink-faint">Инженерный регламент v2.4</span>
       </div>
-      <p class="text-[12px] text-ink-muted max-w-md">
+      <p class="text-xs text-ink-muted max-w-md">
         Инженерный справочник, регламенты поверхностного монтажа и открытая документация по пайке и теплофизике компонентов.
       </p>
-      <div class="text-ink-faint text-[11px] pt-1">
+      <div class="text-ink-faint text-xs pt-1">
         © <?php echo date('Y'); ?> ТОЧКА ПЛАВЛЕНИЯ. Все права защищены.
       </div>
     </div>

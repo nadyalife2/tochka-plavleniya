@@ -113,8 +113,13 @@ html.dark {
 }
 
 .form-select:focus {
-  background: #FFF;
+  background: var(--bg-paper);
   box-shadow: 3px 3px 0px var(--accent-yellow);
+}
+
+.form-select:focus-visible {
+  outline: 2px solid var(--accent, #d35400) !important;
+  outline-offset: 2px !important;
 }
 
 .calc-result {
@@ -298,8 +303,13 @@ html.dark {
 }
 
 .solder-search:focus {
-  background: #FFF;
-  box-shadow: 5px 5px 0px var(--accent-yellow);
+  background: var(--bg-card);
+  box-shadow: 4px 4px 0px var(--border-dark);
+}
+
+.solder-search:focus-visible {
+  outline: 2px solid var(--accent, #d35400) !important;
+  outline-offset: 2px !important;
 }
 
 .table-responsive {

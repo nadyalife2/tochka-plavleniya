@@ -1,19 +1,37 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/articles-data.php';
+require_once __DIR__ . '/includes/rubrics-data.php';
 
 $page_title = "Паяй уверенно — ТОЧКА ПЛАВЛЕНИЯ";
-$page_desc = "Инженерный справочник по пайке: точные ориентиры температуры жала, подбор инструмента и правила монтажа без риска перегреть компоненты.";
+$page_desc  = "Инженерный справочник по пайке: точные ориентиры температуры жала, подбор инструмента и правила монтажа без риска перегреть компоненты.";
 $current_page = 'index';
 
 // Берём только реальные статьи из базы знаний (без выдуманных данных)
 $recent_articles = array_slice($articles, 0, 4);
 
+ob_start();
+?>
+  <link rel="canonical" href="https://tochka-plavleniya.ru/">
+  <style>
+    .washi-tape-hero { top: -10px; left: 16px; transform: rotate(-2.5deg); }
+    .washi-tape-warn { top: -9px; left: 50%; transform: translateX(-50%) rotate(-0.5deg); }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+<?php
+$extra_head = ob_get_clean();
 include __DIR__ . '/includes/header.php';
 ?>
 
-  <!-- Main Container: 64px vertical spacing between sections, strict 8-point grid -->
-  <main class="w-full flex-grow pt-6 sm:pt-8 pb-16">
+  <!-- Main Container: Strict 8-point grid, WCAG accessible main anchor -->
+  <main class="w-full flex-grow pt-6 sm:pt-8 pb-16" id="main-content">
     <div class="max-w-[1140px] mx-auto px-4 sm:px-6 lg:px-8 space-y-14 sm:space-y-16">
 
       <!-- 1. ПЕРВЫЙ ЭКРАН (HERO): Заголовок «Паяй уверенно», 4 задачи, схема жала -->
@@ -21,9 +39,9 @@ include __DIR__ . '/includes/header.php';
         
         <!-- Скотч и пометка (строго только у первого экрана, честный текст без «лабораторный») -->
         <div class="relative inline-block">
-          <div class="sketch-washi-tape" style="top: -10px; left: 16px; transform: rotate(-2.5deg);" aria-hidden="true"></div>
+          <div class="sketch-washi-tape washi-tape-hero" aria-hidden="true"></div>
           <div class="sketch-sticky-note inline-flex items-center gap-2 px-3 py-1 text-ink font-mono text-xs shadow-xs rotate-[-1deg] rounded-sm">
-            <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+            <span class="w-2 h-2 rounded-full bg-accent inline-block" aria-hidden="true"></span>
             <span class="font-bold tracking-wider uppercase">ОТК // ИНЖЕНЕРНЫЙ СПРАВОЧНИК 2026</span>
           </div>
         </div>
@@ -40,45 +58,118 @@ include __DIR__ . '/includes/header.php';
                 Выберите, что нужно соединить
               </p>
               <p class="text-base sm:text-lg text-ink-muted leading-relaxed font-serif max-w-xl">
-                Нажмите свою задачу — откроется готовый ориентир.
+                Нажмите свою задачу — откроется готовый тепловой ориентир и регламент монтажа.
               </p>
             </div>
 
-            <!-- Сетка 4 задач в 2 колонки (крупные, без лишнего кода) -->
+            <!-- Сетка 4 задач в 2 колонки с технической иконографикой и описаниями -->
             <div class="hero-tasks-grid pt-1">
               
               <!-- Задача 1: Провод / кабель -->
-              <a href="interactive.php?tool=temp&task=wire" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Провод / кабель</span>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
+              <a href="interactive.php?tool=temp&task=wire" 
+                 class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                 aria-label="Задача пайки: Провод или кабель. Подбор температуры для многожильного провода">
+                <div>
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">cable</span>
+                      </div>
+                      <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Провод / кабель</span>
+                    </div>
+                    <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform text-lg font-bold" aria-hidden="true">→</span>
+                  </div>
+                  <p class="text-xs text-ink-muted font-sans mt-2 leading-snug">
+                    Многожильный медный провод, лужение жил, термоусадка
+                  </p>
+                </div>
+                <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
+                  <span class="pill-orange text-[10px] uppercase font-bold">Основы пайки</span>
+                  <span class="text-ink-faint text-[11px]">ПОС-61 // 280°C</span>
+                </div>
               </a>
 
               <!-- Задача 2: Печатная плата -->
-              <a href="interactive.php?tool=temp&task=pcb" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Печатная плата</span>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
+              <a href="interactive.php?tool=temp&task=pcb" 
+                 class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                 aria-label="Задача пайки: Печатная плата. Монтаж SMD 0805, QFN и теплоемких полигонов">
+                <div>
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">developer_board</span>
+                      </div>
+                      <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Печатная плата</span>
+                    </div>
+                    <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform text-lg font-bold" aria-hidden="true">→</span>
+                  </div>
+                  <p class="text-xs text-ink-muted font-sans mt-2 leading-snug">
+                    SMD 0805–1206, QFN чипы, земляные полигоны платы
+                  </p>
+                </div>
+                <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
+                  <span class="pill-blue text-[10px] uppercase font-bold">SMD и термопрофили</span>
+                  <span class="text-ink-faint text-[11px]">SAC305 // T12</span>
+                </div>
               </a>
 
               <!-- Задача 3: Медная труба -->
-              <a href="interactive.php?tool=temp&task=pipe" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Медная труба</span>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
+              <a href="interactive.php?tool=temp&task=pipe" 
+                 class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                 aria-label="Задача пайки: Медная труба. Капиллярные фитинги и твердый припой">
+                <div>
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">plumbing</span>
+                      </div>
+                      <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Медная труба</span>
+                    </div>
+                    <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform text-lg font-bold" aria-hidden="true">→</span>
+                  </div>
+                  <p class="text-xs text-ink-muted font-sans mt-2 leading-snug">
+                    Трубы 15–28 мм, капиллярные муфты, горелка и твердый припой
+                  </p>
+                </div>
+                <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
+                  <span class="pill-orange text-[10px] uppercase font-bold">Материалы и флюсы</span>
+                  <span class="text-ink-faint text-[11px]">Горелка // 650°C</span>
+                </div>
               </a>
 
               <!-- Задача 4: Не знаю — помочь -->
-              <a href="interactive.php?tool=temp&task=unknown" class="sketch-card p-4 min-h-[52px] flex items-center justify-between bg-card hover:border-accent group transition-all">
-                <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors">Не знаю — помочь</span>
-                <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform ml-2 text-xl font-bold">→</span>
+              <a href="interactive.php?tool=temp&task=unknown" 
+                 class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
+                 aria-label="Задача: Интерактивный помощник. Экспресс-подбор температуры жала и оборудования">
+                <div>
+                  <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                        <span class="material-symbols-outlined text-[18px]">troubleshoot</span>
+                      </div>
+                      <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Не знаю — помочь</span>
+                    </div>
+                    <span class="font-mono text-ink-muted group-hover:text-accent group-hover:translate-x-1 transition-transform text-lg font-bold" aria-hidden="true">→</span>
+                  </div>
+                  <p class="text-xs text-ink-muted font-sans mt-2 leading-snug">
+                    Пошаговый подбор температуры жала, типа флюса и станции
+                  </p>
+                </div>
+                <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
+                  <span class="pill-yellow text-[10px] uppercase font-bold">Интерактивный верстак</span>
+                  <span class="text-ink-faint text-[11px]">Экспресс-тест</span>
+                </div>
               </a>
 
             </div>
           </div>
 
-          <!-- Правая колонка: Инженерная схема жала -->
+          <!-- Правая колонка: Инженерная схема жала (Fixed aspect ratio to prevent CLS) -->
           <div class="flex flex-col items-center justify-center">
             <div class="sketch-card p-3.5 bg-paper w-full max-w-[440px] shadow-xs relative">
-              <div class="font-mono text-[11px] text-ink-muted pb-2 border-b border-paper-border mb-2.5">
+              <div class="font-mono text-xs text-ink-muted pb-2 border-b border-paper-border mb-2.5 flex items-center justify-between">
                 <span class="font-bold text-ink uppercase tracking-wider">АНАТОМИЯ ЖАЛА</span>
+                <span class="pill-blue text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded">IPC-J-STD</span>
               </div>
               <div class="w-full overflow-hidden rounded bg-white dark:bg-[#1a1f26] flex items-center justify-center border border-paper-border/60 p-1">
                 <img 
@@ -90,7 +181,7 @@ include __DIR__ . '/includes/header.php';
                   loading="eager"
                 />
               </div>
-              <p class="font-mono text-[11px] text-ink-muted mt-2.5 text-center leading-normal">
+              <p class="font-mono text-xs text-ink-muted mt-2.5 text-center leading-normal">
                 Так устроено жало, которое греет соединение: медный сердечник передаёт тепло, защитный слой железа предотвращает растворение в олове
               </p>
             </div>
@@ -99,6 +190,73 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
+      <!-- БЫСТРЫЙ ПОИСК ПО БАЗЕ ЗНАНИЙ (Стиль инженерной миллиметровки) -->
+      <section class="space-y-2">
+        <div id="quick-search-trigger" role="button" tabindex="0" aria-label="Открыть глобальный инженерный поиск по базе (Ctrl+K)"
+             class="sketch-card p-3 sm:p-4 bg-paper flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+          <div class="flex items-center gap-3 text-ink-muted text-xs sm:text-sm font-mono">
+            <span class="material-symbols-outlined text-[20px] text-accent group-hover:scale-110 transition-transform">search</span>
+            <span class="text-ink-muted group-hover:text-ink transition-colors">Поиск по базе: припой ПОС-61, флюс RMA, жала T12/C245, дефекты пайки...</span>
+          </div>
+          <kbd class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono border border-paper-border rounded bg-paper-subtle text-ink-muted">
+            <span>Ctrl</span><span>+</span><span>K</span>
+          </kbd>
+        </div>
+      </section>
+
+      <!-- РУБРИКИ ЖУРНАЛА (4 архитектурных раздела базы знаний) -->
+      <section class="space-y-4" id="rubrics-grid">
+        <div class="flex items-end justify-between flex-wrap gap-2">
+          <div class="space-y-1">
+            <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">РУБРИКИ ЖУРНАЛА</span>
+            <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
+              Тематические разделы
+            </h2>
+          </div>
+          <a href="/category.php?slug=materialy" class="font-mono text-xs text-ink-muted hover:text-accent transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent rounded">
+            <span>Все рубрики в каталоге</span>
+            <span>→</span>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-1">
+          <?php 
+          $rubric_order = ['start', 'materialy', 'praktika', 'oshibki'];
+          foreach ($rubric_order as $rslug):
+            if (!isset($RUBRICS[$rslug])) continue;
+            $rub = $RUBRICS[$rslug];
+            $pill_class = match($rslug) {
+              'start'     => 'pill-yellow',
+              'materialy' => 'pill-orange',
+              'praktika'  => 'pill-blue',
+              'oshibki'   => 'pill-orange',
+              default     => 'pill-blue'
+            };
+          ?>
+            <a href="/category.php?slug=<?= $rslug ?>"
+               class="sketch-card p-4 sm:p-5 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-all group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <div class="space-y-2">
+                <div class="flex items-center justify-between font-mono text-xs">
+                  <span class="<?= $pill_class ?> px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider">
+                    <?= e($rub['subbadge']) ?>
+                  </span>
+                  <span class="text-ink-faint font-bold font-mono">0<?= match($rslug) {'start'=>1, 'materialy'=>2, 'praktika'=>3, 'oshibki'=>4} ?></span>
+                </div>
+                <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
+                  <?= e($rub['title']) ?>
+                </h3>
+                <p class="text-xs text-ink-muted leading-relaxed font-serif line-clamp-3">
+                  <?= e($rub['lead']) ?>
+                </p>
+              </div>
+              <div class="pt-3 border-t border-paper-border flex items-center justify-between font-mono text-xs text-ink-muted">
+                <span class="text-xs text-ink-faint"><?= count($rub['article_ids'] ?? []) ?> материалов</span>
+                <span class="text-ink font-bold group-hover:text-accent group-hover:translate-x-1 transition-all">Открыть →</span>
+              </div>
+            </a>
+          <?php endforeach; ?>
+        </div>
+      </section>
 
       <!-- 2. НОВЫЕ СТАТЬИ: Только реальные статьи из базы знаний -->
       <section class="space-y-4" id="articles">
@@ -109,19 +267,26 @@ include __DIR__ . '/includes/header.php';
               Новые статьи
             </h2>
           </div>
-          <span class="font-mono text-xs text-ink-muted">Инженерные инструкции и практический опыт</span>
+          <a href="/category.php?slug=materialy" class="font-mono text-xs text-ink-muted hover:text-accent transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent rounded">
+            <span>Все статьи журнала</span>
+            <span>→</span>
+          </a>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <?php foreach ($recent_articles as $article): ?>
+          <?php foreach ($recent_articles as $article): 
+            $tag_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
+          ?>
             <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
               <div class="space-y-2">
-                <div class="flex items-center justify-between font-mono text-[11px] text-ink-muted">
-                  <span class="pill-orange uppercase"><?= htmlspecialchars($article['tag']) ?></span>
+                <div class="flex items-center justify-between font-mono text-xs text-ink-muted">
+                  <span class="<?= $tag_pill ?> px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase">
+                    <?= htmlspecialchars($article['tag']) ?>
+                  </span>
                   <span>~<?= (int)$article['read_min'] ?> мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink group-hover:text-accent transition-colors leading-snug">
-                  <a href="article.php?slug=<?= urlencode($article['slug']) ?>">
+                  <a href="article.php?slug=<?= urlencode($article['slug']) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
                     <?= htmlspecialchars($article['title']) ?>
                   </a>
                 </h3>
@@ -131,8 +296,8 @@ include __DIR__ . '/includes/header.php';
               </div>
 
               <div class="pt-3 border-t border-paper-border flex items-center justify-between font-mono text-xs">
-                <span class="text-ink-faint text-[11px]"><?= htmlspecialchars($article['author']) ?></span>
-                <a href="article.php?slug=<?= urlencode($article['slug']) ?>" class="text-ink font-bold group-hover:text-accent">
+                <span class="text-ink-faint text-xs font-hand text-base font-bold italic"><?= htmlspecialchars($article['author']) ?></span>
+                <a href="article.php?slug=<?= urlencode($article['slug']) ?>" class="text-ink font-bold group-hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1">
                   Читать →
                 </a>
               </div>
@@ -150,30 +315,30 @@ include __DIR__ . '/includes/header.php';
               Прикладные микроуроки монтажа
             </h2>
           </div>
-          <span class="font-mono text-xs text-ink-muted">10 быстрых регламентов</span>
+          <span class="font-mono text-xs text-ink-muted">10 регламентов с чек-листами</span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
           <?php foreach (get_all_lessons() as $idx => $l): ?>
             <article class="sketch-card p-3.5 flex flex-col justify-between space-y-2.5 bg-card hover:border-paper-border-dark transition-all rounded-lg group shadow-xs">
               <div class="space-y-2">
-                <div class="flex items-center justify-between font-mono text-[10px]">
-                  <span class="pill-orange uppercase font-bold tracking-tight">Урок <?= $l['read_min'] ?>м</span>
+                <div class="flex items-center justify-between font-mono text-xs">
+                  <span class="pill-orange uppercase font-bold tracking-tight text-[10px]">Урок <?= $l['read_min'] ?>м</span>
                   <span class="text-ink-faint">#<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
                 </div>
                 <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug line-clamp-2">
-                  <a href="article.php?slug=<?= urlencode($l['slug']) ?>">
+                  <a href="article.php?slug=<?= urlencode($l['slug']) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
                     <?= htmlspecialchars($l['title']) ?>
                   </a>
                 </h3>
-                <p class="text-[11px] text-ink-muted leading-relaxed font-serif line-clamp-2">
+                <p class="text-xs text-ink-muted leading-relaxed font-serif line-clamp-2">
                   <?= htmlspecialchars($l['subtitle']) ?>
                 </p>
               </div>
 
-              <div class="pt-2 border-t border-paper-border flex items-center justify-between font-mono text-[11px]">
+              <div class="pt-2 border-t border-paper-border flex items-center justify-between font-mono text-xs">
                 <span class="text-ink-faint text-[10px] uppercase truncate max-w-[80px]"><?= htmlspecialchars($l['tag']) ?></span>
-                <a href="article.php?slug=<?= urlencode($l['slug']) ?>" class="text-ink font-bold group-hover:text-accent shrink-0">
+                <a href="article.php?slug=<?= urlencode($l['slug']) ?>" class="text-ink font-bold group-hover:text-accent shrink-0 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1">
                   Открыть →
                 </a>
               </div>
@@ -198,15 +363,15 @@ include __DIR__ . '/includes/header.php';
           </p>
           <div class="pt-3 border-t border-paper-border flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-ink-muted">
             <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
               <strong>Оловянно-свинцовые припои (ПОС):</strong> ГОСТ 21930 / ГОСТ 21931
             </span>
             <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
               <strong>Бессвинцовые сплавы (SAC305):</strong> Паспорта производителей / ISO 9453
             </span>
             <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>
+              <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
               <strong>Критерии пайки:</strong> IPC-A-610 (внешний вид соединений)
             </span>
           </div>
@@ -214,7 +379,7 @@ include __DIR__ . '/includes/header.php';
 
         <!-- Заметка инженера: предостережение по кислоте -->
         <div class="sketch-pencil-orange relative p-5 rounded-lg shadow-xs space-y-3 mt-5">
-          <div class="sketch-washi-tape" style="top: -9px; left: 50%; transform: translateX(-50%) rotate(-0.5deg);" aria-hidden="true"></div>
+          <div class="sketch-washi-tape washi-tape-warn" aria-hidden="true"></div>
           
           <div class="flex items-center gap-2 text-amber-900 dark:text-amber-300">
             <svg width="16" height="16" class="w-4 h-4 stroke-current shrink-0" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -232,7 +397,6 @@ include __DIR__ . '/includes/header.php';
           </div>
         </div>
       </section>
-
 
       <!-- 4. ЧАСТЫЕ ВОПРОСЫ (FAQ) ИЗ 4 ВОПРОСОВ -->
       <section class="space-y-4" id="faq">
@@ -355,9 +519,26 @@ include __DIR__ . '/includes/header.php';
   <!-- Global Engineering Search Modal (Ctrl+K) -->
   <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
-  <!-- Theme Toggle JS -->
+  <!-- Quick-Search Bar Hook & Theme Toggle JS -->
   <script>
     (function() {
+      // Quick search click/keydown handler
+      const qsTrigger = document.getElementById('quick-search-trigger');
+      if (qsTrigger) {
+        const openModal = function(e) {
+          e.preventDefault();
+          const trigger = document.getElementById('search-modal-trigger');
+          if (trigger) trigger.click();
+        };
+        qsTrigger.addEventListener('click', openModal);
+        qsTrigger.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            openModal(e);
+          }
+        });
+      }
+
+      // Theme toggle
       const toggle = document.getElementById('theme-toggle');
       if (toggle) {
         toggle.addEventListener('click', function() {

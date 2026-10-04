@@ -1,96 +1,20 @@
 <?php
 require_once __DIR__ . '/includes/functions.php';
 require_once __DIR__ . '/includes/articles-data.php';
-
-// Canonical Information Architecture Rubrics Configuration
-$RUBRICS = [
-    'materialy' => [
-        'title'       => 'Материалы и сплавы',
-        'badge'       => '02 // РУБРИКА ЖУРНАЛА',
-        'subbadge'    => 'МАТЕРИАЛЫ И СПЛАВЫ',
-        'lead'        => 'Разбираем металлургию и химию радиомонтажа: свойства припоев (ПОС-61, SAC305, сплав Розе), классификацию флюсов (RMA, No-Clean, водосмывные), реанимацию паяльных паст и паразитные токи утечки.',
-        'filter_tags' => ['materials'],
-        'article_ids' => [3, 7, 6, 12, 11],
-        'featured_id' => 3,
-        'cta' => [
-            'icon'  => 'science',
-            'title' => 'Реестр припоев и калькулятор расхода флюса',
-            'desc'  => 'Расчёт дозировки флюса и паяльной пасты по площади платы (IPC-7095C) и справочник температур ликвидуса 9 марок сплавов по ГОСТ 21931.',
-            'link1' => 'interactive.php#calculator',
-            'lbl1'  => 'Калькулятор расхода флюса →',
-            'link2' => 'interactive.php#table',
-            'lbl2'  => 'Таблица сплавов'
-        ]
-    ],
-    'start' => [
-        'title'       => 'Начать паять',
-        'badge'       => '01 // РУБРИКА ЖУРНАЛА',
-        'subbadge'    => 'СТАРТ И БАЗА',
-        'lead'        => 'Первые шаги в радиомонтаже, базовые принципы смачиваемости, выбор первого оборудования и безопасная организация рабочего места монтажника.',
-        'filter_tags' => ['basics'],
-        'article_ids' => [1, 8, 11],
-        'featured_id' => 1,
-        'cta' => [
-            'icon'  => 'device_thermostat',
-            'title' => 'Термокалькулятор монтажника',
-            'desc'  => 'Подберите безопасное тепловое окно жала паяльной станции под марку припоя и тип соединяемых проводников.',
-            'link1' => 'interactive.php#temp',
-            'lbl1'  => 'Подобрать температуру →',
-            'link2' => 'interactive.php#iron',
-            'lbl2'  => 'Выбрать паяльник'
-        ]
-    ],
-    'praktika' => [
-        'title'       => 'Практика и монтаж',
-        'badge'       => '03 // РУБРИКА ЖУРНАЛА',
-        'subbadge'    => 'ПРАКТИКА И ТЕХНИКА',
-        'lead'        => 'Техника ручного монтажа SMD 0402–1206, пайка безвыводных микросхем QFN, BGA-реболлинг, прогрев массивных полигонов и выбор геометрии жал.',
-        'filter_tags' => ['smd', 'tools'],
-        'article_ids' => [2, 4, 5, 9, 10],
-        'featured_id' => 4,
-        'cta' => [
-            'icon'  => 'construction',
-            'title' => 'Интерактивные калькуляторы и верстак',
-            'desc'  => 'Быстрые расчеты под вашу задачу: безопасная температура жала станции, подбор паяльника и жал под бюджет, чек-лист безопасности монтажа.',
-            'link1' => 'interactive.php#temp',
-            'lbl1'  => 'Термокалькулятор жала →',
-            'link2' => 'interactive.php#iron',
-            'lbl2'  => 'Конфигуратор верстака',
-            'link3' => 'interactive.php#checklist',
-            'lbl3'  => 'Чек-лист пайки'
-        ]
-    ],
-    'oshibki' => [
-        'title'       => 'Проблемы и дефекты',
-        'badge'       => '04 // РУБРИКА ЖУРНАЛА',
-        'subbadge'    => 'ДИАГНОСТИКА БРАКА',
-        'lead'        => 'Диагностика и устранение типового брака пайки: холодный зернистый шов, паразитные перемычки, отслоение медных дорожек и tombstoning.',
-        'filter_tags' => ['basics', 'materials', 'smd'],
-        'article_ids' => [1, 7, 8, 12],
-        'featured_id' => 7,
-        'cta' => [
-            'icon'  => 'search',
-            'title' => 'Интерактивное дерево диагностики дефектов',
-            'desc'  => 'Интерактивный определитель первопричин брака с пошаговыми действиями по устранению дефекта прямо на плате.',
-            'link1' => 'interactive.php#defect',
-            'lbl1'  => 'Диагностировать дефект →',
-            'link2' => 'interactive.php#temp',
-            'lbl2'  => 'Проверить температуру'
-        ]
-    ]
-];
+require_once __DIR__ . '/includes/rubrics-data.php';
 
 // Determine active slug or tag
 $slug = $_GET['slug'] ?? null;
 $tag_param = $_GET['tag'] ?? null;
+$sub_param = $_GET['sub'] ?? 'all';
+$sort_param = $_GET['sort'] ?? 'default';
 
 if ($slug && isset($RUBRICS[$slug])) {
     $current_rubric = $RUBRICS[$slug];
     $current_slug   = $slug;
     $current_page   = $slug;
 } elseif ($tag_param) {
-    $tag_to_slug = ['materials' => 'materialy', 'basics' => 'start', 'smd' => 'praktika', 'tools' => 'praktika'];
-    $current_slug   = $tag_to_slug[$tag_param] ?? 'materialy';
+    $current_slug   = $TAG_TO_SLUG[$tag_param] ?? 'materialy';
     $current_rubric = $RUBRICS[$current_slug] ?? $RUBRICS['materialy'];
     $current_page   = $current_slug;
 } else {
@@ -100,10 +24,12 @@ if ($slug && isset($RUBRICS[$slug])) {
 }
 
 $page_title = $current_rubric['title'] . " — Журнал ТОЧКА ПЛАВЛЕНИЯ";
+$page_desc  = $current_rubric['lead'];
+$canonical_url = "https://tochka-plavleniya.ru/category.php?slug=" . urlencode($current_slug);
 
-// Collect articles
+// Collect articles for this rubric
+$matched_articles = [];
 if (isset($current_rubric['article_ids'])) {
-    $matched_articles = [];
     foreach ($current_rubric['article_ids'] as $aid) {
         foreach ($articles as $art) {
             if ($art['id'] === $aid && empty($art['draft'])) {
@@ -112,8 +38,49 @@ if (isset($current_rubric['article_ids'])) {
             }
         }
     }
-} else {
-    $matched_articles = array_values(array_filter($articles, fn($a) => empty($a['draft']) && in_array($a['tag_key'], $current_rubric['filter_tags'])));
+}
+
+// Append matching published articles & lessons by tag to provide rich catalog and pagination
+if (!empty($current_rubric['filter_tags'])) {
+    $existing_ids = array_column($matched_articles, 'id');
+    foreach ($articles as $art) {
+        if (!in_array($art['id'], $existing_ids) && empty($art['draft']) && in_array($art['tag_key'], $current_rubric['filter_tags'])) {
+            $matched_articles[] = $art;
+            $existing_ids[] = $art['id'];
+        }
+    }
+}
+
+// Sub-tag filtering logic (if selected)
+$active_sub = 'all';
+if (!empty($current_rubric['sub_tags']) && $sub_param !== 'all') {
+    foreach ($current_rubric['sub_tags'] as $st) {
+        if ($st['id'] === $sub_param) {
+            $active_sub = $st['id'];
+            if (!empty($st['keywords'])) {
+                $filtered = array_filter($matched_articles, function($art) use ($st) {
+                    $haystack = mb_strtolower(($art['title'] ?? '') . ' ' . ($art['excerpt'] ?? '') . ' ' . ($art['tag'] ?? ''));
+                    foreach ($st['keywords'] as $kw) {
+                        if (mb_strpos($haystack, mb_strtolower($kw)) !== false) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+                if (!empty($filtered)) {
+                    $matched_articles = array_values($filtered);
+                }
+            }
+            break;
+        }
+    }
+}
+
+// Sorting logic (if selected)
+if ($sort_param === 'time_desc') {
+    usort($matched_articles, fn($a, $b) => ($b['read_min'] ?? 0) <=> ($a['read_min'] ?? 0));
+} elseif ($sort_param === 'time_asc') {
+    usort($matched_articles, fn($a, $b) => ($a['read_min'] ?? 0) <=> ($b['read_min'] ?? 0));
 }
 
 // Separate featured article
@@ -132,33 +99,35 @@ if (!$featured_article && !empty($grid_articles)) {
     $featured_article = array_shift($grid_articles);
 }
 
+// Paginate grid articles (4 items per page)
 $page_num = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $paginated = paginate($grid_articles, 4, $page_num);
 
-/**
- * Strict Editorial Semantic Color Logic:
- * - Orange (pill-orange / hl-orange): Thermal, soldering temperatures, copper, solder alloys, heating stations.
- * - Yellow (pill-yellow / hl-yellow): Chemistry, rosin, active fluxes, workshop master notes (post-it).
- * - Blue   (pill-blue   / hl-blue):   Standards (GOST, IPC), SMD precision, electronics, leakage currents.
- * - Orange / Amber (pill-orange / hl-orange): Thermal, soldering temperatures, copper, solder alloys, heating stations, defect warnings.
- */
-function get_semantic_tag_pill(string $tag_key): string {
-    return match(strtolower($tag_key)) {
-        'materials'          => 'pill-orange', // Металлы, сплавы, нагрев
-        'basics'             => 'pill-yellow', // База, флюсы, канифоль
-        'smd', 'tools'       => 'pill-blue',   // SMD компоненты, приборы, точность
-        'defects', 'oshibki' => 'pill-orange', // Ошибки, брак, предупреждения
-        default              => 'pill-blue',
-    };
-}
-
-$page_desc = $current_rubric['lead'];
-$current_page = $current_slug;
+// Prepare extra head elements: canonical link, schema.org, and custom styling
 ob_start();
 ?>
+  <link rel="canonical" href="<?= e($canonical_url) ?>">
   <style>
     .font-hand { font-family: 'Caveat', cursive; }
+    .washi-tape-badge {
+      top: -6px; left: 16px; width: 44px; height: 14px; transform: rotate(-2deg);
+    }
+    .washi-tape-banner {
+      top: -8px; left: 24px; width: 50px; height: 14px; transform: rotate(-1.5deg);
+    }
+    .washi-tape-postit {
+      top: 0px; left: 20px; width: 50px; height: 14px; transform: rotate(-2deg);
+    }
+    .featured-sketch-frame {
+      border: 2px solid var(--accent);
+      box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
+    }
+    .dark .featured-sketch-frame {
+      border-color: rgba(234, 88, 12, 0.55);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+    }
   </style>
+  <?= render_rubric_schema($current_rubric, $matched_articles) ?>
 <?php
 $extra_head = ob_get_clean();
 include __DIR__ . '/includes/header.php';
@@ -168,13 +137,13 @@ include __DIR__ . '/includes/header.php';
   <main class="w-full flex-grow pt-8 pb-16">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 space-y-8">
       
-      <!-- Breadcrumbs -->
-      <nav class="text-[12px] font-mono text-ink-faint flex items-center gap-1.5 flex-wrap">
-        <a class="hover:text-ink transition-colors" href="/">Главная</a>
-        <span>→</span>
-        <a class="hover:text-ink transition-colors" href="/index.php#articles">Рубрики журнала</a>
-        <span>→</span>
-        <span class="text-ink font-semibold"><?= e($current_rubric['title']) ?></span>
+      <!-- Semantic Breadcrumbs (WCAG compliant) -->
+      <nav aria-label="Хлебные крошки" class="text-xs font-mono text-ink-faint flex items-center gap-1.5 flex-wrap">
+        <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="/">Главная</a>
+        <span aria-hidden="true">→</span>
+        <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="/index.php#articles">Рубрики журнала</a>
+        <span aria-hidden="true">→</span>
+        <span class="text-ink font-semibold px-1" aria-current="location"><?= e($current_rubric['title']) ?></span>
       </nav>
 
       <!-- HERO SECTION (Calm, Engineering Aesthetics with Strict Semantic Highlights) -->
@@ -183,12 +152,12 @@ include __DIR__ . '/includes/header.php';
           
           <!-- Single Subtle Tape & Label Badge (Yellow = Workshop/Editorial Identity) -->
           <div class="relative inline-block mb-1">
-            <div class="sketch-washi-tape" style="top: -6px; left: 16px; width: 44px; height: 14px; transform: rotate(-2deg);" aria-hidden="true"></div>
-            <div class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-[11px] shadow-sm rotate-[-0.8deg] sketch-border">
+            <div class="sketch-washi-tape washi-tape-badge" aria-hidden="true"></div>
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-xs shadow-sm rotate-[-0.8deg] sketch-border">
               <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
               <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?></span>
               <span class="text-ink-faint">|</span>
-              <span class="text-[10px] text-ink-muted uppercase"><?= e($current_rubric['subbadge']) ?></span>
+              <span class="text-[11px] text-ink-muted uppercase"><?= e($current_rubric['subbadge']) ?></span>
             </div>
           </div>
 
@@ -219,13 +188,8 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
-      <!-- CATEGORY NAVIGATION PILLS: Semantic Identity Color Coding:
-           - start: Yellow (Basics/Rosin)
-           - materialy: Orange (Alloys/Thermal)
-           - praktika: Blue (SMD/Instruments)
-           - oshibki: Amber (Defects/Damage)
-      -->
-      <div class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs">
+      <!-- CATEGORY NAVIGATION PILLS: Semantic Identity Color Coding -->
+      <nav aria-label="Переключение рубрик журнала" class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs">
         <?php
         $nav_pills = [
             ['slug' => 'start',     'label' => 'Начать паять',     'dot' => 'bg-amber-400'],
@@ -237,15 +201,46 @@ include __DIR__ . '/includes/header.php';
             $is_curr = ($current_slug === $pill['slug']);
         ?>
           <a href="/category.php?slug=<?= $pill['slug'] ?>"
-             class="inline-flex items-center gap-1.5 px-3 py-1 rounded transition-all whitespace-nowrap text-xs <?= $is_curr ? 'bg-ink text-paper font-bold shadow-sm' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?>">
-            <span class="w-1.5 h-1.5 rounded-full <?= $pill['dot'] ?>"></span>
+             <?= $is_curr ? 'aria-current="page"' : '' ?>
+             class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $is_curr ? 'bg-ink text-paper font-bold shadow-sm' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?>">
+            <span class="w-1.5 h-1.5 rounded-full <?= $pill['dot'] ?>" aria-hidden="true"></span>
             <span><?= $pill['label'] ?></span>
           </a>
         <?php endforeach; ?>
-        <a href="/index.php#articles" class="px-3 py-1 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto text-xs">
+        <a href="/index.php#articles" class="px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
           Все статьи журнала →
         </a>
-      </div>
+      </nav>
+
+      <!-- SUB-TAG FILTERS & IN-RUBRIC SORTING BAR -->
+      <?php if (!empty($current_rubric['sub_tags'])): ?>
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-1 pb-2 border-b border-paper-border/60">
+          <div class="flex items-center gap-1.5 flex-wrap">
+            <span class="text-xs font-mono text-ink-muted uppercase mr-1">Тема:</span>
+            <?php foreach ($current_rubric['sub_tags'] as $st): 
+              $is_active_st = ($active_sub === $st['id']);
+              $st_url = "/category.php?slug=" . urlencode($current_slug) . ($st['id'] !== 'all' ? "&sub=" . urlencode($st['id']) : '') . ($sort_param !== 'default' ? "&sort=" . urlencode($sort_param) : '');
+            ?>
+              <a href="<?= e($st_url) ?>"
+                 class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $is_active_st ? 'bg-paper-border-dark text-ink font-bold border border-ink/40' : 'bg-paper border border-paper-border text-ink-muted hover:border-ink/30 hover:text-ink' ?>">
+                <?php if (!empty($st['icon'])): ?>
+                  <span class="material-symbols-outlined text-[13px] text-accent"><?= e($st['icon']) ?></span>
+                <?php endif; ?>
+                <span><?= e($st['label']) ?></span>
+              </a>
+            <?php endforeach; ?>
+          </div>
+
+          <!-- Quick Sorting Options -->
+          <div class="flex items-center gap-2 text-xs font-mono text-ink-muted ml-auto">
+            <span>Время чтения:</span>
+            <a href="/category.php?slug=<?= urlencode($current_slug) ?>&sub=<?= urlencode($active_sub) ?>&sort=<?= $sort_param === 'time_asc' ? 'time_desc' : 'time_asc' ?>"
+               class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-paper-border bg-paper hover:border-ink/40 text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <span><?= $sort_param === 'time_desc' ? 'Сначала длинные ↓' : ($sort_param === 'time_asc' ? 'Сначала быстрые ↑' : 'По умолчанию') ?></span>
+            </a>
+          </div>
+        </div>
+      <?php endif; ?>
 
       <!-- MAIN EDITORIAL LAYOUT: 8 COLS (Articles) + 4 COLS (Sidebar) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -256,7 +251,7 @@ include __DIR__ . '/includes/header.php';
           <!-- CONTEXTUAL INTERACTIVE CTA BANNER (Engineering Standard / Tool) -->
           <?php if (!empty($current_rubric['cta'])): ?>
             <div class="sketch-card p-5 sm:p-6 bg-card space-y-3 relative overflow-hidden">
-              <div class="sketch-washi-tape" style="top: -8px; left: 24px; transform: rotate(-1.5deg);" aria-hidden="true"></div>
+              <div class="sketch-washi-tape washi-tape-banner" aria-hidden="true"></div>
               <div class="flex items-center justify-between gap-2 pt-1">
                 <div class="flex items-center gap-2">
                   <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1">
@@ -277,45 +272,45 @@ include __DIR__ . '/includes/header.php';
 
               <div class="pt-2 flex flex-wrap items-center gap-2.5">
                 <?php if (!empty($current_rubric['cta']['link1'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono">
+                  <a href="<?= e($current_rubric['cta']['link1']) ?>" class="btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                     <span><?= e($current_rubric['cta']['lbl1']) ?></span>
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($current_rubric['cta']['link2'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent hover:text-accent transition-colors shadow-2xs">
+                  <a href="<?= e($current_rubric['cta']['link2']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent hover:text-accent transition-colors shadow-2xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                     <span><?= e($current_rubric['cta']['lbl2']) ?></span>
-                    <span class="text-xs">→</span>
+                    <span class="text-xs" aria-hidden="true">→</span>
                   </a>
                 <?php endif; ?>
                 <?php if (!empty($current_rubric['cta']['link3'])): ?>
-                  <a href="<?= e($current_rubric['cta']['link3']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent hover:text-accent transition-colors shadow-2xs">
+                  <a href="<?= e($current_rubric['cta']['link3']) ?>" class="inline-flex items-center gap-1 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink font-mono text-xs hover:border-accent hover:text-accent transition-colors shadow-2xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                     <span><?= e($current_rubric['cta']['lbl3']) ?></span>
-                    <span class="text-xs">→</span>
+                    <span class="text-xs" aria-hidden="true">→</span>
                   </a>
                 <?php endif; ?>
               </div>
             </div>
           <?php endif; ?>
 
-          <!-- FEATURED MAIN ARTICLE -->
+          <!-- FEATURED MAIN ARTICLE (Visually Elevated with Engineering Stroke & Stamp Badge) -->
           <?php if ($featured_article): 
             $f_url = "/article.php?slug=" . urlencode($featured_article['slug']);
             $f_tag_pill = get_semantic_tag_pill($featured_article['tag_key'] ?? 'materials');
           ?>
-            <article class="border border-paper-border rounded-lg bg-card p-6 sm:p-7 space-y-5 shadow-sm transition-all hover:border-paper-border-dark relative">
+            <article class="featured-sketch-frame rounded-lg bg-card p-6 sm:p-7 space-y-5 transition-all relative">
               
               <?php if (!empty($featured_article['image'])): ?>
-                <!-- Image Frame -->
+                <!-- Image Frame with FIG badge -->
                 <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
-                  <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-52 sm:h-64 object-cover object-center" loading="lazy">
-                  <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-paper/90 border border-paper-border text-[11px] font-mono text-ink-muted rounded backdrop-blur-sm">
-                    FIG. <?= e($featured_article['id'] ?? '1') ?>.0 // SCHEMATIC
+                  <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-cover object-center" loading="lazy">
+                  <div class="absolute bottom-2 right-2 px-2.5 py-1 bg-paper/95 border border-paper-border text-xs font-mono text-ink-muted rounded backdrop-blur-sm shadow-2xs">
+                    FIG. <?= e($featured_article['id'] ?? '1') ?>.0 // КЛЮЧЕВОЙ РАЗБОР
                   </div>
                 </div>
               <?php endif; ?>
 
-              <!-- Top Meta Line -->
-              <div class="flex items-center justify-between font-mono text-xs text-ink-muted pt-1">
+              <!-- Top Meta Line with Stamp Badge -->
+              <div class="flex items-center justify-between font-mono text-xs text-ink-muted pt-1 flex-wrap gap-2">
                 <div class="flex items-center gap-2">
                   <span class="text-ink font-hand text-lg font-bold italic tracking-wide rotate-[-1deg] inline-block">
                     <?= e($featured_article['author'] ?? 'Иван Пайкин') ?>
@@ -323,50 +318,46 @@ include __DIR__ . '/includes/header.php';
                   <span class="text-ink-faint">·</span>
                   <span>~<?= e($featured_article['read_min'] ?? 8) ?> мин чтения</span>
                 </div>
-                <span class="pill-yellow px-1.5 py-0.5 rounded text-xs font-mono uppercase font-bold flex items-center gap-1">
-                  <span class="material-symbols-outlined text-[13px] text-amber-600 dark:text-amber-400">stars</span>
-                  Флагман рубрики
-                </span>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-200 text-xs font-mono uppercase font-bold">
+                  <span class="material-symbols-outlined text-[14px] text-accent">verified</span>
+                  Флагман рубрики // Рекомендовано
+                </div>
               </div>
 
               <!-- Title & Excerpt -->
               <div class="space-y-2">
-                <h2 class="text-2xl font-bold text-ink tracking-tight leading-snug">
-                  <a class="hover:underline decoration-ink underline-offset-4" href="<?= $f_url ?>">
+                <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight leading-snug">
+                  <a class="hover:underline decoration-ink underline-offset-4 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded" href="<?= $f_url ?>">
                     <?= e($featured_article['title']) ?>
                   </a>
                 </h2>
-                <p class="text-ink/85 font-serif text-base leading-relaxed">
+                <p class="text-ink/85 font-serif text-base sm:text-lg leading-relaxed">
                   <?= e($featured_article['excerpt']) ?>
                 </p>
               </div>
 
-              <!-- Technical Info Strip: Semantic Highlighting:
-                   - RMA / NC: Yellow (Chemistry & fluxes)
-                   - WS: Blue (Industrial wash precision)
-                   - SPEC 02.1: Blue (Engineering standard)
-              -->
+              <!-- Technical Info Strip -->
               <div class="rounded border border-paper-border bg-paper-subtle p-3 flex items-center justify-between font-mono text-xs text-ink-muted overflow-x-auto gap-3">
                 <div class="flex items-center gap-3 shrink-0">
                   <span>RMA-223: <span class="hl-yellow text-ink font-semibold">активный флюс</span></span>
-                  <span class="text-ink-faint">→</span>
+                  <span class="text-ink-faint" aria-hidden="true">→</span>
                   <span>NC-559: <span class="hl-yellow text-ink font-semibold">No-Clean гель</span></span>
-                  <span class="text-ink-faint">→</span>
+                  <span class="text-ink-faint" aria-hidden="true">→</span>
                   <span>WS: <span class="hl-blue text-ink font-semibold">водосмывной</span></span>
                 </div>
-                <span class="pill-blue text-xs font-mono font-bold px-1.5 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
+                <span class="pill-blue text-xs font-mono font-bold px-2 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
               </div>
 
-              <!-- Card Bottom Bar: Tag color derived strictly from topic -->
-              <div class="flex items-center justify-between pt-2 border-t border-paper-border font-mono text-xs text-ink-muted">
+              <!-- Card Bottom Bar -->
+              <div class="flex items-center justify-between pt-3 border-t border-paper-border font-mono text-xs text-ink-muted flex-wrap gap-2">
                 <div class="flex items-center gap-2">
-                  <span class="<?= $f_tag_pill ?> px-1.5 py-0.5 rounded font-mono text-xs font-bold"><?= e($featured_article['tag']) ?></span>
+                  <span class="<?= $f_tag_pill ?> px-2 py-0.5 rounded font-mono text-xs font-bold"><?= e($featured_article['tag']) ?></span>
                   <span class="text-ink-faint">·</span>
                   <span><?= e($featured_article['date'] ?? '2026') ?></span>
                 </div>
-                <a class="text-amber-600 dark:text-amber-500 font-semibold hover:text-amber-700 dark:hover:text-amber-400 hover:underline flex items-center gap-1 group" href="<?= $f_url ?>">
-                  <span class="underline decoration-amber-600 dark:decoration-amber-400 decoration-1 underline-offset-4">Читать статью полностью</span>
-                  <span>→</span>
+                <a class="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-xs font-mono font-bold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none" href="<?= $f_url ?>">
+                  <span>Читать флагманский разбор</span>
+                  <span aria-hidden="true">→</span>
                 </a>
               </div>
 
@@ -378,7 +369,6 @@ include __DIR__ . '/includes/header.php';
             <?php 
             foreach ($paginated['items'] as $article): 
               $art_url = "/article.php?slug=" . urlencode($article['slug']);
-              // Tag pill derived by semantic domain:
               $card_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
             ?>
               <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-all">
@@ -386,14 +376,25 @@ include __DIR__ . '/includes/header.php';
                   <!-- Card Image Frame -->
                   <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
                     <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-cover object-center" loading="lazy">
-                    <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 bg-paper/90 border border-paper-border text-[10px] font-mono text-ink-muted rounded backdrop-blur-sm">
+                    <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 bg-paper/90 border border-paper-border text-[10px] font-mono text-ink-muted rounded backdrop-blur-sm">
                       FIG. <?= e($article['id']) ?>.0 // SKETCH
                     </div>
+                  </div>
+                <?php else: ?>
+                  <div class="h-28 rounded border border-paper-border bg-paper-subtle flex flex-col justify-between p-3.5 relative overflow-hidden">
+                    <div class="flex items-center justify-between text-xs font-mono text-ink-muted">
+                      <span class="flex items-center gap-1.5 font-bold text-accent">
+                        <span class="material-symbols-outlined text-[16px]">school</span>
+                        МИКРОУРОК ВЕРСТАКА
+                      </span>
+                      <span class="text-[10px] font-mono text-ink-faint">#<?= e($article['id']) ?></span>
+                    </div>
+                    <div class="text-[11px] font-mono text-ink-faint">Пошаговый регламент // IPC-A-610</div>
                   </div>
                 <?php endif; ?>
 
                 <div class="space-y-2">
-                  <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint">
+                  <div class="flex items-center justify-between text-xs font-mono text-ink-faint">
                     <span class="<?= $card_pill ?> px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase">
                       <?= e($article['tag']) ?>
                     </span>
@@ -401,167 +402,217 @@ include __DIR__ . '/includes/header.php';
                   </div>
 
                   <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                    <a class="hover:text-amber-600 dark:hover:text-amber-500 hover:underline transition-colors" href="<?= $art_url ?>">
+                    <a class="hover:text-amber-600 dark:hover:text-amber-500 hover:underline transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded" href="<?= $art_url ?>">
                       <?= e($article['title']) ?>
                     </a>
                   </h3>
 
-                  <p class="text-sm text-ink-muted leading-relaxed">
+                  <p class="text-sm text-ink-muted leading-relaxed line-clamp-3">
                     <?= e($article['excerpt']) ?>
                   </p>
                 </div>
 
                 <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-muted font-hand text-base font-bold italic"><?= e($article['author'] ?? 'Мария Канифоль') ?></span>
-                  <a class="text-amber-600 dark:text-amber-500 font-semibold hover:text-amber-700 dark:hover:text-amber-400 hover:underline flex items-center gap-0.5" href="<?= $art_url ?>">
+                  <a class="text-amber-600 dark:text-amber-500 font-semibold hover:text-amber-700 dark:hover:text-amber-400 hover:underline flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1 py-0.5" href="<?= $art_url ?>">
                     <span>Читать</span>
-                    <span>→</span>
+                    <span aria-hidden="true">→</span>
                   </a>
                 </div>
               </article>
             <?php endforeach; ?>
           </div>
 
-          <!-- EDITORIAL PAGINATION -->
+          <!-- EDITORIAL PAGINATION (Semantic WCAG Nav with Prev/Next buttons) -->
           <?php 
-          $base_pag_url = "/category.php?slug=" . urlencode($current_slug);
+          $base_pag_url = "/category.php?slug=" . urlencode($current_slug) . ($active_sub !== 'all' ? "&sub=" . urlencode($active_sub) : '') . ($sort_param !== 'default' ? "&sort=" . urlencode($sort_param) : '');
           if ($paginated['total_pages'] > 1): 
           ?>
-            <div class="flex items-center justify-center gap-2 pt-4 font-mono text-xs">
-              <?php for ($p = 1; $p <= $paginated['total_pages']; $p++): ?>
+            <nav aria-label="Пагинация рубрики" class="flex items-center justify-center gap-2 pt-6 font-mono text-xs flex-wrap">
+              <!-- Previous Button -->
+              <?php if ($page_num > 1): ?>
+                <a href="<?= $base_pag_url ?>&page=<?= $page_num - 1 ?>"
+                   class="min-h-[44px] px-3.5 rounded flex items-center gap-1 border border-paper-border bg-paper text-ink hover:border-accent transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+                  <span aria-hidden="true">←</span>
+                  <span>Предыдущая</span>
+                </a>
+              <?php else: ?>
+                <span aria-disabled="true" class="min-h-[44px] px-3.5 rounded flex items-center gap-1 border border-paper-border/40 bg-paper/50 text-ink-faint cursor-not-allowed">
+                  <span aria-hidden="true">←</span>
+                  <span>Предыдущая</span>
+                </span>
+              <?php endif; ?>
+
+              <!-- Page Number Buttons -->
+              <?php for ($p = 1; $p <= $paginated['total_pages']; $p++): 
+                $is_curr_p = ($p === $page_num);
+              ?>
                 <a href="<?= $base_pag_url ?>&page=<?= $p ?>"
-                   class="w-8 h-8 min-h-[36px] min-w-[36px] rounded flex items-center justify-center border transition-colors <?= $p === $page_num ? 'bg-ink text-paper font-bold border-ink' : 'border-paper-border bg-paper text-ink hover:border-accent' ?>">
+                   <?= $is_curr_p ? 'aria-current="page"' : '' ?>
+                   class="min-h-[44px] min-w-[44px] px-3 rounded flex items-center justify-center border transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $is_curr_p ? 'bg-ink text-paper font-bold border-ink shadow-sm' : 'border-paper-border bg-paper text-ink hover:border-accent' ?>">
                   <?= $p ?>
                 </a>
               <?php endfor; ?>
-            </div>
+
+              <!-- Next Button -->
+              <?php if ($page_num < $paginated['total_pages']): ?>
+                <a href="<?= $base_pag_url ?>&page=<?= $page_num + 1 ?>"
+                   class="min-h-[44px] px-3.5 rounded flex items-center gap-1 border border-paper-border bg-paper text-ink hover:border-accent transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+                  <span>Следующая</span>
+                  <span aria-hidden="true">→</span>
+                </a>
+              <?php else: ?>
+                <span aria-disabled="true" class="min-h-[44px] px-3.5 rounded flex items-center gap-1 border border-paper-border/40 bg-paper/50 text-ink-faint cursor-not-allowed">
+                  <span>Следующая</span>
+                  <span aria-hidden="true">→</span>
+                </span>
+              <?php endif; ?>
+            </nav>
           <?php endif; ?>
 
         </div>
 
-        <!-- RIGHT COLUMN: SIDEBAR (Strict Semantic Workbench Cards) -->
+        <!-- RIGHT COLUMN: SIDEBAR (Contextual Strict Semantic Workbench Cards) -->
         <aside class="lg:col-span-4 space-y-5">
           
-          <!-- YELLOW POST-IT NOTE: Chemistry / Rosin / Workshop Master Note -->
+          <!-- CONTEXTUAL POST-IT NOTE: Workshop Master Note -->
+          <?php 
+          $sb = $current_rubric['sidebar'] ?? [];
+          $sb_note = $sb['note'] ?? [
+              'label' => 'Заметка верстака // Химия',
+              'code' => 'FLUX-QC',
+              'text' => '«Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции!»',
+              'footer_l' => 'Норма нагрева флюса',
+              'footer_r' => 'IPC-TM-650'
+          ];
+          ?>
           <div class="sketch-sticky-note p-4 rounded-lg space-y-2 relative shadow-sm" style="transform: rotate(-0.8deg);">
-            <div class="sketch-washi-tape" style="top: 0px; left: 20px; width: 50px; height: 14px; transform: rotate(-2deg);" aria-hidden="true"></div>
+            <div class="sketch-washi-tape washi-tape-postit" aria-hidden="true"></div>
             
             <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b sketch-divider pb-1 text-ink">
               <span class="flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[13px] text-accent">push_pin</span>
-                Заметка верстака // Химия
+                <?= e($sb_note['label']) ?>
               </span>
-              <span class="text-[10px] opacity-75">FLUX-QC</span>
+              <span class="text-[10px] opacity-75"><?= e($sb_note['code']) ?></span>
             </div>
 
             <p class="font-hand text-base leading-snug italic font-semibold text-ink">
-              «Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции, а не заливай всё флюсом!»
+              <?= e($sb_note['text']) ?>
             </p>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t sketch-divider text-ink-muted">
-              <span>Норма нагрева флюса</span>
-              <span class="font-bold text-ink">IPC-TM-650</span>
+            <div class="pt-1 flex items-center justify-between font-mono text-xs opacity-80 border-t sketch-divider text-ink-muted">
+              <span><?= e($sb_note['footer_l']) ?></span>
+              <span class="font-bold text-ink"><?= e($sb_note['footer_r']) ?></span>
             </div>
           </div>
 
-          <!-- TECHNICAL SPECIFICATION: Solder liquidus (Clean Reference Card) -->
-          <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm relative">
-            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
+          <!-- TECHNICAL SPECIFICATION REFERENCE (Contextual Clean Reference Card) -->
+          <?php 
+          $sb_spec = $sb['spec'] ?? [
+              'title' => 'Ликвидус металлов',
+              'tag' => 'ГОСТ 21931',
+              'tag_pill' => 'pill-blue',
+              'rows' => [
+                  ['label' => 'ПОС-61 (Sn63Pb37)', 'val' => '183 °C'],
+                  ['label' => 'SAC305 (RoHS)', 'val' => '217–220 °C'],
+              ],
+              'more_link' => '/interactive.php#table',
+              'more_text' => 'Вся таблица припоев →'
+          ];
+          ?>
+          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm relative">
+            <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
                 <span class="material-symbols-outlined text-[14px] text-teal-600 dark:text-teal-400">thermostat</span>
-                Ликвидус металлов
+                <?= e($sb_spec['title']) ?>
               </span>
-              <span class="pill-blue text-[10px] font-mono uppercase px-1.5 py-0.5 rounded">ГОСТ 21931</span>
+              <span class="<?= e($sb_spec['tag_pill']) ?> text-[10px] font-mono uppercase px-2 py-0.5 rounded"><?= e($sb_spec['tag']) ?></span>
             </div>
 
-            <div class="space-y-1 font-mono text-xs">
-              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                <span class="text-ink">ПОС-61 (Sn63Pb37)</span>
-                <span class="font-bold text-ink text-xs">183 °C</span>
-              </div>
-              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                <span class="text-ink">SAC305 (RoHS)</span>
-                <span class="font-bold text-ink text-xs">217–220 °C</span>
-              </div>
-              <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                <span class="text-ink">Sn42Bi58 (Низкотемп.)</span>
-                <span class="font-bold text-ink text-xs">138 °C</span>
-              </div>
-              <div class="flex items-center justify-between py-1">
-                <span class="text-ink">Сплав Розе (Демонтаж)</span>
-                <span class="font-bold text-ink text-xs">94 °C</span>
-              </div>
+            <div class="space-y-1.5 font-mono text-xs">
+              <?php foreach ($sb_spec['rows'] as $r): ?>
+                <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
+                  <span class="text-ink"><?= e($r['label']) ?></span>
+                  <span class="font-bold text-ink text-xs"><?= e($r['val']) ?></span>
+                </div>
+              <?php endforeach; ?>
             </div>
 
-            <div class="pt-0.5 text-right">
-              <a href="/interactive.php#table" class="font-mono text-[11px] text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 hover:underline font-bold">
-                Вся таблица припоев (9 марок) →
+            <div class="pt-1 text-right">
+              <a href="<?= e($sb_spec['more_link']) ?>" class="font-mono text-xs text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 hover:underline font-bold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
+                <?= e($sb_spec['more_text']) ?>
               </a>
             </div>
           </div>
 
-          <!-- WARNING CALLOUT: Critical Defect Warning (Rose Alloy Fragility Risk) -->
-          <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-1.5 border-l-4 border-l-amber-500 shadow-sm">
-            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b border-paper-border pb-1">
+          <!-- CONTEXTUAL WARNING CALLOUT (Defect Warning / Engineering Standard) -->
+          <?php 
+          $sb_warn = $sb['warning'] ?? [
+              'title' => 'Риск брака // Сплав Розе',
+              'badge' => 'ОСТОРОЖНО',
+              'text' => '«Сплав Розе (94°C) — строго для демонтажа! После снятия разъёма остатки сплава нужно насухо вычистить оплёткой.»',
+              'footer_l' => 'Хрупкость шва',
+              'footer_r' => 'Бинарная эвтектика'
+          ];
+          ?>
+          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-2 border-l-4 border-l-amber-500 shadow-sm">
+            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold border-b border-paper-border pb-1">
               <span class="flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
                 <span class="material-symbols-outlined text-[15px] text-amber-600 dark:text-amber-400">warning</span>
-                Риск брака // Сплав Розе
+                <?= e($sb_warn['title']) ?>
               </span>
-              <span class="pill-orange text-[9px] px-1.5 py-0.2 rounded font-mono font-bold">ОСТОРОЖНО</span>
+              <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-mono font-bold"><?= e($sb_warn['badge']) ?></span>
             </div>
 
-            <p class="font-hand text-[15px] leading-snug italic font-semibold">
-              «Сплав Розе (94°C) — строго для демонтажа! После снятия разъёма остатки сплава нужно насухо вычистить оплёткой, иначе пайка рассыплется от малейшей вибрации.»
+            <p class="font-hand text-base leading-snug italic font-semibold text-ink">
+              <?= e($sb_warn['text']) ?>
             </p>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-[10px] opacity-80 border-t border-paper-border">
-              <span>Хрупкость шва</span>
-              <span class="font-bold">Бинарная эвтектика</span>
+            <div class="pt-1 flex items-center justify-between font-mono text-xs opacity-80 border-t border-paper-border text-ink-muted">
+              <span><?= e($sb_warn['footer_l']) ?></span>
+              <span class="font-bold text-ink"><?= e($sb_warn['footer_r']) ?></span>
             </div>
           </div>
 
-          <!-- WORKBENCH TOOLS: Semantically Coded Shortcuts:
-               - #temp:   Orange (Thermal window)
-               - #iron:   Blue   (Tooling/Stations)
-               - #defect: Orange (Defects/Troubleshooting)
-          -->
-          <div class="border border-paper-border rounded-lg bg-card p-3.5 space-y-2.5 shadow-sm">
-            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
+          <!-- WORKBENCH TOOLS: Semantically Coded Shortcuts with 44px touch targets -->
+          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">
+            <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span>Инструменты верстака</span>
-              <span class="pill-blue text-[10px] px-1.5 py-0.5 rounded">3 ТУЛЗЫ</span>
+              <span class="pill-blue text-[10px] px-2 py-0.5 rounded">3 ТУЛЗЫ</span>
             </div>
-            <div class="space-y-1.5 font-mono text-xs">
-              <a href="/interactive.php#temp" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group">
+            <div class="space-y-2 font-mono text-xs">
+              <a href="/interactive.php#temp" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
-                  <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-accent">thermostat</span>
+                  <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[15px] text-accent">thermostat</span>
                     Термокалькулятор
                   </div>
-                  <div class="text-[11px] text-ink-muted">Подбор °C под провод и припой</div>
+                  <div class="text-xs text-ink-muted">Подбор °C под провод и припой</div>
                 </div>
-                <span class="pill-orange text-[10px] px-1.5 py-0.2 rounded font-bold">#temp</span>
+                <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-bold">#temp</span>
               </a>
 
-              <a href="/interactive.php#iron" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group">
+              <a href="/interactive.php#iron" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
-                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-xs flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-sky-600 dark:text-sky-400">construction</span>
+                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-xs flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[15px] text-sky-600 dark:text-sky-400">construction</span>
                     Подбор паяльника
                   </div>
-                  <div class="text-[11px] text-ink-muted">Станции T12, C245 под бюджет</div>
+                  <div class="text-xs text-ink-muted">Станции T12, C245 под бюджет</div>
                 </div>
-                <span class="pill-blue text-[10px] px-1.5 py-0.2 rounded font-bold">#iron</span>
+                <span class="pill-blue text-[10px] px-2 py-0.5 rounded font-bold">#iron</span>
               </a>
 
-              <a href="/interactive.php#defect" class="flex items-center justify-between p-1.5 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group">
+              <a href="/interactive.php#defect" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
-                  <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-accent">troubleshoot</span>
+                  <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[15px] text-accent">troubleshoot</span>
                     Дерево дефектов
                   </div>
-                  <div class="text-[11px] text-ink-muted">Диагностика причин брака</div>
+                  <div class="text-xs text-ink-muted">Диагностика причин брака</div>
                 </div>
-                <span class="pill-orange text-[10px] px-1.5 py-0.2 rounded font-bold">#defect</span>
+                <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-bold">#defect</span>
               </a>
             </div>
           </div>

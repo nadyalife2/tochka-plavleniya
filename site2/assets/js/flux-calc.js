@@ -178,6 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const wsVol = calculateFluxVolume(currentArea, 0.006, currentBatch);
       matrixWs.textContent = `${wsVol < 0.1 ? wsVol.toFixed(3) : wsVol.toFixed(2)} мл`;
     }
+
+    try {
+      localStorage.setItem('tp_flux_area', currentArea);
+      localStorage.setItem('tp_flux_type', currentType);
+      localStorage.setItem('tp_flux_stencil', currentStencilH);
+      localStorage.setItem('tp_flux_batch', currentBatch);
+    } catch (e) {}
   }
 
   // Slider and number events
@@ -283,6 +290,38 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // Load saved state from localStorage
+  try {
+    const savedArea = localStorage.getItem('tp_flux_area');
+    if (savedArea && !isNaN(parseFloat(savedArea))) {
+      currentArea = parseFloat(savedArea);
+      if (numberInput) numberInput.value = currentArea;
+      if (slider) slider.value = Math.min(200, currentArea);
+      highlightActivePreset(currentArea);
+    }
+    const savedType = localStorage.getItem('tp_flux_type');
+    if (savedType && typeSelect) {
+      typeSelect.value = savedType;
+      currentType = savedType;
+    }
+    const savedStencil = localStorage.getItem('tp_flux_stencil');
+    if (savedStencil && stencilSelect) {
+      stencilSelect.value = savedStencil;
+      currentStencilH = parseInt(savedStencil, 10) || 120;
+    }
+    const savedBatch = localStorage.getItem('tp_flux_batch');
+    if (savedBatch) {
+      currentBatch = parseInt(savedBatch, 10) || 1;
+      batchButtons.forEach(b => {
+        if (b.getAttribute('data-qty') === savedBatch) {
+          b.className = 'batch-btn px-3.5 py-1 text-xs font-mono rounded border border-ink bg-ink text-paper font-semibold cursor-pointer';
+        } else {
+          b.className = 'batch-btn px-3.5 py-1 text-xs font-mono rounded border border-paper-border bg-paper text-ink hover:border-ink cursor-pointer';
+        }
+      });
+    }
+  } catch (e) {}
 
   // Initial calculation run
   updateCalculator();

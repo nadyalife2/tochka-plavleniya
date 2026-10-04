@@ -19,6 +19,11 @@
       "command": "node",
       "args": ["C:/mcp_servers/MCP-Stack-for-UI-UX-Designers/inspire-mcp/build/index.js"],
       "description": "Web UI layout & component inspiration scraper server"
+    },
+    "deepseek": {
+      "command": "node",
+      "args": ["C:/Users/nadya/AppData/Roaming/npm/node_modules/@iflow-mcp/arikusi-deepseek-mcp-server/dist/index.js"],
+      "description": "DeepSeek AI MCP Server: consult DeepSeek Chat and DeepSeek Reasoner (R1) directly inside Antigravity for code review, complex logic, and second opinions"
     }
   }
 }

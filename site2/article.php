@@ -1414,17 +1414,23 @@ include __DIR__ . '/includes/header.php';
         </div>
         <?php endif; ?>
 
-        <!-- Open Lab block -->
-        <div class="border border-paper-border bg-paper-subtle/50 p-4 rounded-lg space-y-2 text-xs">
-          <div class="flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase text-ink">
-            <span class="w-2 h-2 bg-ink rounded-full inline-block"></span>
-            Лаборатория ТЧП
+        <!-- Interactive Workbench Bridge -->
+        <div class="sketch-card p-4 bg-paper border border-paper-border rounded-lg space-y-3 shadow-xs">
+          <div class="flex items-center justify-between font-mono text-xs pb-1.5 border-b border-paper-border">
+            <span class="pill-orange text-[10px] uppercase font-bold">ВЕРСТАК</span>
+            <span class="text-ink-faint">LAB-TOOL</span>
           </div>
-          <p class="text-ink-muted leading-relaxed">
-            Практические заметки, профили реболлинга и тесты термоинтерфейсов в открытой базе знаний.
-          </p>
-          <a class="inline-block pt-1 font-mono text-xs font-semibold text-ink underline decoration-paper-border-dark" href="interactive.php">
-            Интерактивные расчеты →
+          <div class="space-y-1">
+            <div class="text-xs font-bold text-ink font-mono uppercase tracking-wide">
+              Калькуляторы и сплавы
+            </div>
+            <p class="text-xs text-ink-muted leading-relaxed font-serif">
+              Рассчитайте безопасный терморежим жала или подберите флюс под ваш сплав в 1 клик.
+            </p>
+          </div>
+          <a class="btn btn-primary w-full text-xs font-mono py-2 flex items-center justify-center gap-1.5" href="interactive.php">
+            <span>Открыть калькуляторы</span>
+            <span>→</span>
           </a>
         </div>
 

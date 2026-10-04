@@ -1,0 +1,40 @@
+# robots.txt — ТОЧКА ПЛАВЛЕНИЯ (Инженерный регламент и база знаний по пайке)
+
+User-agent: *
+Allow: /
+Disallow: /includes/
+Disallow: /data/
+Disallow: /tools/
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+
+# AI Search & LLM Web Crawlers (Разрешено полное индексирование для поиска и ответов)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Sitemap
+Sitemap: https://tochka-plavleniya.ru/sitemap.xml
