@@ -7,6 +7,9 @@ $page_title = "Паяй уверенно — ТОЧКА ПЛАВЛЕНИЯ";
 $page_desc  = "Инженерный справочник по пайке: точные ориентиры температуры жала, подбор инструмента и правила монтажа без риска перегреть компоненты.";
 $current_page = 'index';
 
+$assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
+$site_root = function_exists('home_url') ? home_url('/') : '/';
+
 // Берём только реальные статьи из базы знаний (без выдуманных данных)
 $recent_articles = array_slice($articles, 0, 4);
 
@@ -173,7 +176,7 @@ include __DIR__ . '/includes/header.php';
               </div>
               <div class="w-full overflow-hidden rounded bg-white dark:bg-[#1a1f26] flex items-center justify-center border border-paper-border/60 p-1">
                 <img 
-                  src="assets/schematics/tip-cutaway.svg" 
+                  src="<?= $assets_base ?>/assets/schematics/tip-cutaway.svg" 
                   alt="Разрез паяльного жала: медный сердечник, нагреватель и рабочая поверхность" 
                   width="340" 
                   height="180" 

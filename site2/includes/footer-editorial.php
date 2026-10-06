@@ -29,3 +29,5 @@
 
 <!-- Cookie Consent Banner -->
 <?php require_once __DIR__ . '/cookie-banner.php'; ?>
+
+<?php if (function_exists('wp_footer')) wp_footer(); ?>

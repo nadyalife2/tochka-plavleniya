@@ -3,6 +3,13 @@
  * 404.php — Страница ошибки 404
  * Точка Плавления
  */
+
+// Fail-safe: If WordPress mistakenly sends root requests to 404, load home page
+if ((function_exists('is_front_page') && is_front_page()) || (isset($_SERVER['REQUEST_URI']) && trim($_SERVER['REQUEST_URI'], '/') === '')) {
+    require __DIR__ . '/index.php';
+    exit;
+}
+
 require_once __DIR__ . '/includes/functions.php';
 
 $page_title   = '404 — Плата не найдена | Точка Плавления';

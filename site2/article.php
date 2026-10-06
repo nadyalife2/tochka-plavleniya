@@ -155,17 +155,14 @@ foreach ($faq_items as $q => $a) {
 }
 </script>
 
-<!-- Design Tokens (Single Source of Truth) -->
-<link rel="stylesheet" href="assets/css/tokens.css"/>
-
-<!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
-<link rel="stylesheet" href="assets/css/fonts.css"/>
-<link rel="stylesheet" href="assets/css/build.css"/>
+<?php $assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : ''; ?>
+<!-- Design Tokens & Article Styles -->
+<link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css"/>
+<link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css"/>
+<link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-
-<!-- Base UI Components & Reset -->
-<link rel="stylesheet" href="assets/css/base.css"/>
-<link rel="stylesheet" href="assets/css/article.css"/>
+<link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css"/>
+<link rel="stylesheet" href="<?= $assets_base ?>/assets/css/article.css"/>
 
 <style>
   /* Hand-drawn marker underline */

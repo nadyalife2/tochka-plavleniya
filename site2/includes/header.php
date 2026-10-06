@@ -11,9 +11,12 @@
 $page_title = $page_title ?? 'Точка Плавления // ТЧП';
 $page_desc  = $page_desc ?? 'Инженерный медиа-портал, открытые регламенты монтажа и интерактивный верстак инженера-электронщика.';
 $current_page = $current_page ?? '';
+
+$site_root = function_exists('home_url') ? home_url('/') : '/';
+$assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
 ?>
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" <?php if (function_exists('language_attributes')) language_attributes(); ?>>
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -25,13 +28,13 @@ $current_page = $current_page ?? '';
   <meta property="og:title" content="<?= htmlspecialchars($page_title) ?>"/>
   <meta property="og:description" content="<?= htmlspecialchars($page_desc) ?>"/>
   <meta property="og:site_name" content="ТОЧКА ПЛАВЛЕНИЯ"/>
-  <meta property="og:image" content="<?= htmlspecialchars($page_og_image ?? '/assets/img/og-cover.png') ?>"/>
+  <meta property="og:image" content="<?= htmlspecialchars($page_og_image ?? ($assets_base . '/assets/img/og-cover.png')) ?>"/>
 
   <!-- Twitter Card Meta -->
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="<?= htmlspecialchars($page_title) ?>"/>
   <meta name="twitter:description" content="<?= htmlspecialchars($page_desc) ?>"/>
-  <meta name="twitter:image" content="<?= htmlspecialchars($page_og_image ?? '/assets/img/og-cover.png') ?>"/>
+  <meta name="twitter:image" content="<?= htmlspecialchars($page_og_image ?? ($assets_base . '/assets/img/og-cover.png')) ?>"/>
 
   <!-- Immediate Theme Init Script (Zero FOUC) -->
   <script>
@@ -51,17 +54,18 @@ $current_page = $current_page ?? '';
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <!-- Design Tokens (Single Source of Truth) -->
-  <link rel="stylesheet" href="/assets/css/tokens.css">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css">
 
   <!-- Self-Hosted Fonts & Compiled Tailwind CSS -->
-  <link rel="stylesheet" href="/assets/css/fonts.css">
-  <link rel="stylesheet" href="/assets/css/build.css">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css">
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 
   <!-- Base UI Components & Reset -->
-  <link rel="stylesheet" href="/assets/css/base.css">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css">
 
   <?php if (!empty($extra_head)) echo $extra_head; ?>
+  <?php if (function_exists('wp_head')) wp_head(); ?>
 </head>
 <body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
 
@@ -76,7 +80,7 @@ $current_page = $current_page ?? '';
       
       <!-- Brand mark & Title -->
       <div class="flex items-center gap-6">
-        <a class="logo" href="/">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
+        <a class="logo" href="<?= $site_root ?>">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
 
         <!-- Desktop Nav -->
         <?php include __DIR__ . '/header-nav.php'; ?>

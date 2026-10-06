@@ -8,7 +8,8 @@ require_once __DIR__ . '/data/solder-reference.php';
 require_once __DIR__ . '/data/interactive-rules.php';
 
 ob_start();
-$extra_head = '<link rel="stylesheet" href="/assets/css/workbench.css">';
+$assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
+$extra_head = '<link rel="stylesheet" href="' . $assets_base . '/assets/css/workbench.css">';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -1187,10 +1188,10 @@ include __DIR__ . '/includes/header.php';
   </script>
 
   <!-- Scripts -->
-  <script src="assets/js/ui-helpers.js"></script>
-  <script src="assets/js/workbench.js"></script>
-  <script src="assets/js/flux-calc.js"></script>
-  <script src="assets/js/solder-table.js"></script>
+  <script src="<?= $assets_base ?>/assets/js/ui-helpers.js"></script>
+  <script src="<?= $assets_base ?>/assets/js/workbench.js"></script>
+  <script src="<?= $assets_base ?>/assets/js/flux-calc.js"></script>
+  <script src="<?= $assets_base ?>/assets/js/solder-table.js"></script>
   <script>
     (function() {
       const toggle = document.getElementById('theme-toggle');
