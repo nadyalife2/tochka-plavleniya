@@ -1,9 +1,10 @@
+<?php $site_root = function_exists('home_url') ? home_url('/') : '/'; ?>
 <!-- Editorial Minimal Footer (Unified across all pages) -->
 <footer class="w-full border-t border-paper-border bg-paper py-10 mt-12 text-ink-muted text-xs font-mono">
   <div class="max-w-[1140px] mx-auto px-5 sm:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
     <div class="space-y-1.5">
       <div class="flex items-center gap-2 text-ink font-semibold">
-        <a class="logo text-sm hover:opacity-85 transition-opacity" href="index.php">
+        <a class="logo text-sm hover:opacity-85 transition-opacity" href="<?= $site_root ?>">
           ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
         </a>
         <span class="text-ink-faint">·</span>
@@ -17,12 +18,12 @@
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
-      <a class="hover:text-ink transition-colors" href="index.php#articles">Статьи</a>
-      <a class="hover:text-ink transition-colors" href="interactive.php#calculator">Калькулятор флюсов</a>
-      <a class="hover:text-ink transition-colors" href="interactive.php#table">Таблица припоев</a>
-      <a class="hover:text-ink transition-colors" href="interactive.php">Верстак</a>
-      <a class="hover:text-ink transition-colors" href="privacy.php">Конфиденциальность</a>
-      <a class="hover:text-ink transition-colors" href="terms.php">Соглашение</a>
+      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>#articles">Статьи</a>
+      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>interactive.php#calculator">Калькулятор флюсов</a>
+      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>interactive.php#table">Таблица припоев</a>
+      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>interactive.php">Верстак</a>
+      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>privacy.php">Конфиденциальность</a>
+      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>terms.php">Соглашение</a>
     </div>
   </div>
 </footer>

@@ -6,12 +6,13 @@
  *   'index' | 'start' | 'materialy' | 'praktika' | 'oshibki' | 'interactive' | 'category'
  */
 $current_page = $current_page ?? '';
+$site_root = function_exists('home_url') ? home_url('/') : '/';
 
 $nav_items = [
-    ['href' => 'index.php#articles',                  'label' => 'Статьи',       'page' => 'articles'],
-    ['href' => 'interactive.php',                    'label' => 'Калькуляторы', 'page' => 'interactive'],
-    ['href' => 'category.php?slug=praktika',         'label' => 'Практика',     'page' => 'praktika'],
-    ['href' => 'category.php?slug=start',            'label' => 'С чего начать', 'page' => 'start'],
+    ['href' => $site_root . '#articles',                 'label' => 'Статьи',       'page' => 'articles'],
+    ['href' => $site_root . 'interactive.php',           'label' => 'Калькуляторы', 'page' => 'interactive'],
+    ['href' => $site_root . 'category.php?slug=praktika','label' => 'Практика',     'page' => 'praktika'],
+    ['href' => $site_root . 'category.php?slug=start',   'label' => 'С чего начать', 'page' => 'start'],
 ];
 
 if (!function_exists('is_tchp_nav_active')) {
