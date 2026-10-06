@@ -1,0 +1,5 @@
+/**
+ * common.css — Мост обратной совместимости (указывает на base.css)
+ * Все основные стили консолидированы в base.css и tokens.css
+ */
+@import url('base.css');
