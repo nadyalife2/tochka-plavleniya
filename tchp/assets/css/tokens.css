@@ -1,0 +1,124 @@
+/**
+ * tokens.css — Единый источник дизайн-токенов «ТОЧКА ПЛАВЛЕНИЯ» (Editorial Lab / Blueprint)
+ *
+ * Все цвета, типографика, радиусы, тени и сетка определены здесь.
+ * Tailwind CSS и ручные стилевые файлы ссылаются на эти переменные.
+ */
+
+:root {
+  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Мягкая молочная бумага #FAF8F5) --- */
+  --color-bg: #FAF8F5;
+  --color-paper: #ffffff;
+  --color-paper-subtle: #f5f2eb;
+  --color-paper-border: #e2ded5;
+  --color-paper-border-dark: #1A1A1A;
+  --color-card: #ffffff;
+  --color-card-solid: #ffffff;
+  --color-callout: #f5f2eb;
+  --dot-color: #dcd6cb;
+
+  /* --- 30% ТЕКСТ И СТРУКТУРА (Графит #1A1A1A) --- */
+  --color-ink: #1A1A1A;
+  --color-ink-muted: #575249;
+  --color-ink-faint: #787268;
+
+  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Медно-янтарный #FF6B2B) --- */
+  --color-accent: #FF6B2B;
+  --color-accent-hover: #e05819;
+  --color-accent-subtle: rgba(255, 107, 43, 0.12);
+  --color-accent-border: rgba(255, 107, 43, 0.4);
+
+  /* Алиасы семантики */
+  --color-primary: var(--color-accent);
+  --color-primary-hover: var(--color-accent-hover);
+  --color-surface: var(--color-paper);
+  --color-surface-subtle: var(--color-paper-subtle);
+  --color-text: var(--color-ink);
+  --color-text-muted: var(--color-ink-muted);
+  --color-text-faint: var(--color-ink-faint);
+
+  /* Статусные цвета */
+  --color-danger: #b3261e;
+  --color-danger-bg: #fdecec;
+  --color-danger-border: #f8b4b4;
+  --color-success: #1a7f4c;
+  --color-success-bg: #e6f4ea;
+  --color-success-border: #a8dab5;
+  --color-warning: #d97706;
+  --color-warning-bg: #fef3c7;
+  --color-warning-border: #fcd34d;
+
+  /* Инженерные скетч-маркеры */
+  --color-sketch-yellow: #fde047;
+  --color-sketch-yellow-bg: #fffdf5;
+  --color-sketch-tape: rgba(235, 222, 179, 0.85);
+
+  /* --- ТИПОГРАФИКА: Space Grotesk доминанта --- */
+  --font-sans: "Space Grotesk", "IBM Plex Sans", system-ui, -apple-system, sans-serif;
+  --font-serif: Newsreader, Georgia, serif;
+  --font-mono: "JetBrains Mono", monospace;
+  --font-hand: Caveat, cursive;
+
+  --font-size-body: 17px;
+  --line-height-body: 1.7;
+
+  /* --- ФОРМА, СКРУГЛЕНИЯ, СЕТКА 8px И ЛЁГКАЯ БУМАЖНАЯ ПЛАСТИКА --- */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  --border-sketch: 1px solid var(--color-paper-border);
+  --shadow-sketch: 0 1px 3px rgba(20, 20, 20, 0.04);
+  --shadow-card: 0 1px 3px rgba(20, 20, 20, 0.04);
+  --shadow-card-hover: 0 3px 8px rgba(20, 20, 20, 0.07);
+
+  /* Шаг сетки: 8, 16, 32, 64 */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 32px;
+  --space-lg: 64px;
+
+  --container-width: 1140px;
+  --touch-target-min: 48px;
+}
+
+/* ТЁМНАЯ ТЕМА: #242424 карточка, #E8E0D4 текст */
+html.dark {
+  --color-bg: #141414;
+  --color-paper: #242424;
+  --color-paper-subtle: #1c1c1c;
+  --color-paper-border: #383838;
+  --color-paper-border-dark: #4a4a4a;
+  --color-card: #242424;
+  --color-card-solid: #242424;
+  --color-callout: #1c1c1c;
+  --dot-color: #2b2b2b;
+
+  --color-ink: #E8E0D4;
+  --color-ink-muted: #A39B8E;
+  --color-ink-faint: #7A7367;
+
+  --color-accent: #FF6B2B;
+  --color-accent-hover: #ffa066;
+  --color-accent-subtle: rgba(255, 107, 43, 0.18);
+  --color-accent-border: rgba(255, 107, 43, 0.45);
+
+  --color-danger: #ef4444;
+  --color-danger-bg: rgba(179, 38, 30, 0.25);
+  --color-danger-border: rgba(248, 180, 180, 0.35);
+  --color-success: #22c55e;
+  --color-success-bg: rgba(26, 127, 76, 0.25);
+  --color-success-border: rgba(168, 218, 181, 0.35);
+  --color-warning: #f59e0b;
+  --color-warning-bg: rgba(217, 119, 6, 0.25);
+  --color-warning-border: rgba(252, 211, 77, 0.35);
+
+  --color-sketch-yellow-bg: rgba(202, 138, 4, 0.18);
+  --color-sketch-tape: rgba(120, 106, 72, 0.7);
+
+  --border-sketch: 1px solid var(--color-paper-border);
+  --shadow-sketch: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 3px 8px rgba(0, 0, 0, 0.45);
+}

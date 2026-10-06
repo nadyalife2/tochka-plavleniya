@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 180" width="100%" height="100%" fill="none">
+  <!-- Clean technical background -->
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <!-- Subtle technical grid -->
+  <defs>
+    <pattern id="ink-grid-3" width="14" height="14" patternUnits="userSpaceOnUse">
+      <path d="M 14 0 L 0 0 0 14" fill="none" stroke="#e2e8f0" stroke-width="0.6"/>
+    </pattern>
+    <pattern id="hatch-fr4" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#cbd5e1" stroke-width="0.8"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#ink-grid-3)"/>
+
+  <!-- TOP LAYER: BGA Component Substrate -->
+  <rect x="20" y="14" width="300" height="20" fill="#0f172a" stroke="#0f172a" stroke-width="1.4"/>
+  <text x="30" y="28" font-family="Consolas, ui-monospace, monospace" font-size="10.5" fill="#ffffff" font-weight="bold">ПОДЛОЖКА BGA ЧИПА (SUBSTRATE)</text>
+
+  <!-- Component Cu Pad -->
+  <rect x="135" y="34" width="70" height="6" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.2"/>
+
+  <!-- Top IMC Layer (Intermetallic Compound) -->
+  <line x1="135" y1="40" x2="205" y2="40" stroke="#0f172a" stroke-width="2"/>
+
+  <!-- BGA SOLDER BALL (Main Joint) -->
+  <path d="M 135 42 C 108 52, 92 80, 120 115 C 130 126, 140 131, 150 131 L 190 131 C 200 131, 210 126, 220 115 C 248 80, 232 52, 205 42 Z" 
+        fill="#f8fafc" stroke="#0f172a" stroke-width="1.6"/>
+
+  <!-- DEFECT 1: Gas Void / Cavity (>25% IPC-7095) -->
+  <circle cx="160" cy="78" r="15" fill="#ffffff" stroke="#0f172a" stroke-width="1.8" stroke-dasharray="3 2"/>
+  <circle cx="160" cy="78" r="3.5" fill="#0f172a"/>
+
+  <!-- DEFECT 2: Head-in-Pillow / Partial Wetting on right side -->
+  <path d="M 205 42 C 203 50, 194 52, 184 50" fill="none" stroke="#0f172a" stroke-width="2.2"/>
+
+  <!-- BOTTOM LAYER: PCB Board -->
+  <!-- Bottom IMC Layer with DEFECT 3: Microcrack -->
+  <line x1="130" y1="131" x2="210" y2="131" stroke="#0f172a" stroke-width="2"/>
+  <!-- Microcrack in IMC -->
+  <path d="M 140 131 L 150 134 L 165 130 L 175 133" stroke="#0f172a" stroke-width="2.5"/>
+
+  <!-- PCB Copper Pad -->
+  <rect x="125" y="134" width="90" height="6" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.2"/>
+
+  <!-- Solder Mask layer surrounding pad -->
+  <rect x="20" y="134" width="105" height="6" fill="#e2e8f0" stroke="#0f172a" stroke-width="1"/>
+  <rect x="215" y="134" width="105" height="6" fill="#e2e8f0" stroke="#0f172a" stroke-width="1"/>
+
+  <!-- PCB Core: FR-4 Glass Epoxy laminate with crosshatch -->
+  <rect x="20" y="140" width="300" height="24" fill="url(#hatch-fr4)" stroke="#0f172a" stroke-width="1.4"/>
+  <text x="30" y="156" font-family="Consolas, ui-monospace, monospace" font-size="10.5" fill="#0f172a" font-weight="bold">ПЛАТА: ТЕКСТОЛИТ FR-4</text>
+
+  <!-- LEADER LINES & TECHNICAL DEFECT CALLOUTS (Clean Ink) -->
+  <!-- Callout 1: Gas Void -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <polyline points="160,78 115,78 75,56 16,56" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+    <circle cx="160" cy="78" r="2.5" fill="#0f172a"/>
+    <text x="18" y="52" font-size="11" font-weight="700">1. Пустота (Void)</text>
+  </g>
+
+  <!-- Callout 2: Microcrack in IMC -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <polyline points="160,132 185,115 255,115" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+    <circle cx="160" cy="132" r="2.5" fill="#0f172a"/>
+    <text x="215" y="110" font-size="11" font-weight="700">2. Трещина IMC</text>
+  </g>
+
+  <!-- Callout 3: Head-in-Pillow / Wetting -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <polyline points="195,47 235,47 265,37" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+    <circle cx="195" cy="47" r="2.5" fill="#0f172a"/>
+    <text x="245" y="48" font-size="10" font-weight="700">3. Несмачивание</text>
+  </g>
+</svg>
