@@ -342,3 +342,6 @@ add_action('template_redirect', function () {
 add_filter('comments_open', '__return_false', 20, 2);
 add_filter('pings_open', '__return_false', 20, 2);
 add_filter('comments_array', '__return_empty_array', 10, 2);
+
+// 6. Подключение модуля импорта базы знаний и регламентов ТЧП
+require_once __DIR__ . '/includes/demo-importer.php';
