@@ -10,8 +10,73 @@ $current_page = 'index';
 $assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
 $site_root = function_exists('home_url') ? home_url('/') : '/';
 
-// Берём только реальные статьи из базы знаний (без выдуманных данных)
-$recent_articles = array_slice($articles, 0, 4);
+// Динамическая выборка опубликованных статей из WordPress с fallback на справочник
+$recent_articles = [];
+
+if (function_exists('get_posts')) {
+    $wp_recent = get_posts([
+        'numberposts' => 4,
+        'post_status' => 'publish',
+        'post_type'   => 'post',
+        'orderby'     => 'date',
+        'order'       => 'DESC',
+    ]);
+
+    if (!empty($wp_recent)) {
+        foreach ($wp_recent as $p) {
+            $cats = get_the_category($p->ID);
+            $primary_cat = !empty($cats) ? $cats[0]->name : 'Инженерия';
+            $cat_slug = !empty($cats) ? $cats[0]->slug : 'materialy';
+            
+            $content_text = strip_tags($p->post_content);
+            $char_count = function_exists('mb_strlen') ? mb_strlen($content_text, 'UTF-8') : strlen($content_text);
+            $read_min = max(2, min(15, (int)round($char_count / 1100)));
+            if ($read_min < 2) $read_min = 3;
+
+            $excerpt = !empty($p->post_excerpt) 
+                ? $p->post_excerpt 
+                : (function_exists('wp_trim_words') ? wp_trim_words($content_text, 22, '...') : mb_substr($content_text, 0, 140) . '...');
+
+            $author = get_the_author_meta('display_name', $p->post_author) ?: 'Инженер ОТК';
+
+            $recent_articles[] = [
+                'id'       => $p->ID,
+                'slug'     => $p->post_name,
+                'title'    => get_the_title($p->ID),
+                'url'      => get_permalink($p->ID),
+                'tag'      => $primary_cat,
+                'tag_key'  => $cat_slug,
+                'read_min' => $read_min,
+                'excerpt'  => $excerpt,
+                'author'   => $author,
+                'is_wp'    => true
+            ];
+        }
+    }
+}
+
+// Если в WP меньше 4 статей или запуск автономный — добираем из базы знаний articles-data.php
+if (count($recent_articles) < 4) {
+    $needed = 4 - count($recent_articles);
+    $static_candidates = array_slice($articles, 0, $needed);
+    foreach ($static_candidates as $sa) {
+        $link = function_exists('home_url') 
+            ? home_url('/article.php?slug=' . urlencode($sa['slug'])) 
+            : 'article.php?slug=' . urlencode($sa['slug']);
+        $recent_articles[] = [
+            'id'       => $sa['id'] ?? 0,
+            'slug'     => $sa['slug'],
+            'title'    => $sa['title'],
+            'url'      => $link,
+            'tag'      => $sa['tag'],
+            'tag_key'  => $sa['tag_key'] ?? '',
+            'read_min' => $sa['read_min'] ?? 4,
+            'excerpt'  => $sa['excerpt'] ?? '',
+            'author'   => $sa['author'] ?? 'Инженер ОТК',
+            'is_wp'    => false
+        ];
+    }
+}
 
 ob_start();
 ?>
@@ -270,7 +335,7 @@ include __DIR__ . '/includes/header.php';
               Новые статьи
             </h2>
           </div>
-          <a href="/category.php?slug=materialy" class="font-mono text-xs text-ink-muted hover:text-accent transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent rounded">
+          <a href="<?= function_exists('home_url') ? home_url('/category.php?slug=materialy') : '/category.php?slug=materialy' ?>" class="font-mono text-xs text-ink-muted hover:text-accent transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent rounded">
             <span>Все статьи журнала</span>
             <span>→</span>
           </a>
@@ -279,6 +344,7 @@ include __DIR__ . '/includes/header.php';
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
           <?php foreach ($recent_articles as $article): 
             $tag_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
+            $art_url = !empty($article['url']) ? $article['url'] : ('article.php?slug=' . urlencode($article['slug'] ?? ''));
           ?>
             <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
               <div class="space-y-2">
@@ -289,7 +355,7 @@ include __DIR__ . '/includes/header.php';
                   <span>~<?= (int)$article['read_min'] ?> мин</span>
                 </div>
                 <h3 class="text-base font-bold text-ink group-hover:text-accent transition-colors leading-snug">
-                  <a href="article.php?slug=<?= urlencode($article['slug']) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
+                  <a href="<?= htmlspecialchars($art_url) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
                     <?= htmlspecialchars($article['title']) ?>
                   </a>
                 </h3>
@@ -300,7 +366,7 @@ include __DIR__ . '/includes/header.php';
 
               <div class="pt-3 border-t border-paper-border flex items-center justify-between font-mono text-xs">
                 <span class="text-ink-faint text-xs font-hand text-base font-bold italic"><?= htmlspecialchars($article['author']) ?></span>
-                <a href="article.php?slug=<?= urlencode($article['slug']) ?>" class="text-ink font-bold group-hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1">
+                <a href="<?= htmlspecialchars($art_url) ?>" class="text-ink font-bold group-hover:text-accent focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1">
                   Читать →
                 </a>
               </div>

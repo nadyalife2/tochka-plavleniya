@@ -9,8 +9,28 @@ $tag_param = $_GET['tag'] ?? null;
 $sub_param = $_GET['sub'] ?? 'all';
 $sort_param = $_GET['sort'] ?? 'default';
 
+// Detect WordPress queried taxonomy term if inside WP
+$queried_cat = null;
+if (function_exists('is_category') && is_category()) {
+    $queried_cat = get_queried_object();
+    if ($queried_cat && !empty($queried_cat->slug)) {
+        $slug = $queried_cat->slug;
+    }
+}
+
 if ($slug && isset($RUBRICS[$slug])) {
     $current_rubric = $RUBRICS[$slug];
+    $current_slug   = $slug;
+    $current_page   = $slug;
+} elseif ($slug && $queried_cat) {
+    $current_rubric = [
+        'title'       => $queried_cat->name,
+        'tag'         => $queried_cat->name,
+        'lead'        => $queried_cat->description ?: ('Статьи и материалы рубрики «' . $queried_cat->name . '».'),
+        'article_ids' => [],
+        'filter_tags' => [$slug],
+        'sub_tags'    => []
+    ];
     $current_slug   = $slug;
     $current_page   = $slug;
 } elseif ($tag_param) {
@@ -29,6 +49,53 @@ $canonical_url = "https://tochka-plavleniya.ru/category.php?slug=" . urlencode($
 
 // Collect articles for this rubric
 $matched_articles = [];
+
+// 1. Fetch real published WordPress posts for this category
+if (function_exists('get_posts')) {
+    $wp_args = [
+        'numberposts' => 50,
+        'post_status' => 'publish',
+        'post_type'   => 'post',
+        'orderby'     => 'date',
+        'order'       => 'DESC'
+    ];
+    if ($queried_cat && !empty($queried_cat->term_id)) {
+        $wp_args['cat'] = $queried_cat->term_id;
+    } elseif ($slug) {
+        $wp_args['category_name'] = $slug;
+    }
+    $wp_posts = get_posts($wp_args);
+    foreach ($wp_posts as $p) {
+        $cats = get_the_category($p->ID);
+        $primary_cat = !empty($cats) ? $cats[0]->name : $current_rubric['title'];
+        $cat_slug = !empty($cats) ? $cats[0]->slug : $current_slug;
+        $content_text = strip_tags($p->post_content);
+        $read_min = max(2, min(15, (int)round(mb_strlen($content_text) / 1100)));
+        if ($read_min < 2) $read_min = 3;
+        $excerpt = !empty($p->post_excerpt) 
+            ? $p->post_excerpt 
+            : (function_exists('wp_trim_words') ? wp_trim_words($content_text, 24, '...') : mb_substr($content_text, 0, 150) . '...');
+        $author = get_the_author_meta('display_name', $p->post_author) ?: 'Инженер ОТК';
+        $thumb = get_the_post_thumbnail_url($p->ID, 'large');
+
+        $matched_articles[] = [
+            'id'       => $p->ID,
+            'slug'     => $p->post_name,
+            'title'    => get_the_title($p->ID),
+            'url'      => get_permalink($p->ID),
+            'tag'      => $primary_cat,
+            'tag_key'  => $cat_slug,
+            'read_min' => $read_min,
+            'excerpt'  => $excerpt,
+            'author'   => $author,
+            'date'     => get_the_date('j F Y', $p->ID),
+            'image'    => $thumb ?: null,
+            'is_wp'    => true
+        ];
+    }
+}
+
+// 2. Append matching static articles from reference database
 if (isset($current_rubric['article_ids'])) {
     foreach ($current_rubric['article_ids'] as $aid) {
         foreach ($articles as $art) {
@@ -294,7 +361,7 @@ include __DIR__ . '/includes/header.php';
 
           <!-- FEATURED MAIN ARTICLE (Visually Elevated with Engineering Stroke & Stamp Badge) -->
           <?php if ($featured_article): 
-            $f_url = "/article.php?slug=" . urlencode($featured_article['slug']);
+            $f_url = !empty($featured_article['url']) ? $featured_article['url'] : (function_exists('home_url') ? home_url("/article.php?slug=" . urlencode($featured_article['slug'])) : ("/article.php?slug=" . urlencode($featured_article['slug'])));
             $f_tag_pill = get_semantic_tag_pill($featured_article['tag_key'] ?? 'materials');
           ?>
             <article class="featured-sketch-frame rounded-lg bg-card p-6 sm:p-7 space-y-5 transition-all relative">
@@ -368,7 +435,7 @@ include __DIR__ . '/includes/header.php';
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <?php 
             foreach ($paginated['items'] as $article): 
-              $art_url = "/article.php?slug=" . urlencode($article['slug']);
+              $art_url = !empty($article['url']) ? $article['url'] : (function_exists('home_url') ? home_url("/article.php?slug=" . urlencode($article['slug'])) : ("/article.php?slug=" . urlencode($article['slug'])));
               $card_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
             ?>
               <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-all">
