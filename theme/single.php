@@ -153,7 +153,7 @@ if (have_posts()) {
                 <?php endif; ?>
 
                 <!-- Gutenberg / Editor Dynamic Post Content -->
-                <article class="article-content prose max-w-none text-ink font-serif leading-relaxed space-y-6">
+                <article class="article-content prose max-w-none text-ink font-sans leading-relaxed space-y-6">
                   <?php the_content(); ?>
                 </article>
 

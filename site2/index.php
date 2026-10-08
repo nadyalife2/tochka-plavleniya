@@ -61,8 +61,8 @@ if (count($recent_articles) < 4) {
     $static_candidates = array_slice($articles, 0, $needed);
     foreach ($static_candidates as $sa) {
         $link = function_exists('home_url') 
-            ? home_url('/article.php?slug=' . urlencode($sa['slug'])) 
-            : 'article.php?slug=' . urlencode($sa['slug']);
+            ? home_url('/' . urlencode($sa['slug']) . '/') 
+            : ('/' . urlencode($sa['slug']) . '/');
         $recent_articles[] = [
             'id'       => $sa['id'] ?? 0,
             'slug'     => $sa['slug'],
@@ -344,7 +344,7 @@ include __DIR__ . '/includes/header.php';
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
           <?php foreach ($recent_articles as $article): 
             $tag_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
-            $art_url = !empty($article['url']) ? $article['url'] : ('article.php?slug=' . urlencode($article['slug'] ?? ''));
+            $art_url = !empty($article['url']) ? $article['url'] : (function_exists('home_url') ? home_url('/' . urlencode($article['slug'] ?? '') . '/') : ('/' . urlencode($article['slug'] ?? '') . '/'));
           ?>
             <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
               <div class="space-y-2">
@@ -388,7 +388,9 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
-          <?php foreach (get_all_lessons() as $idx => $l): ?>
+          <?php foreach (get_all_lessons() as $idx => $l): 
+            $l_url = function_exists('home_url') ? home_url('/' . urlencode($l['slug']) . '/') : ('/' . urlencode($l['slug']) . '/');
+          ?>
             <article class="sketch-card p-3.5 flex flex-col justify-between space-y-2.5 bg-card hover:border-paper-border-dark transition-all rounded-lg group shadow-xs">
               <div class="space-y-2">
                 <div class="flex items-center justify-between font-mono text-xs">
@@ -396,7 +398,7 @@ include __DIR__ . '/includes/header.php';
                   <span class="text-ink-faint">#<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
                 </div>
                 <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug line-clamp-2">
-                  <a href="article.php?slug=<?= urlencode($l['slug']) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
+                  <a href="<?= esc_url($l_url) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
                     <?= htmlspecialchars($l['title']) ?>
                   </a>
                 </h3>
@@ -407,7 +409,7 @@ include __DIR__ . '/includes/header.php';
 
               <div class="pt-2 border-t border-paper-border flex items-center justify-between font-mono text-xs">
                 <span class="text-ink-faint text-[10px] uppercase truncate max-w-[80px]"><?= htmlspecialchars($l['tag']) ?></span>
-                <a href="article.php?slug=<?= urlencode($l['slug']) ?>" class="text-ink font-bold group-hover:text-accent shrink-0 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1">
+                <a href="<?= esc_url($l_url) ?>" class="text-ink font-bold group-hover:text-accent shrink-0 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1">
                   Открыть →
                 </a>
               </div>

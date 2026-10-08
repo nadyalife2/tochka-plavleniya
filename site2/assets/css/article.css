@@ -60,40 +60,65 @@
   color: var(--color-ink-muted);
 }
 
-/* 3. Контент статьи */
+/* 3. Контент статьи (Модульная карточная архитектура DESIGN.md) */
 .article-content {
-  background: var(--color-card);
-  border: 1px solid var(--color-paper-border);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  box-shadow: var(--shadow-card);
+  background: transparent !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
 }
-@media (min-width: 768px) {
-  .article-content {
-    padding: 2.5rem;
-  }
+
+.article-content > p:first-of-type,
+.article-content > p.text-lg {
+  background: var(--color-card, #ffffff);
+  border: 1px solid var(--color-paper-border);
+  border-radius: var(--radius-lg, 8px);
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.04));
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.7;
+  color: var(--color-ink);
+  margin-bottom: 1.75rem;
 }
 
 .article-content h2 {
   font-family: var(--font-sans);
   font-size: 1.5rem;
-  font-weight: 700;
-  margin: 2rem 0 1rem;
+  font-weight: 800;
+  margin: 2.25rem 0 1rem;
   color: var(--color-ink);
-  border-bottom: 1px solid var(--color-paper-border);
-  padding-bottom: 0.5rem;
+  letter-spacing: -0.015em;
+  border-bottom: none;
+  padding-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.article-content h2::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 1.15em;
+  background: var(--color-accent);
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .article-content h3 {
   font-family: var(--font-sans);
-  font-size: 1.25rem;
+  font-size: 1.2rem;
   font-weight: 700;
   margin: 1.5rem 0 0.75rem;
   color: var(--color-ink);
 }
 
 .article-content p {
-  font-size: 1.05rem;
+  font-family: var(--font-sans);
+  font-size: 1rem;
   line-height: 1.7;
   margin-bottom: 1.25rem;
   color: var(--color-ink);
@@ -376,144 +401,229 @@ html.dark .article-content img {
   pointer-events: none;
 }
 
-/* 11. Дополнительные инженерные паттерны ТОЧКА ПЛАВЛЕНИЯ */
+/* 11. Дополнительные инженерные паттерны ТОЧКА ПЛАВЛЕНИЯ (DESIGN.md Blueprint) */
 
-/* Стикер сбоку (Floating Sticky Note) с обтеканием текста */
-.callout-aside {
-  float: right;
-  max-width: 290px;
-  margin: 0.5rem 0 1.5rem 1.5rem;
-  padding: 1.25rem;
-  background: var(--color-sketch-yellow-bg, #fef9c3);
-  border: 1px solid var(--color-sketch-yellow, #fde047);
-  border-left: 4px solid var(--color-accent, #ea580c);
-  border-radius: var(--radius-md, 6px);
-  box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.05);
+/* 11.1 Врезка: Главный принцип (TL;DR Post-It Sticker) */
+.callout-tldr,
+.wp-block-group.callout-tldr {
+  position: relative !important;
+  background: var(--color-sketch-yellow-bg, #fffdf5) !important;
+  border: 1px solid var(--color-sketch-yellow, #fde047) !important;
+  border-left: 4px solid var(--color-accent, #eb5211) !important;
+  border-radius: var(--radius-md, 8px) !important;
+  padding: 1.5rem 1.75rem !important;
+  margin: 1.75rem 0 !important;
+  box-shadow: 2px 3px 12px -2px rgba(235, 82, 17, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
 }
-@media (max-width: 640px) {
-  .callout-aside {
-    float: none;
-    max-width: 100%;
-    margin: 1.5rem 0;
-  }
+.callout-tldr::before,
+.wp-block-group.callout-tldr::before {
+  content: "";
+  position: absolute;
+  top: -7px;
+  left: 24px;
+  width: 54px;
+  height: 14px;
+  background: rgba(235, 222, 179, 0.9);
+  transform: rotate(-1.5deg);
+  border-radius: 1px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  z-index: 2;
 }
-
-/* Врезка: Техника безопасности (Safety Warning) */
-.callout-safety {
-  padding: 1.25rem 1.5rem;
-  margin: 1.5rem 0;
-  border-radius: var(--radius-md, 6px);
-  background: rgba(239, 68, 68, 0.08);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  border-left: 4px solid var(--color-danger, #ef4444);
+.callout-tldr h3 {
+  font-family: var(--font-sans) !important;
+  font-size: 1.15rem !important;
+  font-weight: 800 !important;
+  color: var(--color-ink) !important;
+  margin: 0 0 0.5rem 0 !important;
 }
-
-/* Врезка: Совет мастера (Pro Tip) */
-.callout-pro {
-  padding: 1.25rem 1.5rem;
-  margin: 1.5rem 0;
-  border-radius: var(--radius-md, 6px);
-  background: rgba(16, 185, 129, 0.08);
-  border: 1px solid rgba(16, 185, 129, 0.35);
-  border-left: 4px solid #10b981;
-}
-
-/* Врезка: Стандарт IPC-A-610 / ГОСТ */
-.callout-ipc {
-  padding: 1.25rem 1.5rem;
-  margin: 1.5rem 0;
-  border-radius: var(--radius-md, 6px);
-  background: var(--color-paper-subtle);
-  border: 1px solid var(--color-paper-border);
-  border-left: 4px solid var(--color-ink-muted);
+.callout-tldr p {
+  font-family: var(--font-sans) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+  color: var(--color-ink) !important;
+  margin: 0 !important;
 }
 
-/* Сравнение «БРАК vs НОРМА (ДО / ПОСЛЕ)» */
-.compare-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-  margin: 2rem 0;
+/* 11.2 Заметка на полях (Marginalia / Aside Notes - Caveat Hand) */
+.callout-aside,
+.wp-block-group.callout-aside,
+.marginalia-box,
+.wp-block-group.marginalia-box {
+  position: relative !important;
+  background: rgba(254, 249, 195, 0.45) !important;
+  border: 1.5px dashed #ca8a04 !important;
+  border-radius: var(--radius-md, 8px) !important;
+  padding: 1.25rem 1.5rem 1.25rem 3.5rem !important;
+  margin: 1.75rem 0 !important;
+  float: none !important;
+  max-width: 100% !important;
+  clear: both !important;
 }
-@media (max-width: 640px) {
-  .compare-grid {
-    grid-template-columns: 1fr;
-  }
+.callout-aside::before,
+.wp-block-group.callout-aside::before,
+.marginalia-box::before,
+.wp-block-group.marginalia-box::before {
+  content: "🏷️";
+  position: absolute;
+  left: 1.2rem;
+  top: 1.15rem;
+  font-size: 1.35rem;
 }
-.compare-col {
-  border: 1px solid var(--color-paper-border);
-  border-radius: var(--radius-md, 6px);
-  background: var(--color-card, #ffffff);
-  padding: 1.25rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+.callout-aside p:first-child,
+.wp-block-group.callout-aside p:first-child {
+  font-family: var(--font-mono) !important;
+  font-size: 0.75rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--color-accent, #eb5211) !important;
+  margin: 0 0 0.25rem 0 !important;
 }
-.badge-defect {
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  background: rgba(239, 68, 68, 0.15);
-  color: #dc2626;
-  font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-}
-.badge-norm {
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  background: rgba(16, 185, 129, 0.15);
-  color: #059669;
-  font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
+.callout-aside p:last-child,
+.wp-block-group.callout-aside p:last-child,
+.marginalia-box p,
+.marginalia-text {
+  font-family: var(--font-hand, 'Caveat', cursive) !important;
+  font-size: 1.35rem !important;
+  line-height: 1.45 !important;
+  color: var(--color-ink) !important;
+  margin: 0 !important;
 }
 
-/* Чек-лист готовности к пайке */
-.checklist-box {
-  background: var(--color-paper-subtle);
-  border: 1px solid var(--color-paper-border);
-  border-radius: var(--radius-md, 6px);
-  padding: 1.5rem;
-  margin: 1.75rem 0;
+/* 11.3 Врезка: Техника безопасности (Safety Warning) */
+.callout-safety,
+.wp-block-group.callout-safety {
+  position: relative !important;
+  background: #fef2f2 !important;
+  border: 1px solid #fecaca !important;
+  border-left: 4px solid #ef4444 !important;
+  border-radius: var(--radius-md, 8px) !important;
+  padding: 1.25rem 1.5rem !important;
+  margin: 1.75rem 0 !important;
+  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.08) !important;
 }
-.checklist-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  padding: 0.6rem 0;
-  border-bottom: 1px dashed var(--color-paper-border);
-  font-size: 0.95rem;
+.callout-safety p {
+  font-family: var(--font-sans) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  color: #991b1b !important;
+  margin: 0 !important;
 }
-.checklist-item:last-child {
-  border-bottom: none;
+.callout-safety strong {
+  color: #b91c1c !important;
+  font-weight: 800 !important;
 }
-.check-icon {
+
+/* 11.4 Врезка: Совет мастера (Pro Tip) */
+.callout-pro,
+.wp-block-group.callout-pro {
+  padding: 1.25rem 1.5rem !important;
+  margin: 1.75rem 0 !important;
+  border-radius: var(--radius-md, 8px) !important;
+  background: #f0fdf4 !important;
+  border: 1px solid #bbf7d0 !important;
+  border-left: 4px solid #10b981 !important;
+}
+.callout-pro p {
+  font-family: var(--font-sans) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.6 !important;
+  color: #065f46 !important;
+  margin: 0 !important;
+}
+
+/* 11.5 Врезка: Стандарт IPC-A-610 / ГОСТ */
+.callout-ipc,
+.wp-block-group.callout-ipc {
+  padding: 1.25rem 1.5rem !important;
+  margin: 1.75rem 0 !important;
+  border-radius: var(--radius-md, 8px) !important;
+  background: var(--color-paper-subtle, #f5f2eb) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+  border-left: 4px solid var(--color-ink-muted, #6b665f) !important;
+}
+.callout-ipc p {
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+  line-height: 1.6 !important;
+  color: var(--color-ink) !important;
+  margin: 0 !important;
+}
+
+/* 11.6 Карточка оснастки «Что понадобится» (Tools Box) */
+.tools-box,
+.wp-block-group.tools-box {
+  background: var(--color-card, #ffffff) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+  border-radius: var(--radius-lg, 8px) !important;
+  padding: 1.5rem 1.75rem !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.05) !important;
+}
+.tools-box h3 {
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--color-accent, #eb5211) !important;
+  margin: 0 0 1rem 0 !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 1px dashed var(--color-paper-border) !important;
+}
+.tools-box ul {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 0.75rem 1.25rem !important;
+}
+.tools-box li {
+  position: relative !important;
+  padding-left: 1.5rem !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+  line-height: 1.5 !important;
+  color: var(--color-ink) !important;
+  margin: 0 !important;
+}
+.tools-box li::before {
+  content: "▸";
+  position: absolute;
+  left: 0;
   color: var(--color-accent);
-  font-weight: 800;
-  font-family: var(--font-mono, monospace);
-  font-size: 1rem;
+  font-weight: bold;
 }
 
-/* Карточка оснастки «Что понадобится» */
-.tools-box {
-  background: var(--color-card, #ffffff);
-  border: 1px solid var(--color-paper-border);
-  border-radius: var(--radius-md, 6px);
-  padding: 1.25rem 1.5rem;
-  margin: 1.75rem 0;
+/* 11.7 Пошаговые карточки регламента (Step Cards) */
+.step-card,
+.wp-block-group.step-card {
+  background: var(--color-card, #ffffff) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+  border-radius: var(--radius-lg, 8px) !important;
+  padding: 1.5rem 1.75rem !important;
+  margin: 1.25rem 0 !important;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  transition: border-color 0.15s ease, transform 0.15s ease;
 }
-
-/* Пошаговые карточки регламента */
-.step-card {
-  border: 1px solid var(--color-paper-border);
-  border-radius: var(--radius-md, 6px);
-  background: var(--color-card, #ffffff);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 1rem;
+.step-card:hover {
+  border-color: var(--color-accent, #eb5211) !important;
+  transform: translateY(-1px);
+}
+.step-card h4 {
+  font-family: var(--font-sans) !important;
+  font-size: 1.1rem !important;
+  font-weight: 800 !important;
+  color: var(--color-ink) !important;
+  margin: 0.35rem 0 0.5rem 0 !important;
+}
+.step-card p {
+  font-family: var(--font-sans) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+  color: var(--color-ink-muted) !important;
+  margin: 0 !important;
 }
 .step-badge,
 .step-badge-yellow,
@@ -523,50 +633,164 @@ html.dark .article-content img {
   display: inline-block;
   font-family: var(--font-mono, monospace);
   font-size: 0.75rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
   border-radius: 4px;
-  margin-right: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.step-badge-orange {
+  background: rgba(235, 82, 17, 0.12);
+  color: var(--color-accent, #eb5211);
+  border: 1px solid rgba(235, 82, 17, 0.25);
 }
 .step-badge-yellow { background: #fef08a; color: #854d0e; }
-.step-badge-orange { background: #ffedd5; color: #c2410c; }
 .step-badge-mint   { background: #d1fae5; color: #065f46; }
 .step-badge-blue   { background: #e0f2fe; color: #0369a1; }
 
-/* Заметка на полях со стрелкой (Marginalia) */
-.marginalia-box {
-  position: relative;
-  border: 1.5px dashed var(--color-paper-border-dark);
-  background: rgba(254, 249, 195, 0.4);
-  border-radius: var(--radius-md, 6px);
-  padding: 1.25rem 1.5rem 1.25rem 3.25rem;
-  margin: 2rem 0;
+/* 11.8 Сравнение «БРАК vs НОРМА (ДО / ПОСЛЕ)» (Compare Grid) */
+.compare-grid,
+.wp-block-group.compare-grid {
+  margin: 2rem 0 !important;
 }
-.marginalia-box::before {
-  content: "✏️";
-  position: absolute;
-  left: 1.2rem;
-  top: 1.1rem;
-  font-size: 1.25rem;
+.compare-grid,
+.compare-grid > .wp-block-group__inner-container {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 1.25rem !important;
 }
-.marginalia-text {
-  font-family: var(--font-hand, 'Caveat', cursive);
-  font-size: 1.25rem;
-  line-height: 1.4;
-  color: var(--color-ink);
-  margin: 0;
+@media (max-width: 640px) {
+  .compare-grid,
+  .compare-grid > .wp-block-group__inner-container {
+    grid-template-columns: 1fr !important;
+  }
+}
+.compare-card {
+  border-radius: var(--radius-lg, 8px) !important;
+  padding: 1.5rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+.compare-card.defect {
+  background: #fff7f7 !important;
+  border: 1px solid #fecaca !important;
+  border-top: 3px solid #ef4444 !important;
+}
+.compare-card.norm {
+  background: #f0fdf4 !important;
+  border: 1px solid #bbf7d0 !important;
+  border-top: 3px solid #10b981 !important;
+}
+.compare-card p {
+  font-family: var(--font-sans) !important;
+  font-size: 0.9rem !important;
+  line-height: 1.6 !important;
+  color: var(--color-ink) !important;
+  margin: 0 !important;
+}
+.badge-defect {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.badge-norm {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  background: #f0fdf4;
+  color: #059669;
+  border: 1px solid #86efac;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
-/* Карточки FAQ */
-.faq-item {
-  border: 1px solid var(--color-paper-border);
-  border-radius: var(--radius-md, 6px);
-  background: var(--color-card, #ffffff);
-  padding: 1.25rem 1.5rem;
-  margin-bottom: 0.85rem;
+/* 11.9 Чек-лист готовности к пайке (Checklist Box) */
+.checklist-box,
+.wp-block-group.checklist-box {
+  background: var(--color-card, #ffffff) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+  border-radius: var(--radius-lg, 8px) !important;
+  padding: 1.5rem 1.75rem !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05) !important;
+}
+.checklist-box h3,
+.checklist-box p:first-child {
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  color: var(--color-accent, #eb5211) !important;
+  margin: 0 0 1rem 0 !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 1px dashed var(--color-paper-border) !important;
+}
+.checklist-box ul {
+  list-style: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.65rem !important;
+}
+.checklist-box li {
+  font-family: var(--font-mono) !important;
+  font-size: 0.85rem !important;
+  line-height: 1.5 !important;
+  color: var(--color-ink) !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 1px dashed var(--color-paper-border) !important;
+  margin: 0 !important;
+}
+.checklist-box li:last-child {
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
 }
 
-/* Крупная цитата / принцип (Quote Hero) */
+/* 11.10 Карточки FAQ (FAQ Items) */
+.faq-item,
+.wp-block-group.faq-item {
+  background: var(--color-card, #ffffff) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+  border-radius: var(--radius-lg, 8px) !important;
+  padding: 1.25rem 1.5rem !important;
+  margin: 0.85rem 0 !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+  transition: border-color 0.15s ease;
+}
+.faq-item:hover {
+  border-color: var(--color-accent, #eb5211) !important;
+}
+.faq-item p:first-child {
+  font-family: var(--font-sans) !important;
+  font-size: 1rem !important;
+  font-weight: 800 !important;
+  color: var(--color-ink) !important;
+  margin: 0 0 0.5rem 0 !important;
+}
+.faq-item p:last-child {
+  font-family: var(--font-sans) !important;
+  font-size: 0.95rem !important;
+  line-height: 1.65 !important;
+  color: var(--color-ink-muted) !important;
+  margin: 0 !important;
+}
+
+/* 11.11 Крупная цитата / принцип (Quote Hero) */
 .quote-hero {
   border-left: 4px solid var(--color-accent, #ea580c);
   background: var(--color-paper-subtle, #f5f2eb);
@@ -579,7 +803,7 @@ html.dark .article-content img {
   color: var(--color-ink, #1a1a1a);
 }
 
-/* Макро-галерея (Gallery Macro) */
+/* 11.12 Макро-галерея (Gallery Macro) */
 .gallery-macro {
   margin: 2rem 0;
   border: 1px solid var(--color-paper-border);
@@ -595,13 +819,52 @@ html.dark .article-content img {
   border-top: 1px solid var(--color-paper-border);
 }
 
-/* График термопрофиля (Thermal Profile SVG) */
+/* 11.13 График термопрофиля (Thermal Profile SVG) */
 .thermal-profile {
   margin: 2rem 0;
   padding: 1.5rem;
   border: 1px solid var(--color-paper-border);
   border-radius: var(--radius-lg, 8px);
   background: var(--color-card, #ffffff);
+}
+
+/* 12. ТЁМНАЯ ТЕМА (DARK MODE) */
+html.dark .article-content > p:first-of-type,
+html.dark .article-content > p.text-lg,
+html.dark .tools-box,
+html.dark .wp-block-group.tools-box,
+html.dark .step-card,
+html.dark .wp-block-group.step-card,
+html.dark .checklist-box,
+html.dark .wp-block-group.checklist-box,
+html.dark .faq-item,
+html.dark .wp-block-group.faq-item {
+  background: var(--color-card, #111827) !important;
+  border-color: var(--color-paper-border, #1e293b) !important;
+}
+
+html.dark .callout-tldr,
+html.dark .wp-block-group.callout-tldr {
+  background: #1c1912 !important;
+  border-color: #854d0e !important;
+}
+
+html.dark .callout-aside,
+html.dark .wp-block-group.callout-aside,
+html.dark .marginalia-box,
+html.dark .wp-block-group.marginalia-box {
+  background: rgba(202, 138, 4, 0.15) !important;
+  border-color: #d97706 !important;
+}
+
+html.dark .compare-card.defect {
+  background: #2a1215 !important;
+  border-color: #7f1d1d !important;
+}
+
+html.dark .compare-card.norm {
+  background: #0d2818 !important;
+  border-color: #065f46 !important;
 }
 
 

@@ -255,10 +255,11 @@ if (!function_exists('render_rubric_schema')) {
         $itemList = [];
         $pos = 1;
         foreach ($articles as $art) {
+            $itemUrl = !empty($art['url']) ? $art['url'] : ("https://tochka-plavleniya.ru/" . urlencode($art['slug'] ?? '') . "/");
             $itemList[] = [
                 "@type" => "ListItem",
                 "position" => $pos++,
-                "url" => "https://tochka-plavleniya.ru/article.php?slug=" . urlencode($art['slug'] ?? ''),
+                "url" => $itemUrl,
                 "name" => $art['title'] ?? ''
             ];
         }
