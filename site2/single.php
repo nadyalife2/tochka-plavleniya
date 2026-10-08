@@ -296,7 +296,7 @@ if (have_posts()) {
         </main>
 
         <?php
-        include __DIR__ . '/includes/footer-editorial.php';
+        include __DIR__ . '/includes/footer.php';
         break; // Display single post
     }
 } else {

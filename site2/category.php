@@ -11,14 +11,36 @@ $sort_param = $_GET['sort'] ?? 'default';
 
 // Detect WordPress queried taxonomy term if inside WP
 $queried_cat = null;
+$queried_tag = null;
+$is_tag_view = false;
+
 if (function_exists('is_category') && is_category()) {
     $queried_cat = get_queried_object();
     if ($queried_cat && !empty($queried_cat->slug)) {
         $slug = $queried_cat->slug;
     }
+} elseif (function_exists('is_tag') && is_tag()) {
+    $queried_tag = get_queried_object();
+    if ($queried_tag && !empty($queried_tag->slug)) {
+        $slug = $queried_tag->slug;
+        $is_tag_view = true;
+    }
 }
 
-if ($slug && isset($RUBRICS[$slug])) {
+if ($is_tag_view && $queried_tag) {
+    $current_rubric = [
+        'title'       => 'Метка: #' . $queried_tag->name,
+        'tag'         => '#' . $queried_tag->name,
+        'lead'        => $queried_tag->description ?: ('Все статьи, регламенты и материалы с меткой #' . $queried_tag->name . '.'),
+        'badge'       => 'МЕТКА // БАЗА ЗНАНИЙ',
+        'subbadge'    => '#' . $queried_tag->name,
+        'article_ids' => [],
+        'filter_tags' => [],
+        'sub_tags'    => []
+    ];
+    $current_slug = $slug;
+    $current_page = 'tag';
+} elseif ($slug && isset($RUBRICS[$slug])) {
     $current_rubric = $RUBRICS[$slug];
     $current_slug   = $slug;
     $current_page   = $slug;
@@ -27,6 +49,8 @@ if ($slug && isset($RUBRICS[$slug])) {
         'title'       => $queried_cat->name,
         'tag'         => $queried_cat->name,
         'lead'        => $queried_cat->description ?: ('Статьи и материалы рубрики «' . $queried_cat->name . '».'),
+        'badge'       => 'РУБРИКА // ЖУРНАЛ',
+        'subbadge'    => $queried_cat->name,
         'article_ids' => [],
         'filter_tags' => [$slug],
         'sub_tags'    => []
@@ -43,14 +67,22 @@ if ($slug && isset($RUBRICS[$slug])) {
     $current_page   = 'materialy';
 }
 
+$site_root = function_exists('home_url') ? home_url('/') : '/';
 $page_title = $current_rubric['title'] . " — Журнал ТОЧКА ПЛАВЛЕНИЯ";
 $page_desc  = $current_rubric['lead'];
-$canonical_url = "https://tochka-plavleniya.ru/category.php?slug=" . urlencode($current_slug);
+
+if ($is_tag_view && $queried_tag) {
+    $canonical_url = get_tag_link($queried_tag->term_id);
+} elseif ($queried_cat) {
+    $canonical_url = get_category_link($queried_cat->term_id);
+} else {
+    $canonical_url = $site_root . "category.php?slug=" . urlencode($current_slug);
+}
 
 // Collect articles for this rubric
 $matched_articles = [];
 
-// 1. Fetch real published WordPress posts for this category
+// 1. Fetch real published WordPress posts for this category / tag
 if (function_exists('get_posts')) {
     $wp_args = [
         'numberposts' => 50,
@@ -59,9 +91,11 @@ if (function_exists('get_posts')) {
         'orderby'     => 'date',
         'order'       => 'DESC'
     ];
-    if ($queried_cat && !empty($queried_cat->term_id)) {
+    if ($is_tag_view && $queried_tag && !empty($queried_tag->term_id)) {
+        $wp_args['tag_id'] = $queried_tag->term_id;
+    } elseif ($queried_cat && !empty($queried_cat->term_id)) {
         $wp_args['cat'] = $queried_cat->term_id;
-    } elseif ($slug) {
+    } elseif ($slug && !$is_tag_view) {
         $wp_args['category_name'] = $slug;
     }
     $wp_posts = get_posts($wp_args);
@@ -95,25 +129,27 @@ if (function_exists('get_posts')) {
     }
 }
 
-// 2. Append matching static articles from reference database
-if (isset($current_rubric['article_ids'])) {
-    foreach ($current_rubric['article_ids'] as $aid) {
-        foreach ($articles as $art) {
-            if ($art['id'] === $aid && empty($art['draft'])) {
-                $matched_articles[] = $art;
-                break;
+// 2. Append matching static articles if not already present from WP
+if (!$is_tag_view) {
+    $existing_slugs = array_filter(array_column($matched_articles, 'slug'));
+    if (isset($current_rubric['article_ids'])) {
+        foreach ($current_rubric['article_ids'] as $aid) {
+            foreach ($articles as $art) {
+                if ($art['id'] === $aid && empty($art['draft']) && !in_array($art['slug'], $existing_slugs)) {
+                    $matched_articles[] = $art;
+                    $existing_slugs[] = $art['slug'];
+                    break;
+                }
             }
         }
     }
-}
 
-// Append matching published articles & lessons by tag to provide rich catalog and pagination
-if (!empty($current_rubric['filter_tags'])) {
-    $existing_ids = array_column($matched_articles, 'id');
-    foreach ($articles as $art) {
-        if (!in_array($art['id'], $existing_ids) && empty($art['draft']) && in_array($art['tag_key'], $current_rubric['filter_tags'])) {
-            $matched_articles[] = $art;
-            $existing_ids[] = $art['id'];
+    if (!empty($current_rubric['filter_tags'])) {
+        foreach ($articles as $art) {
+            if (!in_array($art['slug'], $existing_slugs) && empty($art['draft']) && in_array($art['tag_key'], $current_rubric['filter_tags'])) {
+                $matched_articles[] = $art;
+                $existing_slugs[] = $art['slug'];
+            }
         }
     }
 }

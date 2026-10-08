@@ -329,12 +329,42 @@ add_action('init', function () {
     }
 });
 
-// 4. Fail-safe: Prevent root URL from ever showing 404 in WordPress
+// 4. Fail-safe Routing & Fallbacks (Zero-404 Architecture)
 add_action('template_redirect', function () {
-    if (is_404() && ($_SERVER['REQUEST_URI'] === '/' || empty(trim($_SERVER['REQUEST_URI'], '/')))) {
-        status_header(200);
-        require __DIR__ . '/index.php';
-        exit;
+    if (is_404()) {
+        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+        $path = trim($uri, '/');
+
+        // 4.1. Root URL
+        if ($path === '' || empty($path)) {
+            status_header(200);
+            require __DIR__ . '/index.php';
+            exit;
+        }
+
+        // 4.2. Interactive Workbench
+        if ($path === 'interactive' || $path === 'interactive.php') {
+            status_header(200);
+            require __DIR__ . '/page-interactive.php';
+            exit;
+        }
+
+        // 4.3. Legal Pages
+        if ($path === 'privacy' || $path === 'privacy.php') {
+            status_header(200);
+            require __DIR__ . '/privacy.php';
+            exit;
+        }
+        if ($path === 'terms' || $path === 'terms.php') {
+            status_header(200);
+            require __DIR__ . '/terms.php';
+            exit;
+        }
+        if ($path === 'cookies' || $path === 'cookies.php') {
+            status_header(200);
+            require __DIR__ . '/cookies.php';
+            exit;
+        }
     }
 });
 

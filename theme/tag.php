@@ -1,6 +1,6 @@
 <?php
 /**
- * The template for displaying archive pages
+ * The template for displaying post tags
  *
  * @package ТОЧКА ПЛАВЛЕНИЯ
  * @version 2.2.0

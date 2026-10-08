@@ -108,12 +108,12 @@ $assets_base = function_exists('get_template_directory_uri') ? get_template_dire
         </button>
 
         <?php if ($current_page === 'interactive'): ?>
-          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/#articles" aria-label="Читать статьи журнала">
+          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>#articles" aria-label="Читать статьи журнала">
             <span>Журнал / Статьи</span>
             <span class="material-symbols-outlined text-[14px]">menu_book</span>
           </a>
         <?php else: ?>
-          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="/interactive.php" aria-label="Открыть интерактивный верстак инженера">
+          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>interactive.php" aria-label="Открыть интерактивный верстак инженера">
             <span>Верстак / Тулзы</span>
             <span class="material-symbols-outlined text-[14px]">build</span>
           </a>

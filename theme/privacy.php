@@ -1,9 +1,16 @@
 <?php
+/**
+ * Template Name: Политика конфиденциальности
+ * Description: Положение о нулевом сборе данных (152-ФЗ compliant)
+ *
+ * @package ТОЧКА ПЛАВЛЕНИЯ
+ */
 require_once __DIR__ . '/includes/functions.php';
 
 $page_title = "Политика конфиденциальности — ТОЧКА ПЛАВЛЕНИЯ";
 $page_desc = "Политика конфиденциальности и правила обработки персональных данных портала Точка Плавления.";
 $current_page = 'privacy';
+$site_root = function_exists('home_url') ? home_url('/') : '/';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -13,7 +20,7 @@ include __DIR__ . '/includes/header.php';
       
       <!-- Breadcrumbs -->
       <nav class="text-[12px] font-mono text-ink-faint mb-6 flex items-center gap-1.5">
-        <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
+        <a class="hover:text-ink transition-colors" href="<?= esc_url($site_root) ?>">Главная</a>
         <span>→</span>
         <span class="text-ink">Политика конфиденциальности</span>
       </nav>

@@ -1,13 +1,16 @@
 <?php
 /**
- * cookies.php — Политика использования файлов cookie
- * Точка Плавления
+ * Template Name: Политика cookie
+ * Description: Информация об использовании технических cookie
+ *
+ * @package ТОЧКА ПЛАВЛЕНИЯ
  */
 require_once __DIR__ . '/includes/functions.php';
 
 $page_title = "Политика использования файлов cookie — ТОЧКА ПЛАВЛЕНИЯ";
 $page_desc = "Информация об использовании файлов cookie и аналогичных технологий на портале Точка Плавления.";
 $current_page = 'cookies';
+$site_root = function_exists('home_url') ? home_url('/') : '/';
 
 include __DIR__ . '/includes/header.php';
 ?>
@@ -18,7 +21,7 @@ include __DIR__ . '/includes/header.php';
       
       <!-- Breadcrumbs -->
       <nav class="text-[12px] font-mono text-ink-faint mb-6 flex items-center gap-1.5" aria-label="Хлебные крошки">
-        <a class="hover:text-ink transition-colors" href="/">Главная</a>
+        <a class="hover:text-ink transition-colors" href="<?= esc_url($site_root) ?>">Главная</a>
         <span>→</span>
         <span class="text-ink">Политика использования файлов cookie</span>
       </nav>

@@ -15,6 +15,7 @@ require_once __DIR__ . '/includes/functions.php';
 $page_title   = '404 — Плата не найдена | Точка Плавления';
 $page_desc    = 'Запрошенная страница не существует или была перемещена.';
 $current_page = '404';
+$site_root    = function_exists('home_url') ? home_url('/') : '/';
 
 require_once __DIR__ . '/includes/header.php';
 ?>
@@ -49,8 +50,8 @@ require_once __DIR__ . '/includes/header.php';
   </p>
 
   <div class="flex items-center justify-center gap-3 flex-wrap">
-    <a href="index.php" class="btn-primary">Вернуться на главную →</a>
-    <a href="interactive.php" class="btn-secondary">К инструментам</a>
+    <a href="<?= esc_url($site_root) ?>" class="btn-primary">Вернуться на главную →</a>
+    <a href="<?= esc_url($site_root) ?>interactive.php" class="btn-secondary">К инструментам</a>
   </div>
 </div>
 

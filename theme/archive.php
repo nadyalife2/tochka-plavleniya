@@ -2,7 +2,7 @@
 /**
  * The template for displaying archive pages
  *
- * @package Site2
+ * @package ТОЧКА ПЛАВЛЕНИЯ
  * @version 2.2.0
  */
 

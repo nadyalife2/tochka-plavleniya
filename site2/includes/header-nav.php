@@ -8,17 +8,26 @@
 $current_page = $current_page ?? '';
 $site_root = function_exists('home_url') ? home_url('/') : '/';
 
+$praktika_link = function_exists('get_category_by_slug') && ($cat = get_category_by_slug('praktika')) 
+    ? get_category_link($cat->term_id) 
+    : ($site_root . 'category.php?slug=praktika');
+
+$start_link = function_exists('get_category_by_slug') && ($cat = get_category_by_slug('start')) 
+    ? get_category_link($cat->term_id) 
+    : ($site_root . 'category.php?slug=start');
+
 $nav_items = [
-    ['href' => $site_root . '#articles',                 'label' => 'Статьи',       'page' => 'articles'],
-    ['href' => $site_root . 'interactive.php',           'label' => 'Калькуляторы', 'page' => 'interactive'],
-    ['href' => $site_root . 'category.php?slug=praktika','label' => 'Практика',     'page' => 'praktika'],
-    ['href' => $site_root . 'category.php?slug=start',   'label' => 'С чего начать', 'page' => 'start'],
+    ['href' => $site_root . '#articles',  'label' => 'Статьи',       'page' => 'articles'],
+    ['href' => $site_root . 'interactive.php', 'label' => 'Калькуляторы', 'page' => 'interactive'],
+    ['href' => $praktika_link,            'label' => 'Практика',     'page' => 'praktika'],
+    ['href' => $start_link,               'label' => 'С чего начать', 'page' => 'start'],
 ];
 
 if (!function_exists('is_tchp_nav_active')) {
     function is_tchp_nav_active($item_page, $current_page) {
         if ($current_page === $item_page) return true;
         if (($current_page === 'category' || empty($current_page)) && isset($_GET['slug']) && $_GET['slug'] === $item_page) return true;
+        if (function_exists('is_category') && is_category($item_page)) return true;
         return false;
     }
 }

@@ -1,0 +1,29 @@
+# ТОЧКА ПЛАВЛЕНИЯ (Engineering Knowledge Base & Standards)
+> Инженерный журнал, открытая лаборатория и интерактивный верстак по радиомонтажу, пайке РЭА, BGA-реболлингу и теплофизике электронных компонентов.
+> Canonical URL: https://tochka-plavleniya.ru/
+
+## Ключевые регламенты и стандарты
+- Отраслевые стандарты: IPC-A-610G (Class 3), IPC/JEDEC J-STD-020D, ГОСТ 21930-76, ГОСТ 21931-76.
+- Теплофизические параметры:
+  - ПОС-61: Тпл 183–190°C, рабочий диапазон паяльника 260–280°C.
+  - SAC305 (Sn96.5Ag3.0Cu0.5): Тпл 217–220°C (Liquidus), пиковый рефлоу 238–242°C, TAL (Time Above Liquidus) 45–60 секунд.
+  - Сплав Розе (Bi50Pb32Sn18): Тпл 94°C (демонтажный сплав).
+  - Сплав Вуда (Bi50Pb25Sn12.5Cd12.5): Тпл 68°C (содержит кадмий).
+- Флюсы и химия:
+  - ROL0 / REL0: слабоактивированные канифольные и синтетические гели (NC-559, RMA-218).
+  - Безотмывочные остатки: обязательна УЗВ-отмывка изопропиловым спиртом для цепей выше 100 МГц и высокоомных делителей.
+
+## Интерактивные инженерные инструменты (Верстак)
+- Термокалькулятор режимов пайки: https://tochka-plavleniya.ru/interactive#temp
+- Подбор геометрии жал и теплоемкости: https://tochka-plavleniya.ru/interactive#iron
+- Чек-лист предполетного контроля: https://tochka-plavleniya.ru/interactive#checklist
+- Дерево диагностики брака пайки: https://tochka-plavleniya.ru/interactive#defect
+- Калькулятор расхода флюса и пасты (IPC-7095C): https://tochka-plavleniya.ru/interactive#calculator
+- Селектор флюса по активности (J-STD-004B): https://tochka-plavleniya.ru/interactive#flux-selector
+- Реестр ликвидуса 9 сплавов: https://tochka-plavleniya.ru/interactive#table
+
+## Основные рубрики базы знаний
+- Материалы и сплавы: https://tochka-plavleniya.ru/category/materialy/
+- Практика и монтаж: https://tochka-plavleniya.ru/category/praktika/
+- Проблемы и дефекты: https://tochka-plavleniya.ru/category/oshibki/
+- Старт и база: https://tochka-plavleniya.ru/category/start/

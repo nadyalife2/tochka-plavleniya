@@ -398,6 +398,16 @@ html.dark .article-content img {
   }
 }
 
+/* Врезка: Техника безопасности (Safety Warning) */
+.callout-safety {
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-md, 6px);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  border-left: 4px solid var(--color-danger, #ef4444);
+}
+
 /* Врезка: Совет мастера (Pro Tip) */
 .callout-pro {
   padding: 1.25rem 1.5rem;
@@ -505,7 +515,11 @@ html.dark .article-content img {
   padding: 1.25rem 1.5rem;
   margin-bottom: 1rem;
 }
-.step-badge {
+.step-badge,
+.step-badge-yellow,
+.step-badge-orange,
+.step-badge-mint,
+.step-badge-blue {
   display: inline-block;
   font-family: var(--font-mono, monospace);
   font-size: 0.75rem;
@@ -551,5 +565,44 @@ html.dark .article-content img {
   padding: 1.25rem 1.5rem;
   margin-bottom: 0.85rem;
 }
+
+/* Крупная цитата / принцип (Quote Hero) */
+.quote-hero {
+  border-left: 4px solid var(--color-accent, #ea580c);
+  background: var(--color-paper-subtle, #f5f2eb);
+  padding: 1.5rem 1.75rem;
+  margin: 2rem 0;
+  border-radius: var(--radius-md, 6px);
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--color-ink, #1a1a1a);
+}
+
+/* Макро-галерея (Gallery Macro) */
+.gallery-macro {
+  margin: 2rem 0;
+  border: 1px solid var(--color-paper-border);
+  border-radius: var(--radius-lg, 8px);
+  overflow: hidden;
+  background: var(--color-card, #ffffff);
+}
+.macro-caption {
+  padding: 0.75rem 1rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: var(--color-ink-muted);
+  border-top: 1px solid var(--color-paper-border);
+}
+
+/* График термопрофиля (Thermal Profile SVG) */
+.thermal-profile {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  border: 1px solid var(--color-paper-border);
+  border-radius: var(--radius-lg, 8px);
+  background: var(--color-card, #ffffff);
+}
+
 
 
