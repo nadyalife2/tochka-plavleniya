@@ -331,10 +331,38 @@ add_action('init', function () {
 
 // 4. Fail-safe Routing & Fallbacks (Zero-404 Architecture)
 add_action('template_redirect', function () {
-    if (is_404()) {
-        $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
-        $path = trim($uri, '/');
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    $path = trim($uri, '/');
 
+    // 4.0. Legacy / Direct category.php requests -> 301 Permanent Redirect to canonical WP category
+    if ($path === 'category.php' || $path === 'category') {
+        $slug = $_GET['slug'] ?? '';
+        if (!empty($slug)) {
+            $cat_map = [
+                'start'         => 'старт-и-база',
+                'старт-и-база' => 'старт-и-база',
+                'start-i-baza'  => 'старт-и-база',
+                'praktika'      => 'praktika',
+                'oshibki'       => 'oshibki',
+                'materialy'     => 'materialy'
+            ];
+            $target_slug = $cat_map[$slug] ?? $slug;
+            $cat = function_exists('get_category_by_slug') ? get_category_by_slug($target_slug) : null;
+            if (!$cat && function_exists('get_category_by_slug')) {
+                $cat = get_category_by_slug($slug);
+            }
+            if ($cat && !is_wp_error($cat) && function_exists('get_category_link')) {
+                wp_safe_redirect(get_category_link($cat->term_id), 301);
+                exit;
+            }
+            if (function_exists('home_url')) {
+                wp_safe_redirect(home_url('/category/' . urlencode($target_slug) . '/'), 301);
+                exit;
+            }
+        }
+    }
+
+    if (is_404()) {
         // 4.1. Root URL
         if ($path === '' || empty($path)) {
             status_header(200);
@@ -366,6 +394,17 @@ add_action('template_redirect', function () {
             exit;
         }
     }
+});
+
+// 4.4. Clean Typography: Disable WP Emoji to SVG conversion to avoid duplicated icons & preserve clean text
+add_action('init', function () {
+    remove_action('wp_head', 'print_emoji_detection_script', 7);
+    remove_action('admin_print_scripts', 'print_emoji_detection_script');
+    remove_action('wp_print_styles', 'print_emoji_styles');
+    remove_action('admin_print_styles', 'print_emoji_styles');
+    remove_filter('the_content_feed', 'wp_staticize_emoji');
+    remove_filter('comment_text_rss', 'wp_staticize_emoji');
+    remove_filter('wp_mail', 'wp_staticize_emoji_for_email');
 });
 
 // 5. Disable WordPress comments (Zero-PII / 152-ФЗ compliance)

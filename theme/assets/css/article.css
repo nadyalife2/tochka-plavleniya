@@ -451,10 +451,10 @@ html.dark .article-content img {
 .wp-block-group.marginalia-box {
   position: relative !important;
   background: rgba(254, 249, 195, 0.45) !important;
-  border: 1.5px dashed #ca8a04 !important;
+  border: 1.5px dashed rgba(202, 138, 4, 0.6) !important;
   border-radius: var(--radius-md, 8px) !important;
-  padding: 1.25rem 1.5rem 1.25rem 3.5rem !important;
-  margin: 1.75rem 0 !important;
+  padding: 1.15rem 1.35rem !important;
+  margin: 1.5rem 0 !important;
   float: none !important;
   max-width: 100% !important;
   clear: both !important;
@@ -463,11 +463,8 @@ html.dark .article-content img {
 .wp-block-group.callout-aside::before,
 .marginalia-box::before,
 .wp-block-group.marginalia-box::before {
-  content: "🏷️";
-  position: absolute;
-  left: 1.2rem;
-  top: 1.15rem;
-  font-size: 1.35rem;
+  content: none !important;
+  display: none !important;
 }
 .callout-aside p:first-child,
 .wp-block-group.callout-aside p:first-child {
@@ -477,15 +474,16 @@ html.dark .article-content img {
   text-transform: uppercase !important;
   letter-spacing: 0.06em !important;
   color: var(--color-accent, #eb5211) !important;
-  margin: 0 0 0.25rem 0 !important;
+  margin: 0 0 0.35rem 0 !important;
 }
 .callout-aside p:last-child,
 .wp-block-group.callout-aside p:last-child,
 .marginalia-box p,
 .marginalia-text {
   font-family: var(--font-hand, 'Caveat', cursive) !important;
-  font-size: 1.35rem !important;
-  line-height: 1.45 !important;
+  font-size: 1.25rem !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0.01em !important;
   color: var(--color-ink) !important;
   margin: 0 !important;
 }

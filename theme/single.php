@@ -61,7 +61,21 @@ if (have_posts()) {
         } else {
             $tools_meta = get_post_meta($post_id, 'tchp_tools', true);
             if (!empty($tools_meta)) {
-                $required_tools = is_array($tools_meta) ? $tools_meta : array_map('trim', explode(',', $tools_meta));
+                $raw_tools = is_array($tools_meta) ? $tools_meta : array_map('trim', explode(',', $tools_meta));
+                $post_tags_objs = get_the_tags($post_id);
+                $post_tag_names = $post_tags_objs ? array_map(function($t) { return mb_strtolower($t->name, 'UTF-8'); }, $post_tags_objs) : [];
+                $defect_words = ['пропайка', 'высокая посадка', 'перегрев', 'непропай', 'мостик', 'свищ', 'кратер', 'дефект'];
+                
+                $required_tools = array_filter($raw_tools, function($item) use ($post_tag_names, $defect_words) {
+                    $item_lower = mb_strtolower(trim($item), 'UTF-8');
+                    if (in_array($item_lower, $post_tag_names, true) && !in_array($item_lower, ['флюс', 'паяльник', 'припой', 'термопара'], true)) {
+                        return false;
+                    }
+                    if (in_array($item_lower, $defect_words, true)) {
+                        return false;
+                    }
+                    return !empty($item);
+                });
             }
         }
         if (empty($required_tools)) {
@@ -196,9 +210,42 @@ if (have_posts()) {
                   </div>
                 <?php endif; ?>
 
+                <?php
+                // Clean content: remove duplicate lead paragraph and extract H2 headings for TOC
+                $post_content_raw = get_the_content();
+                $post_content_html = apply_filters('the_content', $post_content_raw);
+                $excerpt_text = trim(strip_tags(get_the_excerpt()));
+
+                // 1. Remove duplicate lead paragraph if the content starts with it
+                if (!empty($excerpt_text)) {
+                    $post_content_html = preg_replace_callback('/^\s*<p[^>]*>(.*?)<\/p>/is', function($matches) use ($excerpt_text) {
+                        $p_text = trim(strip_tags($matches[1]));
+                        if ($p_text === $excerpt_text || mb_stripos($p_text, mb_substr($excerpt_text, 0, 35, 'UTF-8'), 0, 'UTF-8') === 0) {
+                            return ''; // Drop duplicate lead
+                        }
+                        return $matches[0];
+                    }, $post_content_html);
+                }
+
+                // 2. Extract Headings for TOC and add anchor IDs
+                $article_toc = [];
+                $post_content_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc) {
+                    $heading_title = trim(strip_tags($matches[2]));
+                    $heading_slug = sanitize_title($heading_title);
+                    if (!empty($heading_slug)) {
+                        $article_toc[] = [
+                            'id'    => $heading_slug,
+                            'title' => $heading_title
+                        ];
+                        return '<h2 id="' . esc_attr($heading_slug) . '"' . $matches[1] . '>' . $matches[2] . '</h2>';
+                    }
+                    return $matches[0];
+                }, $post_content_html);
+                ?>
+
                 <!-- Gutenberg / Editor Dynamic Post Content (Cards rendered inside) -->
                 <article class="article-content space-y-5 text-ink leading-relaxed">
-                  <?php the_content(); ?>
+                  <?= $post_content_html; ?>
                 </article>
 
                 <?php
@@ -331,6 +378,25 @@ if (have_posts()) {
                     </div>
                   </div>
                 </div>
+
+                <!-- Article Table of Contents (TOC) -->
+                <?php if (!empty($article_toc)): ?>
+                <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
+                  <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+                    <span>ОГЛАВЛЕНИЕ РЕГЛАМЕНТА</span>
+                    <span class="text-accent font-bold"><?= count($article_toc) ?> ЭТАПА</span>
+                  </div>
+                  <nav class="space-y-1 text-xs font-mono">
+                    <?php foreach ($article_toc as $idx => $toc_item): ?>
+                      <a href="#<?= esc_attr($toc_item['id']) ?>" 
+                         class="flex items-center gap-2 px-2.5 py-1.5 rounded transition-all text-ink-muted hover:text-ink hover:bg-paper-subtle group">
+                        <span class="text-[10px] text-ink-faint font-bold shrink-0 group-hover:text-accent"><?= sprintf('%02d', $idx + 1) ?>.</span>
+                        <span class="truncate"><?= esc_html($toc_item['title']) ?></span>
+                      </a>
+                    <?php endforeach; ?>
+                  </nav>
+                </div>
+                <?php endif; ?>
 
                 <!-- Series / Category Articles Navigation -->
                 <?php

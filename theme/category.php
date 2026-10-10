@@ -17,7 +17,28 @@ $is_tag_view = false;
 if (function_exists('is_category') && is_category()) {
     $queried_cat = get_queried_object();
     if ($queried_cat && !empty($queried_cat->slug)) {
-        $slug = $queried_cat->slug;
+        $raw_slug = $queried_cat->slug;
+        $decoded_slug = urldecode($raw_slug);
+        if (isset($RUBRICS[$raw_slug])) {
+            $slug = $raw_slug;
+        } elseif (isset($RUBRICS[$decoded_slug])) {
+            $slug = $decoded_slug;
+        } elseif (!empty($queried_cat->name)) {
+            $cat_name = trim($queried_cat->name);
+            if ($cat_name === 'Старт и база' || $cat_name === 'С чего начать') {
+                $slug = 'start';
+            } elseif ($cat_name === 'Практика и монтаж' || $cat_name === 'Практика') {
+                $slug = 'praktika';
+            } elseif (strpos($cat_name, 'Дефект') !== false || strpos($cat_name, 'Ошибк') !== false) {
+                $slug = 'oshibki';
+            } elseif (strpos($cat_name, 'Материал') !== false || strpos($cat_name, 'Сплав') !== false) {
+                $slug = 'materialy';
+            } else {
+                $slug = $raw_slug;
+            }
+        } else {
+            $slug = $raw_slug;
+        }
     }
 } elseif (function_exists('is_tag') && is_tag()) {
     $queried_tag = get_queried_object();
@@ -42,8 +63,12 @@ if ($is_tag_view && $queried_tag) {
     $current_page = 'tag';
 } elseif ($slug && isset($RUBRICS[$slug])) {
     $current_rubric = $RUBRICS[$slug];
-    $current_slug   = $slug;
-    $current_page   = $slug;
+    $current_slug   = $current_rubric['slug'] ?? $slug;
+    $current_page   = $current_slug;
+} elseif ($slug && isset($RUBRICS[urldecode($slug)])) {
+    $current_rubric = $RUBRICS[urldecode($slug)];
+    $current_slug   = $current_rubric['slug'] ?? 'start';
+    $current_page   = $current_slug;
 } elseif ($slug && $queried_cat) {
     $current_rubric = [
         'title'       => $queried_cat->name,
