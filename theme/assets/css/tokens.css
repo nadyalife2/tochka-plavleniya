@@ -22,12 +22,12 @@
   --color-ink-muted: #575249;
   --color-ink-faint: #666159;
 
-  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Медно-янтарный #eb5211) --- */
-  --color-accent: #eb5211;
-  --color-accent-text: #c23f06;
-  --color-accent-hover: #d2450a;
-  --color-accent-subtle: rgba(235, 82, 17, 0.12);
-  --color-accent-border: rgba(235, 82, 17, 0.4);
+  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Сдержанный медно-янтарный #d9531e) --- */
+  --color-accent: #d9531e;
+  --color-accent-text: #b84008;
+  --color-accent-hover: #be4412;
+  --color-accent-subtle: rgba(217, 83, 30, 0.08);
+  --color-accent-border: rgba(217, 83, 30, 0.28);
 
   /* Алиасы семантики */
   --accent: var(--color-accent);

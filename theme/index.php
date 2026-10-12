@@ -138,7 +138,7 @@ include __DIR__ . '/includes/header.php';
                 <div>
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-ink-muted group-hover:text-accent group-hover:border-accent transition-colors shrink-0">
                         <span class="material-symbols-outlined text-[18px]">cable</span>
                       </div>
                       <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Провод / кабель</span>
@@ -150,7 +150,7 @@ include __DIR__ . '/includes/header.php';
                   </p>
                 </div>
                 <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
-                  <span class="pill-orange text-[10px] uppercase font-bold">[TASK.01] Основы пайки</span>
+                  <span class="pill-blue text-[10px] uppercase font-bold">[TASK.01] Основы пайки</span>
                   <span class="text-ink-faint text-[11px]">ПОС-61 // 280°C</span>
                 </div>
               </a>
@@ -162,7 +162,7 @@ include __DIR__ . '/includes/header.php';
                 <div>
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-ink-muted group-hover:text-accent group-hover:border-accent transition-colors shrink-0">
                         <span class="material-symbols-outlined text-[18px]">developer_board</span>
                       </div>
                       <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Печатная плата</span>
@@ -186,7 +186,7 @@ include __DIR__ . '/includes/header.php';
                 <div>
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-ink-muted group-hover:text-accent group-hover:border-accent transition-colors shrink-0">
                         <span class="material-symbols-outlined text-[18px]">plumbing</span>
                       </div>
                       <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Медная труба</span>
@@ -198,7 +198,7 @@ include __DIR__ . '/includes/header.php';
                   </p>
                 </div>
                 <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
-                  <span class="pill-orange text-[10px] uppercase font-bold">[TASK.03] Материалы и флюсы</span>
+                  <span class="pill-blue text-[10px] uppercase font-bold">[TASK.03] Материалы и флюсы</span>
                   <span class="text-ink-faint text-[11px]">Горелка // 650°C</span>
                 </div>
               </a>
@@ -210,7 +210,7 @@ include __DIR__ . '/includes/header.php';
                 <div>
                   <div class="flex items-center justify-between gap-2">
                     <div class="flex items-center gap-2.5">
-                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-accent shrink-0">
+                      <div class="w-8 h-8 rounded border border-paper-border bg-paper flex items-center justify-center text-ink-muted group-hover:text-accent group-hover:border-accent transition-colors shrink-0">
                         <span class="material-symbols-outlined text-[18px]">troubleshoot</span>
                       </div>
                       <span class="text-base sm:text-lg font-bold text-ink group-hover:text-accent transition-colors leading-tight">Не знаю — помочь</span>
@@ -264,7 +264,7 @@ include __DIR__ . '/includes/header.php';
         <div id="quick-search-trigger" role="button" tabindex="0" aria-label="Открыть глобальный инженерный поиск по базе (Ctrl+K)"
              class="sketch-card p-3 sm:p-4 bg-paper flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
           <div class="flex items-center gap-3 text-ink-muted text-xs sm:text-sm font-mono">
-            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-paper-subtle border border-paper-border text-accent shrink-0">TERMINAL // ПОИСК</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-paper-subtle border border-paper-border text-ink-muted shrink-0">TERMINAL // ПОИСК</span>
             <span class="text-ink-muted group-hover:text-ink transition-colors truncate">> припой ПОС-61, флюс RMA, жала T12/C245, дефекты пайки...</span>
           </div>
           <kbd class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono border border-paper-border rounded bg-paper-subtle text-ink-muted shrink-0">
@@ -277,7 +277,7 @@ include __DIR__ . '/includes/header.php';
       <section class="space-y-4" id="rubrics-grid">
         <div class="flex items-end justify-between flex-wrap gap-2">
           <div class="space-y-1">
-            <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">РУБРИКИ ЖУРНАЛА</span>
+            <span class="font-mono text-xs text-ink-muted font-bold uppercase tracking-wider">РУБРИКИ ЖУРНАЛА</span>
             <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
               Тематические разделы
             </h2>
@@ -331,7 +331,7 @@ include __DIR__ . '/includes/header.php';
       <section class="space-y-4" id="articles">
         <div class="flex items-end justify-between flex-wrap gap-2">
           <div class="space-y-1">
-            <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">БАЗА ЗНАНИЙ</span>
+            <span class="font-mono text-xs text-ink-muted font-bold uppercase tracking-wider">БАЗА ЗНАНИЙ</span>
             <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
               Новые статьи
             </h2>
@@ -380,7 +380,7 @@ include __DIR__ . '/includes/header.php';
       <section class="space-y-4 scroll-mt-24" id="lessons">
         <div class="flex items-end justify-between flex-wrap gap-2">
           <div class="space-y-1">
-            <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ЦЕХОВОЙ ПРАКТИКУМ // 2–3 МИНУТЫ</span>
+            <span class="font-mono text-xs text-ink-muted font-bold uppercase tracking-wider">ЦЕХОВОЙ ПРАКТИКУМ // 2–3 МИНУТЫ</span>
             <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
               Прикладные микроуроки монтажа
             </h2>
@@ -395,7 +395,7 @@ include __DIR__ . '/includes/header.php';
             <article class="sketch-card p-3.5 flex flex-col justify-between space-y-2.5 bg-card hover:border-paper-border-dark transition-all rounded-lg group shadow-xs">
               <div class="space-y-2">
                 <div class="flex items-center justify-between font-mono text-xs">
-                  <span class="pill-orange uppercase font-bold tracking-tight text-[10px]">РЕГЛАМЕНТ-<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
+                  <span class="pill-blue uppercase font-bold tracking-tight text-[10px]">РЕГЛАМЕНТ-<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
                   <span class="text-ink-faint font-mono text-[10px]">~<?= $l['read_min'] ?> МИН</span>
                 </div>
                 <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug line-clamp-2">
@@ -423,7 +423,7 @@ include __DIR__ . '/includes/header.php';
       <section class="space-y-4" id="trust">
 
         <div class="space-y-1">
-          <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ПРОЗРАЧНОСТЬ И ИСТОЧНИКИ</span>
+          <span class="font-mono text-xs text-ink-muted font-bold uppercase tracking-wider">ПРОЗРАЧНОСТЬ И ИСТОЧНИКИ</span>
           <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
             Откуда берутся цифры
           </h2>
@@ -483,7 +483,7 @@ include __DIR__ . '/includes/header.php';
       <!-- 4. ЧАСТЫЕ ВОПРОСЫ (FAQ) ИЗ 4 ВОПРОСОВ -->
       <section class="space-y-4" id="faq">
         <div class="space-y-1">
-          <span class="font-mono text-xs text-accent font-bold uppercase tracking-wider">ВОПРОС — ОТВЕТ</span>
+          <span class="font-mono text-xs text-ink-muted font-bold uppercase tracking-wider">ВОПРОС — ОТВЕТ</span>
           <h2 class="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-sans">
             Частые вопросы
           </h2>
@@ -494,7 +494,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Вопрос 1 -->
           <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
             <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
-              <span class="font-bold text-accent">[ЗАПРОС 01]</span>
+              <span class="font-bold text-ink-muted">[ЗАПРОС 01]</span>
               <span>ТЕМПЕРАТУРНЫЙ РЕЖИМ</span>
             </div>
             <h3 class="text-base font-bold text-ink leading-snug">
@@ -508,7 +508,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Вопрос 2 -->
           <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
             <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
-              <span class="font-bold text-accent">[ЗАПРОС 02]</span>
+              <span class="font-bold text-ink-muted">[ЗАПРОС 02]</span>
               <span>ВЫБОР ОБОРУДОВАНИЯ</span>
             </div>
             <h3 class="text-base font-bold text-ink leading-snug">
@@ -522,7 +522,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Вопрос 3 -->
           <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
             <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
-              <span class="font-bold text-accent">[ЗАПРОС 03]</span>
+              <span class="font-bold text-ink-muted">[ЗАПРОС 03]</span>
               <span>ЗАЩИТА ПЛАТЫ</span>
             </div>
             <h3 class="text-base font-bold text-ink leading-snug">
@@ -536,7 +536,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Вопрос 4 -->
           <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
             <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
-              <span class="font-bold text-accent">[ЗАПРОС 04]</span>
+              <span class="font-bold text-ink-muted">[ЗАПРОС 04]</span>
               <span>МОНТАЖНАЯ ХИМИЯ</span>
             </div>
             <h3 class="text-base font-bold text-ink leading-snug">
