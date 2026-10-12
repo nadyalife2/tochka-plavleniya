@@ -1114,6 +1114,188 @@ html.dark .tape-yellow {
   margin: 0.5rem auto 0;
 }
 
+/* ==========================================================================
+   11. TOP-TIER HARDWARE & EDITORIAL DETAILS (TE, PLAYDATE, KOWALSKI, ADAFRUIT)
+   ========================================================================== */
+
+/* 11.1. Индикатор прогресса чтения статьи (Solder Ribbon) */
+#reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  width: 0%;
+  background: var(--color-accent);
+  z-index: 9999;
+  transition: width 0.08s linear;
+  box-shadow: 0 0 8px rgba(224, 83, 26, 0.45);
+}
+
+/* 11.2. Двойная миллиметровая сетка CAD (Холст верстака) */
+.cad-blueprint-canvas {
+  background-color: var(--color-bg);
+  background-image: 
+    radial-gradient(var(--dot-color, rgba(20, 21, 24, 0.08)) 1px, transparent 1px),
+    linear-gradient(to right, rgba(20, 21, 24, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 21, 24, 0.03) 1px, transparent 1px);
+  background-size: 24px 24px, 120px 120px, 120px 120px;
+}
+html.dark .cad-blueprint-canvas {
+  background-image: 
+    radial-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+}
+
+/* 11.3. Teenage Engineering двухслойный дисплей */
+.te-display {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-readout-bg, #14161a);
+  border: 1px solid #2a2f3a;
+  border-radius: 4px;
+  padding: 0.2rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+  line-height: 1.2;
+}
+.te-display .te-ghost {
+  position: absolute;
+  color: rgba(255, 255, 255, 0.08);
+  user-select: none;
+  pointer-events: none;
+  font-variant-numeric: tabular-nums;
+}
+.te-display .te-active {
+  position: relative;
+  color: var(--color-readout-text, #2dd4bf);
+  z-index: 1;
+  font-variant-numeric: tabular-nums;
+}
+.te-display.amber .te-active {
+  color: var(--color-readout-amber, #fbbf24);
+}
+.te-display.danger .te-active {
+  color: #f87171;
+}
+
+/* 11.4. Playdate 1-битные тактильные карточки с механической тенью */
+.playdate-card {
+  border: 1px solid var(--color-paper-border-dark, #2a2f3a);
+  background: var(--color-paper);
+  box-shadow: 2px 2px 0px var(--color-ink);
+  transition: transform 0.12s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.12s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.playdate-card:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 3px 3px 0px var(--color-ink);
+}
+.playdate-card:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px var(--color-ink);
+}
+
+/* 11.5. CAD угловые крестики юстировки */
+.cad-corner-marks {
+  position: relative;
+}
+.cad-corner-marks::before {
+  content: "+";
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-ink-faint);
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0.5;
+}
+.cad-corner-marks::after {
+  content: "+";
+  position: absolute;
+  bottom: 4px;
+  right: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--color-ink-faint);
+  line-height: 1;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* 11.6. Adafruit Quick-Spec Passport Bar */
+.quick-spec-passport {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  background: var(--color-paper-subtle);
+  border: 1px solid var(--color-paper-border);
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+@media (min-width: 640px) {
+  .quick-spec-passport {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.quick-spec-passport .passport-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.quick-spec-passport .passport-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.quick-spec-passport .passport-value {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* 11.7. Боковые измерительные шкалы CAD (Ruler ticks) на десктопах */
+@media (min-width: 1320px) {
+  .cad-ruler-track {
+    position: fixed;
+    top: 64px;
+    bottom: 24px;
+    width: 28px;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--color-ink-faint);
+    opacity: 0.45;
+    user-select: none;
+  }
+  .cad-ruler-track.left {
+    left: 12px;
+    border-right: 1px dashed var(--color-paper-border);
+    padding-right: 4px;
+  }
+  .cad-ruler-track.right {
+    right: 12px;
+    border-left: 1px dashed var(--color-paper-border);
+    padding-left: 4px;
+    text-align: right;
+  }
+}
+
 
 
 

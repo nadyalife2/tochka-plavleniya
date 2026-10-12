@@ -286,12 +286,37 @@ foreach ($faq_items as $q => $a) {
 $extra_head = ob_get_clean();
 include __DIR__ . '/includes/header.php';
 ?>
+<!-- Reading Progress Bar (Solder Ribbon) -->
+<div id="reading-progress-bar" aria-hidden="true"></div>
+
+<!-- CAD Ruler Sidelines (visible > 1320px) -->
+<div class="cad-ruler-track left" aria-hidden="true">
+  <span>0 mm</span>
+  <span>50</span>
+  <span>100 mm</span>
+  <span>150</span>
+  <span>200 mm</span>
+  <span>250</span>
+  <span>300 mm</span>
+  <span>350</span>
+  <span>400 mm</span>
+</div>
+<div class="cad-ruler-track right" aria-hidden="true">
+  <span>[SEC.01]</span>
+  <span>• • •</span>
+  <span>[IPC-610]</span>
+  <span>• • •</span>
+  <span>[TOL ±0.5]</span>
+  <span>• • •</span>
+  <span>[QC-PASS]</span>
+</div>
+
 <!-- Main Container -->
-<main class="w-full flex-grow pt-8 pb-20" id="main-content">
+<main class="w-full flex-grow pt-8 pb-20 cad-blueprint-canvas relative" id="main-content">
   <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
     
     <!-- Breadcrumbs -->
-    <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap">
+    <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap" aria-label="Хлебные крошки">
       <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
       <span>→</span>
       <?php if (!empty($lesson)): ?>
@@ -312,20 +337,14 @@ include __DIR__ . '/includes/header.php';
       <!-- Central Editorial Column (740px wide max) -->
       <div class="lg:col-span-8 max-w-[730px] space-y-5">
         
-        <!-- Article Header Card -->
-        <div class="bg-paper border border-paper-border rounded-lg p-5 sm:p-8 space-y-5 shadow-sm">
+        <!-- Article Header Card (Playdate 1-bit tactile styling with CAD corner marks) -->
+        <div class="playdate-card cad-corner-marks p-5 sm:p-8 space-y-5 rounded">
 
           <!-- Header Stamp & Technical Spec Bar -->
           <div class="flex items-center justify-between pb-3 border-b border-paper-border text-xs font-mono">
             <div class="flex items-center gap-2">
-              <div class="w-7 h-7 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink shrink-0">
-                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="16">
-                  <rect height="18" rx="2" width="18" x="3" y="3"></rect>
-                  <path d="M8 7v10"></path>
-                  <path d="M16 7v10"></path>
-                  <circle cx="12" cy="7" r="1"></circle>
-                  <circle cx="12" cy="17" r="1"></circle>
-                </svg>
+              <div class="w-7 h-7 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink shrink-0 shadow-xs">
+                <span class="material-symbols-outlined text-[16px] text-accent">precision_manufacturing</span>
               </div>
               <span class="font-bold text-ink uppercase tracking-wider">ТЕХРЕГЛАМЕНТ // ОТК-2026</span>
             </div>
@@ -342,46 +361,72 @@ include __DIR__ . '/includes/header.php';
 
           <!-- Article Header Block -->
           <header class="space-y-4">
-          <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
-            <?= e($lesson ? $lesson['title'] : $article['title']) ?>
-          </h1>
-
-          <!-- Meta line -->
-          <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-ink-muted font-mono pt-1 pb-2">
-            <div class="flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
-              <span class="text-ink"><?= e($lesson ? $lesson['author'] : ($article['author'] ?? 'Инженер Лаборатории ТЧП')) ?></span>
+            <div class="text-[11px] font-mono uppercase tracking-wider text-accent font-bold">
+              [ РЕГЛАМЕНТ МОНТАЖА // СТАНДАРТ ТЧП-2026 ]
             </div>
-            <span class="text-ink-faint">·</span>
-            <time datetime="<?= e($lesson ? $lesson['date'] : ($article['date'] ?? '2026-08-20')) ?>"><?= e($lesson ? $lesson['date'] : ($article['date'] ?? '20 августа 2026')) ?></time>
-            <span class="text-ink-faint">·</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= e($lesson ? $lesson['read_min'] : ($article['read_min'] ?? 8)) ?> мин чтения</span>
-            <span class="text-ink-faint">·</span>
-            <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= e($lesson ? $lesson['difficulty'] : ($article['difficulty'] ?? 'Инженер')) ?></span>
-            <span class="text-ink-faint">·</span>
-            <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено</span>
-          </div>
+            <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
+              <?= e($lesson ? $lesson['title'] : $article['title']) ?>
+            </h1>
 
-          <?php if (!empty($lesson)): ?>
-          <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
-            <span class="text-ink-muted">Оснастка:</span>
-            <?php foreach (array_keys($lesson['required_tools']) as $tool): ?>
-              <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
-            <?php endforeach; ?>
-          </div>
-          <?php elseif (!empty($article['required_tools'])): ?>
-          <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
-            <span class="text-ink-muted">Понадобится:</span>
-            <?php foreach ($article['required_tools'] as $tool): ?>
-              <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
-            <?php endforeach; ?>
-          </div>
-          <?php endif; ?>
+            <!-- Meta line -->
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-ink-muted font-mono pt-1 pb-2 border-b border-paper-border/60">
+              <div class="flex items-center gap-2">
+                <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
+                <span class="text-ink"><?= e($lesson ? $lesson['author'] : ($article['author'] ?? 'Инженер Лаборатории ТЧП')) ?></span>
+              </div>
+              <span class="text-ink-faint">·</span>
+              <time datetime="<?= e($lesson ? $lesson['date'] : ($article['date'] ?? '2026-08-20')) ?>"><?= e($lesson ? $lesson['date'] : ($article['date'] ?? '20 августа 2026')) ?></time>
+              <span class="text-ink-faint">·</span>
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= e($lesson ? $lesson['read_min'] : ($article['read_min'] ?? 8)) ?> мин чтения</span>
+              <span class="text-ink-faint">·</span>
+              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= e($lesson ? $lesson['difficulty'] : ($article['difficulty'] ?? 'Инженер')) ?></span>
+              <span class="text-ink-faint">·</span>
+              <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено</span>
+            </div>
 
-          <!-- Lead Paragraph -->
-          <p class="text-lg text-ink font-serif leading-[1.65] pt-2">
-            <?= e($lesson ? $lesson['subtitle'] : $article['excerpt']) ?><?php if ($slug === 'temperaturnye-profili'): ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.<?php endif; ?>
-          </p>
+            <!-- Adafruit / SparkFun Quick-Spec Passport Bar -->
+            <div class="quick-spec-passport">
+              <div class="passport-col">
+                <span class="passport-label">ТЕМПЕРАТУРА ЖАЛА</span>
+                <div class="te-display">
+                  <span class="te-ghost">888 °C</span>
+                  <span class="te-active">275 °C</span>
+                </div>
+              </div>
+              <div class="passport-col">
+                <span class="passport-label">СПЛАВ ПРИПОЯ</span>
+                <span class="passport-value text-accent">ПОС-61 / SAC305</span>
+              </div>
+              <div class="passport-col">
+                <span class="passport-label">ВРЕМЯ КОНТАКТА (TAL)</span>
+                <span class="passport-value">&lt; 2.5 сек</span>
+              </div>
+              <div class="passport-col">
+                <span class="passport-label">КЛАСС ОТМЫВКИ</span>
+                <span class="passport-value text-emerald-600 dark:text-emerald-400">ROL0 / No-Clean</span>
+              </div>
+            </div>
+
+            <?php if (!empty($lesson)): ?>
+            <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
+              <span class="text-ink-muted">Оснастка:</span>
+              <?php foreach (array_keys($lesson['required_tools']) as $tool): ?>
+                <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
+              <?php endforeach; ?>
+            </div>
+            <?php elseif (!empty($article['required_tools'])): ?>
+            <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
+              <span class="text-ink-muted">Понадобится:</span>
+              <?php foreach ($article['required_tools'] as $tool): ?>
+                <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
+              <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+
+            <!-- Lead Paragraph -->
+            <p class="text-lg text-ink font-serif leading-[1.65] pt-2">
+              <?= e($lesson ? $lesson['subtitle'] : $article['excerpt']) ?><?php if ($slug === 'temperaturnye-profili'): ?> Разбираем, почему стандартная пайка «по цифрам на табло фена» гарантированно убивает многослойные платы, как выставить 4 фазы термопрофиля по стандарту IPC/JEDEC и не допустить коробления текстолита.<?php endif; ?>
+            </p>
           </header>
 
         </div><!-- /Article Header Card -->
@@ -1436,23 +1481,27 @@ include __DIR__ . '/includes/header.php';
         <?php endif; ?>
 
         <!-- Interactive Workbench Bridge -->
-        <div class="sketch-card p-4 bg-paper border border-paper-border rounded-lg space-y-3 shadow-xs">
+        <!-- Quick Lab Drawer Trigger Card (Framework & Kowalski) -->
+        <div class="playdate-card cad-corner-marks p-4 rounded space-y-3">
           <div class="flex items-center justify-between font-mono text-xs pb-1.5 border-b border-paper-border">
-            <span class="pill-orange text-[10px] uppercase font-bold">ВЕРСТАК</span>
-            <span class="text-ink-faint">LAB-TOOL</span>
+            <span class="text-accent text-[10px] uppercase font-bold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-cyan inline-block"></span>
+              ЭКСПРЕСС-ВЕРСТАК
+            </span>
+            <span class="text-ink-faint">MOD.04 // DRAWER</span>
           </div>
           <div class="space-y-1">
             <div class="text-xs font-bold text-ink font-mono uppercase tracking-wide">
-              Калькуляторы и сплавы
+              Экспресс-калькулятор
             </div>
-            <p class="text-xs text-ink-muted leading-relaxed font-serif">
-              Рассчитайте безопасный терморежим жала или подберите флюс под ваш сплав в 1 клик.
+            <p class="text-xs text-ink-muted leading-relaxed">
+              Мгновенный расчет сплавов, допустимого тока провода и проверка классов флюса прямо на странице статьи.
             </p>
           </div>
-          <a class="btn btn-primary w-full text-xs font-mono py-2 flex items-center justify-center gap-1.5" href="interactive.php">
-            <span>Открыть калькуляторы</span>
-            <span>→</span>
-          </a>
+          <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="btn btn-primary w-full text-xs font-mono py-2 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:translate-y-0.5">
+            <span class="material-symbols-outlined text-[15px]">tune</span>
+            <span>Выдвинуть верстак ↗</span>
+          </button>
         </div>
 
       </aside>
@@ -1747,6 +1796,15 @@ include __DIR__ . '/includes/header.php';
     });
   });
 
+  // Reading Progress Bar listener
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement, b = document.body;
+    const st = 'scrollTop', sh = 'scrollHeight';
+    const percent = ((h[st]||b[st]) / ((h[sh]||b[sh]) - h.clientHeight)) * 100;
+    const bar = document.getElementById('reading-progress-bar');
+    if (bar) bar.style.width = Math.min(100, Math.max(0, percent)) + '%';
+  }, { passive: true });
+
   // Initial run
   renderSimulator();
 
@@ -1760,6 +1818,9 @@ include __DIR__ . '/includes/header.php';
   }
 })();
 </script>
+
+  <!-- Tactile Lab Drawer (Teenage Engineering & Emil Kowalski pattern) -->
+  <?php require_once __DIR__ . '/includes/lab-drawer.php'; ?>
 
   <!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
   <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
