@@ -7,18 +7,18 @@
    ========================================================================== */
 
 :root {
-  --color-paper: #faf8f5;
-  --color-paper-subtle: #f3f0ea;
-  --color-paper-border: #e6e2da;
+  --color-paper: #ffffff;
+  --color-paper-subtle: #f7f5ef;
+  --color-paper-border: #e4e0d7;
   --color-paper-border-dark: #d3cdc2;
   --color-ink: #141414;
   --color-ink-muted: #6b665f;
-  /* WCAG AA Compliance: #666159 on #faf8f5 is > 4.7:1 contrast ratio */
+  /* WCAG AA Compliance: #666159 on #ffffff is > 4.7:1 contrast ratio */
   --color-ink-faint: #666159;
-  --color-callout: #fcfaf2;
-  --color-card: rgba(255, 255, 255, 0.75);
-  --dot-color: #d3cdc2;
-  --bg-color: #faf8f5;
+  --color-callout: #f7f5ef;
+  --color-card: #ffffff;
+  --dot-color: #eeeae1;
+  --bg-color: #ffffff;
 }
 
 html.dark {
