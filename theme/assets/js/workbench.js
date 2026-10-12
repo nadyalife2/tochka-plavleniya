@@ -157,6 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       tempRangeDisplay.textContent = 'Паяльник не подходит';
       tempRangeDisplay.style.fontSize = '1.35rem';
+      tempRangeDisplay.classList.remove('temp-heat-pulse');
+      if (tempMeterBox) tempMeterBox.style.display = 'none';
       if (tempBarFill) tempBarFill.style.width = '0%';
       if (tempTipDisplay) tempTipDisplay.textContent = 'Требуется газовая горелка';
       
@@ -184,6 +186,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     tempRangeDisplay.style.fontSize = '';
     tempRangeDisplay.textContent = `${item.t_min} – ${item.t_max} °C`;
+
+    // Tactile micro-animation: trigger temperature heat pulse
+    tempRangeDisplay.classList.remove('temp-heat-pulse');
+    void tempRangeDisplay.offsetWidth;
+    tempRangeDisplay.classList.add('temp-heat-pulse');
 
     // Visual temperature meter gauge (чтение динамических токенов)
     if (tempBarFill) {
@@ -656,14 +663,16 @@ document.addEventListener('DOMContentLoaded', () => {
   function updateConsumption() {
     if (!consType || !consDiam || !consCount || !consLength || !consWeight) return;
 
-    const type = consType.value;
-    const diam = parseFloat(consDiam.value);
-    const count = parseInt(consCount.value) || 1;
+    const type = consType.value || 'point';
+    const rawDiam = parseFloat(consDiam.value);
+    const diam = (isNaN(rawDiam) || rawDiam <= 0) ? 0.8 : Math.max(0.2, Math.min(5.0, rawDiam));
+    const rawCount = parseInt(consCount.value, 10);
+    const count = (isNaN(rawCount) || rawCount <= 0) ? 1 : Math.max(1, Math.min(100000, rawCount));
 
     try {
       localStorage.setItem('tp_cons_type', type);
-      localStorage.setItem('tp_cons_diam', consDiam.value);
-      localStorage.setItem('tp_cons_count', consCount.value);
+      localStorage.setItem('tp_cons_diam', diam.toString());
+      localStorage.setItem('tp_cons_count', count.toString());
     } catch(e) {}
 
     // mm per point for 0.8mm wire as baseline
@@ -672,9 +681,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (type === 'wire') mmPerPoint = 20;
 
     // Adjust for diameter (volume preservation: r^2 * h = const)
-    // base diam = 0.8, r = 0.4. V ~ 0.16 * h
-    // new diam = d, r = d/2. V ~ (d/2)^2 * h_new
-    // h_new = h_old * (0.8 / d)^2
     const lengthMm = mmPerPoint * count * Math.pow(0.8 / diam, 2);
     
     // Add 15% margin
@@ -684,10 +690,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalLengthCm = totalLengthMm / 10;
     
     // Weight: density of POS-61 is ~8.5 g/cm3
-    // Vol in cm3 = pi * (diam/20)^2 * totalLengthCm
     const rCm = diam / 20;
     const volCm3 = Math.PI * rCm * rCm * totalLengthCm;
     const weightG = volCm3 * 8.5;
+
+    if (!isFinite(totalLengthCm) || totalLengthCm <= 0) {
+      consLength.textContent = '~ 0 см';
+      consWeight.textContent = 'Вес: ~ 0.0 г';
+      return;
+    }
 
     consLength.textContent = `~ ${Math.ceil(totalLengthCm)} см`;
     consWeight.textContent = `Вес: ~ ${weightG.toFixed(1)} г`;

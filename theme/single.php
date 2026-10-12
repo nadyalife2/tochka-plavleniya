@@ -151,21 +151,34 @@ if (have_posts()) {
                 <!-- Article Header Card -->
                 <div class="bg-paper border border-paper-border rounded-lg p-5 sm:p-8 space-y-5 shadow-sm">
 
-                  <!-- Retro Illustration / Stamp Badge -->
-                  <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
-                    <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="24">
-                      <rect height="18" rx="2" width="18" x="3" y="3"></rect>
-                      <path d="M8 7v10"></path>
-                      <path d="M16 7v10"></path>
-                      <path d="M12 12h.01"></path>
-                      <circle cx="12" cy="7" r="1"></circle>
-                      <circle cx="12" cy="17" r="1"></circle>
-                    </svg>
+                  <!-- Header Stamp & Technical Spec Bar -->
+                  <div class="flex items-center justify-between pb-3 border-b border-paper-border text-xs font-mono">
+                    <div class="flex items-center gap-2">
+                      <div class="w-7 h-7 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink shrink-0">
+                        <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="16">
+                          <rect height="18" rx="2" width="18" x="3" y="3"></rect>
+                          <path d="M8 7v10"></path>
+                          <path d="M16 7v10"></path>
+                          <circle cx="12" cy="7" r="1"></circle>
+                          <circle cx="12" cy="17" r="1"></circle>
+                        </svg>
+                      </div>
+                      <span class="font-bold text-ink uppercase tracking-wider">ТЕХРЕГЛАМЕНТ // ОТК-2026</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <button type="button" onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted hover:text-ink text-[11px] font-mono font-medium transition-colors cursor-pointer" title="Распечатать технологическую карту (Ctrl+P)">
+                        <span class="material-symbols-outlined text-[14px]">print</span>
+                        <span>Печать техкарты</span>
+                      </button>
+                      <span class="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
+                        IPC-A-610G // КЛАСС 2
+                      </span>
+                    </div>
                   </div>
 
                   <!-- Article Header Block -->
                   <header class="space-y-4">
-                    <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
+                    <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.02em] leading-[1.18] font-serif">
                       <?= esc_html(get_the_title()) ?>
                     </h1>
 
@@ -173,7 +186,7 @@ if (have_posts()) {
                     <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-ink-muted font-mono pt-1 pb-2">
                       <div class="flex items-center gap-2">
                         <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
-                        <span class="text-ink"><?= esc_html(get_the_author()) ?></span>
+                        <span class="text-ink font-semibold"><?= esc_html(get_the_author()) ?></span>
                       </div>
                       <span class="text-ink-faint">·</span>
                       <time datetime="<?= esc_attr(get_the_date('c')) ?>"><?= esc_html(get_the_date('j F Y')) ?></time>
@@ -182,14 +195,14 @@ if (have_posts()) {
                       <span class="text-ink-faint">·</span>
                       <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= esc_html($difficulty) ?></span>
                       <span class="text-ink-faint">·</span>
-                      <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено</span>
+                      <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено ОТК</span>
                     </div>
 
                     <?php if (!empty($required_tools)): ?>
-                    <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
-                      <span class="text-ink-muted">Оснастка:</span>
+                    <div class="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-mono">
+                      <span class="text-ink-muted uppercase font-bold text-[10px]">Оснастка:</span>
                       <?php foreach ($required_tools as $tool): ?>
-                        <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= esc_html($tool) ?></span>
+                        <span class="bg-paper-subtle px-2 py-0.5 rounded border border-paper-border text-ink-muted font-mono font-medium"><?= esc_html($tool) ?></span>
                       <?php endforeach; ?>
                     </div>
                     <?php endif; ?>
@@ -280,9 +293,9 @@ if (have_posts()) {
                     <div class="font-bold text-ink text-sm font-mono">Понравился регламент?</div>
                     <div class="text-xs text-ink-muted font-sans mt-0.5">Поделитесь ссылкой с коллегами по монтажу и ремонту</div>
                   </div>
-                  <button type="button" onclick="navigator.clipboard.writeText(window.location.href); alert('Ссылка на статью скопирована в буфер обмена!');" class="inline-flex items-center gap-2 px-4 py-2.5 rounded bg-ink text-paper text-xs font-mono font-medium hover:opacity-90 transition-opacity cursor-pointer">
+                  <button type="button" id="copy-article-link-btn" onclick="navigator.clipboard.writeText(window.location.href).then(()=>{var t=this.querySelector('.btn-label');if(t){t.textContent='Скопировано!';setTimeout(()=>{t.textContent='Скопировать ссылку';},2500);}});" class="inline-flex items-center gap-2 px-4 py-2.5 rounded bg-ink text-paper text-xs font-mono font-medium hover:opacity-90 transition-opacity cursor-pointer focus-visible:ring-2 focus-visible:ring-accent">
                     <span class="material-symbols-outlined text-[16px]">link</span>
-                    <span>Скопировать ссылку</span>
+                    <span class="btn-label">Скопировать ссылку</span>
                   </button>
                 </div>
 
@@ -348,9 +361,12 @@ if (have_posts()) {
               <aside class="hidden lg:block lg:col-span-4 sticky top-20 space-y-6">
 
                 <!-- Article Passport Card -->
-                <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
-                  <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
-                    <span>ПАСПОРТ СТАТЬИ</span>
+                <div class="border border-paper-border bg-paper p-4.5 rounded-lg space-y-3.5 shadow-sm">
+                  <div class="flex items-center justify-between text-[11px] font-mono pb-2.5 border-b border-paper-border">
+                    <span class="font-bold text-ink uppercase flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+                      ПАСПОРТ ТЕХПРОЦЕССА
+                    </span>
                     <span class="text-accent font-bold"><?= esc_html($reading_time) ?> МИН</span>
                   </div>
                   <div class="space-y-2 text-xs font-mono">
@@ -366,31 +382,31 @@ if (have_posts()) {
                     </div>
                     <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
                       <span class="text-ink-muted">Сложность:</span>
-                      <span class="text-ink"><?= esc_html($difficulty) ?></span>
+                      <span class="text-ink font-bold"><?= esc_html($difficulty) ?></span>
                     </div>
                     <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
-                      <span class="text-ink-muted">Чтение:</span>
-                      <span class="text-ink">~<?= esc_html($reading_time) ?> мин</span>
+                      <span class="text-ink-muted">Хронометраж:</span>
+                      <span class="text-ink font-bold">~<?= esc_html($reading_time) ?> мин</span>
                     </div>
                     <div class="flex items-center justify-between pt-1">
                       <span class="text-ink-muted">Стандарт:</span>
-                      <span class="font-bold text-accent"><?= esc_html($standard) ?></span>
+                      <span class="font-bold text-accent font-mono"><?= esc_html($standard) ?></span>
                     </div>
                   </div>
                 </div>
 
                 <!-- Article Table of Contents (TOC) -->
                 <?php if (!empty($article_toc)): ?>
-                <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
-                  <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
-                    <span>ОГЛАВЛЕНИЕ РЕГЛАМЕНТА</span>
+                <div class="border border-paper-border bg-paper p-4.5 rounded-lg space-y-3 shadow-sm">
+                  <div class="flex items-center justify-between text-[11px] font-mono text-ink pb-2 border-b border-paper-border">
+                    <span class="font-bold uppercase tracking-wider">ОГЛАВЛЕНИЕ РЕГЛАМЕНТА</span>
                     <span class="text-accent font-bold"><?= count($article_toc) ?> ЭТАПА</span>
                   </div>
                   <nav class="space-y-1 text-xs font-mono">
                     <?php foreach ($article_toc as $idx => $toc_item): ?>
                       <a href="#<?= esc_attr($toc_item['id']) ?>" 
                          class="flex items-center gap-2 px-2.5 py-1.5 rounded transition-all text-ink-muted hover:text-ink hover:bg-paper-subtle group">
-                        <span class="text-[10px] text-ink-faint font-bold shrink-0 group-hover:text-accent"><?= sprintf('%02d', $idx + 1) ?>.</span>
+                        <span class="text-[10px] text-ink-faint font-bold shrink-0 group-hover:text-accent">§ <?= sprintf('%02d', $idx + 1) ?></span>
                         <span class="truncate"><?= esc_html($toc_item['title']) ?></span>
                       </a>
                     <?php endforeach; ?>

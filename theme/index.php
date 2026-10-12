@@ -86,9 +86,7 @@ ob_start();
     .washi-tape-warn { top: -9px; left: 50%; transform: translateX(-50%) rotate(-0.5deg); }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after {
-        animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
       }
     }
@@ -134,7 +132,7 @@ include __DIR__ . '/includes/header.php';
             <div class="hero-tasks-grid pt-1">
               
               <!-- Задача 1: Провод / кабель -->
-              <a href="interactive.php?tool=temp&task=wire" 
+              <a href="<?= esc_url($site_root) ?>interactive.php?tool=temp&task=wire" 
                  class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
                  aria-label="Задача пайки: Провод или кабель. Подбор температуры для многожильного провода">
                 <div>
@@ -152,13 +150,13 @@ include __DIR__ . '/includes/header.php';
                   </p>
                 </div>
                 <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
-                  <span class="pill-orange text-[10px] uppercase font-bold">Основы пайки</span>
+                  <span class="pill-orange text-[10px] uppercase font-bold">[TASK.01] Основы пайки</span>
                   <span class="text-ink-faint text-[11px]">ПОС-61 // 280°C</span>
                 </div>
               </a>
 
               <!-- Задача 2: Печатная плата -->
-              <a href="interactive.php?tool=temp&task=pcb" 
+              <a href="<?= esc_url($site_root) ?>interactive.php?tool=temp&task=pcb" 
                  class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
                  aria-label="Задача пайки: Печатная плата. Монтаж SMD 0805, QFN и теплоемких полигонов">
                 <div>
@@ -176,13 +174,13 @@ include __DIR__ . '/includes/header.php';
                   </p>
                 </div>
                 <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
-                  <span class="pill-blue text-[10px] uppercase font-bold">SMD и термопрофили</span>
+                  <span class="pill-blue text-[10px] uppercase font-bold">[TASK.02] SMD и термопрофили</span>
                   <span class="text-ink-faint text-[11px]">SAC305 // T12</span>
                 </div>
               </a>
 
               <!-- Задача 3: Медная труба -->
-              <a href="interactive.php?tool=temp&task=pipe" 
+              <a href="<?= esc_url($site_root) ?>interactive.php?tool=temp&task=pipe" 
                  class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
                  aria-label="Задача пайки: Медная труба. Капиллярные фитинги и твердый припой">
                 <div>
@@ -200,13 +198,13 @@ include __DIR__ . '/includes/header.php';
                   </p>
                 </div>
                 <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
-                  <span class="pill-orange text-[10px] uppercase font-bold">Материалы и флюсы</span>
+                  <span class="pill-orange text-[10px] uppercase font-bold">[TASK.03] Материалы и флюсы</span>
                   <span class="text-ink-faint text-[11px]">Горелка // 650°C</span>
                 </div>
               </a>
 
               <!-- Задача 4: Не знаю — помочь -->
-              <a href="interactive.php?tool=temp&task=unknown" 
+              <a href="<?= esc_url($site_root) ?>interactive.php?tool=temp&task=unknown" 
                  class="sketch-card p-3.5 sm:p-4 flex flex-col justify-between bg-card hover:border-accent group transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none"
                  aria-label="Задача: Интерактивный помощник. Экспресс-подбор температуры жала и оборудования">
                 <div>
@@ -224,7 +222,7 @@ include __DIR__ . '/includes/header.php';
                   </p>
                 </div>
                 <div class="flex items-center justify-between gap-2 mt-3 pt-2 border-t border-paper-border/60 font-mono text-xs text-ink-muted">
-                  <span class="pill-yellow text-[10px] uppercase font-bold">Интерактивный верстак</span>
+                  <span class="pill-yellow text-[10px] uppercase font-bold">[TASK.04] Интерактивный верстак</span>
                   <span class="text-ink-faint text-[11px]">Экспресс-тест</span>
                 </div>
               </a>
@@ -235,11 +233,14 @@ include __DIR__ . '/includes/header.php';
           <!-- Правая колонка: Инженерная схема жала (Fixed aspect ratio to prevent CLS) -->
           <div class="flex flex-col items-center justify-center">
             <div class="sketch-card p-3.5 bg-paper w-full max-w-[440px] shadow-xs relative">
-              <div class="font-mono text-xs text-ink-muted pb-2 border-b border-paper-border mb-2.5 flex items-center justify-between">
-                <span class="font-bold text-ink uppercase tracking-wider">АНАТОМИЯ ЖАЛА</span>
-                <span class="pill-blue text-[10px] font-mono font-bold uppercase px-1.5 py-0.5 rounded">IPC-J-STD</span>
+              <div class="font-mono text-xs text-ink pb-2 border-b border-paper-border mb-2.5 flex items-center justify-between">
+                <span class="font-bold uppercase tracking-wider flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+                  ЧЕРТЁЖ № 01-Ж // АНАТОМИЯ ЖАЛА
+                </span>
+                <span class="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">IPC-J-STD-001</span>
               </div>
-              <div class="w-full overflow-hidden rounded bg-white dark:bg-[#1a1f26] flex items-center justify-center border border-paper-border/60 p-1">
+              <div class="w-full overflow-hidden rounded bg-white dark:bg-[#1a1f26] flex items-center justify-center border border-paper-border p-2 relative card-diagram">
                 <img 
                   src="<?= $assets_base ?>/assets/schematics/tip-cutaway.svg" 
                   alt="Разрез паяльного жала: медный сердечник, нагреватель и рабочая поверхность" 
@@ -258,15 +259,15 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
-      <!-- БЫСТРЫЙ ПОИСК ПО БАЗЕ ЗНАНИЙ (Стиль инженерной миллиметровки) -->
+      <!-- БЫСТРЫЙ ПОИСК ПО БАЗЕ ЗНАНИЙ (Стиль инженерной консоли) -->
       <section class="space-y-2">
         <div id="quick-search-trigger" role="button" tabindex="0" aria-label="Открыть глобальный инженерный поиск по базе (Ctrl+K)"
              class="sketch-card p-3 sm:p-4 bg-paper flex items-center justify-between gap-3 cursor-pointer hover:border-accent transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
           <div class="flex items-center gap-3 text-ink-muted text-xs sm:text-sm font-mono">
-            <span class="material-symbols-outlined text-[20px] text-accent group-hover:scale-110 transition-transform">search</span>
-            <span class="text-ink-muted group-hover:text-ink transition-colors">Поиск по базе: припой ПОС-61, флюс RMA, жала T12/C245, дефекты пайки...</span>
+            <span class="px-1.5 py-0.5 rounded text-[10px] font-bold uppercase bg-paper-subtle border border-paper-border text-accent shrink-0">TERMINAL // ПОИСК</span>
+            <span class="text-ink-muted group-hover:text-ink transition-colors truncate">> припой ПОС-61, флюс RMA, жала T12/C245, дефекты пайки...</span>
           </div>
-          <kbd class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono border border-paper-border rounded bg-paper-subtle text-ink-muted">
+          <kbd class="hidden sm:inline-flex items-center gap-1 px-2.5 py-1 text-xs font-mono border border-paper-border rounded bg-paper-subtle text-ink-muted shrink-0">
             <span>Ctrl</span><span>+</span><span>K</span>
           </kbd>
         </div>
@@ -281,7 +282,7 @@ include __DIR__ . '/includes/header.php';
               Тематические разделы
             </h2>
           </div>
-          <a href="/category.php?slug=materialy" class="font-mono text-xs text-ink-muted hover:text-accent transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent rounded">
+          <a href="<?= esc_url($site_root) ?>category.php?slug=materialy" class="font-mono text-xs text-ink-muted hover:text-accent transition-colors flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent rounded">
             <span>Все рубрики в каталоге</span>
             <span>→</span>
           </a>
@@ -301,25 +302,25 @@ include __DIR__ . '/includes/header.php';
               default     => 'pill-blue'
             };
           ?>
-            <a href="/category.php?slug=<?= $rslug ?>"
+            <a href="<?= esc_url($site_root) ?>category.php?slug=<?= $rslug ?>"
                class="sketch-card p-4 sm:p-5 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-all group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
               <div class="space-y-2">
                 <div class="flex items-center justify-between font-mono text-xs">
                   <span class="<?= $pill_class ?> px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase tracking-wider">
                     <?= e($rub['subbadge']) ?>
                   </span>
-                  <span class="text-ink-faint font-bold font-mono">0<?= match($rslug) {'start'=>1, 'materialy'=>2, 'praktika'=>3, 'oshibki'=>4} ?></span>
+                  <span class="text-ink-faint font-bold font-mono text-[11px]">SEC.0<?= match($rslug) {'start'=>1, 'materialy'=>2, 'praktika'=>3, 'oshibki'=>4} ?></span>
                 </div>
                 <h3 class="text-lg font-bold text-ink group-hover:text-accent transition-colors leading-snug">
                   <?= e($rub['title']) ?>
                 </h3>
-                <p class="text-xs text-ink-muted leading-relaxed font-serif line-clamp-3">
+                <p class="text-xs text-ink-muted leading-relaxed font-sans line-clamp-3">
                   <?= e($rub['lead']) ?>
                 </p>
               </div>
               <div class="pt-3 border-t border-paper-border flex items-center justify-between font-mono text-xs text-ink-muted">
-                <span class="text-xs text-ink-faint"><?= count($rub['article_ids'] ?? []) ?> материалов</span>
-                <span class="text-ink font-bold group-hover:text-accent group-hover:translate-x-1 transition-all">Открыть →</span>
+                <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase bg-paper-subtle border border-paper-border text-ink-muted">[<?= count($rub['article_ids'] ?? []) ?> РЕГЛАМЕНТОВ]</span>
+                <span class="text-ink font-bold group-hover:text-accent group-hover:translate-x-1 transition-all">Изучить →</span>
               </div>
             </a>
           <?php endforeach; ?>
@@ -394,8 +395,8 @@ include __DIR__ . '/includes/header.php';
             <article class="sketch-card p-3.5 flex flex-col justify-between space-y-2.5 bg-card hover:border-paper-border-dark transition-all rounded-lg group shadow-xs">
               <div class="space-y-2">
                 <div class="flex items-center justify-between font-mono text-xs">
-                  <span class="pill-orange uppercase font-bold tracking-tight text-[10px]">Урок <?= $l['read_min'] ?>м</span>
-                  <span class="text-ink-faint">#<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
+                  <span class="pill-orange uppercase font-bold tracking-tight text-[10px]">РЕГЛАМЕНТ-<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
+                  <span class="text-ink-faint font-mono text-[10px]">~<?= $l['read_min'] ?> МИН</span>
                 </div>
                 <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug line-clamp-2">
                   <a href="<?= esc_url($l_url) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
@@ -408,7 +409,7 @@ include __DIR__ . '/includes/header.php';
               </div>
 
               <div class="pt-2 border-t border-paper-border flex items-center justify-between font-mono text-xs">
-                <span class="text-ink-faint text-[10px] uppercase truncate max-w-[80px]"><?= htmlspecialchars($l['tag']) ?></span>
+                <span class="text-ink-faint text-[10px] font-mono uppercase truncate max-w-[90px]">ЧЕК-ЛИСТ: ГОТОВ</span>
                 <a href="<?= esc_url($l_url) ?>" class="text-ink font-bold group-hover:text-accent shrink-0 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1">
                   Открыть →
                 </a>
@@ -428,23 +429,33 @@ include __DIR__ . '/includes/header.php';
           </h2>
         </div>
 
-        <div class="sketch-card p-5 sm:p-6 bg-card space-y-3 border-l-4 border-l-accent">
+        <div class="sketch-card p-5 sm:p-6 bg-card space-y-4 border border-paper-border rounded-lg shadow-xs">
+          <div class="flex items-center justify-between pb-2.5 border-b border-paper-border text-xs font-mono">
+            <span class="font-bold uppercase text-ink flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+              ПАСПОРТ МЕТРОЛОГИЧЕСКОЙ ПОВЕРКИ И НОРМАТИВНОЙ БАЗЫ
+            </span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-paper-subtle border border-paper-border text-ink">ГОСТ & IPC-A-610</span>
+          </div>
           <p class="text-base sm:text-lg text-ink font-serif leading-relaxed">
             Температуры плавления берём из нормативных документов и паспортов сплавов. Уставка паяльной станции — практический стартовый ориентир: её корректируют по теплоёмкости детали, жалу и времени контакта.
           </p>
-          <div class="pt-3 border-t border-paper-border flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-mono text-ink-muted">
-            <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
-              <strong>Оловянно-свинцовые припои (ПОС):</strong> ГОСТ 21930 / ГОСТ 21931
-            </span>
-            <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
-              <strong>Бессвинцовые сплавы (SAC305):</strong> Паспорта производителей / ISO 9453
-            </span>
-            <span class="flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
-              <strong>Критерии пайки:</strong> IPC-A-610 (внешний вид соединений)
-            </span>
+          <div class="pt-3 border-t border-paper-border/80 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs font-mono text-ink-muted">
+            <div class="p-2.5 rounded border border-paper-border bg-paper-subtle space-y-1">
+              <div class="text-[10px] text-ink-faint uppercase font-bold">Оловянно-свинцовые сплавы</div>
+              <div class="font-bold text-ink">ГОСТ 21930 / 21931</div>
+              <div class="text-[11px] text-ink-muted">ПОС-61 (183–190°C)</div>
+            </div>
+            <div class="p-2.5 rounded border border-paper-border bg-paper-subtle space-y-1">
+              <div class="text-[10px] text-ink-faint uppercase font-bold">Бессвинцовые сплавы</div>
+              <div class="font-bold text-ink">ISO 9453 / Паспорта</div>
+              <div class="text-[11px] text-ink-muted">SAC305 (217–220°C)</div>
+            </div>
+            <div class="p-2.5 rounded border border-paper-border bg-paper-subtle space-y-1">
+              <div class="text-[10px] text-ink-faint uppercase font-bold">Критерии приёмки соединений</div>
+              <div class="font-bold text-ink">IPC-A-610G (Класс 2/3)</div>
+              <div class="text-[11px] text-ink-muted">Мениск, галтель, смачивание</div>
+            </div>
           </div>
         </div>
 
@@ -481,7 +492,11 @@ include __DIR__ . '/includes/header.php';
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
           
           <!-- Вопрос 1 -->
-          <div class="sketch-card p-4 bg-card space-y-2">
+          <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
+            <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
+              <span class="font-bold text-accent">[ЗАПРОС 01]</span>
+              <span>ТЕМПЕРАТУРНЫЙ РЕЖИМ</span>
+            </div>
             <h3 class="text-base font-bold text-ink leading-snug">
               Какую температуру выставить для припоя ПОС-61?
             </h3>
@@ -491,7 +506,11 @@ include __DIR__ . '/includes/header.php';
           </div>
 
           <!-- Вопрос 2 -->
-          <div class="sketch-card p-4 bg-card space-y-2">
+          <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
+            <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
+              <span class="font-bold text-accent">[ЗАПРОС 02]</span>
+              <span>ВЫБОР ОБОРУДОВАНИЯ</span>
+            </div>
             <h3 class="text-base font-bold text-ink leading-snug">
               Нужен ли новичку дорогой паяльник вроде JBC?
             </h3>
@@ -501,7 +520,11 @@ include __DIR__ . '/includes/header.php';
           </div>
 
           <!-- Вопрос 3 -->
-          <div class="sketch-card p-4 bg-card space-y-2">
+          <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
+            <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
+              <span class="font-bold text-accent">[ЗАПРОС 03]</span>
+              <span>ЗАЩИТА ПЛАТЫ</span>
+            </div>
             <h3 class="text-base font-bold text-ink leading-snug">
               Как не отслоить медную дорожку от текстолита?
             </h3>
@@ -511,7 +534,11 @@ include __DIR__ . '/includes/header.php';
           </div>
 
           <!-- Вопрос 4 -->
-          <div class="sketch-card p-4 bg-card space-y-2">
+          <div class="sketch-card p-4.5 bg-card space-y-2.5 rounded-lg border border-paper-border shadow-xs">
+            <div class="flex items-center justify-between text-xs font-mono text-ink-faint pb-1 border-b border-paper-border/60">
+              <span class="font-bold text-accent">[ЗАПРОС 04]</span>
+              <span>МОНТАЖНАЯ ХИМИЯ</span>
+            </div>
             <h3 class="text-base font-bold text-ink leading-snug">
               Какой флюс выбрать для первого раза и надо ли его смывать?
             </h3>

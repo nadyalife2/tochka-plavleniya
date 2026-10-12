@@ -238,20 +238,20 @@ ob_start();
   <style>
     .font-hand { font-family: 'Caveat', cursive; }
     .washi-tape-badge {
-      top: -6px; left: 16px; width: 44px; height: 14px; transform: rotate(-2deg);
+      top: -6px; left: 16px; width: 44px; height: 14px; transform: rotate(-0.8deg);
     }
     .washi-tape-banner {
-      top: -8px; left: 24px; width: 50px; height: 14px; transform: rotate(-1.5deg);
+      top: -8px; left: 24px; width: 50px; height: 14px; transform: rotate(-0.6deg);
     }
     .washi-tape-postit {
-      top: 0px; left: 20px; width: 50px; height: 14px; transform: rotate(-2deg);
+      top: 0px; left: 20px; width: 50px; height: 14px; transform: rotate(-0.8deg);
     }
     .featured-sketch-frame {
-      border: 2px solid var(--accent);
+      border: 2px solid var(--color-accent);
       box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
     }
-    .dark .featured-sketch-frame {
-      border-color: rgba(234, 88, 12, 0.55);
+    html.dark .featured-sketch-frame {
+      border-color: var(--color-accent-border);
       box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
     }
   </style>
@@ -262,14 +262,14 @@ include __DIR__ . '/includes/header.php';
 ?>
 
   <!-- Main Content -->
-  <main class="w-full flex-grow pt-8 pb-16">
+  <main class="w-full flex-grow pt-8 pb-16" id="main-content">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 space-y-8">
       
       <!-- Semantic Breadcrumbs (WCAG compliant) -->
       <nav aria-label="Хлебные крошки" class="text-xs font-mono text-ink-faint flex items-center gap-1.5 flex-wrap">
-        <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="/">Главная</a>
+        <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="<?= esc_url($site_root) ?>">Главная</a>
         <span aria-hidden="true">→</span>
-        <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="/index.php#articles">Рубрики журнала</a>
+        <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="<?= esc_url($site_root) ?>index.php#articles">Рубрики журнала</a>
         <span aria-hidden="true">→</span>
         <span class="text-ink font-semibold px-1" aria-current="location"><?= e($current_rubric['title']) ?></span>
       </nav>
@@ -278,12 +278,21 @@ include __DIR__ . '/includes/header.php';
       <section class="border-b border-paper-border pb-8">
         <div class="max-w-3xl space-y-4">
           
+          <?php
+          $sec_codes = [
+              'start'     => 'SEC.01',
+              'materialy' => 'SEC.02',
+              'praktika'  => 'SEC.03',
+              'oshibki'   => 'SEC.04',
+          ];
+          $current_sec_code = $sec_codes[$current_slug] ?? 'SEC.XX';
+          ?>
           <!-- Single Subtle Tape & Label Badge (Yellow = Workshop/Editorial Identity) -->
           <div class="relative inline-block mb-1">
             <div class="sketch-washi-tape washi-tape-badge" aria-hidden="true"></div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-xs shadow-sm rotate-[-0.8deg] sketch-border">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-xs shadow-sm rotate-[-0.5deg] sketch-border">
               <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
-              <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?></span>
+              <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?> // [<?= $current_sec_code ?>]</span>
               <span class="text-ink-faint">|</span>
               <span class="text-[11px] text-ink-muted uppercase"><?= e($current_rubric['subbadge']) ?></span>
             </div>
@@ -320,22 +329,24 @@ include __DIR__ . '/includes/header.php';
       <nav aria-label="Переключение рубрик журнала" class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs">
         <?php
         $nav_pills = [
-            ['slug' => 'start',     'label' => 'Начать паять',     'dot' => 'bg-amber-400'],
-            ['slug' => 'materialy', 'label' => 'Материалы и сплавы', 'dot' => 'bg-orange-500'],
-            ['slug' => 'praktika',  'label' => 'Практика монтажа',   'dot' => 'bg-sky-500'],
-            ['slug' => 'oshibki',   'label' => 'Проблемы и дефекты', 'dot' => 'bg-amber-500'],
+            ['slug' => 'start',     'code' => '01', 'label' => 'Начать паять',     'dot' => 'bg-amber-400'],
+            ['slug' => 'materialy', 'code' => '02', 'label' => 'Материалы и сплавы', 'dot' => 'bg-orange-500'],
+            ['slug' => 'praktika',  'code' => '03', 'label' => 'Практика монтажа',   'dot' => 'bg-sky-500'],
+            ['slug' => 'oshibki',   'code' => '04', 'label' => 'Проблемы и дефекты', 'dot' => 'bg-amber-500'],
         ];
         foreach ($nav_pills as $pill):
             $is_curr = ($current_slug === $pill['slug']);
+            $pill_url = esc_url($site_root) . "category.php?slug=" . $pill['slug'];
         ?>
-          <a href="/category.php?slug=<?= $pill['slug'] ?>"
+          <a href="<?= $pill_url ?>"
              <?= $is_curr ? 'aria-current="page"' : '' ?>
              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $is_curr ? 'bg-ink text-paper font-bold shadow-sm' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?>">
             <span class="w-1.5 h-1.5 rounded-full <?= $pill['dot'] ?>" aria-hidden="true"></span>
+            <span class="text-[10px] opacity-75 font-mono">[SEC.<?= $pill['code'] ?>]</span>
             <span><?= $pill['label'] ?></span>
           </a>
         <?php endforeach; ?>
-        <a href="/index.php#articles" class="px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+        <a href="<?= esc_url($site_root) ?>index.php#articles" class="px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
           Все статьи журнала →
         </a>
       </nav>
@@ -344,10 +355,10 @@ include __DIR__ . '/includes/header.php';
       <?php if (!empty($current_rubric['sub_tags'])): ?>
         <div class="flex flex-wrap items-center justify-between gap-3 pt-1 pb-2 border-b border-paper-border/60">
           <div class="flex items-center gap-1.5 flex-wrap">
-            <span class="text-xs font-mono text-ink-muted uppercase mr-1">Тема:</span>
+            <span class="text-xs font-mono text-ink-muted uppercase mr-1">[ФИЛЬТР ТЕМЫ]:</span>
             <?php foreach ($current_rubric['sub_tags'] as $st): 
               $is_active_st = ($active_sub === $st['id']);
-              $st_url = "/category.php?slug=" . urlencode($current_slug) . ($st['id'] !== 'all' ? "&sub=" . urlencode($st['id']) : '') . ($sort_param !== 'default' ? "&sort=" . urlencode($sort_param) : '');
+              $st_url = esc_url($site_root) . "category.php?slug=" . urlencode($current_slug) . ($st['id'] !== 'all' ? "&sub=" . urlencode($st['id']) : '') . ($sort_param !== 'default' ? "&sort=" . urlencode($sort_param) : '');
             ?>
               <a href="<?= e($st_url) ?>"
                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $is_active_st ? 'bg-paper-border-dark text-ink font-bold border border-ink/40' : 'bg-paper border border-paper-border text-ink-muted hover:border-ink/30 hover:text-ink' ?>">
@@ -361,8 +372,8 @@ include __DIR__ . '/includes/header.php';
 
           <!-- Quick Sorting Options -->
           <div class="flex items-center gap-2 text-xs font-mono text-ink-muted ml-auto">
-            <span>Время чтения:</span>
-            <a href="/category.php?slug=<?= urlencode($current_slug) ?>&sub=<?= urlencode($active_sub) ?>&sort=<?= $sort_param === 'time_asc' ? 'time_desc' : 'time_asc' ?>"
+            <span>[РЕЖИМ ЧТЕНИЯ]:</span>
+            <a href="<?= esc_url($site_root) ?>category.php?slug=<?= urlencode($current_slug) ?>&sub=<?= urlencode($active_sub) ?>&sort=<?= $sort_param === 'time_asc' ? 'time_desc' : 'time_asc' ?>"
                class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-paper-border bg-paper hover:border-ink/40 text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
               <span><?= $sort_param === 'time_desc' ? 'Сначала длинные ↓' : ($sort_param === 'time_asc' ? 'Сначала быстрые ↑' : 'По умолчанию') ?></span>
             </a>
@@ -384,10 +395,10 @@ include __DIR__ . '/includes/header.php';
                 <div class="flex items-center gap-2">
                   <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1">
                     <span class="material-symbols-outlined text-[14px] text-accent">construction</span>
-                    ИНТЕРАКТИВНЫЙ ВЕРСТАК
+                    [ИНТЕРАКТИВНЫЙ ВЕРСТАК // ИНСТРУМЕНТ-01]
                   </span>
                 </div>
-                <span class="text-xs font-mono text-ink-faint">IPC / ГОСТ</span>
+                <span class="text-xs font-mono text-ink-faint">СТАНДАРТ IPC / ГОСТ Р</span>
               </div>
 
               <h2 class="text-lg sm:text-xl font-bold text-ink font-sans">
@@ -422,7 +433,7 @@ include __DIR__ . '/includes/header.php';
 
           <!-- FEATURED MAIN ARTICLE (Visually Elevated with Engineering Stroke & Stamp Badge) -->
           <?php if ($featured_article): 
-            $f_url = !empty($featured_article['url']) ? $featured_article['url'] : (function_exists('home_url') ? home_url("/" . urlencode($featured_article['slug']) . "/") : ("/" . urlencode($featured_article['slug']) . "/"));
+            $f_url = !empty($featured_article['url']) ? $featured_article['url'] : (function_exists('home_url') ? home_url("/" . urlencode($featured_article['slug']) . "/") : ($site_root . urlencode($featured_article['slug']) . "/"));
             $f_tag_pill = get_semantic_tag_pill($featured_article['tag_key'] ?? 'materials');
           ?>
             <article class="featured-sketch-frame rounded-lg bg-card p-6 sm:p-7 space-y-5 transition-all relative">
@@ -431,8 +442,8 @@ include __DIR__ . '/includes/header.php';
                 <!-- Image Frame with FIG badge -->
                 <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
                   <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-cover object-center" loading="lazy">
-                  <div class="absolute bottom-2 right-2 px-2.5 py-1 bg-paper/95 border border-paper-border text-xs font-mono text-ink-muted rounded backdrop-blur-sm shadow-2xs">
-                    FIG. <?= e($featured_article['id'] ?? '1') ?>.0 // КЛЮЧЕВОЙ РАЗБОР
+                  <div class="absolute bottom-2 right-2 px-2.5 py-1 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded shadow-2xs">
+                    [ЧЕРТЁЖ // FIG. <?= e($featured_article['id'] ?? '1') ?>.0] // КЛЮЧЕВОЙ РАЗБОР
                   </div>
                 </div>
               <?php endif; ?>
@@ -441,14 +452,14 @@ include __DIR__ . '/includes/header.php';
               <div class="flex items-center justify-between font-mono text-xs text-ink-muted pt-1 flex-wrap gap-2">
                 <div class="flex items-center gap-2">
                   <span class="text-ink font-hand text-lg font-bold italic tracking-wide rotate-[-1deg] inline-block">
-                    <?= e($featured_article['author'] ?? 'Иван Пайкин') ?>
+                    <?= e($featured_article['author'] ?? 'Инженер ОТК') ?>
                   </span>
                   <span class="text-ink-faint">·</span>
                   <span>~<?= e($featured_article['read_min'] ?? 8) ?> мин чтения</span>
                 </div>
                 <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-200 text-xs font-mono uppercase font-bold">
                   <span class="material-symbols-outlined text-[14px] text-accent">verified</span>
-                  Флагман рубрики // Рекомендовано
+                  [ФЛАГМАНСКИЙ ТЕХРЕГЛАМЕНТ // ОТК]
                 </div>
               </div>
 
@@ -492,20 +503,42 @@ include __DIR__ . '/includes/header.php';
             </article>
           <?php endif; ?>
 
+          <?php if (empty($paginated['items']) && !$featured_article): ?>
+            <!-- Hardened Empty State for filtered/empty categories -->
+            <div class="border border-dashed border-paper-border rounded-lg bg-card p-8 sm:p-12 text-center space-y-4 my-6">
+              <div class="w-12 h-12 rounded-full border border-paper-border bg-paper-subtle text-accent inline-flex items-center justify-center mx-auto">
+                <span class="material-symbols-outlined text-2xl">search_off</span>
+              </div>
+              <div class="space-y-1">
+                <h3 class="font-bold text-ink text-lg font-sans">В этой выборке пока нет опубликованных материалов</h3>
+                <p class="text-sm text-ink-muted max-w-md mx-auto font-sans leading-relaxed">
+                  Попробуйте сбросить фильтр или перейти в другие разделы базы знаний по радиомонтажу.
+                </p>
+              </div>
+              <div class="pt-2">
+                <a href="<?= esc_url($site_root) ?>category.php?slug=<?= urlencode($current_slug) ?>" class="btn-secondary text-xs font-mono inline-flex items-center gap-1.5 px-3 py-1.5 rounded">
+                  <span>Сбросить фильтры</span>
+                  <span aria-hidden="true">↺</span>
+                </a>
+              </div>
+            </div>
+          <?php endif; ?>
+
           <!-- 2-COLUMN ARTICLE CARDS GRID: Semantic Tag Color Assignment -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <?php 
             foreach ($paginated['items'] as $article): 
-              $art_url = !empty($article['url']) ? $article['url'] : (function_exists('home_url') ? home_url("/" . urlencode($article['slug']) . "/") : ("/" . urlencode($article['slug']) . "/"));
+              $art_url = !empty($article['url']) ? $article['url'] : (function_exists('home_url') ? home_url("/" . urlencode($article['slug']) . "/") : ($site_root . urlencode($article['slug']) . "/"));
               $card_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
+              $art_idx = sprintf('%02d', (int)($article['id'] ?? 1));
             ?>
               <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-all">
                 <?php if (!empty($article['image'])): ?>
                   <!-- Card Image Frame -->
                   <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
                     <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-cover object-center" loading="lazy">
-                    <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 bg-paper/90 border border-paper-border text-[10px] font-mono text-ink-muted rounded backdrop-blur-sm">
-                      FIG. <?= e($article['id']) ?>.0 // SKETCH
+                    <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 bg-paper border border-paper-border text-[10px] font-mono text-ink-muted rounded">
+                      [СХЕМА // FIG. <?= e($article['id']) ?>.0]
                     </div>
                   </div>
                 <?php else: ?>
@@ -513,11 +546,11 @@ include __DIR__ . '/includes/header.php';
                     <div class="flex items-center justify-between text-xs font-mono text-ink-muted">
                       <span class="flex items-center gap-1.5 font-bold text-accent">
                         <span class="material-symbols-outlined text-[16px]">school</span>
-                        МИКРОУРОК ВЕРСТАКА
+                        [РЕГЛАМЕНТ-<?= $art_idx ?>]
                       </span>
                       <span class="text-[10px] font-mono text-ink-faint">#<?= e($article['id']) ?></span>
                     </div>
-                    <div class="text-[11px] font-mono text-ink-faint">Пошаговый регламент // IPC-A-610</div>
+                    <div class="text-[11px] font-mono text-ink-faint">Пошаговый регламент // IPC-A-610G</div>
                   </div>
                 <?php endif; ?>
 
@@ -553,7 +586,7 @@ include __DIR__ . '/includes/header.php';
 
           <!-- EDITORIAL PAGINATION (Semantic WCAG Nav with Prev/Next buttons) -->
           <?php 
-          $base_pag_url = "/category.php?slug=" . urlencode($current_slug) . ($active_sub !== 'all' ? "&sub=" . urlencode($active_sub) : '') . ($sort_param !== 'default' ? "&sort=" . urlencode($sort_param) : '');
+          $base_pag_url = esc_url($site_root) . "category.php?slug=" . urlencode($current_slug) . ($active_sub !== 'all' ? "&sub=" . urlencode($active_sub) : '') . ($sort_param !== 'default' ? "&sort=" . urlencode($sort_param) : '');
           if ($paginated['total_pages'] > 1): 
           ?>
             <nav aria-label="Пагинация рубрики" class="flex items-center justify-center gap-2 pt-6 font-mono text-xs flex-wrap">
@@ -614,13 +647,13 @@ include __DIR__ . '/includes/header.php';
               'footer_r' => 'IPC-TM-650'
           ];
           ?>
-          <div class="sketch-sticky-note p-4 rounded-lg space-y-2 relative shadow-sm" style="transform: rotate(-0.8deg);">
+          <div class="sketch-sticky-note p-4 rounded-lg space-y-2 relative shadow-sm" style="transform: rotate(-0.5deg);">
             <div class="sketch-washi-tape washi-tape-postit" aria-hidden="true"></div>
             
             <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b sketch-divider pb-1 text-ink">
               <span class="flex items-center gap-1.5">
                 <span class="material-symbols-outlined text-[13px] text-accent">push_pin</span>
-                <?= e($sb_note['label']) ?>
+                [<?= e($sb_note['label']) ?>]
               </span>
               <span class="text-[10px] opacity-75"><?= e($sb_note['code']) ?></span>
             </div>
@@ -645,7 +678,7 @@ include __DIR__ . '/includes/header.php';
                   ['label' => 'ПОС-61 (Sn63Pb37)', 'val' => '183 °C'],
                   ['label' => 'SAC305 (RoHS)', 'val' => '217–220 °C'],
               ],
-              'more_link' => '/interactive.php#table',
+              'more_link' => esc_url($site_root) . 'interactive.php#table',
               'more_text' => 'Вся таблица припоев →'
           ];
           ?>
@@ -653,7 +686,7 @@ include __DIR__ . '/includes/header.php';
             <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
                 <span class="material-symbols-outlined text-[14px] text-teal-600 dark:text-teal-400">thermostat</span>
-                <?= e($sb_spec['title']) ?>
+                [<?= e($sb_spec['title']) ?>]
               </span>
               <span class="<?= e($sb_spec['tag_pill']) ?> text-[10px] font-mono uppercase px-2 py-0.5 rounded"><?= e($sb_spec['tag']) ?></span>
             </div>
@@ -684,11 +717,11 @@ include __DIR__ . '/includes/header.php';
               'footer_r' => 'Бинарная эвтектика'
           ];
           ?>
-          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-2 border-l-4 border-l-amber-500 shadow-sm">
+          <div class="border border-warning-border rounded-lg bg-warning-bg/30 p-4 space-y-2 shadow-sm">
             <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold border-b border-paper-border pb-1">
-              <span class="flex items-center gap-1.5 text-amber-700 dark:text-amber-400">
-                <span class="material-symbols-outlined text-[15px] text-amber-600 dark:text-amber-400">warning</span>
-                <?= e($sb_warn['title']) ?>
+              <span class="flex items-center gap-1.5 text-warning">
+                <span class="material-symbols-outlined text-[15px] text-warning">warning</span>
+                [<?= e($sb_warn['title']) ?>]
               </span>
               <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-mono font-bold"><?= e($sb_warn['badge']) ?></span>
             </div>
@@ -707,36 +740,36 @@ include __DIR__ . '/includes/header.php';
           <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">
             <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span>Инструменты верстака</span>
-              <span class="pill-blue text-[10px] px-2 py-0.5 rounded">3 ТУЛЗЫ</span>
+              <span class="pill-blue text-[10px] px-2 py-0.5 rounded">[03 МОДУЛЯ]</span>
             </div>
             <div class="space-y-2 font-mono text-xs">
-              <a href="/interactive.php#temp" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <a href="<?= esc_url($site_root) ?>interactive.php#temp" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[15px] text-accent">thermostat</span>
-                    Термокалькулятор
+                    [01] Термокалькулятор
                   </div>
                   <div class="text-xs text-ink-muted">Подбор °C под провод и припой</div>
                 </div>
                 <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-bold">#temp</span>
               </a>
 
-              <a href="/interactive.php#iron" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <a href="<?= esc_url($site_root) ?>interactive.php#iron" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-xs flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[15px] text-sky-600 dark:text-sky-400">construction</span>
-                    Подбор паяльника
+                    [02] Подбор паяльника
                   </div>
                   <div class="text-xs text-ink-muted">Станции T12, C245 под бюджет</div>
                 </div>
                 <span class="pill-blue text-[10px] px-2 py-0.5 rounded font-bold">#iron</span>
               </a>
 
-              <a href="/interactive.php#defect" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <a href="<?= esc_url($site_root) ?>interactive.php#defect" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[15px] text-accent">troubleshoot</span>
-                    Дерево дефектов
+                    [03] Дерево дефектов
                   </div>
                   <div class="text-xs text-ink-muted">Диагностика причин брака</div>
                 </div>

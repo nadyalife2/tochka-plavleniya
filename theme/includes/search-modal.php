@@ -410,10 +410,10 @@
 
     if (filtered.length === 0) {
       resultsContainer.innerHTML = `
-        <div class="py-12 text-center text-ink-muted">
-          <span class="material-symbols-outlined text-4xl text-ink-faint mb-2">search_off</span>
-          <p class="font-mono text-sm">Ничего не найдено по запросу «${escapeHtml(query)}»</p>
-          <p class="text-xs text-ink-faint mt-1">Попробуйте ввести марку припоя (ПОС-61), флюса (RMA-218) или тип дефекта.</p>
+        <div class="py-12 text-center text-ink-muted px-4">
+          <span class="material-symbols-outlined text-4xl text-ink-faint mb-2 select-none">search_off</span>
+          <p class="font-mono text-sm break-words max-w-full">Ничего не найдено по запросу «${escapeHtml(query)}»</p>
+          <p class="text-xs text-ink-faint mt-1 max-w-md mx-auto">Попробуйте ввести марку припоя (ПОС-61), флюса (RMA-218) или тип дефекта.</p>
         </div>
       `;
       activeIndex = -1;

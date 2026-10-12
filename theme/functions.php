@@ -74,7 +74,7 @@ add_action('init', function () {
             'description' => __('Крафтовый жёлтый стикер с ключевым выводом за 10 секунд', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout tldr"} -->
 <div class="wp-block-group callout tldr"><!-- wp:paragraph {"className":"callout-title font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1"} -->
-<p class="callout-title font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">📌 ГЛАВНЫЙ ИНЖЕНЕРНЫЙ ПРИНЦИП // 10 СЕКУНД</p>
+<p class="callout-title font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">[ПРИНЦИП] ГЛАВНЫЙ ВЫВОД // 10 СЕКУНД</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"font-semibold leading-relaxed m-0"} -->
 <p class="font-semibold leading-relaxed m-0">Нагрев платы должен быть строго двухсторонним. Нижний подогрев 140–160°C обязателен для предотвращения коробления текстолита и отрыва BGA-пятаков.</p>
 <!-- /wp:paragraph --></div>
@@ -88,7 +88,7 @@ add_action('init', function () {
             'description' => __('Компактная жёлтая заметка сбоку с мягким обтеканием основного текста', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout-aside"} -->
 <div class="wp-block-group callout-aside"><!-- wp:paragraph {"className":"font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1"} -->
-<p class="font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">🏷️ ЗАМЕТКА НА ПОЛЯХ</p>
+<p class="font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">[ЗАМЕТКА НА ПОЛЯХ]</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"text-xs leading-relaxed m-0"} -->
 <p class="text-xs leading-relaxed m-0">Безотмывочный флюс ROL0 не требует смывки на обычных цепях, но для сигнальных линий выше 100 МГц ультразвуковая отмывка строго обязательна.</p>
 <!-- /wp:paragraph --></div>
@@ -102,7 +102,7 @@ add_action('init', function () {
             'description' => __('Оранжевый блок предостережения от термоудара и повреждения чипов', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout-safety"} -->
 <div class="wp-block-group callout-safety"><!-- wp:paragraph {"className":"m-0"} -->
-<p class="m-0">⚠️ <strong>ВНИМАНИЕ / ТЕРМОУДАР:</strong> Скорость подъема температуры не должна превышать <strong>2–3 °C в секунду</strong>. Превышение скорости приводит к растрескиванию кремниевого кристалла и расслоению BGA-подложки («эффект попкорна»).</p>
+<p class="m-0"><strong>[ВНИМАНИЕ // ТЕРМОУДАР]:</strong> Скорость подъема температуры не должна превышать <strong>2–3 °C в секунду</strong>. Превышение скорости приводит к растрескиванию кремниевого кристалла и расслоению BGA-подложки («эффект попкорна»).</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -114,7 +114,7 @@ add_action('init', function () {
             'description' => __('Мятно-зеленая рамка с тонким практическим лайфхаком', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout-pro"} -->
 <div class="wp-block-group callout-pro"><!-- wp:paragraph {"className":"m-0"} -->
-<p class="m-0">💡 <strong>СОВЕТ МАСТЕРА:</strong> Перед демонтажем бессвинцового BGA-чипа разбавьте тугоплавкий припой по периметру сплавом ПОС-61 или Розе при 200°C. Это снизит эффективную температуру плавления на 30°C и спасет дорожки.</p>
+<p class="m-0"><strong>[РЕКОМЕНДАЦИЯ // СОВЕТ]:</strong> Перед демонтажем бессвинцового BGA-чипа разбавьте тугоплавкий припой по периметру сплавом ПОС-61 или Розе при 200°C. Это снизит эффективную температуру плавления на 30°C и спасет дорожки.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -126,7 +126,7 @@ add_action('init', function () {
             'description' => __('Строгий нормативный блок со ссылкой на отраслевой регламент', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout-ipc"} -->
 <div class="wp-block-group callout-ipc"><!-- wp:paragraph {"className":"m-0"} -->
-<p class="m-0">📜 <strong>СТАНДАРТ IPC-A-610G (Класс 3 / Надежность РЭА):</strong> Заполнение припоем металлизированного сквозного отверстия должно составлять не менее 75% толщины платы при угле смачивания галтели &lt; 90°.</p>
+<p class="m-0"><strong>[СТАНДАРТ IPC-A-610G // Класс 3]:</strong> Заполнение припоем металлизированного сквозного отверстия должно составлять не менее 75% толщины платы при угле смачивания галтели &lt; 90°.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -137,7 +137,7 @@ add_action('init', function () {
             'categories'  => ['tochka-plavleniya'],
             'description' => __('Двухколоночный блок с фото детали и пояснительным текстом', 'site2'),
             'content'     => '<!-- wp:media-text {"mediaPosition":"left","mediaType":"image","className":"my-6"} -->
-<div class="wp-block-media-text alignwide is-stacked-on-mobile my-6"><figure class="wp-block-media-text__media"><img src="" alt="Контроль пайки под микроскопом"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"level":3} -->
+<div class="wp-block-media-text alignwide is-stacked-on-mobile my-6"><figure class="wp-block-media-text__media"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 250\' width=\'400\' height=\'250\'%3E%3Crect width=\'400\' height=\'250\' fill=\'%23f5f3ee\' stroke=\'%23d1cbbe\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%23706d64\'%3E%5B%D0%A7%D0%95%D0%A0%D0%A2%D0%81%D0%96 // %D0%97%D0%90%D0%93%D0%A0%D0%A3%D0%97%D0%98%D0%A2%D0%95 %D0%A4%D0%9E%D0%A2%D0%9E%5D%3C/text%3E%3C/svg%3E" alt="Контроль пайки под микроскопом"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"level":3} -->
 <h3 class="wp-block-heading">Контроль галтели под микроскопом</h3>
 <!-- /wp:heading --><!-- wp:paragraph -->
 <p>Качественное паяное соединение имеет зеркальную поверхность с вогнутым мениском смачивания. Тусклая зернистая структура свидетельствует о перегреве или вибрации платы в момент кристаллизации припоя.</p>
@@ -151,7 +151,7 @@ add_action('init', function () {
             'categories'  => ['tochka-plavleniya'],
             'description' => __('Зеркальный блок для чередования ритма в лонгриде', 'site2'),
             'content'     => '<!-- wp:media-text {"mediaPosition":"right","mediaType":"image","className":"my-6"} -->
-<div class="wp-block-media-text alignwide has-media-on-the-right is-stacked-on-mobile my-6"><figure class="wp-block-media-text__media"><img src="" alt="Посадка шаров BGA"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"level":3} -->
+<div class="wp-block-media-text alignwide has-media-on-the-right is-stacked-on-mobile my-6"><figure class="wp-block-media-text__media"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 250\' width=\'400\' height=\'250\'%3E%3Crect width=\'400\' height=\'250\' fill=\'%23f5f3ee\' stroke=\'%23d1cbbe\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%23706d64\'%3E%5B%D0%A7%D0%95%D0%A0%D0%A2%D0%81%D0%96 // %D0%97%D0%90%D0%93%D0%A0%D0%A3%D0%97%D0%98%D0%A2%D0%95 %D0%A4%D0%9E%D0%A2%D0%9E%5D%3C/text%3E%3C/svg%3E" alt="Посадка шаров BGA"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"level":3} -->
 <h3 class="wp-block-heading">Равномерность посадки BGA-шаров</h3>
 <!-- /wp:heading --><!-- wp:paragraph -->
 <p>При оплавлении шаров через трафарет прямого нагрева держите сопло фена на высоте не менее 20 мм. Слишком сильный воздушный поток сдувает шары до момента смачивания пятака.</p>
@@ -169,7 +169,7 @@ add_action('init', function () {
 <div class="wp-block-column compare-col"><!-- wp:paragraph -->
 <p><span class="badge-defect">✕ ДЕФЕКТ (БРАК)</span></p>
 <!-- /wp:paragraph --><!-- wp:image {"className":"my-2"} -->
-<figure class="wp-block-image my-2"><img src="" alt="Дефект пайки"/></figure>
+<figure class="wp-block-image my-2"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 200\' width=\'300\' height=\'200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%23fef2f2\' stroke=\'%23f87171\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'11\' fill=\'%23b91c1c\'%3E%5B%D0%A4%D0%9E%D0%A2%D0%9E %D0%94%D0%95%D0%A4%D0%95%D0%9A%D0%A2%D0%90%5D%3C/text%3E%3C/svg%3E" alt="Дефект пайки"/></figure>
 <!-- /wp:image --><!-- wp:paragraph {"className":"text-xs text-ink-muted leading-relaxed"} -->
 <p class="text-xs text-ink-muted leading-relaxed"><strong>Холодная пайка:</strong> тусклая зернистая поверхность, микротрещина по границе смачивания из-за недогрева или раннего перемещения платы.</p>
 <!-- /wp:paragraph --></div>
@@ -177,7 +177,7 @@ add_action('init', function () {
 <div class="wp-block-column compare-col"><!-- wp:paragraph -->
 <p><span class="badge-norm">✓ ГОСТ / IPC-A-610</span></p>
 <!-- /wp:paragraph --><!-- wp:image {"className":"my-2"} -->
-<figure class="wp-block-image my-2"><img src="" alt="Норма пайки"/></figure>
+<figure class="wp-block-image my-2"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 200\' width=\'300\' height=\'200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%23f0fdf4\' stroke=\'%234ade80\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'11\' fill=\'%2315803d\'%3E%5B%D0%A4%D0%9E%D0%A2%D0%9E %D0%9D%D0%9E%D0%A0%D0%9C%D0%AB%5D%3C/text%3E%3C/svg%3E" alt="Норма пайки"/></figure>
 <!-- /wp:image --><!-- wp:paragraph {"className":"text-xs text-ink-muted leading-relaxed"} -->
 <p class="text-xs text-ink-muted leading-relaxed"><strong>Норма Class 3:</strong> плавный вогнутый мениск, угол контакта &lt; 30°, полное смачивание контактной площадки без пор и каверн.</p>
 <!-- /wp:paragraph --></div>
@@ -215,7 +215,7 @@ add_action('init', function () {
       <text x="470" y="202" font-family="JetBrains Mono,monospace" font-size="11" fill="currentColor" fill-opacity="0.6">300s</text>
     </svg>
   </div>
-  <div class="mt-2 text-[11px] font-mono text-ink-muted flex items-center justify-between">
+  <div class="mt-2 text-[11px] font-mono text-ink-muted flex flex-col sm:flex-row sm:items-center justify-between gap-1">
     <span>Рис. Нормированный термопрофиль SAC305 (Liquidus 217°C)</span>
     <span>IPC/JEDEC J-STD-020D</span>
   </div>
@@ -256,7 +256,7 @@ add_action('init', function () {
             'description' => __('Стартовый блок со списком оборудования и расходников', 'site2'),
             'content'     => '<!-- wp:group {"className":"tools-box"} -->
 <div class="wp-block-group tools-box"><!-- wp:heading {"level":4,"className":"font-mono text-xs uppercase tracking-wider text-ink pb-2 border-b border-paper-border flex items-center justify-between"} -->
-<h4 class="wp-block-heading font-mono text-xs uppercase tracking-wider text-ink pb-2 border-b border-paper-border flex items-center justify-between"><span>🛠️ ТЕХНОЛОГИЧЕСКАЯ ОСНАСТКА</span><span class="text-accent text-[10px] font-bold">СПЕЦИФИКАЦИЯ</span></h4>
+<h4 class="wp-block-heading font-mono text-xs uppercase tracking-wider text-ink pb-2 border-b border-paper-border flex items-center justify-between"><span>[ОСНАСТКА] ТЕХНОЛОГИЧЕСКИЙ НАБОР</span><span class="text-accent text-[10px] font-bold">СПЕЦИФИКАЦИЯ</span></h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"text-xs font-mono leading-loose mt-2"} -->
 <p class="text-xs font-mono leading-loose mt-2">▸ <strong>Термофен:</strong> турбинный/компрессорный с круглым соплом 10–12 мм<br>▸ <strong>Нижний подогрев:</strong> ИК-термостол с контролем термопары K-типа<br>▸ <strong>Флюс:</strong> безотмывочный ROL0 (Martin / SP-55 / NC-559-ASM)<br>▸ <strong>Оплётка:</strong> медная деоксидированная 2.5 мм (Goot Wick / Chemtronics)</p>
 <!-- /wp:paragraph --></div>
@@ -270,7 +270,7 @@ add_action('init', function () {
             'description' => __('Список обязательных проверок с отметками готовности', 'site2'),
             'content'     => '<!-- wp:group {"className":"checklist-box"} -->
 <div class="wp-block-group checklist-box"><!-- wp:heading {"level":4,"className":"font-mono text-xs uppercase tracking-wider font-bold text-ink mb-3"} -->
-<h4 class="wp-block-heading font-mono text-xs uppercase tracking-wider font-bold text-ink mb-3">✅ ВХОДНОЙ ИНЖЕНЕРНЫЙ КОНТРОЛЬ ПЕРЕД ВКЛЮЧЕНИЕМ</h4>
+<h4 class="wp-block-heading font-mono text-xs uppercase tracking-wider font-bold text-ink mb-3">[КОНТРОЛЬ] ПРЕДПОЛЁТНЫЙ ЧЕК-ЛИСТ ПЕРЕД ВКЛЮЧЕНИЕМ</h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"checklist-item"} -->
 <p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Влагосодержание чипов:</strong> микросхемы просушены в печи при 110°C (не менее 12 часов), индикатор HIC в норме.</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"checklist-item"} -->
@@ -301,13 +301,13 @@ add_action('init', function () {
             'content'     => '<!-- wp:group {"className":"space-y-3 my-6"} -->
 <div class="wp-block-group space-y-3 my-6"><!-- wp:group {"className":"faq-item"} -->
 <div class="wp-block-group faq-item"><!-- wp:heading {"level":4,"className":"text-base font-bold text-ink mb-1"} -->
-<h4 class="wp-block-heading text-base font-bold text-ink mb-1">❓ Какая максимальная температура допустима для бессвинцовой пайки BGA?</h4>
+<h4 class="wp-block-heading text-base font-bold text-ink mb-1">[ВОПРОС] Какая максимальная температура допустима для бессвинцовой пайки BGA?</h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"text-sm text-ink-muted leading-relaxed m-0"} -->
 <p class="text-sm text-ink-muted leading-relaxed m-0">По стандарту IPC/JEDEC J-STD-020 абсолютный пиковый предел составляет 250°C (не дольше 10 секунд). Оптимальный рабочий пик оплавления SAC305 — ровно 238–242°C.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --><!-- wp:group {"className":"faq-item"} -->
 <div class="wp-block-group faq-item"><!-- wp:heading {"level":4,"className":"text-base font-bold text-ink mb-1"} -->
-<h4 class="wp-block-heading text-base font-bold text-ink mb-1">❓ Сколько секунд припой должен находиться в жидком состоянии (TAL)?</h4>
+<h4 class="wp-block-heading text-base font-bold text-ink mb-1">[ВОПРОС] Сколько секунд припой должен находиться в жидком состоянии (TAL)?</h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"text-sm text-ink-muted leading-relaxed m-0"} -->
 <p class="text-sm text-ink-muted leading-relaxed m-0">Время над ликвидусом (TAL) должно составлять от 45 до 60 секунд. Меньше 40 с — риск несмачивания. Дольше 90 с — интерметаллический слой становится слишком толстым и хрупким.</p>
 <!-- /wp:paragraph --></div>

@@ -11,15 +11,42 @@ svg.w-8, .interactive svg.w-8 { width: 32px; height: 32px; }
       scroll-padding-top: 5rem;
     }
     .meter-bar {
-      height: 8px;
-      border-radius: 4px;
-      background: var(--color-paper-border);
+      height: 10px;
+      border-radius: 5px;
+      background: var(--color-paper-subtle, #f5f2eb);
+      border: 1px solid var(--color-paper-border);
       overflow: hidden;
       position: relative;
     }
     .meter-fill {
       height: 100%;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+      border-radius: 4px;
+      transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.45s ease, box-shadow 0.45s ease;
+      box-shadow: 0 0 8px rgba(235, 82, 17, 0.35);
+    }
+    html.dark .meter-fill {
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.45);
+    }
+
+    /* Тактильный тепловой импульс цифр температуры */
+    @keyframes temp-heat-pulse {
+      0% {
+        transform: scale(0.97);
+        filter: brightness(1.2);
+        color: var(--color-accent);
+      }
+      50% {
+        transform: scale(1.03);
+        filter: brightness(1.1);
+      }
+      100% {
+        transform: scale(1);
+        filter: brightness(1);
+      }
+    }
+    .temp-heat-pulse {
+      display: inline-block;
+      animation: temp-heat-pulse 0.4s cubic-bezier(0.22, 1, 0.36, 1);
     }
     .badge-danger {
       background-color: var(--color-danger-bg) !important;
@@ -27,19 +54,19 @@ svg.w-8, .interactive svg.w-8 { width: 32px; height: 32px; }
       border: 1px solid var(--color-danger-border) !important;
     }
 
-    /* Р¤РѕРЅРѕРІР°СЏ СЃРµС‚РєР° РјРёР»Р»РёРјРµС‚СЂРѕРІРєРё */
+    /* Фоновая сетка миллиметровки */
     .workbench-section {
       background-color: var(--color-paper-subtle);
-      background-image: radial-gradient(var(--color-paper-border-dark) 1.2px, transparent 1.2px);
+      background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
       background-size: 18px 18px;
       padding: 32px 24px 28px;
       border-radius: 12px;
       border: 1px solid var(--color-paper-border);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.02);
     }
     html.dark .workbench-section {
       background-color: #15181e;
-      background-image: radial-gradient(#2d3340 1.2px, transparent 1.2px);
+      background-image: radial-gradient(#202530 1px, transparent 1px);
       border-color: #272d3b;
       box-shadow: none;
     }
@@ -67,6 +94,8 @@ svg.w-8, .interactive svg.w-8 { width: 32px; height: 32px; }
       flex-direction: column;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
       transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+      min-width: 0;
+      overflow-wrap: break-word;
     }
     .tech-card:hover {
       transform: translateY(-3px);
@@ -111,29 +140,31 @@ svg.w-8, .interactive svg.w-8 { width: 32px; height: 32px; }
       color: var(--color-ink);
     }
 
-    /* Р§РµСЂС‚С‘Р¶РЅС‹Р№ Р±РµР№РґР¶ FIG. X.X */
+    /* Чертёжный бейдж FIG. X.X (Лабораторный штамп) */
     .fig-badge {
       font-family: var(--font-mono);
-      font-size: 11px;
-      font-weight: 700;
+      font-size: 10px;
+      font-weight: 600;
       color: var(--color-ink-muted);
       background: var(--color-paper-subtle);
-      border: 1px solid var(--color-paper-border-dark);
-      border-radius: 4px;
+      border: 1px solid var(--color-paper-border);
+      border-radius: 3px;
       padding: 2px 7px;
       letter-spacing: 0.04em;
+      text-transform: uppercase;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     }
     html.dark .fig-badge {
-      background: #1e293b;
-      border-color: #334155;
+      background: #1c2230;
+      border-color: #2e384d;
       color: var(--color-ink-muted);
     }
 
-    /* Р‘Р»РѕРє СЃС…РµРјС‹ */
+    /* Блок схемы с угловыми чертёжными метками */
     .card-diagram {
       background: var(--color-paper);
-      border: 1px solid var(--color-paper-subtle);
-      border-radius: 8px;
+      border: 1px solid var(--color-paper-border);
+      border-radius: 6px;
       padding: 10px;
       text-align: center;
       margin-bottom: 14px;
@@ -142,9 +173,32 @@ svg.w-8, .interactive svg.w-8 { width: 32px; height: 32px; }
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      position: relative;
+    }
+    .card-diagram::before,
+    .card-diagram::after {
+      content: "";
+      position: absolute;
+      width: 7px;
+      height: 7px;
+      border-color: var(--color-ink-muted);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .card-diagram::before {
+      top: 6px;
+      left: 6px;
+      border-top: 1.5px solid currentColor;
+      border-left: 1.5px solid currentColor;
+    }
+    .card-diagram::after {
+      bottom: 6px;
+      right: 6px;
+      border-bottom: 1.5px solid currentColor;
+      border-right: 1.5px solid currentColor;
     }
     html.dark .card-diagram {
-      background: var(--color-paper); /* С‡РµСЂС‚С‘Р¶РЅС‹Рµ СЃС…РµРјС‹ РІСЃРµРіРґР° РЅР° Р±РµР»РѕРј РґР»СЏ РєРѕРЅС‚СЂР°СЃС‚Р° С‚СѓС€Рё */
+      background: var(--color-paper);
       border-color: #272d3b;
     }
     .card-diagram img {
@@ -508,6 +562,46 @@ html.dark .workbench-toc-link.active {
   background: var(--color-paper);
 }
 
+/* Встроенный термо-индикатор и тактильная шкала нагрева */
+.meter-bar {
+  height: 8px;
+  width: 100%;
+  background-color: var(--color-paper-subtle, #ede8df);
+  border: 1px solid var(--color-paper-border, #d8d3c5);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+html.dark .meter-bar {
+  background-color: #171b22;
+  border-color: #2b3240;
+}
+
+.meter-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.4s ease;
+  will-change: width;
+}
+
+@keyframes temp-heat-pulse {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.temp-heat-pulse {
+  animation: temp-heat-pulse 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  display: inline-block;
+  transform-origin: left center;
+}
+
 /* Стили печати для бланка технологической карты */
 @media print {
   header, footer, nav,
@@ -545,9 +639,36 @@ html.dark .workbench-toc-link.active {
     scroll-behavior: auto !important;
   }
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+  .meter-fill {
+    transition: none !important;
+  }
+  .temp-heat-pulse {
+    animation: none !important;
   }
 }
 
+/* Закрепление первой колонки марки сплава при горизонтальном скролле */
+#solder-table-grid th:first-child,
+#solder-table-grid td:first-child {
+  position: sticky;
+  left: 0;
+  background: var(--color-paper, #ffffff);
+  z-index: 2;
+  box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.08);
+}
 
+#solder-table-grid th:first-child {
+  background: var(--color-paper-subtle, #f5f2eb);
+  z-index: 3;
+}
+
+html.dark #solder-table-grid td:first-child {
+  background: #15181e;
+  box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.4);
+}
+
+html.dark #solder-table-grid th:first-child {
+  background: #1c212a;
+}

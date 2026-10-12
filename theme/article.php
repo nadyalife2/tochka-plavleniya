@@ -11,6 +11,18 @@ if (!$article && !$lesson) {
     require __DIR__ . '/404.php';
     exit;
 }
+if (!$article && $lesson) {
+    $article = [
+        'slug' => $lesson['slug'] ?? $slug,
+        'title' => $lesson['title'],
+        'excerpt' => ($lesson['subtitle'] ?? '') . ' — ' . ($lesson['tldr'] ?? ''),
+        'date' => '10 авг 2026',
+        'author' => 'ТОЧКА ПЛАВЛЕНИЯ',
+        'read_time' => ($lesson['read_min'] ?? 5) . ' мин',
+        'tag' => 'Микроурок',
+        'tag_key' => 'uroki'
+    ];
+}
 
 // Related articles (pick 3 other articles)
 $related_articles = array_filter($articles, function($item) use ($article) {
@@ -185,9 +197,8 @@ foreach ($faq_items as $q => $a) {
 
   /* Safety & Caution Callouts (Safety First for DIY & High Voltage) */
   .callout-safety {
-    border: 1px solid rgba(234, 88, 12, 0.35);
-    border-left: 4px solid #ea580c;
-    background: rgba(255, 247, 237, 0.8);
+    border: 1px solid var(--color-danger-border, rgba(234, 88, 12, 0.35));
+    background: var(--color-danger-bg, rgba(255, 247, 237, 0.8));
     border-radius: 6px;
     padding: 1rem 1.25rem;
     margin: 1.5rem 0;
@@ -276,7 +287,7 @@ $extra_head = ob_get_clean();
 include __DIR__ . '/includes/header.php';
 ?>
 <!-- Main Container -->
-<main class="w-full flex-grow pt-8 pb-20">
+<main class="w-full flex-grow pt-8 pb-20" id="main-content">
   <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
     
     <!-- Breadcrumbs -->
@@ -304,16 +315,29 @@ include __DIR__ . '/includes/header.php';
         <!-- Article Header Card -->
         <div class="bg-paper border border-paper-border rounded-lg p-5 sm:p-8 space-y-5 shadow-sm">
 
-          <!-- Retro Illustration / Stamp Badge -->
-          <div class="w-12 h-12 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink">
-            <svg fill="none" height="24" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="24">
-              <rect height="18" rx="2" width="18" x="3" y="3"></rect>
-              <path d="M8 7v10"></path>
-              <path d="M16 7v10"></path>
-              <path d="M12 12h.01"></path>
-              <circle cx="12" cy="7" r="1"></circle>
-              <circle cx="12" cy="17" r="1"></circle>
-            </svg>
+          <!-- Header Stamp & Technical Spec Bar -->
+          <div class="flex items-center justify-between pb-3 border-b border-paper-border text-xs font-mono">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink shrink-0">
+                <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24" width="16">
+                  <rect height="18" rx="2" width="18" x="3" y="3"></rect>
+                  <path d="M8 7v10"></path>
+                  <path d="M16 7v10"></path>
+                  <circle cx="12" cy="7" r="1"></circle>
+                  <circle cx="12" cy="17" r="1"></circle>
+                </svg>
+              </div>
+              <span class="font-bold text-ink uppercase tracking-wider">ТЕХРЕГЛАМЕНТ // ОТК-2026</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button type="button" onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted hover:text-ink text-[11px] font-mono font-medium transition-colors cursor-pointer" title="Распечатать технологическую карту (Ctrl+P)">
+                <span class="material-symbols-outlined text-[14px]">print</span>
+                <span>Печать техкарты</span>
+              </button>
+              <span class="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
+                IPC-A-610G // КЛАСС 2
+              </span>
+            </div>
           </div>
 
           <!-- Article Header Block -->
@@ -588,7 +612,7 @@ include __DIR__ . '/includes/header.php';
 
         <?php elseif ($slug === 'temperaturnye-profili'): ?>
         <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
-        <div class="border border-paper-border border-l-4 border-l-ink bg-paper-subtle/50 p-5 rounded-lg text-sm leading-relaxed space-y-2">
+        <div class="border border-paper-border bg-paper-subtle/50 p-5 rounded-lg text-sm leading-relaxed space-y-2">
 
           <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
@@ -619,7 +643,7 @@ include __DIR__ . '/includes/header.php';
           </p>
           
           <!-- Inline quote/highlight line -->
-          <div class="relative border-l-4 border-ink bg-paper-subtle/70 pr-4 pl-5 py-3.5 my-4 rounded-r shadow-sm">
+          <div class="relative border border-paper-border bg-paper-subtle/70 px-5 py-3.5 my-4 rounded-lg shadow-xs">
             <div class="text-lg sm:text-[21px] font-serif italic text-ink leading-relaxed tracking-[-0.01em]">«Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую».</div>
             <div class="mt-2 font-serif italic text-[13px] text-ink-muted flex items-center gap-1.5"><span class="font-mono not-italic text-xs text-ink">—</span> заметка на полях лабораторного журнала</div>
           </div>
@@ -1197,13 +1221,13 @@ include __DIR__ . '/includes/header.php';
         </section>
         <?php else: ?>
         <!-- Engineering Article Draft / In-Development Workbench View -->
-        <div class="border border-paper-border border-l-4 border-l-amber-600 bg-paper-subtle/70 p-5 rounded-lg space-y-3">
+        <div class="border border-warning-border bg-warning-bg/30 p-5 rounded-lg space-y-3">
           <div class="flex items-center justify-between flex-wrap gap-2">
-            <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-800 dark:text-amber-400 flex items-center gap-1.5">
+            <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-warning flex items-center gap-1.5">
               <span class="material-symbols-outlined text-[16px]">science</span>
               Инженерный регламент ТЧП // Статус: Лабораторные замеры
             </span>
-            <span class="text-xs font-mono px-2 py-0.5 rounded bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800 font-bold">
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-warning-bg text-ink border border-warning-border font-bold">
               В разработке
             </span>
           </div>

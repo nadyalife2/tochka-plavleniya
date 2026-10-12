@@ -51,7 +51,7 @@ $tchp_head_escape = static function ($value) {
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css">
   <?php if (!empty($extra_head)) echo $extra_head; ?>
   <?php if (function_exists('wp_head')) wp_head(); ?>
@@ -60,19 +60,19 @@ $tchp_head_escape = static function ($value) {
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-3 focus:left-3 focus:bg-accent focus:text-white focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs focus:shadow-md focus:outline-none">
     Перейти к основному содержимому
   </a>
-  <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper/95 backdrop-blur-sm">
+  <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
       <div class="flex items-center gap-6">
         <a class="logo" href="<?= $site_root ?>">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
         <?php include __DIR__ . '/header-nav.php'; ?>
       </div>
       <div class="flex items-center gap-2 sm:gap-3">
-        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
+        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[44px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
           <span class="material-symbols-outlined text-[18px] text-accent">search</span>
           <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
           <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
         </button>
-        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[40px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+        <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[44px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
           <svg class="w-4 h-4 dark:hidden stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
           </svg>
@@ -83,12 +83,12 @@ $tchp_head_escape = static function ($value) {
           <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
         </button>
         <?php if ($current_page === 'interactive'): ?>
-          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>#articles" aria-label="Читать статьи журнала">
+          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>#articles" aria-label="Читать статьи журнала">
             <span>Журнал / Статьи</span>
             <span class="material-symbols-outlined text-[14px]">menu_book</span>
           </a>
         <?php else: ?>
-          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>interactive.php" aria-label="Открыть интерактивный верстак инженера">
+          <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>interactive.php" aria-label="Открыть интерактивный верстак инженера">
             <span>Верстак / Тулзы</span>
             <span class="material-symbols-outlined text-[14px]">build</span>
           </a>

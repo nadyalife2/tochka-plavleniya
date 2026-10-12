@@ -9,6 +9,24 @@ if (!function_exists('e')) {
     }
 }
 
+if (!function_exists('esc_url')) {
+    function esc_url($url): string {
+        return htmlspecialchars((string)$url, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('esc_html')) {
+    function esc_html($text): string {
+        return htmlspecialchars((string)$text, ENT_QUOTES, 'UTF-8');
+    }
+}
+
+if (!function_exists('esc_attr')) {
+    function esc_attr($text): string {
+        return htmlspecialchars((string)$text, ENT_QUOTES, 'UTF-8');
+    }
+}
+
 if (!function_exists('render_tag')) {
     function render_tag($tag_key, $tag_name, $active_tag = '') {
         $is_active = ($active_tag === $tag_key || ($active_tag === '' && $tag_key === 'all')) ? 'active' : '';

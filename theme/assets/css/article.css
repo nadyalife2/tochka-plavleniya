@@ -45,19 +45,20 @@
 .article-hero h1,
 .hero-h1 {
   font-family: var(--font-sans);
-  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-size: var(--text-h1, clamp(1.75rem, 3.2vw, 2.25rem));
   font-weight: 800;
-  line-height: 1.15;
+  line-height: var(--leading-tight, 1.18);
   margin-bottom: 1rem;
   color: var(--color-ink);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-tight, -0.025em);
 }
 
 .hero-sub {
   font-family: var(--font-serif);
-  font-size: 1.1rem;
-  line-height: 1.6;
+  font-size: var(--text-lead, 1.125rem);
+  line-height: var(--leading-normal, 1.55);
   color: var(--color-ink-muted);
+  max-width: 68ch;
 }
 
 /* 3. Контент статьи (Модульная карточная архитектура DESIGN.md) */
@@ -69,6 +70,25 @@
   box-shadow: none !important;
   color: var(--color-ink);
   font-family: var(--font-sans);
+  overflow-wrap: break-word;
+  word-break: normal;
+}
+
+.article-content h1,
+.article-content h2,
+.article-content h3,
+.article-content h4,
+.article-content p,
+.article-content li,
+.article-content blockquote {
+  overflow-wrap: break-word;
+  word-break: normal;
+  min-width: 0;
+}
+
+.article-content a {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .article-content > p:first-of-type,
@@ -77,21 +97,23 @@
   border: 1px solid var(--color-paper-border);
   border-radius: var(--radius-lg, 8px);
   padding: 1.25rem 1.5rem;
-  box-shadow: var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.04));
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0,0,0,0.03));
   font-family: var(--font-serif);
-  font-size: 1.15rem;
-  line-height: 1.7;
+  font-size: var(--text-lead, 1.125rem);
+  line-height: var(--leading-relaxed, 1.7);
   color: var(--color-ink);
   margin-bottom: 1.75rem;
+  max-width: 68ch;
 }
 
 .article-content h2 {
   font-family: var(--font-sans);
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin: 2.25rem 0 1rem;
+  font-size: var(--text-h2, clamp(1.375rem, 2.2vw, 1.625rem));
+  font-weight: 700;
+  line-height: var(--leading-snug, 1.32);
+  letter-spacing: var(--tracking-snug, -0.015em);
+  margin: 2.5rem 0 1rem;
   color: var(--color-ink);
-  letter-spacing: -0.015em;
   border-bottom: none;
   padding-bottom: 0;
   display: flex;
@@ -101,54 +123,145 @@
 .article-content h2::before {
   content: "";
   display: inline-block;
-  width: 4px;
-  height: 1.15em;
+  width: 3px;
+  height: 1.1em;
   background: var(--color-accent);
   border-radius: 2px;
   flex-shrink: 0;
+  transition: transform var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), background-color var(--duration-fast, 150ms) ease;
+}
+.article-content h2:hover::before {
+  transform: scaleY(1.12);
+  background-color: var(--color-accent-hover);
 }
 
 .article-content h3 {
   font-family: var(--font-sans);
-  font-size: 1.2rem;
+  font-size: var(--text-h3, 1.25rem);
   font-weight: 700;
-  margin: 1.5rem 0 0.75rem;
+  line-height: var(--leading-snug, 1.32);
+  letter-spacing: var(--tracking-snug, -0.015em);
+  margin: 2rem 0 0.75rem;
+  color: var(--color-ink);
+}
+
+.article-content h4 {
+  font-family: var(--font-sans);
+  font-size: var(--text-h4, 1.0625rem);
+  font-weight: 600;
+  line-height: var(--leading-snug, 1.35);
+  letter-spacing: var(--tracking-normal, 0em);
+  margin: 1.5rem 0 0.5rem;
   color: var(--color-ink);
 }
 
 .article-content p {
   font-family: var(--font-sans);
-  font-size: 1rem;
-  line-height: 1.7;
+  font-size: var(--text-body, 1rem);
+  line-height: var(--leading-relaxed, 1.7);
   margin-bottom: 1.25rem;
   color: var(--color-ink);
+  max-width: 68ch;
+}
+
+.article-content blockquote {
+  font-family: var(--font-serif);
+  font-size: var(--text-lead, 1.125rem);
+  line-height: var(--leading-relaxed, 1.7);
+  font-style: italic;
+  color: var(--color-ink);
+  border-left: 2px solid var(--color-accent);
+  padding: 0.5rem 0 0.5rem 1.25rem;
+  margin: 1.75rem 0;
+  max-width: 68ch;
+}
+
+.article-content code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-paper-subtle);
+  border: 1px solid var(--color-paper-border);
+  padding: 0.15em 0.4em;
+  border-radius: var(--radius-sm);
+  color: var(--color-ink);
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.article-content pre {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm, 0.875rem);
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+  background: var(--color-paper-subtle);
+  border: 1px solid var(--color-paper-border);
+  padding: 1.25rem;
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.75rem 0;
+  color: var(--color-ink);
+  max-width: min(68ch, 100%);
+}
+
+.article-content pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.article-content a {
+  color: var(--color-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.15s ease, text-decoration-color 0.15s ease;
+}
+.article-content a:hover {
+  color: var(--color-accent);
+  text-decoration-color: var(--color-accent);
 }
 
 .article-content ul,
 .article-content ol {
   margin: 1.25rem 0;
   padding-left: 1.75rem;
+  max-width: 68ch;
 }
 
 .article-content li {
-  font-size: 1.05rem;
-  line-height: 1.65;
+  font-size: var(--text-body, 1rem);
+  line-height: var(--leading-normal, 1.55);
   margin-bottom: 0.5rem;
   color: var(--color-ink);
 }
 
 /* 4. Таблицы (BOM / Спецификации) */
+.wp-block-table,
+.article-content .wp-block-table {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 1.5rem 0;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-paper-border);
+}
+
 .article-content table,
 .prose table,
 .bom-table {
   width: 100%;
+  min-width: 500px;
   border-collapse: collapse;
   font-size: 0.875rem;
-  margin: 1.5rem 0;
+  margin: 0;
   text-align: left;
-  border: 1px solid var(--color-paper-border);
-  border-radius: var(--radius-sm);
-  overflow: hidden;
 }
 
 .article-content th,
@@ -170,7 +283,9 @@
 .bom-table td {
   padding: 0.65rem 0.85rem;
   border-bottom: 1px solid var(--color-paper-border);
-  color: var(--color-ink-muted);
+  color: var(--color-ink);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-normal, 1.55);
 }
 
 .article-content tr:last-child td,
@@ -232,21 +347,18 @@
 
 .callout.tldr {
   background: var(--color-sketch-yellow-bg);
-  border-color: var(--color-sketch-yellow);
-  border-left: 4px solid var(--color-accent);
+  border: 1px solid var(--color-sketch-yellow);
 }
 
 .callout.important,
 .callout.danger {
   background: var(--color-danger-bg);
-  border-color: var(--color-danger-border);
-  border-left: 4px solid var(--color-danger);
+  border: 1px solid var(--color-danger-border);
 }
 
 .callout.tip {
   background: var(--color-success-bg);
-  border-color: var(--color-success-border);
-  border-left: 4px solid var(--color-success);
+  border: 1px solid var(--color-success-border);
 }
 
 /* 7. Адаптивные изображения и подписи */
@@ -337,6 +449,20 @@ html.dark .article-content img {
   background: var(--color-paper-subtle);
   border: 1px solid var(--color-paper-border);
   border-radius: var(--radius-lg, 8px);
+  min-width: 0;
+}
+
+.article-content .wp-block-media-text__content,
+.article-content .wp-block-media-text__media {
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+.article-content .wp-block-media-text__media img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-sm, 4px);
 }
 
 @media (max-width: 768px) {
@@ -361,10 +487,15 @@ html.dark .article-content img {
   border: 1px solid var(--color-paper-border);
   border-radius: 4px;
   padding: 10px 10px 14px 10px;
-  box-shadow: 3px 3px 0px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   display: inline-block;
   margin: 1.5rem auto;
   text-align: center;
+  transition: transform var(--duration-base, 200ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow var(--duration-base, 200ms) ease;
+}
+.is-style-polaroid:hover {
+  transform: translateY(-2px) rotate(-0.5deg);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.09);
 }
 .is-style-polaroid img {
   border: none;
@@ -409,37 +540,52 @@ html.dark .article-content img {
   position: relative !important;
   background: var(--color-sketch-yellow-bg, #fffdf5) !important;
   border: 1px solid var(--color-sketch-yellow, #fde047) !important;
-  border-left: 4px solid var(--color-accent, #eb5211) !important;
   border-radius: var(--radius-md, 8px) !important;
   padding: 1.5rem 1.75rem !important;
   margin: 1.75rem 0 !important;
-  box-shadow: 2px 3px 12px -2px rgba(235, 82, 17, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.03)) !important;
+  max-width: 68ch !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  transition: transform var(--duration-base, 200ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow var(--duration-base, 200ms) ease, border-color var(--duration-base, 200ms) ease !important;
+}
+.callout-tldr:hover,
+.wp-block-group.callout-tldr:hover {
+  transform: translateY(-1.5px) !important;
+  box-shadow: 0 4px 12px rgba(234, 179, 8, 0.14) !important;
+  border-color: #eab308 !important;
 }
 .callout-tldr::before,
 .wp-block-group.callout-tldr::before {
   content: "";
   position: absolute;
-  top: -7px;
+  top: -6px;
   left: 24px;
-  width: 54px;
-  height: 14px;
-  background: rgba(235, 222, 179, 0.9);
-  transform: rotate(-1.5deg);
+  width: 48px;
+  height: 12px;
+  background: rgba(235, 222, 179, 0.85);
+  transform: rotate(-0.5deg);
   border-radius: 1px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
   z-index: 2;
 }
-.callout-tldr h3 {
-  font-family: var(--font-sans) !important;
-  font-size: 1.15rem !important;
-  font-weight: 800 !important;
+.callout-tldr h3,
+.callout-tldr .callout-title {
+  font-family: var(--font-mono) !important;
+  font-size: var(--text-xs, 0.75rem) !important;
+  font-weight: 700 !important;
+  line-height: var(--leading-tight, 1.2) !important;
+  letter-spacing: var(--tracking-wider, 0.07em) !important;
+  text-transform: uppercase !important;
   color: var(--color-ink) !important;
   margin: 0 0 0.5rem 0 !important;
 }
 .callout-tldr p {
   font-family: var(--font-sans) !important;
-  font-size: 0.95rem !important;
-  line-height: 1.65 !important;
+  font-size: var(--text-body, 1rem) !important;
+  font-weight: 500 !important;
+  line-height: var(--leading-relaxed, 1.68) !important;
   color: var(--color-ink) !important;
   margin: 0 !important;
 }
@@ -450,14 +596,23 @@ html.dark .article-content img {
 .marginalia-box,
 .wp-block-group.marginalia-box {
   position: relative !important;
-  background: rgba(254, 249, 195, 0.45) !important;
-  border: 1.5px dashed rgba(202, 138, 4, 0.6) !important;
+  background: rgba(254, 249, 195, 0.35) !important;
+  border: 1px dashed var(--color-paper-border-dark, #cbd5e1) !important;
   border-radius: var(--radius-md, 8px) !important;
   padding: 1.15rem 1.35rem !important;
   margin: 1.5rem 0 !important;
   float: none !important;
-  max-width: 100% !important;
+  max-width: 68ch !important;
   clear: both !important;
+  transition: transform var(--duration-base, 200ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), border-color var(--duration-base, 200ms) ease, box-shadow var(--duration-base, 200ms) ease !important;
+}
+.callout-aside:hover,
+.wp-block-group.callout-aside:hover,
+.marginalia-box:hover,
+.wp-block-group.marginalia-box:hover {
+  transform: translateY(-1px) rotate(-0.25deg) !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04) !important;
 }
 .callout-aside::before,
 .wp-block-group.callout-aside::before,
@@ -469,11 +624,11 @@ html.dark .article-content img {
 .callout-aside p:first-child,
 .wp-block-group.callout-aside p:first-child {
   font-family: var(--font-mono) !important;
-  font-size: 0.75rem !important;
-  font-weight: 800 !important;
+  font-size: var(--text-xs, 0.75rem) !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  color: var(--color-accent, #eb5211) !important;
+  letter-spacing: var(--tracking-wider, 0.07em) !important;
+  color: var(--color-accent-text, #c23f06) !important;
   margin: 0 0 0.35rem 0 !important;
 }
 .callout-aside p:last-child,
@@ -482,7 +637,7 @@ html.dark .article-content img {
 .marginalia-text {
   font-family: var(--font-hand, 'Caveat', cursive) !important;
   font-size: 1.25rem !important;
-  line-height: 1.55 !important;
+  line-height: 1.5 !important;
   letter-spacing: 0.01em !important;
   color: var(--color-ink) !important;
   margin: 0 !important;
@@ -492,24 +647,35 @@ html.dark .article-content img {
 .callout-safety,
 .wp-block-group.callout-safety {
   position: relative !important;
-  background: #fef2f2 !important;
-  border: 1px solid #fecaca !important;
-  border-left: 4px solid #ef4444 !important;
+  background: var(--color-paper-subtle, #f5f2eb) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
   border-radius: var(--radius-md, 8px) !important;
   padding: 1.25rem 1.5rem !important;
   margin: 1.75rem 0 !important;
-  box-shadow: 0 1px 3px rgba(239, 68, 68, 0.08) !important;
+  box-shadow: var(--shadow-card, 0 1px 2px rgba(0, 0, 0, 0.03)) !important;
+  max-width: 68ch !important;
+  transition: border-color var(--duration-base, 200ms) ease, box-shadow var(--duration-base, 200ms) ease, transform var(--duration-base, 200ms) var(--ease-out) !important;
+}
+.callout-safety:hover,
+.wp-block-group.callout-safety:hover {
+  border-color: rgba(235, 82, 17, 0.35) !important;
+  box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
+  transform: translateY(-1px) !important;
 }
 .callout-safety p {
   font-family: var(--font-sans) !important;
-  font-size: 0.95rem !important;
-  line-height: 1.6 !important;
-  color: #991b1b !important;
+  font-size: var(--text-body, 0.9375rem) !important;
+  line-height: var(--leading-normal, 1.6) !important;
+  color: var(--color-ink) !important;
   margin: 0 !important;
 }
 .callout-safety strong {
-  color: #b91c1c !important;
-  font-weight: 800 !important;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs, 0.75rem);
+  letter-spacing: var(--tracking-wide, 0.04em);
+  text-transform: uppercase;
+  color: var(--color-accent-text, #c23f06) !important;
+  font-weight: 700 !important;
 }
 
 /* 11.4 Врезка: Совет мастера (Pro Tip) */
@@ -518,16 +684,32 @@ html.dark .article-content img {
   padding: 1.25rem 1.5rem !important;
   margin: 1.75rem 0 !important;
   border-radius: var(--radius-md, 8px) !important;
-  background: #f0fdf4 !important;
-  border: 1px solid #bbf7d0 !important;
-  border-left: 4px solid #10b981 !important;
+  background: var(--color-paper-subtle, #f5f2eb) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+  box-shadow: var(--shadow-card, 0 1px 2px rgba(0, 0, 0, 0.03)) !important;
+  max-width: 68ch !important;
+  transition: border-color var(--duration-base, 200ms) ease, box-shadow var(--duration-base, 200ms) ease, transform var(--duration-base, 200ms) var(--ease-out) !important;
+}
+.callout-pro:hover,
+.wp-block-group.callout-pro:hover {
+  border-color: rgba(26, 127, 76, 0.35) !important;
+  box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
+  transform: translateY(-1px) !important;
 }
 .callout-pro p {
   font-family: var(--font-sans) !important;
-  font-size: 0.95rem !important;
-  line-height: 1.6 !important;
-  color: #065f46 !important;
+  font-size: var(--text-body, 0.9375rem) !important;
+  line-height: var(--leading-normal, 1.6) !important;
+  color: var(--color-ink) !important;
   margin: 0 !important;
+}
+.callout-pro strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs, 0.75rem);
+  letter-spacing: var(--tracking-wide, 0.04em);
+  text-transform: uppercase;
+  color: var(--color-success, #1a7f4c) !important;
+  font-weight: 700 !important;
 }
 
 /* 11.5 Врезка: Стандарт IPC-A-610 / ГОСТ */
@@ -538,14 +720,30 @@ html.dark .article-content img {
   border-radius: var(--radius-md, 8px) !important;
   background: var(--color-paper-subtle, #f5f2eb) !important;
   border: 1px solid var(--color-paper-border, #e2e8f0) !important;
-  border-left: 4px solid var(--color-ink-muted, #6b665f) !important;
+  box-shadow: var(--shadow-card, 0 1px 2px rgba(0, 0, 0, 0.03)) !important;
+  max-width: 68ch !important;
+  transition: border-color var(--duration-base, 200ms) ease, box-shadow var(--duration-base, 200ms) ease, transform var(--duration-base, 200ms) var(--ease-out) !important;
+}
+.callout-ipc:hover,
+.wp-block-group.callout-ipc:hover {
+  border-color: var(--color-ink-muted) !important;
+  box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
+  transform: translateY(-1px) !important;
 }
 .callout-ipc p {
-  font-family: var(--font-mono) !important;
-  font-size: 0.85rem !important;
-  line-height: 1.6 !important;
+  font-family: var(--font-sans) !important;
+  font-size: var(--text-body, 0.9375rem) !important;
+  line-height: var(--leading-normal, 1.6) !important;
   color: var(--color-ink) !important;
   margin: 0 !important;
+}
+.callout-ipc strong {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs, 0.75rem);
+  letter-spacing: var(--tracking-wide, 0.04em);
+  text-transform: uppercase;
+  color: var(--color-ink-muted) !important;
+  font-weight: 700 !important;
 }
 
 /* 11.6 Карточка оснастки «Что понадобится» (Tools Box) */
@@ -556,15 +754,19 @@ html.dark .article-content img {
   border-radius: var(--radius-lg, 8px) !important;
   padding: 1.5rem 1.75rem !important;
   margin: 2rem 0 !important;
-  box-shadow: 0 2px 8px -1px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.03)) !important;
+  max-width: 68ch !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
 }
-.tools-box h3 {
+.tools-box h3,
+.tools-box h4 {
   font-family: var(--font-mono) !important;
-  font-size: 0.85rem !important;
-  font-weight: 800 !important;
+  font-size: var(--text-xs, 0.75rem) !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  color: var(--color-accent, #eb5211) !important;
+  letter-spacing: var(--tracking-wider, 0.07em) !important;
+  color: var(--color-ink) !important;
   margin: 0 0 1rem 0 !important;
   padding-bottom: 0.5rem !important;
   border-bottom: 1px dashed var(--color-paper-border) !important;
@@ -574,17 +776,21 @@ html.dark .article-content img {
   padding: 0 !important;
   margin: 0 !important;
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)) !important;
   gap: 0.75rem 1.25rem !important;
 }
 .tools-box li {
   position: relative !important;
   padding-left: 1.5rem !important;
   font-family: var(--font-mono) !important;
-  font-size: 0.85rem !important;
-  line-height: 1.5 !important;
+  font-size: var(--text-sm, 0.875rem) !important;
+  line-height: var(--leading-normal, 1.55) !important;
   color: var(--color-ink) !important;
   margin: 0 !important;
+  transition: transform var(--duration-fast, 150ms) var(--ease-out), color var(--duration-fast, 150ms) ease !important;
+}
+.tools-box li:hover {
+  transform: translateX(2px) !important;
 }
 .tools-box li::before {
   content: "▸";
@@ -592,6 +798,11 @@ html.dark .article-content img {
   left: 0;
   color: var(--color-accent);
   font-weight: bold;
+  transition: transform var(--duration-fast, 150ms) ease, color var(--duration-fast, 150ms) ease;
+}
+.tools-box li:hover::before {
+  transform: translateX(1px);
+  color: var(--color-accent-hover);
 }
 
 /* 11.7 Пошаговые карточки регламента (Step Cards) */
@@ -602,24 +813,36 @@ html.dark .article-content img {
   border-radius: var(--radius-lg, 8px) !important;
   padding: 1.5rem 1.75rem !important;
   margin: 1.25rem 0 !important;
-  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05) !important;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.03)) !important;
+  transition: border-color var(--duration-base, 200ms) var(--ease-out), transform var(--duration-base, 200ms) var(--ease-out), box-shadow var(--duration-base, 200ms) ease !important;
+  max-width: 68ch !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
 }
 .step-card:hover {
   border-color: var(--color-accent, #eb5211) !important;
-  transform: translateY(-1px);
+  transform: translateY(-1.5px) !important;
+  box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
+}
+.step-card:hover .step-badge,
+.step-card:hover .step-badge-yellow,
+.step-card:hover .step-badge-orange,
+.step-card:hover .step-badge-mint,
+.step-card:hover .step-badge-blue {
+  transform: scale(1.03);
 }
 .step-card h4 {
   font-family: var(--font-sans) !important;
-  font-size: 1.1rem !important;
-  font-weight: 800 !important;
+  font-size: var(--text-h4, 1.0625rem) !important;
+  font-weight: 700 !important;
+  line-height: var(--leading-snug, 1.35) !important;
   color: var(--color-ink) !important;
   margin: 0.35rem 0 0.5rem 0 !important;
 }
 .step-card p {
   font-family: var(--font-sans) !important;
-  font-size: 0.95rem !important;
-  line-height: 1.65 !important;
+  font-size: var(--text-body, 0.9375rem) !important;
+  line-height: var(--leading-relaxed, 1.65) !important;
   color: var(--color-ink-muted) !important;
   margin: 0 !important;
 }
@@ -630,26 +853,40 @@ html.dark .article-content img {
 .step-badge-blue {
   display: inline-block;
   font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide, 0.05em);
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
   margin-bottom: 0.5rem;
+  transition: transform var(--duration-fast, 150ms) var(--ease-spring);
 }
 .step-badge-orange {
-  background: rgba(235, 82, 17, 0.12);
-  color: var(--color-accent, #eb5211);
-  border: 1px solid rgba(235, 82, 17, 0.25);
+  background: rgba(235, 82, 17, 0.08);
+  color: var(--color-accent-text, #c23f06);
+  border: 1px solid rgba(235, 82, 17, 0.2);
 }
-.step-badge-yellow { background: #fef08a; color: #854d0e; }
-.step-badge-mint   { background: #d1fae5; color: #065f46; }
-.step-badge-blue   { background: #e0f2fe; color: #0369a1; }
+.step-badge-yellow {
+  background: rgba(234, 179, 8, 0.08);
+  color: #a16207;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+.step-badge-mint {
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.step-badge-blue {
+  background: rgba(14, 165, 233, 0.08);
+  color: #0369a1;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
 
 /* 11.8 Сравнение «БРАК vs НОРМА (ДО / ПОСЛЕ)» (Compare Grid) */
 .compare-grid,
 .wp-block-group.compare-grid {
   margin: 2rem 0 !important;
+  max-width: 68ch !important;
 }
 .compare-grid,
 .compare-grid > .wp-block-group__inner-container {
@@ -669,49 +906,60 @@ html.dark .article-content img {
   display: flex !important;
   flex-direction: column !important;
   gap: 0.75rem !important;
-  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.03)) !important;
+  transition: transform var(--duration-base, 200ms) var(--ease-out), box-shadow var(--duration-base, 200ms) ease, border-color var(--duration-base, 200ms) ease !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
+}
+.compare-card:hover {
+  transform: translateY(-1.5px) !important;
+  box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
 }
 .compare-card.defect {
-  background: #fff7f7 !important;
-  border: 1px solid #fecaca !important;
-  border-top: 3px solid #ef4444 !important;
+  background: var(--color-card, #ffffff) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+}
+.compare-card.defect:hover {
+  border-color: rgba(239, 68, 68, 0.45) !important;
 }
 .compare-card.norm {
-  background: #f0fdf4 !important;
-  border: 1px solid #bbf7d0 !important;
-  border-top: 3px solid #10b981 !important;
+  background: var(--color-card, #ffffff) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
+}
+.compare-card.norm:hover {
+  border-color: rgba(16, 185, 129, 0.45) !important;
 }
 .compare-card p {
   font-family: var(--font-sans) !important;
-  font-size: 0.9rem !important;
-  line-height: 1.6 !important;
+  font-size: var(--text-sm, 0.875rem) !important;
+  line-height: var(--leading-normal, 1.55) !important;
   color: var(--color-ink) !important;
   margin: 0 !important;
 }
 .badge-defect {
   display: inline-block;
-  padding: 0.25rem 0.6rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 4px;
-  background: #fef2f2;
-  color: #dc2626;
-  border: 1px solid #fca5a5;
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  border: 1px solid rgba(239, 68, 68, 0.2);
   font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide, 0.05em);
   text-transform: uppercase;
 }
 .badge-norm {
   display: inline-block;
-  padding: 0.25rem 0.6rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 4px;
-  background: #f0fdf4;
-  color: #059669;
-  border: 1px solid #86efac;
+  background: rgba(16, 185, 129, 0.08);
+  color: #047857;
+  border: 1px solid rgba(16, 185, 129, 0.2);
   font-family: var(--font-mono, monospace);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
+  font-size: var(--text-xs, 0.75rem);
+  font-weight: 700;
+  letter-spacing: var(--tracking-wide, 0.05em);
   text-transform: uppercase;
 }
 
@@ -723,16 +971,20 @@ html.dark .article-content img {
   border-radius: var(--radius-lg, 8px) !important;
   padding: 1.5rem 1.75rem !important;
   margin: 2rem 0 !important;
-  box-shadow: 0 2px 6px -1px rgba(0, 0, 0, 0.05) !important;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.03)) !important;
+  max-width: 68ch !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
 }
 .checklist-box h3,
+.checklist-box h4,
 .checklist-box p:first-child {
   font-family: var(--font-mono) !important;
-  font-size: 0.85rem !important;
-  font-weight: 800 !important;
+  font-size: var(--text-xs, 0.75rem) !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.06em !important;
-  color: var(--color-accent, #eb5211) !important;
+  letter-spacing: var(--tracking-wider, 0.07em) !important;
+  color: var(--color-ink) !important;
   margin: 0 0 1rem 0 !important;
   padding-bottom: 0.5rem !important;
   border-bottom: 1px dashed var(--color-paper-border) !important;
@@ -750,13 +1002,48 @@ html.dark .article-content img {
   font-size: 0.85rem !important;
   line-height: 1.5 !important;
   color: var(--color-ink) !important;
-  padding-bottom: 0.5rem !important;
+  padding: 0.3rem 0.4rem !important;
   border-bottom: 1px dashed var(--color-paper-border) !important;
   margin: 0 !important;
+  border-radius: var(--radius-sm, 4px);
+  transition: background-color var(--duration-fast, 150ms) ease, padding-left var(--duration-fast, 150ms) var(--ease-out) !important;
+}
+.checklist-box li:hover {
+  background-color: var(--color-paper-subtle) !important;
+  padding-left: 0.65rem !important;
 }
 .checklist-box li:last-child {
   border-bottom: none !important;
-  padding-bottom: 0 !important;
+}
+.checklist-box .checklist-item {
+  font-family: var(--font-mono) !important;
+  font-size: var(--text-sm, 0.875rem) !important;
+  line-height: var(--leading-normal, 1.55) !important;
+  color: var(--color-ink) !important;
+  padding: 0.35rem 0.5rem !important;
+  border-bottom: 1px dashed var(--color-paper-border) !important;
+  margin: 0.35rem 0 0 0 !important;
+  max-width: 68ch !important;
+  border-radius: var(--radius-sm, 4px);
+  transition: background-color var(--duration-fast, 150ms) ease, padding-left var(--duration-fast, 150ms) var(--ease-out) !important;
+}
+.checklist-box .checklist-item:hover {
+  background-color: var(--color-paper-subtle) !important;
+  padding-left: 0.75rem !important;
+}
+.checklist-box .checklist-item:last-child {
+  border-bottom: none !important;
+}
+.checklist-box .check-icon {
+  display: inline-block;
+  color: var(--color-success, #1a7f4c) !important;
+  font-weight: 700 !important;
+  margin-right: 0.35rem !important;
+  transition: transform var(--duration-fast, 150ms) var(--ease-spring);
+}
+.checklist-box li:hover .check-icon,
+.checklist-box .checklist-item:hover .check-icon {
+  transform: scale(1.15);
 }
 
 /* 11.10 Карточки FAQ (FAQ Items) */
@@ -767,38 +1054,47 @@ html.dark .article-content img {
   border-radius: var(--radius-lg, 8px) !important;
   padding: 1.25rem 1.5rem !important;
   margin: 0.85rem 0 !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03) !important;
-  transition: border-color 0.15s ease;
+  box-shadow: var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.03)) !important;
+  transition: border-color var(--duration-base, 200ms) var(--ease-out), transform var(--duration-base, 200ms) var(--ease-out), box-shadow var(--duration-base, 200ms) ease !important;
+  max-width: 68ch !important;
+  min-width: 0 !important;
+  overflow-wrap: break-word !important;
 }
 .faq-item:hover {
   border-color: var(--color-accent, #eb5211) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
 }
+.faq-item h4,
 .faq-item p:first-child {
   font-family: var(--font-sans) !important;
-  font-size: 1rem !important;
-  font-weight: 800 !important;
+  font-size: var(--text-h4, 1.0625rem) !important;
+  font-weight: 700 !important;
+  line-height: var(--leading-snug, 1.35) !important;
   color: var(--color-ink) !important;
   margin: 0 0 0.5rem 0 !important;
 }
 .faq-item p:last-child {
   font-family: var(--font-sans) !important;
-  font-size: 0.95rem !important;
-  line-height: 1.65 !important;
+  font-size: var(--text-body, 0.9375rem) !important;
+  line-height: var(--leading-normal, 1.6) !important;
   color: var(--color-ink-muted) !important;
   margin: 0 !important;
 }
 
 /* 11.11 Крупная цитата / принцип (Quote Hero) */
 .quote-hero {
-  border-left: 4px solid var(--color-accent, #ea580c);
+  border: 1px solid var(--color-paper-border);
   background: var(--color-paper-subtle, #f5f2eb);
   padding: 1.5rem 1.75rem;
   margin: 2rem 0;
   border-radius: var(--radius-md, 6px);
   font-family: var(--font-serif, Georgia, serif);
-  font-size: 1.25rem;
-  line-height: 1.6;
+  font-size: var(--text-lead, 1.125rem);
+  line-height: var(--leading-relaxed, 1.65);
+  font-style: italic;
   color: var(--color-ink, #1a1a1a);
+  max-width: 68ch;
 }
 
 /* 11.12 Макро-галерея (Gallery Macro) */
@@ -824,6 +1120,16 @@ html.dark .article-content img {
   border: 1px solid var(--color-paper-border);
   border-radius: var(--radius-lg, 8px);
   background: var(--color-card, #ffffff);
+}
+.sketch-frame svg circle,
+.thermal-profile svg circle {
+  transition: r var(--duration-fast, 150ms) var(--ease-spring), stroke-width var(--duration-fast, 150ms) ease;
+  cursor: pointer;
+}
+.sketch-frame svg circle:hover,
+.thermal-profile svg circle:hover {
+  r: 8px;
+  stroke-width: 3px;
 }
 
 /* 12. ТЁМНАЯ ТЕМА (DARK MODE) */
@@ -864,6 +1170,33 @@ html.dark .compare-card.norm {
   background: #0d2818 !important;
   border-color: #065f46 !important;
 }
+
+/* 13. ДОСТУПНОСТЬ: РЕЖИМ REDUCED MOTION (WCAG 2.1 AAA) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .step-card:hover,
+  .compare-card:hover,
+  .faq-item:hover,
+  .callout-tldr:hover,
+  .callout-aside:hover,
+  .callout-safety:hover,
+  .callout-pro:hover,
+  .callout-ipc:hover,
+  .is-style-polaroid:hover,
+  .tools-box li:hover,
+  .checklist-box li:hover,
+  .checklist-box .checklist-item:hover {
+    transform: none !important;
+  }
+}
+
 
 
 

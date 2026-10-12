@@ -36,8 +36,8 @@ function tchp_build_gutenberg_content($item) {
     // 2. Стикер TL;DR (Главный вывод)
     $tldr = !empty($item['tldr']) ? $item['tldr'] : (!empty($item['excerpt']) ? $item['excerpt'] : 'Перед началом пайки всегда прогревайте плату нижним подогревом и контролируйте смачивание галтели.');
     $out[] = '<!-- wp:group {"className":"callout-tldr"} -->';
-    $out[] = '<div class="wp-block-group callout-tldr"><!-- wp:heading {"level":3,"className":"font-hand text-2xl font-bold mb-2 text-ink"} -->';
-    $out[] = '<h3 class="font-hand text-2xl font-bold mb-2 text-ink">📌 Главный принцип (TL;DR)</h3>';
+    $out[] = '<div class="wp-block-group callout-tldr"><!-- wp:heading {"level":3,"className":"font-mono text-sm font-bold uppercase tracking-wider mb-2 text-ink"} -->';
+    $out[] = '<h3 class="font-mono text-sm font-bold uppercase tracking-wider mb-2 text-ink">[ПРИНЦИП // TL;DR]</h3>';
     $out[] = '<!-- /wp:heading --><!-- wp:paragraph {"className":"text-ink/90 leading-relaxed m-0"} -->';
     $out[] = '<p class="text-ink/90 leading-relaxed m-0">' . esc_html($tldr) . '</p>';
     $out[] = '<!-- /wp:paragraph --></div>';
@@ -47,7 +47,7 @@ function tchp_build_gutenberg_content($item) {
     $aside = !empty($item['danger_rule']['hand']) ? strip_tags($item['danger_rule']['hand']) : '«Не дави жалом на текстолит — тепло передаёт капля припоя и флюс, а не механическое усилие!»';
     $out[] = '<!-- wp:group {"className":"callout-aside"} -->';
     $out[] = '<div class="wp-block-group callout-aside"><!-- wp:paragraph {"className":"font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1"} -->';
-    $out[] = '<p class="font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">🏷️ ЗАМЕТКА НА ПОЛЯХ</p>';
+    $out[] = '<p class="font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">[ЗАМЕТКА НА ПОЛЯХ]</p>';
     $out[] = '<!-- /wp:paragraph --><!-- wp:paragraph {"className":"text-xs leading-relaxed m-0"} -->';
     $out[] = '<p class="text-xs leading-relaxed m-0">' . esc_html($aside) . '</p>';
     $out[] = '<!-- /wp:paragraph --></div>';
@@ -58,7 +58,7 @@ function tchp_build_gutenberg_content($item) {
     $danger_title = !empty($item['danger_rule']['title']) ? $item['danger_rule']['title'] : 'ОШИБКА: ПЕРЕГРЕВ И ТЕРМОУДАР';
     $out[] = '<!-- wp:group {"className":"callout-safety"} -->';
     $out[] = '<div class="wp-block-group callout-safety"><!-- wp:paragraph {"className":"m-0"} -->';
-    $out[] = '<p class="m-0">⚠️ <strong>' . esc_html($danger_title) . ':</strong> ' . esc_html($danger) . '</p>';
+    $out[] = '<p class="m-0"><strong>[ВНИМАНИЕ // ' . esc_html($danger_title) . ']:</strong> ' . esc_html($danger) . '</p>';
     $out[] = '<!-- /wp:paragraph --></div>';
     $out[] = '<!-- /wp:group -->';
 
@@ -66,7 +66,7 @@ function tchp_build_gutenberg_content($item) {
     $tools = !empty($item['required_tools']) ? $item['required_tools'] : ['Паяльная станция' => 'с контролем температуры жала', 'Флюс' => 'NC-559 или канифольный гель ROL0', 'Припой' => 'Sn63Pb37 Ø 0.5–0.8 мм'];
     $out[] = '<!-- wp:group {"className":"tools-box"} -->';
     $out[] = '<div class="wp-block-group tools-box"><!-- wp:heading {"level":3,"className":"text-sm font-mono font-bold uppercase tracking-wider text-ink mb-2"} -->';
-    $out[] = '<h3 class="text-sm font-mono font-bold uppercase tracking-wider text-ink mb-2">🧰 НЕОБХОДИМЫЙ ИНСТРУМЕНТ И ОСНАСТКА</h3>';
+    $out[] = '<h3 class="text-sm font-mono font-bold uppercase tracking-wider text-ink mb-2">[ОСНАСТКА] ТЕХНОЛОГИЧЕСКИЙ НАБОР</h3>';
     $out[] = '<!-- /wp:heading --><!-- wp:list {"className":"space-y-1 font-mono text-xs text-ink/90"} -->';
     $out[] = '<ul class="space-y-1 font-mono text-xs text-ink/90">';
     foreach ($tools as $t_name => $t_spec) {
@@ -141,14 +141,14 @@ function tchp_build_gutenberg_content($item) {
     // 8. Совет мастера (Pro Tip)
     $out[] = '<!-- wp:group {"className":"callout-pro"} -->';
     $out[] = '<div class="wp-block-group callout-pro"><!-- wp:paragraph {"className":"m-0"} -->';
-    $out[] = '<p class="m-0">💡 <strong>СОВЕТ МАСТЕРА:</strong> Держите жало всегда залуженным свежей каплей припоя прямо перед выключением станции. Оксидная плёнка мгновенно растёт на сухом горячем никелевом покрытии и убивает теплопередачу.</p>';
+    $out[] = '<p class="m-0"><strong>[РЕКОМЕНДАЦИЯ // СОВЕТ]:</strong> Держите жало всегда залуженным свежей каплей припоя прямо перед выключением станции. Оксидная плёнка мгновенно растёт на сухом горячем никелевом покрытии и убивает теплопередачу.</p>';
     $out[] = '<!-- /wp:paragraph --></div>';
     $out[] = '<!-- /wp:group -->';
 
     // 9. Стандарт IPC-A-610 / ГОСТ
     $out[] = '<!-- wp:group {"className":"callout-ipc"} -->';
     $out[] = '<div class="wp-block-group callout-ipc"><!-- wp:paragraph {"className":"m-0"} -->';
-    $out[] = '<p class="m-0">📜 <strong>СТАНДАРТ IPC-A-610G (Класс 3 / Промышленная надёжность):</strong> Толщина интерметаллического соединения (IMC) Cu6Sn5 на границе медь-припой должна быть в диапазоне 0.5–1.5 мкм. Превышение толщины из-за перегрева делает шов хрупким при термоциклировании.</p>';
+    $out[] = '<p class="m-0"><strong>[СТАНДАРТ IPC-A-610G // Класс 3]:</strong> Толщина интерметаллического соединения (IMC) Cu6Sn5 на границе медь-припой должна быть в диапазоне 0.5–1.5 мкм. Превышение толщины из-за перегрева делает шов хрупким при термоциклировании.</p>';
     $out[] = '<!-- /wp:paragraph --></div>';
     $out[] = '<!-- /wp:group -->';
 
@@ -161,7 +161,7 @@ function tchp_build_gutenberg_content($item) {
     ];
     $out[] = '<!-- wp:group {"className":"checklist-box"} -->';
     $out[] = '<div class="wp-block-group checklist-box">';
-    $out[] = '<span class="font-mono text-xs font-bold uppercase tracking-wider text-accent mb-2 block">☑️ ПРЕДПОЛЁТНЫЙ ЧЕК-ЛИСТ ОПЕРАЦИИ</span>';
+    $out[] = '<span class="font-mono text-xs font-bold uppercase tracking-wider text-accent mb-2 block">[КОНТРОЛЬ] ПРЕДПОЛЁТНЫЙ ЧЕК-ЛИСТ ОПЕРАЦИИ</span>';
     $out[] = '<!-- wp:list {"className":"space-y-1 font-mono text-xs text-ink/90"} -->';
     $out[] = '<ul class="space-y-1 font-mono text-xs text-ink/90">';
     foreach ($chk as $ci) {
@@ -187,7 +187,7 @@ function tchp_build_gutenberg_content($item) {
         foreach ($item['faq'] as $q => $a) {
             $out[] = '<!-- wp:group {"className":"faq-item"} -->';
             $out[] = '<div class="wp-block-group faq-item">';
-            $out[] = '<!-- wp:heading {"level":4,"className":"text-sm font-bold text-ink m-0"} --><h4 class="text-sm font-bold text-ink m-0">❓ ' . esc_html($q) . '</h4><!-- /wp:heading -->';
+            $out[] = '<!-- wp:heading {"level":4,"className":"text-sm font-bold text-ink m-0"} --><h4 class="text-sm font-bold text-ink m-0">[ВОПРОС] ' . esc_html($q) . '</h4><!-- /wp:heading -->';
             $out[] = '<!-- wp:paragraph {"className":"text-xs text-ink-muted leading-relaxed mt-1 m-0"} --><p class="text-xs text-ink-muted leading-relaxed mt-1 m-0">' . esc_html($a) . '</p><!-- /wp:paragraph -->';
             $out[] = '</div>';
             $out[] = '<!-- /wp:group -->';
@@ -391,7 +391,6 @@ function tchp_render_import_admin_page() {
     ?>
     <div class="wrap" style="max-width: 900px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
         <h1 style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 28px;">🔥</span> 
             <span>Импорт базы знаний «ТОЧКА ПЛАВЛЕНИЯ»</span>
         </h1>
         
@@ -401,7 +400,7 @@ function tchp_render_import_admin_page() {
 
         <?php if ($result): ?>
             <div class="notice notice-success is-dismissible" style="padding: 14px; border-left-color: #f59e0b;">
-                <h3 style="margin-top: 0; color: #b45309;">✅ Импорт успешно завершён!</h3>
+                <h3 style="margin-top: 0; color: #b45309;">[ГОТОВО] Импорт успешно завершён!</h3>
                 <p>
                     <strong>Создано рубрик:</strong> <?= (int)$result['created_cats'] ?><br>
                     <strong>Создано новых статей:</strong> <?= count($result['created_posts']) ?><br>
@@ -418,7 +417,7 @@ function tchp_render_import_admin_page() {
             
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0;">
                 <div style="background: #fdfbf7; border: 1px solid #e7e0d3; padding: 12px; border-radius: 4px;">
-                    <strong>📁 4 рубрики:</strong>
+                    <strong>[РУБРИКИ] 4 направления:</strong>
                     <ul style="margin: 6px 0 0 16px; list-style: disc; font-size: 13px;">
                         <li>Старт и база (<code>start</code>)</li>
                         <li>Материалы и сплавы (<code>materialy</code>)</li>
@@ -427,7 +426,7 @@ function tchp_render_import_admin_page() {
                     </ul>
                 </div>
                 <div style="background: #fdfbf7; border: 1px solid #e7e0d3; padding: 12px; border-radius: 4px;">
-                    <strong>📝 22 инженерных регламента:</strong>
+                    <strong>[СТАТЬИ] 22 инженерных регламента:</strong>
                     <ul style="margin: 6px 0 0 16px; list-style: disc; font-size: 13px;">
                         <li>12 флагманских статей журнала</li>
                         <li>10 прикладных микроуроков верстака</li>
@@ -441,7 +440,7 @@ function tchp_render_import_admin_page() {
                 <?php wp_nonce_field('tchp_import_nonce'); ?>
                 <input type="hidden" name="tchp_run_import_action" value="1">
                 <button type="submit" class="button button-primary button-hero" style="background: #f59e0b; border-color: #d97706; color: #1c1917; font-weight: bold; text-shadow: none; box-shadow: 2px 2px 0 #2c2523;">
-                    🚀 Создать все статьи и рубрики в базе данных
+                    Создать все статьи и рубрики в базе данных
                 </button>
             </form>
         </div>

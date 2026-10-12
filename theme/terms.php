@@ -15,7 +15,7 @@ include __DIR__ . '/includes/header.php';
 ?>
 
   <!-- Main Content -->
-  <main class="w-full flex-grow pt-8 pb-20">
+  <main class="w-full flex-grow pt-8 pb-20" id="main-content">
     <div class="max-w-[960px] mx-auto px-5 sm:px-8">
       
       <!-- Breadcrumbs -->

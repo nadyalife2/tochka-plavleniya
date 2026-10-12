@@ -14,7 +14,7 @@ include __DIR__ . '/includes/header.php';
 ?>
 
   <!-- Main Container -->
-  <main class="interactive w-full flex-grow pt-8 pb-16 relative">
+  <main class="interactive w-full flex-grow pt-8 pb-16 relative" id="main-content">
 
     <!-- Desktop Floating Engineering Index (TOC Rail) -->
     <aside class="workbench-toc-rail" aria-label="Инженерный навигатор верстака">
@@ -87,7 +87,7 @@ include __DIR__ . '/includes/header.php';
           </h1>
 
           <!-- Lead text -->
-          <p class="text-base sm:text-lg text-ink/80 font-serif leading-relaxed">
+          <p class="text-base sm:text-lg text-ink/90 font-serif leading-relaxed">
             Решение конкретных монтажных задач за 1 клик: расчет безопасного терморежима станции, подбор паяльного оборудования под бюджет, интерактивная диагностика причин брака и нормы расхода химии.
           </p>
 
@@ -118,7 +118,7 @@ include __DIR__ . '/includes/header.php';
                     </span>
                     <span class="card-title">Терморежим</span>
                   </div>
-                  <span class="fig-badge">FIG. 1.1</span>
+                  <span class="fig-badge">[ЧЕРТЁЖ // FIG. 1.1]</span>
                 </div>
 
                 <div class="card-diagram">
@@ -169,7 +169,7 @@ include __DIR__ . '/includes/header.php';
                     </span>
                     <span class="card-title">Выбор железа</span>
                   </div>
-                  <span class="fig-badge">FIG. 2.1</span>
+                  <span class="fig-badge">[СПЕЦИФИКАЦИЯ // FIG. 2.1]</span>
                 </div>
 
                 <div class="card-diagram">
@@ -208,7 +208,7 @@ include __DIR__ . '/includes/header.php';
                     </span>
                     <span class="card-title">Диагностика</span>
                   </div>
-                  <span class="fig-badge">FIG. 3.1</span>
+                  <span class="fig-badge">[ДЕФЕКТОСКОП // FIG. 3.1]</span>
                 </div>
 
                 <div class="card-diagram">
@@ -296,16 +296,16 @@ include __DIR__ . '/includes/header.php';
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="quick-task-buttons">
             <button type="button" data-task="wire" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              Провод
+              <span class="opacity-60 mr-1 text-[10px] font-normal">[01]</span>Провод
             </button>
             <button type="button" data-task="pcb" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              Плата
+              <span class="opacity-60 mr-1 text-[10px] font-normal">[02]</span>Плата SMD
             </button>
             <button type="button" data-task="pipe" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              Труба
+              <span class="opacity-60 mr-1 text-[10px] font-normal">[03]</span>Медь / Труба
             </button>
             <button type="button" data-task="unknown" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              Не знаю
+              <span class="opacity-60 mr-1 text-[10px] font-normal">[04]</span>Помощь ОТК
             </button>
           </div>
         </div>
@@ -344,17 +344,6 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <button type="button" id="temp-calc-btn" class="btn-primary w-full mt-4 min-h-[48px]">Рассчитать терморежим</button>
-
-            <!-- Temperature Meter Scale -->
-            <div id="temp-meter-box" class="p-3.5 rounded border border-paper-border bg-paper-subtle space-y-2" style="display:none;">
-              <div class="flex items-center justify-between text-xs font-mono">
-                <span class="text-ink-muted uppercase">Шкала температуры станции:</span>
-                <span class="text-ink-faint">100°C ───── 320°C ───── 450°C</span>
-              </div>
-              <div class="meter-bar">
-                <div id="temp-bar-fill" class="meter-fill" style="width: 55%; background-color: var(--color-accent);"></div>
-              </div>
-            </div>
           </div>
 
           <!-- Result Board (Specification Card) -->
@@ -364,7 +353,7 @@ include __DIR__ . '/includes/header.php';
               <div class="flex items-center justify-between pb-3 border-b border-paper-border">
                 <div class="flex items-center gap-2">
                   <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
-                  <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">КАРТА ТЕРМОРЕЖИМА</span>
+                  <span class="font-mono text-xs font-bold uppercase tracking-wider text-ink">ПРОТОКОЛ ТЕРМОРЕЖИМА // СТАНЦИЯ</span>
                 </div>
                 <span id="temp-status-badge" class="font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink">ОРИЕНТИР</span>
               </div>
@@ -397,25 +386,39 @@ include __DIR__ . '/includes/header.php';
               <div id="temp-result-content" aria-live="polite" aria-atomic="true" class="hidden space-y-3.5">
                 
                 <!-- Строка 1: Ориентир температуры -->
-                <div class="p-3.5 rounded border border-paper-border bg-paper space-y-1">
+                <div class="p-3.5 rounded border border-paper-border bg-paper space-y-2">
                   <div class="flex items-center justify-between font-mono text-xs">
-                    <span class="text-ink-muted uppercase font-bold">1. ОРИЕНТИР ТЕМПЕРАТУРЫ:</span>
-                    <span id="temp-mode-label" class="text-xs font-mono text-ink-faint">УСТАВКА СТАНЦИИ</span>
+                    <span class="text-ink-muted uppercase font-bold">1. УСТАВКА СТАНЦИИ:</span>
+                    <span id="temp-mode-label" class="text-xs font-mono text-ink-faint">ПО ТЕРМОПАРЕ // ±5°C</span>
                   </div>
                   <div class="flex items-baseline gap-2 flex-wrap pt-0.5">
                     <div id="temp-range-display" class="text-2xl sm:text-3xl font-bold font-mono text-accent leading-none">
                       260 – 310 °C
                     </div>
-                    <span id="temp-tip-display" class="text-xs font-mono text-ink-muted">на индикаторе</span>
+                    <span id="temp-tip-display" class="text-xs font-mono text-ink-muted">на индикаторе станции</span>
                   </div>
+
+                  <!-- Встроенная шкала температуры станции с физикой нагрева -->
+                  <div id="temp-meter-box" class="pt-2 pb-1 space-y-1.5" style="display:none;">
+                    <div class="meter-bar">
+                      <div id="temp-bar-fill" class="meter-fill" style="width: 50%; background-color: var(--color-accent);"></div>
+                    </div>
+                    <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint">
+                      <span>100°C</span>
+                      <span class="opacity-70">200°C</span>
+                      <span class="opacity-90 font-bold text-accent">300°C</span>
+                      <span>450°C</span>
+                    </div>
+                  </div>
+
                   <div id="temp-advice-display" class="text-xs font-mono text-ink-muted pt-1"></div>
                 </div>
 
                 <!-- Строка 2: «НЕЛЬЗЯ» (категорический запрет и опасный фактор) -->
-                <div id="temp-warn-box" class="p-3.5 rounded border-l-4 border-red-500 bg-red-500/10 space-y-1">
-                  <div class="flex items-center gap-1.5 font-mono text-xs font-bold text-red-600 dark:text-red-400">
+                <div id="temp-warn-box" class="p-3.5 rounded border border-danger-border bg-danger-bg space-y-1">
+                  <div class="flex items-center gap-1.5 font-mono text-xs font-bold text-danger">
                     <svg class="w-4 h-4 shrink-0 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-                    <span>2. КАТЕГОРИЧЕСКИ НЕЛЬЗЯ:</span>
+                    <span>2. ТЕХНОЛОГИЧЕСКИЙ ЗАПРЕТ:</span>
                   </div>
                   <p id="temp-warn-display" class="font-mono text-xs text-ink leading-relaxed">
                     Не греть полигон дольше 3 секунд и не давить жалом на контактную площадку.
@@ -425,7 +428,7 @@ include __DIR__ . '/includes/header.php';
                 <!-- Строка 3: Ссылка на одну статью -->
                 <div id="temp-article-box" class="p-3.5 rounded border border-paper-border bg-paper space-y-1">
                   <span class="text-xs font-mono text-ink-muted uppercase block font-bold">3. РУКОВОДСТВО:</span>
-                  <a id="temp-article-link" href="article.php?slug=temperaturnye-profili" class="text-xs font-mono font-bold text-ink hover:text-accent underline flex items-center justify-between group">
+                  <a id="temp-article-link" href="<?= function_exists('home_url') ? esc_url(home_url('/temperaturnye-profili/')) : 'article.php?slug=temperaturnye-profili' ?>" class="text-xs font-mono font-bold text-ink hover:text-accent underline flex items-center justify-between group">
                     <span id="temp-article-title">Температурные профили: как не перегреть плату</span>
                     <span class="group-hover:translate-x-1 transition-transform">→</span>
                   </a>
@@ -913,7 +916,7 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <div id="flux-article-link" class="pt-3 border-t border-paper-border">
-              <a href="article.php?slug=gid-po-flyusam" class="inline-flex items-center gap-1.5 text-xs font-mono text-accent font-bold hover:underline">
+              <a href="<?= esc_url($site_root . 'gid-po-flyusam/') ?>" class="inline-flex items-center gap-1.5 text-xs font-mono text-accent font-bold hover:underline">
                 <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0.5-.05"/><path d="M6 2v17.5a2.5 2.5 0 0 1 2.5-2.5H20"/></svg>
                 <span>Читать подробный гид по флюсам</span>
               </a>
@@ -980,7 +983,7 @@ include __DIR__ . '/includes/header.php';
               </div>
             </div>
             <div class="pt-3 border-t border-paper-border text-center">
-              <a href="article.php?slug=temperaturnye-profili" class="inline-flex items-center gap-1.5 text-xs font-mono text-accent font-bold hover:underline">
+              <a href="<?= esc_url($site_root . 'temperaturnye-profili/') ?>" class="inline-flex items-center gap-1.5 text-xs font-mono text-accent font-bold hover:underline">
                 <svg class="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0.5-.05"/><path d="M6 2v17.5a2.5 2.5 0 0 1 2.5-2.5H20"/></svg>
                 <span>Как правильно дозировать припой</span>
               </a>
@@ -1096,7 +1099,7 @@ include __DIR__ . '/includes/header.php';
             <div class="space-y-2">
               <span class="pill-orange text-[10px] uppercase font-bold">Основы</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
-                <a href="article.php?slug=temperaturnye-profili">
+                <a href="<?= esc_url($site_root . 'temperaturnye-profili/') ?>">
                   Температурные профили: как не перегреть плату
                 </a>
               </h3>
@@ -1104,7 +1107,7 @@ include __DIR__ . '/includes/header.php';
                 Теплоемкость текстолита и кривые нагрева для BGA-монтажа.
               </p>
             </div>
-            <a href="article.php?slug=temperaturnye-profili" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
+            <a href="<?= esc_url($site_root . 'temperaturnye-profili/') ?>" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
               Читать регламент →
             </a>
           </article>
@@ -1114,7 +1117,7 @@ include __DIR__ . '/includes/header.php';
             <div class="space-y-2">
               <span class="pill-orange text-[10px] uppercase font-bold">Материалы</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
-                <a href="article.php?slug=gid-po-flyusam">
+                <a href="<?= esc_url($site_root . 'gid-po-flyusam/') ?>">
                   Гид по флюсам: RMA, NC и no-clean в шприце
                 </a>
               </h3>
@@ -1122,7 +1125,7 @@ include __DIR__ . '/includes/header.php';
                 Какой флюс оставить, а какой обязательно смыть с платы.
               </p>
             </div>
-            <a href="article.php?slug=gid-po-flyusam" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
+            <a href="<?= esc_url($site_root . 'gid-po-flyusam/') ?>" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
               Читать регламент →
             </a>
           </article>
@@ -1132,7 +1135,7 @@ include __DIR__ . '/includes/header.php';
             <div class="space-y-2">
               <span class="pill-orange text-[10px] uppercase font-bold">Инструменты</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
-                <a href="article.php?slug=zhala-payalnika">
+                <a href="<?= esc_url($site_root . 'zhala-payalnika/') ?>">
                   Жала паяльника: T12 против JBC C245
                 </a>
               </h3>
@@ -1140,7 +1143,7 @@ include __DIR__ . '/includes/header.php';
                 Скорость нагрева, теплоотдача и ресурс картриджей.
               </p>
             </div>
-            <a href="article.php?slug=zhala-payalnika" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
+            <a href="<?= esc_url($site_root . 'zhala-payalnika/') ?>" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
               Читать регламент →
             </a>
           </article>
@@ -1150,7 +1153,7 @@ include __DIR__ . '/includes/header.php';
             <div class="space-y-2">
               <span class="pill-orange text-[10px] uppercase font-bold">Материалы</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
-                <a href="article.php?slug=splav-roze">
+                <a href="<?= esc_url($site_root . 'splav-roze/') ?>">
                   Сплав Розе и Вуда: риски и правила
                 </a>
               </h3>
@@ -1158,7 +1161,7 @@ include __DIR__ . '/includes/header.php';
                 Как не оставить хрупкий сплав в силовом контакте.
               </p>
             </div>
-            <a href="article.php?slug=splav-roze" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
+            <a href="<?= esc_url($site_root . 'splav-roze/') ?>" class="text-xs font-mono font-bold text-ink group-hover:text-accent pt-2 border-t border-paper-border">
               Читать регламент →
             </a>
           </article>
