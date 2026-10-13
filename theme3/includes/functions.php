@@ -332,3 +332,20 @@ if (!function_exists('render_rubric_schema')) {
         return "<script type=\"application/ld+json\">\n" . json_encode($schema, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) . "\n</script>";
     }
 }
+
+if (!function_exists('tchp_get_article_url')) {
+    /**
+     * Возвращает корректный URL статьи как для WordPress, так и для автономного PHP-сервера
+     */
+    function tchp_get_article_url(string $slug, int $id = 0): string {
+        $site_root = function_exists('home_url') ? home_url('/') : '/';
+        if (function_exists('get_permalink') && $id > 0 && function_exists('get_post') && get_post($id)) {
+            return get_permalink($id);
+        }
+        if (function_exists('home_url') && function_exists('get_posts')) {
+            return home_url('/' . urlencode($slug) . '/');
+        }
+        return $site_root . 'article.php?slug=' . urlencode($slug);
+    }
+}
+

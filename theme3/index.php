@@ -61,9 +61,7 @@ if (count($recent_articles) < 4) {
     $needed = 4 - count($recent_articles);
     $static_candidates = array_slice($articles, 0, $needed);
     foreach ($static_candidates as $sa) {
-        $link = function_exists('home_url') 
-            ? home_url('/' . urlencode($sa['slug']) . '/') 
-            : ('/' . urlencode($sa['slug']) . '/');
+        $link = tchp_get_article_url($sa['slug'], $sa['id'] ?? 0);
         $sa_img = $sa['image'] ?? ($assets_base . '/assets/img/og-cover.png');
         if (str_starts_with($sa_img, '/') && !empty($assets_base)) {
             $sa_img = rtrim($assets_base, '/') . $sa_img;
@@ -308,7 +306,7 @@ include __DIR__ . '/includes/header.php';
           $layout_classes = ['card--big', 'card--tall', 'card--mid', 'card--mid'];
           foreach ($recent_articles as $idx => $article): 
             $cls = $layout_classes[$idx] ?? 'card--mid';
-            $art_url = !empty($article['url']) ? $article['url'] : (function_exists('home_url') ? home_url('/' . urlencode($article['slug'] ?? '') . '/') : ('/' . urlencode($article['slug'] ?? '') . '/'));
+            $art_url = !empty($article['url']) ? $article['url'] : tchp_get_article_url($article['slug'] ?? '', $article['id'] ?? 0);
             $art_img = !empty($article['image']) ? $article['image'] : ($assets_base . '/assets/img/og-cover.png');
           ?>
             <article class="card <?= $cls ?>">
@@ -393,7 +391,7 @@ include __DIR__ . '/includes/header.php';
 
         <div class="lessons-grid">
           <?php foreach (get_all_lessons() as $idx => $l): 
-            $l_url = function_exists('home_url') ? home_url('/' . urlencode($l['slug']) . '/') : ('/' . urlencode($l['slug']) . '/');
+            $l_url = tchp_get_article_url($l['slug'] ?? '', 0);
           ?>
             <article class="card lesson-card">
               <div class="lesson-head">

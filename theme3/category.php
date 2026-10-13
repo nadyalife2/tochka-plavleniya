@@ -433,7 +433,7 @@ include __DIR__ . '/includes/header.php';
 
           <!-- FEATURED MAIN ARTICLE (Visually Elevated with Engineering Stroke & Stamp Badge) -->
           <?php if ($featured_article): 
-            $f_url = !empty($featured_article['url']) ? $featured_article['url'] : (function_exists('home_url') ? home_url("/" . urlencode($featured_article['slug']) . "/") : ($site_root . urlencode($featured_article['slug']) . "/"));
+            $f_url = !empty($featured_article['url']) ? $featured_article['url'] : tchp_get_article_url($featured_article['slug'] ?? '', $featured_article['id'] ?? 0);
             $f_tag_pill = get_semantic_tag_pill($featured_article['tag_key'] ?? 'materials');
           ?>
             <article class="featured-sketch-frame rounded-lg bg-card p-6 sm:p-7 space-y-5 transition-all relative">
@@ -528,7 +528,7 @@ include __DIR__ . '/includes/header.php';
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <?php 
             foreach ($paginated['items'] as $article): 
-              $art_url = !empty($article['url']) ? $article['url'] : (function_exists('home_url') ? home_url("/" . urlencode($article['slug']) . "/") : ($site_root . urlencode($article['slug']) . "/"));
+              $art_url = !empty($article['url']) ? $article['url'] : tchp_get_article_url($article['slug'] ?? '', $article['id'] ?? 0);
               $card_pill = get_semantic_tag_pill($article['tag_key'] ?? '');
               $art_idx = sprintf('%02d', (int)($article['id'] ?? 1));
             ?>
