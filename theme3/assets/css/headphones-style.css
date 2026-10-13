@@ -1,0 +1,563 @@
+/* ==========================================================================
+   HEADPHONES SITE («ЗВУК В УХАХ») AUTHENTIC DESIGN SYSTEM FOR THEME3
+   Faithfully reproduced from headphones_site with signature #FFC700 yellow accents.
+   ========================================================================== */
+
+:root {
+  --bg: #f6f6f6;
+  --ink: #0c0c0c;
+  --muted: #4a4a4a;
+  --line: #e7e7ea;
+  --card: #ffffff;
+  --accent: #111111;
+  --pill: #f2f2f4;
+  --yellow: #FFC700;
+  --yellow-hover: #E5B200;
+
+  /* Legacy theme aliases to ensure Tailwind and components harmonize */
+  --color-bg: #f6f6f6;
+  --color-paper: #ffffff;
+  --color-card: #ffffff;
+  --color-ink: #0c0c0c;
+  --color-ink-muted: #4a4a4a;
+  --color-paper-border: #111111;
+  --color-accent: #FFC700;
+  --color-accent-text: #0c0c0c;
+  --dot-color: transparent;
+  --bg-color: #f6f6f6;
+}
+
+/* Base Body: Zero dots, clean flat surface */
+html, body {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Headings in Space Grotesk */
+h1, h2, h3, h4, h5, h6, .major h2 {
+  font-family: "Space Grotesk", system-ui, -apple-system, sans-serif !important;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+h1 { font-weight: 800; font-size: clamp(2.2rem, 5vw, 3.2rem); line-height: 1.05; }
+h2 { font-weight: 700; font-size: clamp(1.5rem, 3.5vw, 2.0rem); line-height: 1.2; }
+h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
+
+/* Global Container & Sections */
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.section {
+  padding: 48px 0;
+  border-top: 1px solid var(--line);
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   HERO SECTION (Exact Headphones Site)
+   ========================================================================== */
+.hero {
+  padding: 32px 0 18px !important;
+  border-top: none !important;
+}
+
+.hero .container {
+  position: relative;
+}
+
+/* Панель с рамкой 3px */
+.hero .panel {
+  position: relative;
+  background: var(--card);
+  border: 3px solid var(--accent);
+  border-radius: 18px;
+  padding: 3rem 3rem 4.5rem 5.5rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hero .panel p {
+  max-width: 780px;
+  color: var(--ink);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Чипы-навигации в нижнем правом углу */
+.top-nav {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+}
+
+.nav-chips {
+  display: flex;
+  gap: 0.6rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.nav-chips a {
+  border: 2px solid var(--accent);
+  background: #ffffff;
+  color: var(--ink);
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  font-size: 0.85em;
+  font-weight: 800;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.nav-chips a:hover,
+.nav-chips a:focus {
+  background: var(--yellow) !important;
+  color: #000000 !important;
+  transform: translateY(-2px);
+  box-shadow: 2px 2px 0 var(--accent);
+}
+
+.nav-chips a.active,
+.nav-chips a.is-active {
+  background: var(--yellow) !important;
+  color: #000000 !important;
+  border-color: var(--accent) !important;
+  box-shadow: 2px 2px 0 var(--accent);
+}
+
+/* Side Logo — вертикальный вдоль левой рамки */
+.side-logo {
+  position: absolute;
+  top: 24px;
+  left: 36px;
+  height: calc(100% - 48px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  z-index: 2;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.side-logo__text {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  text-orientation: mixed;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 800;
+  font-size: clamp(1.0rem, 2vw, 1.35rem);
+  line-height: 1.0;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  opacity: 1;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+}
+
+.side-logo:hover .side-logo__text {
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   MARQUEE (Бегущая строка тегов)
+   ========================================================================== */
+.section-tags {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.marquee {
+  overflow: hidden;
+  display: flex;
+  width: 100%;
+}
+
+.marquee-track {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.25rem 0.5rem;
+  width: max-content;
+  animation: marquee-anim 55s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.tag {
+  background: var(--pill);
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  padding: 0.45em 0.95em;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--ink);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tag:hover,
+.tag:focus {
+  background: var(--yellow) !important;
+  color: #000000 !important;
+  transform: translateY(-2px);
+  box-shadow: 2px 2px 0 var(--accent);
+}
+
+@keyframes marquee-anim {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ==========================================================================
+   MAJOR SECTION HEADERS
+   ========================================================================== */
+header.major {
+  margin-bottom: 24px;
+}
+
+header.major h2 {
+  font-size: clamp(1.5rem, 3.5vw, 1.9rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+header.major h2 a {
+  text-decoration: none;
+  color: var(--ink);
+  transition: color 0.2s ease;
+}
+
+header.major h2 a:hover {
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   CARDS & ASYMMETRICAL EDITORIAL GRID (asym-grid)
+   ========================================================================== */
+.grid {
+  display: grid;
+  gap: 20px;
+}
+
+.asym-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.asym-grid .card--big   { grid-column: span 7; }
+.asym-grid .card--tall  { grid-column: span 5; }
+.asym-grid .card--mid   { grid-column: span 4; }
+.asym-grid .card--small { grid-column: span 3; }
+
+.asym-grid .card--big .thumb  { height: 320px; }
+.asym-grid .card--tall .thumb { height: 320px; }
+.asym-grid .card--mid .thumb  { height: 200px; }
+.asym-grid .card--small .thumb { height: 180px; }
+
+.card {
+  width: 100%;
+  max-width: 100%;
+  border: 3px solid var(--accent);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 5px 5px 0 var(--accent);
+}
+
+.card a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.thumb {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 3px solid var(--accent);
+  transition: transform 0.3s ease;
+}
+
+.card:hover .thumb {
+  transform: scale(1.02);
+}
+
+.pad {
+  padding: 16px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.pad h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.pad h3 a {
+  color: var(--ink);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.pad h3 a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+}
+
+.excerpt {
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0.4rem 0 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Badges / Pills on cards */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+}
+
+.badge {
+  background: var(--pill);
+  border: 2px solid var(--accent);
+  border-radius: 999px;
+  padding: 0.35em 0.75em;
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-decoration: none;
+  color: var(--ink);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.badge:hover,
+.badge:focus {
+  background: var(--yellow) !important;
+  color: #000000 !important;
+  transform: translateY(-1px);
+}
+
+/* Yellow accent badge */
+.badge-yellow {
+  background: var(--yellow) !important;
+  color: #000000 !important;
+}
+
+/* ==========================================================================
+   SOLERING TASK CARDS & ANATOMY SECTION
+   ========================================================================== */
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.task-item {
+  border: 2.5px solid var(--accent);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.task-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 4px 4px 0 var(--accent);
+}
+
+.temp-pill {
+  background: var(--yellow);
+  color: #000000;
+  border: 1.5px solid var(--accent);
+  border-radius: 999px;
+  font-weight: 800;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.8rem;
+  padding: 2px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.temp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #000000;
+}
+
+/* ==========================================================================
+   TERMINAL SEARCH BAR
+   ========================================================================== */
+.terminal-search {
+  border: 3px solid var(--accent);
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 3px 3px 0 var(--accent);
+  transition: transform 0.2s ease;
+}
+
+.terminal-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 5px 5px 0 var(--accent);
+}
+
+/* ==========================================================================
+   PAGINATION
+   ========================================================================== */
+.pager {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.pager .num,
+.pager .arrow {
+  border: 2px solid var(--accent);
+  background: #ffffff;
+  padding: 0.45em 0.85em;
+  border-radius: 8px;
+  font-weight: 800;
+  cursor: pointer;
+  color: var(--ink);
+  text-decoration: none;
+  min-width: 42px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.pager .num:hover,
+.pager .arrow:hover {
+  background: var(--yellow);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.pager .num.is-active {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.footer {
+  border-top: 3px solid var(--accent);
+  background: #ffffff;
+  padding: 36px 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-top: 60px;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (Tablets & Mobile)
+   ========================================================================== */
+@media (max-width: 980px) {
+  .asym-grid {
+    grid-template-columns: 1fr;
+  }
+  .asym-grid .card--big,
+  .asym-grid .card--tall,
+  .asym-grid .card--mid,
+  .asym-grid .card--small {
+    grid-column: span 1 !important;
+  }
+  .tasks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero .panel {
+    padding: 2.2rem 1.25rem 3.5rem 1.25rem;
+  }
+  .side-logo {
+    position: static;
+    height: auto;
+    width: auto;
+    margin-bottom: 1rem;
+    justify-content: flex-start;
+  }
+  .side-logo__text {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 1.15rem;
+    color: var(--ink);
+  }
+  .top-nav {
+    position: static;
+    margin-top: 1.5rem;
+  }
+  .nav-chips {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .section {
+    padding: 32px 0;
+  }
+}
