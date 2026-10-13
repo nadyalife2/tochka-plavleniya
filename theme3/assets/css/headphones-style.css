@@ -1063,6 +1063,29 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   margin: 0;
 }
 
+/* ==========================================================================
+   INTERNAL PAGES & COMPONENT HARMONIZATION
+   ========================================================================== */
+.tp-headphones .sketch-card,
+.tp-headphones .featured-sketch-frame {
+  border: 2.5px solid #111111;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.tp-headphones .article-content h2,
+.tp-headphones .article-content h3 {
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 0.01em;
+  color: #111111;
+}
+
+.tp-headphones .article-content p,
+.tp-headphones .article-content li {
+  font-family: "Inter", sans-serif;
+}
+
 /* Accessible focus visible */
 :focus-visible {
   outline: 3px solid var(--yellow) !important;
