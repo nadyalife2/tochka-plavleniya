@@ -405,14 +405,14 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 /* ==========================================================================
    SOLERING TASK CARDS & ANATOMY SECTION
    ========================================================================== */
-.tasks-grid {
+.tp-headphones .tasks-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 16px;
 }
 
-.task-item {
-  border: 2.5px solid var(--accent);
+.tp-headphones .task-item {
+  border: 2.5px solid #111111;
   border-radius: 14px;
   background: #ffffff;
   padding: 16px 18px;
@@ -421,19 +421,19 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   justify-content: space-between;
   text-decoration: none;
   color: var(--ink);
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.03);
-  transition: all 0.2s ease;
+  box-shadow: none;
+  transition: transform 0.2s ease;
 }
 
-.task-item:hover {
+.tp-headphones .task-item:hover {
   transform: translateY(-4px);
-  box-shadow: 4px 4px 0 var(--accent);
+  box-shadow: none;
 }
 
-.temp-pill {
-  background: var(--yellow);
-  color: #000000;
-  border: 1.5px solid var(--accent);
+.tp-headphones .temp-pill {
+  background: var(--yellow, #ffd500);
+  color: #111111;
+  border: 1.5px solid #111111;
   border-radius: 999px;
   font-weight: 800;
   font-family: "Space Grotesk", sans-serif;
@@ -444,18 +444,18 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   gap: 4px;
 }
 
-.temp-dot {
+.tp-headphones .temp-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #000000;
+  background: #111111;
 }
 
 /* ==========================================================================
    TERMINAL SEARCH BAR
    ========================================================================== */
-.terminal-search {
-  border: 3px solid var(--accent);
+.tp-headphones .terminal-search {
+  border: 3px solid #111111;
   border-radius: 999px;
   background: #ffffff;
   padding: 10px 20px;
@@ -464,13 +464,13 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   justify-content: space-between;
   gap: 12px;
   cursor: pointer;
-  box-shadow: 3px 3px 0 var(--accent);
+  box-shadow: none;
   transition: transform 0.2s ease;
 }
 
-.terminal-search:hover {
+.tp-headphones .terminal-search:hover {
   transform: translateY(-2px);
-  box-shadow: 5px 5px 0 var(--accent);
+  box-shadow: none;
 }
 
 /* ==========================================================================
@@ -724,43 +724,47 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   align-items: stretch;
 }
 
-.task-head {
+.tp-headphones .task-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  font-family: monospace;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 12px;
 }
 
-.task-head-tag {
+.tp-headphones .task-head-tag {
   font-weight: 700;
 }
 
-.task-title {
-  font-weight: 800;
+.tp-headphones .task-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
   font-size: 1.15rem;
+  color: #111111;
   margin: 4px 0;
 }
 
-.task-desc {
+.tp-headphones .task-desc {
+  font-family: "Inter", sans-serif;
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--muted, #4a4a4a);
   margin: 4px 0 12px;
 }
 
-.task-foot {
+.tp-headphones .task-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--line);
   padding-top: 8px;
-  font-family: monospace;
+  font-family: "Inter", sans-serif;
   font-size: 11px;
 }
 
-.task-foot-cta {
+.tp-headphones .task-foot-cta {
   font-weight: 700;
+  color: #111111;
 }
 
 .schematic-card {
@@ -842,76 +846,122 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   gap: 18px;
 }
 
-.rubric-card {
+.tp-headphones .rubric-card {
+  border: 2.5px solid #111111;
+  border-radius: 14px;
+  background: #ffffff;
   padding: 20px;
   text-decoration: none;
   color: inherit;
+  box-shadow: none;
+  transition: transform 0.2s ease;
 }
 
-.rubric-head {
+.tp-headphones .rubric-card:hover {
+  transform: translateY(-4px);
+  box-shadow: none;
+}
+
+.tp-headphones .rubric-card h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #111111;
+}
+
+.tp-headphones .rubric-card:hover h3 {
+  text-decoration: underline;
+}
+
+.tp-headphones .rubric-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
 }
 
-.rubric-sec-num {
-  font-family: monospace;
+.tp-headphones .rubric-sec-num {
+  font-family: "Space Grotesk", sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: var(--muted);
+  color: var(--muted, #4a4a4a);
 }
 
-.rubric-foot {
+.tp-headphones .rubric-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--line);
   padding-top: 12px;
   margin-top: auto;
-  font-family: monospace;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
 }
 
-.lessons-grid {
+.tp-headphones .lessons-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
   gap: 14px;
 }
 
-.lesson-card {
+.tp-headphones .lesson-card {
+  border: 2.5px solid #111111;
+  border-radius: 14px;
+  background: #ffffff;
   padding: 16px;
+  box-shadow: none;
+  transition: transform 0.2s ease;
 }
 
-.lesson-head {
+.tp-headphones .lesson-card:hover {
+  transform: translateY(-4px);
+  box-shadow: none;
+}
+
+.tp-headphones .lesson-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
-  font-family: monospace;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 10px;
 }
 
-.lesson-title {
+.tp-headphones .lesson-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
   font-size: 0.95rem;
   line-height: 1.35;
   margin-bottom: 6px;
 }
 
-.lesson-desc {
-  font-size: 0.8rem;
+.tp-headphones .lesson-title a {
+  color: #111111;
+  text-decoration: none;
+}
+
+.tp-headphones .lesson-title a:hover,
+.tp-headphones .lesson-card:hover .lesson-title a {
+  text-decoration: underline;
+  color: #111111;
+}
+
+.tp-headphones .lesson-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
   line-height: 1.4;
+  color: var(--muted, #4a4a4a);
   margin-bottom: 12px;
 }
 
-.lesson-foot {
+.tp-headphones .lesson-foot {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-top: 1px solid var(--line);
   padding-top: 8px;
   margin-top: auto;
-  font-family: monospace;
+  font-family: "Inter", sans-serif;
   font-size: 11px;
 }
 
