@@ -1,0 +1,13 @@
+<svg viewBox="0 0 98.6783 39.1052" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="98.678307" height="39.105225" fill="none" mask="url(#mask_13)">
+	<defs>
+		<filter id="pixso_custom_mask_type_alpha">
+			<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0 " />
+		</filter>
+	</defs>
+	<mask id="mask_13" width="95.994232" height="25.998438" x="0.000000" y="0.000000" maskUnits="objectBoundingBox">
+		<g filter="url(#pixso_custom_mask_type_alpha)">
+			<rect id="Mask" width="95.994232" height="25.998438" x="0.000000" y="0.000000" transform="matrix(0.990268,-0.139173,0.139173,0.990268,0,13.3598)" />
+		</g>
+	</mask>
+	<path id="Vector" d="M1.91988 0L94.0743 1.29992L95.9942 8.3195L93.1144 14.2991L95.0343 20.7987L92.1545 25.9984L2.87983 24.6985L0 18.7189L3.83977 11.6993L0.959942 4.67972L1.91988 0Z" fill="rgb(0,0,0)" fill-rule="nonzero" transform="matrix(0.990268,-0.139173,0.139173,0.990268,0,13.3598)" />
+</svg>

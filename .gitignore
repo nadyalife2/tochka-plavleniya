@@ -7,6 +7,7 @@ php_portable/
 *.png
 !site2/assets/img/og-cover.png
 !theme3/**/*.png
+!theme4/**/*.png
 /headphones_site-20261012T193944Z-1-001/
 .playwright-mcp/
 ux-mcp-server/

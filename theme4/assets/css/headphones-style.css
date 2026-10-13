@@ -1,0 +1,1153 @@
+/* ==========================================================================
+   HEADPHONES SITE («ЗВУК В УХАХ») AUTHENTIC DESIGN SYSTEM FOR THEME3
+   Design tokens are consolidated in tokens.css.
+   ========================================================================== */
+
+/* Base Body: Zero dots, clean flat surface */
+html, body {
+  background: var(--bg) !important;
+  background-color: var(--bg) !important;
+  background-image: none !important;
+  color: var(--ink) !important;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Headings in Space Grotesk */
+h1, h2, h3, h4, h5, h6, .major h2 {
+  font-family: "Space Grotesk", system-ui, -apple-system, sans-serif !important;
+  letter-spacing: 0.01em;
+  color: var(--ink);
+}
+
+h1 { font-weight: 800; font-size: clamp(2.2rem, 5vw, 3.2rem); line-height: 1.05; }
+h2 { font-weight: 700; font-size: clamp(1.5rem, 3.5vw, 2.0rem); line-height: 1.2; }
+h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
+
+/* Global Container & Sections */
+.container {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px;
+  width: 100%;
+}
+
+.tp-headphones .section {
+  padding: 48px 0;
+  border-top: 1px solid var(--line);
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   HERO SECTION (Exact Headphones Site)
+   ========================================================================== */
+.tp-headphones .hero {
+  padding: 32px 0 18px !important;
+  border-top: none !important;
+}
+
+.tp-headphones .hero .container {
+  position: relative;
+}
+
+/* Панель hero в инженерном стиле Editorial Lab */
+.tp-headphones .hero .panel {
+  position: relative;
+  background: var(--card);
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  padding: 2.5rem 2.5rem 4rem 2.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tp-headphones .hero .panel p {
+  max-width: 820px;
+  color: var(--muted, #4a4a4a);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.05rem, 2vw, 1.35rem);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Чипы-навигации в нижнем правом углу */
+.tp-headphones .top-nav {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1.5rem;
+}
+
+.tp-headphones .nav-chips {
+  display: flex;
+  gap: 0.6rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+}
+
+.tp-headphones .nav-chips a {
+  border: 1.5px solid #111111;
+  background: #ffffff;
+  color: #111111;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.tp-headphones .nav-chips a:hover,
+.tp-headphones .nav-chips a:focus {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+  transform: translateY(-2px);
+}
+
+.tp-headphones .nav-chips a.active,
+.tp-headphones .nav-chips a.is-active {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+}
+
+.tp-headphones .side-logo {
+  display: none !important;
+}
+
+/* Фирменный логотип ТОЧКА[.]ПЛАВЛЕНИЯ с косым желтым сквирклом-клавишей */
+.tp-headphones .logo,
+.logo {
+  font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--color-ink, #111111);
+  display: inline-flex;
+  align-items: center;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.tp-headphones .logo:hover,
+.logo:hover {
+  opacity: 0.85;
+}
+
+.tp-headphones .logo span,
+.tp-headphones .logo .logo-dot,
+.logo span,
+.logo .logo-dot,
+.tp-headphones .footer__brand .logo-dot {
+  color: #111111;
+  background: #facc15;
+  width: 1.15em;
+  height: 1.15em;
+  border-radius: 5px;
+  transform: skew(-8deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 0.22em;
+  font-size: 0.9em;
+  line-height: 1;
+  font-weight: 900;
+  vertical-align: middle;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.tp-headphones .side-logo.is-fixed .side-logo__text {
+  color: var(--muted, #4a4a4a);
+}
+
+.tp-headphones .side-logo.is-fixed:hover .side-logo__text {
+  color: var(--ink, #111111);
+}
+
+/* ==========================================================================
+   MARQUEE (Бегущая строка тегов)
+   ========================================================================== */
+.tp-headphones .section-tags {
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.tp-headphones .marquee {
+  overflow: hidden;
+  display: flex;
+  width: 100%;
+}
+
+.tp-headphones .marquee-track {
+  display: flex;
+  gap: 0.65rem;
+  padding: 0.25rem 0.5rem;
+  width: max-content;
+  animation: marquee-anim 50s linear infinite;
+}
+
+.tp-headphones .marquee-track:hover {
+  animation-play-state: paused;
+}
+
+.tp-headphones .tag {
+  background: var(--pill, #f2f2f4);
+  border: 2px solid #111111;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #111111;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tp-headphones .tag:hover,
+.tp-headphones .tag:focus {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+  transform: none;
+  box-shadow: none;
+}
+
+@keyframes marquee-anim {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tp-headphones .marquee {
+    overflow-x: auto;
+  }
+  .tp-headphones .marquee-track {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   MAJOR SECTION HEADERS
+   ========================================================================== */
+.tp-headphones header.major {
+  margin-bottom: 24px;
+}
+
+.tp-headphones header.major h2 {
+  font-size: clamp(1.5rem, 3.5vw, 1.9rem);
+  font-weight: 800;
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.tp-headphones header.major h2 a {
+  text-decoration: none;
+  color: var(--ink);
+  transition: color 0.2s ease;
+}
+
+.tp-headphones header.major h2 a:hover {
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   CARDS & ASYMMETRICAL EDITORIAL GRID (asym-grid)
+   ========================================================================== */
+.tp-headphones .grid {
+  display: grid;
+  gap: 20px;
+}
+
+.tp-headphones .asym-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.tp-headphones .asym-grid .card--big   { grid-column: span 7; }
+.tp-headphones .asym-grid .card--tall  { grid-column: span 5; }
+.tp-headphones .asym-grid .card--mid   { grid-column: span 6; }
+.tp-headphones .asym-grid .card--small { grid-column: span 3; }
+
+.tp-headphones .asym-grid .card--big .thumb  { height: 320px; }
+.tp-headphones .asym-grid .card--tall .thumb { height: 320px; }
+.tp-headphones .asym-grid .card--mid .thumb  { height: 220px; }
+.tp-headphones .asym-grid .card--small .thumb { height: 180px; }
+
+.tp-headphones .card {
+  width: 100%;
+  max-width: 100%;
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+
+.tp-headphones .card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+.tp-headphones .card a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.tp-headphones .thumb {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  border-bottom: 1.5px solid var(--line, #18181b);
+  transition: transform 0.3s ease;
+}
+
+.tp-headphones .card:hover .thumb {
+  transform: scale(1.03);
+}
+
+.tp-headphones .pad {
+  padding: 16px 20px 22px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.tp-headphones .pad h3 {
+  margin: 0 0 0.5rem 0;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  line-height: 1.3;
+  text-transform: none;
+}
+
+.tp-headphones .pad h3 a {
+  color: #111111;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.tp-headphones .pad h3 a:hover,
+.tp-headphones .card:hover .pad h3 a {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  color: #111111;
+}
+
+.tp-headphones .excerpt {
+  color: var(--muted, #4a4a4a);
+  font-family: "Inter", sans-serif;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  margin: 0.4rem 0 1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Badges / Pills on cards */
+.tp-headphones .badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: auto;
+}
+
+.tp-headphones .badge {
+  background: var(--pill, #f2f2f4);
+  border: 1.5px solid #111111;
+  border-radius: 999px;
+  padding: 0.35em 0.75em;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #111111;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tp-headphones .badge:hover,
+.tp-headphones .badge:focus {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-color: #111111 !important;
+}
+
+/* Yellow accent badge */
+.tp-headphones .badge-yellow {
+  background: var(--yellow, #ffd500) !important;
+  color: #111111 !important;
+  border-color: #111111 !important;
+}
+
+/* ==========================================================================
+   SOLERING TASK CARDS & ANATOMY SECTION
+   ========================================================================== */
+.tp-headphones .tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.tp-headphones .task-item {
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  color: var(--ink);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tp-headphones .task-item:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.tp-headphones .temp-pill {
+  background: var(--yellow, #ffd500);
+  color: #111111;
+  border: 1.5px solid #111111;
+  border-radius: 999px;
+  font-weight: 800;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 0.8rem;
+  padding: 2px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tp-headphones .temp-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #111111;
+}
+
+/* ==========================================================================
+   TERMINAL SEARCH BAR
+   ========================================================================== */
+.tp-headphones .terminal-search {
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tp-headphones .terminal-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================================================
+   PAGINATION
+   ========================================================================== */
+.tp-headphones .pager {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+
+.tp-headphones .pager .num,
+.tp-headphones .pager .arrow {
+  border: 1.5px solid #111111;
+  background: #ffffff;
+  padding: 0.45em 0.85em;
+  border-radius: 8px;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  color: #111111;
+  text-decoration: none;
+  min-width: 42px;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.tp-headphones .pager .num:hover,
+.tp-headphones .pager .arrow:hover {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+  transform: translateY(-2px);
+}
+
+.tp-headphones .pager .num.is-active {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.tp-headphones .footer {
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+  padding: 32px 0;
+  color: #666666;
+  font-size: 0.9rem;
+  margin-top: 60px;
+}
+
+.tp-headphones .footer__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.tp-headphones .footer__copy {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  color: #666666;
+  font-size: 0.88rem;
+}
+
+.tp-headphones .footer__brand {
+  font-family: var(--font-display, "Space Grotesk", sans-serif);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.tp-headphones .footer__brand strong,
+.tp-headphones .footer__brand .logo-dot {
+  color: #141414;
+  background: var(--yellow, #facc15);
+  padding: 0.02rem 0.25rem;
+  border-radius: 2px;
+  transform: skew(-6deg);
+  display: inline-block;
+  margin: 0 0.15rem;
+  line-height: 0.9;
+  font-weight: 900;
+}
+
+.tp-headphones .footer__sep {
+  color: #cccccc;
+}
+
+.tp-headphones .footer-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+}
+
+.tp-headphones .footer-nav a {
+  color: #555555;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.tp-headphones .footer-nav a:hover {
+  color: #111111;
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .footer__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .footer-nav {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.6rem;
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (Tablets & Mobile)
+   ========================================================================== */
+@media (max-width: 980px) {
+  .tp-headphones .asym-grid {
+    grid-template-columns: 1fr;
+  }
+  .tp-headphones .asym-grid .card--big,
+  .tp-headphones .asym-grid .card--tall,
+  .tp-headphones .asym-grid .card--mid,
+  .tp-headphones .asym-grid .card--small {
+    grid-column: span 1 !important;
+  }
+  .tp-headphones .asym-grid .thumb,
+  .tp-headphones .asym-grid .card--big .thumb,
+  .tp-headphones .asym-grid .card--tall .thumb,
+  .tp-headphones .asym-grid .card--mid .thumb {
+    height: 220px;
+  }
+  .tp-headphones .tasks-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .tp-headphones .hero .panel {
+    padding: 2.2rem 1.25rem 2.5rem 1.25rem;
+  }
+  .tp-headphones .side-logo {
+    position: static;
+    height: auto;
+    width: 100%;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    border: 3px solid #111111;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 10px 16px;
+  }
+  .tp-headphones .side-logo__text {
+    writing-mode: horizontal-tb;
+    transform: none;
+    font-size: 1.15rem;
+    color: var(--muted, #4a4a4a);
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+  .tp-headphones .side-logo__text .logo-dot {
+    margin: 0 0.2rem;
+    padding: 0.05rem 0.35rem;
+    transform: skew(-6deg);
+  }
+  .tp-headphones .top-nav {
+    position: static;
+    margin-top: 1.5rem;
+  }
+  .tp-headphones .nav-chips {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+  .tp-headphones .section {
+    padding: 32px 0;
+  }
+}
+
+/* ==========================================================================
+   SEMANTIC LAYOUT UTILITIES (Replacing inline styles)
+   ========================================================================== */
+.hero-top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 2rem;
+}
+
+.otk-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #000;
+  display: inline-block;
+}
+
+.hero-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.badge-btn {
+  background: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kbd-shortcut {
+  font-size: 11px;
+  opacity: 0.7;
+  font-family: monospace;
+}
+
+.terminal-search-wrapper {
+  margin: 28px 0 16px;
+}
+
+.terminal-search-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--muted);
+  overflow: hidden;
+}
+
+.terminal-search-kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-family: monospace;
+  font-size: 12px;
+  border: 2px solid var(--accent);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--ink);
+}
+
+.tasks-split-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  align-items: stretch;
+}
+
+.tp-headphones .task-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 12px;
+}
+
+.tp-headphones .task-head-tag {
+  font-weight: 700;
+}
+
+.tp-headphones .task-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: #111111;
+  margin: 4px 0;
+}
+
+.tp-headphones .task-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted, #4a4a4a);
+  margin: 4px 0 12px;
+}
+
+.tp-headphones .task-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+}
+
+.tp-headphones .task-foot-cta {
+  font-weight: 700;
+  color: #111111;
+}
+
+.schematic-card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.schematic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--line);
+  margin-bottom: 14px;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.schematic-title {
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.schematic-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--yellow);
+  border: 1.5px solid #000;
+  display: inline-block;
+}
+
+.schematic-canvas {
+  background: #ffffff;
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+}
+
+.schematic-caption {
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 14px 0 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.tp-headphones .card-meta-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.tp-headphones .card-read-time {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted, #4a4a4a);
+}
+
+.tp-headphones .card-author {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted, #4a4a4a);
+}
+
+.rubrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 18px;
+}
+
+.tp-headphones .rubric-card {
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 20px;
+  text-decoration: none;
+  color: inherit;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tp-headphones .rubric-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.tp-headphones .rubric-card h3 {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #111111;
+}
+
+.tp-headphones .rubric-card:hover h3 {
+  text-decoration: underline;
+}
+
+.tp-headphones .rubric-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.tp-headphones .rubric-sec-num {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--muted, #4a4a4a);
+}
+
+.tp-headphones .rubric-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+  margin-top: auto;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+}
+
+.tp-headphones .lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.tp-headphones .lesson-card {
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.tp-headphones .lesson-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+}
+
+.tp-headphones .lesson-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 10px;
+}
+
+.tp-headphones .lesson-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  margin-bottom: 6px;
+}
+
+.tp-headphones .lesson-title a {
+  color: #111111;
+  text-decoration: none;
+}
+
+.tp-headphones .lesson-title a:hover,
+.tp-headphones .lesson-card:hover .lesson-title a {
+  text-decoration: underline;
+  color: #111111;
+}
+
+.tp-headphones .lesson-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--muted, #4a4a4a);
+  margin-bottom: 12px;
+}
+
+.tp-headphones .lesson-foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+  margin-top: auto;
+  font-family: "Inter", sans-serif;
+  font-size: 11px;
+}
+
+.tp-headphones .trust-card {
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.tp-headphones .trust-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--line);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 12px;
+}
+
+.tp-headphones .trust-title {
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #111111;
+}
+
+.tp-headphones .trust-lead {
+  font-family: "Inter", sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: #111111;
+  margin-bottom: 20px;
+}
+
+.tp-headphones .trust-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 14px;
+  font-family: "Inter", sans-serif;
+  font-size: 12px;
+}
+
+.tp-headphones .trust-col {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+}
+
+.tp-headphones .faq-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.tp-headphones .faq-card {
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.tp-headphones .faq-head {
+  display: flex;
+  justify-content: space-between;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 11px;
+  color: var(--muted, #4a4a4a);
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 6px;
+  margin-bottom: 10px;
+}
+
+.tp-headphones .faq-head-id {
+  font-weight: 800;
+}
+
+.tp-headphones .faq-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: #111111;
+  margin-bottom: 8px;
+}
+
+.tp-headphones .faq-desc {
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted, #4a4a4a);
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ==========================================================================
+   INTERNAL PAGES & COMPONENT HARMONIZATION
+   ========================================================================== */
+.tp-headphones .sketch-card,
+.tp-headphones .featured-sketch-frame {
+  border: 1.5px solid var(--line, #18181b);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+}
+
+.tp-headphones .article-content h2,
+.tp-headphones .article-content h3 {
+  font-family: "Space Grotesk", sans-serif;
+  letter-spacing: 0.01em;
+  color: #111111;
+}
+
+.tp-headphones .article-content p,
+.tp-headphones .article-content li {
+  font-family: "Inter", sans-serif;
+}
+
+/* Accessible focus visible */
+:focus-visible {
+  outline: 3px solid var(--yellow) !important;
+  outline-offset: 2px !important;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tp-headphones .marquee {
+    overflow-x: auto !important;
+  }
+  .tp-headphones .marquee-track,
+  .marquee-track {
+    animation: none !important;
+  }
+  .tp-headphones .card:hover,
+  .tp-headphones .card:hover .thumb,
+  .tp-headphones .task-item:hover,
+  .tp-headphones .terminal-search:hover,
+  .tp-headphones .tag:hover,
+  .tp-headphones .badge:hover,
+  .tp-headphones .thumb,
+  .card:hover,
+  .task-item:hover,
+  .terminal-search:hover,
+  .tag:hover,
+  .badge:hover,
+  .thumb {
+    transform: none !important;
+  }
+}
