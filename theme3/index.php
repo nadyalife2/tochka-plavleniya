@@ -124,12 +124,12 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <div class="hero-tools">
-              <button id="search-modal-trigger" type="button" class="badge badge-btn" title="Поиск по базе знаний (Ctrl+K)">
+              <button id="search-modal-trigger" type="button" class="badge badge-btn" title="Поиск по базе знаний (Ctrl+K)" aria-label="Открыть поиск по базе знаний">
                 <span class="material-symbols-outlined text-[16px]">search</span>
                 <span>Поиск</span>
                 <span class="kbd-shortcut">Ctrl+K</span>
               </button>
-              <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="badge badge-yellow" style="cursor: pointer;" title="Открыть верстак">
+              <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="badge badge-yellow" title="Открыть верстак" aria-label="Открыть интерактивный верстак">
                 <span class="material-symbols-outlined text-[16px]">tune</span>
                 <span>Верстак</span>
               </button>

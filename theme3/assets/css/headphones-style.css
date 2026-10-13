@@ -60,7 +60,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 .tp-headphones .hero .panel {
   position: relative;
   background: var(--card);
-  border: 3px solid var(--accent);
+  border: 3px solid #111111;
   border-radius: 18px;
   padding: 3rem 3rem 4.5rem 5.5rem;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.04);
@@ -98,13 +98,15 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 }
 
 .tp-headphones .nav-chips a {
-  border: 2px solid var(--accent);
+  border: 2px solid #111111;
   background: #ffffff;
-  color: var(--ink);
-  padding: 0.45rem 1rem;
+  color: #111111;
+  padding: 0.45rem 0.95rem;
   border-radius: 999px;
-  font-size: 0.85em;
-  font-weight: 800;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   text-decoration: none;
   transition: all 0.2s ease;
   display: inline-flex;
@@ -114,18 +116,17 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 
 .tp-headphones .nav-chips a:hover,
 .tp-headphones .nav-chips a:focus {
-  background: var(--accent) !important;
+  background: #111111 !important;
   color: #ffffff !important;
+  border-color: #111111 !important;
   transform: translateY(-2px);
-  box-shadow: 2px 2px 0 var(--accent);
 }
 
 .tp-headphones .nav-chips a.active,
 .tp-headphones .nav-chips a.is-active {
-  background: var(--accent) !important;
+  background: #111111 !important;
   color: #ffffff !important;
-  border-color: var(--accent) !important;
-  box-shadow: 2px 2px 0 var(--accent);
+  border-color: #111111 !important;
 }
 
 /* Side Logo — вертикальный вдоль левой рамки */
@@ -152,15 +153,16 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   font-weight: 800;
   font-size: clamp(1.0rem, 2vw, 1.35rem);
   line-height: 1.0;
-  letter-spacing: 0.08em;
-  color: var(--muted);
+  letter-spacing: 0.02em;
+  color: #111111;
+  text-transform: uppercase;
   opacity: 1;
   white-space: nowrap;
   transition: color 0.2s ease;
 }
 
 .tp-headphones .side-logo:hover .side-logo__text {
-  color: var(--ink);
+  color: #111111;
 }
 
 /* Фиксированное состояние — позицию left задаёт JS при скролле */
@@ -172,7 +174,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 }
 
 .tp-headphones .side-logo.is-fixed .side-logo__text {
-  color: var(--accent);
+  color: #111111;
 }
 
 /* ==========================================================================
