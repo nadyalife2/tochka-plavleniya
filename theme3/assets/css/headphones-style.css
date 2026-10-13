@@ -71,7 +71,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 
 .tp-headphones .hero .panel p {
   max-width: 780px;
-  color: var(--ink);
+  color: var(--muted, #4a4a4a);
   font-family: "Space Grotesk", sans-serif;
   font-weight: 700;
   font-size: clamp(1.05rem, 2vw, 1.35rem);
@@ -154,7 +154,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   font-size: clamp(1.0rem, 2vw, 1.35rem);
   line-height: 1.0;
   letter-spacing: 0.02em;
-  color: #111111;
+  color: var(--muted, #4a4a4a);
   text-transform: uppercase;
   opacity: 1;
   white-space: nowrap;
@@ -162,7 +162,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 }
 
 .tp-headphones .side-logo:hover .side-logo__text {
-  color: #111111;
+  color: var(--ink, #111111);
 }
 
 /* Фиксированное состояние — позицию left задаёт JS при скролле */
@@ -174,7 +174,11 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 }
 
 .tp-headphones .side-logo.is-fixed .side-logo__text {
-  color: #111111;
+  color: var(--muted, #4a4a4a);
+}
+
+.tp-headphones .side-logo.is-fixed:hover .side-logo__text {
+  color: var(--ink, #111111);
 }
 
 /* ==========================================================================
@@ -637,7 +641,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
     writing-mode: horizontal-tb;
     transform: none;
     font-size: 1.15rem;
-    color: #111111;
+    color: var(--muted, #4a4a4a);
     letter-spacing: 0.02em;
     text-align: center;
   }
