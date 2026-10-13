@@ -34,12 +34,11 @@ $tchp_head_escape = static function ($value) {
   <meta name="twitter:image" content="<?= $tchp_head_escape($page_og_image ?? ($assets_base . '/assets/img/og-cover.png')) ?>"/>
   <?php endif; ?>
 
-  <!-- Immediate Theme Init Script (Zero FOUC) -->
+  <!-- Immediate Theme Init Script (Zero FOUC, Default Light like headphones_site) -->
   <script>
     (function() {
       const saved = localStorage.getItem('tp_theme');
-      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-      if (saved === 'dark' || (!saved && prefersDark)) {
+      if (saved === 'dark') {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');

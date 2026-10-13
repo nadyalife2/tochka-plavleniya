@@ -1,8 +1,7 @@
-// ===== 1. THEME SWITCHER LOGIC (Unified with tp_theme & Tailwind .dark class) =====
+// ===== 1. THEME SWITCHER LOGIC (Default Light Mode like headphones_site) =====
 (function() {
     const saved = localStorage.getItem('tp_theme');
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    if (saved === 'dark' || (!saved && prefersDark)) {
+    if (saved === 'dark') {
         document.documentElement.classList.add('dark');
     } else {
         document.documentElement.classList.remove('dark');

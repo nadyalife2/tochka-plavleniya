@@ -165,6 +165,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   z-index: 2;
   cursor: pointer;
   text-decoration: none;
+  transition: transform 0.15s ease, opacity 0.2s ease;
 }
 
 .side-logo__text {
@@ -184,6 +185,18 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 
 .side-logo:hover .side-logo__text {
   color: var(--ink);
+}
+
+/* Фиксированное состояние — позицию left задаёт JS при скролле */
+.side-logo.is-fixed {
+  position: fixed;
+  top: 56px;
+  height: auto;
+  z-index: 999;
+}
+
+.side-logo.is-fixed .side-logo__text {
+  color: var(--accent);
 }
 
 /* ==========================================================================

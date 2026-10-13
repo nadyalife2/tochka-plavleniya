@@ -106,11 +106,11 @@ include __DIR__ . '/includes/header.php';
   <main id="main-content">
 
     <!-- 1. ПЕРВЫЙ ЭКРАН (HERO): КАПСУЛА И ВЕРТИКАЛЬНЫЙ ЛОГОТИП В СТИЛЕ HEADPHONES SITE -->
-    <section class="hero" id="hero">
+    <header class="hero section" id="top">
       <div class="container">
         
-        <!-- Вертикальный логотип-плашка слева (фирменный элемент «Звук в УХах») -->
-        <a href="#hero" class="side-logo" aria-label="ТОЧКА ПЛАВЛЕНИЯ - Наверх">
+        <!-- Вертикальный логотип-плашка слева (динамический элемент «Звук в УХах») -->
+        <a href="#top" class="side-logo" id="sideLogo" aria-label="ТОЧКА ПЛАВЛЕНИЯ - Вернуться к началу">
           <span class="side-logo__text">ТОЧКА ПЛАВЛЕНИЯ</span>
         </a>
 
@@ -150,7 +150,7 @@ include __DIR__ . '/includes/header.php';
           </nav>
         </div>
       </div>
-    </section>
+    </header>
 
     <!-- 2. СЕКЦИЯ БЕГУЩЕЙ СТРОКИ С ТЕГАМИ (MARQUEE) КАК В HEADPHONES_SITE -->
     <section class="section-tags" aria-label="Популярные темы и теги пайки">
@@ -606,13 +606,109 @@ include __DIR__ . '/includes/header.php';
         });
       }
 
-      // Theme toggle
+      // Theme toggle (Defaults to light mode)
       const toggle = document.getElementById('theme-toggle');
       if (toggle) {
         toggle.addEventListener('click', function() {
           const isDark = document.documentElement.classList.toggle('dark');
           localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
         });
+      }
+
+      // Dynamic Side-Logo Tracking (Authentic Headphones Site Behavior)
+      const sideLogo = document.getElementById('sideLogo');
+      const hero = document.getElementById('top') || document.querySelector('.hero');
+      const container = document.querySelector('.hero .container') || document.querySelector('.container');
+      const topElement = document.getElementById('top') || document.body;
+
+      if (sideLogo) {
+        sideLogo.addEventListener('click', function(e) {
+          e.preventDefault();
+          if (topElement) {
+            topElement.scrollIntoView({ behavior: 'smooth' });
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+
+        sideLogo.addEventListener('mousedown', function() {
+          this.style.transform = 'scale(0.96)';
+        });
+        sideLogo.addEventListener('mouseup', function() {
+          this.style.transform = 'scale(1)';
+        });
+        sideLogo.addEventListener('mouseleave', function() {
+          this.style.transform = 'scale(1)';
+        });
+
+        const GAP = 12;
+        function applyFixedLeft() {
+          if (!sideLogo || !container) return;
+          if (window.innerWidth <= 768) {
+            sideLogo.style.left = '';
+            return;
+          }
+          const containerRect = container.getBoundingClientRect();
+          const logoWidth = sideLogo.offsetWidth || 36;
+          if (containerRect.left > logoWidth + GAP) {
+            sideLogo.style.left = (containerRect.left - logoWidth - GAP) + 'px';
+          } else {
+            sideLogo.style.left = '16px';
+          }
+        }
+
+        function onScroll() {
+          if (!sideLogo || !hero) return;
+          const heroTop = hero.getBoundingClientRect().top + window.pageYOffset;
+
+          if (window.innerWidth <= 768) {
+            if (window.pageYOffset > 100) {
+              sideLogo.classList.add('is-fixed');
+            } else {
+              sideLogo.classList.remove('is-fixed');
+            }
+            sideLogo.style.left = '';
+            return;
+          }
+
+          if (window.pageYOffset >= heroTop + 40) {
+            sideLogo.classList.add('is-fixed');
+            applyFixedLeft();
+          } else {
+            sideLogo.classList.remove('is-fixed');
+            sideLogo.style.left = '';
+          }
+        }
+
+        let ticking = false;
+        function updateScroll() {
+          onScroll();
+          ticking = false;
+        }
+
+        window.addEventListener('scroll', function() {
+          if (!ticking) {
+            requestAnimationFrame(updateScroll);
+            ticking = true;
+          }
+        }, { passive: true });
+
+        window.addEventListener('resize', function() {
+          if (window.innerWidth <= 768) {
+            sideLogo.style.left = '';
+            return;
+          }
+          if (sideLogo.classList.contains('is-fixed')) {
+            applyFixedLeft();
+          }
+        });
+
+        // Initial check on load
+        setTimeout(function() {
+          if (sideLogo.classList.contains('is-fixed')) {
+            applyFixedLeft();
+          }
+        }, 60);
       }
     })();
   </script>
