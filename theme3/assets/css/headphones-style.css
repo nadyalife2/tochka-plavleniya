@@ -618,31 +618,38 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 }
 
 @media (max-width: 768px) {
-  .hero .panel {
-    padding: 2.2rem 1.25rem 3.5rem 1.25rem;
+  .tp-headphones .hero .panel {
+    padding: 2.2rem 1.25rem 2.5rem 1.25rem;
   }
-  .side-logo {
+  .tp-headphones .side-logo {
     position: static;
     height: auto;
-    width: auto;
+    width: 100%;
     margin-bottom: 1rem;
-    justify-content: flex-start;
+    display: flex;
+    justify-content: center;
+    border: 3px solid #111111;
+    border-radius: 12px;
+    background: #ffffff;
+    padding: 10px 16px;
   }
-  .side-logo__text {
+  .tp-headphones .side-logo__text {
     writing-mode: horizontal-tb;
     transform: none;
     font-size: 1.15rem;
-    color: var(--ink);
+    color: #111111;
+    letter-spacing: 0.02em;
+    text-align: center;
   }
-  .top-nav {
+  .tp-headphones .top-nav {
     position: static;
     margin-top: 1.5rem;
   }
-  .nav-chips {
+  .tp-headphones .nav-chips {
     flex-wrap: wrap;
     justify-content: flex-start;
   }
-  .section {
+  .tp-headphones .section {
     padding: 32px 0;
   }
 }
