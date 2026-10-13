@@ -10,7 +10,7 @@
     
     <!-- Search Header / Input Bar -->
     <div class="flex items-center px-4 py-3.5 border-b border-paper-border bg-paper/50 dark:bg-paper/10">
-      <span class="material-symbols-outlined text-accent text-2xl mr-3 select-none">search</span>
+      <?= tp_icon('search', 'w-6 h-6 text-accent mr-3 select-none') ?>
       <input type="text" id="global-search-input" 
              class="w-full bg-transparent text-ink placeholder:text-ink-faint text-base sm:text-lg font-sans focus:outline-none focus:ring-0" 
              style="outline:none !important; box-shadow:none !important;"
@@ -20,7 +20,7 @@
       <div class="flex items-center gap-1.5 ml-2">
         <kbd class="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 bg-paper-border/50 text-ink-muted rounded border border-paper-border select-none">ESC</kbd>
         <button type="button" id="search-modal-close" class="p-1 text-ink-muted hover:text-ink transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center rounded" aria-label="Закрыть поиск">
-          <span class="material-symbols-outlined text-xl">close</span>
+          <?= tp_icon('x', 'w-5 h-5') ?>
         </button>
       </div>
     </div>
@@ -34,7 +34,6 @@
       <button type="button" data-filter="дефекты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Дефекты</button>
       <button type="button" data-filter="инструменты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Инструменты</button>
       <button type="button" data-filter="стандарты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Стандарты</button>
-      <div class="absolute bottom-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#fde047] to-transparent opacity-50 dark:opacity-20"></div>
     </div>
 
     <!-- Live Search Results List -->
@@ -411,7 +410,9 @@
     if (filtered.length === 0) {
       resultsContainer.innerHTML = `
         <div class="py-12 text-center text-ink-muted px-4">
-          <span class="material-symbols-outlined text-4xl text-ink-faint mb-2 select-none">search_off</span>
+          <div class="w-10 h-10 mx-auto mb-2 text-ink-faint flex items-center justify-center">
+            <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><line x1="8" y1="8" x2="14" y2="14"/></svg>
+          </div>
           <p class="font-mono text-sm break-words max-w-full">Ничего не найдено по запросу «${escapeHtml(query)}»</p>
           <p class="text-xs text-ink-faint mt-1 max-w-md mx-auto">Попробуйте ввести марку припоя (ПОС-61), флюса (RMA-218) или тип дефекта.</p>
         </div>

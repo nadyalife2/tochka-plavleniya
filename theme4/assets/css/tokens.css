@@ -6,14 +6,23 @@
  */
 
 :root {
-  /* --- HEADPHONES STYLE CORE PALETTE --- */
-  --bg: #f6f6f6;
-  --ink: #0c0c0c;
-  --muted: #4a4a4a;
-  --line: #e7e7ea;
-  --card: #ffffff;
-  --pill: #f2f2f4;
-  --accent: #111111;
+  /* --- ДВУХУРОВНЕВАЯ СИСТЕМА РАМОК И РАДИУСОВ (EDITORIAL LAB) --- */
+  --border-strong: #111111;
+  --border-soft: #dcd8d0;
+  --radius-control: 10px;
+  --radius-card: 14px;
+  --radius-panel: 14px;
+  --radius-button: 10px;
+  --radius-pill: 999px;
+
+  /* --- АЛИАСЫ НА СТРОГУЮ СИСТЕМУ --color-* (ЕДИНЫЙ ИСТОЧНИК ИСТИНЫ) --- */
+  --bg: var(--color-bg);
+  --ink: var(--color-ink);
+  --muted: var(--color-ink-muted);
+  --line: var(--border-soft);
+  --card: var(--color-card);
+  --pill: var(--color-paper-subtle);
+  --accent: var(--color-accent);
 
   --yellow: #FFC700;
   --yellow-hover: #E5B200;
@@ -26,11 +35,6 @@
   --container-max: 1180px;
   --container-pad: 20px;
   --grid-gap: 16px;
-
-  --radius-card: 14px;
-  --radius-panel: 18px;
-  --radius-button: 8px;
-  --radius-pill: 999px;
 
   /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Светло-серый холст #f6f6f6 без точек) --- */
   --color-bg: #f6f6f6;
@@ -133,11 +137,11 @@
 
   /* --- ФОРМА, СКРУГЛЕНИЯ, СЕТКА 8px И ЛЁГКАЯ БУМАЖНАЯ ПЛАСТИКА --- */
   --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
   --radius-full: 9999px;
 
-  --border-sketch: 1px solid var(--color-paper-border);
+  --border-sketch: 1px solid var(--border-soft);
   --shadow-sketch: 0 1px 3px rgba(20, 20, 20, 0.03);
   --shadow-card: 0 1px 3px rgba(20, 20, 20, 0.03);
   --shadow-card-hover: 0 2px 6px rgba(20, 20, 20, 0.05);
@@ -159,17 +163,20 @@
   --touch-target-min: 48px;
 }
 
-/* ТЁМНАЯ ТЕМА: #242424 карточка, #E8E0D4 текст */
+/* ТЁМНАЯ ТЕМА: #1c1c1e карточка, #f5f5f7 текст */
 html.dark {
+  --border-strong: #FFC700;
+  --border-soft: #38383a;
+
   --color-bg: #121212;
   --bg: #121212;
   --color-paper: #1c1c1e;
   --card: #1c1c1e;
-  --line: #2c2c2e;
+  --line: var(--border-soft);
   --pill: #242426;
   --color-paper-subtle: #242426;
-  --color-paper-border: #38383a;
-  --color-paper-border-dark: #FFC700;
+  --color-paper-border: var(--border-soft);
+  --color-paper-border-dark: var(--border-strong);
   --color-card: #1c1c1e;
   --color-card-solid: #1c1c1e;
   --color-callout: #242426;
@@ -200,8 +207,32 @@ html.dark {
   --color-sketch-yellow-bg: rgba(202, 138, 4, 0.18);
   --color-sketch-tape: rgba(120, 106, 72, 0.7);
 
-  --border-sketch: 1px solid var(--color-paper-border);
+  --border-sketch: 1px solid var(--border-soft);
   --shadow-sketch: 0 1px 3px rgba(0, 0, 0, 0.2);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2);
   --shadow-card-hover: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ==========================================================================
+   ДВУХУРОВНЕВАЯ СИСТЕМА РАМОК (SOFT vs STRONG)
+   ========================================================================== */
+.card,
+.field,
+.alert,
+.table-wrapper,
+.sketch-card,
+.lesson-card,
+.rubric-card,
+.trust-card,
+.faq-card,
+.task-item {
+  border-color: var(--border-soft);
+}
+
+.card-tool,
+.readout-display,
+.search-modal-box,
+.lab-drawer,
+.terminal-search {
+  border-color: var(--border-strong);
 }

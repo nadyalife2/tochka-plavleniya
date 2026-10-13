@@ -3,10 +3,12 @@
   <div class="border border-paper-border-dark bg-paper dark:bg-[#1c1d21] p-4 sm:p-5 rounded-lg shadow-xl space-y-3 relative">
     <div class="flex items-start justify-between gap-3">
       <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-[18px] text-brand-orange">cookie</span>
+        <?= tp_icon('check', 'w-4 h-4 text-accent') ?>
         <span class="font-mono text-xs font-bold uppercase text-ink tracking-wider">Файлы Cookie и аналитика</span>
       </div>
-      <button id="cookie-close-btn" type="button" class="text-ink-faint hover:text-ink font-mono text-xs min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer" aria-label="Закрыть">✕</button>
+      <button id="cookie-close-btn" type="button" class="text-ink-faint hover:text-ink font-mono text-xs min-w-[36px] min-h-[36px] flex items-center justify-center cursor-pointer" aria-label="Закрыть">
+        <?= tp_icon('x', 'w-3.5 h-3.5') ?>
+      </button>
     </div>
 
     <p class="text-xs text-ink-muted leading-relaxed font-sans">

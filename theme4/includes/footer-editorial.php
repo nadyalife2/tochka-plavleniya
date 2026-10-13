@@ -4,8 +4,8 @@
   <div class="container">
     <div class="footer__row">
       <div class="footer__copy">
-        <a class="footer__brand" href="<?= $site_root ?>">
-          ТОЧКА<span class="logo-dot">.</span>ПЛАВЛЕНИЯ
+        <a class="footer__brand logo" href="<?= $site_root ?>">
+          ТОЧКА<span class="logo-squircle" aria-hidden="true"><span class="logo-dot"></span></span>ПЛАВЛЕНИЯ
         </a>
         <span class="footer__sep">•</span>
         <span>Инженерный регламент и теплофизика монтажа</span>

@@ -835,9 +835,6 @@ include __DIR__ . '/includes/header.php';
       <!-- P1 ИНСТРУМЕНТ 6: СЕЛЕКТОР ФЛЮСА (#flux-selector)                       -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="flux-selector" class="card-tool space-y-6 mt-8 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
-        <!-- Washi Tape Accent -->
-        <div class="washi-tape -top-2.5 left-8 w-24 bg-[#ebdeb3]/80 dark:bg-[#786b4f]/40 border-y border-amber-900/10 rotate-[-1.5deg]" aria-hidden="true"></div>
-
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -929,9 +926,6 @@ include __DIR__ . '/includes/header.php';
       <!-- P1 ИНСТРУМЕНТ 4.2: РАСХОД ПРИПОЯ (#solder-consumption)                 -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="solder-consumption" class="card-tool space-y-6 mt-8 mb-8 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
-        <!-- Washi Tape Accent -->
-        <div class="washi-tape -top-2.5 right-10 w-24 bg-[#ebdeb3]/80 dark:bg-[#786b4f]/40 border-y border-amber-900/10 rotate-[2deg]" aria-hidden="true"></div>
-
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -997,9 +991,6 @@ include __DIR__ . '/includes/header.php';
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="table" class="scroll-mt-20 card-tool space-y-6 relative">
         <a id="solder-table" class="block absolute -top-24 pointer-events-none" aria-hidden="true"></a>
-        <!-- Washi Tape Accent -->
-        <div class="washi-tape -top-2.5 left-12 w-28 bg-[#ebdeb3]/80 dark:bg-[#786b4f]/40 border-y border-amber-900/10 rotate-[-1deg]" aria-hidden="true"></div>
-
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -1235,6 +1226,18 @@ include __DIR__ . '/includes/header.php';
       }
     })();
   </script>
+
+  <!-- Editorial Minimal Footer -->
+  <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
+
+  <!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
+  <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
+
+  <!-- Tactile Lab Drawer (Teenage Engineering & Emil Kowalski pattern) -->
+  <?php require_once __DIR__ . '/includes/lab-drawer.php'; ?>
+
+  <!-- Global Engineering Search Modal (Ctrl+K) -->
+  <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
 </body>
 </html>

@@ -117,12 +117,12 @@ include __DIR__ . '/includes/header.php';
 
             <div class="hero-tools">
               <button id="hero-search-trigger" onclick="document.getElementById('search-modal-trigger')?.click()" type="button" class="badge badge-btn" title="Поиск по базе знаний (Ctrl+K)" aria-label="Открыть поиск по базе знаний">
-                <span class="material-symbols-outlined text-[16px]">search</span>
+                <?= tp_icon('search', 'w-3.5 h-3.5') ?>
                 <span>Поиск</span>
                 <span class="kbd-shortcut">Ctrl+K</span>
               </button>
               <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="badge badge-yellow" title="Открыть верстак" aria-label="Открыть интерактивный верстак">
-                <span class="material-symbols-outlined text-[16px]">tune</span>
+                <?= tp_icon('sliders', 'w-3.5 h-3.5') ?>
                 <span>Верстак</span>
               </button>
             </div>

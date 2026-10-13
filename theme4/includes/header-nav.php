@@ -75,7 +75,7 @@ if (!function_exists('is_tchp_nav_active')) {
         $active = is_tchp_nav_active($item['page'], $current_page);
     ?>
         <a href="<?= htmlspecialchars($item['href']) ?>"
-           class="nav-link inline-flex items-center min-h-[44px] px-2.5 sm:px-3 rounded transition-colors text-xs sm:text-sm <?= $active ? 'active text-accent font-bold border-b-2 border-accent bg-accent/5' : 'text-ink-muted hover:text-ink hover:bg-paper-border/30' ?>"
+           class="nav-link inline-flex items-center min-h-[44px] px-2.5 sm:px-3 rounded transition-colors text-xs sm:text-sm <?= $active ? 'active text-ink font-bold border-b-2 border-accent bg-accent/15' : 'text-ink-muted hover:text-ink hover:bg-paper-border/30' ?>"
            <?php if ($active): ?>aria-current="page"<?php endif; ?>>
             <?= htmlspecialchars($item['label']) ?>
         </a>

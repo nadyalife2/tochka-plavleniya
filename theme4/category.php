@@ -791,6 +791,9 @@ include __DIR__ . '/includes/header.php';
   <!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
   <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
 
+  <!-- Tactile Lab Drawer (Teenage Engineering & Emil Kowalski pattern) -->
+  <?php require_once __DIR__ . '/includes/lab-drawer.php'; ?>
+
   <!-- Global Engineering Search Modal (Ctrl+K) -->
   <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 

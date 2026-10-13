@@ -22,10 +22,10 @@ svg.w-8, .interactive svg.w-8 { width: 32px; height: 32px; }
       height: 100%;
       border-radius: 4px;
       transition: width 0.65s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.45s ease, box-shadow 0.45s ease;
-      box-shadow: 0 0 8px rgba(235, 82, 17, 0.35);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
     html.dark .meter-fill {
-      box-shadow: 0 0 12px rgba(249, 115, 22, 0.45);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
     }
 
     /* Тактильный тепловой импульс цифр температуры */

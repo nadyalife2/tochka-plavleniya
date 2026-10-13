@@ -349,3 +349,34 @@ if (!function_exists('tchp_get_article_url')) {
     }
 }
 
+if (!function_exists('tp_icon')) {
+    /**
+     * Возвращает локальную Lucide SVG-иконку из assets/icons/
+     */
+    function tp_icon(string $name, string $class = ''): string {
+        static $cache = [];
+        $clean_name = preg_replace('/[^a-zA-Z0-9_-]/', '', $name);
+        
+        if (!isset($cache[$clean_name])) {
+            $path = __DIR__ . '/../assets/icons/' . $clean_name . '.svg';
+            if (file_exists($path)) {
+                $cache[$clean_name] = file_get_contents($path);
+            } else {
+                $cache[$clean_name] = '';
+            }
+        }
+        
+        if (empty($cache[$clean_name])) {
+            return '';
+        }
+        
+        $svg = $cache[$clean_name];
+        $classes = trim('tp-icon ' . $class);
+        if (!empty($classes)) {
+            $svg = preg_replace('/^<svg\b/', '<svg class="' . esc_attr($classes) . '"', $svg, 1);
+        }
+        return $svg;
+    }
+}
+
+

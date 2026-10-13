@@ -128,34 +128,34 @@ a {
   gap: 0.5rem;
   min-height: var(--touch-target-min, 48px);
   background-color: var(--color-accent);
-  color: #ffffff !important;
-  border-radius: var(--radius-md);
+  color: var(--color-accent-text, #0c0c0c) !important;
+  border-radius: var(--radius-control, 10px);
   padding: 0.7rem 1.6rem;
   font-weight: 700;
   font-family: var(--font-sans);
   font-size: 0.95rem;
   transition: background-color 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
   border: 1px solid var(--color-accent-hover);
-  box-shadow: 0 1px 3px rgba(185, 67, 13, 0.25);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
   cursor: pointer;
   text-decoration: none;
 }
 .btn-primary:hover {
   background-color: var(--color-accent-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 10px rgba(185, 67, 13, 0.35);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.16);
 }
 .btn-primary:active {
   transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(185, 67, 13, 0.2);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 
 html.dark .btn-primary {
-  border-color: rgba(255, 107, 43, 0.6);
-  box-shadow: 0 1px 4px rgba(255, 107, 43, 0.2);
+  border-color: rgba(255, 199, 0, 0.55);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
 }
 html.dark .btn-primary:hover {
-  box-shadow: 0 4px 12px rgba(255, 107, 43, 0.35);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
 }
 
 .btn-secondary {
@@ -341,7 +341,7 @@ html.dark .btn-primary:hover {
    ========================================================================== */
 
 .logo {
-  font-family: var(--font-sans);
+  font-family: var(--font-heading, var(--font-sans));
   font-size: 1.25rem;
   font-weight: 800;
   text-decoration: none;
@@ -354,28 +354,55 @@ html.dark .btn-primary:hover {
   transition: opacity 0.15s ease;
 }
 .logo:hover {
-  opacity: 0.85;
+  opacity: 0.9;
 }
-.logo span {
-  color: #141414;
+.logo-squircle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05em;
+  height: 1.05em;
   background: var(--color-accent);
-  padding: 0.05rem 0.35rem;
-  border-radius: 3px;
-  transform: skew(-6deg);
-  display: inline-block;
-  margin: 0 0.18rem;
-  font-size: 1.05em;
-  line-height: 0.9;
+  border-radius: 32%;
+  transform: skew(-8deg);
+  margin: 0 0.22em;
+  vertical-align: middle;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
+}
+.logo:hover .logo-squircle {
+  transform: skew(-8deg) rotate(3deg);
+}
+.logo-squircle .logo-dot,
+.logo .logo-dot {
+  display: block;
+  width: 0.22em;
+  height: 0.22em;
+  background: var(--color-accent-text, #0c0c0c);
+  border-radius: 50%;
 }
 
 .nav-link {
-  transition: color 0.15s ease, background-color 0.15s ease;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
 }
 .nav-link.active {
-  color: var(--color-accent) !important;
+  color: var(--color-ink) !important;
   border-bottom: 2px solid var(--color-accent) !important;
   background: var(--color-accent-subtle) !important;
   font-weight: 700 !important;
+}
+
+/* 3.1. Локальные иконки Lucide */
+.tp-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  stroke-width: 1.5;
+  stroke: currentColor;
+  fill: none;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* ==========================================================================
@@ -632,7 +659,7 @@ footer,
    ========================================================================== */
 .bg-accent {
   background-color: var(--color-accent) !important;
-  color: #ffffff !important;
+  color: var(--color-accent-text, #0c0c0c) !important;
 }
 .bg-accent:hover,
 .hover\:bg-accent-hover:hover {
@@ -753,49 +780,18 @@ html.dark .sketch-corner-crease {
   stroke: rgba(202, 138, 4, 0.8) !important;
 }
 
-/* Карандашная штриховка в лабораторном блокноте (белая бумага + текстура оранжевого карандаша) */
-.sketch-pencil-orange {
-  background-color: var(--color-paper);
-  background-image: 
-    repeating-linear-gradient(
-      -48deg,
-      rgba(235, 82, 17, 0.12) 0px,
-      rgba(235, 82, 17, 0.12) 1.5px,
-      transparent 1.5px,
-      transparent 5.5px
-    ),
-    repeating-linear-gradient(
-      -44deg,
-      rgba(255, 120, 40, 0.06) 0px,
-      rgba(255, 120, 40, 0.06) 2px,
-      transparent 2px,
-      transparent 9px
-    ),
-    radial-gradient(
-      ellipse at 35% 50%,
-      rgba(255, 107, 43, 0.08) 0%,
-      rgba(255, 107, 43, 0.02) 65%,
-      transparent 100%
-    );
-  border: 1px solid var(--color-paper-border);
+/* Инженерная врезка предупреждения (чистый editorial без оранжевого шума) */
+.sketch-pencil-orange,
+.box-caution-orange {
+  background-color: var(--color-paper-subtle);
+  border: 1px solid var(--border-soft);
+  border-left: 4px solid var(--color-error-border, #dc2626);
 }
 
-html.dark .sketch-pencil-orange {
-  background-color: var(--color-paper);
-  background-image: 
-    repeating-linear-gradient(
-      -48deg,
-      rgba(249, 115, 22, 0.14) 0px,
-      rgba(249, 115, 22, 0.14) 1.5px,
-      transparent 1.5px,
-      transparent 5.5px
-    ),
-    radial-gradient(
-      ellipse at 35% 50%,
-      rgba(249, 115, 22, 0.10) 0%,
-      transparent 100%
-    );
-  border-color: var(--color-paper-border);
+html.dark .sketch-pencil-orange,
+html.dark .box-caution-orange {
+  background-color: var(--color-paper-subtle);
+  border-color: var(--border-soft);
   border-left-color: var(--color-accent);
 }
 
@@ -997,6 +993,8 @@ html.dark .tape-yellow {
   border-radius: var(--radius-sm);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
   line-height: 1;
+  font-variant-numeric: tabular-nums;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 .readout-display.readout-amber {
   color: var(--color-readout-amber);
@@ -1009,6 +1007,36 @@ html.dark .tape-yellow {
   box-shadow: 0 0 6px currentColor;
   display: inline-block;
   margin-right: 0.2rem;
+}
+
+/* Стабильные табличные цифры для табло и калькуляторов */
+.calc-result-value,
+.result-value,
+.readout-val {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes resultFlash {
+  0% {
+    background-color: var(--color-accent);
+    color: #0c0c0c;
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.result-value.is-updated,
+.calc-result-value.is-updated,
+.readout-display.is-updated {
+  animation: resultFlash 0.35s ease-out;
+}
+
+.result-value.is-error,
+.calc-result-value.is-error {
+  border-color: var(--color-error-border, #dc2626) !important;
+  color: var(--color-error-text, #991b1b) !important;
+  background-color: var(--color-error-bg, #fef2f2) !important;
 }
 
 /* 10.2. Тактильный отклик физической клавиши (Tactile Keycap Press) */
@@ -1092,9 +1120,9 @@ html.dark .tape-yellow {
   right: 0;
   bottom: 0;
   width: 100%;
-  max-width: 480px;
+  max-width: 440px;
   background-color: var(--color-bg);
-  border-left: 1px solid var(--color-paper-border);
+  border-left: 1px solid var(--border-strong, var(--color-paper-border));
   box-shadow: -8px 0 32px rgba(0, 0, 0, 0.12);
   z-index: 1000;
   transform: translateX(100%);
@@ -1114,6 +1142,26 @@ html.dark .tape-yellow {
   margin: 0.5rem auto 0;
 }
 
+@media (max-width: 640px) {
+  .lab-drawer-panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: 18px 18px 0 0;
+    border-left: none;
+    border-top: 1px solid var(--border-strong, var(--color-paper-border));
+    transform: translateY(100%);
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.16);
+  }
+  .lab-drawer-backdrop.active .lab-drawer-panel {
+    transform: translateY(0);
+  }
+}
+
 /* ==========================================================================
    11. TOP-TIER HARDWARE & EDITORIAL DETAILS (TE, PLAYDATE, KOWALSKI, ADAFRUIT)
    ========================================================================== */
@@ -1128,7 +1176,7 @@ html.dark .tape-yellow {
   background: var(--color-accent);
   z-index: 9999;
   transition: width 0.08s linear;
-  box-shadow: 0 0 8px rgba(224, 83, 26, 0.45);
+  box-shadow: 0 1px 3px rgba(255, 199, 0, 0.3);
 }
 
 /* 11.2. Двойная миллиметровая сетка CAD (Холст верстака) */

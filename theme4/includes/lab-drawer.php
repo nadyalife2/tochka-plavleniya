@@ -20,7 +20,7 @@
         </div>
       </div>
       <button type="button" id="lab-drawer-close" class="p-1.5 text-ink-muted hover:text-ink transition-colors rounded border border-paper-border bg-paper-subtle min-w-[36px] min-h-[36px] flex items-center justify-center tactile-press" aria-label="Закрыть выдвижную панель (Esc)">
-        <span class="material-symbols-outlined text-lg">close</span>
+        <?= tp_icon('x', 'w-4 h-4') ?>
       </button>
     </div>
 
@@ -136,12 +136,15 @@
     const closeBtn = document.getElementById('lab-drawer-close');
     let lastActiveElement = null;
 
-    window.openLabDrawer = function() {
+    window.openLabDrawer = function(saveState = true) {
       if (!backdrop) return;
       lastActiveElement = document.activeElement;
       backdrop.classList.add('active');
       backdrop.setAttribute('aria-hidden', 'false');
       document.body.style.overflow = 'hidden';
+      if (saveState) {
+        try { sessionStorage.setItem('tp_drawer_open', '1'); } catch(e) {}
+      }
       if (closeBtn) closeBtn.focus();
     };
 
@@ -150,6 +153,7 @@
       backdrop.classList.remove('active');
       backdrop.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
+      try { sessionStorage.removeItem('tp_drawer_open'); } catch(e) {}
       if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
         lastActiveElement.focus();
       }
@@ -172,6 +176,12 @@
         window.closeLabDrawer();
       }
     });
+
+    try {
+      if (sessionStorage.getItem('tp_drawer_open') === '1') {
+        window.openLabDrawer(false);
+      }
+    } catch(e) {}
 
     // Интерактив сплавов в шторке
     const alloySelect = document.getElementById('drawer-alloy-select');
