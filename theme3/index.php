@@ -117,20 +117,20 @@ include __DIR__ . '/includes/header.php';
         <!-- Панель-капсула с рамкой 3px -->
         <div class="panel">
           <!-- Верхний служебный бар: ОТК бейдж + кнопки Поиск и Верстак -->
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 2rem;">
-            <div class="badge badge-yellow" style="display: inline-flex; align-items: center; gap: 8px;">
-              <span style="width: 8px; height: 8px; border-radius: 50%; background: #000; display: inline-block;"></span>
+          <div class="hero-top-bar">
+            <div class="badge badge-yellow otk-status-badge">
+              <span class="status-dot"></span>
               <span>ОТК // ИНЖЕНЕРНЫЙ СПРАВОЧНИК 2026</span>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 8px;">
-              <button id="search-modal-trigger" type="button" class="badge" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px; background: #ffffff;" title="Поиск по базе знаний (Ctrl+K)">
-                <span class="material-symbols-outlined" style="font-size: 16px;">search</span>
+            <div class="hero-tools">
+              <button id="search-modal-trigger" type="button" class="badge badge-btn" title="Поиск по базе знаний (Ctrl+K)">
+                <span class="material-symbols-outlined text-[16px]">search</span>
                 <span>Поиск</span>
-                <span style="font-size: 11px; opacity: 0.7; font-family: monospace;">Ctrl+K</span>
+                <span class="kbd-shortcut">Ctrl+K</span>
               </button>
-              <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="badge badge-yellow" style="cursor: pointer; display: inline-flex; align-items: center; gap: 6px;" title="Открыть верстак">
-                <span class="material-symbols-outlined" style="font-size: 16px;">tune</span>
+              <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="badge badge-yellow" style="cursor: pointer;" title="Открыть верстак">
+                <span class="material-symbols-outlined text-[16px]">tune</span>
                 <span>Верстак</span>
               </button>
             </div>
@@ -184,14 +184,14 @@ include __DIR__ . '/includes/header.php';
     <div class="container">
 
       <!-- 3. ИНЖЕНЕРНЫЙ ТЕРМИНАЛ-ПОИСК -->
-      <section style="margin: 28px 0 16px;">
+      <section class="terminal-search-wrapper">
         <div id="quick-search-trigger" role="button" tabindex="0" aria-label="Открыть глобальный инженерный поиск по базе (Ctrl+K)"
              class="terminal-search">
-          <div style="display: flex; align-items: center; gap: 12px; font-family: monospace; font-size: 0.9rem; color: var(--muted); overflow: hidden;">
-            <span class="badge badge-yellow" style="padding: 2px 8px; font-size: 11px;">TERMINAL</span>
-            <span style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">> припой ПОС-61, флюс RMA, жала T12/C245, дефекты пайки...</span>
+          <div class="terminal-search-inner">
+            <span class="badge badge-yellow text-[11px] py-0.5 px-2">TERMINAL</span>
+            <span class="truncate">> припой ПОС-61, флюс RMA, жала T12/C245, дефекты пайки...</span>
           </div>
-          <kbd style="display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; font-family: monospace; font-size: 12px; border: 2px solid var(--accent); border-radius: 6px; background: #ffffff; color: var(--ink);">
+          <kbd class="terminal-search-kbd">
             <span>Ctrl</span><span>+</span><span>K</span>
           </kbd>
         </div>
@@ -203,7 +203,7 @@ include __DIR__ . '/includes/header.php';
           <h2><a href="<?= esc_url($site_root) ?>interactive.php">Паяй уверенно // Задачи монтажа</a></h2>
         </header>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: stretch;">
+        <div class="tasks-split-grid">
           
           <!-- Левая колонка: 4 задачи -->
           <div class="tasks-grid">
@@ -211,91 +211,91 @@ include __DIR__ . '/includes/header.php';
             <!-- Задача 1: Провод -->
             <a href="<?= esc_url($site_root) ?>interactive.php?tool=temp&task=wire" class="task-item">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: monospace; font-size: 12px;">
-                  <span style="font-weight: 700;">[MOD.01 // ПРОВОД]</span>
+                <div class="task-head">
+                  <span class="task-head-tag">[MOD.01 // ПРОВОД]</span>
                   <span class="temp-pill"><span class="temp-dot"></span>280 °C</span>
                 </div>
-                <div style="font-weight: 800; font-size: 1.15rem; margin: 4px 0;">Провод / кабель</div>
-                <p style="font-size: 0.85rem; color: var(--muted); margin: 4px 0 12px;">Многожильный медный провод, лужение жил, термоусадка</p>
+                <div class="task-title">Провод / кабель</div>
+                <p class="task-desc">Многожильный медный провод, лужение жил, термоусадка</p>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 8px; font-family: monospace; font-size: 11px;">
-                <span class="badge" style="padding: 2px 6px;">ПОС-61</span>
-                <span style="font-weight: 700;">Регламент →</span>
+              <div class="task-foot">
+                <span class="badge py-0.5 px-1.5">ПОС-61</span>
+                <span class="task-foot-cta">Регламент →</span>
               </div>
             </a>
 
             <!-- Задача 2: Плата -->
             <a href="<?= esc_url($site_root) ?>interactive.php?tool=temp&task=pcb" class="task-item">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: monospace; font-size: 12px;">
-                  <span style="font-weight: 700;">[MOD.02 // ПЛАТА]</span>
+                <div class="task-head">
+                  <span class="task-head-tag">[MOD.02 // ПЛАТА]</span>
                   <span class="temp-pill"><span class="temp-dot"></span>240 °C</span>
                 </div>
-                <div style="font-weight: 800; font-size: 1.15rem; margin: 4px 0;">Печатная плата</div>
-                <p style="font-size: 0.85rem; color: var(--muted); margin: 4px 0 12px;">SMD 0805–1206, QFN чипы, земляные полигоны платы</p>
+                <div class="task-title">Печатная плата</div>
+                <p class="task-desc">SMD 0805–1206, QFN чипы, земляные полигоны платы</p>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 8px; font-family: monospace; font-size: 11px;">
-                <span class="badge" style="padding: 2px 6px;">SAC305 // ROL0</span>
-                <span style="font-weight: 700;">Регламент →</span>
+              <div class="task-foot">
+                <span class="badge py-0.5 px-1.5">SAC305 // ROL0</span>
+                <span class="task-foot-cta">Регламент →</span>
               </div>
             </a>
 
             <!-- Задача 3: Медная труба -->
             <a href="<?= esc_url($site_root) ?>interactive.php?tool=temp&task=pipe" class="task-item">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: monospace; font-size: 12px;">
-                  <span style="font-weight: 700;">[MOD.03 // МЕДЬ]</span>
+                <div class="task-head">
+                  <span class="task-head-tag">[MOD.03 // МЕДЬ]</span>
                   <span class="temp-pill"><span class="temp-dot"></span>650 °C</span>
                 </div>
-                <div style="font-weight: 800; font-size: 1.15rem; margin: 4px 0;">Медная труба</div>
-                <p style="font-size: 0.85rem; color: var(--muted); margin: 4px 0 12px;">Трубы 15–28 мм, капиллярные муфты, горелка и твердый припой</p>
+                <div class="task-title">Медная труба</div>
+                <p class="task-desc">Трубы 15–28 мм, капиллярные муфты, горелка и твердый припой</p>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 8px; font-family: monospace; font-size: 11px;">
-                <span class="badge" style="padding: 2px 6px;">П-14 // Cu-P</span>
-                <span style="font-weight: 700;">Регламент →</span>
+              <div class="task-foot">
+                <span class="badge py-0.5 px-1.5">П-14 // Cu-P</span>
+                <span class="task-foot-cta">Регламент →</span>
               </div>
             </a>
 
             <!-- Задача 4: Экспресс-верстак -->
             <a href="javascript:void(0)" onclick="if(window.openLabDrawer) window.openLabDrawer();" class="task-item">
               <div>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: monospace; font-size: 12px;">
-                  <span style="font-weight: 700;">[MOD.04 // ВЕРСТАК]</span>
+                <div class="task-head">
+                  <span class="task-head-tag">[MOD.04 // ВЕРСТАК]</span>
                   <span class="temp-pill"><span class="temp-dot"></span>DRAWER</span>
                 </div>
-                <div style="font-weight: 800; font-size: 1.15rem; margin: 4px 0;">Экспресс-верстак</div>
-                <p style="font-size: 0.85rem; color: var(--muted); margin: 4px 0 12px;">Выдвижная панель: мгновенный расчет сплава, тока провода и флюса</p>
+                <div class="task-title">Экспресс-верстак</div>
+                <p class="task-desc">Выдвижная панель: мгновенный расчет сплава, тока провода и флюса</p>
               </div>
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 8px; font-family: monospace; font-size: 11px;">
-                <span class="badge badge-yellow" style="padding: 2px 6px;">Быстрая панель</span>
-                <span style="font-weight: 700;">Открыть ↗</span>
+              <div class="task-foot">
+                <span class="badge badge-yellow py-0.5 px-1.5">Быстрая панель</span>
+                <span class="task-foot-cta">Открыть ↗</span>
               </div>
             </a>
 
           </div>
 
           <!-- Правая колонка: Чертёж № 01-Ж // Анатомия жала -->
-          <div class="card" style="padding: 20px; display: flex; flex-direction: column; justify-content: space-between;">
+          <div class="card schematic-card">
             <div>
-              <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 2px solid var(--line); margin-bottom: 14px; font-family: monospace; font-size: 12px;">
-                <span style="font-weight: 800; display: flex; align-items: center; gap: 8px;">
-                  <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); border: 1.5px solid #000; display: inline-block;"></span>
+              <div class="schematic-header">
+                <span class="schematic-title">
+                  <span class="schematic-dot"></span>
                   ЧЕРТЁЖ № 01-Ж // АНАТОМИЯ ЖАЛА
                 </span>
-                <span class="badge" style="font-size: 10px; padding: 2px 8px;">IPC-J-STD-001</span>
+                <span class="badge text-[10px] py-0.5 px-2">IPC-J-STD-001</span>
               </div>
-              <div style="background: #ffffff; border: 2px solid var(--line); border-radius: 10px; padding: 12px; display: flex; align-items: center; justify-content: center; min-height: 180px;">
+              <div class="schematic-canvas">
                 <img 
                   src="<?= $assets_base ?>/assets/schematics/tip-cutaway.svg" 
                   alt="Разрез паяльного жала: медный сердечник, нагреватель и рабочая поверхность" 
                   width="340" 
                   height="180" 
-                  style="max-width: 100%; height: auto; object-fit: contain;"
+                  class="max-w-full h-auto object-contain"
                   loading="eager"
                 />
               </div>
             </div>
-            <p style="font-family: monospace; font-size: 12px; color: var(--muted); margin: 14px 0 0; text-align: center; line-height: 1.4;">
+            <p class="schematic-caption">
               Медный сердечник передаёт тепло, защитный слой железа предотвращает растворение в олове.
             </p>
           </div>
@@ -322,11 +322,11 @@ include __DIR__ . '/includes/header.php';
                 <img src="<?= htmlspecialchars($art_img) ?>" class="thumb" alt="<?= htmlspecialchars($article['title']) ?>" loading="lazy" />
               </a>
               <div class="pad">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div class="card-meta-top">
                   <span class="badge badge-yellow">
                     <?= htmlspecialchars($article['tag']) ?>
                   </span>
-                  <span style="font-family: monospace; font-size: 12px; color: var(--muted);">
+                  <span class="card-read-time">
                     ~<?= (int)$article['read_min'] ?> мин
                   </span>
                 </div>
@@ -339,10 +339,10 @@ include __DIR__ . '/includes/header.php';
                   <?= htmlspecialchars($article['excerpt']) ?>
                 </p>
                 <div class="badges">
-                  <span class="badge" style="font-family: monospace;">
+                  <span class="badge card-author">
                     <?= htmlspecialchars($article['author']) ?>
                   </span>
-                  <a href="<?= htmlspecialchars($art_url) ?>" class="badge badge-yellow" style="margin-left: auto;">
+                  <a href="<?= htmlspecialchars($art_url) ?>" class="badge badge-yellow ml-auto">
                     Читать →
                   </a>
                 </div>
@@ -358,33 +358,33 @@ include __DIR__ . '/includes/header.php';
           <h2><a href="<?= esc_url($site_root) ?>category.php?slug=materialy">Тематические разделы</a></h2>
         </header>
 
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 18px;">
+        <div class="rubrics-grid">
           <?php 
           $rubric_order = ['start', 'materialy', 'praktika', 'oshibki'];
           foreach ($rubric_order as $rslug):
             if (!isset($RUBRICS[$rslug])) continue;
             $rub = $RUBRICS[$rslug];
           ?>
-            <a href="<?= esc_url($site_root) ?>category.php?slug=<?= $rslug ?>" class="card" style="padding: 20px; text-decoration: none; color: inherit;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <span class="badge badge-yellow" style="font-size: 10px;">
+            <a href="<?= esc_url($site_root) ?>category.php?slug=<?= $rslug ?>" class="card rubric-card">
+              <div class="rubric-head">
+                <span class="badge badge-yellow text-[10px]">
                   <?= e($rub['subbadge']) ?>
                 </span>
-                <span style="font-family: monospace; font-size: 11px; font-weight: 700; color: var(--muted);">
+                <span class="rubric-sec-num">
                   SEC.0<?= match($rslug) {'start'=>1, 'materialy'=>2, 'praktika'=>3, 'oshibki'=>4} ?>
                 </span>
               </div>
-              <h3 style="margin-bottom: 8px;">
+              <h3 class="mb-2">
                 <?= e($rub['title']) ?>
               </h3>
-              <p class="excerpt" style="margin-bottom: 16px;">
+              <p class="excerpt mb-4">
                 <?= e($rub['lead']) ?>
               </p>
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 12px; margin-top: auto; font-family: monospace; font-size: 12px;">
-                <span class="badge" style="font-size: 10px;">
+              <div class="rubric-foot">
+                <span class="badge text-[10px]">
                   <?= count($rub['article_ids'] ?? []) ?> РЕГЛАМЕНТОВ
                 </span>
-                <span style="font-weight: 800;">Изучить →</span>
+                <span class="font-extrabold">Изучить →</span>
               </div>
             </a>
           <?php endforeach; ?>
@@ -397,26 +397,26 @@ include __DIR__ . '/includes/header.php';
           <h2><a href="<?= esc_url($site_root) ?>category.php?slug=praktika">Прикладные микроуроки монтажа</a></h2>
         </header>
 
-        <div class="grid" style="grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px;">
+        <div class="lessons-grid">
           <?php foreach (get_all_lessons() as $idx => $l): 
             $l_url = function_exists('home_url') ? home_url('/' . urlencode($l['slug']) . '/') : ('/' . urlencode($l['slug']) . '/');
           ?>
-            <article class="card" style="padding: 16px;">
-              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-family: monospace; font-size: 10px;">
-                <span class="badge badge-yellow" style="padding: 1px 6px;">РЕГЛАМЕНТ-<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
-                <span style="color: var(--muted);">~<?= $l['read_min'] ?> МИН</span>
+            <article class="card lesson-card">
+              <div class="lesson-head">
+                <span class="badge badge-yellow py-0.5 px-1.5">РЕГЛАМЕНТ-<?= str_pad($idx + 1, 2, '0', STR_PAD_LEFT) ?></span>
+                <span class="text-ink-muted">~<?= $l['read_min'] ?> МИН</span>
               </div>
-              <h3 style="font-size: 0.95rem; line-height: 1.35; margin-bottom: 6px;">
+              <h3 class="lesson-title">
                 <a href="<?= esc_url($l_url) ?>">
                   <?= htmlspecialchars($l['title']) ?>
                 </a>
               </h3>
-              <p class="excerpt" style="font-size: 0.8rem; line-height: 1.4; margin-bottom: 12px;">
+              <p class="excerpt lesson-desc">
                 <?= htmlspecialchars($l['subtitle']) ?>
               </p>
-              <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--line); padding-top: 8px; margin-top: auto; font-family: monospace; font-size: 11px;">
-                <span style="color: var(--muted); font-size: 10px;">ЧЕК-ЛИСТ</span>
-                <a href="<?= esc_url($l_url) ?>" style="font-weight: 800;">
+              <div class="lesson-foot">
+                <span class="text-ink-muted text-[10px]">ЧЕК-ЛИСТ</span>
+                <a href="<?= esc_url($l_url) ?>" class="font-extrabold">
                   Открыть →
                 </a>
               </div>
@@ -431,32 +431,32 @@ include __DIR__ . '/includes/header.php';
           <h2><a href="#">Откуда берутся цифры // Метрология</a></h2>
         </header>
 
-        <div class="card" style="padding: 24px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--line); padding-bottom: 10px; margin-bottom: 16px; font-family: monospace; font-size: 12px;">
-            <span style="font-weight: 800; display: flex; align-items: center; gap: 8px;">
-              <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); border: 1.5px solid #000; display: inline-block;"></span>
+        <div class="card trust-card">
+          <div class="trust-header">
+            <span class="trust-title">
+              <span class="schematic-dot"></span>
               ПАСПОРТ МЕТРОЛОГИЧЕСКОЙ ПОВЕРКИ И НОРМАТИВНОЙ БАЗЫ
             </span>
-            <span class="badge" style="font-size: 10px;">ГОСТ & IPC-A-610</span>
+            <span class="badge text-[10px]">ГОСТ & IPC-A-610</span>
           </div>
-          <p style="font-size: 1.05rem; line-height: 1.6; margin-bottom: 20px;">
+          <p class="trust-lead">
             Температуры плавления берём из нормативных документов и паспортов сплавов. Уставка паяльной станции — практический стартовый ориентир: её корректируют по теплоёмкости детали, жалу и времени контакта.
           </p>
-          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; font-family: monospace; font-size: 12px;">
-            <div style="padding: 12px; border: 2px solid var(--line); border-radius: 8px; background: var(--bg);">
-              <div style="color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase;">Оловянно-свинцовые сплавы</div>
-              <div style="font-weight: 800; font-size: 13px; margin: 4px 0;">ГОСТ 21930 / 21931</div>
-              <div style="color: var(--muted);">ПОС-61 (183–190°C)</div>
+          <div class="trust-grid">
+            <div class="trust-col">
+              <div class="text-ink-muted text-[10px] font-bold uppercase">Оловянно-свинцовые сплавы</div>
+              <div class="font-extrabold text-[13px] my-1">ГОСТ 21930 / 21931</div>
+              <div class="text-ink-muted">ПОС-61 (183–190°C)</div>
             </div>
-            <div style="padding: 12px; border: 2px solid var(--line); border-radius: 8px; background: var(--bg);">
-              <div style="color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase;">Бессвинцовые сплавы</div>
-              <div style="font-weight: 800; font-size: 13px; margin: 4px 0;">ISO 9453 / Паспорта</div>
-              <div style="color: var(--muted);">SAC305 (217–220°C)</div>
+            <div class="trust-col">
+              <div class="text-ink-muted text-[10px] font-bold uppercase">Бессвинцовые сплавы</div>
+              <div class="font-extrabold text-[13px] my-1">ISO 9453 / Паспорта</div>
+              <div class="text-ink-muted">SAC305 (217–220°C)</div>
             </div>
-            <div style="padding: 12px; border: 2px solid var(--line); border-radius: 8px; background: var(--bg);">
-              <div style="color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase;">Критерии приёмки соединений</div>
-              <div style="font-weight: 800; font-size: 13px; margin: 4px 0;">IPC-A-610G (Класс 2/3)</div>
-              <div style="color: var(--muted);">Мениск, галтель, смачивание</div>
+            <div class="trust-col">
+              <div class="text-ink-muted text-[10px] font-bold uppercase">Критерии приёмки соединений</div>
+              <div class="font-extrabold text-[13px] my-1">IPC-A-610G (Класс 2/3)</div>
+              <div class="text-ink-muted">Мениск, галтель, смачивание</div>
             </div>
           </div>
         </div>
@@ -468,48 +468,48 @@ include __DIR__ . '/includes/header.php';
           <h2><a href="#">Частые вопросы // Инженерный FAQ</a></h2>
         </header>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px;">
+        <div class="faq-grid">
           
-          <div class="card" style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 10px;">
-              <span style="font-weight: 800;">[ЗАПРОС 01]</span>
+          <div class="card faq-card">
+            <div class="faq-head">
+              <span class="faq-head-id">[ЗАПРОС 01]</span>
               <span>ТЕМПЕРАТУРНЫЙ РЕЖИМ</span>
             </div>
-            <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Какую температуру выставить для припоя ПОС-61?</h3>
-            <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.5; margin: 0;">
+            <h3 class="faq-title">Какую температуру выставить для припоя ПОС-61?</h3>
+            <p class="faq-desc">
               Припой ПОС-61 плавится при 183–190 °C. На паяльной станции выставляйте <strong>260–290 °C</strong>. Запас в 80–100 °C необходим, чтобы компенсировать отвод тепла в медные дорожки платы.
             </p>
           </div>
 
-          <div class="card" style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 10px;">
-              <span style="font-weight: 800;">[ЗАПРОС 02]</span>
+          <div class="card faq-card">
+            <div class="faq-head">
+              <span class="faq-head-id">[ЗАПРОС 02]</span>
               <span>ВЫБОР ОБОРУДОВАНИЯ</span>
             </div>
-            <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Нужен ли новичку дорогой паяльник вроде JBC?</h3>
-            <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.5; margin: 0;">
+            <h3 class="faq-title">Нужен ли новичку дорогой паяльник вроде JBC?</h3>
+            <p class="faq-desc">
               Нет. Для старта достаточно станции на картриджах <strong>Hakko T12</strong> (или USB-PD паяльника вроде Pinecil). Они быстро греются и держат температуру благодаря встроенной в жало термопаре.
             </p>
           </div>
 
-          <div class="card" style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 10px;">
-              <span style="font-weight: 800;">[ЗАПРОС 03]</span>
+          <div class="card faq-card">
+            <div class="faq-head">
+              <span class="faq-head-id">[ЗАПРОС 03]</span>
               <span>ЗАЩИТА ПЛАТЫ</span>
             </div>
-            <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Как не отслоить медную дорожку от текстолита?</h3>
-            <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.5; margin: 0;">
+            <h3 class="faq-title">Как не отслоить медную дорожку от текстолита?</h3>
+            <p class="faq-desc">
               Главное правило: <strong>не более 2.5–3 секунд</strong> контакта жала с площадкой. Если припой не плавится за это время — увеличьте площадь контакта жала, но не давите на дорожку силой.
             </p>
           </div>
 
-          <div class="card" style="padding: 20px;">
-            <div style="display: flex; justify-content: space-between; font-family: monospace; font-size: 11px; color: var(--muted); border-bottom: 1px solid var(--line); padding-bottom: 6px; margin-bottom: 10px;">
-              <span style="font-weight: 800;">[ЗАПРОС 04]</span>
+          <div class="card faq-card">
+            <div class="faq-head">
+              <span class="faq-head-id">[ЗАПРОС 04]</span>
               <span>МОНТАЖНАЯ ХИМИЯ</span>
             </div>
-            <h3 style="font-size: 1.05rem; margin-bottom: 8px;">Какой флюс выбрать для первого раза и надо ли его смывать?</h3>
-            <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.5; margin: 0;">
+            <h3 class="faq-title">Какой флюс выбрать для первого раза и надо ли его смывать?</h3>
+            <p class="faq-desc">
               Выбирайте гелевый флюс класса <strong>No-Clean (ROL0)</strong>. Канифоль безопасна, но твердеет; активные кислотные флюсы для плат брать категорически запрещено — их остатки разъедают дорожки.
             </p>
           </div>

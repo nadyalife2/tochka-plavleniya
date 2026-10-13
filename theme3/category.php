@@ -563,7 +563,7 @@ include __DIR__ . '/includes/header.php';
                   </div>
 
                   <h3 class="text-base font-bold text-ink leading-snug tracking-tight">
-                    <a class="hover:text-amber-600 dark:hover:text-amber-500 hover:underline transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded" href="<?= $art_url ?>">
+                    <a class="text-ink hover:underline transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded" href="<?= $art_url ?>">
                       <?= e($article['title']) ?>
                     </a>
                   </h3>
@@ -575,7 +575,7 @@ include __DIR__ . '/includes/header.php';
 
                 <div class="pt-3 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-muted font-hand text-base font-bold italic"><?= e($article['author'] ?? 'Мария Канифоль') ?></span>
-                  <a class="text-amber-600 dark:text-amber-500 font-semibold hover:text-amber-700 dark:hover:text-amber-400 hover:underline flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1 py-0.5" href="<?= $art_url ?>">
+                  <a class="text-ink font-bold hover:underline flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1 py-0.5" href="<?= $art_url ?>">
                     <span>Читать</span>
                     <span aria-hidden="true">→</span>
                   </a>
@@ -701,7 +701,7 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <div class="pt-1 text-right">
-              <a href="<?= e($sb_spec['more_link']) ?>" class="font-mono text-xs text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 hover:underline font-bold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
+              <a href="<?= e($sb_spec['more_link']) ?>" class="font-mono text-xs text-ink hover:underline font-bold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
                 <?= e($sb_spec['more_text']) ?>
               </a>
             </div>
@@ -743,7 +743,7 @@ include __DIR__ . '/includes/header.php';
               <span class="pill-blue text-[10px] px-2 py-0.5 rounded">[03 МОДУЛЯ]</span>
             </div>
             <div class="space-y-2 font-mono text-xs">
-              <a href="<?= esc_url($site_root) ?>interactive.php#temp" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-orange-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <a href="<?= esc_url($site_root) ?>interactive.php#temp" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[15px] text-accent">thermostat</span>
@@ -754,10 +754,10 @@ include __DIR__ . '/includes/header.php';
                 <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-bold">#temp</span>
               </a>
 
-              <a href="<?= esc_url($site_root) ?>interactive.php#iron" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-sky-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <a href="<?= esc_url($site_root) ?>interactive.php#iron" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
-                  <div class="font-bold group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors text-xs flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[15px] text-sky-600 dark:text-sky-400">construction</span>
+                  <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-[15px] text-accent">construction</span>
                     [02] Подбор паяльника
                   </div>
                   <div class="text-xs text-ink-muted">Станции T12, C245 под бюджет</div>
@@ -765,7 +765,7 @@ include __DIR__ . '/includes/header.php';
                 <span class="pill-blue text-[10px] px-2 py-0.5 rounded font-bold">#iron</span>
               </a>
 
-              <a href="<?= esc_url($site_root) ?>interactive.php#defect" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-amber-400 text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <a href="<?= esc_url($site_root) ?>interactive.php#defect" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[15px] text-accent">troubleshoot</span>

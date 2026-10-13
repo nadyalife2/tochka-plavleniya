@@ -6,45 +6,59 @@
  */
 
 :root {
-  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Чистый белый холст #ffffff) --- */
-  --color-bg: #ffffff;
+  /* --- HEADPHONES STYLE CORE PALETTE --- */
+  --bg: #f6f6f6;
+  --ink: #0c0c0c;
+  --muted: #4a4a4a;
+  --line: #e7e7ea;
+  --card: #ffffff;
+  --pill: #f2f2f4;
+
+  --yellow: #FFC700;
+  --yellow-hover: #E5B200;
+  --on-yellow: #000000;
+
+  /* В Headphones акцент рамок — чёрный #111111 */
+  --accent: #111111;
+
+  /* --- 60% ЦВЕТОВЫЕ ПОВЕРХНОСТИ (Светло-серый холст #f6f6f6 без точек) --- */
+  --color-bg: #f6f6f6;
   --color-paper: #ffffff;
-  --color-paper-subtle: #f7f5ef;
-  --color-paper-border: #e4e0d7;
-  --color-paper-border-dark: #1A1A1A;
+  --color-paper-subtle: #f2f2f4;
+  --color-paper-border: #111111;
+  --color-paper-border-dark: #111111;
   --color-card: #ffffff;
   --color-card-solid: #ffffff;
-  --color-callout: #f7f5ef;
-  --dot-color: #eeeae1;
+  --color-callout: #f2f2f4;
+  --dot-color: transparent;
 
-  /* --- 30% ТЕКСТ И СТРУКТУРА (Анодированный приборный графит) --- */
-  --color-ink: #141518;
-  --color-ink-muted: #4b515d;
+  /* --- 30% ТЕКСТ И СТРУКТУРА --- */
+  --color-ink: #0c0c0c;
+  --color-ink-muted: #4a4a4a;
   --color-ink-faint: #6e7582;
 
-  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Сигнальный медно-янтарный Teenage Engineering #E0531A) --- */
-  --color-accent: #e0531a;
-  --color-accent-text: #b83d0a;
-  --color-accent-hover: #c94410;
-  --color-accent-subtle: rgba(224, 83, 26, 0.08);
-  --color-accent-border: rgba(224, 83, 26, 0.28);
+  /* --- 10% АКЦЕНТ И ДЕЙСТВИЕ (Фирменный жёлтый #FFC700) --- */
+  --color-accent: #FFC700;
+  --color-accent-text: #0c0c0c;
+  --color-accent-hover: #E5B200;
+  --color-accent-subtle: rgba(255, 199, 0, 0.14);
+  --color-accent-border: #111111;
+  --color-primary: #FFC700;
+  --color-primary-hover: #E5B200;
 
-  /* --- ВСПОМОГАТЕЛЬНЫЙ ПРИБОРНЫЙ ЦИАН (Контрольная зона допуска / IPC норма) --- */
+  /* --- ВСПОМОГАТЕЛЬНЫЙ ПРИБОРНЫЙ ЦИАН --- */
   --color-cyan: #0d9488;
   --color-cyan-text: #0f766e;
   --color-cyan-subtle: rgba(13, 148, 136, 0.08);
   --color-cyan-border: rgba(13, 148, 136, 0.28);
 
-  /* --- ЦИФРОВОЙ СЕГМЕНТНЫЙ ИНДИКАТОР (Digital Readout Display) --- */
+  /* --- ЦИФРОВОЙ СЕГМЕНТНЫЙ ИНДИКАТОР --- */
   --color-readout-bg: #14161a;
   --color-readout-text: #2dd4bf;
-  --color-readout-amber: #fbbf24;
+  --color-readout-amber: #FFC700;
   --color-readout-border: #232730;
 
   /* Алиасы семантики */
-  --accent: var(--color-accent);
-  --color-primary: var(--color-accent);
-  --color-primary-hover: var(--color-accent-hover);
   --color-surface: var(--color-paper);
   --color-surface-subtle: var(--color-paper-subtle);
   --color-text: var(--color-ink);
@@ -72,8 +86,9 @@
   --color-sketch-yellow-bg: #fffdf5;
   --color-sketch-tape: rgba(235, 222, 179, 0.85);
 
-  /* --- ТИПОГРАФИКА: IBM Plex Sans доминанта (DESIGN.md) --- */
-  --font-sans: "IBM Plex Sans", "Space Grotesk", system-ui, -apple-system, sans-serif;
+  /* --- ТИПОГРАФИКА: Inter & Space Grotesk --- */
+  --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-display: "Space Grotesk", system-ui, -apple-system, sans-serif;
   --font-serif: Newsreader, Georgia, serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-hand: Caveat, cursive;
@@ -135,25 +150,29 @@
 
 /* ТЁМНАЯ ТЕМА: #242424 карточка, #E8E0D4 текст */
 html.dark {
-  --color-bg: #141414;
-  --color-paper: #242424;
-  --color-paper-subtle: #1c1c1c;
-  --color-paper-border: #383838;
-  --color-paper-border-dark: #4a4a4a;
-  --color-card: #242424;
-  --color-card-solid: #242424;
-  --color-callout: #1c1c1c;
-  --dot-color: #202020;
+  --color-bg: #121212;
+  --bg: #121212;
+  --color-paper: #1c1c1e;
+  --card: #1c1c1e;
+  --color-paper-subtle: #242426;
+  --color-paper-border: #38383a;
+  --color-paper-border-dark: #FFC700;
+  --color-card: #1c1c1e;
+  --color-card-solid: #1c1c1e;
+  --color-callout: #242426;
+  --dot-color: transparent;
 
-  --color-ink: #E8E0D4;
-  --color-ink-muted: #A39B8E;
-  --color-ink-faint: #7A7367;
+  --color-ink: #f5f5f7;
+  --ink: #f5f5f7;
+  --color-ink-muted: #a1a1a6;
+  --muted: #a1a1a6;
+  --color-ink-faint: #636366;
 
-  --color-accent: #f97316;
-  --color-accent-text: #fb923c;
-  --color-accent-hover: #ffa066;
-  --color-accent-subtle: rgba(249, 115, 22, 0.18);
-  --color-accent-border: rgba(249, 115, 22, 0.45);
+  --color-accent: #FFC700;
+  --color-accent-text: #000000;
+  --color-accent-hover: #ffd633;
+  --color-accent-subtle: rgba(255, 199, 0, 0.18);
+  --color-accent-border: #FFC700;
 
   --color-danger: #ef4444;
   --color-danger-bg: rgba(179, 38, 30, 0.25);

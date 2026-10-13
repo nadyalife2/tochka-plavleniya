@@ -1,29 +1,25 @@
 <?php $site_root = function_exists('home_url') ? home_url('/') : '/'; ?>
 <!-- Editorial Minimal Footer (Unified across all pages) -->
-<footer class="w-full border-t border-paper-border bg-paper py-10 mt-12 text-ink-muted text-xs font-mono">
-  <div class="max-w-[1140px] mx-auto px-5 sm:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-    <div class="space-y-1.5">
-      <div class="flex items-center gap-2 text-ink font-semibold">
-        <a class="logo text-sm hover:opacity-85 transition-opacity" href="<?= $site_root ?>">
-          ТОЧКА<span>.</span>ПЛАВЛЕНИЯ
+<footer class="footer">
+  <div class="container">
+    <div class="footer__row">
+      <div class="footer__copy">
+        <a class="footer__brand" href="<?= $site_root ?>">
+          ТОЧКА<strong>.</strong>ПЛАВЛЕНИЯ
         </a>
-        <span class="text-ink-faint">·</span>
-        <span class="text-xs font-normal text-ink-faint">Инженерный регламент v2.4</span>
+        <span class="footer__sep">•</span>
+        <span>Инженерный регламент и теплофизика монтажа</span>
+        <span class="footer__sep">•</span>
+        <span>© <?= date('Y') ?></span>
       </div>
-      <p class="text-xs text-ink-muted max-w-md">
-        Инженерный справочник, регламенты поверхностного монтажа и открытая документация по пайке и теплофизике компонентов.
-      </p>
-      <div class="text-ink-faint text-xs pt-1">
-        © <?php echo date('Y'); ?> ТОЧКА ПЛАВЛЕНИЯ. Все права защищены.
-      </div>
-    </div>
-    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-[12px]">
-      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>#articles">Статьи</a>
-      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>interactive.php#calculator">Калькулятор флюсов</a>
-      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>interactive.php#table">Таблица припоев</a>
-      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>interactive.php">Верстак</a>
-      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>privacy.php">Конфиденциальность</a>
-      <a class="hover:text-ink transition-colors" href="<?= $site_root ?>terms.php">Соглашение</a>
+      <nav class="footer-nav">
+        <a href="<?= $site_root ?>#articles">Статьи</a>
+        <a href="<?= $site_root ?>interactive.php#calculator">Калькулятор флюсов</a>
+        <a href="<?= $site_root ?>interactive.php#table">Таблица припоев</a>
+        <a href="<?= $site_root ?>interactive.php">Верстак</a>
+        <a href="<?= $site_root ?>privacy.php">Конфиденциальность</a>
+        <a href="<?= $site_root ?>terms.php">Соглашение</a>
+      </nav>
     </div>
   </div>
 </footer>
