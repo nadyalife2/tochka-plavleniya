@@ -1094,9 +1094,26 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 
 /* Reduced motion preference */
 @media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .tp-headphones .marquee {
+    overflow-x: auto !important;
+  }
+  .tp-headphones .marquee-track,
   .marquee-track {
     animation: none !important;
   }
+  .tp-headphones .card:hover,
+  .tp-headphones .card:hover .thumb,
+  .tp-headphones .task-item:hover,
+  .tp-headphones .terminal-search:hover,
+  .tp-headphones .tag:hover,
+  .tp-headphones .badge:hover,
+  .tp-headphones .thumb,
   .card:hover,
   .task-item:hover,
   .terminal-search:hover,
