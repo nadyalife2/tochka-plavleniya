@@ -486,13 +486,14 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 
 .tp-headphones .pager .num,
 .tp-headphones .pager .arrow {
-  border: 2px solid var(--accent);
+  border: 2px solid #111111;
   background: #ffffff;
   padding: 0.45em 0.85em;
   border-radius: 8px;
-  font-weight: 800;
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
   cursor: pointer;
-  color: var(--ink);
+  color: #111111;
   text-decoration: none;
   min-width: 42px;
   text-align: center;
@@ -501,14 +502,16 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 
 .tp-headphones .pager .num:hover,
 .tp-headphones .pager .arrow:hover {
-  background: var(--yellow);
-  border-color: var(--accent);
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
   transform: translateY(-2px);
 }
 
 .tp-headphones .pager .num.is-active {
-  background: var(--accent);
+  background: #111111;
   color: #ffffff;
+  border-color: #111111;
 }
 
 /* ==========================================================================
@@ -965,83 +968,98 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   font-size: 11px;
 }
 
-.trust-card {
+.tp-headphones .trust-card {
+  border: 2.5px solid #111111;
+  border-radius: 14px;
+  background: #ffffff;
   padding: 24px;
+  box-shadow: none;
 }
 
-.trust-header {
+.tp-headphones .trust-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 2px solid var(--line);
   padding-bottom: 10px;
   margin-bottom: 16px;
-  font-family: monospace;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 12px;
 }
 
-.trust-title {
+.tp-headphones .trust-title {
   font-weight: 800;
   display: flex;
   align-items: center;
   gap: 8px;
+  color: #111111;
 }
 
-.trust-lead {
+.tp-headphones .trust-lead {
+  font-family: "Inter", sans-serif;
   font-size: 1.05rem;
   line-height: 1.6;
+  color: #111111;
   margin-bottom: 20px;
 }
 
-.trust-grid {
+.tp-headphones .trust-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 14px;
-  font-family: monospace;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
 }
 
-.trust-col {
+.tp-headphones .trust-col {
   padding: 12px;
-  border: 2px solid var(--line);
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--bg);
 }
 
-.faq-grid {
+.tp-headphones .faq-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 16px;
 }
 
-.faq-card {
+.tp-headphones .faq-card {
+  border: 2.5px solid #111111;
+  border-radius: 14px;
+  background: #ffffff;
   padding: 20px;
+  box-shadow: none;
 }
 
-.faq-head {
+.tp-headphones .faq-head {
   display: flex;
   justify-content: space-between;
-  font-family: monospace;
+  font-family: "Space Grotesk", sans-serif;
   font-size: 11px;
-  color: var(--muted);
+  color: var(--muted, #4a4a4a);
   border-bottom: 1px solid var(--line);
   padding-bottom: 6px;
   margin-bottom: 10px;
 }
 
-.faq-head-id {
+.tp-headphones .faq-head-id {
   font-weight: 800;
 }
 
-.faq-title {
+.tp-headphones .faq-title {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
   font-size: 1.05rem;
+  color: #111111;
   margin-bottom: 8px;
 }
 
-.faq-desc {
+.tp-headphones .faq-desc {
+  font-family: "Inter", sans-serif;
   font-size: 0.9rem;
-  color: var(--muted);
-  line-height: 1.5;
+  color: var(--muted, #4a4a4a);
+  line-height: 1.55;
   margin: 0;
 }
 
