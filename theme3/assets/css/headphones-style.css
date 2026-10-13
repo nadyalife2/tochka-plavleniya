@@ -1,31 +1,7 @@
 /* ==========================================================================
    HEADPHONES SITE («ЗВУК В УХАХ») AUTHENTIC DESIGN SYSTEM FOR THEME3
-   Faithfully reproduced from headphones_site with signature #FFC700 yellow accents.
+   Design tokens are consolidated in tokens.css.
    ========================================================================== */
-
-:root {
-  --bg: #f6f6f6;
-  --ink: #0c0c0c;
-  --muted: #4a4a4a;
-  --line: #e7e7ea;
-  --card: #ffffff;
-  --accent: #111111;
-  --pill: #f2f2f4;
-  --yellow: #FFC700;
-  --yellow-hover: #E5B200;
-
-  /* Legacy theme aliases to ensure Tailwind and components harmonize */
-  --color-bg: #f6f6f6;
-  --color-paper: #ffffff;
-  --color-card: #ffffff;
-  --color-ink: #0c0c0c;
-  --color-ink-muted: #4a4a4a;
-  --color-paper-border: #111111;
-  --color-accent: #FFC700;
-  --color-accent-text: #0c0c0c;
-  --dot-color: transparent;
-  --bg-color: #f6f6f6;
-}
 
 /* Base Body: Zero dots, clean flat surface */
 html, body {
