@@ -414,3 +414,16 @@ add_filter('comments_array', '__return_empty_array', 10, 2);
 
 // 6. Подключение модуля импорта базы знаний и регламентов ТЧП
 require_once __DIR__ . '/includes/demo-importer.php';
+
+// 7. Asset Enqueuing & Cache-Busting for Headphones System
+add_action('wp_enqueue_scripts', function () {
+    $theme_dir = get_template_directory();
+    $theme_uri = get_template_directory_uri();
+
+    $tokens_ver = file_exists($theme_dir . '/assets/css/tokens.css') ? filemtime($theme_dir . '/assets/css/tokens.css') : '1.0.0';
+    $headphones_ver = file_exists($theme_dir . '/assets/css/headphones-style.css') ? filemtime($theme_dir . '/assets/css/headphones-style.css') : '1.0.0';
+
+    wp_enqueue_style('theme3-tokens', $theme_uri . '/assets/css/tokens.css', [], $tokens_ver);
+    wp_enqueue_style('theme3-headphones', $theme_uri . '/assets/css/headphones-style.css', ['theme3-tokens'], $headphones_ver);
+});
+

@@ -45,14 +45,21 @@ $tchp_head_escape = static function ($value) {
       }
     })();
   </script>
+  <?php
+    $tchp_tokens_path = dirname(__DIR__) . '/assets/css/tokens.css';
+    $tchp_hp_path     = dirname(__DIR__) . '/assets/css/headphones-style.css';
+    $tchp_tokens_ver  = file_exists($tchp_tokens_path) ? filemtime($tchp_tokens_path) : '1.0.0';
+    $tchp_hp_ver      = file_exists($tchp_hp_path) ? filemtime($tchp_hp_path) : '1.0.0';
+  ?>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css?v=<?= $tchp_tokens_ver ?>">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css">
-  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/headphones-style.css">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/headphones-style.css?v=<?= $tchp_hp_ver ?>">
   <?php if (!empty($extra_head)) echo $extra_head; ?>
   <?php if (function_exists('wp_head')) wp_head(); ?>
 </head>
