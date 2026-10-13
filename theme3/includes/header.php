@@ -56,7 +56,7 @@ $tchp_head_escape = static function ($value) {
   <?php if (!empty($extra_head)) echo $extra_head; ?>
   <?php if (function_exists('wp_head')) wp_head(); ?>
 </head>
-<body class="font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
+<body class="tp-headphones font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-3 focus:left-3 focus:bg-accent focus:text-white focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs focus:shadow-md focus:outline-none">
     Перейти к основному содержимому
   </a>

@@ -38,7 +38,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   width: 100%;
 }
 
-.section {
+.tp-headphones .section {
   padding: 48px 0;
   border-top: 1px solid var(--line);
   max-width: 100%;
@@ -47,17 +47,17 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 /* ==========================================================================
    HERO SECTION (Exact Headphones Site)
    ========================================================================== */
-.hero {
+.tp-headphones .hero {
   padding: 32px 0 18px !important;
   border-top: none !important;
 }
 
-.hero .container {
+.tp-headphones .hero .container {
   position: relative;
 }
 
 /* Панель с рамкой 3px */
-.hero .panel {
+.tp-headphones .hero .panel {
   position: relative;
   background: var(--card);
   border: 3px solid var(--accent);
@@ -69,7 +69,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   box-sizing: border-box;
 }
 
-.hero .panel p {
+.tp-headphones .hero .panel p {
   max-width: 780px;
   color: var(--ink);
   font-family: "Space Grotesk", sans-serif;
@@ -82,13 +82,13 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 }
 
 /* Чипы-навигации в нижнем правом углу */
-.top-nav {
+.tp-headphones .top-nav {
   position: absolute;
   right: 1.5rem;
   bottom: 1.5rem;
 }
 
-.nav-chips {
+.tp-headphones .nav-chips {
   display: flex;
   gap: 0.6rem;
   list-style: none;
@@ -97,7 +97,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   flex-wrap: wrap;
 }
 
-.nav-chips a {
+.tp-headphones .nav-chips a {
   border: 2px solid var(--accent);
   background: #ffffff;
   color: var(--ink);
@@ -112,24 +112,24 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   gap: 0.35rem;
 }
 
-.nav-chips a:hover,
-.nav-chips a:focus {
-  background: var(--yellow) !important;
-  color: #000000 !important;
+.tp-headphones .nav-chips a:hover,
+.tp-headphones .nav-chips a:focus {
+  background: var(--accent) !important;
+  color: #ffffff !important;
   transform: translateY(-2px);
   box-shadow: 2px 2px 0 var(--accent);
 }
 
-.nav-chips a.active,
-.nav-chips a.is-active {
-  background: var(--yellow) !important;
-  color: #000000 !important;
+.tp-headphones .nav-chips a.active,
+.tp-headphones .nav-chips a.is-active {
+  background: var(--accent) !important;
+  color: #ffffff !important;
   border-color: var(--accent) !important;
   box-shadow: 2px 2px 0 var(--accent);
 }
 
 /* Side Logo — вертикальный вдоль левой рамки */
-.side-logo {
+.tp-headphones .side-logo {
   position: absolute;
   top: 24px;
   left: 36px;
@@ -144,7 +144,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   transition: transform 0.15s ease, opacity 0.2s ease;
 }
 
-.side-logo__text {
+.tp-headphones .side-logo__text {
   writing-mode: vertical-rl;
   transform: rotate(180deg);
   text-orientation: mixed;
@@ -159,39 +159,39 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   transition: color 0.2s ease;
 }
 
-.side-logo:hover .side-logo__text {
+.tp-headphones .side-logo:hover .side-logo__text {
   color: var(--ink);
 }
 
 /* Фиксированное состояние — позицию left задаёт JS при скролле */
-.side-logo.is-fixed {
+.tp-headphones .side-logo.is-fixed {
   position: fixed;
   top: 56px;
   height: auto;
   z-index: 999;
 }
 
-.side-logo.is-fixed .side-logo__text {
+.tp-headphones .side-logo.is-fixed .side-logo__text {
   color: var(--accent);
 }
 
 /* ==========================================================================
    MARQUEE (Бегущая строка тегов)
    ========================================================================== */
-.section-tags {
+.tp-headphones .section-tags {
   padding: 14px 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
   background: #ffffff;
 }
 
-.marquee {
+.tp-headphones .marquee {
   overflow: hidden;
   display: flex;
   width: 100%;
 }
 
-.marquee-track {
+.tp-headphones .marquee-track {
   display: flex;
   gap: 0.65rem;
   padding: 0.25rem 0.5rem;
@@ -199,11 +199,11 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   animation: marquee-anim 55s linear infinite;
 }
 
-.marquee-track:hover {
+.tp-headphones .marquee-track:hover {
   animation-play-state: paused;
 }
 
-.tag {
+.tp-headphones .tag {
   background: var(--pill);
   border: 2px solid var(--accent);
   border-radius: 999px;
@@ -216,8 +216,8 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   white-space: nowrap;
 }
 
-.tag:hover,
-.tag:focus {
+.tp-headphones .tag:hover,
+.tp-headphones .tag:focus {
   background: var(--yellow) !important;
   color: #000000 !important;
   transform: translateY(-2px);
@@ -232,50 +232,50 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 /* ==========================================================================
    MAJOR SECTION HEADERS
    ========================================================================== */
-header.major {
+.tp-headphones header.major {
   margin-bottom: 24px;
 }
 
-header.major h2 {
+.tp-headphones header.major h2 {
   font-size: clamp(1.5rem, 3.5vw, 1.9rem);
   font-weight: 800;
   text-transform: uppercase;
   margin: 0;
 }
 
-header.major h2 a {
+.tp-headphones header.major h2 a {
   text-decoration: none;
   color: var(--ink);
   transition: color 0.2s ease;
 }
 
-header.major h2 a:hover {
+.tp-headphones header.major h2 a:hover {
   color: var(--accent);
 }
 
 /* ==========================================================================
    CARDS & ASYMMETRICAL EDITORIAL GRID (asym-grid)
    ========================================================================== */
-.grid {
+.tp-headphones .grid {
   display: grid;
   gap: 20px;
 }
 
-.asym-grid {
+.tp-headphones .asym-grid {
   grid-template-columns: repeat(12, minmax(0, 1fr));
 }
 
-.asym-grid .card--big   { grid-column: span 7; }
-.asym-grid .card--tall  { grid-column: span 5; }
-.asym-grid .card--mid   { grid-column: span 4; }
-.asym-grid .card--small { grid-column: span 3; }
+.tp-headphones .asym-grid .card--big   { grid-column: span 7; }
+.tp-headphones .asym-grid .card--tall  { grid-column: span 5; }
+.tp-headphones .asym-grid .card--mid   { grid-column: span 4; }
+.tp-headphones .asym-grid .card--small { grid-column: span 3; }
 
-.asym-grid .card--big .thumb  { height: 320px; }
-.asym-grid .card--tall .thumb { height: 320px; }
-.asym-grid .card--mid .thumb  { height: 200px; }
-.asym-grid .card--small .thumb { height: 180px; }
+.tp-headphones .asym-grid .card--big .thumb  { height: 320px; }
+.tp-headphones .asym-grid .card--tall .thumb { height: 320px; }
+.tp-headphones .asym-grid .card--mid .thumb  { height: 200px; }
+.tp-headphones .asym-grid .card--small .thumb { height: 180px; }
 
-.card {
+.tp-headphones .card {
   width: 100%;
   max-width: 100%;
   border: 3px solid var(--accent);
@@ -290,12 +290,12 @@ header.major h2 a:hover {
   position: relative;
 }
 
-.card:hover {
+.tp-headphones .card:hover {
   transform: translateY(-5px);
   box-shadow: 5px 5px 0 var(--accent);
 }
 
-.card a {
+.tp-headphones .card a {
   text-decoration: none;
   color: inherit;
 }
@@ -456,7 +456,7 @@ header.major h2 a:hover {
 /* ==========================================================================
    PAGINATION
    ========================================================================== */
-.pager {
+.tp-headphones .pager {
   display: flex;
   gap: 0.5rem;
   justify-content: center;
@@ -464,8 +464,8 @@ header.major h2 a:hover {
   flex-wrap: wrap;
 }
 
-.pager .num,
-.pager .arrow {
+.tp-headphones .pager .num,
+.tp-headphones .pager .arrow {
   border: 2px solid var(--accent);
   background: #ffffff;
   padding: 0.45em 0.85em;
@@ -479,14 +479,14 @@ header.major h2 a:hover {
   transition: all 0.2s ease;
 }
 
-.pager .num:hover,
-.pager .arrow:hover {
+.tp-headphones .pager .num:hover,
+.tp-headphones .pager .arrow:hover {
   background: var(--yellow);
   border-color: var(--accent);
   transform: translateY(-2px);
 }
 
-.pager .num.is-active {
+.tp-headphones .pager .num.is-active {
   background: var(--accent);
   color: #ffffff;
 }
@@ -494,8 +494,8 @@ header.major h2 a:hover {
 /* ==========================================================================
    FOOTER
    ========================================================================== */
-.footer {
-  border-top: 3px solid var(--accent);
+.tp-headphones .footer {
+  border-top: 1px solid var(--line);
   background: #ffffff;
   padding: 32px 0;
   color: #666666;
@@ -503,7 +503,7 @@ header.major h2 a:hover {
   margin-top: 60px;
 }
 
-.footer__row {
+.tp-headphones .footer__row {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -511,7 +511,7 @@ header.major h2 a:hover {
   gap: 1.25rem;
 }
 
-.footer__copy {
+.tp-headphones .footer__copy {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -520,7 +520,7 @@ header.major h2 a:hover {
   font-size: 0.88rem;
 }
 
-.footer__brand {
+.tp-headphones .footer__brand {
   font-family: var(--font-display, "Space Grotesk", sans-serif);
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -529,22 +529,22 @@ header.major h2 a:hover {
   font-size: 0.95rem;
 }
 
-.footer__brand strong {
+.tp-headphones .footer__brand strong {
   color: var(--yellow);
 }
 
-.footer__sep {
+.tp-headphones .footer__sep {
   color: #cccccc;
 }
 
-.footer-nav {
+.tp-headphones .footer-nav {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 1.25rem;
 }
 
-.footer-nav a {
+.tp-headphones .footer-nav a {
   color: #555555;
   text-decoration: none;
   font-size: 0.88rem;
@@ -552,7 +552,7 @@ header.major h2 a:hover {
   transition: color 0.15s ease;
 }
 
-.footer-nav a:hover {
+.tp-headphones .footer-nav a:hover {
   color: #111111;
   text-decoration: underline;
 }
