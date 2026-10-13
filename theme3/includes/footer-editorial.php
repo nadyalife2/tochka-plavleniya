@@ -5,7 +5,7 @@
     <div class="footer__row">
       <div class="footer__copy">
         <a class="footer__brand" href="<?= $site_root ?>">
-          ТОЧКА<strong>.</strong>ПЛАВЛЕНИЯ
+          ТОЧКА<span class="logo-dot">.</span>ПЛАВЛЕНИЯ
         </a>
         <span class="footer__sep">•</span>
         <span>Инженерный регламент и теплофизика монтажа</span>

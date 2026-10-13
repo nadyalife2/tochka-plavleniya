@@ -165,6 +165,37 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   color: var(--ink, #111111);
 }
 
+.tp-headphones .side-logo__text .logo-dot {
+  display: inline-block;
+  color: #111111;
+  background: var(--yellow, #facc15);
+  padding: 0 4px;
+  border-radius: 2px;
+  line-height: 0.85;
+  font-weight: 900;
+  margin: 0.2rem 0;
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.tp-headphones .side-logo:hover .side-logo__text .logo-dot {
+  background: #fde047;
+  color: #000000;
+}
+
+.tp-headphones .logo span,
+.tp-headphones .logo .logo-dot {
+  color: #141414;
+  background: var(--yellow, #facc15);
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  transform: skew(-6deg);
+  display: inline-block;
+  margin: 0 0.18rem;
+  font-size: 1.05em;
+  line-height: 0.9;
+  font-weight: 900;
+}
+
 /* Фиксированное состояние — позицию left задаёт JS при скролле */
 .tp-headphones .side-logo.is-fixed {
   position: fixed;
@@ -556,8 +587,17 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   font-size: 0.95rem;
 }
 
-.tp-headphones .footer__brand strong {
-  color: var(--yellow);
+.tp-headphones .footer__brand strong,
+.tp-headphones .footer__brand .logo-dot {
+  color: #141414;
+  background: var(--yellow, #facc15);
+  padding: 0.02rem 0.25rem;
+  border-radius: 2px;
+  transform: skew(-6deg);
+  display: inline-block;
+  margin: 0 0.15rem;
+  line-height: 0.9;
+  font-weight: 900;
 }
 
 .tp-headphones .footer__sep {
@@ -644,6 +684,11 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
     color: var(--muted, #4a4a4a);
     letter-spacing: 0.02em;
     text-align: center;
+  }
+  .tp-headphones .side-logo__text .logo-dot {
+    margin: 0 0.2rem;
+    padding: 0.05rem 0.35rem;
+    transform: skew(-6deg);
   }
   .tp-headphones .top-nav {
     position: static;

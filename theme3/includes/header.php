@@ -71,7 +71,7 @@ $tchp_head_escape = static function ($value) {
   <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
       <div class="flex items-center gap-6">
-        <a class="logo" href="<?= $site_root ?>">ТОЧКА<span>.</span>ПЛАВЛЕНИЯ</a>
+        <a class="logo" href="<?= $site_root ?>">ТОЧКА<span class="logo-dot">.</span>ПЛАВЛЕНИЯ</a>
         <?php include __DIR__ . '/header-nav.php'; ?>
       </div>
       <div class="flex items-center gap-2 sm:gap-3">

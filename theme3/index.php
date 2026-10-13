@@ -111,7 +111,7 @@ include __DIR__ . '/includes/header.php';
         
         <!-- Вертикальный логотип-плашка слева (динамический элемент «Звук в УХах») -->
         <a href="#top" class="side-logo" id="sideLogo" aria-label="ТОЧКА ПЛАВЛЕНИЯ - Вернуться к началу">
-          <span class="side-logo__text">ТОЧКА ПЛАВЛЕНИЯ</span>
+          <span class="side-logo__text">ТОЧКА<span class="logo-dot">.</span>ПЛАВЛЕНИЯ</span>
         </a>
 
         <!-- Панель-капсула с рамкой 3px -->
