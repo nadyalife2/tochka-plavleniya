@@ -108,13 +108,7 @@ include __DIR__ . '/includes/header.php';
     <!-- 1. ПЕРВЫЙ ЭКРАН (HERO): КАПСУЛА И ВЕРТИКАЛЬНЫЙ ЛОГОТИП В СТИЛЕ HEADPHONES SITE -->
     <header class="hero section" id="top">
       <div class="container">
-        
-        <!-- Вертикальный логотип-плашка слева (динамический элемент «Звук в УХах») -->
-        <a href="#top" class="side-logo" id="sideLogo" aria-label="ТОЧКА ПЛАВЛЕНИЯ - Вернуться к началу">
-          <span class="side-logo__text">ТОЧКА<span class="logo-dot">.</span>ПЛАВЛЕНИЯ</span>
-        </a>
-
-        <!-- Панель-капсула с рамкой 3px -->
+        <!-- Панель-капсула hero -->
         <div class="panel">
           <!-- Верхний служебный бар: ОТК бейдж + кнопки Поиск и Верстак -->
           <div class="hero-top-bar">
@@ -124,7 +118,7 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <div class="hero-tools">
-              <button id="search-modal-trigger" type="button" class="badge badge-btn" title="Поиск по базе знаний (Ctrl+K)" aria-label="Открыть поиск по базе знаний">
+              <button id="hero-search-trigger" onclick="document.getElementById('search-modal-trigger')?.click()" type="button" class="badge badge-btn" title="Поиск по базе знаний (Ctrl+K)" aria-label="Открыть поиск по базе знаний">
                 <span class="material-symbols-outlined text-[16px]">search</span>
                 <span>Поиск</span>
                 <span class="kbd-shortcut">Ctrl+K</span>
@@ -613,102 +607,6 @@ include __DIR__ . '/includes/header.php';
           const isDark = document.documentElement.classList.toggle('dark');
           localStorage.setItem('tp_theme', isDark ? 'dark' : 'light');
         });
-      }
-
-      // Dynamic Side-Logo Tracking (Authentic Headphones Site Behavior)
-      const sideLogo = document.getElementById('sideLogo');
-      const hero = document.getElementById('top') || document.querySelector('.hero');
-      const container = document.querySelector('.hero .container') || document.querySelector('.container');
-      const topElement = document.getElementById('top') || document.body;
-
-      if (sideLogo) {
-        sideLogo.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (topElement) {
-            topElement.scrollIntoView({ behavior: 'smooth' });
-          } else {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }
-        });
-
-        sideLogo.addEventListener('mousedown', function() {
-          this.style.transform = 'scale(0.96)';
-        });
-        sideLogo.addEventListener('mouseup', function() {
-          this.style.transform = 'scale(1)';
-        });
-        sideLogo.addEventListener('mouseleave', function() {
-          this.style.transform = 'scale(1)';
-        });
-
-        const GAP = 12;
-        function applyFixedLeft() {
-          if (!sideLogo || !container) return;
-          if (window.innerWidth <= 768) {
-            sideLogo.style.left = '';
-            return;
-          }
-          const containerRect = container.getBoundingClientRect();
-          const logoWidth = sideLogo.offsetWidth || 36;
-          if (containerRect.left > logoWidth + GAP) {
-            sideLogo.style.left = (containerRect.left - logoWidth - GAP) + 'px';
-          } else {
-            sideLogo.style.left = '16px';
-          }
-        }
-
-        function onScroll() {
-          if (!sideLogo || !hero) return;
-          const heroTop = hero.getBoundingClientRect().top + window.pageYOffset;
-
-          if (window.innerWidth <= 768) {
-            if (window.pageYOffset > 100) {
-              sideLogo.classList.add('is-fixed');
-            } else {
-              sideLogo.classList.remove('is-fixed');
-            }
-            sideLogo.style.left = '';
-            return;
-          }
-
-          if (window.pageYOffset >= heroTop + 40) {
-            sideLogo.classList.add('is-fixed');
-            applyFixedLeft();
-          } else {
-            sideLogo.classList.remove('is-fixed');
-            sideLogo.style.left = '';
-          }
-        }
-
-        let ticking = false;
-        function updateScroll() {
-          onScroll();
-          ticking = false;
-        }
-
-        window.addEventListener('scroll', function() {
-          if (!ticking) {
-            requestAnimationFrame(updateScroll);
-            ticking = true;
-          }
-        }, { passive: true });
-
-        window.addEventListener('resize', function() {
-          if (window.innerWidth <= 768) {
-            sideLogo.style.left = '';
-            return;
-          }
-          if (sideLogo.classList.contains('is-fixed')) {
-            applyFixedLeft();
-          }
-        });
-
-        // Initial check on load
-        setTimeout(function() {
-          if (sideLogo.classList.contains('is-fixed')) {
-            applyFixedLeft();
-          }
-        }, 60);
       }
     })();
   </script>

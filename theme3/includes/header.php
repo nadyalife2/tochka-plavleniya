@@ -67,7 +67,6 @@ $tchp_head_escape = static function ($value) {
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-3 focus:left-3 focus:bg-accent focus:text-white focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs focus:shadow-md focus:outline-none">
     Перейти к основному содержимому
   </a>
-  <?php if ($current_page !== 'index'): ?>
   <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 h-14 flex items-center justify-between gap-6">
       <div class="flex items-center gap-6">
@@ -109,4 +108,3 @@ $tchp_head_escape = static function ($value) {
       </div>
     </div>
   </header>
-  <?php endif; ?>
