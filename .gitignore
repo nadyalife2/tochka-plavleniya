@@ -3,6 +3,7 @@
 /php.zip
 php_portable/
 *.zip
+!theme4.zip
 *.log
 *.png
 !site2/assets/img/og-cover.png
