@@ -141,6 +141,8 @@
       lastActiveElement = document.activeElement;
       backdrop.classList.add('active');
       backdrop.setAttribute('aria-hidden', 'false');
+      const trigger = document.getElementById('header-drawer-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'true');
       document.body.style.overflow = 'hidden';
       if (saveState) {
         try { sessionStorage.setItem('tp_drawer_open', '1'); } catch(e) {}
@@ -152,6 +154,8 @@
       if (!backdrop) return;
       backdrop.classList.remove('active');
       backdrop.setAttribute('aria-hidden', 'true');
+      const trigger = document.getElementById('header-drawer-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
       document.body.style.overflow = '';
       try { sessionStorage.removeItem('tp_drawer_open'); } catch(e) {}
       if (lastActiveElement && typeof lastActiveElement.focus === 'function') {
@@ -171,9 +175,33 @@
       });
     }
 
+    // A11y: Escape для выхода и Focus Trap для циклирования фокуса внутри модальной шторки
     document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && backdrop && backdrop.classList.contains('active')) {
+      if (!backdrop || !backdrop.classList.contains('active')) return;
+
+      if (e.key === 'Escape') {
+        e.preventDefault();
         window.closeLabDrawer();
+        return;
+      }
+
+      if (e.key === 'Tab' && panel) {
+        const focusables = panel.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+        if (!focusables.length) return;
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first || document.activeElement === backdrop) {
+            e.preventDefault();
+            last.focus();
+          }
+        } else {
+          if (document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+          }
+        }
       }
     });
 

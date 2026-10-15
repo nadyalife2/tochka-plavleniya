@@ -109,6 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.tipY = this.rows / 2;
       this.isContactActive = false;
       this.touchTimeSec = 0.0;
+      this.timeAccumulator = 0.0;
       this.lastFrameTime = performance.now();
       this.animId = null;
       this.isRunning = false;
@@ -152,13 +153,56 @@ document.addEventListener('DOMContentLoaded', () => {
       return p;
     }
 
+    releaseContact() {
+      this.isContactActive = false;
+      this.isToggleActive = false;
+      const heatBtn = document.getElementById('sim-heat-btn');
+      const heatLabel = document.getElementById('sim-heat-label');
+      if (heatBtn) {
+        heatBtn.setAttribute('aria-pressed', 'false');
+        heatBtn.classList.remove('ring-2', 'ring-ink');
+      }
+      if (heatLabel) {
+        heatLabel.textContent = '● Начать нагрев';
+      }
+    }
+
+    setContactActive(active, isToggle = false) {
+      if (active) {
+        this.isContactActive = true;
+        this.isToggleActive = isToggle;
+        const heatBtn = document.getElementById('sim-heat-btn');
+        const heatLabel = document.getElementById('sim-heat-label');
+        if (heatBtn) {
+          heatBtn.setAttribute('aria-pressed', 'true');
+          heatBtn.classList.add('ring-2', 'ring-ink');
+        }
+        if (heatLabel) {
+          heatLabel.textContent = '■ Остановить нагрев';
+        }
+        this.start();
+      } else {
+        this.releaseContact();
+      }
+    }
+
+    toggleHeating() {
+      if (this.isContactActive) {
+        this.releaseContact();
+      } else {
+        this.setContactActive(true, true);
+      }
+    }
+
     reset() {
       for (let i = 0; i < this.grid.length; i++) {
         this.grid[i] = this.ambientTemp;
         this.prevGrid[i] = this.ambientTemp;
       }
       this.touchTimeSec = 0;
+      this.timeAccumulator = 0;
       this.lastFrameTime = performance.now();
+      this.releaseContact();
     }
 
     configure(tipTemp, meltTemp, workType) {
@@ -197,72 +241,65 @@ document.addEventListener('DOMContentLoaded', () => {
         };
       };
 
-      // Pointer Events для объединения мыши, стилуса и тачскрина
+      // Pointer Events для объединения мыши, стилуса и тачскрина на холсте
       this.canvas.addEventListener('pointerdown', (e) => {
         try { this.canvas.setPointerCapture(e.pointerId); } catch(err) {}
-        this.isContactActive = true;
         const pos = getPos(e);
         this.tipX = pos.c;
         this.tipY = pos.r;
-        this.start();
+        this.setContactActive(true, false);
       });
 
       this.canvas.addEventListener('pointermove', (e) => {
         const pos = getPos(e);
         this.tipX = pos.c;
         this.tipY = pos.r;
-        if (this.isContactActive) {
-          this.start();
+        // Координаты обновляются без перезапуска цикла, не сбивая delta-time
+      });
+
+      this.canvas.addEventListener('pointerup', (e) => {
+        try { this.canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+        if (!this.isToggleActive) {
+          this.releaseContact();
         }
       });
 
-      const releaseContact = (e) => {
+      this.canvas.addEventListener('pointercancel', (e) => {
         try { this.canvas.releasePointerCapture(e.pointerId); } catch(err) {}
-        this.isContactActive = false;
-      };
+        if (!this.isToggleActive) {
+          this.releaseContact();
+        }
+      });
 
-      this.canvas.addEventListener('pointerup', releaseContact);
-      this.canvas.addEventListener('pointercancel', releaseContact);
       this.canvas.addEventListener('pointerleave', (e) => {
         if (!this.canvas.hasPointerCapture || !this.canvas.hasPointerCapture(e.pointerId)) {
-          this.isContactActive = false;
+          if (!this.isToggleActive) {
+            this.releaseContact();
+          }
         }
       });
 
-      // Аппаратные кнопки доступности (клавиатура / клик)
+      // Аппаратные кнопки доступности (клавиатура / клик-переключатель)
       const heatBtn = document.getElementById('sim-heat-btn');
       const releaseBtn = document.getElementById('sim-release-btn');
       const resetBtn = document.getElementById('sim-reset-btn');
 
       if (heatBtn) {
-        const startHeat = (e) => {
-          if (e.cancelable) e.preventDefault();
-          this.isContactActive = true;
-          this.start();
-        };
-        const stopHeat = (e) => {
-          if (e.cancelable) e.preventDefault();
-          this.isContactActive = false;
-        };
-        heatBtn.addEventListener('pointerdown', startHeat);
-        heatBtn.addEventListener('pointerup', stopHeat);
-        heatBtn.addEventListener('pointercancel', stopHeat);
+        heatBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.toggleHeating();
+        });
         heatBtn.addEventListener('keydown', (e) => {
           if (e.key === ' ' || e.key === 'Enter') {
-            this.isContactActive = true;
-            this.start();
-          }
-        });
-        heatBtn.addEventListener('keyup', (e) => {
-          if (e.key === ' ' || e.key === 'Enter') {
-            this.isContactActive = false;
+            e.preventDefault();
+            this.toggleHeating();
           }
         });
       }
 
       if (releaseBtn) {
         releaseBtn.addEventListener('click', () => {
-          this.isContactActive = false;
+          this.releaseContact();
         });
       }
 
@@ -274,6 +311,13 @@ document.addEventListener('DOMContentLoaded', () => {
           if (heatmapJointTemp) heatmapJointTemp.textContent = `${Math.round(this.ambientTemp)} °C ○ ТВЁРДОЕ`;
         });
       }
+
+      // Гарантированный сброс контакта при потере фокуса страницы
+      window.addEventListener('blur', () => {
+        if (!this.isToggleActive) {
+          this.releaseContact();
+        }
+      });
 
       // Сворачивание / разворачивание модели
       const toggleBtn = document.getElementById('toggle-sim-btn');
@@ -291,6 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
             simBody.classList.add('hidden');
             toggleBtn.setAttribute('aria-expanded', 'false');
             if (toggleStatus) toggleStatus.textContent = 'Показать симуляцию ↓';
+            this.releaseContact();
             this.stop();
           }
         });
@@ -299,9 +344,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
     step() {
       const now = performance.now();
-      const dt = Math.min(0.1, Math.max(0.001, (now - (this.lastFrameTime || now)) / 1000));
+      let frameTime = (now - (this.lastFrameTime || now)) / 1000;
+      if (frameTime > 0.2) frameTime = 0.2; // Предотвращение лавинообразных скачков при зависании вкладки
       this.lastFrameTime = now;
+      this.timeAccumulator += frameTime;
 
+      // Фиксированный шаг моделирования (Fixed DT = 1/60 c) с субстеппингом для стабильности физики
+      const FIXED_DT = 1 / 60;
+      let substeps = 0;
+      while (this.timeAccumulator >= FIXED_DT && substeps < 4) {
+        this.substep(FIXED_DT);
+        this.timeAccumulator -= FIXED_DT;
+        substeps++;
+      }
+
+      // Обновление контрольных приборов интерфейса
+      const cols = this.cols;
+      const rows = this.rows;
+      const padX = Math.floor(cols / 2);
+      const padY = Math.floor(rows / 2);
+      const padTemp = this.grid[padY * cols + padX];
+
+      if (heatmapTipTemp) heatmapTipTemp.textContent = `${Math.round(this.tipTemp)} °C`;
+      if (heatmapJointTemp) {
+        const isLiquid = padTemp >= this.meltTemp;
+        heatmapJointTemp.textContent = `${Math.round(padTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
+        heatmapJointTemp.className = isLiquid ? 'text-accent font-bold' : 'text-cyan font-bold';
+      }
+      if (heatmapTalDisplay) {
+        heatmapTalDisplay.textContent = `TAL: ${this.touchTimeSec.toFixed(1)} с`;
+      }
+    }
+
+    substep(dt) {
       const cols = this.cols;
       const rows = this.rows;
       const prev = this.prevGrid;
@@ -315,9 +390,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const tx = Math.max(1, Math.min(cols - 2, Math.floor(this.tipX)));
       const ty = Math.max(1, Math.min(rows - 2, Math.floor(this.tipY)));
 
-      // Нагрев подаётся строго при активном контакте жала (нажатие кнопки или удержание указателя)
-      const isHeating = this.isContactActive;
-      if (isHeating) {
+      // Нагрев подаётся строго при активном контакте жала
+      if (this.isContactActive) {
         prev[ty * cols + tx] = this.tipTemp;
         if (tx > 0) prev[ty * cols + (tx - 1)] = Math.max(prev[ty * cols + (tx - 1)], this.tipTemp * 0.92);
         if (tx < cols - 1) prev[ty * cols + (tx + 1)] = Math.max(prev[ty * cols + (tx + 1)], this.tipTemp * 0.92);
@@ -325,6 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ty < rows - 1) prev[(ty + 1) * cols + tx] = Math.max(prev[(ty + 1) * cols + tx], this.tipTemp * 0.92);
       }
 
+      // 2D-уравнение теплопроводности (разностная схема Лапласа)
       for (let r = 1; r < rows - 1; r++) {
         const rowOffset = r * cols;
         for (let c = 1; c < cols - 1; c++) {
@@ -341,24 +416,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Измеряем температуру и TAL одной фиксированной контрольной площадки (в центре симуляции)
+      // Граничные условия: естественный теплоотвод в текстолит и окружающую среду по периметру
+      for (let c = 0; c < cols; c++) {
+        curr[c] += (ambient - curr[c]) * 0.12;
+        curr[(rows - 1) * cols + c] += (ambient - curr[(rows - 1) * cols + c]) * 0.12;
+      }
+      for (let r = 0; r < rows; r++) {
+        curr[r * cols] += (ambient - curr[r * cols]) * 0.12;
+        curr[r * cols + (cols - 1)] += (ambient - curr[r * cols + (cols - 1)]) * 0.12;
+      }
+
+      // TAL (Time Above Liquidus) — накопленное интегральное время выше точки ликвидуса контрольной площадки
       const padX = Math.floor(cols / 2);
       const padY = Math.floor(rows / 2);
       const padTemp = curr[padY * cols + padX];
-
-      // TAL (Time Above Liquidus) — накопленное интегральное время выше точки ликвидуса фиксированной площадки
       if (padTemp >= this.meltTemp) {
         this.touchTimeSec += dt;
-      }
-
-      if (heatmapTipTemp) heatmapTipTemp.textContent = `${Math.round(this.tipTemp)} °C`;
-      if (heatmapJointTemp) {
-        const isLiquid = padTemp >= this.meltTemp;
-        heatmapJointTemp.textContent = `${Math.round(padTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
-        heatmapJointTemp.className = isLiquid ? 'text-accent font-bold' : 'text-cyan font-bold';
-      }
-      if (heatmapTalDisplay) {
-        heatmapTalDisplay.textContent = `TAL: ${this.touchTimeSec.toFixed(1)} с`;
       }
     }
 
@@ -449,8 +522,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
+          this.releaseContact();
           if (this.isRunning) this.stopLoopOnly();
         } else if (this.isVisible && this.shouldRun) {
+          this.lastFrameTime = performance.now();
           this.start();
         }
       });
@@ -483,6 +558,11 @@ document.addEventListener('DOMContentLoaded', () => {
       this.shouldRun = false;
       this.stopLoopOnly();
     }
+  }
+
+  if (thermalCanvas) {
+    thermalSim = new ThermalSimulator(thermalCanvas);
+    window.thermalSim = thermalSim;
   }
 
   function updateTempCalculator() {

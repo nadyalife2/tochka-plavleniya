@@ -427,10 +427,10 @@ include __DIR__ . '/includes/header.php';
 
                       <!-- Кнопки управления (100% клавиатурная и сенсорная доступность) -->
                       <div class="flex items-center gap-2 pt-1">
-                        <button type="button" id="sim-heat-btn" class="flex-1 py-1.5 px-3 rounded border border-paper-border bg-accent text-ink font-mono text-xs font-bold hover:bg-accent-hover active:scale-95 transition-all cursor-pointer shadow-xs select-none" title="Удерживайте кнопку или кликните по холсту для контакта жала">
-                          ● [Удерживать] Нагреть
+                        <button type="button" id="sim-heat-btn" class="flex-1 py-1.5 px-3 rounded border border-paper-border bg-accent text-ink font-mono text-xs font-bold hover:bg-accent-hover active:scale-95 transition-all cursor-pointer shadow-xs select-none" aria-pressed="false" title="Нажмите для включения или выключения нагрева">
+                          <span id="sim-heat-label">● Начать нагрев</span>
                         </button>
-                        <button type="button" id="sim-release-btn" class="py-1.5 px-3 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink font-mono text-xs font-bold transition-all cursor-pointer select-none">
+                        <button type="button" id="sim-release-btn" class="py-1.5 px-3 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink font-mono text-xs font-bold transition-all cursor-pointer select-none" title="Остановить нагрев и отвести жало">
                           Отпустить жало
                         </button>
                         <button type="button" id="sim-reset-btn" class="py-1.5 px-3 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted font-mono text-xs transition-all cursor-pointer select-none" title="Сбросить температуру и отсчет TAL">

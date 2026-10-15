@@ -87,9 +87,33 @@ if ($is_tag_view && $queried_tag) {
     $current_rubric = $RUBRICS[$current_slug] ?? $RUBRICS['materialy'];
     $current_page   = $current_slug;
 } else {
-    $current_rubric = $RUBRICS['materialy'];
-    $current_slug   = 'materialy';
-    $current_page   = 'materialy';
+    // Полноценный общий архив всех публикаций и регламентов базы знаний
+    $all_ids = [];
+    foreach ($RUBRICS as $r) {
+        if (!empty($r['article_ids'])) {
+            $all_ids = array_merge($all_ids, $r['article_ids']);
+        }
+    }
+    $all_ids = array_values(array_unique($all_ids));
+
+    $current_rubric = [
+        'title'       => 'Все публикации // База знаний',
+        'tag'         => 'ВСЕ РЕГЛАМЕНТЫ',
+        'lead'        => 'Полный систематизированный архив инженерных статей, руководств по монтажу РЭА, температурных профилей и стандартов IPC/ГОСТ.',
+        'badge'       => 'АРХИВ // БАЗА ЗНАНИЙ',
+        'subbadge'    => 'Все статьи',
+        'article_ids' => $all_ids,
+        'filter_tags' => ['Все', 'Сплавы', 'Флюсы', 'Монтаж', 'BGA', 'T12', 'IPC'],
+        'sub_tags'    => [
+            ['id' => 'all',       'label' => 'Все материалы',   'count' => count($articles ?? [])],
+            ['id' => 'basics',    'label' => 'Старт и база',    'keywords' => ['старт', 'баз', 'паяльник', 'оборудован'], 'count' => 5],
+            ['id' => 'solders',   'label' => 'Сплавы и припои', 'keywords' => ['припой', 'пос-61', 'sac305', 'сплав'],    'count' => 6],
+            ['id' => 'assembly',  'label' => 'Монтаж и пайка',  'keywords' => ['монтаж', 'пайк', 'лужен', 'картридж'],    'count' => 8],
+            ['id' => 'defects',   'label' => 'Дефекты и брак',  'keywords' => ['дефект', 'брак', 'перегрев', 'мостик'],   'count' => 5],
+        ]
+    ];
+    $current_slug   = 'all';
+    $current_page   = 'archive';
 }
 
 $site_root = function_exists('home_url') ? home_url('/') : '/';
@@ -195,9 +219,7 @@ if (!empty($current_rubric['sub_tags']) && $sub_param !== 'all') {
                     }
                     return false;
                 });
-                if (!empty($filtered)) {
-                    $matched_articles = array_values($filtered);
-                }
+                $matched_articles = array_values($filtered);
             }
             break;
         }

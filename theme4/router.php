@@ -47,9 +47,9 @@ if (preg_match('#^/category/([a-zA-Z0-9_\-%]+)/?$#', $uri, $matches)) {
 // 4. Красивые URL статей и уроков: /{slug}/
 $slug = trim($uri, '/');
 if (!empty($slug)) {
-    $rubric_slugs = ['start', 'materialy', 'praktika', 'oshibki', 'oborudovanie'];
+    $rubric_slugs = ['start', 'materialy', 'praktika', 'oshibki', 'oborudovanie', 'archive', 'all'];
     if (in_array($slug, $rubric_slugs, true)) {
-        $_GET['slug'] = $slug;
+        $_GET['slug'] = ($slug === 'archive' ? 'all' : $slug);
         require __DIR__ . '/category.php';
         exit;
     }

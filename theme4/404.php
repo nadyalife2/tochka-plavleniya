@@ -20,7 +20,7 @@ $site_root    = function_exists('home_url') ? home_url('/') : '/';
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<main class="w-full flex-grow pt-12 pb-20" id="main-content">
+<main class="w-full flex-grow pt-12 pb-40 sm:pb-24" id="main-content">
 <div class="max-w-[800px] mx-auto px-5 sm:px-8 text-center space-y-6">
   
   <div class="inline-flex items-center gap-2 px-3 py-1 font-mono text-stamp font-bold rounded border border-paper-border bg-paper-subtle text-ink uppercase tracking-wider">

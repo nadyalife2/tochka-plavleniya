@@ -1,6 +1,7 @@
 # ТОЧКА ПЛАВЛЕНИЯ (Engineering Knowledge Base & Standards)
 > Инженерный журнал, открытая лаборатория и интерактивный верстак по радиомонтажу, пайке РЭА, BGA-реболлингу и теплофизике электронных компонентов.
 > Canonical URL: https://tochka-plavleniya.ru/
+> Full Technical Specification: https://tochka-plavleniya.ru/llms-full.txt
 
 ## Ключевые регламенты и стандарты
 - Отраслевые стандарты: IPC-A-610G (Class 3), IPC/JEDEC J-STD-020D, ГОСТ 21930-76, ГОСТ 21931-76.
