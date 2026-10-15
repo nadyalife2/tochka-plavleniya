@@ -20,8 +20,8 @@ $site_root    = function_exists('home_url') ? home_url('/') : '/';
 require_once __DIR__ . '/includes/header.php';
 ?>
 
-<main class="w-full flex-grow pt-12 pb-40 sm:pb-24" id="main-content">
-<div class="max-w-[800px] mx-auto px-5 sm:px-8 text-center space-y-6">
+<main class="w-full flex-grow pt-6 sm:pt-12 pb-32 sm:pb-24 min-h-[75vh] flex flex-col justify-center" id="main-content">
+<div class="max-w-[720px] mx-auto px-4 sm:px-8 text-center space-y-5">
   
   <div class="inline-flex items-center gap-2 px-3 py-1 font-mono text-stamp font-bold rounded border border-paper-border bg-paper-subtle text-ink uppercase tracking-wider">
     <span class="w-1.5 h-1.5 rounded-full bg-danger inline-block" aria-hidden="true"></span>
@@ -29,13 +29,13 @@ require_once __DIR__ . '/includes/header.php';
   </div>
 
   <!-- Broken PCB SVG Sketch Frame -->
-  <div class="sketch-card p-6 sm:p-8 bg-card mx-auto relative overflow-hidden" style="max-width: 480px; margin: 0 auto;">
-    <div class="text-xs font-mono text-ink-muted flex items-center justify-between pb-3 border-b border-paper-border mb-4">
+  <div class="sketch-card p-4 sm:p-6 bg-card mx-auto relative overflow-hidden" style="max-width: 420px; margin: 0 auto;">
+    <div class="text-xs font-mono text-ink-muted flex items-center justify-between pb-2 border-b border-paper-border mb-3">
       <span class="font-bold text-ink">[ЧЕРТЁЖ // FIG. 404]</span>
       <span class="text-stamp uppercase">СБОЙ ТЕХПРОЦЕССА</span>
     </div>
 
-    <svg viewBox="0 0 320 200" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-danger" style="max-width: 320px; width: 100%; height: auto; display: block; margin: 0 auto;" aria-label="Схема повреждённой печатной платы">
+    <svg viewBox="0 0 320 200" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="mx-auto text-danger" style="max-width: 250px; width: 100%; height: auto; display: block; margin: 0 auto;" aria-label="Схема повреждённой печатной платы">
       <rect x="30" y="20" width="260" height="160" rx="8" fill="var(--color-card, #ffffff)" stroke="currentColor" stroke-dasharray="6 4"/>
       <!-- Burnt chip -->
       <rect x="110" y="60" width="100" height="80" rx="4" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="2"/>

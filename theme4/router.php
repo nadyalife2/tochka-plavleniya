@@ -5,6 +5,17 @@
 
 $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// 0. GEO и LLM файлы спецификации (robots.txt, llms.txt, llms-full.txt)
+if ($uri === '/llms.txt' || $uri === '/llms-full.txt' || $uri === '/robots.txt') {
+    $target = __DIR__ . $uri;
+    if (file_exists($target)) {
+        header('Content-Type: text/plain; charset=utf-8');
+        header('X-Robots-Tag: all');
+        readfile($target);
+        exit;
+    }
+}
+
 // 1. Если запрашивается реальный статический файл (css, js, svg, png, jpg, webp, woff2 и т.д.)
 $file = __DIR__ . $uri;
 if ($uri !== '/' && file_exists($file) && !is_dir($file)) {

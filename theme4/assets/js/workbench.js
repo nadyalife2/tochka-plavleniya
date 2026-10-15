@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.tipX = this.cols / 2;
       this.tipY = this.rows / 2;
       this.isContactActive = false;
+      this.isToggleActive = false;
       this.touchTimeSec = 0.0;
       this.timeAccumulator = 0.0;
       this.lastFrameTime = performance.now();
@@ -205,24 +206,30 @@ document.addEventListener('DOMContentLoaded', () => {
       this.releaseContact();
     }
 
-    configure(tipTemp, meltTemp, workType) {
+    configure(tipTemp, solidusTemp, liquidusTemp, workType) {
       this.reset();
       this.tipTemp = tipTemp || 280;
-      this.meltTemp = meltTemp || 183;
+      if (typeof liquidusTemp === 'string') {
+        workType = liquidusTemp;
+        liquidusTemp = solidusTemp;
+      }
+      this.solidusTemp = solidusTemp || 183;
+      this.liquidusTemp = liquidusTemp || 190;
+      this.meltTemp = this.liquidusTemp;
 
-      // Von Neumann stability criterion: k <= 0.25 for 2D forward Euler
+      // Критерий устойчивости фон Неймана для 2D явной схемы Эйлера (k <= 0.25)
       if (workType === 'smd_small') {
         this.conductivity = 0.08;
-        this.coolingRate = 0.025;
+        this.coolingRate = 0.022;
       } else if (workType === 'smd_large' || workType === 'copper_pipe') {
-        this.conductivity = 0.20;
-        this.coolingRate = 0.035;
+        this.conductivity = 0.19;
+        this.coolingRate = 0.030;
       } else if (workType && workType.startsWith('wire')) {
-        this.conductivity = 0.16;
-        this.coolingRate = 0.018;
+        this.conductivity = 0.15;
+        this.coolingRate = 0.016;
       } else {
-        this.conductivity = 0.14;
-        this.coolingRate = 0.020;
+        this.conductivity = 0.13;
+        this.coolingRate = 0.018;
       }
 
       this.start();
@@ -279,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
-      // Аппаратные кнопки доступности (клавиатура / клик-переключатель)
+      // Аппаратные кнопки доступности (нативный клик обрабатывает мышь, тач и клавиатурные Space/Enter без дублирования)
       const heatBtn = document.getElementById('sim-heat-btn');
       const releaseBtn = document.getElementById('sim-release-btn');
       const resetBtn = document.getElementById('sim-reset-btn');
@@ -288,12 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
         heatBtn.addEventListener('click', (e) => {
           e.preventDefault();
           this.toggleHeating();
-        });
-        heatBtn.addEventListener('keydown', (e) => {
-          if (e.key === ' ' || e.key === 'Enter') {
-            e.preventDefault();
-            this.toggleHeating();
-          }
         });
       }
 
@@ -307,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBtn.addEventListener('click', () => {
           this.reset();
           this.render();
-          if (heatmapTalDisplay) heatmapTalDisplay.textContent = 'TAL: 0.0 с';
+          if (heatmapTalDisplay) heatmapTalDisplay.textContent = `TAL (> ${this.liquidusTemp || 183} °C): 0.0 с`;
           if (heatmapJointTemp) heatmapJointTemp.textContent = `${Math.round(this.ambientTemp)} °C ○ ТВЁРДОЕ`;
         });
       }
@@ -367,12 +368,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (heatmapTipTemp) heatmapTipTemp.textContent = `${Math.round(this.tipTemp)} °C`;
       if (heatmapJointTemp) {
-        const isLiquid = padTemp >= this.meltTemp;
-        heatmapJointTemp.textContent = `${Math.round(padTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
-        heatmapJointTemp.className = isLiquid ? 'text-accent font-bold' : 'text-cyan font-bold';
+        let stateStr = '';
+        let stateClass = '';
+        if (padTemp < this.solidusTemp) {
+          stateStr = `${Math.round(padTemp)} °C ○ ТВЁРДОЕ`;
+          stateClass = 'text-cyan font-bold';
+        } else if (padTemp < this.liquidusTemp) {
+          stateStr = `${Math.round(padTemp)} °C ◐ ПЛАВЛЕНИЕ`;
+          stateClass = 'text-amber-400 font-bold';
+        } else {
+          stateStr = `${Math.round(padTemp)} °C ● РАСПЛАВ`;
+          stateClass = 'text-accent font-bold';
+        }
+        heatmapJointTemp.textContent = stateStr;
+        heatmapJointTemp.className = stateClass;
       }
       if (heatmapTalDisplay) {
-        heatmapTalDisplay.textContent = `TAL: ${this.touchTimeSec.toFixed(1)} с`;
+        heatmapTalDisplay.textContent = `TAL (> ${this.liquidusTemp || 183} °C): ${this.touchTimeSec.toFixed(1)} с`;
       }
     }
 
@@ -384,22 +396,25 @@ document.addEventListener('DOMContentLoaded', () => {
       const k = this.conductivity;
       const loss = this.coolingRate;
       const ambient = this.ambientTemp;
+      const dtScale = dt * 60; // 1.0 при эталонном шаге 1/60 секунды
 
       prev.set(curr);
 
       const tx = Math.max(1, Math.min(cols - 2, Math.floor(this.tipX)));
       const ty = Math.max(1, Math.min(rows - 2, Math.floor(this.tipY)));
 
-      // Нагрев подаётся строго при активном контакте жала
+      // Теплопередача через контактное термосопротивление и теплоёмкость жала станции (без мгновенного скачка)
       if (this.isContactActive) {
-        prev[ty * cols + tx] = this.tipTemp;
-        if (tx > 0) prev[ty * cols + (tx - 1)] = Math.max(prev[ty * cols + (tx - 1)], this.tipTemp * 0.92);
-        if (tx < cols - 1) prev[ty * cols + (tx + 1)] = Math.max(prev[ty * cols + (tx + 1)], this.tipTemp * 0.92);
-        if (ty > 0) prev[(ty - 1) * cols + tx] = Math.max(prev[(ty - 1) * cols + tx], this.tipTemp * 0.92);
-        if (ty < rows - 1) prev[(ty + 1) * cols + tx] = Math.max(prev[(ty + 1) * cols + tx], this.tipTemp * 0.92);
+        const contactCoeff = 0.28 * dtScale;
+        const contactCoeffEdge = 0.14 * dtScale;
+        prev[ty * cols + tx] += (this.tipTemp - prev[ty * cols + tx]) * contactCoeff;
+        if (tx > 0) prev[ty * cols + (tx - 1)] += (this.tipTemp * 0.93 - prev[ty * cols + (tx - 1)]) * contactCoeffEdge;
+        if (tx < cols - 1) prev[ty * cols + (tx + 1)] += (this.tipTemp * 0.93 - prev[ty * cols + (tx + 1)]) * contactCoeffEdge;
+        if (ty > 0) prev[(ty - 1) * cols + tx] += (this.tipTemp * 0.93 - prev[(ty - 1) * cols + tx]) * contactCoeffEdge;
+        if (ty < rows - 1) prev[(ty + 1) * cols + tx] += (this.tipTemp * 0.93 - prev[(ty + 1) * cols + tx]) * contactCoeffEdge;
       }
 
-      // 2D-уравнение теплопроводности (разностная схема Лапласа)
+      // 2D-уравнение теплопроводности (разностная схема Лапласа, строго откалиброванная под dt)
       for (let r = 1; r < rows - 1; r++) {
         const rowOffset = r * cols;
         for (let c = 1; c < cols - 1; c++) {
@@ -411,26 +426,27 @@ document.addEventListener('DOMContentLoaded', () => {
           const center = prev[idx];
 
           const laplacian = left + right + up + down - 4 * center;
-          let newT = center + k * laplacian - loss * (center - ambient);
+          let newT = center + (k * laplacian - loss * (center - ambient)) * dtScale;
           curr[idx] = Math.max(ambient, Math.min(this.tipTemp + 20, newT));
         }
       }
 
       // Граничные условия: естественный теплоотвод в текстолит и окружающую среду по периметру
+      const edgeLoss = 0.08 * dtScale;
       for (let c = 0; c < cols; c++) {
-        curr[c] += (ambient - curr[c]) * 0.12;
-        curr[(rows - 1) * cols + c] += (ambient - curr[(rows - 1) * cols + c]) * 0.12;
+        curr[c] += (ambient - curr[c]) * edgeLoss;
+        curr[(rows - 1) * cols + c] += (ambient - curr[(rows - 1) * cols + c]) * edgeLoss;
       }
       for (let r = 0; r < rows; r++) {
-        curr[r * cols] += (ambient - curr[r * cols]) * 0.12;
-        curr[r * cols + (cols - 1)] += (ambient - curr[r * cols + (cols - 1)]) * 0.12;
+        curr[r * cols] += (ambient - curr[r * cols]) * edgeLoss;
+        curr[r * cols + (cols - 1)] += (ambient - curr[r * cols + (cols - 1)]) * edgeLoss;
       }
 
       // TAL (Time Above Liquidus) — накопленное интегральное время выше точки ликвидуса контрольной площадки
       const padX = Math.floor(cols / 2);
       const padY = Math.floor(rows / 2);
       const padTemp = curr[padY * cols + padX];
-      if (padTemp >= this.meltTemp) {
+      if (padTemp >= (this.liquidusTemp || 183)) {
         this.touchTimeSec += dt;
       }
     }
@@ -759,9 +775,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       // Получаем физические параметры сплава из единого реестра TCHP_MATERIALS
       const mat = (window.TCHP_MATERIALS && window.TCHP_MATERIALS[sVal]) || {};
-      const meltT = mat.t_melt_max || 190;
+      const solT = mat.t_melt_min || 183;
+      const liqT = mat.t_melt_max || 190;
       const avg = (item.t_min + item.t_max) / 2;
-      thermalSim.configure(avg, meltT, wVal);
+      thermalSim.configure(avg, solT, liqT, wVal);
     }
 
   }

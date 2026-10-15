@@ -427,3 +427,20 @@ add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('theme3-headphones', $theme_uri . '/assets/css/headphones-style.css', ['theme3-tokens'], $headphones_ver);
 });
 
+// 8. Резервная отдача GEO и LLM файлов (llms.txt, llms-full.txt, robots.txt) через WordPress
+add_action('init', function () {
+    $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
+    $req = trim($uri, '/');
+    if ($req === 'llms.txt' || $req === 'llms-full.txt' || $req === 'robots.txt') {
+        $theme_file = function_exists('get_template_directory') ? get_template_directory() . '/' . $req : __DIR__ . '/' . $req;
+        $root_file  = defined('ABSPATH') ? ABSPATH . $req : null;
+        $target     = ($root_file && file_exists($root_file)) ? $root_file : (file_exists($theme_file) ? $theme_file : null);
+        if ($target) {
+            header('Content-Type: text/plain; charset=utf-8');
+            header('X-Robots-Tag: all');
+            readfile($target);
+            exit;
+        }
+    }
+});
+

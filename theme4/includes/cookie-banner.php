@@ -1,27 +1,48 @@
 <!-- Cookie Consent Banner (Editorial Style / 152-ФЗ Zero-PII) -->
-<div id="cookie-consent-banner" class="fixed bottom-16 sm:bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 transform transition-all duration-300 translate-y-0 opacity-100 hidden">
-  <div class="border border-paper-border-dark bg-paper dark:bg-card p-4 sm:p-5 rounded-lg shadow-xl space-y-3 relative">
-    <div class="flex items-start justify-between gap-3">
-      <div class="flex items-center gap-2">
-        <?= tp_icon('check', 'w-4 h-4 text-accent') ?>
-        <span class="font-mono text-xs font-bold uppercase text-ink tracking-wider">Файлы Cookie и аналитика</span>
+<div id="cookie-consent-banner" class="fixed bottom-[54px] sm:bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:max-w-[340px] z-50 transform transition-all duration-300 translate-y-0 opacity-100 hidden">
+  <div class="border border-paper-border-dark bg-paper dark:bg-card p-3 sm:p-4 rounded-lg shadow-xl relative">
+    
+    <!-- Mobile Compact Single-Row Layout -->
+    <div class="sm:hidden flex items-center justify-between gap-2 text-xs font-mono">
+      <div class="flex items-center gap-1.5 min-w-0">
+        <span class="w-1.5 h-1.5 rounded-full bg-accent shrink-0"></span>
+        <span class="truncate text-ink font-medium text-[11px]">Cookies: тема и аналитика (152-ФЗ)</span>
       </div>
-      <button id="cookie-close-btn" type="button" class="text-ink-faint hover:text-ink font-mono text-xs min-w-[44px] min-h-[44px] flex items-center justify-center cursor-pointer" aria-label="Закрыть">
-        <?= tp_icon('x', 'w-4 h-4') ?>
-      </button>
-
+      <div class="flex items-center gap-1 shrink-0">
+        <a class="text-ink-muted hover:text-ink underline text-[11px] px-1 py-1" href="<?php echo function_exists('home_url') ? esc_url(home_url('/privacy/')) : 'privacy.php'; ?>">Инфо</a>
+        <button id="cookie-accept-btn" type="button" class="px-2.5 py-1 bg-ink text-paper text-[11px] font-mono font-medium rounded hover:opacity-90 transition-opacity cursor-pointer shadow-xs">
+          Принять
+        </button>
+        <button id="cookie-close-btn" type="button" class="text-ink-muted hover:text-ink p-1 cursor-pointer" aria-label="Закрыть">
+          <?= tp_icon('x', 'w-3.5 h-3.5') ?>
+        </button>
+      </div>
     </div>
 
-    <p class="text-xs text-ink-muted leading-relaxed font-sans">
-      Мы используем cookies исключительно для сохранения выбранной темы и анонимной статистики Яндекса. Мы <span class="font-semibold text-ink">не собираем</span> персональные данные (152-ФЗ).
-    </p>
+    <!-- Tablet / Desktop Editorial Card Layout -->
+    <div class="hidden sm:block space-y-2.5">
+      <div class="flex items-start justify-between gap-2">
+        <div class="flex items-center gap-1.5">
+          <span class="w-1.5 h-1.5 rounded-full bg-accent"></span>
+          <span class="font-mono text-xs font-bold uppercase text-ink tracking-wider">Файлы Cookie и аналитика</span>
+        </div>
+        <button id="cookie-close-btn-desk" type="button" class="text-ink-faint hover:text-ink font-mono text-xs p-1 cursor-pointer" aria-label="Закрыть">
+          <?= tp_icon('x', 'w-3.5 h-3.5') ?>
+        </button>
+      </div>
 
-    <div class="flex items-center justify-between gap-3 pt-2 border-t border-paper-border text-xs font-mono">
-      <a class="text-ink-muted hover:text-ink underline text-xs min-h-[44px] inline-flex items-center" href="<?php echo function_exists('home_url') ? esc_url(home_url('/privacy/')) : 'privacy.php'; ?>">Политика 152-ФЗ →</a>
-      <button id="cookie-accept-btn" type="button" class="min-h-[44px] px-4 py-2 bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shadow-sm border border-paper-border-dark dark:border-paper-border cursor-pointer">
-        Принять и продолжить
-      </button>
+      <p class="text-[11.5px] text-ink-muted leading-relaxed font-sans">
+        Мы используем cookies для темы оформления и анонимной аналитики Яндекса. Персональные данные не собираются (152-ФЗ Zero-PII).
+      </p>
+
+      <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-paper-border text-[11px] font-mono">
+        <a class="text-ink-muted hover:text-ink underline" href="<?php echo function_exists('home_url') ? esc_url(home_url('/privacy/')) : 'privacy.php'; ?>">Политика 152-ФЗ →</a>
+        <button id="cookie-accept-btn-desk" type="button" class="px-3 py-1 bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity shadow-xs border border-paper-border-dark dark:border-paper-border cursor-pointer">
+          Принять
+        </button>
+      </div>
     </div>
+
   </div>
 </div>
 
@@ -44,8 +65,12 @@
 
       const acceptBtn = document.getElementById('cookie-accept-btn');
       const closeBtn = document.getElementById('cookie-close-btn');
+      const acceptBtnDesk = document.getElementById('cookie-accept-btn-desk');
+      const closeBtnDesk = document.getElementById('cookie-close-btn-desk');
       if (acceptBtn) acceptBtn.addEventListener('click', acceptCookie);
       if (closeBtn) closeBtn.addEventListener('click', acceptCookie);
+      if (acceptBtnDesk) acceptBtnDesk.addEventListener('click', acceptCookie);
+      if (closeBtnDesk) closeBtnDesk.addEventListener('click', acceptCookie);
     } catch (e) {
       console.error(e);
     }

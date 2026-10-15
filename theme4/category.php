@@ -124,8 +124,10 @@ if ($is_tag_view && $queried_tag) {
     $canonical_url = get_tag_link($queried_tag->term_id);
 } elseif ($queried_cat) {
     $canonical_url = get_category_link($queried_cat->term_id);
+} elseif ($current_slug === 'all') {
+    $canonical_url = "https://tochka-plavleniya.ru/archive/";
 } else {
-    $canonical_url = $site_root . "category.php?slug=" . urlencode($current_slug);
+    $canonical_url = "https://tochka-plavleniya.ru/category/" . urlencode($current_slug) . "/";
 }
 
 // Collect articles for this rubric
@@ -284,11 +286,11 @@ include __DIR__ . '/includes/header.php';
 ?>
 
   <!-- Main Content -->
-  <main class="w-full flex-grow pt-8 pb-16" id="main-content">
-    <div class="max-w-[1140px] mx-auto px-5 sm:px-8 space-y-8">
+  <main class="w-full flex-grow pt-4 sm:pt-8 pb-16" id="main-content">
+    <div class="max-w-[1140px] mx-auto px-4 sm:px-8 space-y-4 sm:space-y-8">
       
       <!-- Semantic Breadcrumbs (WCAG compliant) -->
-      <nav aria-label="Хлебные крошки" class="text-xs font-mono text-ink-faint flex items-center gap-1.5 flex-wrap">
+      <nav aria-label="Хлебные крошки" class="text-[11px] sm:text-xs font-mono text-ink-faint flex items-center gap-1.5 flex-wrap">
         <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="<?= esc_url($site_root) ?>">Главная</a>
         <span aria-hidden="true">→</span>
         <a class="hover:text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded px-1" href="<?= esc_url($site_root) ?>index.php#articles">Рубрики журнала</a>
@@ -297,8 +299,8 @@ include __DIR__ . '/includes/header.php';
       </nav>
 
       <!-- HERO SECTION (Calm, Engineering Aesthetics with Strict Semantic Highlights) -->
-      <section class="border-b border-paper-border pb-8">
-        <div class="max-w-3xl space-y-4">
+      <section class="border-b border-paper-border pb-4 sm:pb-8">
+        <div class="max-w-3xl space-y-2.5 sm:space-y-4">
           
           <?php
           $sec_codes = [
@@ -310,7 +312,7 @@ include __DIR__ . '/includes/header.php';
           $current_sec_code = $sec_codes[$current_slug] ?? 'SEC.XX';
           ?>
           <!-- Single Subtle Workshop Stamp -->
-          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink font-mono text-xs">
+          <div class="inline-flex items-center gap-1.5 sm:gap-2 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded bg-paper-subtle border border-paper-border text-ink font-mono text-[11px] sm:text-xs">
             <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
             <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?> // [<?= $current_sec_code ?>]</span>
             <span class="text-ink-faint">|</span>
@@ -318,12 +320,12 @@ include __DIR__ . '/includes/header.php';
           </div>
 
           <!-- Headline -->
-          <h1 class="text-3xl sm:text-5xl font-bold text-ink tracking-tight font-sans">
+          <h1 class="text-2xl sm:text-5xl font-bold text-ink tracking-tight font-sans">
             <?= e($current_rubric['title']) ?>
           </h1>
 
           <!-- Lead Paragraph: Calm, Editorial Typography -->
-          <p class="text-base sm:text-lg text-ink font-serif leading-[1.65]">
+          <p class="text-sm sm:text-lg text-ink font-serif leading-snug sm:leading-[1.65]">
             <?php if ($current_slug === 'materialy'): ?>
               Разбираем металлургию и химию радиомонтажа: свойства припоев (<strong>ПОС-61, SAC305</strong>), классификацию флюсов (<strong>RMA и No-Clean</strong>), риск разрушения шва от сплава Розе и защиту от токов утечки.
             <?php elseif ($current_slug === 'start'): ?>
@@ -650,106 +652,181 @@ include __DIR__ . '/includes/header.php';
         <!-- RIGHT COLUMN: SIDEBAR (Contextual Strict Semantic Workbench Cards) -->
         <aside class="lg:col-span-4 space-y-5">
           
-          <!-- CONTEXTUAL POST-IT NOTE: Workshop Master Note -->
-          <?php 
-          $sb = $current_rubric['sidebar'] ?? [];
-          $sb_note = $sb['note'] ?? [
-              'label' => 'Заметка верстака // Химия',
-              'code' => 'FLUX-QC',
-              'text' => '«Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции!»',
-              'footer_l' => 'Норма нагрева флюса',
-              'footer_r' => 'IPC-TM-650'
-          ];
-          ?>
-          <div class="sketch-sticky-note p-4 rounded-lg space-y-2 relative shadow-sm" style="transform: rotate(-0.5deg);">
-            <div class="sketch-washi-tape washi-tape-postit" aria-hidden="true"></div>
-            
-            <div class="flex items-center justify-between font-mono text-stamp uppercase font-bold border-b sketch-divider pb-1 text-ink">
-              <span class="flex items-center gap-1.5">
-                <?= tp_icon('pin', 'w-3.5 h-3.5 text-accent') ?>
-                [<?= e($sb_note['label']) ?>]
-              </span>
-              <span class="text-stamp opacity-75"><?= e($sb_note['code']) ?></span>
+          <?php if ($current_slug === 'all'): ?>
+            <!-- UNIVERSAL ARCHIVE NAVIGATION: Rubrics Overview -->
+            <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">
+              <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
+                <span class="flex items-center gap-1.5 text-ink">
+                  <?= tp_icon('book-open', 'w-3.5 h-3.5 text-accent') ?>
+                  [РУБРИКИ БАЗЫ ЗНАНИЙ]
+                </span>
+                <span class="pill-blue text-stamp font-mono uppercase px-2 py-0.5 rounded">4 РАЗДЕЛА</span>
+              </div>
+              <div class="space-y-2 font-mono text-xs">
+                <a href="<?= esc_url($site_root) ?>category.php?slug=start" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold group-hover:text-accent">[SEC.01] Старт и база</span>
+                    <span class="text-ink-muted text-[11px]">Базовый курс →</span>
+                  </div>
+                  <p class="text-[11px] text-ink-muted mt-1 font-sans">Выбор паяльника, основы термопрофиля, смачивание меди.</p>
+                </a>
+                <a href="<?= esc_url($site_root) ?>category.php?slug=materialy" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold group-hover:text-accent">[SEC.02] Материалы и сплавы</span>
+                    <span class="text-ink-muted text-[11px]">Металлургия →</span>
+                  </div>
+                  <p class="text-[11px] text-ink-muted mt-1 font-sans">Реестр ПОС-61, SAC305, классификация флюсов J-STD-004.</p>
+                </a>
+                <a href="<?= esc_url($site_root) ?>category.php?slug=praktika" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold group-hover:text-accent">[SEC.03] Практика монтажа</span>
+                    <span class="text-ink-muted text-[11px]">Техпроцессы →</span>
+                  </div>
+                  <p class="text-[11px] text-ink-muted mt-1 font-sans">Ручной SMD-монтаж 0402, картриджи T12/C245, BGA-реболлинг.</p>
+                </a>
+                <a href="<?= esc_url($site_root) ?>category.php?slug=oshibki" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
+                  <div class="flex items-center justify-between">
+                    <span class="font-bold group-hover:text-accent">[SEC.04] Проблемы и дефекты</span>
+                    <span class="text-ink-muted text-[11px]">Диагностика →</span>
+                  </div>
+                  <p class="text-[11px] text-ink-muted mt-1 font-sans">Устранение tombstoning, холодной пайки и сбоев термопрофиля.</p>
+                </a>
+              </div>
             </div>
 
-            <p class="font-hand text-base leading-snug italic font-semibold text-ink">
-              <?= e($sb_note['text']) ?>
-            </p>
-
-            <div class="pt-1 flex items-center justify-between font-mono text-xs opacity-80 border-t sketch-divider text-ink-muted">
-              <span><?= e($sb_note['footer_l']) ?></span>
-              <span class="font-bold text-ink"><?= e($sb_note['footer_r']) ?></span>
-            </div>
-          </div>
-
-          <!-- TECHNICAL SPECIFICATION REFERENCE (Contextual Clean Reference Card) -->
-          <?php 
-          $sb_spec = $sb['spec'] ?? [
-              'title' => 'Плавление припоев',
-              'tag' => 'ГОСТ / IPC',
-              'tag_pill' => 'pill-blue',
-              'rows' => [
-                  ['label' => 'ПОС-61 (ГОСТ 21931)',  'val' => '183–190 °C'],
-                  ['label' => 'Sn63Pb37 (Эвтектика)', 'val' => '183 °C'],
-                  ['label' => 'SAC305 (RoHS)',        'val' => '217–220 °C'],
-              ],
-              'more_link' => esc_url($site_root) . 'interactive.php#table',
-              'more_text' => 'Вся таблица припоев →'
-          ];
-          ?>
-          <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm relative">
-            <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
-              <span class="flex items-center gap-1.5 text-ink">
-                <?= tp_icon('thermometer', 'w-3.5 h-3.5 text-teal-600 dark:text-teal-400') ?>
-                [<?= e($sb_spec['title']) ?>]
-              </span>
-              <span class="<?= e($sb_spec['tag_pill']) ?> text-stamp font-mono uppercase px-2 py-0.5 rounded"><?= e($sb_spec['tag']) ?></span>
-            </div>
-
-            <div class="space-y-1.5 font-mono text-xs">
-              <?php foreach ($sb_spec['rows'] as $r): ?>
+            <!-- UNIVERSAL ENGINEERING STANDARDS REFERENCE -->
+            <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">
+              <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
+                <span class="flex items-center gap-1.5 text-ink">
+                  <?= tp_icon('shield', 'w-3.5 h-3.5 text-emerald-600') ?>
+                  [СТАНДАРТЫ РЕГЛАМЕНТА]
+                </span>
+                <span class="pill-mint text-stamp font-mono uppercase px-2 py-0.5 rounded">IPC / ГОСТ</span>
+              </div>
+              <div class="space-y-1.5 font-mono text-xs">
                 <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
-                  <span class="text-ink"><?= e($r['label']) ?></span>
-                  <span class="font-bold text-ink text-xs"><?= e($r['val']) ?></span>
+                  <span class="text-ink">ГОСТ 21930-76</span>
+                  <span class="text-ink-muted text-[11px]">Припои оловянно-свинцовые</span>
                 </div>
-              <?php endforeach; ?>
+                <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
+                  <span class="text-ink">IPC-A-610G</span>
+                  <span class="text-ink-muted text-[11px]">Критерии годности пайки</span>
+                </div>
+                <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
+                  <span class="text-ink">J-STD-004B</span>
+                  <span class="text-ink-muted text-[11px]">Классификация флюсов</span>
+                </div>
+                <div class="flex items-center justify-between py-1">
+                  <span class="text-ink">J-STD-006C</span>
+                  <span class="text-ink-muted text-[11px]">Электронные сплавы</span>
+                </div>
+              </div>
             </div>
 
-            <div class="pt-1 text-right">
-              <a href="<?= e($sb_spec['more_link']) ?>" class="font-mono text-xs text-ink hover:underline font-bold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
-                <?= e($sb_spec['more_text']) ?>
-              </a>
-            </div>
-          </div>
+          <?php else: ?>
 
-          <!-- CONTEXTUAL WARNING CALLOUT (Defect Warning / Engineering Standard) -->
-          <?php 
-          $sb_warn = $sb['warning'] ?? [
-              'title' => 'Риск брака // Сплав Розе',
-              'badge' => 'ОСТОРОЖНО',
-              'text' => '«Сплав Розе (94°C) — строго для демонтажа! После снятия разъёма остатки сплава нужно насухо вычистить оплёткой.»',
-              'footer_l' => 'Хрупкость шва',
-              'footer_r' => 'Бинарная эвтектика'
-          ];
-          ?>
-          <div class="border border-warning-border rounded-lg bg-warning-bg/30 p-4 space-y-2 shadow-sm">
-            <div class="flex items-center justify-between font-mono text-stamp uppercase font-bold border-b border-paper-border pb-1">
-              <span class="flex items-center gap-1.5 text-warning">
-                <?= tp_icon('alert-triangle', 'w-3.5 h-3.5 text-warning') ?>
-                [<?= e($sb_warn['title']) ?>]
-              </span>
-              <span class="pill-orange text-stamp px-2 py-0.5 rounded font-mono font-bold"><?= e($sb_warn['badge']) ?></span>
+            <!-- CONTEXTUAL POST-IT NOTE: Workshop Master Note -->
+            <?php 
+            $sb = $current_rubric['sidebar'] ?? [];
+            $sb_note = $sb['note'] ?? [
+                'label' => 'Заметка верстака // Химия',
+                'code' => 'FLUX-QC',
+                'text' => '«Канифоль активируется при 150°C, но сгорает в золу при 300°C. Если жало дымит чёрным — убавь нагрев станции!»',
+                'footer_l' => 'Норма нагрева флюса',
+                'footer_r' => 'IPC-TM-650'
+            ];
+            ?>
+            <div class="sketch-sticky-note p-4 rounded-lg space-y-2 relative shadow-sm" style="transform: rotate(-0.5deg);">
+              <div class="sketch-washi-tape washi-tape-postit" aria-hidden="true"></div>
+              
+              <div class="flex items-center justify-between font-mono text-stamp uppercase font-bold border-b sketch-divider pb-1 text-ink">
+                <span class="flex items-center gap-1.5">
+                  <?= tp_icon('pin', 'w-3.5 h-3.5 text-accent') ?>
+                  [<?= e($sb_note['label']) ?>]
+                </span>
+                <span class="text-stamp opacity-75"><?= e($sb_note['code']) ?></span>
+              </div>
+
+              <p class="font-hand text-base leading-snug italic font-semibold text-ink">
+                <?= e($sb_note['text']) ?>
+              </p>
+
+              <div class="pt-1 flex items-center justify-between font-mono text-xs opacity-80 border-t sketch-divider text-ink-muted">
+                <span><?= e($sb_note['footer_l']) ?></span>
+                <span class="font-bold text-ink"><?= e($sb_note['footer_r']) ?></span>
+              </div>
             </div>
 
-            <p class="font-hand text-base leading-snug italic font-semibold text-ink">
-              <?= e($sb_warn['text']) ?>
-            </p>
+            <!-- TECHNICAL SPECIFICATION REFERENCE (Contextual Clean Reference Card) -->
+            <?php 
+            $sb_spec = $sb['spec'] ?? [
+                'title' => 'Плавление припоев',
+                'tag' => 'ГОСТ / IPC',
+                'tag_pill' => 'pill-blue',
+                'rows' => [
+                    ['label' => 'ПОС-61 (ГОСТ 21931)',  'val' => '183–190 °C'],
+                    ['label' => 'Sn63Pb37 (Эвтектика)', 'val' => '183 °C'],
+                    ['label' => 'SAC305 (RoHS)',        'val' => '217–220 °C'],
+                ],
+                'more_link' => esc_url($site_root) . 'interactive.php#table',
+                'more_text' => 'Вся таблица припоев →'
+            ];
+            ?>
+            <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm relative">
+              <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
+                <span class="flex items-center gap-1.5 text-ink">
+                  <?= tp_icon('thermometer', 'w-3.5 h-3.5 text-teal-600 dark:text-teal-400') ?>
+                  [<?= e($sb_spec['title']) ?>]
+                </span>
+                <span class="<?= e($sb_spec['tag_pill']) ?> text-stamp font-mono uppercase px-2 py-0.5 rounded"><?= e($sb_spec['tag']) ?></span>
+              </div>
 
-            <div class="pt-1 flex items-center justify-between font-mono text-xs opacity-80 border-t border-paper-border text-ink-muted">
-              <span><?= e($sb_warn['footer_l']) ?></span>
-              <span class="font-bold text-ink"><?= e($sb_warn['footer_r']) ?></span>
+              <div class="space-y-1.5 font-mono text-xs">
+                <?php foreach ($sb_spec['rows'] as $r): ?>
+                  <div class="flex items-center justify-between py-1 border-b border-paper-border/50">
+                    <span class="text-ink"><?= e($r['label']) ?></span>
+                    <span class="font-bold text-ink text-xs"><?= e($r['val']) ?></span>
+                  </div>
+                <?php endforeach; ?>
+              </div>
+
+              <div class="pt-1 text-right">
+                <a href="<?= e($sb_spec['more_link']) ?>" class="font-mono text-xs text-ink hover:underline font-bold focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
+                  <?= e($sb_spec['more_text']) ?>
+                </a>
+              </div>
             </div>
-          </div>
+
+            <!-- CONTEXTUAL WARNING CALLOUT (Defect Warning / Engineering Standard) -->
+            <?php 
+            $sb_warn = $sb['warning'] ?? [
+                'title' => 'Риск брака // Сплав Розе',
+                'badge' => 'ОСТОРОЖНО',
+                'text' => '«Сплав Розе (94°C) — строго для демонтажа! После снятия разъёма остатки сплава нужно насухо вычистить оплёткой.»',
+                'footer_l' => 'Хрупкость шва',
+                'footer_r' => 'Бинарная эвтектика'
+            ];
+            ?>
+            <div class="border border-warning-border rounded-lg bg-warning-bg/30 p-4 space-y-2 shadow-sm">
+              <div class="flex items-center justify-between font-mono text-stamp uppercase font-bold border-b border-paper-border pb-1">
+                <span class="flex items-center gap-1.5 text-warning">
+                  <?= tp_icon('alert-triangle', 'w-3.5 h-3.5 text-warning') ?>
+                  [<?= e($sb_warn['title']) ?>]
+                </span>
+                <span class="pill-orange text-stamp px-2 py-0.5 rounded font-mono font-bold"><?= e($sb_warn['badge']) ?></span>
+              </div>
+
+              <p class="font-hand text-base leading-snug italic font-semibold text-ink">
+                <?= e($sb_warn['text']) ?>
+              </p>
+
+              <div class="pt-1 flex items-center justify-between font-mono text-xs opacity-80 border-t border-paper-border text-ink-muted">
+                <span><?= e($sb_warn['footer_l']) ?></span>
+                <span class="font-bold text-ink"><?= e($sb_warn['footer_r']) ?></span>
+              </div>
+            </div>
+
+          <?php endif; ?>
 
           <!-- WORKBENCH TOOLS: Semantically Coded Shortcuts with 44px touch targets -->
           <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">

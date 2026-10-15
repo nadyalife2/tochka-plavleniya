@@ -23,6 +23,9 @@ $tchp_head_escape = static function ($value) {
   <?php endif; ?>
   <?php if (!$tchp_rank_math_active): ?>
   <meta name="description" content="<?= $tchp_head_escape($page_desc) ?>">
+  <?php if (!empty($canonical_url)): ?>
+  <link rel="canonical" href="<?= $tchp_head_escape($canonical_url) ?>">
+  <?php endif; ?>
   <meta property="og:type" content="<?= function_exists('is_singular') && is_singular('post') ? 'article' : 'website' ?>"/>
   <meta property="og:title" content="<?= $tchp_head_escape($page_title) ?>"/>
   <meta property="og:description" content="<?= $tchp_head_escape($page_desc) ?>"/>
@@ -68,19 +71,19 @@ $tchp_head_escape = static function ($value) {
     Перейти к основному содержимому
   </a>
   <header class="w-full border-b border-paper-border sticky top-0 z-40 bg-paper">
-    <div class="max-w-[1140px] mx-auto px-3 sm:px-8 h-14 flex items-center justify-between gap-2 sm:gap-6">
+    <div class="max-w-[1140px] mx-auto px-3 sm:px-8 h-14 flex items-center justify-between gap-1.5 sm:gap-6">
       <div class="flex items-center gap-2 sm:gap-6 min-w-0">
         <a class="logo shrink-0" href="<?= $site_root ?>">ТОЧКА<span class="logo-squircle" aria-hidden="true"><span class="logo-dot"></span></span>ПЛАВЛЕНИЯ</a>
         <?php include __DIR__ . '/header-nav.php'; ?>
       </div>
-      <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
-        <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] sm:min-h-[44px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 shrink-0" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
+      <div class="flex items-center gap-1 sm:gap-3 shrink-0">
+        <button id="search-modal-trigger" type="button" class="inline-flex items-center justify-center min-w-[38px] min-h-[38px] sm:min-w-auto sm:min-h-[44px] px-2 sm:px-3 border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 shrink-0" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
           <?= tp_icon('search', 'w-4 h-4 text-accent') ?>
           <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
           <kbd class="hidden md:inline-block text-stamp font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-muted dark:text-ink rounded border border-paper-border">Ctrl+K</kbd>
         </button>
-        <button id="header-drawer-trigger" type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[40px] sm:min-h-[44px] border border-paper-border hover:border-accent bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 group shrink-0" title="Выдвижной микро-верстак (Сплавы, токи, флюсы)" aria-label="Открыть выдвижной верстак" aria-haspopup="dialog" aria-expanded="false" aria-controls="lab-drawer-backdrop">
-          <span class="w-1.5 h-1.5 rounded-full bg-cyan inline-block"></span>
+        <button id="header-drawer-trigger" type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="inline-flex items-center justify-center min-w-[38px] min-h-[38px] sm:min-w-auto sm:min-h-[44px] px-2 sm:px-3 border border-paper-border hover:border-accent bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 group shrink-0" title="Выдвижной микро-верстак (Сплавы, токи, флюсы)" aria-label="Открыть выдвижной верстак" aria-haspopup="dialog" aria-expanded="false" aria-controls="lab-drawer-backdrop">
+          <span class="w-1.5 h-1.5 rounded-full bg-cyan inline-block hidden sm:inline-block"></span>
           <?= tp_icon('sliders', 'w-4 h-4 text-cyan group-hover:text-accent transition-colors') ?>
           <span class="hidden lg:inline text-xs font-mono text-ink-muted group-hover:text-ink">Быстрый расчёт</span>
         </button>

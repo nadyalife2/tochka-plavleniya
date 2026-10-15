@@ -283,7 +283,9 @@ if (!function_exists('get_semantic_tag_pill')) {
 if (!function_exists('render_rubric_schema')) {
     function render_rubric_schema(array $rubric, array $articles): string {
         $rslug = $rubric['slug'] ?? 'materialy';
-        if (function_exists('get_category_by_slug') && ($cat = get_category_by_slug($rslug))) {
+        if ($rslug === 'all') {
+            $canonical_url = "https://tochka-plavleniya.ru/archive/";
+        } elseif (function_exists('get_category_by_slug') && ($cat = get_category_by_slug($rslug))) {
             $canonical_url = get_category_link($cat->term_id);
         } else {
             $canonical_url = "https://tochka-plavleniya.ru/category/" . urlencode($rslug) . "/";
@@ -342,8 +344,8 @@ if (!function_exists('render_rubric_schema')) {
                         [
                             "@type" => "ListItem",
                             "position" => 2,
-                            "name" => "Рубрики журнала",
-                            "item" => "https://tochka-plavleniya.ru/#rubrics"
+                            "name" => ($rslug === 'all' ? "Архив" : "Рубрики журнала"),
+                            "item" => ($rslug === 'all' ? "https://tochka-plavleniya.ru/archive/" : "https://tochka-plavleniya.ru/#rubrics")
                         ],
                         [
                             "@type" => "ListItem",
@@ -440,10 +442,15 @@ if (!function_exists('tchp_get_express_workbench_matrix')) {
                 'pth'    => ['range' => '275 – 315', 'liq' => '183 °C', 'delta' => '+90...130 °C', 'max' => 315],
                 'copper' => ['range' => '300 – 340', 'liq' => '183 °C', 'delta' => '+115...155 °C', 'max' => 340],
             ],
+            'pos40' => [
+                'smd'    => ['range' => '280 – 310', 'liq' => '183–238 °C', 'delta' => '+42...72 °C от ликвидуса', 'max' => 310],
+                'pth'    => ['range' => '300 – 330', 'liq' => '183–238 °C', 'delta' => '+62...92 °C от ликвидуса', 'max' => 330],
+                'copper' => ['range' => '320 – 350', 'liq' => '183–238 °C', 'delta' => '+82...112 °C (технолог. предел 350 °C)', 'max' => 350],
+            ],
             'sac305' => [
-                'smd'    => ['range' => '310 – 335', 'liq' => '217 °C', 'delta' => '+93...118 °C', 'max' => 335],
-                'pth'    => ['range' => '320 – 350', 'liq' => '217 °C', 'delta' => '+103...133 °C', 'max' => 350],
-                'copper' => ['range' => '340 – 370', 'liq' => '217 °C', 'delta' => '+123...153 °C', 'max' => 370],
+                'smd'    => ['range' => '310 – 335', 'liq' => '217–220 °C', 'delta' => '+90...115 °C', 'max' => 335],
+                'pth'    => ['range' => '320 – 350', 'liq' => '217–220 °C', 'delta' => '+100...130 °C', 'max' => 350],
+                'copper' => ['range' => '340 – 370', 'liq' => '217–220 °C', 'delta' => '+120...150 °C', 'max' => 370],
             ],
             'sn42bi58' => [
                 'smd'    => ['range' => '200 – 225', 'liq' => '138 °C', 'delta' => '+62...87 °C', 'max' => 225],
