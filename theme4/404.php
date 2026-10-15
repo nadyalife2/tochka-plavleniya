@@ -39,7 +39,7 @@ require_once __DIR__ . '/includes/header.php';
       <rect x="30" y="20" width="260" height="160" rx="8" fill="var(--color-card, #ffffff)" stroke="currentColor" stroke-dasharray="6 4"/>
       <!-- Burnt chip -->
       <rect x="110" y="60" width="100" height="80" rx="4" fill="currentColor" fill-opacity="0.1" stroke="currentColor" stroke-width="2"/>
-      <text x="122" y="105" font-family="var(--font-mono, monospace)" font-size="13" fill="currentColor" stroke="none" font-weight="700">404 // SHORT</text>
+      <text x="125" y="105" font-family="var(--font-mono, monospace)" font-size="13" fill="currentColor" stroke="none" font-weight="700">404 // OPEN</text>
       <!-- Smoke waves -->
       <path d="M140 50 Q130 30 145 15 T135 0" stroke="var(--color-ink-muted, #706d64)" opacity="0.6" stroke-width="1.4"/>
       <path d="M180 50 Q190 30 175 15 T185 0" stroke="var(--color-ink-muted, #706d64)" opacity="0.6" stroke-width="1.4"/>

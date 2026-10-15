@@ -232,7 +232,7 @@ include __DIR__ . '/includes/header.php';
         </div>
 
         <!-- Secondary P1 shortcut pills -->
-        <div class="pt-2 flex flex-wrap items-center gap-2.5">
+        <div class="pt-2 hidden lg:flex flex-wrap items-center gap-2.5">
           <span class="text-xs font-mono text-ink-faint">Также на верстаке:</span>
           <a href="#flux-selector" class="inline-flex items-center gap-1.5 px-3 py-1 rounded text-xs font-mono border border-paper-border bg-paper hover:border-accent text-ink transition-colors shadow-2xs">
             <svg class="w-3.5 h-3.5 text-accent shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
@@ -306,14 +306,14 @@ include __DIR__ . '/includes/header.php';
               <label for="temp-work" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Что вы собираетесь паять?</label>
               <select id="temp-work" class="input-base font-mono">
                 <option value="" selected disabled>-- Выберите задачу --</option>
-                <option value="smd_medium">Обычные SMD детали (0603–1206) или микросхемы (SOP, QFP)</option>
-                <option value="smd_small">Очень мелкие SMD детали (0201–0402)</option>
-                <option value="smd_large">Крупные микросхемы или транзисторы с теплоотводом (QFN, D-PAK)</option>
-                <option value="pth">Детали в отверстия (выводной монтаж), штыревые разъемы</option>
-                <option value="wire_thin">Тонкие проводки и перемычки (до 0.5 мм²)</option>
-                <option value="wire_medium">Обычные провода (0.5 – 2.5 мм²)</option>
-                <option value="wire_heavy">Толстые силовые провода (больше 2.5 мм²)</option>
-                <option value="bga">BGA чипы (реболлинг или пайка феном)</option>
+                <option value="smd_medium">SMD 0603–1206 / микросхемы SOP, QFP</option>
+                <option value="smd_small">Прецизионный SMD (0201–0402)</option>
+                <option value="smd_large">Крупные микросхемы / полигоны (QFN, D-PAK)</option>
+                <option value="pth">Выводной монтаж (THT) / разъемы</option>
+                <option value="wire_thin">Тонкие провода (до 0.5 мм²)</option>
+                <option value="wire_medium">Обычные провода (0.5–2.5 мм²)</option>
+                <option value="wire_heavy">Толстые провода (> 2.5 мм²)</option>
+                <option value="bga">BGA чипы (реболлинг / фен)</option>
                 <option value="copper_pipe">Медные трубы</option>
               </select>
             </div>
@@ -322,12 +322,12 @@ include __DIR__ . '/includes/header.php';
               <label for="temp-solder" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Какой припой вы используете?</label>
               <select id="temp-solder" class="input-base font-mono">
                 <option value="" selected disabled>-- Выберите припой --</option>
-                <option value="pos61">Свинцовый: ПОС-61 или аналог (183–190 °C)</option>
-                <option value="sn63pb37">Свинцовый: Sn63Pb37 / ПОС-63 (183 °C)</option>
-                <option value="sac305">Бессвинцовый: SAC305 или обычный без свинца (217–220 °C)</option>
-                <option value="pos40">Грубый свинцовый: ПОС-40 (183–238 °C)</option>
-                <option value="sn42bi58">Низкотемпературный (паста): Sn42Bi58 (138 °C)</option>
-                <option value="roze">Сплав Розе (только для выпаивания) (94 °C)</option>
+                <option value="pos61">ПОС-61 (ГОСТ 21931 • 183–190 °C)</option>
+                <option value="sn63pb37">Sn63Pb37 (Эвтектика • 183 °C)</option>
+                <option value="sac305">SAC305 (RoHS • 217–220 °C)</option>
+                <option value="pos40">ПОС-40 (ГОСТ 21931 • 183–238 °C)</option>
+                <option value="sn42bi58">Sn42Bi58 (Низкотемп. • 138 °C)</option>
+                <option value="roze">Сплав Розе (Демонтаж • 94 °C)</option>
               </select>
             </div>
 
@@ -503,11 +503,11 @@ include __DIR__ . '/includes/header.php';
             <div>
               <label for="iron-task" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">1. Что вы будете паять чаще всего?</label>
               <select id="iron-task" class="input-base font-mono">
-                <option value="wire">Обычные провода, кабели, бытовая пайка для дома</option>
-                <option value="boards_tht">Печатные платы (детали с ножками в отверстия)</option>
-                <option value="smd" selected>Платы с мелкими SMD-деталями (базовый ремонт электроники)</option>
-                <option value="smd_fine">Сложный ремонт: очень мелкие детали под микроскопом, телефоны</option>
-                <option value="connectors">Толстые силовые разъемы (дроны, авто), клеммы</option>
+                <option value="wire">Провода, кабели, бытовая пайка дома</option>
+                <option value="boards_tht">Печатные платы (выводной THT монтаж)</option>
+                <option value="smd" selected>Платы с SMD-деталями (ремонт электроники)</option>
+                <option value="smd_fine">Прецизионный ремонт (0201, микроскоп)</option>
+                <option value="connectors">Силовые разъемы (XT60, авто, дроны)</option>
                 <option value="bga_rework">Замена BGA чипов (ноутбуки, видеокарты)</option>
                 <option value="pipes">Медные водопроводные трубы</option>
               </select>
@@ -516,9 +516,9 @@ include __DIR__ . '/includes/header.php';
             <div>
               <label for="iron-intensity" class="block text-xs font-mono font-bold uppercase text-ink mb-1.5">2. Как часто планируете паять?</label>
               <select id="iron-intensity" class="input-base font-mono">
-                <option value="rare">Пару раз в месяц (починить наушники, собрать гирлянду)</option>
-                <option value="regular" selected>Регулярно (хобби, радиолюбитель, сборка своих плат)</option>
-                <option value="daily">Ежедневно (работа в сервисном центре)</option>
+                <option value="rare">Эпизодически (1–2 раза в месяц)</option>
+                <option value="regular" selected>Регулярно (хобби, DIY, сборка плат)</option>
+                <option value="daily">Ежедневно (проф. сервисный центр)</option>
               </select>
             </div>
 

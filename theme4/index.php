@@ -261,13 +261,13 @@ include __DIR__ . '/includes/header.php';
                   <label for="exp-solder-select" class="block font-bold text-ink text-xs uppercase tracking-wide">
                     Припой / марка сплава:
                   </label>
-                  <select id="exp-solder-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-2 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-                    <option value="pos61" selected>ПОС-61 // ГОСТ 21931 (Тпл 183–190 °C)</option>
-                    <option value="sn63pb37">Sn63Pb37 // Эвтектика (183 °C)</option>
-                    <option value="sac305">SAC305 // Бессвинец RoHS (217–220 °C)</option>
-                    <option value="pos40">ПОС-40 // Медь и силовое (183–238 °C)</option>
-                    <option value="sn42bi58">Sn42Bi58 // Низкотемпературный (138 °C)</option>
-                    <option value="rose">Сплав Розе // Демонтажный (94 °C)</option>
+                  <select id="exp-solder-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-2 pr-8 text-ellipsis text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+                    <option value="pos61" selected>ПОС-61 (ГОСТ 21931 • 183–190 °C)</option>
+                    <option value="sn63pb37">Sn63Pb37 (Эвтектика • 183 °C)</option>
+                    <option value="sac305">SAC305 (RoHS • 217–220 °C)</option>
+                    <option value="pos40">ПОС-40 (ГОСТ 21931 • 183–238 °C)</option>
+                    <option value="sn42bi58">Sn42Bi58 (Низкотемп. • 138 °C)</option>
+                    <option value="rose">Сплав Розе (Демонтаж • 94 °C)</option>
                   </select>
                 </div>
 
@@ -276,10 +276,10 @@ include __DIR__ . '/includes/header.php';
                   <label for="exp-mass-select" class="block font-bold text-ink text-xs uppercase tracking-wide">
                     Тип паяемого узла:
                   </label>
-                  <select id="exp-mass-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-2 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-                    <option value="smd" selected>SMD чипы и тонкие дорожки (1–2 слоя)</option>
-                    <option value="pth">Выводной монтаж (DIP, провода, разъемы)</option>
-                    <option value="copper">Массивная медь / Земляные полигоны GND</option>
+                  <select id="exp-mass-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-2 pr-8 text-ellipsis text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+                    <option value="smd" selected>SMD детали (1–2 слоя)</option>
+                    <option value="pth">Выводной монтаж (DIP, провода)</option>
+                    <option value="copper">Массивная медь / Полигоны GND</option>
                   </select>
                 </div>
               </div>
@@ -682,7 +682,7 @@ include __DIR__ . '/includes/header.php';
               <span class="text-xs opacity-75">БАЗА-01</span>
             </div>
 
-            <p class="font-hand text-base leading-snug italic font-semibold text-ink">
+            <p class="font-serif text-base leading-relaxed italic text-ink font-medium">
               «Греем не припой, а спаиваемые выводы детали и контактную площадку. Припой сам потечет в зону наивысшей температуры!»
             </p>
 

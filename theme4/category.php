@@ -747,7 +747,7 @@ include __DIR__ . '/includes/header.php';
                 <span class="text-stamp opacity-75"><?= e($sb_note['code']) ?></span>
               </div>
 
-              <p class="font-hand text-base leading-snug italic font-semibold text-ink">
+              <p class="font-serif text-base leading-relaxed italic text-ink font-medium">
                 <?= e($sb_note['text']) ?>
               </p>
 

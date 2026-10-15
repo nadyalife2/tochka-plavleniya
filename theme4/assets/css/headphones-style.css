@@ -1138,10 +1138,10 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
    ========================================================================== */
 .tp-headphones .sketch-card,
 .tp-headphones .featured-sketch-frame {
-  border: 1.5px solid var(--line, #18181b);
-  border-radius: 14px;
-  background: #ffffff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+  border: 1px solid var(--line, #222222);
+  border-radius: 8px;
+  background: var(--color-card, #ffffff);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
 }
 
 .tp-headphones .article-content h2,
