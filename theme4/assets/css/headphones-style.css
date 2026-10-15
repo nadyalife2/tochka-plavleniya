@@ -104,7 +104,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   background: #ffffff;
   color: #111111;
   padding: 0.45rem 0.95rem;
-  border-radius: 999px;
+  border-radius: var(--radius-sm, 4px);
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -238,7 +238,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   height: 38px;
   background: var(--pill, #f2f2f4);
   border: 2px solid #111111;
-  border-radius: 999px;
+  border-radius: var(--radius-sm, 4px);
   padding: 0 1.1rem;
   font-family: "Space Grotesk", sans-serif;
   font-weight: 600;
@@ -409,7 +409,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 .tp-headphones .badge {
   background: var(--pill, #f2f2f4);
   border: 1.5px solid #111111;
-  border-radius: 999px;
+  border-radius: var(--radius-sm, 4px);
   padding: 0.35em 0.75em;
   font-size: 0.8rem;
   font-weight: 700;
@@ -444,7 +444,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
 
 .tp-headphones .task-item {
   border: 1.5px solid var(--line, #18181b);
-  border-radius: 14px;
+  border-radius: var(--radius-lg, 8px);
   background: #ffffff;
   padding: 16px 18px;
   display: flex;
@@ -465,7 +465,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   background: var(--yellow, #ffd500);
   color: #111111;
   border: 1.5px solid #111111;
-  border-radius: 999px;
+  border-radius: var(--radius-sm, 4px);
   font-weight: 800;
   font-family: "Space Grotesk", sans-serif;
   font-size: 0.8rem;
@@ -487,7 +487,7 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
    ========================================================================== */
 .tp-headphones .terminal-search {
   border: 1.5px solid var(--line, #18181b);
-  border-radius: 999px;
+  border-radius: var(--radius-lg, 8px);
   background: #ffffff;
   padding: 10px 20px;
   display: flex;

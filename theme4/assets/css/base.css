@@ -157,7 +157,7 @@ a {
   min-height: var(--touch-target-min, 48px);
   background-color: var(--color-accent);
   color: var(--color-accent-text, #0c0c0c) !important;
-  border-radius: var(--radius-control, 10px);
+  border-radius: var(--radius-sm, 4px);
   padding: 0.7rem 1.6rem;
   font-weight: 700;
   font-family: var(--font-sans);
