@@ -140,5 +140,39 @@ require_once __DIR__ . '/search-modal.php';
     });
   </script>
 
+  <!-- Floating Accessible "Подняться к меню" Button -->
+  <button id="scroll-to-menu-btn" type="button" aria-label="Подняться к главному меню" title="Подняться к главному меню (Home)" class="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-40 inline-flex items-center gap-1.5 px-3 py-2 rounded border border-paper-border hover:border-accent bg-paper/95 dark:bg-card/95 text-ink font-mono text-xs shadow-md transition-all active:translate-y-0.5 cursor-pointer opacity-0 pointer-events-none group duration-200">
+    <svg class="w-4 h-4 text-accent transition-transform group-hover:-translate-y-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6"/></svg>
+    <span class="font-bold text-ink">К меню</span>
+    <kbd class="hidden sm:inline-block text-[10px] text-ink-muted bg-paper-subtle px-1.5 py-0.2 rounded border border-paper-border select-none">Home</kbd>
+  </button>
+
+  <script>
+    (function() {
+      const scrollBtn = document.getElementById('scroll-to-menu-btn');
+      if (!scrollBtn) return;
+
+      function handleScroll() {
+        if (window.pageYOffset > 240) {
+          scrollBtn.classList.remove('opacity-0', 'pointer-events-none');
+          scrollBtn.classList.add('opacity-100');
+        } else {
+          scrollBtn.classList.add('opacity-0', 'pointer-events-none');
+          scrollBtn.classList.remove('opacity-100');
+        }
+      }
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+
+      scrollBtn.addEventListener('click', function() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        const logo = document.querySelector('header .logo');
+        if (logo && logo.focus) {
+          logo.focus({ preventScroll: true });
+        }
+      });
+    })();
+  </script>
+
 </body>
 </html>

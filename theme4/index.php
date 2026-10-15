@@ -153,11 +153,11 @@ include __DIR__ . '/includes/header.php';
 ?>
 
   <!-- Main Content in Unified Editorial Lab Blueprint Layout -->
-  <main id="main-content" class="w-full flex-grow">
+  <main id="main-content" class="w-full flex-grow pt-8 pb-16">
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 py-6 space-y-6">
 
       <!-- 1. EDITORIAL HEADER (UNIFIED WITH CATEGORY.PHP) -->
-      <section id="top" class="border-b border-paper-border pb-6 space-y-4">
+      <section id="top" class="scroll-mt-24 border-b border-paper-border pb-6 space-y-4">
         <div class="max-w-3xl space-y-3">
           
           <!-- Single Subtle Workshop Stamp -->
@@ -379,7 +379,7 @@ include __DIR__ . '/includes/header.php';
           <?php endif; ?>
 
           <!-- ПРИКЛАДНЫЕ ЗАДАЧИ МОНТАЖА (4 МОДУЛЯ В СТИЛЕ КАРТОЧЕК СТАТЕЙ) -->
-          <section id="tasks" class="space-y-3">
+          <section id="tasks" class="scroll-mt-24 space-y-3">
             <div class="flex items-center justify-between border-b border-paper-border pb-2">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('wrench', 'w-4 h-4 text-accent') ?>
@@ -456,7 +456,7 @@ include __DIR__ . '/includes/header.php';
           </section>
 
           <!-- СВЕЖИЕ СТАТЬИ ЖУРНАЛА (2-КОЛОНОЧНАЯ СЕТКА) -->
-          <section id="articles" class="space-y-3">
+          <section id="articles" class="scroll-mt-24 space-y-3">
             <div class="flex items-center justify-between border-b border-paper-border pb-2">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('book-open', 'w-4 h-4 text-accent') ?>
@@ -527,7 +527,7 @@ include __DIR__ . '/includes/header.php';
           </section>
 
           <!-- ТЕМАТИЧЕСКИЕ РАЗДЕЛЫ ЖУРНАЛА -->
-          <section id="rubrics" class="space-y-3">
+          <section id="rubrics" class="scroll-mt-24 space-y-3">
             <div class="flex items-center justify-between border-b border-paper-border pb-2">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('sliders', 'w-4 h-4 text-accent') ?>
@@ -562,7 +562,7 @@ include __DIR__ . '/includes/header.php';
           </section>
 
           <!-- 10 ПРИКЛАДНЫХ МИКРОУРОКОВ МОНТАЖА (ВИКТРИНА ПРАКТИКУМА) -->
-          <section id="lessons" class="space-y-3">
+          <section id="lessons" class="scroll-mt-24 space-y-3">
             <div class="flex items-center justify-between border-b border-paper-border pb-2">
               <div>
                 <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
@@ -612,7 +612,7 @@ include __DIR__ . '/includes/header.php';
           </section>
 
           <!-- ИНЖЕНЕРНЫЙ FAQ -->
-          <section id="faq" class="border border-paper-border rounded-lg bg-card p-5 sm:p-6 space-y-4 shadow-sm">
+          <section id="faq" class="scroll-mt-24 border border-paper-border rounded-lg bg-card p-5 sm:p-6 space-y-4 shadow-sm">
             <div class="flex items-center justify-between pb-3 border-b border-paper-border">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('alert-triangle', 'w-4 h-4 text-accent') ?>

@@ -408,8 +408,9 @@ html.dark .pill-blue {
 }
 .logo-squircle {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  padding-bottom: 0.16em;
   width: 1.05em;
   height: 1.05em;
   background: var(--color-accent);

@@ -165,8 +165,9 @@ h3 { font-weight: 700; font-size: 1.18rem; line-height: 1.35; }
   border-radius: 32%;
   transform: skew(-8deg);
   display: inline-flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
+  padding-bottom: 0.16em;
   margin: 0 0.22em;
   vertical-align: middle;
   transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
