@@ -708,9 +708,9 @@ include __DIR__ . '/includes/header.php';
           <div class="py-2">
             <div class="text-stamp font-mono text-ink-faint uppercase mb-2">Опорные значения стандарта IPC/JEDEC:</div>
             <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
-              <span class="sketch-pill-gray text-ink">Ликвидус SAC305: <span class="font-bold">217°C</span></span>
+              <span class="sketch-pill-yellow text-ink">ПОС-61: <span class="font-bold">183–190°C</span></span>
               <span class="text-ink-faint">→</span>
-              <span class="sketch-pill-yellow text-ink">ПОС-61: <span class="font-bold">183°C</span></span>
+              <span class="sketch-pill-gray text-ink">Sn63Pb37: <span class="font-bold">183°C</span></span>
               <span class="text-ink-faint">→</span>
               <span class="sketch-pill-gray text-ink">Окно TAL: <span class="font-bold">45–75 с</span></span>
               <span class="text-ink-faint">→</span>
@@ -975,18 +975,18 @@ include __DIR__ . '/includes/header.php';
               </div>
             </div>
 
-            <!-- ПОС-61 -->
+            <!-- Sn63Pb37 / ПОС-61 -->
             <div class="p-4 rounded border border-paper-border bg-paper flex flex-col justify-between space-y-3 shadow-sm">
               <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-stamp font-mono text-ink-faint uppercase font-semibold">Свинцовый эвтектик</div>
-                    <h3 class="font-bold text-base text-ink">ПОС-61 / Sn63Pb37</h3>
-                    <div class="text-xs font-mono text-ink-muted">Sn63 Pb37</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase font-semibold">Свинцовые сплавы</div>
+                    <h3 class="font-bold text-base text-ink">Sn63Pb37 / ПОС-61</h3>
+                    <div class="text-xs font-mono text-ink-muted">Sn63 (эвтектика) // ПОС-61 (ГОСТ 21931)</div>
                   </div>
                   <div class="text-right">
-                    <div class="font-mono text-lg font-bold text-ink leading-none">183°C</div>
-                    <div class="text-stamp font-mono text-ink-faint uppercase mt-1">эвтектика</div>
+                    <div class="font-mono text-lg font-bold text-ink leading-none">183°C / 190°C</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase mt-1">эвтектика / ликвидус</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
@@ -994,11 +994,11 @@ include __DIR__ . '/includes/header.php';
                   <span class="sketch-pill-yellow text-ink font-bold text-xs">210°C — 220°C</span>
                 </div>
                 <p class="text-xs text-ink-muted leading-relaxed">
-                  Сервисный ремонт, реболлинг на свинец, мягкая текучесть и зеркальная галтель без микротрещин.
+                  Сервисный ремонт, реболлинг на свинец, мягкая текучесть и зеркальная галтель без микротрещин. Sn63Pb37 плавится строго при 183 °C, ПОС-61 имеет интервал 183–190 °C.
                 </p>
               </div>
               <div class="pt-2 text-right">
-                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border cursor-pointer" onclick="if(window.TCHP_UI){window.TCHP_UI.copyToClipboard('ПОС-61 | Eutectic: 183C | Reflow Window: 210-220C | TAL: 30-50s', this);}else{navigator.clipboard.writeText('ПОС-61 | Eutectic: 183C | Reflow Window: 210-220C | TAL: 30-50s'); this.innerText='[✓ В БУФЕРЕ]';}" type="button">
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border cursor-pointer" onclick="if(window.TCHP_UI){window.TCHP_UI.copyToClipboard('Sn63Pb37: 183C (эвтектика) | ПОС-61: 183-190C (ГОСТ 21931) | Окно: 210-220C | TAL: 30-50s', this);}else{navigator.clipboard.writeText('Sn63Pb37: 183C (эвтектика) | ПОС-61: 183-190C (ГОСТ 21931) | Окно: 210-220C | TAL: 30-50s'); this.innerText='[✓ В БУФЕРЕ]';}" type="button">
                   копировать техпаспорт
                 </button>
               </div>

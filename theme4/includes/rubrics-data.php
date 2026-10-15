@@ -47,13 +47,13 @@ if (!defined('RUBRICS_CONFIG_LOADED')) {
                     'footer_r'=> 'ГОСТ / IPC'
                 ],
                 'spec' => [
-                    'title'   => 'Ликвидус металлов',
-                    'tag'     => 'ГОСТ 21931',
+                    'title'   => 'Плавление припоев',
+                    'tag'     => 'ГОСТ / IPC',
                     'tag_pill'=> 'pill-blue',
                     'rows'    => [
-                        ['label' => 'ПОС-61 (Sn63Pb37)', 'val' => '183 °C'],
-                        ['label' => 'SAC305 (RoHS)',      'val' => '217–220 °C'],
-                        ['label' => 'Sn42Bi58 (Низкотемп.)','val' => '138 °C'],
+                        ['label' => 'ПОС-61 (ГОСТ 21931)',  'val' => '183–190 °C'],
+                        ['label' => 'Sn63Pb37 (Эвтектика)', 'val' => '183 °C'],
+                        ['label' => 'SAC305 (RoHS)',        'val' => '217–220 °C'],
                         ['label' => 'Сплав Розе (Демонтаж)','val' => '94 °C'],
                     ],
                     'more_link' => '/interactive.php#table',

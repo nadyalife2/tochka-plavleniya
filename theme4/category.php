@@ -433,7 +433,7 @@ include __DIR__ . '/includes/header.php';
               <?php if (!empty($featured_article['image'])): ?>
                 <!-- Image Frame with FIG badge -->
                 <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
-                  <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-cover object-center" loading="lazy">
+                  <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-contain object-center bg-paper-subtle p-2" loading="lazy">
                   <div class="absolute bottom-2 right-2 px-2.5 py-1 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded shadow-2xs">
                     [ЧЕРТЁЖ // FIG. <?= e($featured_article['id'] ?? '1') ?>.0] // КЛЮЧЕВОЙ РАЗБОР
                   </div>
@@ -528,7 +528,7 @@ include __DIR__ . '/includes/header.php';
                 <?php if (!empty($article['image'])): ?>
                   <!-- Card Image Frame -->
                   <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
-                    <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-cover object-center" loading="lazy">
+                    <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-contain object-center bg-paper-subtle p-2" loading="lazy">
                     <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 bg-paper border border-paper-border text-stamp font-mono text-ink-muted rounded">
                       [СХЕМА // FIG. <?= e($article['id']) ?>.0]
                     </div>
@@ -663,12 +663,13 @@ include __DIR__ . '/includes/header.php';
           <!-- TECHNICAL SPECIFICATION REFERENCE (Contextual Clean Reference Card) -->
           <?php 
           $sb_spec = $sb['spec'] ?? [
-              'title' => 'Ликвидус металлов',
-              'tag' => 'ГОСТ 21931',
+              'title' => 'Плавление припоев',
+              'tag' => 'ГОСТ / IPC',
               'tag_pill' => 'pill-blue',
               'rows' => [
-                  ['label' => 'ПОС-61 (Sn63Pb37)', 'val' => '183 °C'],
-                  ['label' => 'SAC305 (RoHS)', 'val' => '217–220 °C'],
+                  ['label' => 'ПОС-61 (ГОСТ 21931)',  'val' => '183–190 °C'],
+                  ['label' => 'Sn63Pb37 (Эвтектика)', 'val' => '183 °C'],
+                  ['label' => 'SAC305 (RoHS)',        'val' => '217–220 °C'],
               ],
               'more_link' => esc_url($site_root) . 'interactive.php#table',
               'more_text' => 'Вся таблица припоев →'

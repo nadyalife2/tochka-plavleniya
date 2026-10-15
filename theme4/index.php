@@ -182,7 +182,7 @@ include __DIR__ . '/includes/header.php';
       </section>
 
       <!-- 2. CATEGORY NAVIGATION PILLS BAR -->
-      <nav aria-label="Переключение рубрик журнала" class="flex items-center gap-2 overflow-x-auto pb-2 font-mono text-xs">
+      <nav aria-label="Переключение рубрик журнала" class="flex items-center gap-2 overflow-x-auto lg:overflow-x-visible lg:flex-wrap pb-2 font-mono text-xs">
         <a href="<?= esc_url($site_root) ?>" aria-current="page" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-xs bg-ink text-paper font-bold shadow-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
           <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
           <span class="opacity-75 font-mono">[ГЛАВНАЯ]</span>
@@ -279,7 +279,7 @@ include __DIR__ . '/includes/header.php';
                     </span>
                   </div>
                   <div class="text-xs text-ink-muted">
-                    Интервал ликвидуса: <span id="exp-liq-val" class="font-bold text-ink">183–190 °C</span> · Градиент теплоотвода: <span id="exp-delta-val" class="font-bold text-accent">+75...105 °C</span>
+                    Интервал плавления: <span id="exp-liq-val" class="font-bold text-ink">183–190 °C</span> · Градиент теплоотвода: <span id="exp-delta-val" class="font-bold text-accent">+75...105 °C</span>
                   </div>
                 </div>
 
@@ -317,7 +317,7 @@ include __DIR__ . '/includes/header.php';
               <?php if (!empty($featured_article['image'])): ?>
                 <!-- Image Frame with FIG badge -->
                 <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
-                  <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-cover object-center" loading="lazy">
+                  <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-contain object-center bg-paper-subtle p-2" loading="lazy">
                   <div class="absolute bottom-2 right-2 px-2.5 py-1 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded shadow-2xs">
                     [ЧЕРТЁЖ // FIG. <?= e($featured_article['id'] ?? '1') ?>.0] // КЛЮЧЕВОЙ РАЗБОР
                   </div>
@@ -438,7 +438,7 @@ include __DIR__ . '/includes/header.php';
               </a>
 
               <!-- Задача 4: Экспресс-верстак -->
-              <div onclick="if(window.openLabDrawer) window.openLabDrawer();" class="border border-paper-border rounded-lg bg-card p-4 flex flex-col justify-between space-y-3 hover:border-paper-border-dark transition-all group cursor-pointer">
+              <button id="drawer-open-trigger" type="button" onclick="if(window.openLabDrawer) window.openLabDrawer();" aria-haspopup="dialog" aria-expanded="false" class="w-full text-left border border-paper-border rounded-lg bg-card p-4 flex flex-col justify-between space-y-3 hover:border-paper-border-dark transition-all group cursor-pointer">
                 <div class="space-y-1.5">
                   <div class="flex items-center justify-between text-xs font-mono">
                     <span class="pill-blue font-bold uppercase">[МОДУЛЬ 04 // ВЕРСТАК]</span>
@@ -451,7 +451,7 @@ include __DIR__ . '/includes/header.php';
                   <span class="badge badge-yellow py-0.5 px-1.5">Панель</span>
                   <span class="font-bold text-ink group-hover:underline">Открыть ↗</span>
                 </div>
-              </div>
+              </button>
             </div>
           </section>
 
@@ -462,7 +462,7 @@ include __DIR__ . '/includes/header.php';
                 <?= tp_icon('book-open', 'w-4 h-4 text-accent') ?>
                 <span>Свежие публикации // База знаний</span>
               </h2>
-              <a href="<?= esc_url($site_root) ?>category.php?slug=materialy" class="text-xs font-mono text-ink hover:underline font-bold">Все публикации →</a>
+              <a href="<?= esc_url($site_root) ?>category.php" class="text-xs font-mono text-ink hover:underline font-bold">Все публикации →</a>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -475,7 +475,7 @@ include __DIR__ . '/includes/header.php';
                 <article class="border border-paper-border rounded-lg bg-card p-5 flex flex-col justify-between space-y-4 hover:border-paper-border-dark transition-all">
                   <?php if (!empty($article['image'])): ?>
                     <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
-                      <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-cover object-center" loading="lazy">
+                      <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-contain object-center bg-paper-subtle p-2" loading="lazy">
                       <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded">
                         [СХЕМА // FIG. <?= e($article['id']) ?>.0]
                       </div>

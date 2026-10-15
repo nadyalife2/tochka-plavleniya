@@ -107,8 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       this.tipX = this.cols / 2;
       this.tipY = this.rows / 2;
-      this.isMouseDown = false;
-      this.isHovering = false;
+      this.isContactActive = false;
       this.touchTimeSec = 0.0;
       this.lastFrameTime = performance.now();
       this.animId = null;
@@ -188,8 +187,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initEvents() {
       const getPos = (e) => {
         const rect = this.canvas.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const clientX = e.clientX !== undefined ? e.clientX : (e.touches ? e.touches[0].clientX : rect.left + rect.width / 2);
+        const clientY = e.clientY !== undefined ? e.clientY : (e.touches ? e.touches[0].clientY : rect.top + rect.height / 2);
         const x = Math.max(0, Math.min(this.w, (clientX - rect.left) * (this.w / rect.width)));
         const y = Math.max(0, Math.min(this.h, (clientY - rect.top) * (this.h / rect.height)));
         return {
@@ -198,77 +197,104 @@ document.addEventListener('DOMContentLoaded', () => {
         };
       };
 
-      let touchStartX = 0;
-      let touchStartY = 0;
-      let isTouchDragging = false;
-
-      const onDown = (e) => {
-        this.isMouseDown = true;
-        this.isHovering = true;
+      // Pointer Events для объединения мыши, стилуса и тачскрина
+      this.canvas.addEventListener('pointerdown', (e) => {
+        try { this.canvas.setPointerCapture(e.pointerId); } catch(err) {}
+        this.isContactActive = true;
         const pos = getPos(e);
         this.tipX = pos.c;
         this.tipY = pos.r;
         this.start();
-      };
+      });
 
-      const onMove = (e) => {
-        this.isHovering = true;
+      this.canvas.addEventListener('pointermove', (e) => {
         const pos = getPos(e);
         this.tipX = pos.c;
         this.tipY = pos.r;
-        this.start();
-      };
-
-      const onUp = () => {
-        this.isMouseDown = false;
-        this.isHovering = false;
-        isTouchDragging = false;
-      };
-
-      const onTouchStart = (e) => {
-        if (!e.touches || e.touches.length !== 1) return;
-        touchStartX = e.touches[0].clientX;
-        touchStartY = e.touches[0].clientY;
-        isTouchDragging = false;
-        const pos = getPos(e);
-        this.tipX = pos.c;
-        this.tipY = pos.r;
-        this.start();
-      };
-
-      const onTouchMove = (e) => {
-        if (!e.touches || e.touches.length !== 1) return;
-        const curX = e.touches[0].clientX;
-        const curY = e.touches[0].clientY;
-        const dx = Math.abs(curX - touchStartX);
-        const dy = Math.abs(curY - touchStartY);
-
-        // If predominantly horizontal, engage heat drag without scrolling page
-        if (dx > 8 && dx > dy) {
-          isTouchDragging = true;
-        }
-
-        if (isTouchDragging) {
-          if (e.cancelable) e.preventDefault();
-          const pos = getPos(e);
-          this.tipX = pos.c;
-          this.tipY = pos.r;
+        if (this.isContactActive) {
           this.start();
         }
+      });
+
+      const releaseContact = (e) => {
+        try { this.canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+        this.isContactActive = false;
       };
 
-      this.canvas.addEventListener('mousedown', onDown);
-      window.addEventListener('mousemove', (e) => {
-        if (this.isMouseDown) onMove(e);
+      this.canvas.addEventListener('pointerup', releaseContact);
+      this.canvas.addEventListener('pointercancel', releaseContact);
+      this.canvas.addEventListener('pointerleave', (e) => {
+        if (!this.canvas.hasPointerCapture || !this.canvas.hasPointerCapture(e.pointerId)) {
+          this.isContactActive = false;
+        }
       });
-      window.addEventListener('mouseup', onUp);
 
-      this.canvas.addEventListener('touchstart', onTouchStart, { passive: true });
-      this.canvas.addEventListener('touchmove', onTouchMove, { passive: false });
-      this.canvas.addEventListener('touchend', onUp);
+      // Аппаратные кнопки доступности (клавиатура / клик)
+      const heatBtn = document.getElementById('sim-heat-btn');
+      const releaseBtn = document.getElementById('sim-release-btn');
+      const resetBtn = document.getElementById('sim-reset-btn');
 
-      this.canvas.addEventListener('mouseenter', () => { this.isHovering = true; this.start(); });
-      this.canvas.addEventListener('mouseleave', () => { this.isHovering = false; });
+      if (heatBtn) {
+        const startHeat = (e) => {
+          if (e.cancelable) e.preventDefault();
+          this.isContactActive = true;
+          this.start();
+        };
+        const stopHeat = (e) => {
+          if (e.cancelable) e.preventDefault();
+          this.isContactActive = false;
+        };
+        heatBtn.addEventListener('pointerdown', startHeat);
+        heatBtn.addEventListener('pointerup', stopHeat);
+        heatBtn.addEventListener('pointercancel', stopHeat);
+        heatBtn.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            this.isContactActive = true;
+            this.start();
+          }
+        });
+        heatBtn.addEventListener('keyup', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') {
+            this.isContactActive = false;
+          }
+        });
+      }
+
+      if (releaseBtn) {
+        releaseBtn.addEventListener('click', () => {
+          this.isContactActive = false;
+        });
+      }
+
+      if (resetBtn) {
+        resetBtn.addEventListener('click', () => {
+          this.reset();
+          this.render();
+          if (heatmapTalDisplay) heatmapTalDisplay.textContent = 'TAL: 0.0 с';
+          if (heatmapJointTemp) heatmapJointTemp.textContent = `${Math.round(this.ambientTemp)} °C ○ ТВЁРДОЕ`;
+        });
+      }
+
+      // Сворачивание / разворачивание модели
+      const toggleBtn = document.getElementById('toggle-sim-btn');
+      const simBody = document.getElementById('temp-heatmap-body');
+      const toggleStatus = document.getElementById('toggle-sim-status');
+      if (toggleBtn && simBody) {
+        toggleBtn.addEventListener('click', () => {
+          const isHidden = simBody.classList.contains('hidden');
+          if (isHidden) {
+            simBody.classList.remove('hidden');
+            toggleBtn.setAttribute('aria-expanded', 'true');
+            if (toggleStatus) toggleStatus.textContent = 'Скрыть симуляцию ↑';
+            this.start();
+          } else {
+            simBody.classList.add('hidden');
+            toggleBtn.setAttribute('aria-expanded', 'false');
+            if (toggleStatus) toggleStatus.textContent = 'Показать симуляцию ↓';
+            this.stop();
+          }
+        });
+      }
     }
 
     step() {
@@ -289,8 +315,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const tx = Math.max(1, Math.min(cols - 2, Math.floor(this.tipX)));
       const ty = Math.max(1, Math.min(rows - 2, Math.floor(this.tipY)));
 
-      // Нагрев подаётся только при активном контакте жала с платой (нажатие или удержание курсора)
-      const isHeating = this.isMouseDown || this.isHovering;
+      // Нагрев подаётся строго при активном контакте жала (нажатие кнопки или удержание указателя)
+      const isHeating = this.isContactActive;
       if (isHeating) {
         prev[ty * cols + tx] = this.tipTemp;
         if (tx > 0) prev[ty * cols + (tx - 1)] = Math.max(prev[ty * cols + (tx - 1)], this.tipTemp * 0.92);
@@ -315,23 +341,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Измеряем температуру в центральной контактной площадке и непосредственно под жалом
+      // Измеряем температуру и TAL одной фиксированной контрольной площадки (в центре симуляции)
       const padX = Math.floor(cols / 2);
       const padY = Math.floor(rows / 2);
       const padTemp = curr[padY * cols + padX];
-      const tipContactTemp = curr[ty * cols + tx];
-      const activeZoneTemp = isHeating ? tipContactTemp : padTemp;
 
-      // TAL (Time Above Liquidus) — накопленное интегральное время выше точки ликвидуса.
-      // Не убывает при охлаждении (соответствует стандарту IPC J-STD-020D).
-      if (activeZoneTemp >= this.meltTemp) {
+      // TAL (Time Above Liquidus) — накопленное интегральное время выше точки ликвидуса фиксированной площадки
+      if (padTemp >= this.meltTemp) {
         this.touchTimeSec += dt;
       }
 
       if (heatmapTipTemp) heatmapTipTemp.textContent = `${Math.round(this.tipTemp)} °C`;
       if (heatmapJointTemp) {
-        const isLiquid = activeZoneTemp >= this.meltTemp;
-        heatmapJointTemp.textContent = `${Math.round(activeZoneTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
+        const isLiquid = padTemp >= this.meltTemp;
+        heatmapJointTemp.textContent = `${Math.round(padTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
         heatmapJointTemp.className = isLiquid ? 'text-accent font-bold' : 'text-cyan font-bold';
       }
       if (heatmapTalDisplay) {
@@ -655,14 +678,14 @@ document.addEventListener('DOMContentLoaded', () => {
         thermalSim = new ThermalSimulator(thermalCanvas);
       }
       const solderMelts = {
-        'pos61': 183,
-        'sn63pb37': 183,
+        'pos61': 190,    // Ликвидус по ГОСТ 21931-76 (солидус 183 °C, интервал плавления 183–190 °C)
+        'sn63pb37': 183, // Истинная эвтектика
         'sac305': 217,
-        'pos40': 183,
+        'pos40': 238,    // Ликвидус (солидус 183 °C)
         'sn42bi58': 138,
         'roze': 94
       };
-      const meltT = solderMelts[sVal] || 183;
+      const meltT = solderMelts[sVal] || 190;
       const avg = (item.t_min + item.t_max) / 2;
       thermalSim.configure(avg, meltT, wVal);
     }

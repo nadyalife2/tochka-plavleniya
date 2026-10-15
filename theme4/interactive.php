@@ -397,28 +397,51 @@ include __DIR__ . '/includes/header.php';
                       <span class="opacity-90 font-bold text-accent">300°C</span>
                       <span>450°C</span>
                     </div>
+                  </div>
+
                   <!-- Интерактивный симулятор теплопроводности (учебная 2D-модель) -->
                   <div id="temp-heatmap-container" class="mt-3 pt-3 border-t border-paper-border space-y-2" style="display:none;">
-                    <div class="flex items-center justify-between text-stamp font-mono">
-                      <span class="font-bold text-ink uppercase flex items-center gap-1.5">
+                    <button type="button" id="toggle-sim-btn" class="w-full text-xs font-mono font-bold flex items-center justify-between p-2 rounded border border-paper-border bg-paper hover:bg-paper-subtle transition-all cursor-pointer" aria-expanded="false" aria-controls="temp-heatmap-body">
+                      <span class="flex items-center gap-1.5 uppercase text-ink">
                         <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
-                        УЧЕБНАЯ МОДЕЛЬ ТЕПЛОПРОВОДНОСТИ
+                        Учебная 2D-модель прогрева площадки
                       </span>
-                      <span id="heatmap-tal-display" class="text-accent font-bold">TAL: --</span>
-                    </div>
-                    <div class="relative rounded overflow-hidden border border-paper-border bg-[#14161a]">
-                      <canvas id="thermal-canvas" width="480" height="130" class="w-full h-[120px] block cursor-crosshair" aria-label="Интерактивная учебная модель теплопроводности паяльного соединения"></canvas>
-                      <div class="absolute bottom-1.5 left-2 flex items-center gap-2 text-stamp font-mono text-white/80 select-none pointer-events-none">
-                        <span>● ЖАЛО: <span id="heatmap-tip-temp" class="text-accent font-bold">--</span></span>
-                        <span>● ЗОНА КОНТАКТА: <span id="heatmap-joint-temp" class="text-emerald-400 font-bold">--</span></span>
+                      <span id="toggle-sim-status" class="text-accent font-mono text-[11px]">Показать симуляцию ↓</span>
+                    </button>
+
+                    <div id="temp-heatmap-body" class="space-y-2 hidden">
+                      <div class="flex items-center justify-between text-stamp font-mono">
+                        <span class="text-ink-muted uppercase">Замер TAL на центральной площадке</span>
+                        <span id="heatmap-tal-display" class="text-accent font-bold">TAL: 0.0 с</span>
                       </div>
-                      <div class="absolute top-1.5 right-2 text-stamp font-mono text-white/50 uppercase select-none pointer-events-none">
-                        2D МОДЕЛЬ // ИЛЛЮСТРАЦИЯ
+                      <div class="relative rounded overflow-hidden border border-paper-border bg-[#14161a]">
+                        <canvas id="thermal-canvas" width="480" height="130" class="w-full h-[120px] block cursor-crosshair touch-none" aria-label="Интерактивная учебная модель теплопроводности паяльного соединения"></canvas>
+                        <div class="absolute bottom-1.5 left-2 flex items-center gap-2 text-stamp font-mono text-white/80 select-none pointer-events-none">
+                          <span>● ЖАЛО: <span id="heatmap-tip-temp" class="text-accent font-bold">--</span></span>
+                          <span>● ПЛОЩАДКА: <span id="heatmap-joint-temp" class="text-emerald-400 font-bold">--</span></span>
+                        </div>
+                        <div class="absolute top-1.5 right-2 text-stamp font-mono text-white/50 uppercase select-none pointer-events-none">
+                          УЧЕБНАЯ МОДЕЛЬ // 2D
+                        </div>
                       </div>
+
+                      <!-- Кнопки управления (100% клавиатурная и сенсорная доступность) -->
+                      <div class="flex items-center gap-2 pt-1">
+                        <button type="button" id="sim-heat-btn" class="flex-1 py-1.5 px-3 rounded border border-paper-border bg-accent text-ink font-mono text-xs font-bold hover:bg-accent-hover active:scale-95 transition-all cursor-pointer shadow-xs select-none" title="Удерживайте кнопку или кликните по холсту для контакта жала">
+                          ● [Удерживать] Нагреть
+                        </button>
+                        <button type="button" id="sim-release-btn" class="py-1.5 px-3 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink font-mono text-xs font-bold transition-all cursor-pointer select-none">
+                          Отпустить жало
+                        </button>
+                        <button type="button" id="sim-reset-btn" class="py-1.5 px-3 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted font-mono text-xs transition-all cursor-pointer select-none" title="Сбросить температуру и отсчет TAL">
+                          Сбросить
+                        </button>
+                      </div>
+
+                      <p class="text-stamp font-mono text-ink-muted leading-tight">
+                        Учебная 2D-модель физики распределения тепла при контакте жала с медным полигоном. Не является измерительным прибором.
+                      </p>
                     </div>
-                    <p class="text-stamp font-mono text-ink-muted leading-tight">
-                      Учебная 2D-модель динамики прогрева медной площадки при касании жала. Является визуальной иллюстрацией физических процессов, а не измерительным прибором.
-                    </p>
                   </div>
 
                   <div id="temp-advice-display" class="text-xs font-mono text-ink-muted pt-1"></div>

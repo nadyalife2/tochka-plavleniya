@@ -78,7 +78,7 @@ $tchp_head_escape = static function ($value) {
         <button id="header-drawer-trigger" type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[44px] border border-paper-border hover:border-accent bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 group" title="Выдвижной микро-верстак (Сплавы, токи, флюсы)" aria-label="Открыть выдвижной верстак">
           <span class="w-1.5 h-1.5 rounded-full bg-cyan inline-block"></span>
           <?= tp_icon('sliders', 'w-4 h-4 text-cyan group-hover:text-accent transition-colors') ?>
-          <span class="hidden lg:inline text-xs font-mono text-ink-muted group-hover:text-ink">Калькулятор</span>
+          <span class="hidden lg:inline text-xs font-mono text-ink-muted group-hover:text-ink">Быстрый расчёт</span>
         </button>
         <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[44px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
           <?= tp_icon('moon', 'w-4 h-4 dark:hidden') ?>
@@ -87,12 +87,12 @@ $tchp_head_escape = static function ($value) {
         </button>
         <?php if ($current_page === 'interactive'): ?>
           <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>#articles" aria-label="Читать статьи журнала">
-            <span>Журнал / Статьи</span>
+            <span>База знаний</span>
             <?= tp_icon('book-open', 'w-3.5 h-3.5') ?>
           </a>
         <?php else: ?>
           <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>interactive.php" aria-label="Открыть интерактивный верстак инженера">
-            <span>Верстак / Тулзы</span>
+            <span>Верстак</span>
             <?= tp_icon('wrench', 'w-3.5 h-3.5') ?>
           </a>
         <?php endif; ?>
