@@ -38,7 +38,7 @@ $tools = $article['tools'] ?? 'Паяльник, припой, флюс';
   </div>
   
   <!-- CTA / Tools needed -->
-  <div class="mt-4 pt-4 border-t border-paper-border-light flex items-center justify-between font-mono text-xs text-ink-muted">
+  <div class="mt-4 pt-4 border-t border-paper-border/60 flex items-center justify-between font-mono text-xs text-ink-muted">
     <span class="truncate pr-4" title="Нужны: <?= e($tools) ?>">Нужны: <span class="text-ink font-medium"><?= e($tools) ?></span></span>
     <span class="text-accent font-medium shrink-0 group-hover:underline">Урок →</span>
   </div>

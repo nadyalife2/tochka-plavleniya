@@ -129,7 +129,7 @@ if (have_posts()) {
           <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
 
             <!-- Breadcrumbs -->
-            <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap" aria-label="Хлебные крошки">
+            <nav class="text-xs font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap" aria-label="Хлебные крошки">
               <a class="hover:text-ink transition-colors" href="<?= esc_url($site_root) ?>">Главная</a>
               <span>→</span>
               <?php if ($primary_cat): ?>
@@ -166,11 +166,11 @@ if (have_posts()) {
                       <span class="font-bold text-ink uppercase tracking-wider">ТЕХРЕГЛАМЕНТ // ОТК-2026</span>
                     </div>
                     <div class="flex items-center gap-2">
-                      <button type="button" onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted hover:text-ink text-[11px] font-mono font-medium transition-colors cursor-pointer" title="Распечатать технологическую карту (Ctrl+P)">
-                        <span class="material-symbols-outlined text-[14px]">print</span>
+                      <button type="button" onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted hover:text-ink text-stamp font-mono font-medium transition-colors cursor-pointer" title="Распечатать технологическую карту (Ctrl+P)">
+                        <?= tp_icon('printer', 'w-3.5 h-3.5') ?>
                         <span>Печать техкарты</span>
                       </button>
-                      <span class="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
+                      <span class="font-mono text-stamp font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
                         IPC-A-610G // КЛАСС 2
                       </span>
                     </div>
@@ -178,29 +178,29 @@ if (have_posts()) {
 
                   <!-- Article Header Block -->
                   <header class="space-y-4">
-                    <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.02em] leading-[1.18] font-serif">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-ink tracking-[-0.02em] leading-[1.18] font-serif">
                       <?= esc_html(get_the_title()) ?>
                     </h1>
 
                     <!-- Meta line -->
-                    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-ink-muted font-mono pt-1 pb-2">
+                    <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs sm:text-sm text-ink-muted font-mono pt-1 pb-2">
                       <div class="flex items-center gap-2">
-                        <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
+                        <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-stamp flex items-center justify-center font-bold text-ink">ТП</span>
                         <span class="text-ink font-semibold"><?= esc_html(get_the_author()) ?></span>
                       </div>
                       <span class="text-ink-faint">·</span>
                       <time datetime="<?= esc_attr(get_the_date('c')) ?>"><?= esc_html(get_the_date('j F Y')) ?></time>
                       <span class="text-ink-faint">·</span>
-                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= esc_html($reading_time) ?> мин чтения</span>
+                      <span class="flex items-center gap-1"><?= tp_icon('clock', 'w-3.5 h-3.5') ?>~<?= esc_html($reading_time) ?> мин чтения</span>
                       <span class="text-ink-faint">·</span>
-                      <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= esc_html($difficulty) ?></span>
+                      <span class="flex items-center gap-1"><?= tp_icon('graduation-cap', 'w-3.5 h-3.5') ?>Уровень: <?= esc_html($difficulty) ?></span>
                       <span class="text-ink-faint">·</span>
-                      <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено ОТК</span>
+                      <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><?= tp_icon('shield-check', 'w-3.5 h-3.5') ?>Проверено ОТК</span>
                     </div>
 
                     <?php if (!empty($required_tools)): ?>
-                    <div class="mt-2 flex flex-wrap items-center gap-2 text-[11px] font-mono">
-                      <span class="text-ink-muted uppercase font-bold text-[10px]">Оснастка:</span>
+                    <div class="mt-2 flex flex-wrap items-center gap-2 text-xs font-mono">
+                      <span class="text-ink-muted uppercase font-bold text-stamp">Оснастка:</span>
                       <?php foreach ($required_tools as $tool): ?>
                         <span class="bg-paper-subtle px-2 py-0.5 rounded border border-paper-border text-ink-muted font-mono font-medium"><?= esc_html($tool) ?></span>
                       <?php endforeach; ?>
@@ -294,7 +294,7 @@ if (have_posts()) {
                     <div class="text-xs text-ink-muted font-sans mt-0.5">Поделитесь ссылкой с коллегами по монтажу и ремонту</div>
                   </div>
                   <button type="button" id="copy-article-link-btn" onclick="navigator.clipboard.writeText(window.location.href).then(()=>{var t=this.querySelector('.btn-label');if(t){t.textContent='Скопировано!';setTimeout(()=>{t.textContent='Скопировать ссылку';},2500);}});" class="inline-flex items-center gap-2 px-4 py-2.5 rounded bg-ink text-paper text-xs font-mono font-medium hover:opacity-90 transition-opacity cursor-pointer focus-visible:ring-2 focus-visible:ring-accent">
-                    <span class="material-symbols-outlined text-[16px]">link</span>
+                    <?= tp_icon('link', 'w-4 h-4') ?>
                     <span class="btn-label">Скопировать ссылку</span>
                   </button>
                 </div>
@@ -307,7 +307,7 @@ if (have_posts()) {
                   ?>
                   <?php if ($prev_post): ?>
                     <a href="<?= esc_url(get_permalink($prev_post)) ?>" class="p-4 rounded-lg border border-paper-border bg-paper hover:bg-paper-subtle transition-colors flex flex-col gap-1 group shadow-xs">
-                      <span class="text-[11px] font-mono text-ink-muted">← Предыдущая статья</span>
+                      <span class="text-stamp font-mono text-ink-muted">← Предыдущая статья</span>
                       <span class="text-xs font-bold text-ink group-hover:text-accent transition-colors line-clamp-2"><?= esc_html(get_the_title($prev_post)) ?></span>
                     </a>
                   <?php else: ?>
@@ -316,7 +316,7 @@ if (have_posts()) {
 
                   <?php if ($next_post): ?>
                     <a href="<?= esc_url(get_permalink($next_post)) ?>" class="p-4 rounded-lg border border-paper-border bg-paper hover:bg-paper-subtle transition-colors flex flex-col gap-1 sm:text-right group shadow-xs">
-                      <span class="text-[11px] font-mono text-ink-muted">Следующая статья →</span>
+                      <span class="text-stamp font-mono text-ink-muted">Следующая статья →</span>
                       <span class="text-xs font-bold text-ink group-hover:text-accent transition-colors line-clamp-2"><?= esc_html(get_the_title($next_post)) ?></span>
                     </a>
                   <?php endif; ?>
@@ -332,7 +332,7 @@ if (have_posts()) {
                 if (!empty($related_posts)):
                 ?>
                 <div class="pt-4 space-y-3">
-                  <div class="text-[11px] font-mono text-ink-faint uppercase">Другие материалы:</div>
+                  <div class="text-stamp font-mono text-ink-faint uppercase">Другие материалы:</div>
                   <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                     <?php foreach ($related_posts as $rel): ?>
                       <?php
@@ -340,7 +340,7 @@ if (have_posts()) {
                       $rel_cat_name = !empty($rel_cats) ? $rel_cats[0]->name : 'Материал';
                       ?>
                       <a class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-colors block shadow-xs" href="<?= esc_url(get_permalink($rel)) ?>">
-                        <div class="text-[11px] font-mono text-ink-faint uppercase"><?= esc_html($rel_cat_name) ?></div>
+                        <div class="text-stamp font-mono text-ink-faint uppercase"><?= esc_html($rel_cat_name) ?></div>
                         <div class="font-medium text-ink mt-1 line-clamp-2"><?= esc_html(get_the_title($rel)) ?></div>
                       </a>
                     <?php endforeach; ?>
@@ -362,7 +362,7 @@ if (have_posts()) {
 
                 <!-- Article Passport Card -->
                 <div class="border border-paper-border bg-paper p-4.5 rounded-lg space-y-3.5 shadow-sm">
-                  <div class="flex items-center justify-between text-[11px] font-mono pb-2.5 border-b border-paper-border">
+                  <div class="flex items-center justify-between text-stamp font-mono pb-2.5 border-b border-paper-border">
                     <span class="font-bold text-ink uppercase flex items-center gap-1.5">
                       <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
                       ПАСПОРТ ТЕХПРОЦЕССА
@@ -398,7 +398,7 @@ if (have_posts()) {
                 <!-- Article Table of Contents (TOC) -->
                 <?php if (!empty($article_toc)): ?>
                 <div class="border border-paper-border bg-paper p-4.5 rounded-lg space-y-3 shadow-sm">
-                  <div class="flex items-center justify-between text-[11px] font-mono text-ink pb-2 border-b border-paper-border">
+                  <div class="flex items-center justify-between text-stamp font-mono text-ink pb-2 border-b border-paper-border">
                     <span class="font-bold uppercase tracking-wider">ОГЛАВЛЕНИЕ РЕГЛАМЕНТА</span>
                     <span class="text-accent font-bold"><?= count($article_toc) ?> ЭТАПА</span>
                   </div>
@@ -406,7 +406,7 @@ if (have_posts()) {
                     <?php foreach ($article_toc as $idx => $toc_item): ?>
                       <a href="#<?= esc_attr($toc_item['id']) ?>" 
                          class="flex items-center gap-2 px-2.5 py-1.5 rounded transition-all text-ink-muted hover:text-ink hover:bg-paper-subtle group">
-                        <span class="text-[10px] text-ink-faint font-bold shrink-0 group-hover:text-accent">§ <?= sprintf('%02d', $idx + 1) ?></span>
+                        <span class="text-stamp text-ink-faint font-bold shrink-0 group-hover:text-accent">§ <?= sprintf('%02d', $idx + 1) ?></span>
                         <span class="truncate"><?= esc_html($toc_item['title']) ?></span>
                       </a>
                     <?php endforeach; ?>
@@ -428,7 +428,7 @@ if (have_posts()) {
                 if (!empty($series_posts)):
                 ?>
                 <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
-                  <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+                  <div class="flex items-center justify-between text-stamp font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
                     <span>СТАТЬИ РАЗДЕЛА</span>
                     <span>СЕРИЯ ТЧП</span>
                   </div>
@@ -436,7 +436,7 @@ if (have_posts()) {
                     <a href="<?= esc_url(get_permalink($post_id)) ?>" class="block px-2.5 py-2 rounded transition-all bg-ink text-paper font-bold shadow-xs">
                       <div class="flex items-center justify-between gap-2">
                         <span class="truncate">→ <?= esc_html(get_the_title()) ?></span>
-                        <span class="text-[10px] text-paper/70 shrink-0"><?= esc_html($reading_time) ?>м</span>
+                        <span class="text-stamp text-paper/70 shrink-0"><?= esc_html($reading_time) ?>м</span>
                       </div>
                     </a>
                     <?php foreach ($series_posts as $idx => $sp): ?>
@@ -444,7 +444,7 @@ if (have_posts()) {
                          class="block px-2.5 py-2 rounded transition-all text-ink-muted hover:text-ink hover:bg-paper-subtle">
                         <div class="flex items-center justify-between gap-2">
                           <span class="truncate"><?= ($idx + 2) ?>. <?= esc_html(get_the_title($sp)) ?></span>
-                          <span class="text-[10px] text-ink-faint shrink-0">~5м</span>
+                          <span class="text-stamp text-ink-faint shrink-0">~5м</span>
                         </div>
                       </a>
                     <?php endforeach; ?>
@@ -455,7 +455,7 @@ if (have_posts()) {
                 <!-- Interactive Workbench Bridge -->
                 <div class="sketch-card p-4 bg-paper border border-paper-border rounded-lg space-y-3 shadow-xs">
                   <div class="flex items-center justify-between font-mono text-xs pb-1.5 border-b border-paper-border">
-                    <span class="pill-orange text-[10px] uppercase font-bold">ВЕРСТАК</span>
+                    <span class="pill-orange text-stamp uppercase font-bold">ВЕРСТАК</span>
                     <span class="text-ink-faint">LAB-TOOL</span>
                   </div>
                   <div class="space-y-1">
@@ -480,11 +480,11 @@ if (have_posts()) {
                     </div>
                     <div>
                       <div class="font-bold text-ink text-xs font-sans"><?= esc_html(get_the_author()) ?></div>
-                      <div class="text-[11px] text-ink-muted font-mono">Лаборатория ТОЧКА ПЛАВЛЕНИЯ</div>
+                      <div class="text-stamp text-ink-muted font-mono">Лаборатория ТОЧКА ПЛАВЛЕНИЯ</div>
                     </div>
                   </div>
                   <div class="border-t border-paper-border pt-2">
-                    <span class="pill-tag-mint text-[10px] font-mono">
+                    <span class="pill-tag-mint text-stamp font-mono">
                       ✓ Инженерная верификация
                     </span>
                   </div>

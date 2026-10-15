@@ -248,11 +248,11 @@ ob_start();
     }
     .featured-sketch-frame {
       border: 2px solid var(--color-accent);
-      box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.06);
+      box-shadow: var(--shadow-card);
     }
     html.dark .featured-sketch-frame {
       border-color: var(--color-accent-border);
-      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 4px 20px -2px var(--border-strong);
     }
   </style>
   <?= render_rubric_schema($current_rubric, $matched_articles) ?>
@@ -287,15 +287,12 @@ include __DIR__ . '/includes/header.php';
           ];
           $current_sec_code = $sec_codes[$current_slug] ?? 'SEC.XX';
           ?>
-          <!-- Single Subtle Tape & Label Badge (Yellow = Workshop/Editorial Identity) -->
-          <div class="relative inline-block mb-1">
-            <div class="sketch-washi-tape washi-tape-badge" aria-hidden="true"></div>
-            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#fefce8] dark:bg-[#ca8a04]/20 border border-[#fde047] dark:border-[#ca8a04]/60 text-ink font-mono text-xs shadow-sm rotate-[-0.5deg] sketch-border">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
-              <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?> // [<?= $current_sec_code ?>]</span>
-              <span class="text-ink-faint">|</span>
-              <span class="text-[11px] text-ink-muted uppercase"><?= e($current_rubric['subbadge']) ?></span>
-            </div>
+          <!-- Single Subtle Workshop Stamp -->
+          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink font-mono text-xs">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+            <span class="font-bold tracking-wider uppercase"><?= e($current_rubric['badge']) ?> // [<?= $current_sec_code ?>]</span>
+            <span class="text-ink-faint">|</span>
+            <span class="text-stamp text-ink-muted uppercase"><?= e($current_rubric['subbadge']) ?></span>
           </div>
 
           <!-- Headline -->
@@ -303,20 +300,16 @@ include __DIR__ . '/includes/header.php';
             <?= e($current_rubric['title']) ?>
           </h1>
 
-          <!-- Lead Paragraph: Semantic Color Mapping:
-               - Orange = Metallurgy, solder alloys, heating
-               - Yellow = Chemistry, fluxes, rosin
-               - Blue   = Electronic parameters, precision, standards
-          -->
-          <p class="text-base sm:text-lg text-ink/90 font-serif leading-[1.65]">
+          <!-- Lead Paragraph: Calm, Editorial Typography -->
+          <p class="text-base sm:text-lg text-ink font-serif leading-[1.65]">
             <?php if ($current_slug === 'materialy'): ?>
-              Разбираем металлургию и химию радиомонтажа: свойства припоев (<mark class="hl-orange">ПОС-61, SAC305</mark>), химию флюсов (<mark class="hl-yellow">RMA и No-Clean</mark>), риск разрушения шва от сплава Розе и защиту от <mark class="hl-blue">токов утечки</mark>.
+              Разбираем металлургию и химию радиомонтажа: свойства припоев (<strong>ПОС-61, SAC305</strong>), классификацию флюсов (<strong>RMA и No-Clean</strong>), риск разрушения шва от сплава Розе и защиту от токов утечки.
             <?php elseif ($current_slug === 'start'): ?>
-              Первые шаги в радиомонтаже: выбор <mark class="hl-orange">паяльной станции</mark>, основы работы с <mark class="hl-yellow">канифолью</mark>, физика <mark class="hl-blue">смачиваемости меди</mark> и защита от перегрева дорожек.
+              Первые шаги в радиомонтаже: выбор паяльной станции, работа с канифолью, смачиваемость меди и защита контактных площадок от перегрева.
             <?php elseif ($current_slug === 'praktika'): ?>
-              Техника точного ручного монтажа: работа с компонентами <mark class="hl-blue">SMD 0402–1206</mark>, геометрия картриджей <mark class="hl-orange">T12 и C245</mark>, дозировка <mark class="hl-yellow">паяльной пасты</mark> и пайка термочувствительных микросхем QFN.
+              Техника точного ручного монтажа: работа с компонентами <strong>SMD 0402–1206</strong>, картриджи <strong>T12 и C245</strong>, дозировка пасты и пайка QFN-микросхем.
             <?php elseif ($current_slug === 'oshibki'): ?>
-              Диагностика и устранение типового брака: критический дефект <mark class="hl-orange">tombstoning и трещины</mark>, паразитные <mark class="hl-blue">оловянные перемычки</mark>, неактивированный флюс в <mark class="hl-yellow">холодном шве</mark> и сбои термопрофиля.
+              Диагностика и устранение типового брака: дефекты <strong>tombstoning</strong>, паразитные перемычки припоя, неактивированный флюс и сбои термопрофиля.
             <?php else: ?>
               <?= e($current_rubric['lead']) ?>
             <?php endif; ?>
@@ -342,7 +335,7 @@ include __DIR__ . '/includes/header.php';
              <?= $is_curr ? 'aria-current="page"' : '' ?>
              class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $is_curr ? 'bg-ink text-paper font-bold shadow-sm' : 'border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink' ?>">
             <span class="w-1.5 h-1.5 rounded-full <?= $pill['dot'] ?>" aria-hidden="true"></span>
-            <span class="text-[10px] opacity-75 font-mono">[SEC.<?= $pill['code'] ?>]</span>
+            <span class="text-stamp opacity-75 font-mono">[SEC.<?= $pill['code'] ?>]</span>
             <span><?= $pill['label'] ?></span>
           </a>
         <?php endforeach; ?>
@@ -363,7 +356,7 @@ include __DIR__ . '/includes/header.php';
               <a href="<?= e($st_url) ?>"
                  class="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $is_active_st ? 'bg-paper-border-dark text-ink font-bold border border-ink/40' : 'bg-paper border border-paper-border text-ink-muted hover:border-ink/30 hover:text-ink' ?>">
                 <?php if (!empty($st['icon'])): ?>
-                  <span class="material-symbols-outlined text-[13px] text-accent"><?= e($st['icon']) ?></span>
+                  <?= tp_icon($st['icon'], 'w-3.5 h-3.5 text-accent') ?>
                 <?php endif; ?>
                 <span><?= e($st['label']) ?></span>
               </a>
@@ -390,11 +383,10 @@ include __DIR__ . '/includes/header.php';
           <!-- CONTEXTUAL INTERACTIVE CTA BANNER (Engineering Standard / Tool) -->
           <?php if (!empty($current_rubric['cta'])): ?>
             <div class="sketch-card p-5 sm:p-6 bg-card space-y-3 relative overflow-hidden">
-              <div class="sketch-washi-tape washi-tape-banner" aria-hidden="true"></div>
               <div class="flex items-center justify-between gap-2 pt-1">
                 <div class="flex items-center gap-2">
-                  <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1">
-                    <span class="material-symbols-outlined text-[14px] text-accent">construction</span>
+                  <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1.5">
+                    <?= tp_icon('wrench', 'w-3.5 h-3.5 text-accent') ?>
                     [ИНТЕРАКТИВНЫЙ ВЕРСТАК // ИНСТРУМЕНТ-01]
                   </span>
                 </div>
@@ -457,8 +449,8 @@ include __DIR__ . '/includes/header.php';
                   <span class="text-ink-faint">·</span>
                   <span>~<?= e($featured_article['read_min'] ?? 8) ?> мин чтения</span>
                 </div>
-                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/40 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-200 text-xs font-mono uppercase font-bold">
-                  <span class="material-symbols-outlined text-[14px] text-accent">verified</span>
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded bg-blue-50 dark:bg-blue-950/60 border border-blue-200 dark:border-blue-800 text-blue-900 dark:text-blue-200 text-xs font-mono uppercase font-bold">
+                  <?= tp_icon('shield-check', 'w-3.5 h-3.5 text-blue-700 dark:text-blue-300') ?>
                   [ФЛАГМАНСКИЙ ТЕХРЕГЛАМЕНТ // ОТК]
                 </div>
               </div>
@@ -484,7 +476,7 @@ include __DIR__ . '/includes/header.php';
                   <span class="text-ink-faint" aria-hidden="true">→</span>
                   <span>WS: <span class="hl-blue text-ink font-semibold">водосмывной</span></span>
                 </div>
-                <span class="pill-blue text-xs font-mono font-bold px-2 py-0.5 rounded ml-2 shrink-0">SPEC 02.1</span>
+                <span class="pill-blue text-xs font-mono font-bold px-2 py-0.5 rounded ml-2 shrink-0">ГОСТ 21931</span>
               </div>
 
               <!-- Card Bottom Bar -->
@@ -507,7 +499,7 @@ include __DIR__ . '/includes/header.php';
             <!-- Hardened Empty State for filtered/empty categories -->
             <div class="border border-dashed border-paper-border rounded-lg bg-card p-8 sm:p-12 text-center space-y-4 my-6">
               <div class="w-12 h-12 rounded-full border border-paper-border bg-paper-subtle text-accent inline-flex items-center justify-center mx-auto">
-                <span class="material-symbols-outlined text-2xl">search_off</span>
+                <?= tp_icon('search', 'w-6 h-6 text-accent') ?>
               </div>
               <div class="space-y-1">
                 <h3 class="font-bold text-ink text-lg font-sans">В этой выборке пока нет опубликованных материалов</h3>
@@ -537,7 +529,7 @@ include __DIR__ . '/includes/header.php';
                   <!-- Card Image Frame -->
                   <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
                     <img src="<?= e($article['image']) ?>" alt="<?= e($article['title']) ?>" class="w-full h-36 object-cover object-center" loading="lazy">
-                    <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 bg-paper border border-paper-border text-[10px] font-mono text-ink-muted rounded">
+                    <div class="absolute bottom-1.5 right-1.5 px-2 py-0.5 bg-paper border border-paper-border text-stamp font-mono text-ink-muted rounded">
                       [СХЕМА // FIG. <?= e($article['id']) ?>.0]
                     </div>
                   </div>
@@ -545,18 +537,18 @@ include __DIR__ . '/includes/header.php';
                   <div class="h-28 rounded border border-paper-border bg-paper-subtle flex flex-col justify-between p-3.5 relative overflow-hidden">
                     <div class="flex items-center justify-between text-xs font-mono text-ink-muted">
                       <span class="flex items-center gap-1.5 font-bold text-accent">
-                        <span class="material-symbols-outlined text-[16px]">school</span>
+                        <?= tp_icon('book-open', 'w-3.5 h-3.5 text-accent') ?>
                         [РЕГЛАМЕНТ-<?= $art_idx ?>]
                       </span>
-                      <span class="text-[10px] font-mono text-ink-faint">#<?= e($article['id']) ?></span>
+                      <span class="text-stamp font-mono text-ink-faint">#<?= e($article['id']) ?></span>
                     </div>
-                    <div class="text-[11px] font-mono text-ink-faint">Пошаговый регламент // IPC-A-610G</div>
+                    <div class="text-stamp font-mono text-ink-faint">Пошаговый регламент // IPC-A-610G</div>
                   </div>
                 <?php endif; ?>
 
                 <div class="space-y-2">
                   <div class="flex items-center justify-between text-xs font-mono text-ink-faint">
-                    <span class="<?= $card_pill ?> px-1.5 py-0.5 rounded text-[10px] font-mono font-bold uppercase">
+                    <span class="<?= $card_pill ?> px-1.5 py-0.5 rounded text-stamp font-mono font-bold uppercase">
                       <?= e($article['tag']) ?>
                     </span>
                     <span>~<?= e($article['read_min']) ?> мин</span>
@@ -650,12 +642,12 @@ include __DIR__ . '/includes/header.php';
           <div class="sketch-sticky-note p-4 rounded-lg space-y-2 relative shadow-sm" style="transform: rotate(-0.5deg);">
             <div class="sketch-washi-tape washi-tape-postit" aria-hidden="true"></div>
             
-            <div class="flex items-center justify-between font-mono text-[10px] uppercase font-bold border-b sketch-divider pb-1 text-ink">
+            <div class="flex items-center justify-between font-mono text-stamp uppercase font-bold border-b sketch-divider pb-1 text-ink">
               <span class="flex items-center gap-1.5">
-                <span class="material-symbols-outlined text-[13px] text-accent">push_pin</span>
+                <?= tp_icon('pin', 'w-3.5 h-3.5 text-accent') ?>
                 [<?= e($sb_note['label']) ?>]
               </span>
-              <span class="text-[10px] opacity-75"><?= e($sb_note['code']) ?></span>
+              <span class="text-stamp opacity-75"><?= e($sb_note['code']) ?></span>
             </div>
 
             <p class="font-hand text-base leading-snug italic font-semibold text-ink">
@@ -685,10 +677,10 @@ include __DIR__ . '/includes/header.php';
           <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm relative">
             <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span class="flex items-center gap-1.5 text-ink">
-                <span class="material-symbols-outlined text-[14px] text-teal-600 dark:text-teal-400">thermostat</span>
+                <?= tp_icon('thermometer', 'w-3.5 h-3.5 text-teal-600 dark:text-teal-400') ?>
                 [<?= e($sb_spec['title']) ?>]
               </span>
-              <span class="<?= e($sb_spec['tag_pill']) ?> text-[10px] font-mono uppercase px-2 py-0.5 rounded"><?= e($sb_spec['tag']) ?></span>
+              <span class="<?= e($sb_spec['tag_pill']) ?> text-stamp font-mono uppercase px-2 py-0.5 rounded"><?= e($sb_spec['tag']) ?></span>
             </div>
 
             <div class="space-y-1.5 font-mono text-xs">
@@ -718,12 +710,12 @@ include __DIR__ . '/includes/header.php';
           ];
           ?>
           <div class="border border-warning-border rounded-lg bg-warning-bg/30 p-4 space-y-2 shadow-sm">
-            <div class="flex items-center justify-between font-mono text-[11px] uppercase font-bold border-b border-paper-border pb-1">
+            <div class="flex items-center justify-between font-mono text-stamp uppercase font-bold border-b border-paper-border pb-1">
               <span class="flex items-center gap-1.5 text-warning">
-                <span class="material-symbols-outlined text-[15px] text-warning">warning</span>
+                <?= tp_icon('alert-triangle', 'w-3.5 h-3.5 text-warning') ?>
                 [<?= e($sb_warn['title']) ?>]
               </span>
-              <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-mono font-bold"><?= e($sb_warn['badge']) ?></span>
+              <span class="pill-orange text-stamp px-2 py-0.5 rounded font-mono font-bold"><?= e($sb_warn['badge']) ?></span>
             </div>
 
             <p class="font-hand text-base leading-snug italic font-semibold text-ink">
@@ -740,40 +732,40 @@ include __DIR__ . '/includes/header.php';
           <div class="border border-paper-border rounded-lg bg-card p-4 space-y-3 shadow-sm">
             <div class="flex items-center justify-between font-mono text-xs uppercase font-bold text-ink-muted border-b border-paper-border pb-1.5">
               <span>Инструменты верстака</span>
-              <span class="pill-blue text-[10px] px-2 py-0.5 rounded">[03 МОДУЛЯ]</span>
+              <span class="pill-blue text-stamp px-2 py-0.5 rounded">[03 МОДУЛЯ]</span>
             </div>
             <div class="space-y-2 font-mono text-xs">
               <a href="<?= esc_url($site_root) ?>interactive.php#temp" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[15px] text-accent">thermostat</span>
+                    <?= tp_icon('thermometer', 'w-3.5 h-3.5 text-accent') ?>
                     [01] Термокалькулятор
                   </div>
                   <div class="text-xs text-ink-muted">Подбор °C под провод и припой</div>
                 </div>
-                <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-bold">#temp</span>
+                <span class="pill-orange text-stamp px-2 py-0.5 rounded font-bold">#расчет</span>
               </a>
 
               <a href="<?= esc_url($site_root) ?>interactive.php#iron" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[15px] text-accent">construction</span>
+                    <?= tp_icon('wrench', 'w-3.5 h-3.5 text-accent') ?>
                     [02] Подбор паяльника
                   </div>
                   <div class="text-xs text-ink-muted">Станции T12, C245 под бюджет</div>
                 </div>
-                <span class="pill-blue text-[10px] px-2 py-0.5 rounded font-bold">#iron</span>
+                <span class="pill-blue text-stamp px-2 py-0.5 rounded font-bold">#паяльник</span>
               </a>
 
               <a href="<?= esc_url($site_root) ?>interactive.php#defect" class="min-h-[44px] flex items-center justify-between px-3 py-2 rounded border border-paper-border bg-paper hover:border-accent text-ink transition-colors group focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
                 <div>
                   <div class="font-bold group-hover:text-accent transition-colors text-xs flex items-center gap-1.5">
-                    <span class="material-symbols-outlined text-[15px] text-accent">troubleshoot</span>
+                    <?= tp_icon('sliders', 'w-3.5 h-3.5 text-accent') ?>
                     [03] Дерево дефектов
                   </div>
                   <div class="text-xs text-ink-muted">Диагностика причин брака</div>
                 </div>
-                <span class="pill-orange text-[10px] px-2 py-0.5 rounded font-bold">#defect</span>
+                <span class="pill-orange text-stamp px-2 py-0.5 rounded font-bold">#дефекты</span>
               </a>
             </div>
           </div>
@@ -809,5 +801,8 @@ include __DIR__ . '/includes/header.php';
     })();
   </script>
 
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=7bd99a9d-1036-4cae-b680-1d37c8e37200"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

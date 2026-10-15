@@ -1,3 +1,84 @@
+---
+name: ТОЧКА ПЛАВЛЕНИЯ
+description: Открытый инженерный медиа-портал, база технологических регламентов и интерактивный верстак инженера пайки
+colors:
+  primary: "#FFC700"
+  primary-hover: "#E5B200"
+  neutral-bg: "#F6F6F6"
+  paper: "#FFFFFF"
+  paper-subtle: "#F2F2F4"
+  border: "#111111"
+  border-soft: "#DCD8D0"
+  ink: "#0C0C0C"
+  ink-muted: "#4A4A4A"
+  ink-faint: "#6E7582"
+  cyan: "#0D9488"
+  danger: "#B3261E"
+  success: "#1A7F4C"
+typography:
+  display:
+    fontFamily: "'Space Grotesk', system-ui, sans-serif"
+    fontSize: "clamp(2rem, 4vw, 2.75rem)"
+    fontWeight: 700
+    lineHeight: 1.18
+    letterSpacing: "-0.025em"
+  editorial:
+    fontFamily: "'Newsreader', Georgia, serif"
+    fontSize: "clamp(1.75rem, 3.2vw, 2.25rem)"
+    fontWeight: 700
+    lineHeight: 1.18
+    letterSpacing: "-0.02em"
+  headline:
+    fontFamily: "'IBM Plex Sans', system-ui, sans-serif"
+    fontSize: "clamp(1.75rem, 3.2vw, 2.25rem)"
+    fontWeight: 700
+    lineHeight: 1.18
+    letterSpacing: "-0.02em"
+  title:
+    fontFamily: "'IBM Plex Sans', system-ui, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 600
+    lineHeight: 1.35
+  body:
+    fontFamily: "'IBM Plex Sans', system-ui, sans-serif"
+    fontSize: "1rem"
+    fontWeight: 400
+    lineHeight: 1.7
+  label:
+    fontFamily: "'JetBrains Mono', monospace"
+    fontSize: "0.875rem"
+    fontWeight: 500
+    lineHeight: 1.55
+  hand:
+    fontFamily: "'Caveat', cursive"
+    fontSize: "1.125rem"
+    fontWeight: 600
+rounded:
+  sm: "4px"
+  md: "8px"
+  control: "10px"
+  card: "14px"
+  full: "999px"
+spacing:
+  xs: "4px"
+  sm: "8px"
+  md: "16px"
+  lg: "24px"
+  xl: "32px"
+components:
+  button-primary:
+    backgroundColor: "{colors.primary}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.control}"
+    padding: "10px 20px"
+  button-primary-hover:
+    backgroundColor: "{colors.primary-hover}"
+  card-default:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    rounded: "{rounded.card}"
+    padding: "20px"
+---
 
 # DESIGN.md — Дизайн-манифест «ТОЧКА ПЛАВЛЕНИЯ»
 
@@ -11,7 +92,8 @@
 - **Ощущение:** Аккуратный лабораторный журнал инженера-электронщика. Высокая плотность полезных данных, идеальная читаемость, чертёжные сетки миллиметровки, технические штампы `[ОТК-2026]`, рукописные заметки на полях (Caveat Hand) и медно-янтарный термо-акцент паяльного жала.
 - **Главный принцип вёрстки:** **Блочно-модульная структура**. Страницы и статьи строятся из отдельных независимых карточек на точечном холсте (`dot grid`). **Никогда не накрывать весь контент единой сплошной белой плашкой!** Холст должен дышать между смысловыми блоками.
 - **Длина строки чтения:** Строго ограничена `max-width: 68ch` в редакционных материалах для предотвращения усталости глаз.
-- **Единый источник токенов:** `theme/assets/css/tokens.css`.
+- **Единый источник токенов:** `theme4/assets/css/tokens.css`.
+
 
 ---
 
@@ -70,7 +152,8 @@
 - `H3`: `1.25rem` (20px) / line-height: `1.35`
 - `H4`: `1.0625rem` (17px) / line-height: `1.4`
 - `Body`: `1rem` (16px, базовый размер 17px в лонгридах) / line-height: `1.7`
-- `Mono Small`: `0.75rem`–`0.875rem` / tabular-nums / line-height: `1.55`
+- `Mono Small`: `0.75rem`–`0.875rem` (12px–14px) / tabular-nums / line-height: `1.55`
+- `Stamp / Micro`: `0.6875rem` (11px) / line-height: `1.3` / tracking: `0.04em` (технические штампы, бейджи ГОСТ, служебные индексы)
 
 ---
 

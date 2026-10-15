@@ -191,7 +191,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         if (visibleCount === 0 && query !== '') {
-            noResultsMsg.innerHTML = `<span class="material-symbols-outlined text-[15px] align-middle mr-1 text-ink-muted">search</span> Ничего не найдено по запросу «<strong>${query}</strong>»`;
+            noResultsMsg.innerHTML = `<span class="inline-block font-mono text-xs text-ink-muted mr-1" aria-hidden="true">[?]</span> Ничего не найдено по запросу «<strong>${query}</strong>»`;
             noResultsMsg.style.display = 'block';
         } else {
             noResultsMsg.style.display = 'none';

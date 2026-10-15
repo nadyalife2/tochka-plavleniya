@@ -34,6 +34,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const tempArticleLink = document.getElementById('temp-article-link');
   const tempArticleTitle = document.getElementById('temp-article-title');
   const quickTaskButtons = document.querySelectorAll('.quick-task-btn');
+  const heatmapContainer = document.getElementById('temp-heatmap-container');
+  const thermalCanvas = document.getElementById('thermal-canvas');
+  const heatmapTalDisplay = document.getElementById('heatmap-tal-display');
+  const heatmapTipTemp = document.getElementById('heatmap-tip-temp');
+  const heatmapJointTemp = document.getElementById('heatmap-joint-temp');
+  let thermalSim = null;
 
   let activeQuickTask = 'wire';
 
@@ -76,6 +82,369 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ───────────────────────────────────────────────────────────────────────────
+  // ИНТЕРАКТИВНЫЙ СИМУЛЯТОР ТЕПЛОПРОВОДНОСТИ (CANVAS 2D HEATMAP // 60 FPS)
+  // ───────────────────────────────────────────────────────────────────────────
+  class ThermalSimulator {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext('2d', { alpha: false });
+      this.w = canvas.width || 480;
+      this.h = canvas.height || 130;
+      this.cols = 60;
+      this.rows = 20;
+      this.cellW = this.w / this.cols;
+      this.cellH = this.h / this.rows;
+
+      this.grid = new Float32Array(this.cols * this.rows);
+      this.prevGrid = new Float32Array(this.cols * this.rows);
+
+      this.ambientTemp = 24.0;
+      this.tipTemp = 280.0;
+      this.meltTemp = 183.0;
+      this.conductivity = 0.22;
+      this.coolingRate = 0.018;
+
+      this.tipX = this.cols / 2;
+      this.tipY = this.rows / 2;
+      this.isMouseDown = false;
+      this.isHovering = false;
+      this.touchTimeSec = 0.0;
+      this.animId = null;
+      this.isRunning = false;
+      this.isVisible = true;
+      this.shouldRun = false;
+
+      this.palette = this.generateIronbowPalette();
+      this.initEvents();
+      this.initVisibilityObserver();
+      this.reset();
+    }
+
+    generateIronbowPalette() {
+      const p = new Uint32Array(256);
+      for (let i = 0; i < 256; i++) {
+        const t = i / 255;
+        let r = 0, g = 0, b = 0;
+        if (t < 0.25) {
+          const f = t / 0.25;
+          r = Math.floor(20 + 70 * f);
+          g = Math.floor(22 + 20 * f);
+          b = Math.floor(35 + 120 * f);
+        } else if (t < 0.55) {
+          const f = (t - 0.25) / 0.30;
+          r = Math.floor(90 + 130 * f);
+          g = Math.floor(42 + 60 * f);
+          b = Math.floor(155 * (1 - f));
+        } else if (t < 0.85) {
+          const f = (t - 0.55) / 0.30;
+          r = Math.min(255, Math.floor(220 + 35 * f));
+          g = Math.floor(102 + 97 * f);
+          b = Math.floor(10 * f);
+        } else {
+          const f = (t - 0.85) / 0.15;
+          r = 255;
+          g = Math.floor(199 + 56 * f);
+          b = Math.floor(150 * f);
+        }
+        p[i] = (255 << 24) | (b << 16) | (g << 8) | r;
+      }
+      return p;
+    }
+
+    reset() {
+      for (let i = 0; i < this.grid.length; i++) {
+        this.grid[i] = this.ambientTemp;
+        this.prevGrid[i] = this.ambientTemp;
+      }
+      this.touchTimeSec = 0;
+    }
+
+    configure(tipTemp, meltTemp, workType) {
+      this.reset();
+      this.tipTemp = tipTemp || 280;
+      this.meltTemp = meltTemp || 183;
+
+      // Von Neumann stability criterion: k <= 0.25 for 2D forward Euler
+      if (workType === 'smd_small') {
+        this.conductivity = 0.08;
+        this.coolingRate = 0.025;
+      } else if (workType === 'smd_large' || workType === 'copper_pipe') {
+        this.conductivity = 0.20;
+        this.coolingRate = 0.035;
+      } else if (workType && workType.startsWith('wire')) {
+        this.conductivity = 0.16;
+        this.coolingRate = 0.018;
+      } else {
+        this.conductivity = 0.14;
+        this.coolingRate = 0.020;
+      }
+
+      this.start();
+    }
+
+    initEvents() {
+      const getPos = (e) => {
+        const rect = this.canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        const x = Math.max(0, Math.min(this.w, (clientX - rect.left) * (this.w / rect.width)));
+        const y = Math.max(0, Math.min(this.h, (clientY - rect.top) * (this.h / rect.height)));
+        return {
+          c: Math.floor(x / this.cellW),
+          r: Math.floor(y / this.cellH)
+        };
+      };
+
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let isTouchDragging = false;
+
+      const onDown = (e) => {
+        this.isMouseDown = true;
+        this.isHovering = true;
+        const pos = getPos(e);
+        this.tipX = pos.c;
+        this.tipY = pos.r;
+        this.start();
+      };
+
+      const onMove = (e) => {
+        this.isHovering = true;
+        const pos = getPos(e);
+        this.tipX = pos.c;
+        this.tipY = pos.r;
+        this.start();
+      };
+
+      const onUp = () => {
+        this.isMouseDown = false;
+        this.isHovering = false;
+        isTouchDragging = false;
+      };
+
+      const onTouchStart = (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        isTouchDragging = false;
+        const pos = getPos(e);
+        this.tipX = pos.c;
+        this.tipY = pos.r;
+        this.start();
+      };
+
+      const onTouchMove = (e) => {
+        if (!e.touches || e.touches.length !== 1) return;
+        const curX = e.touches[0].clientX;
+        const curY = e.touches[0].clientY;
+        const dx = Math.abs(curX - touchStartX);
+        const dy = Math.abs(curY - touchStartY);
+
+        // If predominantly horizontal, engage heat drag without scrolling page
+        if (dx > 8 && dx > dy) {
+          isTouchDragging = true;
+        }
+
+        if (isTouchDragging) {
+          if (e.cancelable) e.preventDefault();
+          const pos = getPos(e);
+          this.tipX = pos.c;
+          this.tipY = pos.r;
+          this.start();
+        }
+      };
+
+      this.canvas.addEventListener('mousedown', onDown);
+      window.addEventListener('mousemove', (e) => {
+        if (this.isMouseDown) onMove(e);
+      });
+      window.addEventListener('mouseup', onUp);
+
+      this.canvas.addEventListener('touchstart', onTouchStart, { passive: true });
+      this.canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+      this.canvas.addEventListener('touchend', onUp);
+
+      this.canvas.addEventListener('mouseenter', () => { this.isHovering = true; this.start(); });
+      this.canvas.addEventListener('mouseleave', () => { this.isHovering = false; });
+    }
+
+    step() {
+      const cols = this.cols;
+      const rows = this.rows;
+      const prev = this.prevGrid;
+      const curr = this.grid;
+      const k = this.conductivity;
+      const loss = this.coolingRate;
+      const ambient = this.ambientTemp;
+
+      prev.set(curr);
+
+      const tx = Math.max(1, Math.min(cols - 2, Math.floor(this.tipX)));
+      const ty = Math.max(1, Math.min(rows - 2, Math.floor(this.tipY)));
+
+      prev[ty * cols + tx] = this.tipTemp;
+      if (tx > 0) prev[ty * cols + (tx - 1)] = Math.max(prev[ty * cols + (tx - 1)], this.tipTemp * 0.92);
+      if (tx < cols - 1) prev[ty * cols + (tx + 1)] = Math.max(prev[ty * cols + (tx + 1)], this.tipTemp * 0.92);
+      if (ty > 0) prev[(ty - 1) * cols + tx] = Math.max(prev[(ty - 1) * cols + tx], this.tipTemp * 0.92);
+      if (ty < rows - 1) prev[(ty + 1) * cols + tx] = Math.max(prev[(ty + 1) * cols + tx], this.tipTemp * 0.92);
+
+      for (let r = 1; r < rows - 1; r++) {
+        const rowOffset = r * cols;
+        for (let c = 1; c < cols - 1; c++) {
+          const idx = rowOffset + c;
+          const left = prev[idx - 1];
+          const right = prev[idx + 1];
+          const up = prev[idx - cols];
+          const down = prev[idx + cols];
+          const center = prev[idx];
+
+          const laplacian = left + right + up + down - 4 * center;
+          let newT = center + k * laplacian - loss * (center - ambient);
+          curr[idx] = Math.max(ambient, Math.min(this.tipTemp + 20, newT));
+        }
+      }
+
+      const jointTemp = curr[ty * cols + tx];
+      if (jointTemp >= this.meltTemp) {
+        this.touchTimeSec += 0.016;
+      } else {
+        this.touchTimeSec = Math.max(0, this.touchTimeSec - 0.03);
+      }
+
+      if (heatmapTipTemp) heatmapTipTemp.textContent = `${Math.round(this.tipTemp)} °C`;
+      if (heatmapJointTemp) {
+        const isLiquid = jointTemp >= this.meltTemp;
+        heatmapJointTemp.textContent = `${Math.round(jointTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
+        heatmapJointTemp.className = isLiquid ? 'text-accent font-bold' : 'text-cyan font-bold';
+      }
+      if (heatmapTalDisplay) {
+        heatmapTalDisplay.textContent = `TAL: ${this.touchTimeSec.toFixed(1)} сек`;
+      }
+    }
+
+    render() {
+      const imgData = this.ctx.createImageData(this.w, this.h);
+      const buf = new Uint32Array(imgData.data.buffer);
+      const cols = this.cols;
+      const cellW = this.cellW;
+      const cellH = this.cellH;
+      const maxT = Math.max(350, this.tipTemp + 30);
+      const rangeT = maxT - this.ambientTemp;
+
+      for (let y = 0; y < this.h; y++) {
+        const r = Math.min(this.rows - 1, Math.floor(y / cellH));
+        const rowOffset = r * cols;
+        const pyOffset = y * this.w;
+
+        for (let x = 0; x < this.w; x++) {
+          const c = Math.min(this.cols - 1, Math.floor(x / cellW));
+          const tVal = this.grid[rowOffset + c];
+          const norm = Math.max(0, Math.min(1, (tVal - this.ambientTemp) / rangeT));
+          const palIdx = Math.floor(norm * 255);
+          buf[pyOffset + x] = this.palette[palIdx];
+        }
+      }
+
+      this.ctx.putImageData(imgData, 0, 0);
+      this.drawOverlays();
+    }
+
+    drawOverlays() {
+      const ctx = this.ctx;
+
+      // Draw faint CAD grid lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      for (let x = 0; x < this.w; x += 40) {
+        ctx.moveTo(x, 0); ctx.lineTo(x, this.h);
+      }
+      for (let y = 0; y < this.h; y += 35) {
+        ctx.moveTo(0, y); ctx.lineTo(this.w, y);
+      }
+      ctx.stroke();
+
+      // Draw virtual copper pad & track
+      const cx = this.w / 2;
+      const cy = this.h / 2;
+      ctx.strokeStyle = 'rgba(255, 199, 0, 0.4)';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(cx - 90, cy);
+      ctx.lineTo(cx + 90, cy);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255, 199, 0, 0.8)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Active tip crosshair
+      const tx = this.tipX * this.cellW + this.cellW / 2;
+      const ty = this.tipY * this.cellH + this.cellH / 2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(tx, ty, 6, 0, Math.PI * 2);
+      ctx.moveTo(tx - 10, ty); ctx.lineTo(tx + 10, ty);
+      ctx.moveTo(tx, ty - 10); ctx.lineTo(tx, ty + 10);
+      ctx.stroke();
+    }
+
+    initVisibilityObserver() {
+      if ('IntersectionObserver' in window) {
+        this.observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            this.isVisible = entry.isIntersecting;
+            if (this.isVisible && this.shouldRun) {
+              this.start();
+            } else if (!this.isVisible && this.isRunning) {
+              this.stopLoopOnly();
+            }
+          });
+        }, { threshold: 0.05 });
+        this.observer.observe(this.canvas);
+      }
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+          if (this.isRunning) this.stopLoopOnly();
+        } else if (this.isVisible && this.shouldRun) {
+          this.start();
+        }
+      });
+    }
+
+    start() {
+      this.shouldRun = true;
+      if (!this.isVisible || this.isRunning) return;
+      this.isRunning = true;
+
+      const loop = () => {
+        this.step();
+        this.render();
+        if (this.isRunning) {
+          this.animId = requestAnimationFrame(loop);
+        }
+      };
+
+      this.animId = requestAnimationFrame(loop);
+    }
+
+    stopLoopOnly() {
+      this.isRunning = false;
+      if (this.animId) cancelAnimationFrame(this.animId);
+      this.animId = null;
+    }
+
+    stop() {
+      this.shouldRun = false;
+      this.stopLoopOnly();
+    }
+  }
+
   function updateTempCalculator() {
     if (!tempSolder || !tempWork || !tempRangeDisplay) return;
 
@@ -84,6 +453,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (tempEmptyState) tempEmptyState.classList.add('hidden');
       if (tempResultContent) tempResultContent.classList.remove('hidden');
       if (tempMeterBox) tempMeterBox.style.display = 'none';
+      if (heatmapContainer) heatmapContainer.style.display = 'none';
+      if (thermalSim) thermalSim.stop();
 
       if (tempStatusBadge) {
         tempStatusBadge.textContent = 'ТРЕБУЕТСЯ ВЫБОР';
@@ -121,14 +492,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // State: Валидация выбора
     if (!sVal) {
-      if (window.TCHP_UI) window.TCHP_UI.showFieldError(tempSolder, 'Выберите марку припоя');
+      if (window.TCHP_UI) window.TCHP_UI.showFieldError(tempSolder, 'Укажите марку припоя (например, ПОС-61 или SAC305) для расчёта точки ликвидуса');
       return;
     } else if (window.TCHP_UI) {
       window.TCHP_UI.clearFieldError(tempSolder);
     }
 
     if (!wVal) {
-      if (window.TCHP_UI) window.TCHP_UI.showFieldError(tempWork, 'Выберите тип монтажной операции');
+      if (window.TCHP_UI) window.TCHP_UI.showFieldError(tempWork, 'Укажите тип детали или проводника: теплоёмкость меди определяет нужный запас тепла жала');
       return;
     } else if (window.TCHP_UI) {
       window.TCHP_UI.clearFieldError(tempWork);
@@ -160,6 +531,8 @@ document.addEventListener('DOMContentLoaded', () => {
       tempRangeDisplay.classList.remove('temp-heat-pulse');
       if (tempMeterBox) tempMeterBox.style.display = 'none';
       if (tempBarFill) tempBarFill.style.width = '0%';
+      if (heatmapContainer) heatmapContainer.style.display = 'none';
+      if (thermalSim) thermalSim.stop();
       if (tempTipDisplay) tempTipDisplay.textContent = 'Требуется газовая горелка';
       
       if (tempAdviceDisplay) {
@@ -180,8 +553,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Режим нормального ориентира
     if (tempStatusBadge) {
-      tempStatusBadge.textContent = 'ОРИЕНТИР';
-      tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink';
+      const avg = (item.t_min + item.t_max) / 2;
+      if (avg <= 300) {
+        tempStatusBadge.textContent = 'ДОПУСК СОБЛЮДЁН // IPC-A-610';
+        tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink';
+      } else {
+        tempStatusBadge.textContent = 'ПОВЫШЕННЫЙ НАГРЕВ // ПРЕДНАГРЕВ';
+        tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-amber-400 text-ink';
+      }
     }
 
     tempRangeDisplay.style.fontSize = '';
@@ -250,6 +629,25 @@ document.addEventListener('DOMContentLoaded', () => {
         tempArticleLink.href = 'article.php?slug=pravilo-treh-sekund';
         tempArticleTitle.textContent = 'Микроурок: Тепловое окно и правило 2–3 секунд';
       }
+    }
+
+    // Reveal and configure thermal simulation
+    if (heatmapContainer) heatmapContainer.style.display = 'block';
+    if (thermalCanvas) {
+      if (!thermalSim) {
+        thermalSim = new ThermalSimulator(thermalCanvas);
+      }
+      const solderMelts = {
+        'pos61': 183,
+        'sn63pb37': 183,
+        'sac305': 217,
+        'pos40': 183,
+        'sn42bi58': 138,
+        'roze': 94
+      };
+      const meltT = solderMelts[sVal] || 183;
+      const avg = (item.t_min + item.t_max) / 2;
+      thermalSim.configure(avg, meltT, wVal);
     }
 
   }
@@ -352,7 +750,24 @@ document.addEventListener('DOMContentLoaded', () => {
     ironClassDisplay.textContent = item.class || 'Универсальная станция';
     if (ironControlDisplay) ironControlDisplay.textContent = item.control || 'Цифровой термостат';
     if (ironTipDisplay) ironTipDisplay.textContent = item.tip_type || 'T12 / C245 совместимые';
+
     if (ironNoteDisplay) ironNoteDisplay.textContent = item.note || '';
+
+    const presetsDisplay = document.getElementById('iron-presets-display');
+    if (presetsDisplay) {
+      const presetsMap = {
+        wire: ['Pinecil V2 (USB-PD)', 'TS101', 'T12 Mini'],
+        boards_tht: ['KSGER T12', 'Quick 957D', 'Hakko FX-888D'],
+        smd: ['KSGER T12 (T12-BC2)', 'Aixun T3A (C245)', 'Quick 957D'],
+        smd_fine: ['Sugon T26D (JBC C210)', 'Aixun T3B', 'JBC CD-2BQF'],
+        connectors: ['Aixun T3A (C245-784)', 'JBC Heavy Duty C245', 'T12 Топорик'],
+        bga_rework: ['Quick 861DW (1000W)', 'Atten ST-862D', 'JBC CD-2BQF'],
+        pipes: ['Горелка MAPP Gas', 'Мощный паяльник 150-200W']
+      };
+      const list = presetsMap[tVal] || ['KSGER T12', 'Aixun T3A', 'Quick 861DW', 'JBC CD-2BQF'];
+      presetsDisplay.innerHTML = list.map(name => `<span class="px-2 py-0.5 rounded border border-paper-border bg-paper text-ink font-bold">${name}</span>`).join('');
+    }
+
 
     // Must have list
     if (ironMustDisplay) {

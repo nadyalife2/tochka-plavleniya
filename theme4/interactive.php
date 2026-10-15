@@ -9,7 +9,7 @@ require_once __DIR__ . '/data/interactive-rules.php';
 
 ob_start();
 $assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
-$extra_head = '<link rel="stylesheet" href="' . $assets_base . '/assets/css/workbench.css">';
+$extra_head = '<link rel="stylesheet" href="' . $assets_base . '/assets/css/workbench.css"><link rel="stylesheet" href="' . $assets_base . '/assets/css/interactive.css">';
 include __DIR__ . '/includes/header.php';
 ?>
 
@@ -62,27 +62,16 @@ include __DIR__ . '/includes/header.php';
       <section class="border-b border-paper-border pb-10 space-y-5">
         <div class="max-w-3xl space-y-4">
           
-          <!-- Tape & Label Badge -->
-          <div class="relative inline-block mb-1">
-            <div class="absolute -top-2 left-6 w-10 h-3 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-sm rotate-[-2deg] z-10 pointer-events-none"></div>
-            <div class="inline-flex items-center gap-2 px-2.5 py-1 bg-[#fffdf5] dark:bg-[#ca8a04]/15 border border-[#fde047] dark:border-[#ca8a04]/40 text-ink font-mono text-xs shadow-sm rotate-[-1.2deg] sketch-border">
-              <span class="w-2 h-2 rounded-full bg-accent inline-block shadow-[0_0_6px_rgba(235,82,17,0.8)]"></span>
-              <span class="font-bold tracking-wider uppercase">ВЕРСТАК // LAB TOOLS v3.0</span>
-              <span class="text-ink-faint">|</span>
-              <span class="text-xs text-ink-muted">7 КАЛЬКУЛЯТОРОВ И СПРАВОЧНИКОВ</span>
-            </div>
-          </div>
-
-          <!-- Metadata -->
-          <div class="flex items-center gap-2 font-mono text-xs text-ink-muted">
-            <span class="w-2 h-2 rounded-full bg-ink inline-block"></span>
-            <span class="uppercase tracking-wider font-semibold text-ink">Инженерный верстак v2.4</span>
-            <span>·</span>
-            <span>Расчеты по ГОСТ 21930/21931 и спецификациям сплавов</span>
+          <!-- Workshop Stamp -->
+          <div class="inline-flex items-center gap-2 px-3 py-1 bg-paper-subtle border border-paper-border text-ink font-mono text-stamp rounded uppercase font-bold tracking-wider">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+            <span>ВЕРСТАК // ИНЖЕНЕРНЫЙ СПРАВОЧНИК 2026</span>
+            <span class="text-ink-faint">·</span>
+            <span class="text-ink-muted">ГОСТ 21930/21931 &amp; IPC-A-610</span>
           </div>
 
           <!-- Headline -->
-          <h1 class="text-3xl sm:text-4xl lg:text-[46px] font-bold text-ink tracking-tight leading-[1.15] font-serif">
+          <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-ink tracking-tight leading-[1.15] font-serif">
             Интерактивный верстак инженера
           </h1>
 
@@ -269,7 +258,6 @@ include __DIR__ . '/includes/header.php';
       <!-- P0 ИНСТРУМЕНТ 1: ТЕРМОКАЛЬКУЛЯТОР (#temp)                             -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="temp" class="card-tool space-y-6 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
-        <div class="absolute -top-2.5 left-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-2xs rotate-[-2.5deg] pointer-events-none"></div>
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -291,21 +279,21 @@ include __DIR__ . '/includes/header.php';
         <!-- Quick Task Selector: 1-Click for Провод, Плата, Труба, Не знаю -->
         <div class="mb-4 p-3.5 rounded-md border border-paper-border bg-paper-subtle space-y-2 shadow-2xs">
           <div class="flex items-center justify-between font-mono text-xs">
-            <span class="font-bold text-accent uppercase tracking-wider">БЫСТРЫЙ РАСЧЁТ В 1 КЛИК // ЧТО ПАЯЕТЕ?</span>
-            <span class="text-ink-muted hidden sm:inline text-xs">Выберите задачу для моментального ориентира:</span>
+            <span class="font-bold text-ink uppercase tracking-wider">Сценарии монтажа:</span>
+            <span class="text-ink-muted hidden sm:inline text-xs">Выберите задачу для быстрого ориентира:</span>
           </div>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2" id="quick-task-buttons">
             <button type="button" data-task="wire" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              <span class="opacity-60 mr-1 text-[10px] font-normal">[01]</span>Провод
+              <span class="opacity-60 mr-1 text-stamp font-normal">[01]</span>Провод
             </button>
             <button type="button" data-task="pcb" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              <span class="opacity-60 mr-1 text-[10px] font-normal">[02]</span>Плата SMD
+              <span class="opacity-60 mr-1 text-stamp font-normal">[02]</span>Плата SMD
             </button>
             <button type="button" data-task="pipe" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              <span class="opacity-60 mr-1 text-[10px] font-normal">[03]</span>Медь / Труба
+              <span class="opacity-60 mr-1 text-stamp font-normal">[03]</span>Медь / Труба
             </button>
-            <button type="button" data-task="unknown" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5">
-              <span class="opacity-60 mr-1 text-[10px] font-normal">[04]</span>Помощь ОТК
+            <button type="button" data-task="unknown" class="quick-task-btn px-3 py-2 rounded font-mono text-xs font-bold border border-paper-border bg-paper hover:border-accent hover:text-accent transition-all text-center cursor-pointer shadow-2xs active:translate-y-0.5" title="Пошаговый подбор для нестандартных деталей">
+              <span class="opacity-60 mr-1 text-stamp font-normal">[04]</span>Не знаю задачу
             </button>
           </div>
         </div>
@@ -395,7 +383,7 @@ include __DIR__ . '/includes/header.php';
                     <div id="temp-range-display" class="text-2xl sm:text-3xl font-bold font-mono text-accent leading-none">
                       260 – 310 °C
                     </div>
-                    <span id="temp-tip-display" class="text-xs font-mono text-ink-muted">на индикаторе станции</span>
+                    <span id="temp-tip-display" class="text-xs font-mono text-ink-muted">на дисплее станции (в точке контакта: ~225–245 °C)</span>
                   </div>
 
                   <!-- Встроенная шкала температуры станции с физикой нагрева -->
@@ -403,12 +391,34 @@ include __DIR__ . '/includes/header.php';
                     <div class="meter-bar">
                       <div id="temp-bar-fill" class="meter-fill" style="width: 50%; background-color: var(--color-accent);"></div>
                     </div>
-                    <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint">
+                    <div class="flex items-center justify-between text-stamp font-mono text-ink-faint">
                       <span>100°C</span>
                       <span class="opacity-70">200°C</span>
                       <span class="opacity-90 font-bold text-accent">300°C</span>
                       <span>450°C</span>
                     </div>
+                  <!-- Интерактивный симулятор теплопроводности (FLIR-style Canvas 2D Heatmap) -->
+                  <div id="temp-heatmap-container" class="mt-3 pt-3 border-t border-paper-border space-y-2" style="display:none;">
+                    <div class="flex items-center justify-between text-stamp font-mono">
+                      <span class="font-bold text-ink uppercase flex items-center gap-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+                        СИМУЛЯЦИЯ ТЕПЛОПРОВОДНОСТИ
+                      </span>
+                      <span id="heatmap-tal-display" class="text-accent font-bold">TAL: --</span>
+                    </div>
+                    <div class="relative rounded overflow-hidden border border-paper-border bg-[#14161a]">
+                      <canvas id="thermal-canvas" width="480" height="130" class="w-full h-[120px] block cursor-crosshair" aria-label="Интерактивный тепловизор паяльного соединения"></canvas>
+                      <div class="absolute bottom-1.5 left-2 flex items-center gap-2 text-stamp font-mono text-white/80 select-none pointer-events-none">
+                        <span>● ЖАЛО: <span id="heatmap-tip-temp" class="text-accent font-bold">--</span></span>
+                        <span>● ЗОНА КОНТАКТА: <span id="heatmap-joint-temp" class="text-emerald-400 font-bold">--</span></span>
+                      </div>
+                      <div class="absolute top-1.5 right-2 text-stamp font-mono text-white/50 uppercase select-none pointer-events-none">
+                        FLIR THERMAL MODEL
+                      </div>
+                    </div>
+                    <p class="text-stamp font-mono text-ink-muted leading-tight">
+                      Кликните или перемещайте курсор по плате, чтобы смоделировать касание жала паяльника и динамику растекания тепла по меди.
+                    </p>
                   </div>
 
                   <div id="temp-advice-display" class="text-xs font-mono text-ink-muted pt-1"></div>
@@ -449,7 +459,6 @@ include __DIR__ . '/includes/header.php';
       <!-- P0 ИНСТРУМЕНТ 2: КОНФИГУРАТОР ПАЯЛЬНИКА (#iron)                      -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="iron" class="card-tool space-y-6 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
-        <div class="absolute -top-2.5 left-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-2xs rotate-[1.8deg] pointer-events-none"></div>
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -520,6 +529,17 @@ include __DIR__ . '/includes/header.php';
               </div>
             </div>
 
+            <div class="pt-2 border-t border-paper-border text-xs font-mono">
+              <span class="text-ink-muted block text-xs uppercase mb-1">Проверенные эталонные станции (Пресеты):</span>
+              <div id="iron-presets-display" class="flex flex-wrap gap-1.5">
+                <span class="px-2 py-0.5 rounded border border-paper-border bg-paper text-ink font-bold">KSGER T12</span>
+                <span class="px-2 py-0.5 rounded border border-paper-border bg-paper text-ink font-bold">Aixun T3A</span>
+                <span class="px-2 py-0.5 rounded border border-paper-border bg-paper text-ink font-bold">Quick 861DW (1000W)</span>
+                <span class="px-2 py-0.5 rounded border border-paper-border bg-paper text-ink font-bold">JBC CD-2BQF</span>
+              </div>
+            </div>
+
+
             <div class="pt-2 border-t border-paper-border space-y-2">
               <div class="text-xs font-mono uppercase font-bold text-ink">Обязательный минимум на верстаке:</div>
               <ul id="iron-must-display" class="space-y-1"></ul>
@@ -582,7 +602,6 @@ include __DIR__ . '/includes/header.php';
       <!-- P0 ИНСТРУМЕНТ 4: ДЕРЕВО ДИАГНОСТИКИ ДЕФЕКТОВ (#defect)                 -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="defect" class="card-tool space-y-6 relative bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
-        <div class="absolute -top-2.5 left-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-2xs rotate-[-2deg] pointer-events-none"></div>
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -618,7 +637,6 @@ include __DIR__ . '/includes/header.php';
       <!-- P1 ИНСТРУМЕНТ 5: КАЛЬКУЛЯТОР ДОЗИРОВКИ ПАСТЫ И ФЛЮСА (#calculator)    -->
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <section id="calculator" class="card-tool relative space-y-6 bg-paper border border-paper-border rounded-lg p-5 sm:p-7 shadow-xs">
-        <div class="absolute -top-2.5 left-8 w-12 h-3.5 bg-[#ebdeb3]/80 dark:bg-[#786a48]/70 border-l border-r border-[#d2c39b]/70 dark:border-[#968458]/70 shadow-2xs rotate-[-1.5deg] pointer-events-none"></div>
         <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-3 pb-4 border-b border-paper-border">
           <div>
             <div class="flex items-center gap-3">
@@ -661,16 +679,16 @@ include __DIR__ . '/includes/header.php';
               <!-- Controls column -->
               <div style="display:flex; flex-direction:column; gap:1.25rem;">
                 <!-- Area Control -->
-                <div style="padding:1rem; border-radius:8px; background:var(--color-paper-subtle); border:1px solid var(--color-paper-border);">
+                <div style="padding:1rem; border-radius:var(--radius-md); background:var(--color-paper-subtle); border:1px solid var(--color-paper-border);">
                   <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
-                    <label for="flux-area-slider" style="font-size:12px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); letter-spacing:0.05em;">Площадь монтажной зоны:</label>
+                    <label for="flux-area-slider" style="font-size:var(--text-xs); font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); letter-spacing:0.05em;">Площадь монтажной зоны:</label>
                     <div style="display:flex; align-items:center; gap:6px;">
-                      <input type="number" id="flux-area" value="35" min="1" max="500" style="width:72px; padding:4px 8px; text-align:right; border-radius:6px; background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:14px; font-weight:700; outline:none;"/>
-                      <span style="font-size:12px; font-family:monospace; font-weight:700; color:var(--color-ink-muted);">см²</span>
+                      <input type="number" id="flux-area" value="35" min="1" max="500" style="width:72px; padding:4px 8px; text-align:right; border-radius:var(--radius-md); background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:14px; font-weight:700; outline:none;"/>
+                      <span style="font-size:var(--text-xs); font-family:monospace; font-weight:700; color:var(--color-ink-muted);">см²</span>
                     </div>
                   </div>
                   <input type="range" id="flux-area-slider" min="1" max="200" value="35" class="range-slider" style="width:100%; cursor:pointer; margin-bottom:0.5rem;"/>
-                  <div style="display:flex; justify-content:space-between; font-size:11px; font-family:monospace; color:var(--color-ink-faint);">
+                  <div style="display:flex; justify-content:space-between; font-size:var(--text-stamp); font-family:monospace; color:var(--color-ink-faint);">
                     <span>1 см²</span>
                     <span>50 см²</span>
                     <span>100 см²</span>
@@ -680,8 +698,8 @@ include __DIR__ . '/includes/header.php';
 
                 <!-- Chemistry Selector -->
                 <div>
-                  <label for="flux-type" style="display:block; font-size:12px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Материал и технология нанесения:</label>
-                  <select id="flux-type" style="width:100%; padding:10px 14px; border-radius:6px; background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:13px; outline:none;">
+                  <label for="flux-type" style="display:block; font-size:var(--text-xs); font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Материал и технология нанесения:</label>
+                  <select id="flux-type" style="width:100%; padding:10px 14px; border-radius:var(--radius-md); background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:var(--text-sm); outline:none;">
                     <option value="paste_sac" selected>Паяльная паста SAC305 (Sn96.5Ag3Cu0.5, 88.5% металла) — трафарет</option>
                     <option value="paste_sn63">Паяльная паста Sn63Pb37 (эвтектика, 90% металла) — трафарет</option>
                     <option value="bga_nc">Безотмывочный гель BGA (NC-559 / ROL0) — тонкий слой 50–70 мкм</option>
@@ -692,8 +710,8 @@ include __DIR__ . '/includes/header.php';
 
                 <!-- Stencil Thickness Control (shown for solder pastes) -->
                 <div id="stencil-thickness-group">
-                  <label for="stencil-thickness" style="display:block; font-size:12px; font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Толщина трафарета (апертура 18%):</label>
-                  <select id="stencil-thickness" style="width:100%; padding:10px 14px; border-radius:6px; background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:13px; outline:none;">
+                  <label for="stencil-thickness" style="display:block; font-size:var(--text-xs); font-family:monospace; font-weight:700; text-transform:uppercase; color:var(--color-ink); margin-bottom:8px; letter-spacing:0.05em;">Толщина трафарета (высота столбика пасты, апертура 18%):</label>
+                  <select id="stencil-thickness" style="width:100%; padding:10px 14px; border-radius:var(--radius-md); background:var(--color-paper); border:1px solid var(--color-paper-border-dark); color:var(--color-ink); font-family:monospace; font-size:var(--text-sm); outline:none;">
                     <option value="100">100 мкм (0.10 мм — тонкий шаг, QFN, BGA 0.5 мм)</option>
                     <option value="120" selected>120 мкм (0.12 мм — стандартный SMD монтаж 0603/SOIC/QFP)</option>
                     <option value="130">130 мкм (0.13 мм — универсальный стандарт)</option>
@@ -705,10 +723,10 @@ include __DIR__ . '/includes/header.php';
                 <div>
                   <span class="block text-xs font-mono font-bold uppercase text-ink mb-2 tracking-[0.05em]">Объём партии плат:</span>
                   <div style="display:flex; flex-wrap:wrap; gap:8px;">
-                    <button type="button" class="batch-btn" data-qty="1" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; font-weight:700; border:1px solid var(--color-accent); background:var(--color-paper); color:var(--color-accent); cursor:pointer;">1 плата</button>
-                    <button type="button" class="batch-btn" data-qty="5" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">5 плат</button>
-                    <button type="button" class="batch-btn" data-qty="10" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">10 плат</button>
-                    <button type="button" class="batch-btn" data-qty="50" style="padding:6px 12px; border-radius:6px; font-size:12px; font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">50 плат (серия)</button>
+                    <button type="button" class="batch-btn" data-qty="1" style="padding:6px 12px; border-radius:var(--radius-md); font-size:var(--text-xs); font-family:monospace; font-weight:700; border:1px solid var(--color-accent); background:var(--color-paper); color:var(--color-accent); cursor:pointer;">1 плата</button>
+                    <button type="button" class="batch-btn" data-qty="5" style="padding:6px 12px; border-radius:var(--radius-md); font-size:var(--text-xs); font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">5 плат</button>
+                    <button type="button" class="batch-btn" data-qty="10" style="padding:6px 12px; border-radius:var(--radius-md); font-size:var(--text-xs); font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">10 плат</button>
+                    <button type="button" class="batch-btn" data-qty="50" style="padding:6px 12px; border-radius:var(--radius-md); font-size:var(--text-xs); font-family:monospace; border:1px solid var(--color-paper-border); background:var(--color-paper); color:var(--color-ink); cursor:pointer;">50 плат (серия)</button>
                   </div>
                 </div>
               </div>
@@ -767,9 +785,9 @@ include __DIR__ . '/includes/header.php';
                       <line x1="75" y1="74" x2="75" y2="80" stroke-width="0.7" opacity="0.5"/>
                     </svg>
                     <div>
-                      <div class="text-[10px] font-mono uppercase font-bold text-ink-muted mb-0.5">Зарисовка платы:</div>
+                      <div class="text-stamp font-mono uppercase font-bold text-ink-muted mb-0.5">Зарисовка платы:</div>
                       <div id="pcb-dimensions" class="text-xs font-mono font-bold text-ink">59 × 59 мм (35 см²)</div>
-                      <div class="text-[10px] font-mono text-ink-faint mt-0.5">↑ масштаб к площади</div>
+                      <div class="text-stamp font-mono text-ink-faint mt-0.5">↑ масштаб к площади</div>
                     </div>
                   </div>
 
@@ -790,7 +808,7 @@ include __DIR__ . '/includes/header.php';
                       <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="shrink-0" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                       </svg>
-                      <span id="copy-flux-text" aria-live="polite">Скопировать параметры в журнал</span>
+                      <span id="copy-flux-text" aria-live="polite">Скопировать регламент (дозировка и отмывка)</span>
                     </button>
                   </div>
 
@@ -1002,9 +1020,11 @@ include __DIR__ . '/includes/header.php';
               <span class="font-hand text-base text-ink-muted font-semibold tracking-wide">«IPC J-STD-006C & ГОСТ»</span>
             </div>
           </div>
-          <div class="w-full sm:w-64">
-            <input type="text" id="solder-search" aria-label="Поиск по реестру сплавов и припоев" placeholder="Поиск (ПОС-61, SAC305, 183°C)..." class="input-base font-mono text-xs"/>
+          <div class="w-full sm:w-80 flex items-center gap-2">
+            <input type="text" id="solder-search" aria-label="Поиск по реестру сплавов и припоев" placeholder="Поиск (ПОС-61, SAC305, 183°C)..." class="input-base font-mono text-xs flex-1"/>
+            <button type="button" id="solder-reset-btn" class="btn btn-secondary text-xs px-2.5 py-1.5 whitespace-nowrap min-h-[36px] hidden" title="Сбросить поиск и фильтры">✕ Сброс</button>
           </div>
+
         </div>
 
         <div class="overflow-x-auto">
@@ -1024,9 +1044,11 @@ include __DIR__ . '/includes/header.php';
                   <td class="py-2.5 px-3 font-bold text-ink whitespace-nowrap">
                     <?= e($solder['name']) ?>
                     <?php if ($solder['type'] === 'leadfree'): ?>
-                      <span class="ml-1 px-1.5 py-0.5 rounded border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 text-xs">RoHS</span>
+                      <span class="rohs-tag rohs-yes ml-1">RoHS</span>
                     <?php elseif ($solder['type'] === 'lowtemp'): ?>
-                      <span class="ml-1 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 text-xs">Низкотемп.</span>
+                      <span class="ml-1 px-1.5 py-0.5 rounded border border-amber-300 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 text-amber-900 dark:text-amber-300 text-xs font-mono font-bold">Низкотемп.</span>
+                    <?php else: ?>
+                      <span class="rohs-tag rohs-no ml-1">Pb</span>
                     <?php endif; ?>
                   </td>
                   <td class="py-2.5 px-3">
@@ -1088,7 +1110,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Статья 1: Термопрофили -->
           <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
             <div class="space-y-2">
-              <span class="pill-orange text-[10px] uppercase font-bold">Основы</span>
+              <span class="pill-orange text-stamp uppercase font-bold">Основы</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
                 <a href="<?= esc_url($site_root . 'temperaturnye-profili/') ?>">
                   Температурные профили: как не перегреть плату
@@ -1106,7 +1128,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Статья 2: Флюсы -->
           <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
             <div class="space-y-2">
-              <span class="pill-orange text-[10px] uppercase font-bold">Материалы</span>
+              <span class="pill-orange text-stamp uppercase font-bold">Материалы</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
                 <a href="<?= esc_url($site_root . 'gid-po-flyusam/') ?>">
                   Гид по флюсам: RMA, NC и no-clean в шприце
@@ -1124,7 +1146,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Статья 3: Жала -->
           <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
             <div class="space-y-2">
-              <span class="pill-orange text-[10px] uppercase font-bold">Инструменты</span>
+              <span class="pill-orange text-stamp uppercase font-bold">Инструменты</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
                 <a href="<?= esc_url($site_root . 'zhala-payalnika/') ?>">
                   Жала паяльника: T12 против JBC C245
@@ -1142,7 +1164,7 @@ include __DIR__ . '/includes/header.php';
           <!-- Статья 4: Сплав Розе -->
           <article class="sketch-card p-4 flex flex-col justify-between space-y-3 bg-card hover:border-accent transition-colors group">
             <div class="space-y-2">
-              <span class="pill-orange text-[10px] uppercase font-bold">Материалы</span>
+              <span class="pill-orange text-stamp uppercase font-bold">Материалы</span>
               <h3 class="text-sm font-bold text-ink group-hover:text-accent transition-colors leading-snug">
                 <a href="<?= esc_url($site_root . 'splav-roze/') ?>">
                   Сплав Розе и Вуда: риски и правила
@@ -1239,5 +1261,8 @@ include __DIR__ . '/includes/header.php';
   <!-- Global Engineering Search Modal (Ctrl+K) -->
   <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=7bd99a9d-1036-4cae-b680-1d37c8e37200"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

@@ -46,7 +46,7 @@
       }
       errorEl.setAttribute('role', 'alert');
       inputElement.setAttribute('aria-describedby', errorEl.id);
-      errorEl.innerHTML = `<span class="material-symbols-outlined text-[14px]">error</span> ${message}`;
+      errorEl.innerHTML = `<span class="inline-block text-xs font-bold mr-1" aria-hidden="true">[!]</span> ${message}`;
       inputElement.focus();
     },
 
@@ -103,7 +103,7 @@
       if (warning) {
         warningHtml = `
           <div class="alert alert-warning mt-3">
-            <span class="material-symbols-outlined text-[18px] text-amber-600 shrink-0">warning</span>
+            <span class="inline-block font-mono font-bold text-amber-700 dark:text-amber-400 shrink-0 mr-1.5" aria-hidden="true">[ВНИМАНИЕ]</span>
             <div class="text-xs font-mono">${warning}</div>
           </div>
         `;
@@ -151,7 +151,7 @@
      * @param {HTMLElement} triggerBtn
      * @param {string} successText
      */
-    copyToClipboard(text, triggerBtn, successText = 'Скопировано!') {
+    copyToClipboard(text, triggerBtn, successText = '[✓ В БУФЕРЕ // ТЕХПАСПОРТ]') {
       if (!navigator.clipboard) {
         const textarea = document.createElement('textarea');
         textarea.value = text;
@@ -173,12 +173,12 @@
 
       if (triggerBtn) {
         const originalHtml = triggerBtn.innerHTML;
-        triggerBtn.innerHTML = `<span class="text-accent font-semibold">✓ ${successText}</span>`;
+        triggerBtn.innerHTML = `<span class="font-mono text-accent font-bold tracking-tight">${successText}</span>`;
         triggerBtn.disabled = true;
         setTimeout(() => {
           triggerBtn.innerHTML = originalHtml;
           triggerBtn.disabled = false;
-        }, 1800);
+        }, 2000);
       }
     }
   };

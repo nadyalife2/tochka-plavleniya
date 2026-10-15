@@ -17,7 +17,7 @@ $tchp_head_escape = static function ($value) {
 <html <?php if (function_exists('language_attributes')) { language_attributes(); } else { echo 'lang="ru"'; } ?>>
 <head>
   <meta charset="<?php echo $tchp_head_escape(function_exists('get_bloginfo') ? get_bloginfo('charset') : 'UTF-8'); ?>">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
   <?php if (!$tchp_wp_owns_title): ?>
   <title><?= $tchp_head_escape($page_title) ?></title>
   <?php endif; ?>
@@ -51,9 +51,6 @@ $tchp_head_escape = static function ($value) {
     $tchp_tokens_ver  = file_exists($tchp_tokens_path) ? filemtime($tchp_tokens_path) : '1.0.0';
     $tchp_hp_ver      = file_exists($tchp_hp_path) ? filemtime($tchp_hp_path) : '1.0.0';
   ?>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css?v=<?= $tchp_tokens_ver ?>">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css">
@@ -62,7 +59,7 @@ $tchp_head_escape = static function ($value) {
   <?php if (!empty($extra_head)) echo $extra_head; ?>
   <?php if (function_exists('wp_head')) wp_head(); ?>
 </head>
-<body class="tp-headphones font-sans min-h-screen flex flex-col justify-between text-[17px] leading-[1.7]">
+<body class="tp-headphones font-sans min-h-screen flex flex-col justify-between text-base leading-relaxed">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-3 focus:left-3 focus:bg-accent focus:text-ink focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs focus:shadow-md focus:outline-none">
     Перейти к основному содержимому
   </a>
@@ -76,7 +73,7 @@ $tchp_head_escape = static function ($value) {
         <button id="search-modal-trigger" type="button" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[44px] border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
           <?= tp_icon('search', 'w-4 h-4 text-accent') ?>
           <span class="hidden md:inline text-xs text-ink-muted">Поиск</span>
-          <kbd class="hidden md:inline-block text-[10px] font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-faint rounded border border-paper-border">Ctrl+K</kbd>
+          <kbd class="hidden md:inline-block text-stamp font-mono px-1.5 py-0.2 bg-paper-border/60 text-ink-muted dark:text-ink rounded border border-paper-border">Ctrl+K</kbd>
         </button>
         <button id="header-drawer-trigger" type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="inline-flex items-center gap-1.5 px-2.5 sm:px-3 min-h-[44px] border border-paper-border hover:border-accent bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 group" title="Выдвижной микро-верстак (Сплавы, токи, флюсы)" aria-label="Открыть выдвижной верстак">
           <span class="w-1.5 h-1.5 rounded-full bg-cyan inline-block"></span>
@@ -86,7 +83,7 @@ $tchp_head_escape = static function ($value) {
         <button id="theme-toggle" type="button" class="hidden sm:inline-flex sketch-pill-gray hover:border-ink/50 text-ink font-mono text-xs min-h-[44px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
           <?= tp_icon('moon', 'w-4 h-4 dark:hidden') ?>
           <?= tp_icon('sun', 'w-4 h-4 hidden dark:inline') ?>
-          <span class="text-xs text-ink-muted dark:text-ink-faint font-mono">Тема</span>
+          <span class="text-xs text-ink-muted dark:text-ink font-mono">Тема</span>
         </button>
         <?php if ($current_page === 'interactive'): ?>
           <a class="hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] border border-paper-border-dark dark:border-paper-border bg-ink text-paper text-xs font-mono font-medium rounded hover:opacity-90 transition-opacity" href="<?= esc_url($site_root) ?>#articles" aria-label="Читать статьи журнала">

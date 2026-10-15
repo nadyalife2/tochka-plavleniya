@@ -5,7 +5,7 @@
  */
 ?>
 <!-- Global Search Modal Container -->
-<div id="search-modal" role="dialog" aria-modal="true" aria-labelledby="global-search-input">
+<div id="search-modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="global-search-input">
   <div id="search-modal-box">
     
     <!-- Search Header / Input Bar -->
@@ -19,21 +19,34 @@
              spellcheck="false">
       <div class="flex items-center gap-1.5 ml-2">
         <kbd class="hidden sm:inline-block text-[11px] font-mono px-2 py-0.5 bg-paper-border/50 text-ink-muted rounded border border-paper-border select-none">ESC</kbd>
-        <button type="button" id="search-modal-close" class="p-1 text-ink-muted hover:text-ink transition-colors min-w-[36px] min-h-[36px] flex items-center justify-center rounded" aria-label="Закрыть поиск">
+        <button type="button" id="search-modal-close" class="p-2 text-ink-muted hover:text-ink hover:bg-paper-border/30 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center rounded border border-paper-border sm:border-transparent cursor-pointer" aria-label="Закрыть поиск" title="Закрыть поиск (Esc)">
           <?= tp_icon('x', 'w-5 h-5') ?>
         </button>
+
       </div>
     </div>
 
     <!-- Filter Category Badges -->
     <div class="flex items-center gap-1.5 px-4 py-2 border-b border-paper-border/70 overflow-x-auto text-xs font-mono scrollbar-none bg-paper/30 relative">
       <span class="text-ink-faint text-[11px] uppercase mr-1 select-none">Раздел:</span>
-      <button type="button" data-filter="all" class="search-category-pill active px-2.5 py-1 rounded bg-[#fde047] dark:bg-[#ca8a04]/40 text-ink font-bold -rotate-1 transition-all">Все</button>
-      <button type="button" data-filter="сплавы" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Сплавы</button>
-      <button type="button" data-filter="флюсы" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Флюсы</button>
-      <button type="button" data-filter="дефекты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Дефекты</button>
-      <button type="button" data-filter="инструменты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Инструменты</button>
-      <button type="button" data-filter="стандарты" class="search-category-pill px-2.5 py-1 rounded border border-paper-border text-ink-muted hover:text-ink transition-all">Стандарты</button>
+      <button type="button" data-filter="all" class="search-category-pill active px-2.5 py-1 rounded">Все</button>
+      <button type="button" data-filter="сплавы" class="search-category-pill px-2.5 py-1 rounded">Сплавы</button>
+      <button type="button" data-filter="флюсы" class="search-category-pill px-2.5 py-1 rounded">Флюсы</button>
+      <button type="button" data-filter="дефекты" class="search-category-pill px-2.5 py-1 rounded">Дефекты</button>
+      <button type="button" data-filter="инструменты" class="search-category-pill px-2.5 py-1 rounded">Инструменты</button>
+      <button type="button" data-filter="стандарты" class="search-category-pill px-2.5 py-1 rounded">Стандарты</button>
+    </div>
+
+    <!-- Onboarding Quick Start Chips (1-Click Discovery) -->
+    <div id="search-onboard-chips" class="px-4 py-1.5 border-b border-paper-border/40 bg-paper-subtle/40 flex items-center justify-between gap-2 overflow-x-auto scrollbar-none text-xs font-mono">
+      <div class="flex items-center gap-1.5 shrink-0">
+        <span class="text-ink-faint text-[10px] uppercase tracking-wider font-bold">Быстрый старт:</span>
+        <button type="button" class="search-quick-chip px-2 py-0.5 rounded border border-paper-border bg-paper hover:border-accent hover:text-accent transition-colors text-[11px] cursor-pointer" data-query="ПОС-61">ПОС-61</button>
+        <button type="button" class="search-quick-chip px-2 py-0.5 rounded border border-paper-border bg-paper hover:border-accent hover:text-accent transition-colors text-[11px] cursor-pointer" data-query="SAC305">SAC305</button>
+        <button type="button" class="search-quick-chip px-2 py-0.5 rounded border border-paper-border bg-paper hover:border-accent hover:text-accent transition-colors text-[11px] cursor-pointer" data-query="RMA-218">RMA-218</button>
+        <button type="button" class="search-quick-chip px-2 py-0.5 rounded border border-paper-border bg-paper hover:border-accent hover:text-accent transition-colors text-[11px] cursor-pointer" data-query="Мостики">Мостики</button>
+      </div>
+      <span class="text-[10px] text-ink-faint hidden sm:inline select-none">1 клик для поиска</span>
     </div>
 
     <!-- Live Search Results List -->
@@ -48,7 +61,7 @@
         <span><kbd class="px-1.5 py-0.5 bg-paper-border/60 rounded border border-paper-border text-ink">Enter</kbd> Выбрать</span>
       </div>
       <span class="text-accent font-semibold flex items-center gap-1">
-        <span class="w-1.5 h-1.5 rounded-full bg-accent animate-pulse"></span> ТЧП // Инженерная база
+        <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span> ТЧП // Инженерная база
       </span>
     </div>
 
@@ -383,14 +396,22 @@
   // Filter pills
   categoryPills.forEach(pill => {
     pill.addEventListener('click', () => {
-      categoryPills.forEach(p => {
-        p.classList.remove('bg-[#fde047]', 'dark:bg-[#ca8a04]/40', 'text-ink', 'font-bold', 'active', '-rotate-1');
-        p.classList.add('border', 'border-paper-border', 'text-ink-muted');
-      });
-      pill.classList.remove('border', 'border-paper-border', 'text-ink-muted');
-      pill.classList.add('bg-[#fde047]', 'dark:bg-[#ca8a04]/40', 'text-ink', 'font-bold', 'active', '-rotate-1');
+      categoryPills.forEach(p => p.classList.remove('active'));
+      pill.classList.add('active');
       currentCategory = pill.dataset.filter;
       renderResults(searchInput.value.trim());
+    });
+  });
+
+  // Quick Start Onboarding Chips click listener
+  document.querySelectorAll('.search-quick-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const q = chip.dataset.query || chip.textContent.trim();
+      if (searchInput) {
+        searchInput.value = q;
+        searchInput.focus();
+        renderResults(q);
+      }
     });
   });
 
@@ -413,8 +434,8 @@
           <div class="w-10 h-10 mx-auto mb-2 text-ink-faint flex items-center justify-center">
             <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/><line x1="8" y1="8" x2="14" y2="14"/></svg>
           </div>
-          <p class="font-mono text-sm break-words max-w-full">Ничего не найдено по запросу «${escapeHtml(query)}»</p>
-          <p class="text-xs text-ink-faint mt-1 max-w-md mx-auto">Попробуйте ввести марку припоя (ПОС-61), флюса (RMA-218) или тип дефекта.</p>
+          <p class="font-mono text-sm break-words max-w-full font-bold text-ink">В базе знаний пока нет материала по запросу «${escapeHtml(query)}»</p>
+          <p class="text-xs text-ink-muted mt-1.5 max-w-md mx-auto leading-relaxed">Проверьте опечатки или воспользуйтесь быстрыми фильтрами разделов: Сплавы, Флюсы, Дефекты или Инструменты.</p>
         </div>
       `;
       activeIndex = -1;
@@ -467,9 +488,13 @@
   }
 
   // Keyboard navigation inside search results
+  let searchRaf = null;
   if (searchInput) {
     searchInput.addEventListener('input', () => {
-      renderResults(searchInput.value.trim());
+      if (searchRaf) cancelAnimationFrame(searchRaf);
+      searchRaf = requestAnimationFrame(() => {
+        renderResults(searchInput.value.trim());
+      });
     });
 
     searchInput.addEventListener('keydown', (e) => {

@@ -172,7 +172,6 @@ foreach ($faq_items as $q => $a) {
 <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css"/>
 <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css"/>
 <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css"/>
 <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/article.css"/>
 
@@ -192,29 +191,29 @@ foreach ($faq_items as $q => $a) {
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--color-paper-border-dark);
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
   }
 
   /* Safety & Caution Callouts (Safety First for DIY & High Voltage) */
   .callout-safety {
-    border: 1px solid var(--color-danger-border, rgba(234, 88, 12, 0.35));
-    background: var(--color-danger-bg, rgba(255, 247, 237, 0.8));
-    border-radius: 6px;
+    border: 1px solid var(--color-danger-border);
+    background: var(--color-danger-bg);
+    border-radius: var(--radius-md);
     padding: 1rem 1.25rem;
     margin: 1.5rem 0;
-    color: #9a3412;
+    color: var(--color-danger);
   }
   .callout-safety strong {
-    color: #7c2d12;
+    color: var(--color-danger);
   }
   html.dark .callout-safety {
-    border-color: rgba(234, 88, 12, 0.4);
-    border-left-color: #f97316;
-    background: rgba(67, 26, 7, 0.3);
-    color: #fed7aa;
+    border-color: var(--color-danger-border);
+    border-left-color: var(--color-accent);
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
   }
   html.dark .callout-safety strong {
-    color: #ffedd5;
+    color: var(--color-danger);
   }
 
   /* Responsive BOM / Data Tables for DIY Articles */
@@ -222,11 +221,11 @@ foreach ($faq_items as $q => $a) {
   .bom-table {
     width: 100%;
     border-collapse: collapse;
-    font-size: 0.85rem;
+    font-size: var(--text-sm);
     margin: 1.5rem 0;
     text-align: left;
     border: 1px solid var(--color-paper-border);
-    border-radius: 6px;
+    border-radius: var(--radius-md);
     overflow: hidden;
   }
   .prose thead th,
@@ -234,7 +233,7 @@ foreach ($faq_items as $q => $a) {
     background: var(--color-paper-subtle);
     padding: 0.65rem 0.85rem;
     font-family: var(--font-mono, monospace);
-    font-size: 0.72rem;
+    font-size: var(--text-stamp);
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -290,7 +289,7 @@ include __DIR__ . '/includes/header.php';
 <div id="reading-progress-bar" aria-hidden="true"></div>
 
 <!-- CAD Ruler Sidelines (visible > 1320px) -->
-<div class="cad-ruler-track left" aria-hidden="true">
+<div class="hidden xl:flex cad-ruler-track left" aria-hidden="true">
   <span>0 mm</span>
   <span>50</span>
   <span>100 mm</span>
@@ -301,7 +300,7 @@ include __DIR__ . '/includes/header.php';
   <span>350</span>
   <span>400 mm</span>
 </div>
-<div class="cad-ruler-track right" aria-hidden="true">
+<div class="hidden xl:flex cad-ruler-track right" aria-hidden="true">
   <span>[SEC.01]</span>
   <span>• • •</span>
   <span>[IPC-610]</span>
@@ -316,7 +315,7 @@ include __DIR__ . '/includes/header.php';
   <div class="max-w-[1140px] mx-auto px-5 sm:px-8">
     
     <!-- Breadcrumbs -->
-    <nav class="text-[12px] font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap" aria-label="Хлебные крошки">
+    <nav class="text-xs font-mono text-ink-faint mb-8 flex items-center gap-1.5 flex-wrap" aria-label="Хлебные крошки">
       <a class="hover:text-ink transition-colors" href="index.php">Главная</a>
       <span>→</span>
       <?php if (!empty($lesson)): ?>
@@ -344,16 +343,16 @@ include __DIR__ . '/includes/header.php';
           <div class="flex items-center justify-between pb-3 border-b border-paper-border text-xs font-mono">
             <div class="flex items-center gap-2">
               <div class="w-7 h-7 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink shrink-0 shadow-xs">
-                <span class="material-symbols-outlined text-[16px] text-accent">precision_manufacturing</span>
+                <?= tp_icon('wrench', 'w-4 h-4 text-accent') ?>
               </div>
               <span class="font-bold text-ink uppercase tracking-wider">ТЕХРЕГЛАМЕНТ // ОТК-2026</span>
             </div>
             <div class="flex items-center gap-2">
-              <button type="button" onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted hover:text-ink text-[11px] font-mono font-medium transition-colors cursor-pointer" title="Распечатать технологическую карту (Ctrl+P)">
-                <span class="material-symbols-outlined text-[14px]">print</span>
+              <button type="button" onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted hover:text-ink text-stamp font-mono font-medium transition-colors cursor-pointer" title="Распечатать технологическую карту (Ctrl+P)">
+                <?= tp_icon('printer', 'w-3.5 h-3.5') ?>
                 <span>Печать техкарты</span>
               </button>
-              <span class="font-mono text-[10px] font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
+              <span class="font-mono text-stamp font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
                 IPC-A-610G // КЛАСС 2
               </span>
             </div>
@@ -361,27 +360,24 @@ include __DIR__ . '/includes/header.php';
 
           <!-- Article Header Block -->
           <header class="space-y-4">
-            <div class="text-[11px] font-mono uppercase tracking-wider text-accent font-bold">
-              [ РЕГЛАМЕНТ МОНТАЖА // СТАНДАРТ ТЧП-2026 ]
-            </div>
-            <h1 class="text-3xl sm:text-[38px] font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
+            <h1 class="text-3xl sm:text-4xl font-bold text-ink tracking-[-0.03em] leading-[1.18] font-sans">
               <?= e($lesson ? $lesson['title'] : $article['title']) ?>
             </h1>
 
             <!-- Meta line -->
-            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-[13px] text-ink-muted font-mono pt-1 pb-2 border-b border-paper-border/60">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-ink-muted font-mono pt-1 pb-2 border-b border-paper-border/60">
               <div class="flex items-center gap-2">
-                <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-[11px] flex items-center justify-center font-bold text-ink">ТП</span>
+                <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-stamp flex items-center justify-center font-bold text-ink">ТП</span>
                 <span class="text-ink"><?= e($lesson ? $lesson['author'] : ($article['author'] ?? 'Инженер Лаборатории ТЧП')) ?></span>
               </div>
               <span class="text-ink-faint">·</span>
               <time datetime="<?= e($lesson ? $lesson['date'] : ($article['date'] ?? '2026-08-20')) ?>"><?= e($lesson ? $lesson['date'] : ($article['date'] ?? '20 августа 2026')) ?></time>
               <span class="text-ink-faint">·</span>
-              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">schedule</span>~<?= e($lesson ? $lesson['read_min'] : ($article['read_min'] ?? 8)) ?> мин чтения</span>
+              <span class="flex items-center gap-1"><?= tp_icon('clock', 'w-3.5 h-3.5') ?>~<?= e($lesson ? $lesson['read_min'] : ($article['read_min'] ?? 8)) ?> мин чтения</span>
               <span class="text-ink-faint">·</span>
-              <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">school</span>Уровень: <?= e($lesson ? $lesson['difficulty'] : ($article['difficulty'] ?? 'Инженер')) ?></span>
+              <span class="flex items-center gap-1"><?= tp_icon('graduation-cap', 'w-3.5 h-3.5') ?>Уровень: <?= e($lesson ? $lesson['difficulty'] : ($article['difficulty'] ?? 'Инженер')) ?></span>
               <span class="text-ink-faint">·</span>
-              <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><span class="material-symbols-outlined text-[14px]">verified</span>Проверено</span>
+              <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><?= tp_icon('shield-check', 'w-3.5 h-3.5') ?>Проверено</span>
             </div>
 
             <!-- Adafruit / SparkFun Quick-Spec Passport Bar -->
@@ -408,14 +404,14 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <?php if (!empty($lesson)): ?>
-            <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
+            <div class="mt-2 flex flex-wrap items-center gap-2 text-xs font-mono">
               <span class="text-ink-muted">Оснастка:</span>
               <?php foreach (array_keys($lesson['required_tools']) as $tool): ?>
                 <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
               <?php endforeach; ?>
             </div>
             <?php elseif (!empty($article['required_tools'])): ?>
-            <div class="mt-2 flex flex-wrap items-center gap-2 text-[12px] font-mono">
+            <div class="mt-2 flex flex-wrap items-center gap-2 text-xs font-mono">
               <span class="text-ink-muted">Понадобится:</span>
               <?php foreach ($article['required_tools'] as $tool): ?>
                 <span class="bg-paper-subtle px-1.5 py-0.5 rounded border border-paper-border text-ink"><?= e($tool) ?></span>
@@ -458,9 +454,9 @@ include __DIR__ . '/includes/header.php';
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Оснастка и инструмент -->
             <div class="p-4 rounded-lg bg-paper-subtle border border-paper-border space-y-2.5">
-              <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-ink pb-1.5 border-b border-paper-border flex items-center justify-between">
+              <div class="text-stamp font-mono font-bold uppercase tracking-wider text-ink pb-1.5 border-b border-paper-border flex items-center justify-between">
                 <span>Инструмент и материалы</span>
-                <span class="text-accent text-[10px] font-bold">SPECS</span>
+                <span class="text-accent text-stamp font-bold">SPECS</span>
               </div>
               <dl class="space-y-2 text-xs font-mono">
                 <?php foreach ($lesson['required_tools'] as $tool_name => $tool_desc): ?>
@@ -474,9 +470,9 @@ include __DIR__ . '/includes/header.php';
 
             <!-- Режимы и допуски -->
             <div class="p-4 rounded-lg bg-paper-subtle border border-paper-border space-y-2.5">
-              <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-ink pb-1.5 border-b border-paper-border flex items-center justify-between">
+              <div class="text-stamp font-mono font-bold uppercase tracking-wider text-ink pb-1.5 border-b border-paper-border flex items-center justify-between">
                 <span>Параметры техпроцесса</span>
-                <span class="text-emerald-600 dark:text-emerald-400 text-[10px] font-bold">TOLERANCE</span>
+                <span class="text-emerald-600 dark:text-emerald-400 text-stamp font-bold">TOLERANCE</span>
               </div>
               <dl class="space-y-2 text-xs font-mono">
                 <?php foreach ($lesson['key_specs'] as $spec_name => $spec_val): ?>
@@ -519,7 +515,7 @@ include __DIR__ . '/includes/header.php';
               <svg class="w-4 h-4 stroke-current inline-block shrink-0" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
               КАТЕГОРИЧЕСКИ ЗАПРЕЩЕНО // ОПАСНОСТЬ БРАКА
             </span>
-            <span class="px-2 py-0.5 text-[10px] bg-paper text-ink border border-paper-border-dark rounded font-bold uppercase">СТОП</span>
+            <span class="px-2 py-0.5 text-stamp bg-paper text-ink border border-paper-border-dark rounded font-bold uppercase">СТОП</span>
           </div>
           <h3 class="font-mono text-sm font-bold text-ink">
             <?= e($lesson['danger_rule']['title']) ?>
@@ -563,7 +559,7 @@ include __DIR__ . '/includes/header.php';
         <div class="p-5 rounded-lg border border-paper-border bg-paper-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs">
           <div class="space-y-1">
             <div class="font-mono text-xs font-bold uppercase tracking-wider text-accent flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-base">construction</span>
+              <?= tp_icon('wrench', 'w-4 h-4 text-accent') ?>
               <span>Интерактивный верстак ТЧП</span>
             </div>
             <h3 class="text-base sm:text-lg font-bold text-ink">Рассчитайте параметры для вашей задачи</h3>
@@ -571,7 +567,7 @@ include __DIR__ . '/includes/header.php';
           </div>
           <a href="<?= e($lesson['interactive_link']['url']) ?>" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded bg-ink hover:bg-ink-muted text-paper text-xs font-mono font-bold transition-colors shadow-sm shrink-0 sm:whitespace-nowrap text-center">
             <span><?= e($lesson['interactive_link']['label']) ?></span>
-            <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+            <?= tp_icon('arrow-right', 'w-4 h-4') ?>
           </a>
         </div>
 
@@ -579,7 +575,7 @@ include __DIR__ . '/includes/header.php';
         <?php if (!empty($lesson['faq'])): ?>
         <section class="bg-paper border border-paper-border rounded-lg p-5 sm:p-6 space-y-4 shadow-sm" id="lesson-faq">
           <div class="flex items-center gap-2 pb-3 border-b border-paper-border">
-            <span class="material-symbols-outlined text-accent text-xl">help_outline</span>
+            <?= tp_icon('alert-triangle', 'w-5 h-5 text-accent') ?>
             <h2 class="text-base sm:text-lg font-bold font-mono uppercase tracking-tight text-ink">Частые вопросы по регламенту</h2>
           </div>
 
@@ -659,7 +655,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Callout: "Как читать этот регламент" (tochkicamp style box) -->
         <div class="border border-paper-border bg-paper-subtle/50 p-5 rounded-lg text-sm leading-relaxed space-y-2">
 
-          <div class="text-[11px] font-mono font-semibold uppercase tracking-wider text-ink">
+          <div class="text-stamp font-mono font-semibold uppercase tracking-wider text-ink">
             КАК ЧИТАТЬ ЭТОТ РЕГЛАМЕНТ
           </div>
           <p class="text-ink/80">
@@ -670,10 +666,10 @@ include __DIR__ . '/includes/header.php';
         <!-- TL;DR Sticky Post-It Note (Yellow with dark mode parity) -->
         <div class="postit-yellow p-5 rounded-lg relative my-6">
           <div class="flex items-center gap-2 mb-2">
-            <span class="material-symbols-outlined text-xl text-brand-orange">push_pin</span>
+            <?= tp_icon('pin', 'w-5 h-5 text-accent') ?>
             <h3 class="font-hand text-2xl font-bold text-ink">В двух словах (TL;DR)</h3>
           </div>
-          <p class="text-[16px] leading-relaxed text-ink/90">
+          <p class="text-base leading-relaxed text-ink/90">
             <strong>Ключевая мысль:</strong> Нагрев должен быть двухсторонним (нижний подогрев 140–160°C обязателен). Без нижнего подогрева верхний фен перегревает чип до деструкции кремния, пока нижние слои меди остаются холодными.
           </p>
         </div>
@@ -684,17 +680,17 @@ include __DIR__ . '/includes/header.php';
             1. Теплоемкость текстолита и почему фен всегда врет
           </h2>
           <p class="text-ink/85">
-            Стандартная ошибка при пайке сложных чипов — выставлять на станции фиксированные 350°C и греть плату сверху. Датчик станции измеряет температуру спирали внутри фена, а на поверхности текстолита и тем более под корпусом BGA температура оказывается <mark>на 80–120°C ниже</mark>.
+            Стандартная ошибка при пайке сложных чипов — выставлять на станции фиксированные 350°C и греть плату сверху. Датчик станции измеряет температуру спирали внутри фена, а на поверхности текстолита и тем более под корпусом BGA температура оказывается <strong>на 80–120°C ниже</strong>.
           </p>
           
           <!-- Inline quote/highlight line -->
           <div class="relative border border-paper-border bg-paper-subtle/70 px-5 py-3.5 my-4 rounded-lg shadow-xs">
-            <div class="text-lg sm:text-[21px] font-serif italic text-ink leading-relaxed tracking-[-0.01em]">«Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую».</div>
-            <div class="mt-2 font-serif italic text-[13px] text-ink-muted flex items-center gap-1.5"><span class="font-mono not-italic text-xs text-ink">—</span> заметка на полях лабораторного журнала</div>
+            <div class="text-lg sm:text-xl font-serif italic text-ink leading-relaxed tracking-[-0.01em]">«Температура на сопле фена не имеет ничего общего с температурой припоя под чипом. Без замера на плате вы паяете вслепую».</div>
+            <div class="mt-2 font-serif italic text-xs text-ink-muted flex items-center gap-1.5"><span class="font-mono not-italic text-xs text-ink">—</span> заметка на полях лабораторного журнала</div>
           </div>
 
           <p class="text-ink/85">
-            Плата состоит из 6–12 слоев FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: текстолит изгибается «лодочкой» (<span class="font-mono text-[13px] bg-paper-subtle px-1 rounded">warpage</span>), а центральные шарики слипаются в короткое замыкание.
+            Плата состоит из 6–12 слоев FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: текстолит изгибается «лодочкой» (<span class="font-mono text-xs bg-paper-subtle px-1 rounded">warpage</span>), а центральные шарики слипаются в короткое замыкание.
           </p>
 
           <!-- Рис. 1: Эскиз термического градиента из Stitch -->
@@ -704,13 +700,13 @@ include __DIR__ . '/includes/header.php';
             </div>
             <figcaption class="px-1 text-xs font-mono text-ink-muted leading-relaxed flex items-center justify-between">
               <span><span class="text-ink font-semibold">Рис. 1.</span> Эскиз термического градиента при локальном нагреве соплом фена.</span>
-              <span class="hidden sm:inline-block text-[11px] text-ink-faint uppercase">IPC/JEDEC</span>
+              <span class="hidden sm:inline-block text-stamp text-ink-faint uppercase">IPC/JEDEC</span>
             </figcaption>
           </figure>
 
           <!-- Minimal Specs Flow Chips -->
           <div class="py-2">
-            <div class="text-[11px] font-mono text-ink-faint uppercase mb-2">Опорные значения стандарта IPC/JEDEC:</div>
+            <div class="text-stamp font-mono text-ink-faint uppercase mb-2">Опорные значения стандарта IPC/JEDEC:</div>
             <div class="flex flex-wrap items-center gap-2 font-mono text-xs">
               <span class="sketch-pill-gray text-ink">Ликвидус SAC305: <span class="font-bold">217°C</span></span>
               <span class="text-ink-faint">→</span>
@@ -727,16 +723,16 @@ include __DIR__ . '/includes/header.php';
             <div class="flex-1 min-w-0 pr-4 space-y-1">
               <div class="flex items-center gap-2">
                 <span class="w-6 h-6 rounded border border-paper-border bg-paper flex items-center justify-center text-ink text-xs font-mono shadow-xs">
-                  <span class="material-symbols-outlined text-[15px]">build</span>
+                  <?= tp_icon('wrench', 'w-3.5 h-3.5 text-accent') ?>
                 </span>
-                <span class="font-mono text-[11px] font-bold text-ink uppercase tracking-wider">Интерактивный верстак</span>
+                <span class="font-mono text-stamp font-bold text-ink uppercase tracking-wider">Интерактивный верстак</span>
               </div>
               <h3 class="text-base sm:text-lg font-bold text-ink pt-0.5">Рассчитайте параметры для вашей платы</h3>
               <p class="text-xs sm:text-sm text-ink-muted leading-relaxed">Используйте селектор флюса и калькулятор расхода припоя перед началом работы.</p>
             </div>
             <a href="interactive.php#solder-consumption" class="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 min-h-[40px] bg-ink hover:bg-ink-muted text-paper rounded font-mono text-xs font-medium transition-colors shadow-sm shrink-0 whitespace-nowrap text-center">
               <span>Открыть инструменты</span>
-              <span class="material-symbols-outlined text-[16px]" aria-hidden="true">arrow_forward</span>
+              <?= tp_icon('arrow-right', 'w-4 h-4') ?>
             </a>
           </div>
         </section>
@@ -750,18 +746,18 @@ include __DIR__ . '/includes/header.php';
             <p class="text-ink/85 mt-2">
               Технологический профиль пайки оплавлением регламентируется стандартом <code class="font-mono text-xs font-medium px-1.5 py-0.5 bg-paper-subtle border border-paper-border rounded text-ink">IPC-7530A</code> и TDS паяльных паст. Процесс сводится к четырёхступенчатому контролируемому циклу (не путать с квалификационным стресс-тестом компонентов по J-STD-020E):
             </p>
-            <div class="my-3 inline-flex flex-wrap items-center gap-3 p-2.5 rounded border border-ink/40 bg-callout transform -rotate-[0.5deg] text-xs font-mono text-ink shadow-sm">
-              <div class="flex items-center gap-1.5 px-2 py-0.5 bg-ink text-paper rounded text-[11px] font-bold tracking-wider uppercase"><span class="w-1.5 h-1.5 rounded-full bg-accent"></span><span>IPC-7530A</span></div>
-              <div class="text-ink text-xs font-semibold tracking-tight">ПРОФИЛИРОВАНИЕ ОПЛАВЛЕНИЯ ПЕЧИ</div>
-              <span class="text-ink-faint text-[11px] hidden sm:inline-block">|</span>
-              <div class="text-ink-muted text-[11px] font-sans flex items-center gap-1"><span class="material-symbols-outlined text-[13px] text-brand-orange align-middle">warning</span>ПРЕДЕЛ НАГРЕВА: НЕ БОЛЕЕ 2.0–2.5 °C/с (ОПАСНОСТЬ ДЕЛАМИНАЦИИ)</div>
+            <div class="my-3 inline-flex flex-wrap items-center gap-2.5 p-2 rounded border border-paper-border bg-paper-subtle text-xs font-mono text-ink">
+              <span class="px-2 py-0.5 bg-ink text-paper rounded text-stamp font-bold tracking-wider uppercase">IPC-7530A</span>
+              <span class="text-ink font-semibold">Профилирование оплавления печи</span>
+              <span class="text-ink-faint text-stamp hidden sm:inline-block">|</span>
+              <span class="text-ink-muted text-xs font-sans flex items-center gap-1"><?= tp_icon('alert-triangle', 'w-3.5 h-3.5 text-warning align-middle') ?>Предел нагрева: не более 2.0–2.5 °C/с (риск деламинации)</span>
             </div>
           </div>
 
           <!-- Hand-Drawn Sketch Graph SVG (Light & Dark Parity) -->
           <div class="sketch-frame p-4 sm:p-6 my-6 relative overflow-hidden">
             <div class="font-hand text-xl font-bold text-ink mb-3 flex items-center gap-2">
-              <span class="material-symbols-outlined text-lg text-brand-orange">show_chart</span>
+              <?= tp_icon('chart-line', 'w-5 h-5 text-accent') ?>
               Схема нагрева: T°C / Время (сек)
             </div>
             
@@ -796,7 +792,7 @@ include __DIR__ . '/includes/header.php';
                 <text x="470" y="202" font-family="JetBrains Mono" font-size="11" class="fill-ink-muted">300s</text>
               </svg>
             </div>
-            <div class="mt-3 text-[11px] font-mono text-ink-faint flex items-center justify-between">
+            <div class="mt-3 text-stamp font-mono text-ink-faint flex items-center justify-between">
               <span>Рис. 2. Нормированная кривая SAC305 (Liquidus 217°C)</span>
               <span class="uppercase">IPC/JEDEC J-STD-020</span>
             </div>
@@ -810,17 +806,17 @@ include __DIR__ . '/includes/header.php';
                 <span class="text-ink-muted font-mono text-xs">1–3°C/с</span>
               </div>
               <div class="font-semibold text-ink text-sm">Прогрев (Preheat)</div>
-              <p class="text-[13px] text-ink-muted leading-snug">
+              <p class="text-xs text-ink-muted leading-snug">
                 Плавный подъем до 150°C для испарения легких фракций растворителя флюса.
               </p>
             </div>
             <div class="p-4 bg-paper rounded border border-paper-border space-y-1.5">
               <div class="flex items-center justify-between text-xs font-mono pb-1">
-                <span class="px-1.5 py-0.5 text-[11px] uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 2</span>
+                <span class="px-1.5 py-0.5 text-stamp uppercase font-mono text-ink-muted bg-paper-subtle border border-paper-border rounded">ФАЗА 2</span>
                 <span class="text-ink-muted font-mono text-xs">150–200°C</span>
               </div>
               <div class="font-semibold text-ink text-sm">Активация (Soak)</div>
-              <p class="text-[13px] text-ink-muted leading-snug">
+              <p class="text-xs text-ink-muted leading-snug">
                 Выравнивание температурного поля чипа и платы, удаление поверхностных оксидов.
               </p>
             </div>
@@ -830,7 +826,7 @@ include __DIR__ . '/includes/header.php';
                 <span class="font-semibold text-[#c2410c] dark:text-[#fdba74] font-mono text-xs">Пик 235–245°C</span>
               </div>
               <div class="font-semibold text-ink text-sm">Оплавление (Reflow)</div>
-              <p class="text-[13px] text-ink-muted leading-snug">
+              <p class="text-xs text-ink-muted leading-snug">
                 Время TAL над ликвидусом 45–75 сек. Формирование интерметаллического слоя.
               </p>
             </div>
@@ -840,7 +836,7 @@ include __DIR__ . '/includes/header.php';
                 <span class="text-ink dark:text-[#5eead4] font-mono text-xs font-semibold">2–4°C/с</span>
               </div>
               <div class="font-semibold text-ink text-sm">Охлаждение (Cooling)</div>
-              <p class="text-[13px] text-ink-muted leading-snug">
+              <p class="text-xs text-ink-muted leading-snug">
                 Контролируемый спад для мелкозернистой кристаллической структуры галтели.
               </p>
             </div>
@@ -850,7 +846,7 @@ include __DIR__ . '/includes/header.php';
           <div class="border border-paper-border rounded-lg bg-paper-subtle/70 p-5 sm:p-6 space-y-5" id="simulator">
             <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 pb-2 border-b border-paper-border">
               <div>
-                <div class="text-[11px] font-mono text-ink-faint uppercase tracking-wider">Инженерный калькулятор</div>
+                <div class="text-stamp font-mono text-ink-faint uppercase tracking-wider">Инженерный калькулятор</div>
                 <h3 class="text-lg font-bold text-ink">Профиль термостола и фена</h3>
               </div>
               
@@ -871,19 +867,19 @@ include __DIR__ . '/includes/header.php';
             <!-- Phase Switcher Tabs -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-left" id="stage-tabs">
               <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="0" type="button">
-                <div class="text-[11px] font-mono text-ink-faint">01 ПРОГРЕВ</div>
+                <div class="text-stamp font-mono text-ink-faint">01 ПРОГРЕВ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-0">25°C → 150°C</div>
               </button>
               <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="1" type="button">
-                <div class="text-[11px] font-mono text-ink-faint">02 АКТИВАЦИЯ</div>
+                <div class="text-stamp font-mono text-ink-faint">02 АКТИВАЦИЯ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-1">150°C → 190°C</div>
               </button>
               <button class="stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all shadow-sm" data-stage="2" type="button">
-                <div class="text-[11px] font-mono text-ink font-semibold">03 ОПЛАВЛЕНИЕ *</div>
+                <div class="text-stamp font-mono text-ink font-semibold">03 ОПЛАВЛЕНИЕ *</div>
                 <div class="text-xs font-mono text-ink font-semibold mt-0.5" id="tab-temp-2">217°C → 240°C</div>
               </button>
               <button class="stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark" data-stage="3" type="button">
-                <div class="text-[11px] font-mono text-ink-faint">04 ОХЛАЖДЕНИЕ</div>
+                <div class="text-stamp font-mono text-ink-faint">04 ОХЛАЖДЕНИЕ</div>
                 <div class="text-xs font-mono text-ink mt-0.5" id="tab-temp-3">240°C → 100°C</div>
               </button>
             </div>
@@ -893,7 +889,7 @@ include __DIR__ . '/includes/header.php';
               <div class="flex flex-wrap items-center justify-between gap-3 pb-2 border-b border-paper-border">
                 <div class="flex items-center gap-2">
                   <span class="text-xs font-mono px-1.5 py-0.5 bg-ink text-paper rounded font-bold" id="detail-tag">ФАЗА 03</span>
-                  <span class="font-semibold text-ink text-[15px]" id="detail-title">Оплавление (Reflow) — 217°C → 240°C</span>
+                  <span class="font-semibold text-ink text-sm" id="detail-title">Оплавление (Reflow) — 217°C → 240°C</span>
                 </div>
                 <button class="font-mono text-xs text-ink-muted hover:text-ink underline decoration-paper-border-dark flex items-center gap-1" id="copy-stage-btn" type="button">
                   <span id="copy-btn-text">Скопировать параметры</span>
@@ -903,31 +899,31 @@ include __DIR__ . '/includes/header.php';
               <!-- Numerical parameters grid -->
               <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[11px]">СКОРОСТЬ / TAL</div>
+                  <div class="text-ink-faint text-stamp">СКОРОСТЬ / TAL</div>
                   <div class="text-ink font-semibold mt-1" id="detail-speed">TAL: 45 — 75 сек</div>
                 </div>
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[11px]">ДЛИТЕЛЬНОСТЬ</div>
+                  <div class="text-ink-faint text-stamp">ДЛИТЕЛЬНОСТЬ</div>
                   <div class="text-ink font-semibold mt-1" id="detail-duration">Пик: 10 — 20 сек</div>
                 </div>
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[11px]">НИЖНИЙ ПОДОГРЕВ</div>
+                  <div class="text-ink-faint text-stamp">НИЖНИЙ ПОДОГРЕВ</div>
                   <div class="text-ink font-semibold mt-1" id="detail-bottom">170°C — 185°C</div>
                 </div>
                 <div class="p-2 bg-paper-subtle rounded border border-paper-border">
-                  <div class="text-ink-faint text-[11px]">СОПЛО ФЕНА</div>
+                  <div class="text-ink-faint text-stamp">СОПЛО ФЕНА</div>
                   <div class="text-ink font-semibold mt-1" id="detail-top">255°C (35 л/мин)</div>
                 </div>
               </div>
 
               <!-- Text notes -->
-              <div class="text-[13px] text-ink-muted space-y-2 pt-1">
+              <div class="text-xs text-ink-muted space-y-2 pt-1">
                 <div>
                   <strong class="text-ink font-medium">Физика процесса:</strong>
                   <span id="detail-desc">Полный переход шариков в жидкую фазу, смачивание контактных площадок и диффузионный рост интерметаллического слоя Cu6Sn5.</span>
                 </div>
-                <div class="p-3 rounded border border-paper-border bg-paper-subtle/50 text-[13px] leading-relaxed flex items-start gap-2.5 text-ink/85 mt-2">
-                  <span class="font-mono text-[11px] uppercase tracking-wider text-ink font-semibold shrink-0 pt-0.5">Внимание:</span>
+                <div class="p-3 rounded border border-paper-border bg-paper-subtle/50 text-xs leading-relaxed flex items-start gap-2.5 text-ink/85 mt-2">
+                  <span class="font-mono text-stamp uppercase tracking-wider text-ink font-semibold shrink-0 pt-0.5">Внимание:</span>
                   <span id="detail-warning" class="text-ink/80">Превышение 248–250°C на кристалле ведет к деламинации кремниевой подложки и необратимому перегреву.</span>
                 </div>
               </div>
@@ -955,26 +951,26 @@ include __DIR__ . '/includes/header.php';
               <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Бессвинцовый стандарт</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase font-semibold">Бессвинцовый стандарт</div>
                     <h3 class="font-bold text-base text-ink">SAC305</h3>
                     <div class="text-xs font-mono text-ink-muted">Sn96.5 Ag3.0 Cu0.5</div>
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">217°C</div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">ликвидус</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase mt-1">ликвидус</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
                   <span class="sketch-pill-gray text-ink font-bold text-xs">235°C — 245°C</span>
                 </div>
-                <p class="text-[13px] text-ink-muted leading-relaxed">
+                <p class="text-xs text-ink-muted leading-relaxed">
                   Заводской монтаж BGA, современные материнские платы и видеокарты. Высокая механическая прочность.
                 </p>
               </div>
               <div class="pt-2 text-right">
-                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('SAC305 | Liquidus: 217C | Reflow Window: 235-245C | TAL: 45-75s'); this.innerText='скопировано!';" type="button">
-                  копировать
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border cursor-pointer" onclick="if(window.TCHP_UI){window.TCHP_UI.copyToClipboard('SAC305 | Liquidus: 217C | Reflow Window: 235-245C | TAL: 45-75s', this);}else{navigator.clipboard.writeText('SAC305 | Liquidus: 217C | Reflow Window: 235-245C | TAL: 45-75s'); this.innerText='[✓ В БУФЕРЕ]';}" type="button">
+                  копировать техпаспорт
                 </button>
               </div>
             </div>
@@ -984,26 +980,26 @@ include __DIR__ . '/includes/header.php';
               <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Свинцовый эвтектик</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase font-semibold">Свинцовый эвтектик</div>
                     <h3 class="font-bold text-base text-ink">ПОС-61 / Sn63Pb37</h3>
                     <div class="text-xs font-mono text-ink-muted">Sn63 Pb37</div>
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">183°C</div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase mt-1">эвтектика</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
                   <span class="sketch-pill-yellow text-ink font-bold text-xs">210°C — 220°C</span>
                 </div>
-                <p class="text-[13px] text-ink-muted leading-relaxed">
+                <p class="text-xs text-ink-muted leading-relaxed">
                   Сервисный ремонт, реболлинг на свинец, мягкая текучесть и зеркальная галтель без микротрещин.
                 </p>
               </div>
               <div class="pt-2 text-right">
-                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('ПОС-61 | Eutectic: 183C | Reflow Window: 210-220C | TAL: 30-50s'); this.innerText='скопировано!';" type="button">
-                  копировать
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border cursor-pointer" onclick="if(window.TCHP_UI){window.TCHP_UI.copyToClipboard('ПОС-61 | Eutectic: 183C | Reflow Window: 210-220C | TAL: 30-50s', this);}else{navigator.clipboard.writeText('ПОС-61 | Eutectic: 183C | Reflow Window: 210-220C | TAL: 30-50s'); this.innerText='[✓ В БУФЕРЕ]';}" type="button">
+                  копировать техпаспорт
                 </button>
               </div>
             </div>
@@ -1013,26 +1009,26 @@ include __DIR__ . '/includes/header.php';
               <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Низкотемпературный</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase font-semibold">Низкотемпературный</div>
                     <h3 class="font-bold text-base text-ink">Sn42Bi58</h3>
                     <div class="text-xs font-mono text-ink-muted">Sn42 Bi58 (Висмутовый)</div>
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">138°C</div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">эвтектика</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase mt-1">эвтектика</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
                   <span class="sketch-pill-gray text-ink font-bold text-xs">165°C — 175°C</span>
                 </div>
-                <p class="text-[13px] text-ink-muted leading-relaxed">
+                <p class="text-xs text-ink-muted leading-relaxed">
                   Монтаж пластиковых FPC-разъемов, OLED-шлейфов и термочувствительных датчиков MEMS без коробления.
                 </p>
               </div>
               <div class="pt-2 text-right">
-                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('Sn42Bi58 | Eutectic: 138C | Reflow Window: 165-175C | TAL: 30-45s'); this.innerText='скопировано!';" type="button">
-                  копировать
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border cursor-pointer" onclick="if(window.TCHP_UI){window.TCHP_UI.copyToClipboard('Sn42Bi58 | Eutectic: 138C | Reflow Window: 165-175C | TAL: 30-45s', this);}else{navigator.clipboard.writeText('Sn42Bi58 | Eutectic: 138C | Reflow Window: 165-175C | TAL: 30-45s'); this.innerText='[✓ В БУФЕРЕ]';}" type="button">
+                  копировать техпаспорт
                 </button>
               </div>
             </div>
@@ -1042,26 +1038,26 @@ include __DIR__ . '/includes/header.php';
               <div class="space-y-2">
                 <div class="flex items-start justify-between">
                   <div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase font-semibold">Сверхнизкоплавкий</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase font-semibold">Сверхнизкоплавкий</div>
                     <h3 class="font-bold text-base text-ink">Сплав Розе</h3>
                     <div class="text-xs font-mono text-ink-muted">Bi50 Pb32 Sn18</div>
                   </div>
                   <div class="text-right">
                     <div class="font-mono text-lg font-bold text-ink leading-none">96°C</div>
-                    <div class="text-[11px] font-mono text-ink-faint uppercase mt-1">плавление</div>
+                    <div class="text-stamp font-mono text-ink-faint uppercase mt-1">плавление</div>
                   </div>
                 </div>
                 <div class="my-2.5 py-1.5 border-y border-paper-border flex items-center justify-between text-xs font-mono">
                   <span class="text-ink-faint uppercase">Окно пайки:</span>
                   <span class="sketch-pill-gray text-ink font-bold text-xs">130°C — 140°C</span>
                 </div>
-                <p class="text-[13px] text-ink-muted leading-relaxed">
+                <p class="text-xs text-ink-muted leading-relaxed">
                   Исключительно для безопасного демонтажа чипов (разбавление тугоплавкого припоя). В чистом виде запрещен!
                 </p>
               </div>
               <div class="pt-2 text-right">
-                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border" onclick="navigator.clipboard.writeText('Сплав Розе | Melting: 96C | Desoldering Window: 130-140C'); this.innerText='скопировано!';" type="button">
-                  копировать
+                <button class="text-xs font-mono text-ink-muted hover:text-ink transition-colors underline decoration-paper-border cursor-pointer" onclick="if(window.TCHP_UI){window.TCHP_UI.copyToClipboard('Сплав Розе | Melting: 96C | Desoldering Window: 130-140C', this);}else{navigator.clipboard.writeText('Сплав Розе | Melting: 96C | Desoldering Window: 130-140C'); this.innerText='[✓ В БУФЕРЕ]';}" type="button">
+                  копировать техпаспорт
                 </button>
               </div>
             </div>
@@ -1090,17 +1086,17 @@ include __DIR__ . '/includes/header.php';
               </div>
               <figcaption class="px-1 text-xs font-mono text-ink-muted leading-relaxed flex items-center justify-between">
                 <span><span class="text-ink font-semibold">Рис. 2.</span> Схема монтажа термопары К-типа возле галтелей шариковых выводов BGA.</span>
-                <span class="hidden sm:inline-block text-[11px] text-ink-faint uppercase">К-тип / Каптон</span>
+                <span class="hidden sm:inline-block text-stamp text-ink-faint uppercase">К-тип / Каптон</span>
               </figcaption>
             </figure>
 
             <div class="border border-paper-border bg-callout p-4 rounded space-y-1.5">
               <div class="flex items-center gap-2">
                 <span class="font-semibold text-ink text-sm">Влажность микросхем (MSL 3)</span>
-                <span class="font-mono text-[11px] px-1.5 py-0.5 rounded bg-paper-subtle text-ink-muted border border-paper-border font-medium">ВАЖНО</span>
+                <span class="font-mono text-stamp px-1.5 py-0.5 rounded bg-paper-subtle text-ink-muted border border-paper-border font-medium">ВАЖНО</span>
               </div>
               <p class="text-sm text-ink-muted leading-relaxed">
-                Если BGA-компонент лежал на воздухе дольше 72 часов, влага в полимере закипает при 230°C и распирает корпус изнутри (<mark>«эффект попкорна»</mark>). Обязательно сушите чип 12–24 часа при 100–110°C перед пайкой.
+                Если BGA-компонент лежал на воздухе дольше 72 часов, влага в полимере закипает при 230°C и распирает корпус изнутри (<strong>«эффект попкорна»</strong>). Обязательно сушите чип 12–24 часа при 100–110°C перед пайкой.
               </p>
             </div>
 
@@ -1116,7 +1112,7 @@ include __DIR__ . '/includes/header.php';
 
         <!-- Summary Box ("Что запомнить") -->
         <div class="border border-paper-border bg-paper p-5 sm:p-6 rounded-lg space-y-3 font-sans">
-          <div class="text-[11px] font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
+          <div class="text-stamp font-mono font-bold uppercase tracking-wider text-ink flex items-center gap-1.5">
             <span>●</span> ЧТО ЗАПОМНИТЬ
           </div>
           <ul class="space-y-2 text-sm text-ink/85 leading-relaxed">
@@ -1130,7 +1126,7 @@ include __DIR__ . '/includes/header.php';
             </li>
             <li class="flex items-start gap-2.5">
               <span class="text-ink-faint font-mono">—</span>
-              <span>Оптимальное время над ликвидусом (TAL) для SAC305 составляет строго <mark>45–75 секунд</mark>.</span>
+              <span>Оптимальное время над ликвидусом (TAL) для SAC305 составляет строго <strong>45–75 секунд</strong>.</span>
             </li>
             <li class="flex items-start gap-2.5">
               <span class="text-ink-faint font-mono">—</span>
@@ -1148,7 +1144,7 @@ include __DIR__ . '/includes/header.php';
         <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: In-Article Native RSYA Ad Container */ ?>
         <!-- In-Article Native RSYA Ad Container -->
         <div class="my-8 p-4 rounded border border-dashed border-paper-border bg-paper-subtle/40 text-center">
-          <div class="text-[11px] font-mono text-ink-faint uppercase mb-1">РЕКЛАМА / ПАРТНЕРСКИЙ БЛОК ЯНДЕКСА</div>
+          <div class="text-stamp font-mono text-ink-faint uppercase mb-1">РЕКЛАМА / ПАРТНЕРСКИЙ БЛОК ЯНДЕКСА</div>
           <div id="yandex_rtb_in_article" class="min-h-[100px] flex items-center justify-center text-xs font-mono text-ink-muted border border-paper-border rounded bg-paper">
             [Контейнер РСЯ In-Article · Адаптивный блок]
           </div>
@@ -1185,43 +1181,43 @@ include __DIR__ . '/includes/header.php';
         <section class="my-8 p-5 sm:p-6 rounded-lg border border-paper-border bg-card space-y-4">
           <div class="flex items-center justify-between border-b border-paper-border pb-3">
             <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-[16px] text-brand-orange">handyman</span>
+              <?= tp_icon('wrench', 'w-4 h-4 text-accent') ?>
               <h3 class="font-bold text-xs sm:text-sm text-ink uppercase font-mono">Проверенное оборудование и химия к статье</h3>
             </div>
-            <span class="text-[11px] font-mono text-ink-faint">МАРКЕТ / ЧИПДИП</span>
+            <span class="text-stamp font-mono text-ink-faint">МАРКЕТ / ЧИПДИП</span>
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-sans">
             <a href="https://market.yandex.ru" target="_blank" rel="sponsored nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
-              <div class="text-[11px] font-mono text-ink-faint uppercase">Термовоздушная станция</div>
+              <div class="text-stamp font-mono text-ink-faint uppercase">Термовоздушная станция</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Quick 861DW (1000W)</div>
-              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Турбированный термофен для BGA чипов</div>
+              <div class="text-stamp text-ink-muted mt-1 leading-snug">Турбированный термофен для BGA чипов</div>
               <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="font-bold text-ink">от 24 500 ₽</span>
-                <span class="text-accent underline text-[11px]">Маркет →</span>
+                <span class="text-accent underline text-stamp">Маркет →</span>
               </div>
             </a>
             <a href="https://market.yandex.ru" target="_blank" rel="sponsored nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
-              <div class="text-[11px] font-mono text-ink-faint uppercase">Флюс-гель No-Clean</div>
+              <div class="text-stamp font-mono text-ink-faint uppercase">Флюс-гель No-Clean</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">Cyberflux RMA-218</div>
-              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Безотмывочный гель для бессвинца</div>
+              <div class="text-stamp text-ink-muted mt-1 leading-snug">Безотмывочный гель для бессвинца</div>
               <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="font-bold text-ink">от 950 ₽</span>
-                <span class="text-accent underline text-[11px]">Маркет →</span>
+                <span class="text-accent underline text-stamp">Маркет →</span>
               </div>
             </a>
             <a href="https://market.yandex.ru" target="_blank" rel="sponsored nofollow noopener" class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-all block group">
-              <div class="text-[11px] font-mono text-ink-faint uppercase">Припой SAC305</div>
+              <div class="text-stamp font-mono text-ink-faint uppercase">Припой SAC305</div>
               <div class="font-bold text-xs text-ink group-hover:text-accent mt-0.5">BGA Balls 0.45mm</div>
-              <div class="text-[11px] text-ink-muted mt-1 leading-snug">Прецизионные шарики Sn96.5Ag3Cu0.5</div>
+              <div class="text-stamp text-ink-muted mt-1 leading-snug">Прецизионные шарики Sn96.5Ag3Cu0.5</div>
               <div class="mt-3 pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono">
                 <span class="font-bold text-ink">от 1 200 ₽</span>
-                <span class="text-accent underline text-[11px]">Маркет →</span>
+                <span class="text-accent underline text-stamp">Маркет →</span>
               </div>
             </a>
           </div>
 
           <!-- 347-ФЗ Маркировка рекламы -->
-          <div class="pt-3 border-t border-paper-border flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11px] font-mono text-ink-faint">
+          <div class="pt-3 border-t border-paper-border flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-stamp font-mono text-ink-faint">
             <span>Реклама · erid и данные о рекламодателях доступны по ссылкам перехода</span>
             <span>ООО «Яндекс», ИНН 7736207543 / ООО «Интернет Решения», ИНН 7704217370</span>
           </div>
@@ -1233,7 +1229,7 @@ include __DIR__ . '/includes/header.php';
         <div class="my-8 p-5 rounded-lg border-2 border-paper-border-dark bg-paper-subtle flex flex-col sm:flex-row sm:items-center justify-between gap-4 sketch-border">
           <div class="space-y-1">
             <div class="flex items-center gap-2 flex-wrap">
-              <span class="sketch-pill-yellow text-ink text-[11px] font-mono font-bold">СЕРВИСНЫЙ ЦЕНТР ТЧП</span>
+              <span class="sketch-pill-yellow text-ink text-stamp font-mono font-bold">СЕРВИСНЫЙ ЦЕНТР ТЧП</span>
               <span class="text-xs font-bold text-ink">Нужен сложный BGA-ремонт платы?</span>
             </div>
             <p class="text-xs text-ink-muted max-w-lg leading-relaxed">
@@ -1249,7 +1245,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Self-Check Block (Проверьте себя) -->
         <section class="my-8 p-6 rounded-lg border border-accent bg-paper-subtle space-y-4">
           <div class="flex items-center gap-2">
-            <span class="material-symbols-outlined text-accent text-2xl">quiz</span>
+            <?= tp_icon('check', 'w-5 h-5 text-accent') ?>
             <h2 class="text-xl font-bold text-ink">Проверьте себя</h2>
           </div>
           <p class="text-sm text-ink-muted">Готовы применить знания на практике? Воспользуйтесь нашими инструментами для расчета параметров.</p>
@@ -1268,8 +1264,8 @@ include __DIR__ . '/includes/header.php';
         <!-- Engineering Article Draft / In-Development Workbench View -->
         <div class="border border-warning-border bg-warning-bg/30 p-5 rounded-lg space-y-3">
           <div class="flex items-center justify-between flex-wrap gap-2">
-            <span class="text-[11px] font-mono font-bold uppercase tracking-wider text-warning flex items-center gap-1.5">
-              <span class="material-symbols-outlined text-[16px]">science</span>
+            <span class="text-stamp font-mono font-bold uppercase tracking-wider text-warning flex items-center gap-1.5">
+              <?= tp_icon('filter', 'w-4 h-4') ?>
               Инженерный регламент ТЧП // Статус: Лабораторные замеры
             </span>
             <span class="text-xs font-mono px-2 py-0.5 rounded bg-warning-bg text-ink border border-warning-border font-bold">
@@ -1290,19 +1286,19 @@ include __DIR__ . '/includes/header.php';
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
             <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
-              <div class="text-ink-faint uppercase text-[11px]">Категория монтажа</div>
+              <div class="text-ink-faint uppercase text-stamp">Категория монтажа</div>
               <div class="text-ink font-bold text-sm"><?= e($article['tag'] ?? 'РЭА') ?></div>
             </div>
             <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
-              <div class="text-ink-faint uppercase text-[11px]">Уровень сложности</div>
+              <div class="text-ink-faint uppercase text-stamp">Уровень сложности</div>
               <div class="text-ink font-bold text-sm"><?= e($article['difficulty'] ?? 'Инженер') ?></div>
             </div>
             <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
-              <div class="text-ink-faint uppercase text-[11px]">Расчетное время изучения</div>
+              <div class="text-ink-faint uppercase text-stamp">Расчетное время изучения</div>
               <div class="text-ink font-bold text-sm">~<?= e($article['read_min'] ?? 7) ?> минут</div>
             </div>
             <div class="p-3 rounded bg-paper-subtle border border-paper-border space-y-1">
-              <div class="text-ink-faint uppercase text-[11px]">Необходимый инструмент</div>
+              <div class="text-ink-faint uppercase text-stamp">Необходимый инструмент</div>
               <div class="text-ink font-semibold"><?= e(implode(', ', $article['required_tools'] ?? ['Паяльная станция', 'Термопара'])) ?></div>
             </div>
           </div>
@@ -1317,7 +1313,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Available Tools Callout -->
         <div class="bg-card border border-paper-border rounded-lg p-5 space-y-3 shadow-sm">
           <div class="font-mono text-xs font-bold uppercase text-ink flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-[18px] text-accent">calculate</span>
+            <?= tp_icon('sliders', 'w-4 h-4 text-accent') ?>
             <span>Инструменты для этой задачи</span>
           </div>
           <p class="text-xs sm:text-sm text-ink-muted leading-relaxed">
@@ -1347,11 +1343,11 @@ include __DIR__ . '/includes/header.php';
 
         <!-- Related Reading -->
         <div class="pt-4 space-y-3">
-          <div class="text-[11px] font-mono text-ink-faint uppercase">Другие материалы:</div>
+          <div class="text-stamp font-mono text-ink-faint uppercase">Другие материалы:</div>
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
             <?php foreach ($related_articles as $rel): ?>
               <a class="p-3 border border-paper-border rounded bg-paper hover:border-paper-border-dark transition-colors block" href="article.php?slug=<?= e($rel['slug']) ?>">
-                <div class="text-[11px] font-mono text-ink-faint uppercase"><?= e($rel['category'] ?? 'Материал') ?></div>
+                <div class="text-stamp font-mono text-ink-faint uppercase"><?= e($rel['category'] ?? 'Материал') ?></div>
                 <div class="font-medium text-ink mt-1"><?= e($rel['title']) ?></div>
               </a>
             <?php endforeach; ?>
@@ -1366,7 +1362,7 @@ include __DIR__ . '/includes/header.php';
         <?php if (!empty($lesson)): ?>
         <!-- Lesson Passport & Checklist Progress -->
         <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
-          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+          <div class="flex items-center justify-between text-stamp font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
             <span>ПАСПОРТ УРОКА</span>
             <span class="text-accent font-bold">2–3 МИН</span>
           </div>
@@ -1398,7 +1394,7 @@ include __DIR__ . '/includes/header.php';
 
         <!-- 10 Micro-lessons Series Navigation -->
         <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-sm">
-          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+          <div class="flex items-center justify-between text-stamp font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
             <span>ВСЕ 10 МИКРОУРОКОВ</span>
             <span>СЕРИЯ ТЧП</span>
           </div>
@@ -1409,7 +1405,7 @@ include __DIR__ . '/includes/header.php';
                  class="block px-2.5 py-2 rounded transition-all <?= $is_curr ? 'bg-ink text-paper font-bold shadow-xs' : 'text-ink-muted hover:text-ink hover:bg-paper-subtle' ?>">
                 <div class="flex items-center justify-between gap-2">
                   <span class="truncate"><?= ($idx + 1) ?>. <?= e($l['title']) ?></span>
-                  <span class="text-[10px] <?= $is_curr ? 'text-paper/70' : 'text-ink-faint' ?> shrink-0"><?= $l['read_min'] ?>м</span>
+                  <span class="text-stamp <?= $is_curr ? 'text-paper/70' : 'text-ink-faint' ?> shrink-0"><?= $l['read_min'] ?>м</span>
                 </div>
               </a>
             <?php endforeach; ?>
@@ -1420,11 +1416,11 @@ include __DIR__ . '/includes/header.php';
 
         <!-- Table of Contents -->
         <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
-          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+          <div class="flex items-center justify-between text-stamp font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
             <span>СОДЕРЖАНИЕ</span>
             <span>4 раздела</span>
           </div>
-          <nav class="space-y-1 text-[13px] font-mono" id="toc-nav">
+          <nav class="space-y-1 text-xs font-mono" id="toc-nav">
             <a class="toc-link block px-2 py-1 rounded text-ink font-semibold hover:bg-paper-subtle transition-colors" href="#step-1">
               1. Теплоемкость и датчики
             </a>
@@ -1445,7 +1441,7 @@ include __DIR__ . '/includes/header.php';
         <?php else: ?>
         <!-- Technical Summary Sidebar Card -->
         <div class="border border-paper-border bg-paper p-4 rounded-lg space-y-3">
-          <div class="flex items-center justify-between text-[11px] font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
+          <div class="flex items-center justify-between text-stamp font-mono text-ink-faint uppercase pb-2 border-b border-paper-border">
             <span>ПАСПОРТ МАТЕРИАЛА</span>
             <span>ТЧП-LAB</span>
           </div>
@@ -1473,7 +1469,7 @@ include __DIR__ . '/includes/header.php';
         <?php if (false): /* [РЕКЛАМА / МОНЕТИЗАЦИЯ ОТКЛЮЧЕНА]: Sticky Sidebar РСЯ Slot */ ?>
         <!-- Sticky Sidebar РСЯ Slot -->
         <div class="border border-dashed border-paper-border bg-paper p-4 rounded-lg text-center space-y-2">
-          <div class="text-[11px] font-mono text-ink-faint uppercase">РЕКЛАМА РСЯ</div>
+          <div class="text-stamp font-mono text-ink-faint uppercase">РЕКЛАМА РСЯ</div>
           <div id="yandex_rtb_sidebar" class="min-h-[220px] flex items-center justify-center text-xs font-mono text-ink-muted bg-paper-subtle rounded border border-paper-border">
             [РСЯ Сайдбар · 300x250]
           </div>
@@ -1484,7 +1480,7 @@ include __DIR__ . '/includes/header.php';
         <!-- Quick Lab Drawer Trigger Card (Framework & Kowalski) -->
         <div class="playdate-card cad-corner-marks p-4 rounded space-y-3">
           <div class="flex items-center justify-between font-mono text-xs pb-1.5 border-b border-paper-border">
-            <span class="text-accent text-[10px] uppercase font-bold flex items-center gap-1">
+            <span class="text-accent text-stamp uppercase font-bold flex items-center gap-1">
               <span class="w-1.5 h-1.5 rounded-full bg-cyan inline-block"></span>
               ЭКСПРЕСС-ВЕРСТАК
             </span>
@@ -1499,7 +1495,7 @@ include __DIR__ . '/includes/header.php';
             </p>
           </div>
           <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="btn btn-primary w-full text-xs font-mono py-2 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:translate-y-0.5">
-            <span class="material-symbols-outlined text-[15px]">tune</span>
+            <?= tp_icon('sliders', 'w-3.5 h-3.5') ?>
             <span>Выдвинуть верстак ↗</span>
           </button>
         </div>
@@ -1688,11 +1684,11 @@ include __DIR__ . '/includes/header.php';
       const tempDiv = btn.querySelector('div:last-child');
       if (idx === currentStage) {
         btn.className = 'stage-btn p-2.5 rounded border border-ink bg-callout text-left transition-all shadow-sm';
-        if (titleDiv) titleDiv.className = 'text-[11px] font-mono text-ink font-semibold';
+        if (titleDiv) titleDiv.className = 'text-stamp font-mono text-ink font-semibold';
         if (tempDiv) tempDiv.className = 'text-xs font-mono text-ink font-semibold mt-0.5';
       } else {
         btn.className = 'stage-btn p-2.5 rounded border border-paper-border bg-paper text-left transition-all hover:border-paper-border-dark';
-        if (titleDiv) titleDiv.className = 'text-[11px] font-mono text-ink-faint';
+        if (titleDiv) titleDiv.className = 'text-stamp font-mono text-ink-faint';
         if (tempDiv) tempDiv.className = 'text-xs font-mono text-ink mt-0.5';
       }
     });
@@ -1828,5 +1824,8 @@ include __DIR__ . '/includes/header.php';
   <!-- Global Engineering Search Modal (Ctrl+K) -->
   <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
+<!-- impeccable-live-start -->
+<script src="http://localhost:8400/live.js?token=7bd99a9d-1036-4cae-b680-1d37c8e37200"></script>
+<!-- impeccable-live-end -->
 </body>
 </html>

@@ -11,7 +11,7 @@
     <!-- Drawer Header -->
     <div class="p-4 border-b border-paper-border bg-paper flex items-center justify-between shrink-0">
       <div class="flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-accent inline-block animate-pulse" aria-hidden="true"></span>
+        <span class="w-2.5 h-2.5 rounded-full bg-accent inline-block" aria-hidden="true"></span>
         <div>
           <span class="text-[10px] font-mono uppercase tracking-widest text-ink-muted block">[ЛАБОРАТОРНЫЙ ИНСТРУМЕНТ]</span>
           <h3 id="lab-drawer-title" class="text-sm font-bold text-ink font-mono uppercase tracking-wider">
@@ -19,7 +19,7 @@
           </h3>
         </div>
       </div>
-      <button type="button" id="lab-drawer-close" class="p-1.5 text-ink-muted hover:text-ink transition-colors rounded border border-paper-border bg-paper-subtle min-w-[36px] min-h-[36px] flex items-center justify-center tactile-press" aria-label="Закрыть выдвижную панель (Esc)">
+      <button type="button" id="lab-drawer-close" class="p-2 text-ink-muted hover:text-ink transition-colors rounded border border-paper-border bg-paper-subtle min-w-[44px] min-h-[44px] flex items-center justify-center tactile-press cursor-pointer" aria-label="Закрыть выдвижную панель (Esc)">
         <?= tp_icon('x', 'w-4 h-4') ?>
       </button>
     </div>
@@ -88,7 +88,7 @@
         </div>
         <div class="text-[11px] font-mono text-ink-muted bg-paper-subtle p-2 rounded border border-paper-border">
           <span>Плотность тока: </span><strong id="drawer-density" class="text-ink">5.0 А/мм²</strong> 
-          <span class="text-emerald-600 dark:text-emerald-400 font-bold ml-1" id="drawer-status">✓ НОРМА</span>
+          <span class="text-emerald-700 dark:text-emerald-400 font-bold ml-1" id="drawer-status">✓ НОРМА</span>
         </div>
       </div>
 
@@ -101,15 +101,15 @@
         <div class="space-y-1.5 text-xs font-mono">
           <div class="p-1.5 rounded bg-paper-subtle border border-paper-border flex items-center justify-between">
             <span class="font-bold text-ink">ROL0 (No-Clean)</span>
-            <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">БЕЗОПАСЕН</span>
+            <span class="text-[10px] text-emerald-700 dark:text-emerald-400 font-bold">БЕЗОПАСЕН</span>
           </div>
           <div class="p-1.5 rounded bg-paper-subtle border border-paper-border flex items-center justify-between">
             <span class="font-bold text-ink">REL0 / RMA</span>
-            <span class="text-[10px] text-amber-600 font-bold">СМЫВКА ЖЕЛАТЕЛЬНА</span>
+            <span class="text-[10px] text-amber-700 dark:text-amber-400 font-bold">СМЫВКА ЖЕЛАТЕЛЬНА</span>
           </div>
           <div class="p-1.5 rounded bg-paper-subtle border border-paper-border flex items-center justify-between">
             <span class="font-bold text-ink">ORM0 / Кислотный</span>
-            <span class="text-[10px] text-red-600 font-bold">ОПАСЕН ДЛЯ ПЛАТ</span>
+            <span class="text-[10px] text-red-700 dark:text-red-400 font-bold">ОПАСЕН ДЛЯ ПЛАТ</span>
           </div>
         </div>
       </div>

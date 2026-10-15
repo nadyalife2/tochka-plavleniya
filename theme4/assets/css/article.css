@@ -243,7 +243,9 @@
 
 /* 4. Таблицы (BOM / Спецификации) */
 .wp-block-table,
-.article-content .wp-block-table {
+.article-content .wp-block-table,
+figure.bom-table,
+.bom-table.wp-block-table {
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
@@ -255,7 +257,8 @@
 
 .article-content table,
 .prose table,
-.bom-table {
+.bom-table table,
+table.bom-table {
   width: 100%;
   min-width: 500px;
   border-collapse: collapse;
@@ -266,7 +269,8 @@
 
 .article-content th,
 .prose thead th,
-.bom-table th {
+.bom-table th,
+table.bom-table th {
   background: var(--color-paper-subtle);
   padding: 0.65rem 0.85rem;
   font-family: var(--font-mono);
@@ -280,7 +284,8 @@
 
 .article-content td,
 .prose td,
-.bom-table td {
+.bom-table td,
+table.bom-table td {
   padding: 0.65rem 0.85rem;
   border-bottom: 1px solid var(--color-paper-border);
   color: var(--color-ink);
@@ -289,12 +294,14 @@
 }
 
 .article-content tr:last-child td,
-.bom-table tr:last-child td {
+.bom-table tr:last-child td,
+table.bom-table tr:last-child td {
   border-bottom: none;
 }
 
 .article-content tr:hover td,
-.bom-table tr:hover td {
+.bom-table tr:hover td,
+table.bom-table tr:hover td {
   background: var(--color-paper-subtle);
 }
 
@@ -439,7 +446,8 @@ html.dark .article-content img {
 }
 
 /* 9. Блок «Медиа и текст» */
-.article-content .wp-block-media-text {
+.article-content .wp-block-media-text,
+.wp-block-media-text {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
@@ -453,22 +461,49 @@ html.dark .article-content img {
 }
 
 .article-content .wp-block-media-text__content,
-.article-content .wp-block-media-text__media {
+.article-content .wp-block-media-text__media,
+.wp-block-media-text__content,
+.wp-block-media-text__media {
   min-width: 0;
   overflow-wrap: break-word;
 }
 
-.article-content .wp-block-media-text__media img {
+.article-content .wp-block-media-text__media img,
+.wp-block-media-text__media img {
   width: 100%;
   height: auto;
   display: block;
   border-radius: var(--radius-sm, 4px);
 }
 
+/* Зеркальное чередование: иллюстрация справа, текст слева */
+.article-content .wp-block-media-text.has-media-on-the-right .wp-block-media-text__media,
+.wp-block-media-text.has-media-on-the-right .wp-block-media-text__media {
+  grid-column: 2;
+  grid-row: 1;
+}
+.article-content .wp-block-media-text.has-media-on-the-right .wp-block-media-text__content,
+.wp-block-media-text.has-media-on-the-right .wp-block-media-text__content {
+  grid-column: 1;
+  grid-row: 1;
+}
+
 @media (max-width: 768px) {
-  .article-content .wp-block-media-text {
-    grid-template-columns: 1fr;
+  .article-content .wp-block-media-text,
+  .wp-block-media-text,
+  .wp-block-media-text.is-stacked-on-mobile {
+    grid-template-columns: 1fr !important;
     gap: 1rem;
+  }
+  .article-content .wp-block-media-text.has-media-on-the-right .wp-block-media-text__media,
+  .wp-block-media-text.has-media-on-the-right .wp-block-media-text__media {
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+  }
+  .article-content .wp-block-media-text.has-media-on-the-right .wp-block-media-text__content,
+  .wp-block-media-text.has-media-on-the-right .wp-block-media-text__content {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
   }
 }
 
@@ -536,7 +571,9 @@ html.dark .article-content img {
 
 /* 11.1 Врезка: Главный принцип (TL;DR Post-It Sticker) */
 .callout-tldr,
-.wp-block-group.callout-tldr {
+.wp-block-group.callout-tldr,
+.callout.tldr,
+.wp-block-group.callout.tldr {
   position: relative !important;
   background: var(--color-sketch-yellow-bg, #fffdf5) !important;
   border: 1px solid var(--color-sketch-yellow, #fde047) !important;
@@ -551,13 +588,17 @@ html.dark .article-content img {
   transition: transform var(--duration-base, 200ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)), box-shadow var(--duration-base, 200ms) ease, border-color var(--duration-base, 200ms) ease !important;
 }
 .callout-tldr:hover,
-.wp-block-group.callout-tldr:hover {
+.wp-block-group.callout-tldr:hover,
+.callout.tldr:hover,
+.wp-block-group.callout.tldr:hover {
   transform: translateY(-1.5px) !important;
   box-shadow: 0 4px 12px rgba(234, 179, 8, 0.14) !important;
   border-color: #eab308 !important;
 }
 .callout-tldr::before,
-.wp-block-group.callout-tldr::before {
+.wp-block-group.callout-tldr::before,
+.callout.tldr::before,
+.wp-block-group.callout.tldr::before {
   content: "";
   position: absolute;
   top: -6px;
@@ -571,7 +612,9 @@ html.dark .article-content img {
   z-index: 2;
 }
 .callout-tldr h3,
-.callout-tldr .callout-title {
+.callout-tldr .callout-title,
+.callout.tldr h3,
+.callout.tldr .callout-title {
   font-family: var(--font-mono) !important;
   font-size: var(--text-xs, 0.75rem) !important;
   font-weight: 700 !important;
@@ -581,7 +624,8 @@ html.dark .article-content img {
   color: var(--color-ink) !important;
   margin: 0 0 0.5rem 0 !important;
 }
-.callout-tldr p {
+.callout-tldr p,
+.callout.tldr p {
   font-family: var(--font-sans) !important;
   font-size: var(--text-body, 1rem) !important;
   font-weight: 500 !important;
@@ -779,6 +823,13 @@ html.dark .article-content img {
   grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)) !important;
   gap: 0.75rem 1.25rem !important;
 }
+.tools-box p {
+  font-family: var(--font-mono) !important;
+  font-size: var(--text-sm, 0.875rem) !important;
+  line-height: var(--leading-normal, 1.6) !important;
+  color: var(--color-ink) !important;
+  margin: 0 !important;
+}
 .tools-box li {
   position: relative !important;
   padding-left: 1.5rem !important;
@@ -824,13 +875,6 @@ html.dark .article-content img {
   transform: translateY(-1.5px) !important;
   box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
 }
-.step-card:hover .step-badge,
-.step-card:hover .step-badge-yellow,
-.step-card:hover .step-badge-orange,
-.step-card:hover .step-badge-mint,
-.step-card:hover .step-badge-blue {
-  transform: scale(1.03);
-}
 .step-card h4 {
   font-family: var(--font-sans) !important;
   font-size: var(--text-h4, 1.0625rem) !important;
@@ -859,7 +903,16 @@ html.dark .article-content img {
   padding: 0.2rem 0.55rem;
   border-radius: 4px;
   margin-bottom: 0.5rem;
-  transition: transform var(--duration-fast, 150ms) var(--ease-spring);
+  transition: transform var(--duration-fast, 150ms) var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1));
+}
+.step-card h4 .step-badge,
+.step-card h4 .step-badge-yellow,
+.step-card h4 .step-badge-orange,
+.step-card h4 .step-badge-mint,
+.step-card h4 .step-badge-blue {
+  vertical-align: middle !important;
+  margin-right: 0.5rem !important;
+  margin-bottom: 0 !important;
 }
 .step-badge-orange {
   background: var(--color-accent-subtle);
@@ -900,7 +953,9 @@ html.dark .article-content img {
     grid-template-columns: 1fr !important;
   }
 }
-.compare-card {
+.compare-card,
+.compare-col,
+.wp-block-column.compare-col {
   border-radius: var(--radius-lg, 8px) !important;
   padding: 1.5rem !important;
   display: flex !important;
@@ -910,23 +965,35 @@ html.dark .article-content img {
   transition: transform var(--duration-base, 200ms) var(--ease-out), box-shadow var(--duration-base, 200ms) ease, border-color var(--duration-base, 200ms) ease !important;
   min-width: 0 !important;
   overflow-wrap: break-word !important;
+  background: var(--color-card, #ffffff) !important;
+  border: 1px solid var(--color-paper-border, #e2e8f0) !important;
 }
-.compare-card:hover {
+.compare-card:hover,
+.compare-col:hover,
+.wp-block-column.compare-col:hover {
   transform: translateY(-1.5px) !important;
   box-shadow: var(--shadow-card-hover, 0 2px 6px rgba(20, 20, 20, 0.05)) !important;
 }
-.compare-card.defect {
+.compare-card.defect,
+.compare-col.defect,
+.wp-block-column.compare-col:has(.badge-defect) {
   background: var(--color-card, #ffffff) !important;
   border: 1px solid var(--color-paper-border, #e2e8f0) !important;
 }
-.compare-card.defect:hover {
+.compare-card.defect:hover,
+.compare-col.defect:hover,
+.wp-block-column.compare-col:has(.badge-defect):hover {
   border-color: rgba(239, 68, 68, 0.45) !important;
 }
-.compare-card.norm {
+.compare-card.norm,
+.compare-col.norm,
+.wp-block-column.compare-col:has(.badge-norm) {
   background: var(--color-card, #ffffff) !important;
   border: 1px solid var(--color-paper-border, #e2e8f0) !important;
 }
-.compare-card.norm:hover {
+.compare-card.norm:hover,
+.compare-col.norm:hover,
+.wp-block-column.compare-col:has(.badge-norm):hover {
   border-color: rgba(16, 185, 129, 0.45) !important;
 }
 .compare-card p {
@@ -1148,7 +1215,9 @@ html.dark .wp-block-group.faq-item {
 }
 
 html.dark .callout-tldr,
-html.dark .wp-block-group.callout-tldr {
+html.dark .wp-block-group.callout-tldr,
+html.dark .callout.tldr,
+html.dark .wp-block-group.callout.tldr {
   background: #1c1912 !important;
   border-color: #854d0e !important;
 }
@@ -1161,14 +1230,54 @@ html.dark .wp-block-group.marginalia-box {
   border-color: #d97706 !important;
 }
 
-html.dark .compare-card.defect {
+html.dark .compare-card.defect,
+html.dark .compare-col.defect,
+html.dark .wp-block-column.compare-col:has(.badge-defect) {
   background: #2a1215 !important;
   border-color: #7f1d1d !important;
 }
 
-html.dark .compare-card.norm {
+html.dark .compare-card.norm,
+html.dark .compare-col.norm,
+html.dark .wp-block-column.compare-col:has(.badge-norm) {
   background: #0d2818 !important;
   border-color: #065f46 !important;
+}
+
+html.dark .step-badge-yellow {
+  background: rgba(250, 204, 21, 0.12) !important;
+  color: #fde047 !important;
+  border-color: rgba(250, 204, 21, 0.35) !important;
+}
+
+html.dark .step-badge-mint {
+  background: rgba(52, 211, 153, 0.12) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+html.dark .step-badge-blue {
+  background: rgba(56, 189, 248, 0.12) !important;
+  color: #7dd3fc !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+}
+
+html.dark .step-badge-orange {
+  background: rgba(249, 115, 22, 0.15) !important;
+  color: #fdba74 !important;
+  border-color: rgba(249, 115, 22, 0.4) !important;
+}
+
+html.dark .badge-defect {
+  background: rgba(239, 68, 68, 0.2) !important;
+  color: #fca5a5 !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+html.dark .badge-norm {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #6ee7b7 !important;
+  border-color: rgba(16, 185, 129, 0.4) !important;
 }
 
 /* 13. ДОСТУПНОСТЬ: РЕЖИМ REDUCED MOTION (WCAG 2.1 AAA) */

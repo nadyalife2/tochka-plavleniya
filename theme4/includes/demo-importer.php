@@ -400,7 +400,7 @@ function tchp_render_import_admin_page() {
 
         <?php if ($result): ?>
             <div class="notice notice-success is-dismissible" style="padding: 14px; border-left-color: #f59e0b;">
-                <h3 style="margin-top: 0; color: #b45309;">[ГОТОВО] Импорт успешно завершён!</h3>
+                <h3 style="margin-top: 0; color: #0f4c81;">[ГОТОВО] Импорт успешно завершён!</h3>
                 <p>
                     <strong>Создано рубрик:</strong> <?= (int)$result['created_cats'] ?><br>
                     <strong>Создано новых статей:</strong> <?= count($result['created_posts']) ?><br>
