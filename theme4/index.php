@@ -170,49 +170,52 @@ include __DIR__ . '/includes/header.php';
 
           <!-- Headline -->
           <h1 class="text-3xl sm:text-5xl font-bold text-ink tracking-tight font-sans">
-            Инженерный справочник по пайке и радиомонтажу
+            Инженерный справочник и регламенты пайки
           </h1>
 
           <!-- Lead Paragraph: Calm, Editorial Typography -->
           <p class="text-base sm:text-lg text-ink font-serif leading-[1.65]">
-            Открытые регламенты радиомонтажа, температурные профили сплавов (<strong>ПОС-61, SAC305</strong>), классификация флюсов (<strong>RMA и No-Clean</strong>), геометрия картриджей <strong>T12 и C245</strong> и интерактивный верстак инженера.
+            Практические температурные режимы для радиомонтажа, карты совместимости припоев и флюсов по ГОСТ и IPC.
           </p>
 
         </div>
       </section>
 
-      <!-- 2. CATEGORY NAVIGATION PILLS BAR -->
-      <nav aria-label="Переключение рубрик журнала" class="flex items-center gap-2 overflow-x-auto lg:overflow-x-visible lg:flex-wrap pb-2 font-mono text-xs">
-        <a href="<?= esc_url($site_root) ?>" aria-current="page" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-xs bg-ink text-paper font-bold shadow-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
-          <span class="opacity-75 font-mono">[ГЛАВНАЯ]</span>
-          <span>Все разделы</span>
-        </a>
-        <a href="<?= esc_url($site_root) ?>category.php?slug=start" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-400" aria-hidden="true"></span>
-          <span class="opacity-75 font-mono">[SEC.01]</span>
-          <span>Начать паять</span>
-        </a>
-        <a href="<?= esc_url($site_root) ?>category.php?slug=materialy" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
-          <span class="w-1.5 h-1.5 rounded-full bg-orange-500" aria-hidden="true"></span>
-          <span class="opacity-75 font-mono">[SEC.02]</span>
-          <span>Материалы и сплавы</span>
-        </a>
-        <a href="<?= esc_url($site_root) ?>category.php?slug=praktika" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
-          <span class="w-1.5 h-1.5 rounded-full bg-sky-500" aria-hidden="true"></span>
-          <span class="opacity-75 font-mono">[SEC.03]</span>
-          <span>Практика монтажа</span>
-        </a>
-        <a href="<?= esc_url($site_root) ?>category.php?slug=oshibki" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
-          <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
-          <span class="opacity-75 font-mono">[SEC.04]</span>
-          <span>Проблемы и дефекты</span>
-        </a>
-        <a href="<?= esc_url($site_root) ?>interactive.php" class="px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none flex items-center gap-1.5">
-          <?= tp_icon('sliders', 'w-3.5 h-3.5 text-accent') ?>
-          <span>Интерактивный верстак →</span>
-        </a>
-      </nav>
+      <!-- 2. CATEGORY NAVIGATION PILLS BAR WITH SCROLL CUE -->
+      <div class="relative w-full">
+        <nav aria-label="Переключение рубрик журнала" class="flex items-center gap-2 overflow-x-auto lg:overflow-x-visible lg:flex-wrap pb-2 font-mono text-xs pr-8 lg:pr-0">
+          <a href="<?= esc_url($site_root) ?>" aria-current="page" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded transition-all whitespace-nowrap text-xs bg-ink text-paper font-bold shadow-sm focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-accent" aria-hidden="true"></span>
+            <span class="opacity-75 font-mono">[ГЛАВНАЯ]</span>
+            <span>Все разделы</span>
+          </a>
+          <a href="<?= esc_url($site_root) ?>category.php?slug=start" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400" aria-hidden="true"></span>
+            <span class="opacity-75 font-mono">[SEC.01]</span>
+            <span>Начать паять</span>
+          </a>
+          <a href="<?= esc_url($site_root) ?>category.php?slug=materialy" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-500" aria-hidden="true"></span>
+            <span class="opacity-75 font-mono">[SEC.02]</span>
+            <span>Материалы и сплавы</span>
+          </a>
+          <a href="<?= esc_url($site_root) ?>category.php?slug=praktika" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-500" aria-hidden="true"></span>
+            <span class="opacity-75 font-mono">[SEC.03]</span>
+            <span>Практика монтажа</span>
+          </a>
+          <a href="<?= esc_url($site_root) ?>category.php?slug=oshibki" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-muted hover:border-paper-border-dark hover:text-ink transition-all whitespace-nowrap text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-500" aria-hidden="true"></span>
+            <span class="opacity-75 font-mono">[SEC.04]</span>
+            <span>Проблемы и дефекты</span>
+          </a>
+          <a href="<?= esc_url($site_root) ?>interactive.php" class="px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none flex items-center gap-1.5">
+            <?= tp_icon('sliders', 'w-3.5 h-3.5 text-accent') ?>
+            <span>Интерактивный верстак →</span>
+          </a>
+        </nav>
+        <div class="absolute right-0 top-0 bottom-2 w-8 bg-gradient-to-l from-paper to-transparent pointer-events-none lg:hidden" aria-hidden="true"></div>
+      </div>
 
       <!-- 3. MAIN EDITORIAL LAYOUT: 8 COLS (Articles) + 4 COLS (Sidebar) -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -225,18 +228,29 @@ include __DIR__ . '/includes/header.php';
             <div class="flex items-center justify-between gap-2 pt-1">
               <span class="pill-blue text-xs font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded flex items-center gap-1.5">
                 <?= tp_icon('sliders', 'w-3.5 h-3.5 text-accent') ?>
-                <span>[ЭКСПРЕСС-ВЕРСТАК // ТЕРМООКНО ЖАЛА]</span>
+                <span>[БЫСТРЫЙ РАСЧЁТ // ТЕМПЕРАТУРА ЖАЛА]</span>
               </span>
               <span class="badge-stamp text-ink-faint">ГОСТ 21931 / IPC-A-610</span>
             </div>
 
             <div>
-              <h2 class="text-lg sm:text-xl font-bold text-ink font-sans">
-                Калькулятор ориентировочной температуры жала паяльника
+              <h2 class="text-xl sm:text-2xl font-bold text-ink font-sans tracking-tight">
+                Подбор температуры жала
               </h2>
-              <p class="text-xs sm:text-sm text-ink-muted font-mono leading-relaxed mt-1">
-                Выберите сплав припоя и тип паяемого узла — табло отобразит стартовый рабочий диапазон уставки станции. Уставка корректируется по теплоёмкости узла и форме жала.
+              <p class="text-xs sm:text-sm text-ink-muted font-sans leading-relaxed mt-1">
+                Стартовый ориентир уставки паяльной станции для защиты дорожек и компонентов от тепловой деструкции.
               </p>
+            </div>
+
+            <!-- Quick Task Buttons: "Что вы паяете?" -->
+            <div class="space-y-1.5 pt-0.5">
+              <span class="block text-xs font-mono font-bold text-ink uppercase tracking-wide">Что вы паяете? (быстрый выбор):</span>
+              <div class="flex items-center gap-1.5 flex-wrap font-mono text-xs" id="exp-task-presets">
+                <button type="button" data-mass="pth" data-solder="pos61" class="exp-preset-btn px-2.5 py-1.5 rounded border border-paper-border bg-paper hover:border-accent text-ink font-bold transition-all cursor-pointer shadow-2xs">Провод / разъём</button>
+                <button type="button" data-mass="smd" data-solder="pos61" class="exp-preset-btn px-2.5 py-1.5 rounded border border-accent bg-accent text-ink font-bold transition-all cursor-pointer shadow-2xs">Плата / SMD</button>
+                <button type="button" data-mass="copper" data-solder="pos61" class="exp-preset-btn px-2.5 py-1.5 rounded border border-paper-border bg-paper hover:border-accent text-ink font-bold transition-all cursor-pointer shadow-2xs">Массивная медь</button>
+                <button type="button" data-mass="pth" data-solder="sac305" class="exp-preset-btn px-2.5 py-1.5 rounded border border-paper-border bg-paper hover:border-accent text-ink font-bold transition-all cursor-pointer shadow-2xs">Без свинца (RoHS)</button>
+              </div>
             </div>
 
             <!-- Interactive Express Controls -->
@@ -245,12 +259,13 @@ include __DIR__ . '/includes/header.php';
                 <!-- Solder selector -->
                 <div class="space-y-1">
                   <label for="exp-solder-select" class="block font-bold text-ink text-xs uppercase tracking-wide">
-                    Припой / Марка сплава:
+                    Припой / марка сплава:
                   </label>
-                  <select id="exp-solder-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-1.5 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+                  <select id="exp-solder-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-2 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
                     <option value="pos61" selected>ПОС-61 // ГОСТ 21931 (Тпл 183–190 °C)</option>
                     <option value="sn63pb37">Sn63Pb37 // Эвтектика (183 °C)</option>
-                    <option value="sac305">SAC305 // Бессвинец RoHS (217 °C)</option>
+                    <option value="sac305">SAC305 // Бессвинец RoHS (217–220 °C)</option>
+                    <option value="pos40">ПОС-40 // Медь и силовое (183–238 °C)</option>
                     <option value="sn42bi58">Sn42Bi58 // Низкотемпературный (138 °C)</option>
                     <option value="rose">Сплав Розе // Демонтажный (94 °C)</option>
                   </select>
@@ -259,9 +274,9 @@ include __DIR__ . '/includes/header.php';
                 <!-- Board / Mass selector -->
                 <div class="space-y-1">
                   <label for="exp-mass-select" class="block font-bold text-ink text-xs uppercase tracking-wide">
-                    Теплоёмкость соединения:
+                    Тип паяемого узла:
                   </label>
-                  <select id="exp-mass-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-1.5 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+                  <select id="exp-mass-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-2 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
                     <option value="smd" selected>SMD чипы и тонкие дорожки (1–2 слоя)</option>
                     <option value="pth">Выводной монтаж (DIP, провода, разъемы)</option>
                     <option value="copper">Массивная медь / Земляные полигоны GND</option>
@@ -269,36 +284,55 @@ include __DIR__ . '/includes/header.php';
                 </div>
               </div>
 
-              <!-- Digital Readout Display -->
-              <div class="rounded border border-paper-border bg-paper p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3" aria-live="polite">
-                <div class="space-y-0.5">
-                  <div class="flex items-center gap-2">
-                    <span class="text-ink-muted text-xs font-bold uppercase">Ориентир станции:</span>
-                    <span id="exp-safety-badge" class="pill-blue text-xs font-bold px-2 py-0.5 rounded">
-                      СТАРТОВЫЙ ДИАПАЗОН // РАБОЧЕЕ ОКНО
-                    </span>
+              <!-- Digital Readout Display with Clear Hierarchy -->
+              <div class="rounded border border-paper-border bg-paper p-4 space-y-3" aria-live="polite">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div class="space-y-1">
+                    <div class="text-xs font-mono font-bold text-ink-muted uppercase tracking-wider">
+                      Температура на станции:
+                    </div>
+                    <div class="flex items-baseline gap-1.5">
+                      <div class="text-3xl sm:text-4xl font-bold font-mono text-ink tracking-tight flex items-baseline">
+                        <span id="exp-temp-out">260 – 295</span>
+                        <span class="text-amber-500 dark:text-amber-400 font-bold ml-1.5 text-2xl sm:text-3xl">°C</span>
+                      </div>
+                    </div>
+                    <p class="text-xs text-ink-muted font-sans">
+                      Стартовый ориентир для выбранной задачи.
+                    </p>
                   </div>
-                  <div class="text-xs text-ink-muted">
-                    Интервал плавления: <span id="exp-liq-val" class="font-bold text-ink">183–190 °C</span> · Градиент теплоотвода: <span id="exp-delta-val" class="font-bold text-accent">+75...105 °C</span>
+
+                  <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" id="exp-copy-btn" class="min-h-[38px] px-3.5 py-1.5 rounded border border-paper-border hover:border-accent text-ink hover:text-accent transition-colors text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-xs" title="Скопировать значение">
+                      <?= tp_icon('copy', 'w-3.5 h-3.5') ?>
+                      <span>Копировать</span>
+                    </button>
                   </div>
                 </div>
 
-                <div class="flex items-center gap-2 shrink-0">
-                  <div class="px-3 py-1.5 rounded bg-ink text-paper font-mono font-bold text-lg tabular-nums tracking-wider border border-ink flex items-center gap-1 shadow-2xs">
-                    <span id="exp-temp-out">260 – 295</span>
-                    <span class="text-accent text-sm">°C</span>
+                <!-- Collapsible Secondary Details -->
+                <details class="pt-2 border-t border-paper-border font-mono text-xs text-ink-muted group">
+                  <summary class="cursor-pointer text-ink font-bold hover:text-accent transition-colors list-none flex items-center justify-between select-none">
+                    <span>Подробнее о режиме ▾</span>
+                    <span id="exp-safety-badge" class="pill-blue text-[11px] font-bold px-2 py-0.5 rounded">РАБОЧЕЕ ОКНО</span>
+                  </summary>
+                  <div class="pt-2.5 space-y-1.5 text-xs">
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                      <span>Интервал плавления: <strong id="exp-liq-val" class="text-ink">183–190 °C</strong></span>
+                      <span>Градиент теплоотвода: <strong id="exp-delta-val" class="text-accent">+75...105 °C</strong></span>
+                    </div>
+                    <div class="pt-1 text-stamp text-ink-faint">
+                      Стандарты: ГОСТ 21931-76 / IPC-A-610 · Контроль времени контакта: 2.0–3.0 с
+                    </div>
                   </div>
-                  <button type="button" id="exp-copy-btn" class="px-2.5 py-1.5 rounded border border-paper-border hover:border-accent text-ink hover:text-accent transition-colors text-xs font-mono font-bold" title="Скопировать значение">
-                    Копировать
-                  </button>
-                </div>
+                </details>
               </div>
             </div>
 
             <!-- Action buttons: 1 Clear Primary CTA + 2 Quiet Secondary Links -->
             <div class="pt-1 flex flex-wrap items-center gap-3">
               <a href="<?= esc_url($site_root) ?>interactive.php#temp" class="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-xs font-mono font-bold shadow-sm">
-                <span>Открыть полный верстак (8 модулей) →</span>
+                <span>Верстак (полный расчёт) →</span>
               </a>
               <span class="text-ink-faint text-xs">·</span>
               <a href="<?= esc_url($site_root) ?>interactive.php#iron" class="text-xs font-mono text-ink-muted hover:text-ink hover:underline transition-colors">
@@ -903,6 +937,11 @@ include __DIR__ . '/includes/header.php';
           pth: { range: '210 – 235', liq: '138 °C', delta: '+72...97 °C', max: 235 },
           copper: { range: '220 – 245', liq: '138 °C', delta: '+82...107 °C', max: 245 }
         },
+        pos40: {
+          smd: { range: '280 – 310', liq: '183–238 °C', delta: '+75...105 °C', max: 310 },
+          pth: { range: '300 – 330', liq: '183–238 °C', delta: '+95...125 °C', max: 330 },
+          copper: { range: '320 – 350', liq: '183–238 °C', delta: '+115...145 °C', max: 350 }
+        },
         rose: {
           smd: { range: '140 – 170', liq: '94 °C', delta: '+46...76 °C', max: 170 },
           pth: { range: '150 – 180', liq: '94 °C', delta: '+56...86 °C', max: 180 },
@@ -920,16 +959,34 @@ include __DIR__ . '/includes/header.php';
         deltaValEl.textContent = data.delta;
 
         if (data.max > 340) {
-          safetyEl.className = 'pill-orange text-xs font-bold px-2 py-0.5 rounded';
+          safetyEl.className = 'pill-orange text-[11px] font-bold px-2 py-0.5 rounded';
           safetyEl.textContent = 'ОРАНЖЕВАЯ ЗОНА // РИСК ПЕРЕГРЕВА МЕДИ (КОНТАКТ < 3 С)';
         } else if (data.max < 200) {
-          safetyEl.className = 'pill-yellow text-xs font-bold px-2 py-0.5 rounded';
+          safetyEl.className = 'pill-yellow text-[11px] font-bold px-2 py-0.5 rounded';
           safetyEl.textContent = 'ДЕМОНТАЖНЫЙ РЕЖИМ // НИЗКАЯ ТЕМПЕРАТУРА';
         } else {
-          safetyEl.className = 'pill-blue text-xs font-bold px-2 py-0.5 rounded';
+          safetyEl.className = 'pill-blue text-[11px] font-bold px-2 py-0.5 rounded';
           safetyEl.textContent = 'СТАРТОВЫЙ ДИАПАЗОН // РАБОЧЕЕ ОКНО';
         }
       }
+
+      // Поддержка кнопок быстрого выбора задачи
+      const presetButtons = document.querySelectorAll('.exp-preset-btn');
+      presetButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const m = btn.dataset.mass;
+          const s = btn.dataset.solder;
+          if (m && massEl) massEl.value = m;
+          if (s && solderEl) solderEl.value = s;
+          presetButtons.forEach(b => {
+            b.classList.remove('border-accent', 'bg-accent');
+            b.classList.add('border-paper-border', 'bg-paper');
+          });
+          btn.classList.remove('border-paper-border', 'bg-paper');
+          btn.classList.add('border-accent', 'bg-accent');
+          updateCalc();
+        });
+      });
 
       solderEl.addEventListener('change', updateCalc);
       massEl.addEventListener('change', updateCalc);

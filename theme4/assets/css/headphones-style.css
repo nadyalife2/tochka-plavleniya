@@ -1203,26 +1203,27 @@ html.dark :focus-visible {
    COOKIE BANNER & TOUCH TARGET REFINEMENTS (WCAG 2.5.5)
    ========================================================================== */
 #cookie-consent-banner {
-  position: fixed !important;
-  bottom: 74px !important;
-  left: 12px !important;
-  right: 12px !important;
-  z-index: 9999 !important;
-  max-width: 440px !important;
+  position: fixed;
+  z-index: 9999;
+  left: 12px;
+  right: 12px;
+  bottom: calc(56px + env(safe-area-inset-bottom, 0px));
+  max-width: 100%;
   margin: 0 auto;
+}
+
+@media (min-width: 640px) {
+  #cookie-consent-banner {
+    left: auto;
+    right: 24px;
+    bottom: 24px;
+    max-width: 340px;
+    margin: 0;
+  }
 }
 
 #solder-reset-btn.hidden {
   display: none !important;
-}
-
-
-@media (min-width: 640px) {
-  #cookie-consent-banner {
-    left: auto !important;
-    bottom: 24px !important;
-    right: 24px !important;
-  }
 }
 
 @media (max-width: 768px) {

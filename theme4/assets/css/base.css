@@ -620,9 +620,6 @@ input[type="range"].range-slider::-webkit-slider-thumb:hover {
   body.tp-headphones {
     padding-bottom: max(4.5rem, calc(4rem + env(safe-area-inset-bottom)));
   }
-  #cookie-consent-banner {
-    bottom: max(4.5rem, calc(4.25rem + env(safe-area-inset-bottom)));
-  }
 }
 @media (max-width: 768px) {
   header nav.nav {

@@ -700,7 +700,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     tempRangeDisplay.style.fontSize = '';
-    tempRangeDisplay.textContent = `${item.t_min} – ${item.t_max} °C`;
+    tempRangeDisplay.innerHTML = `${item.t_min} – ${item.t_max} <span class="text-amber-500 dark:text-amber-400 font-bold ml-1">°C</span>`;
 
     // Tactile micro-animation: trigger temperature heat pulse
     tempRangeDisplay.classList.remove('temp-heat-pulse');

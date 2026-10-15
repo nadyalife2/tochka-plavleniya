@@ -376,14 +376,14 @@ include __DIR__ . '/includes/header.php';
                 <!-- Строка 1: Ориентир температуры -->
                 <div class="p-3.5 rounded border border-paper-border bg-paper space-y-2">
                   <div class="flex items-center justify-between font-mono text-xs">
-                    <span class="text-ink-muted uppercase font-bold">1. УСТАВКА СТАНЦИИ:</span>
+                    <span class="text-ink-muted uppercase font-bold">ТЕМПЕРАТУРА НА СТАНЦИИ:</span>
                     <span id="temp-mode-label" class="text-xs font-mono text-ink-faint">ПО ТЕРМОПАРЕ // ±5°C</span>
                   </div>
                   <div class="flex items-baseline gap-2 flex-wrap pt-0.5">
-                    <div id="temp-range-display" class="text-2xl sm:text-3xl font-bold font-mono text-accent leading-none">
-                      260 – 310 °C
+                    <div id="temp-range-display" class="text-2xl sm:text-3xl font-bold font-mono text-ink leading-none">
+                      260 – 310 <span class="text-amber-500 dark:text-amber-400 font-bold ml-1">°C</span>
                     </div>
-                    <span id="temp-tip-display" class="text-xs font-mono text-ink-muted">на дисплее станции (в точке контакта: ~225–245 °C)</span>
+                    <span id="temp-tip-display" class="text-xs font-mono text-ink-muted">Стартовый ориентир для выбранной задачи</span>
                   </div>
 
                   <!-- Встроенная шкала температуры станции с физикой нагрева -->
