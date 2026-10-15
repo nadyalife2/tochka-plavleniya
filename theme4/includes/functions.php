@@ -406,4 +406,80 @@ if (!function_exists('tp_icon')) {
     }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// ЕДИНЫЙ ИСТОЧНИК ПРАВДЫ: РЕЕСТР МАТЕРИАЛОВ ТЧП
+// ─────────────────────────────────────────────────────────────────────────────
+require_once dirname(__DIR__) . '/data/materials-registry.php';
+
+if (!function_exists('tchp_get_materials_registry')) {
+    function tchp_get_materials_registry(): array {
+        global $MATERIALS_REGISTRY;
+        return $MATERIALS_REGISTRY ?? [];
+    }
+}
+
+if (!function_exists('tchp_get_express_workbench_matrix')) {
+    /**
+     * Формирует единую матрицу уставок экспресс-калькулятора (index.php)
+     * строго на базе $MATERIALS_REGISTRY без дублирования в клиентском JS.
+     */
+    function tchp_get_express_workbench_matrix(): array {
+        global $MATERIALS_REGISTRY;
+        $solders = $MATERIALS_REGISTRY['solders'] ?? [];
+        $matrix = [];
+
+        // Специальные калиброванные пресеты для ключевых сплавов
+        $known_presets = [
+            'pos61' => [
+                'smd'    => ['range' => '260 – 295', 'liq' => '183–190 °C', 'delta' => '+75...105 °C', 'max' => 295],
+                'pth'    => ['range' => '280 – 320', 'liq' => '183–190 °C', 'delta' => '+95...130 °C', 'max' => 320],
+                'copper' => ['range' => '300 – 340', 'liq' => '183–190 °C', 'delta' => '+115...150 °C', 'max' => 340],
+            ],
+            'sn63pb37' => [
+                'smd'    => ['range' => '260 – 290', 'liq' => '183 °C', 'delta' => '+75...105 °C', 'max' => 290],
+                'pth'    => ['range' => '275 – 315', 'liq' => '183 °C', 'delta' => '+90...130 °C', 'max' => 315],
+                'copper' => ['range' => '300 – 340', 'liq' => '183 °C', 'delta' => '+115...155 °C', 'max' => 340],
+            ],
+            'sac305' => [
+                'smd'    => ['range' => '310 – 335', 'liq' => '217 °C', 'delta' => '+93...118 °C', 'max' => 335],
+                'pth'    => ['range' => '320 – 350', 'liq' => '217 °C', 'delta' => '+103...133 °C', 'max' => 350],
+                'copper' => ['range' => '340 – 370', 'liq' => '217 °C', 'delta' => '+123...153 °C', 'max' => 370],
+            ],
+            'sn42bi58' => [
+                'smd'    => ['range' => '200 – 225', 'liq' => '138 °C', 'delta' => '+62...87 °C', 'max' => 225],
+                'pth'    => ['range' => '210 – 235', 'liq' => '138 °C', 'delta' => '+72...97 °C', 'max' => 235],
+                'copper' => ['range' => '220 – 245', 'liq' => '138 °C', 'delta' => '+82...107 °C', 'max' => 245],
+            ],
+            'roze' => [
+                'smd'    => ['range' => '140 – 170', 'liq' => '94 °C', 'delta' => '+46...76 °C', 'max' => 170],
+                'pth'    => ['range' => '150 – 180', 'liq' => '94 °C', 'delta' => '+56...86 °C', 'max' => 180],
+                'copper' => ['range' => '160 – 190', 'liq' => '94 °C', 'delta' => '+66...96 °C', 'max' => 190],
+            ],
+            'wood' => [
+                'smd'    => ['range' => '110 – 135', 'liq' => '72 °C', 'delta' => '+40...65 °C', 'max' => 135],
+                'pth'    => ['range' => '120 – 145', 'liq' => '72 °C', 'delta' => '+50...75 °C', 'max' => 145],
+                'copper' => ['range' => '130 – 155', 'liq' => '72 °C', 'delta' => '+60...85 °C', 'max' => 155],
+            ],
+        ];
+
+        foreach ($solders as $id => $s) {
+            if (isset($known_presets[$id])) {
+                $matrix[$id] = $known_presets[$id];
+                continue;
+            }
+            $t_min = $s['t_melt_min'] ?? 183;
+            $t_max = $s['t_melt_max'] ?? 190;
+            $liq_str = ($t_min === $t_max) ? "{$t_max} °C" : "{$t_min}–{$t_max} °C";
+
+            $matrix[$id] = [
+                'smd'    => ['range' => ($t_max + 75) . ' – ' . ($t_max + 105), 'liq' => $liq_str, 'delta' => '+75...105 °C', 'max' => $t_max + 105],
+                'pth'    => ['range' => ($t_max + 95) . ' – ' . ($t_max + 130), 'liq' => $liq_str, 'delta' => '+95...130 °C', 'max' => $t_max + 130],
+                'copper' => ['range' => ($t_max + 115) . ' – ' . ($t_max + 150), 'liq' => $liq_str, 'delta' => '+115...150 °C', 'max' => $t_max + 150],
+            ];
+        }
+
+        return $matrix;
+    }
+}
+
 

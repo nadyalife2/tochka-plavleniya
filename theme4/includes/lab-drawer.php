@@ -141,8 +141,9 @@
       lastActiveElement = document.activeElement;
       backdrop.classList.add('active');
       backdrop.setAttribute('aria-hidden', 'false');
-      const trigger = document.getElementById('header-drawer-trigger');
-      if (trigger) trigger.setAttribute('aria-expanded', 'true');
+      document.querySelectorAll('[onclick*="openLabDrawer"]').forEach(btn => {
+        btn.setAttribute('aria-expanded', 'true');
+      });
       document.body.style.overflow = 'hidden';
       if (saveState) {
         try { sessionStorage.setItem('tp_drawer_open', '1'); } catch(e) {}
@@ -154,8 +155,9 @@
       if (!backdrop) return;
       backdrop.classList.remove('active');
       backdrop.setAttribute('aria-hidden', 'true');
-      const trigger = document.getElementById('header-drawer-trigger');
-      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+      document.querySelectorAll('[onclick*="openLabDrawer"]').forEach(btn => {
+        btn.setAttribute('aria-expanded', 'false');
+      });
       document.body.style.overflow = '';
       try { sessionStorage.removeItem('tp_drawer_open'); } catch(e) {}
       if (lastActiveElement && typeof lastActiveElement.focus === 'function') {

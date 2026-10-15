@@ -757,15 +757,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!thermalSim) {
         thermalSim = new ThermalSimulator(thermalCanvas);
       }
-      const solderMelts = {
-        'pos61': 190,    // Ликвидус по ГОСТ 21931-76 (солидус 183 °C, интервал плавления 183–190 °C)
-        'sn63pb37': 183, // Истинная эвтектика
-        'sac305': 217,
-        'pos40': 238,    // Ликвидус (солидус 183 °C)
-        'sn42bi58': 138,
-        'roze': 94
-      };
-      const meltT = solderMelts[sVal] || 190;
+      // Получаем физические параметры сплава из единого реестра TCHP_MATERIALS
+      const mat = (window.TCHP_MATERIALS && window.TCHP_MATERIALS[sVal]) || {};
+      const meltT = mat.t_melt_max || 190;
       const avg = (item.t_min + item.t_max) / 2;
       thermalSim.configure(avg, meltT, wVal);
     }

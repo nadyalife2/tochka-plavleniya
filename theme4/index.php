@@ -881,8 +881,8 @@ include __DIR__ . '/includes/header.php';
 
       if (!solderEl || !massEl || !tempOutEl) return;
 
-      // Матрица диапазонов уставки станции, согласованная с полным верстаком
-      const MATRIX = {
+      // Единая матрица диапазонов уставки станции, сформированная на базе $MATERIALS_REGISTRY
+      const MATRIX = window.TCHP_EXPRESS_MATRIX || {
         pos61: {
           smd: { range: '260 – 295', liq: '183–190 °C', delta: '+75...105 °C', max: 295 },
           pth: { range: '280 – 320', liq: '183–190 °C', delta: '+95...130 °C', max: 320 },

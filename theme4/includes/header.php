@@ -58,6 +58,10 @@ $tchp_head_escape = static function ($value) {
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/headphones-style.css?v=<?= $tchp_hp_ver ?>">
   <?php if (!empty($extra_head)) echo $extra_head; ?>
   <?php if (function_exists('wp_head')) wp_head(); ?>
+  <script>
+    window.TCHP_MATERIALS = <?= json_encode(function_exists('tchp_get_materials_registry') ? (tchp_get_materials_registry()['solders'] ?? []) : [], JSON_UNESCAPED_UNICODE) ?>;
+    window.TCHP_EXPRESS_MATRIX = <?= json_encode(function_exists('tchp_get_express_workbench_matrix') ? tchp_get_express_workbench_matrix() : [], JSON_UNESCAPED_UNICODE) ?>;
+  </script>
 </head>
 <body class="tp-headphones font-sans min-h-screen flex flex-col justify-between text-base leading-relaxed">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-3 focus:left-3 focus:bg-accent focus:text-ink focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs focus:shadow-md focus:outline-none">

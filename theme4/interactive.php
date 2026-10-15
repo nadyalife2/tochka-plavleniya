@@ -86,8 +86,8 @@ include __DIR__ . '/includes/header.php';
           </div>
         </div>
 
-        <!-- Инженерный блок верстака в чертёжном стиле (FIG. 1.1 - 3.1) -->
-        <div class="workbench-section mt-4">
+        <!-- Инженерный блок верстака в чертёжном стиле (FIG. 1.1 - 3.1) — на мобильном скрыт для быстрого доступа к полям калькулятора -->
+        <div class="workbench-section mt-4 hidden md:block">
           <div class="workbench-container">
             <div class="cards-grid">
 

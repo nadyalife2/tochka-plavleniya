@@ -1494,7 +1494,7 @@ include __DIR__ . '/includes/header.php';
               Мгновенный расчет сплавов, допустимого тока провода и проверка классов флюса прямо на странице статьи.
             </p>
           </div>
-          <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="btn btn-primary w-full text-xs font-mono py-2 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:translate-y-0.5">
+          <button type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" aria-haspopup="dialog" aria-expanded="false" aria-controls="lab-drawer-backdrop" aria-label="Открыть выдвижной верстак" class="btn btn-primary w-full text-xs font-mono py-2 flex items-center justify-center gap-1.5 cursor-pointer shadow-xs active:translate-y-0.5">
             <?= tp_icon('sliders', 'w-3.5 h-3.5') ?>
             <span>Выдвинуть верстак ↗</span>
           </button>
