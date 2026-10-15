@@ -397,27 +397,27 @@ include __DIR__ . '/includes/header.php';
                       <span class="opacity-90 font-bold text-accent">300°C</span>
                       <span>450°C</span>
                     </div>
-                  <!-- Интерактивный симулятор теплопроводности (FLIR-style Canvas 2D Heatmap) -->
+                  <!-- Интерактивный симулятор теплопроводности (учебная 2D-модель) -->
                   <div id="temp-heatmap-container" class="mt-3 pt-3 border-t border-paper-border space-y-2" style="display:none;">
                     <div class="flex items-center justify-between text-stamp font-mono">
                       <span class="font-bold text-ink uppercase flex items-center gap-1.5">
                         <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
-                        СИМУЛЯЦИЯ ТЕПЛОПРОВОДНОСТИ
+                        УЧЕБНАЯ МОДЕЛЬ ТЕПЛОПРОВОДНОСТИ
                       </span>
                       <span id="heatmap-tal-display" class="text-accent font-bold">TAL: --</span>
                     </div>
                     <div class="relative rounded overflow-hidden border border-paper-border bg-[#14161a]">
-                      <canvas id="thermal-canvas" width="480" height="130" class="w-full h-[120px] block cursor-crosshair" aria-label="Интерактивный тепловизор паяльного соединения"></canvas>
+                      <canvas id="thermal-canvas" width="480" height="130" class="w-full h-[120px] block cursor-crosshair" aria-label="Интерактивная учебная модель теплопроводности паяльного соединения"></canvas>
                       <div class="absolute bottom-1.5 left-2 flex items-center gap-2 text-stamp font-mono text-white/80 select-none pointer-events-none">
                         <span>● ЖАЛО: <span id="heatmap-tip-temp" class="text-accent font-bold">--</span></span>
                         <span>● ЗОНА КОНТАКТА: <span id="heatmap-joint-temp" class="text-emerald-400 font-bold">--</span></span>
                       </div>
                       <div class="absolute top-1.5 right-2 text-stamp font-mono text-white/50 uppercase select-none pointer-events-none">
-                        FLIR THERMAL MODEL
+                        2D МОДЕЛЬ // ИЛЛЮСТРАЦИЯ
                       </div>
                     </div>
                     <p class="text-stamp font-mono text-ink-muted leading-tight">
-                      Кликните или перемещайте курсор по плате, чтобы смоделировать касание жала паяльника и динамику растекания тепла по меди.
+                      Учебная 2D-модель динамики прогрева медной площадки при касании жала. Является визуальной иллюстрацией физических процессов, а не измерительным прибором.
                     </p>
                   </div>
 
@@ -1261,8 +1261,5 @@ include __DIR__ . '/includes/header.php';
   <!-- Global Engineering Search Modal (Ctrl+K) -->
   <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
 
-<!-- impeccable-live-start -->
-<script src="http://localhost:8400/live.js?token=7bd99a9d-1036-4cae-b680-1d37c8e37200"></script>
-<!-- impeccable-live-end -->
 </body>
 </html>

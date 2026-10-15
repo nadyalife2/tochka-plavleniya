@@ -801,8 +801,5 @@ include __DIR__ . '/includes/header.php';
     })();
   </script>
 
-<!-- impeccable-live-start -->
-<script src="http://localhost:8400/live.js?token=7bd99a9d-1036-4cae-b680-1d37c8e37200"></script>
-<!-- impeccable-live-end -->
 </body>
 </html>

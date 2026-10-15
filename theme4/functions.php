@@ -193,7 +193,7 @@ add_action('init', function () {
             'content'     => '<!-- wp:html -->
 <div class="sketch-frame p-4 sm:p-6 my-6 relative overflow-hidden bg-card border border-paper-border rounded-lg shadow-xs">
   <div class="font-hand text-xl font-bold text-ink mb-3 flex items-center gap-2">
-    <?= tp_icon('chart-line', 'w-4 h-4 text-accent') ?>
+    <svg class="tp-icon w-4 h-4 text-accent" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
     <span>Схема нагрева: T°C / Время (сек) — SAC305</span>
   </div>
   <div class="w-full overflow-x-auto">

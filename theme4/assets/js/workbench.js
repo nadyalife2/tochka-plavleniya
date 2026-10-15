@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.isMouseDown = false;
       this.isHovering = false;
       this.touchTimeSec = 0.0;
+      this.lastFrameTime = performance.now();
       this.animId = null;
       this.isRunning = false;
       this.isVisible = true;
@@ -158,6 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.prevGrid[i] = this.ambientTemp;
       }
       this.touchTimeSec = 0;
+      this.lastFrameTime = performance.now();
     }
 
     configure(tipTemp, meltTemp, workType) {
@@ -270,6 +272,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     step() {
+      const now = performance.now();
+      const dt = Math.min(0.1, Math.max(0.001, (now - (this.lastFrameTime || now)) / 1000));
+      this.lastFrameTime = now;
+
       const cols = this.cols;
       const rows = this.rows;
       const prev = this.prevGrid;
@@ -283,11 +289,15 @@ document.addEventListener('DOMContentLoaded', () => {
       const tx = Math.max(1, Math.min(cols - 2, Math.floor(this.tipX)));
       const ty = Math.max(1, Math.min(rows - 2, Math.floor(this.tipY)));
 
-      prev[ty * cols + tx] = this.tipTemp;
-      if (tx > 0) prev[ty * cols + (tx - 1)] = Math.max(prev[ty * cols + (tx - 1)], this.tipTemp * 0.92);
-      if (tx < cols - 1) prev[ty * cols + (tx + 1)] = Math.max(prev[ty * cols + (tx + 1)], this.tipTemp * 0.92);
-      if (ty > 0) prev[(ty - 1) * cols + tx] = Math.max(prev[(ty - 1) * cols + tx], this.tipTemp * 0.92);
-      if (ty < rows - 1) prev[(ty + 1) * cols + tx] = Math.max(prev[(ty + 1) * cols + tx], this.tipTemp * 0.92);
+      // Нагрев подаётся только при активном контакте жала с платой (нажатие или удержание курсора)
+      const isHeating = this.isMouseDown || this.isHovering;
+      if (isHeating) {
+        prev[ty * cols + tx] = this.tipTemp;
+        if (tx > 0) prev[ty * cols + (tx - 1)] = Math.max(prev[ty * cols + (tx - 1)], this.tipTemp * 0.92);
+        if (tx < cols - 1) prev[ty * cols + (tx + 1)] = Math.max(prev[ty * cols + (tx + 1)], this.tipTemp * 0.92);
+        if (ty > 0) prev[(ty - 1) * cols + tx] = Math.max(prev[(ty - 1) * cols + tx], this.tipTemp * 0.92);
+        if (ty < rows - 1) prev[(ty + 1) * cols + tx] = Math.max(prev[(ty + 1) * cols + tx], this.tipTemp * 0.92);
+      }
 
       for (let r = 1; r < rows - 1; r++) {
         const rowOffset = r * cols;
@@ -305,21 +315,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      const jointTemp = curr[ty * cols + tx];
-      if (jointTemp >= this.meltTemp) {
-        this.touchTimeSec += 0.016;
-      } else {
-        this.touchTimeSec = Math.max(0, this.touchTimeSec - 0.03);
+      // Измеряем температуру в центральной контактной площадке и непосредственно под жалом
+      const padX = Math.floor(cols / 2);
+      const padY = Math.floor(rows / 2);
+      const padTemp = curr[padY * cols + padX];
+      const tipContactTemp = curr[ty * cols + tx];
+      const activeZoneTemp = isHeating ? tipContactTemp : padTemp;
+
+      // TAL (Time Above Liquidus) — накопленное интегральное время выше точки ликвидуса.
+      // Не убывает при охлаждении (соответствует стандарту IPC J-STD-020D).
+      if (activeZoneTemp >= this.meltTemp) {
+        this.touchTimeSec += dt;
       }
 
       if (heatmapTipTemp) heatmapTipTemp.textContent = `${Math.round(this.tipTemp)} °C`;
       if (heatmapJointTemp) {
-        const isLiquid = jointTemp >= this.meltTemp;
-        heatmapJointTemp.textContent = `${Math.round(jointTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
+        const isLiquid = activeZoneTemp >= this.meltTemp;
+        heatmapJointTemp.textContent = `${Math.round(activeZoneTemp)} °C ${isLiquid ? '● РАСПЛАВ' : '○ ТВЁРДОЕ'}`;
         heatmapJointTemp.className = isLiquid ? 'text-accent font-bold' : 'text-cyan font-bold';
       }
       if (heatmapTalDisplay) {
-        heatmapTalDisplay.textContent = `TAL: ${this.touchTimeSec.toFixed(1)} сек`;
+        heatmapTalDisplay.textContent = `TAL: ${this.touchTimeSec.toFixed(1)} с`;
       }
     }
 
@@ -419,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     start() {
       this.shouldRun = true;
+      this.lastFrameTime = performance.now();
       if (!this.isVisible || this.isRunning) return;
       this.isRunning = true;
 
@@ -555,10 +572,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (tempStatusBadge) {
       const avg = (item.t_min + item.t_max) / 2;
       if (avg <= 300) {
-        tempStatusBadge.textContent = 'ДОПУСК СОБЛЮДЁН // IPC-A-610';
-        tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-accent text-ink';
+        tempStatusBadge.textContent = 'СТАРТОВЫЙ ОРИЕНТИР // СТАНДАРТНЫЙ РЕЖИМ';
+        tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-paper-subtle border border-paper-border text-ink';
       } else {
-        tempStatusBadge.textContent = 'ПОВЫШЕННЫЙ НАГРЕВ // ПРЕДНАГРЕВ';
+        tempStatusBadge.textContent = 'ПОВЫШЕННЫЙ НАГРЕВ // ТРЕБУЕТСЯ ПРЕДНАГРЕВ';
         tempStatusBadge.className = 'font-mono text-xs px-2 py-0.5 rounded font-bold uppercase bg-amber-400 text-ink';
       }
     }

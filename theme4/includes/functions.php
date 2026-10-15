@@ -135,16 +135,29 @@ if (!function_exists('get_reading_time')) {
 
 if (!function_exists('render_article_schema')) {
     function render_article_schema(array $article, array $faq = []): string {
-        $url = "https://tochka-plavleniya.ru/article/" . ($article['slug'] ?? 'post');
+        $slug = $article['slug'] ?? 'post';
+        $post_id = $article['id'] ?? 0;
+        if (function_exists('tchp_get_article_url')) {
+            $raw_url = tchp_get_article_url($slug, $post_id);
+            if (str_starts_with($raw_url, 'http://') || str_starts_with($raw_url, 'https://')) {
+                $url = $raw_url;
+            } else {
+                $url = "https://tochka-plavleniya.ru" . (str_starts_with($raw_url, '/') ? $raw_url : '/' . $raw_url);
+            }
+        } else {
+            $url = "https://tochka-plavleniya.ru/" . urlencode($slug) . "/";
+        }
+        $date_pub = !empty($article['date']) ? $article['date'] : '2026-08-20';
+        $date_mod = !empty($article['date_modified']) ? $article['date_modified'] : $date_pub;
         $graph = [
             [
                 "@type" => "TechArticle",
-                "@id" => $url . "/#article",
+                "@id" => $url . "#article",
                 "headline" => $article['title'] ?? '',
                 "description" => $article['excerpt'] ?? '',
                 "inLanguage" => "ru",
-                "datePublished" => $article['date'] ?? '2026-08-20',
-                "dateModified" => date('Y-m-d'),
+                "datePublished" => $date_pub,
+                "dateModified" => $date_mod,
                 "author" => [
                     "@type" => "Person",
                     "name" => $article['author'] ?? 'Инженер Лаборатории ТЧП',
@@ -269,11 +282,25 @@ if (!function_exists('get_semantic_tag_pill')) {
  */
 if (!function_exists('render_rubric_schema')) {
     function render_rubric_schema(array $rubric, array $articles): string {
-        $canonical_url = "https://tochka-plavleniya.ru/category.php?slug=" . urlencode($rubric['slug'] ?? 'materialy');
+        $rslug = $rubric['slug'] ?? 'materialy';
+        if (function_exists('get_category_by_slug') && ($cat = get_category_by_slug($rslug))) {
+            $canonical_url = get_category_link($cat->term_id);
+        } else {
+            $canonical_url = "https://tochka-plavleniya.ru/category/" . urlencode($rslug) . "/";
+        }
         $itemList = [];
         $pos = 1;
         foreach ($articles as $art) {
-            $itemUrl = !empty($art['url']) ? $art['url'] : ("https://tochka-plavleniya.ru/" . urlencode($art['slug'] ?? '') . "/");
+            $aslug = $art['slug'] ?? '';
+            $aid = $art['id'] ?? 0;
+            if (function_exists('tchp_get_article_url')) {
+                $raw_art_url = tchp_get_article_url($aslug, $aid);
+                $itemUrl = (str_starts_with($raw_art_url, 'http://') || str_starts_with($raw_art_url, 'https://'))
+                    ? $raw_art_url
+                    : ("https://tochka-plavleniya.ru" . (str_starts_with($raw_art_url, '/') ? $raw_art_url : '/' . $raw_art_url));
+            } else {
+                $itemUrl = "https://tochka-plavleniya.ru/" . urlencode($aslug) . "/";
+            }
             $itemList[] = [
                 "@type" => "ListItem",
                 "position" => $pos++,
@@ -316,7 +343,7 @@ if (!function_exists('render_rubric_schema')) {
                             "@type" => "ListItem",
                             "position" => 2,
                             "name" => "Рубрики журнала",
-                            "item" => "https://tochka-plavleniya.ru/#articles"
+                            "item" => "https://tochka-plavleniya.ru/#rubrics"
                         ],
                         [
                             "@type" => "ListItem",

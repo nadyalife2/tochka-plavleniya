@@ -87,21 +87,64 @@ $featured_article = $articles[3] ?? $articles[0]; // Жало T12 vs C245 на �
 $f_url = tchp_get_article_url($featured_article['slug'], $featured_article['id'] ?? 0);
 $f_tag_pill = get_semantic_tag_pill($featured_article['tag_key'] ?? 'tools');
 
+// Инженерный FAQ главной страницы (источник правды для видимого блока и JSON-LD)
+$index_faq = [
+    [
+        'q' => 'Какую температуру выставить для припоя ПОС-61?',
+        'a' => 'Припой ПОС-61 плавится в интервале 183–190 °C (ГОСТ 21931-76). На паяльной станции выставляйте 260–290 °C. Это практический стартовый ориентир для мелкой пайки, а не норма ГОСТ: запас в 75–100 °C необходим, чтобы компенсировать отвод тепла в медные дорожки платы.'
+    ],
+    [
+        'q' => 'Нужен ли новичку дорогой паяльник вроде JBC?',
+        'a' => 'Нет. Для уверенного старта достаточно паяльной станции на картриджах Hakko T12 или портативного USB-PD паяльника (Pinecil, TS101). Они прогреваются за 8–10 секунд и стабильно держат температуру благодаря встроенной в картридж термопаре.'
+    ],
+    [
+        'q' => 'Как не отслоить медную дорожку от текстолита?',
+        'a' => 'Главное правило: время контакта жала с контактной площадкой не должно превышать 2.5–3 секунд. Если припой не плавится за это время — увеличьте площадь пятна контакта жала (клин вместо иглы) или используйте подогрев платы, но не давите на медь силой.'
+    ],
+    [
+        'q' => 'Какой флюс выбрать для первого раза и надо ли его смывать?',
+        'a' => 'Выбирайте гелевый флюс класса No-Clean (ROL0 / REL0). Канифоль безопасна, но твердеет; активные кислотные флюсы для электроники категорически запрещены — их остатки разъедают медь и вызывают микротоки утечки.'
+    ]
+];
+
 ob_start();
 ?>
   <link rel="canonical" href="https://tochka-plavleniya.ru/">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebSite",
-    "name": "ТОЧКА ПЛАВЛЕНИЯ",
-    "url": "https://tochka-plavleniya.ru/",
-    "description": "Инженерный справочник по пайке, температурные режимы жала и интерактивный верстак.",
-    "potentialAction": {
-      "@type": "SearchAction",
-      "target": "https://tochka-plavleniya.ru/?s={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://tochka-plavleniya.ru/#website",
+        "url": "https://tochka-plavleniya.ru/",
+        "name": "ТОЧКА ПЛАВЛЕНИЯ",
+        "description": "Инженерный справочник по пайке, температурные режимы жала и интерактивный верстак.",
+        "inLanguage": "ru-RU",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://tochka-plavleniya.ru/?s={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      },
+      {
+        "@type": "FAQPage",
+        "@id": "https://tochka-plavleniya.ru/#faq",
+        "inLanguage": "ru-RU",
+        "mainEntity": [
+          <?php foreach ($index_faq as $i => $item): ?>
+          {
+            "@type": "Question",
+            "name": <?= json_encode($item['q'], JSON_UNESCAPED_UNICODE) ?>,
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": <?= json_encode($item['a'], JSON_UNESCAPED_UNICODE) ?>
+            }
+          }<?= $i < count($index_faq) - 1 ? ',' : '' ?>
+          <?php endforeach; ?>
+        ]
+      }
+    ]
   }
   </script>
 <?php
@@ -114,7 +157,7 @@ include __DIR__ . '/includes/header.php';
     <div class="max-w-[1140px] mx-auto px-5 sm:px-8 py-6 space-y-6">
 
       <!-- 1. EDITORIAL HEADER (UNIFIED WITH CATEGORY.PHP) -->
-      <section class="border-b border-paper-border pb-6 space-y-4">
+      <section id="top" class="border-b border-paper-border pb-6 space-y-4">
         <div class="max-w-3xl space-y-3">
           
           <!-- Single Subtle Workshop Stamp -->
@@ -189,10 +232,10 @@ include __DIR__ . '/includes/header.php';
 
             <div>
               <h2 class="text-lg sm:text-xl font-bold text-ink font-sans">
-                Калькулятор безопасной температуры паяльного жала
+                Калькулятор ориентировочной температуры жала паяльника
               </h2>
               <p class="text-xs sm:text-sm text-ink-muted font-mono leading-relaxed mt-1">
-                Выберите сплав припоя и тип паяемого узла — табло мгновенно рассчитает безопасную температуру жала станции.
+                Выберите сплав припоя и тип паяемого узла — табло отобразит стартовый рабочий диапазон уставки станции. Уставка корректируется по теплоёмкости узла и форме жала.
               </p>
             </div>
 
@@ -205,10 +248,11 @@ include __DIR__ . '/includes/header.php';
                     Припой / Марка сплава:
                   </label>
                   <select id="exp-solder-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-1.5 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-                    <option value="pos61" data-liq="183">ПОС-61 // Свинцовый (183 °C)</option>
-                    <option value="sac305" data-liq="217">SAC305 // Бессвинец RoHS (217 °C)</option>
-                    <option value="sn42bi58" data-liq="138">Sn42Bi58 // Низкотемпературный (138 °C)</option>
-                    <option value="rose" data-liq="94">Сплав Розе // Демонтажный (94 °C)</option>
+                    <option value="pos61" selected>ПОС-61 // ГОСТ 21931 (Тпл 183–190 °C)</option>
+                    <option value="sn63pb37">Sn63Pb37 // Эвтектика (183 °C)</option>
+                    <option value="sac305">SAC305 // Бессвинец RoHS (217 °C)</option>
+                    <option value="sn42bi58">Sn42Bi58 // Низкотемпературный (138 °C)</option>
+                    <option value="rose">Сплав Розе // Демонтажный (94 °C)</option>
                   </select>
                 </div>
 
@@ -218,9 +262,9 @@ include __DIR__ . '/includes/header.php';
                     Теплоёмкость соединения:
                   </label>
                   <select id="exp-mass-select" class="w-full bg-paper border border-paper-border-dark rounded px-2.5 py-1.5 text-ink font-mono text-xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent">
-                    <option value="smd" data-delta="85">SMD чипы и тонкие дорожки (1–2 слоя)</option>
-                    <option value="pth" data-delta="105">Выводной монтаж (DIP, провода, разъемы)</option>
-                    <option value="copper" data-delta="125">Массивная медь / Земляные полигоны GND</option>
+                    <option value="smd" selected>SMD чипы и тонкие дорожки (1–2 слоя)</option>
+                    <option value="pth">Выводной монтаж (DIP, провода, разъемы)</option>
+                    <option value="copper">Массивная медь / Земляные полигоны GND</option>
                   </select>
                 </div>
               </div>
@@ -229,19 +273,19 @@ include __DIR__ . '/includes/header.php';
               <div class="rounded border border-paper-border bg-paper p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3" aria-live="polite">
                 <div class="space-y-0.5">
                   <div class="flex items-center gap-2">
-                    <span class="text-ink-muted text-xs font-bold uppercase">Режим станции:</span>
+                    <span class="text-ink-muted text-xs font-bold uppercase">Ориентир станции:</span>
                     <span id="exp-safety-badge" class="pill-blue text-xs font-bold px-2 py-0.5 rounded">
-                      ЗЕЛЁНАЯ ЗОНА // БЕЗОПАСНО
+                      СТАРТОВЫЙ ДИАПАЗОН // РАБОЧЕЕ ОКНО
                     </span>
                   </div>
                   <div class="text-xs text-ink-muted">
-                    Ликвидус: <span id="exp-liq-val" class="font-bold text-ink">183 °C</span> · Дельта теплопередачи: <span id="exp-delta-val" class="font-bold text-accent">+85 °C</span>
+                    Интервал ликвидуса: <span id="exp-liq-val" class="font-bold text-ink">183–190 °C</span> · Градиент теплоотвода: <span id="exp-delta-val" class="font-bold text-accent">+75...105 °C</span>
                   </div>
                 </div>
 
                 <div class="flex items-center gap-2 shrink-0">
                   <div class="px-3 py-1.5 rounded bg-ink text-paper font-mono font-bold text-lg tabular-nums tracking-wider border border-ink flex items-center gap-1 shadow-2xs">
-                    <span id="exp-temp-out">268</span>
+                    <span id="exp-temp-out">260 – 295</span>
                     <span class="text-accent text-sm">°C</span>
                   </div>
                   <button type="button" id="exp-copy-btn" class="px-2.5 py-1.5 rounded border border-paper-border hover:border-accent text-ink hover:text-accent transition-colors text-xs font-mono font-bold" title="Скопировать значение">
@@ -335,7 +379,7 @@ include __DIR__ . '/includes/header.php';
           <?php endif; ?>
 
           <!-- ПРИКЛАДНЫЕ ЗАДАЧИ МОНТАЖА (4 МОДУЛЯ В СТИЛЕ КАРТОЧЕК СТАТЕЙ) -->
-          <div class="space-y-3">
+          <section id="tasks" class="space-y-3">
             <div class="flex items-center justify-between border-b border-paper-border pb-2">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('wrench', 'w-4 h-4 text-accent') ?>
@@ -409,10 +453,10 @@ include __DIR__ . '/includes/header.php';
                 </div>
               </div>
             </div>
-          </div>
+          </section>
 
           <!-- СВЕЖИЕ СТАТЬИ ЖУРНАЛА (2-КОЛОНОЧНАЯ СЕТКА) -->
-          <div class="space-y-3">
+          <section id="articles" class="space-y-3">
             <div class="flex items-center justify-between border-b border-paper-border pb-2">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('book-open', 'w-4 h-4 text-accent') ?>
@@ -480,10 +524,10 @@ include __DIR__ . '/includes/header.php';
                 </article>
               <?php endforeach; ?>
             </div>
-          </div>
+          </section>
 
           <!-- ТЕМАТИЧЕСКИЕ РАЗДЕЛЫ ЖУРНАЛА -->
-          <div class="space-y-3">
+          <section id="rubrics" class="space-y-3">
             <div class="flex items-center justify-between border-b border-paper-border pb-2">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('sliders', 'w-4 h-4 text-accent') ?>
@@ -515,10 +559,60 @@ include __DIR__ . '/includes/header.php';
                 </a>
               <?php endforeach; ?>
             </div>
-          </div>
+          </section>
+
+          <!-- 10 ПРИКЛАДНЫХ МИКРОУРОКОВ МОНТАЖА (ВИКТРИНА ПРАКТИКУМА) -->
+          <section id="lessons" class="space-y-3">
+            <div class="flex items-center justify-between border-b border-paper-border pb-2">
+              <div>
+                <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
+                  <?= tp_icon('wrench', 'w-4 h-4 text-accent') ?>
+                  <span>Прикладные микроуроки монтажа // Практикум</span>
+                </h2>
+                <p class="text-xs text-ink-muted font-sans mt-0.5">10 коротких цеховых инструкций по 2–3 минуты: физика процессов, чек-листы и нормы IPC-A-610.</p>
+              </div>
+              <span class="pill-blue text-xs font-mono font-bold px-2 py-0.5 rounded shrink-0 hidden sm:inline-block">10 РЕГЛАМЕНТОВ</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <?php 
+              if (function_exists('get_all_lessons')):
+                foreach (get_all_lessons() as $idx => $l): 
+                  $l_url = tchp_get_article_url($l['slug'] ?? '', 0);
+                  $l_idx = str_pad($idx + 1, 2, '0', STR_PAD_LEFT);
+              ?>
+                <article class="border border-paper-border rounded-lg bg-card p-4 flex flex-col justify-between space-y-2.5 hover:border-paper-border-dark transition-all group">
+                  <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs font-mono">
+                      <span class="badge badge-yellow py-0.5 px-1.5 font-bold">[РЕГЛАМЕНТ-<?= $l_idx ?>]</span>
+                      <span class="text-ink-muted font-mono text-xs">~<?= e($l['read_min'] ?? 2) ?> МИН</span>
+                    </div>
+                    <h3 class="font-bold text-ink text-sm sm:text-base group-hover:text-accent transition-colors leading-snug">
+                      <a href="<?= esc_url($l_url) ?>" class="focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
+                        <?= e($l['title']) ?>
+                      </a>
+                    </h3>
+                    <p class="text-xs text-ink-muted font-sans leading-relaxed line-clamp-2">
+                      <?= e($l['subtitle'] ?? '') ?>
+                    </p>
+                  </div>
+                  <div class="pt-2 border-t border-paper-border flex items-center justify-between text-xs font-mono text-ink-faint">
+                    <span class="text-xs font-mono text-ink-muted">ЧЕК-ЛИСТ ОПЕРАЦИИ</span>
+                    <a href="<?= esc_url($l_url) ?>" class="font-bold text-ink group-hover:underline inline-flex items-center gap-1 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none rounded">
+                      <span>Открыть</span>
+                      <span aria-hidden="true">→</span>
+                    </a>
+                  </div>
+                </article>
+              <?php 
+                endforeach;
+              endif;
+              ?>
+            </div>
+          </section>
 
           <!-- ИНЖЕНЕРНЫЙ FAQ -->
-          <div class="border border-paper-border rounded-lg bg-card p-5 sm:p-6 space-y-4 shadow-sm">
+          <section id="faq" class="border border-paper-border rounded-lg bg-card p-5 sm:p-6 space-y-4 shadow-sm">
             <div class="flex items-center justify-between pb-3 border-b border-paper-border">
               <h2 class="text-base sm:text-lg font-bold font-mono uppercase text-ink flex items-center gap-2">
                 <?= tp_icon('alert-triangle', 'w-4 h-4 text-accent') ?>
@@ -528,24 +622,14 @@ include __DIR__ . '/includes/header.php';
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-mono">
-              <div class="p-3.5 rounded bg-paper-subtle border border-paper-border space-y-1.5">
-                <div class="font-bold text-ink text-xs">Какую температуру выставлять для припоя ПОС-61?</div>
-                <p class="text-ink-muted leading-relaxed font-sans text-xs">Рабочее окно жала — 260–290 °C. Ликвидус сплава 183 °C; дельта в 80–100 °C необходима для быстрого прогрева площадок платы без сжигания канифоли.</p>
-              </div>
-              <div class="p-3.5 rounded bg-paper-subtle border border-paper-border space-y-1.5">
-                <div class="font-bold text-ink text-xs">Нужно ли смывать флюс-гель No-Clean (NC-559)?</div>
-                <p class="text-ink-muted leading-relaxed font-sans text-xs">В низковольтных схемах остатки пассивны. Но в ВЧ-трактах, цепях выше 50 В и под BGA смывка изопропанолом обязательна из-за риска микротоков утечки.</p>
-              </div>
-              <div class="p-3.5 rounded bg-paper-subtle border border-paper-border space-y-1.5">
-                <div class="font-bold text-ink text-xs">Как не оторвать пятаки при демонтаже разъема?</div>
-                <p class="text-ink-muted leading-relaxed font-sans text-xs">Разбавьте тугоплавкий бессвинец каплей сплава Розе (94 °C), удалите расплав медной оплеткой с флюсом и снимайте разъем пинцетом без механического усилия.</p>
-              </div>
-              <div class="p-3.5 rounded bg-paper-subtle border border-paper-border space-y-1.5">
-                <div class="font-bold text-ink text-xs">Какой паяльник выбрать: T12 или JBC C245?</div>
-                <p class="text-ink-muted leading-relaxed font-sans text-xs">T12 — надежный стандарт до 70 Вт для домашней лаборатории. C245 с картриджами 130 Вт незаменим для профессионального ремонта многослойных плат с земляными полигонами.</p>
-              </div>
+              <?php foreach ($index_faq as $f): ?>
+                <div class="p-3.5 rounded bg-paper-subtle border border-paper-border space-y-1.5">
+                  <div class="font-bold text-ink text-xs"><?= e($f['q']) ?></div>
+                  <p class="text-ink-muted leading-relaxed font-sans text-xs"><?= e($f['a']) ?></p>
+                </div>
+              <?php endforeach; ?>
             </div>
-          </div>
+          </section>
 
         </div>
 
@@ -592,20 +676,38 @@ include __DIR__ . '/includes/header.php';
               <!-- Сплав 1: ПОС-61 -->
               <details class="group border border-paper-border/70 rounded bg-paper-subtle/50 transition-colors open:bg-paper-subtle">
                 <summary class="flex items-center justify-between p-2 cursor-pointer select-none hover:text-accent transition-colors list-none">
-                  <span class="font-bold text-ink group-open:text-accent">ПОС-61 // Sn63Pb37</span>
+                  <span class="font-bold text-ink group-open:text-accent">ПОС-61 // ГОСТ 21931</span>
+                  <span class="font-bold text-ink tabular-nums text-xs bg-paper border border-paper-border px-1.5 py-0.5 rounded shadow-2xs">183–190 °C</span>
+                </summary>
+                <div class="px-2.5 pb-2.5 pt-1.5 border-t border-paper-border/50 text-xs text-ink-muted space-y-1 bg-paper/60 rounded-b">
+                  <div class="flex justify-between"><span>Состав:</span><span class="font-bold text-ink">59–61% Sn, ост. Pb</span></div>
+                  <div class="flex justify-between"><span>Солидус / Ликвидус:</span><span class="font-bold text-ink">183 °C / 190 °C</span></div>
+                  <div class="flex justify-between"><span>Окно жала:</span><span class="text-accent font-bold">260–295 °C</span></div>
+                  <div class="flex justify-between"><span>Тип:</span><span>Оловянно-свинцовый (доэвтектика)</span></div>
+                  <div class="pt-1 text-right">
+                    <button type="button" class="copy-solder-temp text-xs text-ink hover:underline font-bold" data-temp="183–190 °C">Скопировать 183–190 °C</button>
+                  </div>
+                </div>
+              </details>
+
+              <!-- Сплав 2: Sn63Pb37 -->
+              <details class="group border border-paper-border/70 rounded bg-paper-subtle/50 transition-colors open:bg-paper-subtle">
+                <summary class="flex items-center justify-between p-2 cursor-pointer select-none hover:text-accent transition-colors list-none">
+                  <span class="font-bold text-ink group-open:text-accent">Sn63Pb37 // Эвтектика</span>
                   <span class="font-bold text-ink tabular-nums text-xs bg-paper border border-paper-border px-1.5 py-0.5 rounded shadow-2xs">183 °C</span>
                 </summary>
                 <div class="px-2.5 pb-2.5 pt-1.5 border-t border-paper-border/50 text-xs text-ink-muted space-y-1 bg-paper/60 rounded-b">
                   <div class="flex justify-between"><span>Состав:</span><span class="font-bold text-ink">63% Sn, 37% Pb</span></div>
+                  <div class="flex justify-between"><span>Точка плавления:</span><span class="font-bold text-ink">183 °C (эвтектическая)</span></div>
                   <div class="flex justify-between"><span>Окно жала:</span><span class="text-accent font-bold">260–290 °C</span></div>
-                  <div class="flex justify-between"><span>Тип:</span><span>Эвтектика (без кашевидной фазы)</span></div>
+                  <div class="flex justify-between"><span>Стандарт:</span><span>IPC-J-STD-006 / ASTM B32</span></div>
                   <div class="pt-1 text-right">
                     <button type="button" class="copy-solder-temp text-xs text-ink hover:underline font-bold" data-temp="183 °C">Скопировать 183 °C</button>
                   </div>
                 </div>
               </details>
 
-              <!-- Сплав 2: SAC305 -->
+              <!-- Сплав 3: SAC305 -->
               <details class="group border border-paper-border/70 rounded bg-paper-subtle/50 transition-colors open:bg-paper-subtle">
                 <summary class="flex items-center justify-between p-2 cursor-pointer select-none hover:text-accent transition-colors list-none">
                   <span class="font-bold text-ink group-open:text-accent">SAC305 // Бессвинец</span>
@@ -621,7 +723,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
               </details>
 
-              <!-- Сплав 3: Sn42Bi58 -->
+              <!-- Сплав 4: Sn42Bi58 -->
               <details class="group border border-paper-border/70 rounded bg-paper-subtle/50 transition-colors open:bg-paper-subtle">
                 <summary class="flex items-center justify-between p-2 cursor-pointer select-none hover:text-accent transition-colors list-none">
                   <span class="font-bold text-ink group-open:text-accent">Sn42Bi58 // Низкотемп.</span>
@@ -637,7 +739,7 @@ include __DIR__ . '/includes/header.php';
                 </div>
               </details>
 
-              <!-- Сплав 4: Сплав Розе -->
+              <!-- Сплав 5: Сплав Розе -->
               <details class="group border border-paper-border/70 rounded bg-paper-subtle/50 transition-colors open:bg-paper-subtle">
                 <summary class="flex items-center justify-between p-2 cursor-pointer select-none hover:text-accent transition-colors list-none">
                   <span class="font-bold text-ink group-open:text-accent">Сплав Розе // Демонтаж</span>
@@ -745,16 +847,17 @@ include __DIR__ . '/includes/header.php';
           </div>
 
           <!-- 6. МЕТРОЛОГИЯ И НОРМАТИВНАЯ БАЗА -->
-          <div class="border border-paper-border rounded-lg bg-paper-subtle p-4 space-y-2 shadow-sm font-mono text-xs">
+          <div id="trust" class="border border-paper-border rounded-lg bg-paper-subtle p-4 space-y-2 shadow-sm font-mono text-xs">
             <div class="flex items-center justify-between border-b border-paper-border pb-1 text-xs font-bold text-ink uppercase">
               <span>Метрология</span>
               <span class="text-ink-faint">ОТК-2026</span>
             </div>
             <div class="space-y-1 text-ink-muted text-xs">
-              <div>• ГОСТ 21930 / 21931: ПОС-61 (183 °C)</div>
+              <div>• ГОСТ 21930 / 21931: ПОС-61 (183–190 °C)</div>
+              <div>• IPC-J-STD-006: Sn63Pb37 (183 °C эвтектика)</div>
               <div>• ISO 9453: Бессвинец SAC305 (217 °C)</div>
-              <div>• IPC-A-610G: Стандарты приемки РЭА</div>
-              <div>• IEC 61340-5-1: Электростатическая защита</div>
+              <div>• IPC-A-610G: Стандарты приемки РЭА (Класс 2/3)</div>
+              <div>• IEC 61340-5-1: Электростатическая защита ESD</div>
             </div>
           </div>
 
@@ -766,7 +869,7 @@ include __DIR__ . '/includes/header.php';
   </main>
 
   <script>
-    // Живой интерактивный калькулятор безопасной температуры жала на главной странице
+    // Живой интерактивный калькулятор ориентировочной температуры жала на главной странице
     (function initExpressWorkbench() {
       const solderEl = document.getElementById('exp-solder-select');
       const massEl = document.getElementById('exp-mass-select');
@@ -778,32 +881,59 @@ include __DIR__ . '/includes/header.php';
 
       if (!solderEl || !massEl || !tempOutEl) return;
 
+      // Матрица диапазонов уставки станции, согласованная с полным верстаком
+      const MATRIX = {
+        pos61: {
+          smd: { range: '260 – 295', liq: '183–190 °C', delta: '+75...105 °C', max: 295 },
+          pth: { range: '280 – 320', liq: '183–190 °C', delta: '+95...130 °C', max: 320 },
+          copper: { range: '300 – 340', liq: '183–190 °C', delta: '+115...150 °C', max: 340 }
+        },
+        sn63pb37: {
+          smd: { range: '260 – 290', liq: '183 °C', delta: '+75...105 °C', max: 290 },
+          pth: { range: '275 – 315', liq: '183 °C', delta: '+90...130 °C', max: 315 },
+          copper: { range: '300 – 340', liq: '183 °C', delta: '+115...155 °C', max: 340 }
+        },
+        sac305: {
+          smd: { range: '310 – 335', liq: '217 °C', delta: '+93...118 °C', max: 335 },
+          pth: { range: '320 – 350', liq: '217 °C', delta: '+103...133 °C', max: 350 },
+          copper: { range: '340 – 370', liq: '217 °C', delta: '+123...153 °C', max: 370 }
+        },
+        sn42bi58: {
+          smd: { range: '200 – 225', liq: '138 °C', delta: '+62...87 °C', max: 225 },
+          pth: { range: '210 – 235', liq: '138 °C', delta: '+72...97 °C', max: 235 },
+          copper: { range: '220 – 245', liq: '138 °C', delta: '+82...107 °C', max: 245 }
+        },
+        rose: {
+          smd: { range: '140 – 170', liq: '94 °C', delta: '+46...76 °C', max: 170 },
+          pth: { range: '150 – 180', liq: '94 °C', delta: '+56...86 °C', max: 180 },
+          copper: { range: '160 – 190', liq: '94 °C', delta: '+66...96 °C', max: 190 }
+        }
+      };
+
       function updateCalc() {
-        const sOpt = solderEl.options[solderEl.selectedIndex];
-        const mOpt = massEl.options[massEl.selectedIndex];
+        const sKey = solderEl.value || 'pos61';
+        const mKey = massEl.value || 'smd';
+        const data = (MATRIX[sKey] && MATRIX[sKey][mKey]) || MATRIX.pos61.smd;
 
-        const liq = parseInt(sOpt.getAttribute('data-liq') || '183', 10);
-        const delta = parseInt(mOpt.getAttribute('data-delta') || '85', 10);
-        const temp = liq + delta;
+        tempOutEl.textContent = data.range;
+        liqValEl.textContent = data.liq;
+        deltaValEl.textContent = data.delta;
 
-        tempOutEl.textContent = temp;
-        liqValEl.textContent = liq + ' °C';
-        deltaValEl.textContent = '+' + delta + ' °C';
-
-        if (temp > 340) {
+        if (data.max > 340) {
           safetyEl.className = 'pill-orange text-xs font-bold px-2 py-0.5 rounded';
-          safetyEl.textContent = 'ОРАНЖЕВАЯ ЗОНА // РИСК ПЕРЕГРЕВА МЕДИ';
-        } else if (temp < 220) {
+          safetyEl.textContent = 'ОРАНЖЕВАЯ ЗОНА // РИСК ПЕРЕГРЕВА МЕДИ (КОНТАКТ < 3 С)';
+        } else if (data.max < 200) {
           safetyEl.className = 'pill-yellow text-xs font-bold px-2 py-0.5 rounded';
-          safetyEl.textContent = 'НИЗКАЯ ТЕМПЕРАТУРА // ДЕМОНТАЖНЫЙ РЕЖИМ';
+          safetyEl.textContent = 'ДЕМОНТАЖНЫЙ РЕЖИМ // НИЗКАЯ ТЕМПЕРАТУРА';
         } else {
           safetyEl.className = 'pill-blue text-xs font-bold px-2 py-0.5 rounded';
-          safetyEl.textContent = 'ЗЕЛЁНАЯ ЗОНА // БЕЗОПАСНО ДЛЯ ПЛАТЫ';
+          safetyEl.textContent = 'СТАРТОВЫЙ ДИАПАЗОН // РАБОЧЕЕ ОКНО';
         }
       }
 
       solderEl.addEventListener('change', updateCalc);
       massEl.addEventListener('change', updateCalc);
+      updateCalc();
 
       if (copyBtn) {
         copyBtn.addEventListener('click', function() {
