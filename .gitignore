@@ -9,6 +9,8 @@ php_portable/
 !site2/assets/img/og-cover.png
 !theme3/**/*.png
 !theme4/**/*.png
+!media/**/*.png
+!media/**/*.webp
 /headphones_site-20261012T193944Z-1-001/
 .playwright-mcp/
 ux-mcp-server/
