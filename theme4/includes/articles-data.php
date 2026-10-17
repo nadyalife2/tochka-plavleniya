@@ -18,7 +18,7 @@ $articles = [
         'date'     => '10 авг 2026',
         'author'   => 'Иван Пайкин',
         'icon'     => 'thermometer',
-        'image'    => '/assets/schematics/bga-defect-crosssection.svg'
+        'image'    => '/assets/schematics/thermal-gradient.svg'
     ],
     [
         'id'       => 2,
@@ -50,7 +50,7 @@ $articles = [
         'date'     => '01 авг 2026',
         'author'   => 'Иван Пайкин',
         'icon'     => 'drop',
-        'image'    => 'https://lh3.googleusercontent.com/aida-public/AB6AXuDq0hH5xM39QDK1ZqCle8_Wk1nH4vsPEFi-qLOCIaH0mt5-NgDzrCsJkTQtjTFrNG8X9c4iXDGbdoYyxa9w9vsD5lhmodhFeYkAWkHXAFy0RloCfAkIN97lpnpFIzEqofnLwCZ_hIQ31MPvwYjr0YKml4OBALGI73SBp5g7T0cpRCK35Hp4utgd9ONG1OB3QN5BnZnqPkHXUtJPjiJgakBYuQhMka55il18DlWwDTGLTl5ZZrP1LM9R'
+        'image'    => '/assets/schematics/flux-syringe-guide.svg'
     ],
     [
         'id'       => 4,
@@ -66,7 +66,7 @@ $articles = [
         'date'     => '28 июл 2026',
         'author'   => 'Мария Канифоль',
         'icon'     => 'tools',
-        'image'    => 'https://lh3.googleusercontent.com/aida-public/AB6AXuChE9QvE8LozVtk7VrKxyYI-SrHgrPhImpEKRwWLy8fCBhxDhgQJbz22eBoGpZ97AEmkDILNPB6nXPLwk4Pq62v8qVL76AJmtm7Y3M86EKjJYmx-yPJkCc-vq1O-rNVWNo_vypZINr_lZHpl4QKTYJnCzMarAZm24hHEabOepCGf90eCac2R0yEBmu4eXa8cQtRGKfECNtCPUpfGFTV4N28XpeOWVBdpVriBQO9ZdB_yuU45CFoJi1n'
+        'image'    => '/assets/schematics/cartridges-compare.svg'
     ],
     [
         'id'       => 5,

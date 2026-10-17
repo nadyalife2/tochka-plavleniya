@@ -616,7 +616,7 @@ input[type="range"].range-slider::-webkit-slider-thumb:hover {
 .mobile-quick-bar {
   display: none !important;
 }
-@media (max-width: 768px) {
+@media (max-width: 639px) {
   .mobile-quick-bar {
     display: flex !important;
     position: fixed;
@@ -643,10 +643,51 @@ input[type="range"].range-slider::-webkit-slider-thumb:hover {
   body.tp-headphones {
     padding-bottom: max(4.5rem, calc(4rem + env(safe-area-inset-bottom)));
   }
-}
-@media (max-width: 768px) {
   header nav.nav {
     display: none !important;
+  }
+}
+
+/* ───────────────────────────────────────────────────────────────────────────
+   COOKIE BANNER RESPONSIVE STYLING (152-ФЗ)
+   ─────────────────────────────────────────────────────────────────────────── */
+.cookie-banner-container {
+  position: fixed;
+  z-index: 50;
+  box-sizing: border-box;
+}
+
+@media (max-width: 639px) {
+  .cookie-banner-container {
+    bottom: 58px;
+    left: 12px;
+    right: 12px;
+    max-width: calc(100vw - 24px);
+    width: auto;
+  }
+  .cookie-banner-mobile {
+    display: flex !important;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .cookie-banner-desktop {
+    display: none !important;
+  }
+}
+
+@media (min-width: 640px) {
+  .cookie-banner-container {
+    bottom: 16px;
+    right: 20px;
+    left: auto;
+    width: 350px;
+    max-width: calc(100vw - 40px);
+  }
+  .cookie-banner-mobile {
+    display: none !important;
+  }
+  .cookie-banner-desktop {
+    display: block !important;
   }
 }
 

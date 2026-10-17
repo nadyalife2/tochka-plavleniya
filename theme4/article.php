@@ -365,18 +365,18 @@ include __DIR__ . '/includes/header.php';
             </h1>
 
             <!-- Meta line -->
-            <div class="flex flex-wrap items-center gap-x-3 gap-y-2 text-xs text-ink-muted font-mono pt-1 pb-2 border-b border-paper-border/60">
+            <div class="flex flex-wrap items-center gap-x-2.5 gap-y-1.5 text-xs text-ink-muted font-mono pt-1 pb-2 border-b border-paper-border/60">
               <div class="flex items-center gap-2">
                 <span class="w-5 h-5 rounded-full border border-paper-border bg-paper-subtle text-stamp flex items-center justify-center font-bold text-ink">ТП</span>
                 <span class="text-ink"><?= e($lesson ? $lesson['author'] : ($article['author'] ?? 'Инженер Лаборатории ТЧП')) ?></span>
               </div>
-              <span class="text-ink-faint">·</span>
+              <span class="hidden sm:inline text-ink-faint" aria-hidden="true">·</span>
               <time datetime="<?= e($lesson ? $lesson['date'] : ($article['date'] ?? '2026-08-20')) ?>"><?= e($lesson ? $lesson['date'] : ($article['date'] ?? '20 августа 2026')) ?></time>
-              <span class="text-ink-faint">·</span>
+              <span class="hidden sm:inline text-ink-faint" aria-hidden="true">·</span>
               <span class="flex items-center gap-1"><?= tp_icon('clock', 'w-3.5 h-3.5') ?>~<?= e($lesson ? $lesson['read_min'] : ($article['read_min'] ?? 8)) ?> мин чтения</span>
-              <span class="text-ink-faint">·</span>
+              <span class="hidden sm:inline text-ink-faint" aria-hidden="true">·</span>
               <span class="flex items-center gap-1"><?= tp_icon('graduation-cap', 'w-3.5 h-3.5') ?>Уровень: <?= e($lesson ? $lesson['difficulty'] : ($article['difficulty'] ?? 'Инженер')) ?></span>
-              <span class="text-ink-faint">·</span>
+              <span class="hidden sm:inline text-ink-faint" aria-hidden="true">·</span>
               <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><?= tp_icon('shield-check', 'w-3.5 h-3.5') ?>Проверено</span>
             </div>
 
@@ -693,13 +693,13 @@ include __DIR__ . '/includes/header.php';
             Плата состоит из 6–12 слоев FR-4 и сплошных полигонов питания/земли (GND). Медь моментально отводит тепло от точки нагрева. Попытка прогреть только верх чипа создает мощный тепловой градиент: текстолит изгибается «лодочкой» (<span class="font-mono text-xs bg-paper-subtle px-1 rounded">warpage</span>), а центральные шарики слипаются в короткое замыкание.
           </p>
 
-          <!-- Рис. 1: Эскиз термического градиента из Stitch -->
-          <figure class="my-6 rounded-lg border border-paper-border-dark bg-white/80 p-2.5 sm:p-3 shadow-sm space-y-2.5">
-            <div class="overflow-hidden rounded border border-paper-border bg-[#fdfcfa]">
-              <img src="https://lh3.googleusercontent.com/aida/AEtjO1VPsrSrCUy54hlNvHq3-Bi3BKtsJ-HwVhUxUONjwD8ZW0JSYUhhCuE48K8uFAbVhm1l6z5bcfKlnWxsiJr8i-lI5dRkG6Iq2l-n00la6L6BC75KwJkw-kUiJ47GXICVho8XMATZw8RLlRI3tpSAkvmZT52hn5vSTCl2e71Md3Q3zGQ48s2w26JMOB_rnaw7fgtN-WHJUqkwlP4tX_D5R9x006Zys-oVO1_EwhYmZFvSU24W0G04DQtmqfA" alt="Эскиз термического градиента при локальном нагреве соплом фена" class="w-full h-auto block object-cover" loading="lazy">
+          <!-- Рис. 1: Эскиз термического градиента -->
+          <figure class="my-6 rounded-lg border border-paper-border-dark bg-white/80 dark:bg-card p-2.5 sm:p-3 shadow-sm space-y-2.5">
+            <div class="overflow-hidden rounded border border-paper-border bg-white dark:bg-paper">
+              <img src="<?= $assets_base ?>/assets/schematics/thermal-gradient.svg" alt="Схема термического градиента при локальном нагреве соплом фена" class="w-full h-auto block object-contain">
             </div>
             <figcaption class="px-1 text-xs font-mono text-ink-muted leading-relaxed flex items-center justify-between">
-              <span><span class="text-ink font-semibold">Рис. 1.</span> Эскиз термического градиента при локальном нагреве соплом фена.</span>
+              <span><span class="text-ink font-semibold">Рис. 1.</span> Схема термического градиента при локальном нагреве соплом фена.</span>
               <span class="hidden sm:inline-block text-stamp text-ink-faint uppercase">IPC/JEDEC</span>
             </figcaption>
           </figure>
@@ -1079,10 +1079,10 @@ include __DIR__ . '/includes/header.php';
               </p>
             </div>
 
-            <!-- Рис. 2: Схема монтажа термопары К-типа из Stitch -->
-            <figure class="my-6 rounded-lg border border-paper-border-dark bg-white/80 p-2.5 sm:p-3 shadow-sm space-y-2.5">
-              <div class="overflow-hidden rounded border border-paper-border bg-[#fdfcfa]">
-                <img src="https://lh3.googleusercontent.com/aida/AEtjO1XPXO_7vFBi0-sZRVk7MH6OetXskpHt5Xcf3Ip6nfHDDYM7qdO0nERNQaH_49PYrri281JQZUD0JhgzliwsR7F5Ks8GvSMY32dTxDUIHzZ_P5Drz6niq2ZSyIRirmXvsdrZExlqKeZ_11m0Vf64Fa9fYCMG9SMrAAg0F5hGzsceoEP1ajdrLph6LgFKfgF6aLS30BF8hJJkW20S0l03CIQZ4uc7pmSJ_MFPJyqCHL4KNonVuGSJXGX1rAg" alt="Схема монтажа термопары К-типа возле галтелей шариковых выводов BGA" class="w-full h-auto block object-cover" loading="lazy">
+            <!-- Рис. 2: Схема монтажа термопары К-типа -->
+            <figure class="my-6 rounded-lg border border-paper-border-dark bg-white/80 dark:bg-card p-2.5 sm:p-3 shadow-sm space-y-2.5">
+              <div class="overflow-hidden rounded border border-paper-border bg-white dark:bg-paper">
+                <img src="<?= $assets_base ?>/assets/schematics/thermocouple-mount.svg" alt="Схема монтажа термопары К-типа возле галтелей шариковых выводов BGA" class="w-full h-auto block object-contain">
               </div>
               <figcaption class="px-1 text-xs font-mono text-ink-muted leading-relaxed flex items-center justify-between">
                 <span><span class="text-ink font-semibold">Рис. 2.</span> Схема монтажа термопары К-типа возле галтелей шариковых выводов BGA.</span>
