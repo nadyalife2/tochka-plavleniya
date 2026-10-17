@@ -13,7 +13,7 @@ $site_root = function_exists('home_url') ? home_url('/') : '/';
 $assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
 
 // 1. If viewed in WordPress and post exists in database
-if (have_posts()) {
+if (function_exists('have_posts') && have_posts()) {
     while (have_posts()) {
         the_post();
 
@@ -35,9 +35,10 @@ if (have_posts()) {
         // Categories & Standard badge
         $categories  = get_the_category();
         $primary_cat = !empty($categories) ? $categories[0] : null;
-        $standard    = get_post_meta($post_id, 'tchp_standard', true) ?: 'ГОСТ / IPC-A-610';
+        $standard    = get_post_meta($post_id, 'tchp_standard', true) ?: '';
+        $std_class   = get_post_meta($post_id, 'tchp_standard_class', true) ?: '';
 
-        // Difficulty & tools resolution from meta or lessons data
+        // Difficulty, editorial, tools & FAQ resolution
         $post_slug   = get_post_field('post_name', $post_id);
         $lesson_data = function_exists('get_lesson_by_slug') ? get_lesson_by_slug($post_slug) : null;
         $article_data = function_exists('get_article_by_slug') ? get_article_by_slug($post_slug) : null;
@@ -53,39 +54,48 @@ if (have_posts()) {
             }
         }
 
-        $required_tools = [];
-        if (!empty($lesson_data['required_tools'])) {
-            $required_tools = array_keys($lesson_data['required_tools']);
-        } elseif (!empty($article_data['required_tools'])) {
-            $required_tools = $article_data['required_tools'];
-        } else {
-            $tools_meta = get_post_meta($post_id, 'tchp_tools', true);
-            if (!empty($tools_meta)) {
-                $raw_tools = is_array($tools_meta) ? $tools_meta : array_map('trim', explode(',', $tools_meta));
-                $post_tags_objs = get_the_tags($post_id);
-                $post_tag_names = $post_tags_objs ? array_map(function($t) { return mb_strtolower($t->name, 'UTF-8'); }, $post_tags_objs) : [];
-                $defect_words = ['пропайка', 'высокая посадка', 'перегрев', 'непропай', 'мостик', 'свищ', 'кратер', 'дефект'];
-                
-                $required_tools = array_filter($raw_tools, function($item) use ($post_tag_names, $defect_words) {
-                    $item_lower = mb_strtolower(trim($item), 'UTF-8');
-                    if (in_array($item_lower, $post_tag_names, true) && !in_array($item_lower, ['флюс', 'паяльник', 'припой', 'термопара'], true)) {
-                        return false;
-                    }
-                    if (in_array($item_lower, $defect_words, true)) {
-                        return false;
-                    }
-                    return !empty($item);
-                });
+        // Editorial data (Status, Reviewer, Date)
+        $editorial = function_exists('tchp_get_editorial_data') 
+            ? tchp_get_editorial_data($post_id) 
+            : [
+                'status'        => 'unreviewed',
+                'reviewer_id'   => 0,
+                'reviewer_name' => '',
+                'reviewed_at'   => '',
+                'is_outdated'   => false,
+                'is_verified'   => false,
+            ];
+
+        // Tools resolution (Meta takes precedence, empty meta stays empty, lesson is fallback only if meta absent)
+        $required_tools = function_exists('tchp_get_article_tools') 
+            ? tchp_get_article_tools($post_id) 
+            : [];
+
+        if (empty($required_tools) && !metadata_exists('post', $post_id, 'tchp_tools') && !metadata_exists('post', $post_id, 'tchp_tools_needed')) {
+            if (!empty($lesson_data['required_tools'])) {
+                foreach ($lesson_data['required_tools'] as $name => $desc) {
+                    $required_tools[] = ['name' => (string) $name, 'model' => '', 'purpose' => (string) $desc];
+                }
+            } elseif (!empty($article_data['required_tools'])) {
+                foreach ($article_data['required_tools'] as $item) {
+                    $required_tools[] = ['name' => (string) $item, 'model' => '', 'purpose' => ''];
+                }
             }
         }
-        if (empty($required_tools)) {
-            $required_tools = ['Паяльная станция', 'Термопара', 'Флюс'];
-        }
+
+        // FAQ items
+        $article_faq = function_exists('tchp_get_article_faq') ? tchp_get_article_faq($post_id) : [];
 
         // Additional head tags (Schema.org & article CSS)
         ob_start();
         ?>
         <link rel="stylesheet" href="<?= esc_url($assets_base) ?>/assets/css/article.css">
+        <?php
+        $should_render_schema = function_exists('tchp_should_render_theme_schema')
+            ? tchp_should_render_theme_schema($post_id)
+            : !class_exists('RankMath');
+        if ($should_render_schema):
+        ?>
         <script type="application/ld+json">
         {
           "@context": "https://schema.org",
@@ -105,6 +115,7 @@ if (have_posts()) {
           }
         }
         </script>
+        <?php endif; ?>
         <?php
         $extra_head = ob_get_clean();
 
@@ -163,16 +174,20 @@ if (have_posts()) {
                           <circle cx="12" cy="17" r="1"></circle>
                         </svg>
                       </div>
-                      <span class="font-bold text-ink uppercase tracking-wider">ТЕХРЕГЛАМЕНТ // ОТК-2026</span>
+                      <span class="font-bold text-ink uppercase tracking-wider">
+                        <?= !empty($standard) ? esc_html($standard) : 'ТЕХРЕГЛАМЕНТ РАБОТ' ?>
+                      </span>
                     </div>
                     <div class="flex items-center gap-2">
                       <button type="button" onclick="window.print()" class="no-print hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded border border-paper-border bg-paper hover:bg-paper-subtle text-ink-muted hover:text-ink text-stamp font-mono font-medium transition-colors cursor-pointer" title="Распечатать технологическую карту (Ctrl+P)">
                         <?= tp_icon('printer', 'w-3.5 h-3.5') ?>
                         <span>Печать техкарты</span>
                       </button>
-                      <span class="font-mono text-stamp font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
-                        IPC-A-610G // КЛАСС 2
-                      </span>
+                      <?php if (!empty($std_class)): ?>
+                        <span class="font-mono text-stamp font-bold uppercase px-2 py-0.5 rounded border border-paper-border bg-paper-subtle text-ink">
+                          <?= esc_html($std_class) ?>
+                        </span>
+                      <?php endif; ?>
                     </div>
                   </div>
 
@@ -195,14 +210,30 @@ if (have_posts()) {
                       <span class="text-ink-faint">·</span>
                       <span class="flex items-center gap-1"><?= tp_icon('graduation-cap', 'w-3.5 h-3.5') ?>Уровень: <?= esc_html($difficulty) ?></span>
                       <span class="text-ink-faint">·</span>
-                      <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><?= tp_icon('shield-check', 'w-3.5 h-3.5') ?>Проверено ОТК</span>
+                      <?php if (!empty($editorial['is_verified'])): ?>
+                        <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="<?= esc_attr('Проверил инженер: ' . ($editorial['reviewer_name'] ?: 'ОТК') . (!empty($editorial['reviewed_at']) ? ' (' . date_i18n('d.m.Y', strtotime($editorial['reviewed_at'])) . ')' : '')) ?>">
+                          <?= tp_icon('shield-check', 'w-3.5 h-3.5') ?>Проверено редакцией
+                        </span>
+                      <?php else: ?>
+                        <span class="flex items-center gap-1 text-ink-muted font-mono text-xs" title="Материал ожидает подтверждения инженером ОТК">
+                          <?= tp_icon('clock', 'w-3.5 h-3.5') ?>Редакционная проверка не завершена
+                        </span>
+                      <?php endif; ?>
                     </div>
 
                     <?php if (!empty($required_tools)): ?>
                     <div class="mt-2 flex flex-wrap items-center gap-2 text-xs font-mono">
                       <span class="text-ink-muted uppercase font-bold text-stamp">Оснастка:</span>
                       <?php foreach ($required_tools as $tool): ?>
-                        <span class="bg-paper-subtle px-2 py-0.5 rounded border border-paper-border text-ink-muted font-mono font-medium"><?= esc_html($tool) ?></span>
+                        <?php
+                        $tool_name = is_array($tool) ? ($tool['name'] ?? '') : (string) $tool;
+                        $tool_model = is_array($tool) ? ($tool['model'] ?? '') : '';
+                        $tool_purpose = is_array($tool) ? ($tool['purpose'] ?? '') : '';
+                        if (empty($tool_name)) continue;
+                        ?>
+                        <span class="bg-paper-subtle px-2 py-0.5 rounded border border-paper-border text-ink-muted font-mono font-medium" <?= !empty($tool_purpose) ? 'title="' . esc_attr($tool_purpose) . '"' : '' ?>>
+                          <?= esc_html($tool_name) ?><?= !empty($tool_model) ? ' (' . esc_html($tool_model) . ')' : '' ?>
+                        </span>
                       <?php endforeach; ?>
                     </div>
                     <?php endif; ?>
@@ -233,24 +264,40 @@ if (have_posts()) {
                 if (!empty($excerpt_text)) {
                     $post_content_html = preg_replace_callback('/^\s*<p[^>]*>(.*?)<\/p>/is', function($matches) use ($excerpt_text) {
                         $p_text = trim(strip_tags($matches[1]));
-                        if ($p_text === $excerpt_text || mb_stripos($p_text, mb_substr($excerpt_text, 0, 35, 'UTF-8'), 0, 'UTF-8') === 0) {
+                        $match_start = function_exists('mb_stripos') && function_exists('mb_substr')
+                            ? (mb_stripos($p_text, mb_substr($excerpt_text, 0, 35, 'UTF-8'), 0, 'UTF-8') === 0)
+                            : (stripos($p_text, substr($excerpt_text, 0, 35)) === 0);
+                        if ($p_text === $excerpt_text || $match_start) {
                             return ''; // Drop duplicate lead
                         }
                         return $matches[0];
                     }, $post_content_html);
                 }
 
-                // 2. Extract Headings for TOC and add anchor IDs
+                // 2. Extract Headings for TOC and add anchor IDs safely (preserving existing id attributes)
                 $article_toc = [];
                 $post_content_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc) {
+                    $attrs = $matches[1];
                     $heading_title = trim(strip_tags($matches[2]));
+
+                    // Check if an id is already present in existing attributes
+                    if (preg_match('/\bid=["\']([^"\']+)["\']/i', $attrs, $id_match)) {
+                        $existing_id = $id_match[1];
+                        $article_toc[] = [
+                            'id'    => $existing_id,
+                            'title' => $heading_title,
+                        ];
+                        return $matches[0]; // Keep existing heading untouched without duplicate id!
+                    }
+
+                    // Otherwise generate clean unique slug
                     $heading_slug = sanitize_title($heading_title);
                     if (!empty($heading_slug)) {
                         $article_toc[] = [
                             'id'    => $heading_slug,
-                            'title' => $heading_title
+                            'title' => $heading_title,
                         ];
-                        return '<h2 id="' . esc_attr($heading_slug) . '"' . $matches[1] . '>' . $matches[2] . '</h2>';
+                        return '<h2 id="' . esc_attr($heading_slug) . '"' . $attrs . '>' . $matches[2] . '</h2>';
                     }
                     return $matches[0];
                 }, $post_content_html);
@@ -260,6 +307,33 @@ if (have_posts()) {
                 <article class="article-content space-y-5 text-ink leading-relaxed">
                   <?= $post_content_html; ?>
                 </article>
+
+                <?php if (!empty($article_faq)): ?>
+                  <!-- Visible FAQ Section (Single Source of Truth) -->
+                  <section class="border border-paper-border rounded-lg bg-paper p-5 sm:p-6 space-y-4 shadow-xs" id="article-faq">
+                    <div class="flex items-center gap-2 pb-2 border-b border-paper-border">
+                      <div class="w-7 h-7 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink shrink-0">
+                        <?= tp_icon('help-circle', 'w-4 h-4 text-accent') ?>
+                      </div>
+                      <h2 class="text-lg sm:text-xl font-bold font-serif text-ink m-0">
+                        Часто задаваемые вопросы (FAQ)
+                      </h2>
+                    </div>
+                    <div class="space-y-3 pt-1">
+                      <?php foreach ($article_faq as $faq_item): ?>
+                        <details class="group border border-paper-border rounded bg-paper-subtle/50 p-3.5 open:bg-paper transition-colors">
+                          <summary class="font-bold text-xs sm:text-sm text-ink cursor-pointer list-none flex items-center justify-between gap-2 select-none">
+                            <span><?= esc_html($faq_item['q']) ?></span>
+                            <span class="text-ink-muted text-xs font-mono transition-transform group-open:rotate-180" aria-hidden="true">▾</span>
+                          </summary>
+                          <div class="mt-2 text-xs sm:text-sm text-ink-muted leading-relaxed font-sans border-t border-paper-border/60 pt-2">
+                            <?= esc_html($faq_item['a']) ?>
+                          </div>
+                        </details>
+                      <?php endforeach; ?>
+                    </div>
+                  </section>
+                <?php endif; ?>
 
                 <?php
                 // Display Tags if present
@@ -350,8 +424,8 @@ if (have_posts()) {
 
                 <?php
                 // Comments template
-                if (comments_open() || get_comments_number()):
-                  comments_template();
+                if (function_exists('comments_open') && (comments_open() || get_comments_number())):
+                  if (function_exists('comments_template')) comments_template();
                 endif;
                 ?>
 

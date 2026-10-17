@@ -1,0 +1,64 @@
+{
+  "$schema": "./article-contract-v1.schema.json",
+  "content_id": "tchp-bga-qfn-20261018-01",
+  "content_hash": "sha256-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "schema_version": "1.0",
+  "title": "Монтаж QFN-микросхем с термалпадом: термопрофиль и предотвращение дефектов",
+  "slug": "montazh-qfn-termalpad",
+  "excerpt": "Инженерный регламент пайки корпусов QFN: расчет термопрофиля, дозирование флюса и предотвращение эффекта аквапланирования при пайке открытого земляного полигона.",
+  "category_slug": "praktika",
+  "tags": ["QFN", "SAC305", "Термопрофиль", "Монтаж"],
+  "reading_time": 6,
+  "difficulty": "Инженер",
+  "solder_alloy": "sac305",
+  "temp_data": {
+    "kind": "joint_temperature",
+    "range": "217 – 235 °C",
+    "peak": "245 °C"
+  },
+  "standard_data": {
+    "standard": "IPC-A-610G",
+    "class": "КЛАСС 2",
+    "description": "Электронные изделия общего и промышленного назначения"
+  },
+  "tools": [
+    {
+      "name": "Термовоздушная станция",
+      "model": "Quick 861DW",
+      "purpose": "Бесконтактный локальный прогрев с контролем потока"
+    },
+    {
+      "name": "Нижний подогрев плат",
+      "model": "AOYUE 853A",
+      "purpose": "Предварительный подогрев текстолита до 130 °C"
+    },
+    {
+      "name": "Флюс-гель безотмывочный",
+      "model": "Cyberflux RMA-218",
+      "purpose": "Удаление оксидов и улучшение смачиваемости без отмывки"
+    }
+  ],
+  "content_html": "<p class=\"lead text-lg font-serif italic text-ink\">Корпуса QFN (Quad Flat No-leads) требуют строгого соблюдения температурного градиента из-за массивного центрального теплоотводящего полигона.</p><section id=\"step-1\"><h2 id=\"step-1-thermal\" class=\"text-xl font-bold text-ink mt-8 mb-3\">1. Подготовка и нижний подогрев</h2><p>Температура предварительного прогрева текстолита должна поддерживаться в диапазоне 130–150 °C.</p></section>",
+  "faq": [
+    {
+      "q": "Почему нельзя наносить припойную пасту сплошным слоем на термалпад QFN?",
+      "a": "Сплошной слой пасты при расплавлении создает избыточное гидродинамическое давление, приводящее к всплытию (аквапланированию) компонента и отрыву краевых выводов. Паста должна наноситься трафаретом в виде сетки или островков с покрытием 50–70% площади."
+    },
+    {
+      "q": "Какая максимальная скорость нарастания температуры (Ramp-up) допустима?",
+      "a": "По стандарту IPC/JEDEC J-STD-020 скорость нагрева не должна превышать 2–3 °C в секунду во избежание термического удара кремниевого кристалла."
+    }
+  ],
+  "sources": [
+    {
+      "title": "IPC-7095D: Design and Assembly Process Implementation for BGAs and QFNs",
+      "standard": "IPC-7095D",
+      "url": "https://www.ipc.org/"
+    },
+    {
+      "title": "J-STD-020E: Moisture/Reflow Sensitivity Classification for Nonhermetic Surface Mount Devices",
+      "standard": "J-STD-020E",
+      "url": "https://www.jedec.org/"
+    }
+  ]
+}
