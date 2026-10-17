@@ -97,6 +97,7 @@ if ($is_tag_view && $queried_tag) {
     $all_ids = array_values(array_unique($all_ids));
 
     $current_rubric = [
+        'slug'        => 'all',
         'title'       => 'Все публикации // База знаний',
         'tag'         => 'ВСЕ РЕГЛАМЕНТЫ',
         'lead'        => 'Полный систематизированный архив инженерных статей, руководств по монтажу РЭА, температурных профилей и стандартов IPC/ГОСТ.',
@@ -146,7 +147,7 @@ if (function_exists('get_posts')) {
         $wp_args['tag_id'] = $queried_tag->term_id;
     } elseif ($queried_cat && !empty($queried_cat->term_id)) {
         $wp_args['cat'] = $queried_cat->term_id;
-    } elseif ($slug && !$is_tag_view) {
+    } elseif ($current_slug !== 'all' && $slug && !$is_tag_view) {
         $wp_args['category_name'] = $slug;
     }
     $wp_posts = get_posts($wp_args);
@@ -389,14 +390,18 @@ include __DIR__ . '/includes/header.php';
           </div>
 
           <!-- Quick Sorting Options -->
-          <div class="flex items-center gap-2 text-xs font-mono text-ink-muted ml-auto">
-            <span>[РЕЖИМ ЧТЕНИЯ]:</span>
-            <a href="<?= esc_url($site_root) ?>category.php?slug=<?= urlencode($current_slug) ?>&sub=<?= urlencode($active_sub) ?>&sort=<?= $sort_param === 'time_asc' ? 'time_desc' : 'time_asc' ?>"
-               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-paper-border bg-paper hover:border-ink/40 text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
-              <span><?= $sort_param === 'time_desc' ? 'Сначала длинные ↓' : ($sort_param === 'time_asc' ? 'Сначала быстрые ↑' : 'По умолчанию') ?></span>
-              <span class="text-ink-muted text-[10px]" aria-hidden="true">▾</span>
-            </a>
-          </div>
+          <form method="GET" action="<?= esc_url($site_root) ?>category.php" class="flex items-center gap-2 text-xs font-mono text-ink-muted ml-auto">
+            <input type="hidden" name="slug" value="<?= e($current_slug) ?>">
+            <?php if ($active_sub !== 'all'): ?>
+              <input type="hidden" name="sub" value="<?= e($active_sub) ?>">
+            <?php endif; ?>
+            <label for="sort-select" class="text-xs font-mono text-ink-muted whitespace-nowrap">[СОРТИРОВКА]:</label>
+            <select id="sort-select" name="sort" onchange="this.form.submit()" class="bg-paper border border-paper-border hover:border-ink/40 text-ink text-xs font-mono px-2 py-1 rounded cursor-pointer focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+              <option value="default" <?= $sort_param === 'default' ? 'selected' : '' ?>>По умолчанию</option>
+              <option value="time_asc" <?= $sort_param === 'time_asc' ? 'selected' : '' ?>>Сначала быстрые (↑)</option>
+              <option value="time_desc" <?= $sort_param === 'time_desc' ? 'selected' : '' ?>>Сначала лонгриды (↓)</option>
+            </select>
+          </form>
         </div>
       <?php endif; ?>
 

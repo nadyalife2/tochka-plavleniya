@@ -267,7 +267,7 @@ include __DIR__ . '/includes/header.php';
                     <option value="sac305">SAC305 (RoHS • 217–220 °C)</option>
                     <option value="pos40">ПОС-40 (ГОСТ 21931 • 183–238 °C)</option>
                     <option value="sn42bi58">Sn42Bi58 (Низкотемп. • 138 °C)</option>
-                    <option value="rose">Сплав Розе (Демонтаж • 94 °C)</option>
+                    <option value="roze">Сплав Розе (Демонтаж • 94 °C)</option>
                   </select>
                 </div>
 
@@ -943,6 +943,11 @@ include __DIR__ . '/includes/header.php';
           pth: { range: '300 – 330', liq: '183–238 °C', delta: '+95...125 °C', max: 330 },
           copper: { range: '320 – 350', liq: '183–238 °C', delta: '+115...145 °C', max: 350 }
         },
+        roze: {
+          smd: { range: '140 – 170', liq: '94 °C', delta: '+46...76 °C', max: 170 },
+          pth: { range: '150 – 180', liq: '94 °C', delta: '+56...86 °C', max: 180 },
+          copper: { range: '160 – 190', liq: '94 °C', delta: '+66...96 °C', max: 190 }
+        },
         rose: {
           smd: { range: '140 – 170', liq: '94 °C', delta: '+46...76 °C', max: 170 },
           pth: { range: '150 – 180', liq: '94 °C', delta: '+56...86 °C', max: 180 },
@@ -953,7 +958,16 @@ include __DIR__ . '/includes/header.php';
       function updateCalc() {
         const sKey = solderEl.value || 'pos61';
         const mKey = massEl.value || 'smd';
-        const data = (MATRIX[sKey] && MATRIX[sKey][mKey]) || MATRIX.pos61.smd;
+        const data = MATRIX[sKey]?.[mKey];
+
+        if (!data) {
+          tempOutEl.textContent = '—';
+          liqValEl.textContent = '—';
+          deltaValEl.textContent = '—';
+          safetyEl.className = 'pill-yellow text-[11px] font-bold px-2 py-0.5 rounded';
+          safetyEl.textContent = 'НЕТ ДАННЫХ ДЛЯ ВЫБРАННОГО СОЧЕТАНИЯ';
+          return;
+        }
 
         tempOutEl.textContent = data.range;
         liqValEl.textContent = data.liq;

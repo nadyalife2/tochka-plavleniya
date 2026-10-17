@@ -42,7 +42,7 @@
           <option value="pos61" data-temp="280 °C" data-solidus="183 °C" data-liquidus="190 °C" data-flux="ROL0 / RMA" data-tal="2.5–3.0 с">ПОС-61 (Sn61Pb39) — Стандарт РЭА</option>
           <option value="sac305" data-temp="240 °C" data-solidus="217 °C" data-liquidus="217 °C" data-flux="ROL0 No-Clean" data-tal="45–60 с">SAC305 (Sn96.5Ag3Cu0.5) — Бессвинцовый</option>
           <option value="pos40" data-temp="310 °C" data-solidus="183 °C" data-liquidus="238 °C" data-flux="RMA" data-tal="3.0–4.0 с">ПОС-40 (Sn40Pb60) — Силовой монтаж</option>
-          <option value="rose" data-temp="150 °C" data-solidus="94 °C" data-liquidus="94 °C" data-flux="Спиртоканифоль" data-tal="1.5–2.0 с">Сплав Розе (Bi50Pb32Sn18) — Демонтаж</option>
+          <option value="roze" data-temp="150 °C" data-solidus="94 °C" data-liquidus="94 °C" data-flux="Спиртоканифоль" data-tal="1.5–2.0 с">Сплав Розе (Bi50Pb32Sn18) — Демонтаж</option>
           <option value="wood" data-temp="120 °C" data-solidus="68 °C" data-liquidus="72 °C" data-flux="Канифоль" data-tal="1.0–2.0 с">Сплав Вуда (Bi50Pb25Sn12.5Cd12.5)</option>
         </select>
 
