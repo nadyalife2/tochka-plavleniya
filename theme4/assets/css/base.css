@@ -255,6 +255,12 @@ html.dark .btn-primary:hover {
   border-color: var(--color-danger);
 }
 
+/* Horizontal scroll fade hint */
+.scroll-fade-right {
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 32px), transparent 100%);
+}
+
 /* Бейджи */
 .badge {
   display: inline-flex;
@@ -507,10 +513,17 @@ html.dark .sketch-pill-gray {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 28' preserveAspectRatio='none'%3E%3Cpath d='M1.5 3 C 22 1.5, 62 4, 98 2 C 99.5 11.5, 98 19.5, 99 25.5 C 70 26.5, 25 24.5, 1 25.5 C 0.5 17, 0 8.5, 1.5 3 Z' fill='%23222735' fill-opacity='0.95' stroke='%233e465c' stroke-width='0.9' stroke-dasharray='35 1 25 1' stroke-linecap='round'/%3E%3Cpath d='M4 6.5 C 30 5, 75 5.5, 95 4.5 C 96 12, 95 18, 96 22 C 68 23, 30 21.5, 3 22 Z' fill='%232c3346' fill-opacity='0.6'/%3E%3C/svg%3E");
 }
 
-/* Скрытие переключателя темы в шапке на смартфонах (доступен в нижнем баре навигации) */
-@media (max-width: 768px) {
-  #theme-toggle {
+/* Управление отображением кнопок поиска и ящика в шапке (на смартфонах скрыты, т.к. есть в нижнем баре) */
+@media (max-width: 639px) {
+  #search-modal-trigger,
+  #header-drawer-trigger {
     display: none !important;
+  }
+}
+@media (min-width: 640px) {
+  #search-modal-trigger,
+  #header-drawer-trigger {
+    display: inline-flex !important;
   }
 }
 
@@ -617,6 +630,15 @@ input[type="range"].range-slider::-webkit-slider-thumb:hover {
     padding: 0.25rem 0.5rem max(0.35rem, env(safe-area-inset-bottom));
     align-items: center;
     justify-content: space-around;
+  }
+  .mobile-quick-bar button,
+  .mobile-quick-bar a {
+    min-width: 64px;
+    min-height: 48px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
   body.tp-headphones {
     padding-bottom: max(4.5rem, calc(4rem + env(safe-area-inset-bottom)));

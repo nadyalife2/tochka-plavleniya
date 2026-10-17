@@ -77,17 +77,17 @@ $tchp_head_escape = static function ($value) {
         <?php include __DIR__ . '/header-nav.php'; ?>
       </div>
       <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-        <button id="search-modal-trigger" type="button" class="w-11 h-11 min-w-[44px] min-h-[44px] sm:w-auto sm:min-h-[44px] sm:px-3 border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 inline-flex items-center justify-center shrink-0" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
+        <button id="search-modal-trigger" type="button" class="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] sm:w-auto sm:min-h-[44px] sm:px-3 border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 items-center justify-center shrink-0" title="Поиск по базе знаний (Ctrl+K)" aria-label="Поиск по базе знаний">
           <?= tp_icon('search', 'w-4 h-4 text-accent') ?>
           <span class="hidden md:inline text-xs text-ink-muted ml-1.5">Поиск</span>
-          <kbd class="hidden md:inline-block text-stamp font-mono px-1.5 py-0.2 ml-1.5 bg-paper-border/60 text-ink-muted dark:text-ink rounded border border-paper-border">Ctrl+K</kbd>
+          <kbd class="hidden lg:inline-block text-stamp font-mono px-1.5 py-0.2 ml-1.5 bg-paper-border/60 text-ink-muted dark:text-ink rounded border border-paper-border">Ctrl+K</kbd>
         </button>
-        <button id="header-drawer-trigger" type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="w-11 h-11 min-w-[44px] min-h-[44px] sm:w-auto sm:min-h-[44px] sm:px-3 border border-paper-border hover:border-accent bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 group inline-flex items-center justify-center shrink-0" title="Выдвижной микро-верстак (Сплавы, токи, флюсы)" aria-label="Открыть выдвижной верстак" aria-haspopup="dialog" aria-expanded="false" aria-controls="lab-drawer-backdrop">
+        <button id="header-drawer-trigger" type="button" onclick="if(window.openLabDrawer)window.openLabDrawer();" class="inline-flex w-11 h-11 min-w-[44px] min-h-[44px] sm:w-auto sm:min-h-[44px] sm:px-3 border border-paper-border hover:border-accent bg-paper text-ink font-mono text-xs rounded transition-all cursor-pointer shadow-sm active:translate-y-0.5 group items-center justify-center shrink-0" title="Выдвижной микро-верстак (Сплавы, токи, флюсы)" aria-label="Открыть выдвижной верстак" aria-haspopup="dialog" aria-expanded="false" aria-controls="lab-drawer-backdrop">
           <span class="w-1.5 h-1.5 rounded-full bg-cyan inline-block hidden sm:inline-block mr-1.5"></span>
           <?= tp_icon('sliders', 'w-4 h-4 text-cyan group-hover:text-accent transition-colors') ?>
           <span class="hidden lg:inline text-xs font-mono text-ink-muted group-hover:text-ink ml-1.5">Быстрый расчёт</span>
         </button>
-        <button id="theme-toggle" type="button" class="hidden sm:inline-flex border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded min-h-[44px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5 shrink-0" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
+        <button id="theme-toggle" type="button" class="inline-flex border border-paper-border hover:border-paper-border-dark bg-paper text-ink font-mono text-xs rounded min-h-[44px] px-3 py-1.5 items-center gap-1.5 transition-all cursor-pointer shadow-sm active:translate-y-0.5 shrink-0" title="Сменить тему (Светлая / Тёмная)" aria-label="Сменить тему">
           <?= tp_icon('moon', 'w-4 h-4 dark:hidden') ?>
           <?= tp_icon('sun', 'w-4 h-4 hidden dark:inline') ?>
           <span class="text-xs text-ink-muted dark:text-ink font-mono">Тема</span>

@@ -291,22 +291,19 @@ include __DIR__ . '/includes/header.php';
                     <div class="text-xs font-mono font-bold text-ink-muted uppercase tracking-wider">
                       Температура на станции:
                     </div>
-                    <div class="flex items-baseline gap-1.5">
+                    <div class="flex items-center gap-3 flex-wrap">
                       <div class="text-3xl sm:text-4xl font-bold font-mono text-ink tracking-tight flex items-baseline">
                         <span id="exp-temp-out">260 – 295</span>
                         <span class="text-amber-500 dark:text-amber-400 font-bold ml-1.5 text-2xl sm:text-3xl">°C</span>
                       </div>
+                      <button type="button" id="exp-copy-btn" class="min-h-[34px] px-3 py-1 rounded border border-paper-border hover:border-accent text-ink hover:text-accent transition-colors text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-xs" title="Скопировать значение">
+                        <?= tp_icon('copy', 'w-3.5 h-3.5') ?>
+                        <span>Копировать</span>
+                      </button>
                     </div>
                     <p class="text-xs text-ink-muted font-sans">
                       Стартовый ориентир для выбранной задачи.
                     </p>
-                  </div>
-
-                  <div class="flex items-center gap-2 shrink-0">
-                    <button type="button" id="exp-copy-btn" class="min-h-[38px] px-3.5 py-1.5 rounded border border-paper-border hover:border-accent text-ink hover:text-accent transition-colors text-xs font-mono font-bold flex items-center gap-1.5 cursor-pointer shadow-xs" title="Скопировать значение">
-                      <?= tp_icon('copy', 'w-3.5 h-3.5') ?>
-                      <span>Копировать</span>
-                    </button>
                   </div>
                 </div>
 
@@ -334,14 +331,15 @@ include __DIR__ . '/includes/header.php';
               <a href="<?= esc_url($site_root) ?>interactive.php#temp" class="btn-primary inline-flex items-center gap-1.5 px-4 py-2 text-xs font-mono font-bold shadow-sm">
                 <span>Верстак (полный расчёт) →</span>
               </a>
-              <span class="text-ink-faint text-xs">·</span>
-              <a href="<?= esc_url($site_root) ?>interactive.php#iron" class="text-xs font-mono text-ink-muted hover:text-ink hover:underline transition-colors">
-                Подбор паяльника T12/C245
-              </a>
-              <span class="text-ink-faint text-xs">·</span>
-              <a href="<?= esc_url($site_root) ?>interactive.php#table" class="text-xs font-mono text-ink-muted hover:text-ink hover:underline transition-colors">
-                Реестр 9 сплавов ГОСТ
-              </a>
+              <div class="flex items-center gap-2.5 flex-wrap">
+                <a href="<?= esc_url($site_root) ?>interactive.php#iron" class="text-xs font-mono text-ink-muted hover:text-ink hover:underline transition-colors">
+                  Подбор паяльника T12/C245
+                </a>
+                <span class="text-ink-faint text-xs">·</span>
+                <a href="<?= esc_url($site_root) ?>interactive.php#table" class="text-xs font-mono text-ink-muted hover:text-ink hover:underline transition-colors">
+                  Реестр 9 сплавов ГОСТ
+                </a>
+              </div>
             </div>
           </div>
 
@@ -352,9 +350,12 @@ include __DIR__ . '/includes/header.php';
                 <!-- Image Frame with FIG badge -->
                 <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
                   <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-contain object-center bg-paper-subtle p-2" loading="lazy">
-                  <div class="absolute bottom-2 right-2 px-2.5 py-1 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded shadow-2xs">
+                  <div class="hidden sm:block absolute bottom-2 right-2 px-2.5 py-1 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded shadow-2xs">
                     [ЧЕРТЁЖ // FIG. <?= e($featured_article['id'] ?? '1') ?>.0] // КЛЮЧЕВОЙ РАЗБОР
                   </div>
+                </div>
+                <div class="sm:hidden text-[11px] font-mono text-ink-muted px-1">
+                  [ЧЕРТЁЖ // FIG. <?= e($featured_article['id'] ?? '1') ?>.0] // КЛЮЧЕВОЙ РАЗБОР
                 </div>
               <?php endif; ?>
 

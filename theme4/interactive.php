@@ -46,18 +46,6 @@ include __DIR__ . '/includes/header.php';
         <span class="text-ink font-semibold">Интерактивный верстак инженера</span>
       </nav>
 
-      <!-- Mobile / Tablet Quick-Nav Chips -->
-      <nav class="workbench-subnav-mobile" aria-label="Быстрый переход по верстаку">
-        <a href="#temp" class="workbench-subnav-chip active" data-tool="temp">01 // Терморежим</a>
-        <a href="#iron" class="workbench-subnav-chip" data-tool="iron">02 // Паяльник</a>
-        <a href="#checklist" class="workbench-subnav-chip" data-tool="checklist">03 // Чек-лист</a>
-        <a href="#defect" class="workbench-subnav-chip" data-tool="defect">04 // Диагностика</a>
-        <a href="#calculator" class="workbench-subnav-chip" data-tool="calculator">05 // Дозировка</a>
-        <a href="#flux-selector" class="workbench-subnav-chip" data-tool="flux-selector">06 // Флюс</a>
-        <a href="#solder-consumption" class="workbench-subnav-chip" data-tool="solder-consumption">07 // Расход</a>
-        <a href="#table" class="workbench-subnav-chip" data-tool="table">08 // Сплавы</a>
-      </nav>
-
       <!-- HERO / HUB ZONE -->
       <section class="border-b border-paper-border pb-10 space-y-5">
         <div class="max-w-3xl space-y-4">
@@ -144,8 +132,8 @@ include __DIR__ . '/includes/header.php';
                 </div>
 
                 <div class="card-footer">
-                  <span class="spec-tag">ОРИЕНТИР</span>
-                  <a href="#temp" class="card-btn">Открыть калькулятор →</a>
+                  <span class="spec-tag font-bold font-mono" id="quick-temp-result">290–320 °C</span>
+                  <a href="#temp" class="card-btn">Детальный расчёт →</a>
                 </div>
               </div>
 
@@ -253,6 +241,17 @@ include __DIR__ . '/includes/header.php';
         </div>
       </section>
 
+      <!-- Mobile / Tablet Quick-Nav Chips (Below Hero) -->
+      <nav class="workbench-subnav-mobile scroll-fade-right" aria-label="Быстрый переход по верстаку">
+        <a href="#temp" class="workbench-subnav-chip active" data-tool="temp">01 // Терморежим</a>
+        <a href="#iron" class="workbench-subnav-chip" data-tool="iron">02 // Паяльник</a>
+        <a href="#checklist" class="workbench-subnav-chip" data-tool="checklist">03 // Чек-лист</a>
+        <a href="#defect" class="workbench-subnav-chip" data-tool="defect">04 // Диагностика</a>
+        <a href="#calculator" class="workbench-subnav-chip" data-tool="calculator">05 // Дозировка</a>
+        <a href="#flux-selector" class="workbench-subnav-chip" data-tool="flux-selector">06 // Флюс</a>
+        <a href="#solder-consumption" class="workbench-subnav-chip" data-tool="solder-consumption">07 // Расход</a>
+        <a href="#table" class="workbench-subnav-chip" data-tool="table">08 // Сплавы</a>
+      </nav>
 
       <!-- ═══════════════════════════════════════════════════════════════════════ -->
       <!-- P0 ИНСТРУМЕНТ 1: ТЕРМОКАЛЬКУЛЯТОР (#temp)                             -->
@@ -1207,15 +1206,6 @@ include __DIR__ . '/includes/header.php';
     </div>
   </main>
 
-  <!-- Editorial Minimal Footer -->
-  <?php require_once __DIR__ . '/includes/footer-editorial.php'; ?>
-
-  <!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
-  <?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
-
-  <!-- Global Engineering Search Modal (Ctrl+K) -->
-  <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
-
   <!-- Pass Rules to Client-Side Workbench Engine -->
   <script>
     window.TCHP_RULES = {
@@ -1241,11 +1231,27 @@ include __DIR__ . '/includes/header.php';
         });
       }
 
-      // Sync Card 1 mini-selectors with Temperature Calculator (#temp)
+      // Sync Card 1 mini-selectors with Temperature Calculator (#temp) and compute live result
       const qWork = document.getElementById('quick-temp-work');
       const qSolder = document.getElementById('quick-temp-solder');
+      const qResult = document.getElementById('quick-temp-result');
       const mainWork = document.getElementById('temp-work');
       const mainSolder = document.getElementById('temp-solder');
+
+      function updateQuickCardResult() {
+        if (!qResult) return;
+        const sVal = qSolder ? qSolder.value : 'sac305';
+        const wVal = qWork ? qWork.value : 'smd_medium';
+        const rules = window.TCHP_RULES?.temp;
+        if (rules && rules[sVal] && rules[sVal][wVal]) {
+          const rule = rules[sVal][wVal];
+          if (rule.t_min && rule.t_max) {
+            qResult.textContent = `${rule.t_min}–${rule.t_max} °C`;
+            return;
+          }
+        }
+        qResult.textContent = '290–320 °C';
+      }
 
       const syncQuickToMain = () => {
         if (qWork && mainWork && qWork.value) {
@@ -1256,12 +1262,13 @@ include __DIR__ . '/includes/header.php';
           mainSolder.value = qSolder.value;
           mainSolder.dispatchEvent(new Event('change'));
         }
+        updateQuickCardResult();
       };
 
-      if (qWork && mainWork) {
+      if (qWork) {
         qWork.addEventListener('change', syncQuickToMain);
       }
-      if (qSolder && mainSolder) {
+      if (qSolder) {
         qSolder.addEventListener('change', syncQuickToMain);
       }
 
@@ -1269,6 +1276,9 @@ include __DIR__ . '/includes/header.php';
       if (tempCardBtn) {
         tempCardBtn.addEventListener('click', syncQuickToMain);
       }
+
+      // Initial calculation on load
+      updateQuickCardResult();
     })();
   </script>
 

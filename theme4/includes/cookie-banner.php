@@ -1,5 +1,5 @@
 <!-- Cookie Consent Banner (Editorial Style / 152-ФЗ Zero-PII) -->
-<div id="cookie-consent-banner" class="fixed bottom-[54px] sm:bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:max-w-[340px] z-50 transform transition-all duration-300 translate-y-0 opacity-100 hidden">
+<div id="cookie-consent-banner" class="fixed bottom-[66px] sm:bottom-4 left-3 right-3 sm:left-auto sm:right-6 sm:max-w-[340px] max-w-[calc(100vw-24px)] box-border z-50 transform transition-all duration-300 translate-y-0 opacity-100 hidden">
   <div class="border border-paper-border-dark bg-paper dark:bg-card p-3 sm:p-4 rounded-lg shadow-xl relative">
     
     <!-- Mobile Compact Single-Row Layout -->

@@ -105,11 +105,11 @@ if ($is_tag_view && $queried_tag) {
         'article_ids' => $all_ids,
         'filter_tags' => ['Все', 'Сплавы', 'Флюсы', 'Монтаж', 'BGA', 'T12', 'IPC'],
         'sub_tags'    => [
-            ['id' => 'all',       'label' => 'Все материалы',   'count' => count($articles ?? [])],
-            ['id' => 'basics',    'label' => 'Старт и база',    'keywords' => ['старт', 'баз', 'паяльник', 'оборудован'], 'count' => 5],
-            ['id' => 'solders',   'label' => 'Сплавы и припои', 'keywords' => ['припой', 'пос-61', 'sac305', 'сплав'],    'count' => 6],
-            ['id' => 'assembly',  'label' => 'Монтаж и пайка',  'keywords' => ['монтаж', 'пайк', 'лужен', 'картридж'],    'count' => 8],
-            ['id' => 'defects',   'label' => 'Дефекты и брак',  'keywords' => ['дефект', 'брак', 'перегрев', 'мостик'],   'count' => 5],
+            ['id' => 'all',        'label' => 'Все форматы',         'count' => count($articles ?? [])],
+            ['id' => 'standards',  'label' => 'Техрегламенты',       'keywords' => ['регламент', 'стандарт', 'гост', 'ipc', 'техпроцесс', 'правил'], 'count' => 7],
+            ['id' => 'tables',     'label' => 'Таблицы и ГОСТ',      'keywords' => ['таблиц', 'гост', 'сплав', 'температур', 'ликвидус', 'состав'], 'count' => 5],
+            ['id' => 'defects',    'label' => 'Диагностика брака',   'keywords' => ['дефект', 'брак', 'перегрев', 'мостик', 'пустот', 'трещин'], 'count' => 6],
+            ['id' => 'tools',      'label' => 'Оснастка и жала',     'keywords' => ['жало', 'паяльник', 'картридж', 'флюс', 'оснастк', 't12', 'c245'], 'count' => 6],
         ]
     ];
     $current_slug   = 'all';
@@ -363,7 +363,8 @@ include __DIR__ . '/includes/header.php';
             <span><?= $pill['label'] ?></span>
           </a>
         <?php endforeach; ?>
-        <a href="<?= esc_url($site_root) ?>index.php#articles" class="px-3 py-1.5 rounded border border-paper-border bg-paper text-ink-faint hover:text-ink transition-colors whitespace-nowrap ml-auto text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+        <a href="<?= esc_url($site_root) ?>category.php?slug=all"
+           class="px-3 py-1.5 rounded transition-all whitespace-nowrap ml-auto text-xs focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none <?= $current_slug === 'all' ? 'bg-ink text-paper font-bold shadow-sm' : 'border border-paper-border bg-paper text-ink-faint hover:text-ink' ?>">
           Все статьи журнала →
         </a>
       </nav>
@@ -391,8 +392,9 @@ include __DIR__ . '/includes/header.php';
           <div class="flex items-center gap-2 text-xs font-mono text-ink-muted ml-auto">
             <span>[РЕЖИМ ЧТЕНИЯ]:</span>
             <a href="<?= esc_url($site_root) ?>category.php?slug=<?= urlencode($current_slug) ?>&sub=<?= urlencode($active_sub) ?>&sort=<?= $sort_param === 'time_asc' ? 'time_desc' : 'time_asc' ?>"
-               class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-paper-border bg-paper hover:border-ink/40 text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
+               class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded border border-paper-border bg-paper hover:border-ink/40 text-ink transition-colors focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none">
               <span><?= $sort_param === 'time_desc' ? 'Сначала длинные ↓' : ($sort_param === 'time_asc' ? 'Сначала быстрые ↑' : 'По умолчанию') ?></span>
+              <span class="text-ink-muted text-[10px]" aria-hidden="true">▾</span>
             </a>
           </div>
         </div>
@@ -458,9 +460,12 @@ include __DIR__ . '/includes/header.php';
                 <!-- Image Frame with FIG badge -->
                 <div class="overflow-hidden rounded border border-paper-border bg-paper relative">
                   <img src="<?= e($featured_article['image']) ?>" alt="<?= e($featured_article['title']) ?>" class="w-full h-56 sm:h-64 object-contain object-center bg-paper-subtle p-2" loading="lazy">
-                  <div class="absolute bottom-2 right-2 px-2.5 py-1 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded shadow-2xs">
+                  <div class="hidden sm:block absolute bottom-2 right-2 px-2.5 py-1 bg-paper border border-paper-border text-xs font-mono text-ink-muted rounded shadow-2xs">
                     [ЧЕРТЁЖ // FIG. <?= e($featured_article['id'] ?? '1') ?>.0] // КЛЮЧЕВОЙ РАЗБОР
                   </div>
+                </div>
+                <div class="sm:hidden text-[11px] font-mono text-ink-muted px-1">
+                  [ЧЕРТЁЖ // FIG. <?= e($featured_article['id'] ?? '1') ?>.0] // КЛЮЧЕВОЙ РАЗБОР
                 </div>
               <?php endif; ?>
 
@@ -664,30 +669,30 @@ include __DIR__ . '/includes/header.php';
               </div>
               <div class="space-y-2 font-mono text-xs">
                 <a href="<?= esc_url($site_root) ?>category.php?slug=start" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
-                  <div class="flex items-center justify-between">
+                  <div class="flex items-center justify-between gap-2">
                     <span class="font-bold group-hover:text-accent">[SEC.01] Старт и база</span>
-                    <span class="text-ink-muted text-[11px]">Базовый курс →</span>
+                    <span class="text-ink-muted text-[11px] whitespace-nowrap shrink-0">Базовый курс →</span>
                   </div>
                   <p class="text-[11px] text-ink-muted mt-1 font-sans">Выбор паяльника, основы термопрофиля, смачивание меди.</p>
                 </a>
                 <a href="<?= esc_url($site_root) ?>category.php?slug=materialy" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
-                  <div class="flex items-center justify-between">
+                  <div class="flex items-center justify-between gap-2">
                     <span class="font-bold group-hover:text-accent">[SEC.02] Материалы и сплавы</span>
-                    <span class="text-ink-muted text-[11px]">Металлургия →</span>
+                    <span class="text-ink-muted text-[11px] whitespace-nowrap shrink-0">Металлургия →</span>
                   </div>
                   <p class="text-[11px] text-ink-muted mt-1 font-sans">Реестр ПОС-61, SAC305, классификация флюсов J-STD-004.</p>
                 </a>
                 <a href="<?= esc_url($site_root) ?>category.php?slug=praktika" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
-                  <div class="flex items-center justify-between">
+                  <div class="flex items-center justify-between gap-2">
                     <span class="font-bold group-hover:text-accent">[SEC.03] Практика монтажа</span>
-                    <span class="text-ink-muted text-[11px]">Техпроцессы →</span>
+                    <span class="text-ink-muted text-[11px] whitespace-nowrap shrink-0">Техпроцессы →</span>
                   </div>
                   <p class="text-[11px] text-ink-muted mt-1 font-sans">Ручной SMD-монтаж 0402, картриджи T12/C245, BGA-реболлинг.</p>
                 </a>
                 <a href="<?= esc_url($site_root) ?>category.php?slug=oshibki" class="block p-2.5 rounded border border-paper-border hover:border-accent bg-paper text-ink transition-colors group">
-                  <div class="flex items-center justify-between">
+                  <div class="flex items-center justify-between gap-2">
                     <span class="font-bold group-hover:text-accent">[SEC.04] Проблемы и дефекты</span>
-                    <span class="text-ink-muted text-[11px]">Диагностика →</span>
+                    <span class="text-ink-muted text-[11px] whitespace-nowrap shrink-0">Диагностика →</span>
                   </div>
                   <p class="text-[11px] text-ink-muted mt-1 font-sans">Устранение tombstoning, холодной пайки и сбоев термопрофиля.</p>
                 </a>

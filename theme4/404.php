@@ -84,12 +84,18 @@ require_once __DIR__ . '/includes/header.php';
     <button type="button" onclick="window.openSearchModal &amp;&amp; window.openSearchModal()" class="inline-flex items-center gap-2 px-3 py-1.5 rounded border border-paper-border bg-paper-subtle text-xs font-mono text-ink-muted hover:text-ink hover:border-ink/40 transition-colors">
       <?= tp_icon('search', 'w-3.5 h-3.5 text-accent') ?>
       <span>Поиск по базе знаний</span>
-      <kbd class="px-1.5 py-0.5 text-xs bg-paper border border-paper-border rounded">Ctrl+K</kbd>
+      <kbd class="hidden lg:inline-block px-1.5 py-0.5 text-xs bg-paper border border-paper-border rounded">Ctrl+K</kbd>
     </button>
   </div>
 
 </div>
 </main>
+
+<!-- Tactile Lab Drawer -->
+<?php require_once __DIR__ . '/includes/lab-drawer.php'; ?>
+
+<!-- Mobile Sticky Quick Bar (44px WCAG Touch Targets) -->
+<?php require_once __DIR__ . '/includes/mobile-bar.php'; ?>
 
 <!-- Global Engineering Search Modal (Ctrl+K) -->
 <?php require_once __DIR__ . '/includes/search-modal.php'; ?>
