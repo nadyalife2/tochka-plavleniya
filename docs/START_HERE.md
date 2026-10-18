@@ -10,10 +10,10 @@
 
 | Что вы хотите сделать? | Раздел | Ссылка на руководство |
 |---|:---:|---|
-| **Изменить сайт, тему `theme4`, плагин `tchp-content`, схемы контрактов или CLI-инструменты** | **Раздел 1** | [01-development/GUIDE.md](file:///d:/сайт%20для%20пайки/docs/01-development/GUIDE.md) |
-| **Развернуть, настроить или восстановить WordPress, сервер, плагины, права и REST API** | **Раздел 2** | [02-wordpress-setup/GUIDE.md](file:///d:/сайт%20для%20пайки/docs/02-wordpress-setup/GUIDE.md) |
-| **Оформить готовую статью, заполнить метаполя, доставить черновик в WordPress и вычитать** | **Раздел 3** | [03-editorial-publishing/GUIDE.md](file:///d:/сайт%20для%20пайки/docs/03-editorial-publishing/GUIDE.md) |
-| **Найти новую тему, собрать доказательства (ГОСТ/IPC), написать статью голосом Practico или сгенерировать иллюстрации** | **Раздел 4** | [04-research-voice-visuals/GUIDE.md](file:///d:/сайт%20для%20пайки/docs/04-research-voice-visuals/GUIDE.md) |
+| **Изменить сайт, тему `theme4`, плагин `tchp-content`, схемы контрактов или CLI-инструменты** | **Раздел 1** | [01-development/GUIDE.md](01-development/GUIDE.md) |
+| **Развернуть, настроить или восстановить WordPress, сервер, плагины, права и REST API** | **Раздел 2** | [02-wordpress-setup/GUIDE.md](02-wordpress-setup/GUIDE.md) |
+| **Оформить готовую статью, заполнить метаполя, доставить черновик в WordPress и вычитать** | **Раздел 3** | [03-editorial-publishing/GUIDE.md](03-editorial-publishing/GUIDE.md) |
+| **Найти новую тему, собрать доказательства (ГОСТ/IPC), написать статью голосом Practico или сгенерировать иллюстрации** | **Раздел 4** | [04-research-voice-visuals/GUIDE.md](04-research-voice-visuals/GUIDE.md) |
 
 ---
 
@@ -22,24 +22,25 @@
 Чтобы правила и код не противоречили друг другу, в проекте закреплены канонические источники:
 
 1. **Контракт статьи и типы данных:**
-   * Источник: [`schemas/article-contract-v1.schema.json`](file:///d:/сайт%20для%20пайки/schemas/article-contract-v1.schema.json)
-   * Пример: [`schemas/article-example-v1.json`](file:///d:/сайт%20для%20пайки/schemas/article-example-v1.json)
+   * Источник: [`schemas/article-contract-v1.schema.json`](../schemas/article-contract-v1.schema.json)
+   * Пример: [`schemas/article-example-v1.json`](../schemas/article-example-v1.json)
    * *Никакие скиллы или скрипты не имеют права придумывать собственные форматы полей.*
 
 2. **Реестр сплавов и физические свойства:**
-   * Канонические идентификаторы: `pos61`, `sn63pb37`, `pos40`, `sac305`, `sac405`, `sn42bi58`, `snbiago`, `roze`, `vuda`, `universal`.
-   * Источник нормализации: функция `tchp_get_canonical_alloys()` в [`wp-content/plugins/tchp-content/tchp-content.php`](file:///d:/сайт%20для%20пайки/wp-content/plugins/tchp-content/tchp-content.php) и [`theme4/includes/articles-data.php`](file:///d:/сайт%20для%20пайки/theme4/includes/articles-data.php).
+   * **Физические характеристики и температурные диапазоны:** [`theme4/data/materials-registry.php`](../theme4/data/materials-registry.php) (справочник сплавов `$MATERIALS_REGISTRY`, температуры солидус/ликвидус, ГОСТы).
+   * **Канонические идентификаторы (slugs) и нормализация:** `pos61`, `sn63pb37`, `pos40`, `sac305`, `sac405`, `sn42bi58`, `snbiago`, `roze`, `vuda`, `universal`. Источник валидации: функции `tchp_get_canonical_alloys()` и `tchp_normalize_solder_alloy()` в [`wp-content/plugins/tchp-content/tchp-content.php`](../wp-content/plugins/tchp-content/tchp-content.php).
+   * **Формат данных статьи:** объект `solder_alloy` и `temp_data` в [`schemas/article-contract-v1.schema.json`](../schemas/article-contract-v1.schema.json).
 
 3. **Редакционная верификация и отпечаток (Fingerprint):**
-   * Регистрация метаполей и расчёт SHA-256: [`wp-content/plugins/tchp-content/tchp-content.php`](file:///d:/сайт%20для%20пайки/wp-content/plugins/tchp-content/tchp-content.php).
+   * Регистрация метаполей и расчёт SHA-256: [`wp-content/plugins/tchp-content/tchp-content.php`](../wp-content/plugins/tchp-content/tchp-content.php).
    * Поля: `tchp_review_status` (`unreviewed`, `in_review`, `verified`), `tchp_reviewed_content_hash`, `tchp_reviewer_id`, `tchp_reviewed_at`, `tchp_review_outdated`.
 
 4. **Визуальный стиль и компоненты (Bento-Sketch Hybrid):**
-   * Источник токенов и стилей: папка темы [`theme4/`](file:///d:/сайт%20для%20пайки/theme4/) и правила [`DESIGN.md`](file:///d:/сайт%20для%20пайки/DESIGN.md).
-   * Бумажный фон, карандашный контур 1px, векторный монохромный SVG. Без градиентов, неонового свечения и стеклянного морфизма.
+   * Единый источник дизайн-токенов: [`theme4/assets/css/tokens.css`](../theme4/assets/css/tokens.css) и правила [`DESIGN.md`](../DESIGN.md).
+   * Фактическая палитра темы: светло-серый фон `--color-bg: #f6f6f6` (светлая тема) / `#121212` (тёмная тема), фирменный янтарный акцент канифоли `--color-accent: #FFC700`, карандашная рамка 1px, векторный монохромный SVG. Без градиентов, неонового свечения и стеклянного морфизма.
 
 5. **Голос автора (Practico):**
-   * Спецификация и образцы: раздел [`docs/04-research-voice-visuals/GUIDE.md`](file:///d:/сайт%20для%20пайки/docs/04-research-voice-visuals/GUIDE.md).
+   * Спецификация и образцы: раздел [`docs/04-research-voice-visuals/GUIDE.md`](04-research-voice-visuals/GUIDE.md) и база знаний [`gem-knowledge/`](../gem-knowledge/).
    * Принцип: *термин → физический механизм → наблюдаемое последствие*. Никакого выдуманного личного опыта и кулинарных метафор.
 
 ---

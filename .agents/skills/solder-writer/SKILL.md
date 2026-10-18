@@ -20,9 +20,9 @@ metadata:
 ## Quick Start
 
 **Написание статьи:**
-- Используйте утверждённый шаблон статьи (`06_article_template.md`).
-- Следите за списком запрещённых фраз (`04_forbidden_phrases.txt`).
-- Указывайте точные температуры в °C и канонические сплавы (`pos61`, `sac305` и др.).
+- Используйте утверждённый шаблон статьи ([`06_article_template.md`](../../../gem-knowledge/06_article_template.md)).
+- Следите за списком запрещённых фраз ([`04_forbidden_phrases.txt`](../../../gem-knowledge/04_forbidden_phrases.txt)).
+- Указывайте точные температуры в °C и канонические сплавы (`pos61`, `sac305` и др.) из реестра материалов ([`theme4/data/materials-registry.php`](../../../theme4/data/materials-registry.php)).
 
 ---
 
@@ -41,7 +41,7 @@ metadata:
 
 ## 2. Структурный Регламент Статьи
 
-Статья не использует жёстко зашитые инструменты и температуры. Все параметры определяются бриф-исследованием и вносятся в соответствии со схемой [schemas/article-contract-v1.schema.json](file:///d:/сайт%20для%20пайки/schemas/article-contract-v1.schema.json):
+Статья не использует жёстко зашитые инструменты и температуры. Все параметры определяются бриф-исследованием и вносятся в соответствии со схемой [`schemas/article-contract-v1.schema.json`](../../../schemas/article-contract-v1.schema.json):
 
 1. **Введение / Краткий ответ (TL;DR):**
    * Прямой содержательный ответ на вопрос читателя в первом абзаце (без вводных слов «в современном мире»).
@@ -63,6 +63,6 @@ metadata:
 
 ## 3. Ссылки на стандарты проекта
 
-* **Канонический JSON-контракт:** [schemas/article-contract-v1.schema.json](file:///d:/сайт%20для%20пайки/schemas/article-contract-v1.schema.json)
-* **Каталог инженерных паттернов:** [docs/03-editorial-publishing/GUIDE.md](file:///d:/сайт%20для%20пайки/docs/03-editorial-publishing/GUIDE.md)
-* **Профиль авторского голоса Practico:** [docs/04-research-voice-visuals/GUIDE.md](file:///d:/сайт%20для%20пайки/docs/04-research-voice-visuals/GUIDE.md)
+* **Канонический JSON-контракт:** [`schemas/article-contract-v1.schema.json`](../../../schemas/article-contract-v1.schema.json)
+* **Каталог инженерных паттернов:** [`docs/03-editorial-publishing/GUIDE.md`](../../../docs/03-editorial-publishing/GUIDE.md)
+* **Профиль авторского голоса Practico:** [`docs/04-research-voice-visuals/GUIDE.md`](../../../docs/04-research-voice-visuals/GUIDE.md)
