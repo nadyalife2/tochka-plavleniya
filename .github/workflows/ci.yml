@@ -1,0 +1,48 @@
+name: CI / Quality Gate
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Run Automated Tests & Verify Packages
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, json, filter
+          coverage: none
+
+      - name: Setup Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jsonschema
+
+      - name: Execute Master Test Runner
+        run: |
+          python tests/run-all-tests.py
+
+      - name: Upload Distribution Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: tochka-plavleniya-packages
+          path: |
+            theme4.zip
+            tchp-content.zip
+          retention-days: 14

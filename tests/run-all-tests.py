@@ -10,12 +10,26 @@ Executes:
 
 import sys
 import json
+import shutil
 import zipfile
 import subprocess
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
-PHP_EXE = r"C:\Users\nadya\php_portable\php.exe"
+
+def get_php_executable():
+    # 1. Check system PATH (standard on Linux CI / macOS / configured Windows)
+    which_php = shutil.which("php")
+    if which_php:
+        return which_php
+    # 2. Local fallback on Windows portable PHP
+    portable_win = Path(r"C:\Users\nadya\php_portable\php.exe")
+    if portable_win.exists():
+        return str(portable_win)
+    # Default fallback
+    return "php"
+
+PHP_EXE = get_php_executable()
 
 def run_json_schema_tests():
     import jsonschema
@@ -62,7 +76,7 @@ def run_json_schema_tests():
         print("  [PASS] Negative test: legacy alias 'wood' correctly rejected in strict schema.")
 
 def run_php_lint():
-    print("\n[STEP 2/4] Running PHP Syntax Check (Lint)...")
+    print(f"\n[STEP 2/4] Running PHP Syntax Check using '{PHP_EXE}'...")
     php_files = [
         ROOT_DIR / "wp-content" / "plugins" / "tchp-content" / "tchp-content.php",
         ROOT_DIR / "theme4" / "single.php",
@@ -85,27 +99,27 @@ def run_php_integration_tests():
 
 def build_and_verify_archives():
     print("\n[STEP 4/4] Building and Verifying Distribution Packages...")
-    build_script = ROOT_DIR / "scratch" / "build_distribution_archives.py"
+    build_script = ROOT_DIR / "tools" / "build_distribution_archives.py"
     res = subprocess.run([sys.executable, str(build_script)], capture_output=True, text=True)
     assert res.returncode == 0, f"Build archives failed:\n{res.stderr}"
     print(res.stdout.strip())
 
     # Verify theme4.zip
     theme_zip = ROOT_DIR / "theme4.zip"
-    assert theme_zip.exists()
+    assert theme_zip.exists(), "theme4.zip was not created"
     with zipfile.ZipFile(theme_zip, "r") as zf:
         namelist = zf.namelist()
-        assert "theme4/style.css" in namelist
-        assert "theme4/single.php" in namelist
-        assert "theme4/index.php" in namelist
+        assert "theme4/style.css" in namelist, "Missing theme4/style.css in theme4.zip"
+        assert "theme4/single.php" in namelist, "Missing theme4/single.php in theme4.zip"
+        assert "theme4/index.php" in namelist, "Missing theme4/index.php in theme4.zip"
     print(f"  [PASS] theme4.zip verified ({theme_zip.stat().st_size} bytes, root prefix 'theme4/').")
 
     # Verify tchp-content.zip
     plugin_zip = ROOT_DIR / "tchp-content.zip"
-    assert plugin_zip.exists()
+    assert plugin_zip.exists(), "tchp-content.zip was not created"
     with zipfile.ZipFile(plugin_zip, "r") as zf:
         namelist = zf.namelist()
-        assert "tchp-content/tchp-content.php" in namelist
+        assert "tchp-content/tchp-content.php" in namelist, "Missing tchp-content/tchp-content.php in tchp-content.zip"
     print(f"  [PASS] tchp-content.zip verified ({plugin_zip.stat().st_size} bytes, root prefix 'tchp-content/').")
 
 if __name__ == "__main__":
