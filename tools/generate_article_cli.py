@@ -20,28 +20,32 @@ from ai_article_generator import (
 
 def main() -> int:
     parser = argparse.ArgumentParser(
-        description="Генерация статьи и создание черновика WordPress."
+        description="Генерация статьи по каноническому контракту TCHP (JSON + HTML предпросмотр)."
     )
-    parser.add_argument("--topic", required=True)
-    parser.add_argument("--audience", default="Новички в пайке")
-    parser.add_argument("--model", default="gemini-2.5-flash")
-    parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--output-dir", default="generated_articles")
-    parser.add_argument("--wp-url", default=os.environ.get("WP_URL", ""))
-    parser.add_argument("--wp-user", default=os.environ.get("WP_USER", ""))
-    parser.add_argument("--wp-pass", default=os.environ.get("WP_PASS", ""))
+    parser.add_argument("--topic", required=True, help="Тема статьи")
+    parser.add_argument("--audience", default="Новички в пайке", help="Целевая аудитория")
+    parser.add_argument("--model", default="gemini-2.5-flash", help="Модель Gemini")
+    parser.add_argument("--output-dir", default="generated_articles", help="Директория для сохранения JSON и HTML")
+    parser.add_argument(
+        "--publish-direct-experimental",
+        action="store_true",
+        help="[ЭКСПЕРИМЕНТАЛЬНО] Прямая отправка черновика через встроенный класс (в обход delivery_cli.py и журнала). По умолчанию отключено.",
+    )
+    parser.add_argument("--wp-url", default=os.environ.get("WP_URL", ""), help="URL WordPress (только для экспериментальной отправки)")
+    parser.add_argument("--wp-user", default=os.environ.get("WP_USER", ""), help="Имя пользователя WordPress")
+    parser.add_argument("--wp-pass", default=os.environ.get("WP_PASS", ""), help="Application Password WordPress")
     parser.add_argument(
         "--status",
         default="draft",
         choices=["draft", "pending"],
-        help="Автоматическая публикация запрещена.",
+        help="Статус черновика для экспериментальной отправки (draft или pending).",
     )
 
     args = parser.parse_args()
 
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
-        print("GEMINI_API_KEY не найден.", file=sys.stderr)
+        print("GEMINI_API_KEY не найден в переменных окружения.", file=sys.stderr)
         return 1
 
     try:
@@ -64,12 +68,22 @@ def main() -> int:
 
     save_local_preview(article, html_path)
 
-    if args.dry_run:
-        print(f"Dry-run завершён. JSON: {json_path}")
+    print("=======================================================")
+    print("✅ СТАТЬЯ УСПЕШНО СГЕНЕРИРОВАНА И ВАЛИДИРОВАНА!")
+    print(f"   Файл контракта (JSON): {json_path}")
+    print(f"   Предпросмотр (HTML):   {html_path}")
+    print("=======================================================")
+
+    if not args.publish_direct_experimental:
+        print("\nℹ️ ШТАТНЫЙ СПОСОБ ДОСТАВКИ В WORDPRESS:")
+        print("   Используйте канонический публикатор delivery_cli.py (с журналом и защитой от конфликтов):")
+        print(f"   python tools/delivery_cli.py send-draft --file {json_path} --wp-url <WP_URL> --wp-user <WP_USER> --wp-pass <WP_PASS>")
         return 0
 
+    # Экспериментальный прямой путь (только по явному флагу)
+    print("\n⚠️ ВНИМАНИЕ: Запущена экспериментальная прямая отправка в обход delivery_cli.py...")
     if not (args.wp_url and args.wp_user and args.wp_pass):
-        print("Для создания черновика укажите WP_URL, WP_USER и WP_PASS.", file=sys.stderr)
+        print("Ошибка: для прямой отправки необходимо указать --wp-url, --wp-user и --wp-pass.", file=sys.stderr)
         return 1
 
     try:
@@ -80,7 +94,7 @@ def main() -> int:
         return 1
 
     print(
-        "Черновик создан. "
+        "Черновик создан напрямую. "
         f"ID: {response.get('id')} | Статус: {response.get('status')}"
     )
     return 0

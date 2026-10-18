@@ -76,7 +76,7 @@ add_action('init', function () {
 <div class="wp-block-group callout-tldr callout tldr"><!-- wp:paragraph {"className":"callout-title font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1"} -->
 <p class="callout-title font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">Главный принцип // Регламент 10 секунд</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"font-semibold leading-relaxed m-0"} -->
-<p class="font-semibold leading-relaxed m-0">Нагрев платы должен быть строго двухсторонним. Нижний подогрев 140–160°C обязателен для предотвращения коробления текстолита и отрыва BGA-пятаков.</p>
+<p class="font-semibold leading-relaxed m-0">[Сформулируйте ключевой практический вывод операции: проверяемое условие, режим и результат по техническому регламенту конкретной задачи].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -90,7 +90,7 @@ add_action('init', function () {
 <div class="wp-block-group callout-aside"><!-- wp:paragraph {"className":"font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1"} -->
 <p class="font-mono text-xs font-bold uppercase tracking-wider text-ink mb-1">Заметка на полях</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"text-xs leading-relaxed m-0"} -->
-<p class="text-xs leading-relaxed m-0">Безотмывочный флюс ROL0 не требует смывки на обычных цепях, но для сигнальных линий выше 100 МГц ультразвуковая отмывка строго обязательна.</p>
+<p class="text-xs leading-relaxed m-0">[Компактная пометка на полях: важный нюанс подготовки, граничные условия применимости или практический совет со ссылкой на документацию].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -102,7 +102,7 @@ add_action('init', function () {
             'description' => __('Оранжевый блок предостережения от термоудара и повреждения чипов', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout-safety"} -->
 <div class="wp-block-group callout-safety"><!-- wp:paragraph {"className":"m-0"} -->
-<p class="m-0"><strong>Термоудар и предел скорости нагрева:</strong> Скорость подъема температуры не должна превышать <strong>2–3 °C в секунду</strong>. Превышение скорости приводит к растрескиванию кремниевого кристалла и расслоению BGA-подложки («эффект попкорна»).</p>
+<p class="m-0"><strong>Внимание (Техника безопасности):</strong> [Проверенное предупреждение по безопасности или предел термоудара для конкретного компонента с указанием граничных условий и источника из документации].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -114,7 +114,7 @@ add_action('init', function () {
             'description' => __('Мятно-зеленая рамка с тонким практическим лайфхаком', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout-pro"} -->
 <div class="wp-block-group callout-pro"><!-- wp:paragraph {"className":"m-0"} -->
-<p class="m-0"><strong>Инженерная рекомендация:</strong> Перед демонтажем бессвинцового BGA-чипа разбавьте тугоплавкий припой по периметру сплавом ПОС-61 или Розе при 200°C. Это снизит эффективную температуру плавления на 30°C и спасет дорожки.</p>
+<p class="m-0"><strong>Инженерная рекомендация:</strong> [Практическая рекомендация мастера с указанием граничных условий применимости под конкретную технологию или тип платы].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -230,21 +230,21 @@ add_action('init', function () {
             'description' => __('Карточки пошагового технологического процесса с цветными бейджами', 'site2'),
             'content'     => '<!-- wp:group {"className":"step-card"} -->
 <div class="wp-block-group step-card"><!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><span class="step-badge step-badge-yellow">ШАГ 01</span> Подготовка и преднагрев платы</h4>
+<h4 class="wp-block-heading"><span class="step-badge step-badge-yellow">ШАГ 01</span> Подготовка и фиксация</h4>
 <!-- /wp:heading --><!-- wp:paragraph -->
-<p>Зафиксируйте плату на термостоле. Разогрейте плату снизу со скоростью не более 2°C/сек до температуры 140–150°C для равномерного распределения тепла.</p>
+<p>[Описание подготовительного этапа: очистка контактных площадок, механическая фиксация и предварительный подогрев с указанием граничных температур по технологической карте платы].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --><!-- wp:group {"className":"step-card"} -->
 <div class="wp-block-group step-card"><!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><span class="step-badge step-badge-orange">ШАГ 02</span> Нанесение флюса и оплавление</h4>
+<h4 class="wp-block-heading"><span class="step-badge step-badge-orange">ШАГ 02</span> Нанесение флюса и нагрев</h4>
 <!-- /wp:heading --><!-- wp:paragraph -->
-<p>Нанесите тонкий равномерный слой вязкого гелевого флюса ROL0. Включите верхний фен (330–350°C на индикаторе) и прогревайте чип круговыми движениями на высоте 20 мм.</p>
+<p>[Описание операции пайки/монтажа: тип флюса, дозирование припоя, режим термоинструмента и дистанция сопла под конкретный компонент].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --><!-- wp:group {"className":"step-card"} -->
 <div class="wp-block-group step-card"><!-- wp:heading {"level":4} -->
-<h4 class="wp-block-heading"><span class="step-badge step-badge-mint">ШАГ 03</span> Контролируемое охлаждение</h4>
+<h4 class="wp-block-heading"><span class="step-badge step-badge-mint">ШАГ 03</span> Охлаждение и контроль</h4>
 <!-- /wp:heading --><!-- wp:paragraph -->
-<p>Не перемещайте плату до полного затвердевания припоя (ниже 180°C). Быстрое охлаждение воздухом формирует мелкозернистую прочную структуру галтели.</p>
+<p>[Описание фазы кристаллизации и контроля качества соединения: визуальные признаки правильного мениска смачивания и отсутствие механических вибраций до полного застывания].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -258,7 +258,7 @@ add_action('init', function () {
 <div class="wp-block-group tools-box"><!-- wp:heading {"level":4,"className":"font-mono text-xs uppercase tracking-wider text-ink pb-2 border-b border-paper-border flex items-center justify-between"} -->
 <h4 class="wp-block-heading font-mono text-xs uppercase tracking-wider text-ink pb-2 border-b border-paper-border flex items-center justify-between"><span>Оснастка и материалы</span><span class="text-accent text-xs font-bold">СПЕЦИФИКАЦИЯ</span></h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"text-xs font-mono leading-loose mt-2"} -->
-<p class="text-xs font-mono leading-loose mt-2">▸ <strong>Термофен:</strong> турбинный/компрессорный с круглым соплом 10–12 мм<br>▸ <strong>Нижний подогрев:</strong> ИК-термостол с контролем термопары K-типа<br>▸ <strong>Флюс:</strong> безотмывочный ROL0 (Martin / SP-55 / NC-559-ASM)<br>▸ <strong>Оплётка:</strong> медная деоксидированная 2.5 мм (Goot Wick / Chemtronics)</p>
+<p class="text-xs font-mono leading-loose mt-2">▸ <strong>[Оборудование 1]:</strong> [Модель термоинструмента и рабочее сопло/жало]<br>▸ <strong>[Оснастка 2]:</strong> [Нижний подогрев / термостол с датчиком обратной связи]<br>▸ <strong>[Флюс / Паста]:</strong> [Тип флюса по J-STD-004 и марка под задачу]<br>▸ <strong>[Расходный материал]:</strong> [Марка припоя по ГОСТ/ISO и вспомогательные средства]</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -272,13 +272,13 @@ add_action('init', function () {
 <div class="wp-block-group checklist-box"><!-- wp:heading {"level":4,"className":"font-mono text-xs uppercase tracking-wider font-bold text-ink mb-3"} -->
 <h4 class="wp-block-heading font-mono text-xs uppercase tracking-wider font-bold text-ink mb-3">Контрольный чек-лист перед включением</h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"checklist-item"} -->
-<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Влагосодержание чипов:</strong> микросхемы просушены в печи при 110°C (не менее 12 часов), индикатор HIC в норме.</p>
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Влагосодержание чипов:</strong> [Проверка чувствительности к влаге MSL по J-STD-020, предварительная сушка при необходимости].</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"checklist-item"} -->
-<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Антистатическая защита ESD:</strong> антистатический коврик и браслет заземлены, сопротивление &lt; 1 МОм.</p>
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Антистатическая защита ESD:</strong> [Заземление рабочего места, антистатический браслет и инструмент по стандарту].</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"checklist-item"} -->
-<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Калибровка термопары:</strong> датчик нижнего подогрева установлен на текстолит в 10 мм от зоны пайки.</p>
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Термоконтроль:</strong> [Установка и калибровка термодатчика в зоне пайки по технологической карте].</p>
 <!-- /wp:paragraph --><!-- wp:paragraph {"className":"checklist-item"} -->
-<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Срок годности флюса:</strong> вязкость флюса нормальная, расслоения геля и осадка не наблюдается.</p>
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Срок годности материалов:</strong> [Проверка срока годности флюса, отсутствие расслоения и осадка].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -289,7 +289,7 @@ add_action('init', function () {
             'categories'  => ['tochka-plavleniya'],
             'description' => __('Инженерная спецификация режимов, температур и допусков', 'site2'),
             'content'     => '<!-- wp:table {"className":"bom-table"} -->
-<figure class="wp-block-table bom-table"><table class="has-fixed-layout"><thead><tr><th>Параметр / Инструмент</th><th>Режим техпроцесса</th><th>Допуск / Спецификация</th></tr></thead><tbody><tr><td>Термофен (сопло 10 мм)</td><td>330–350 °C на индикаторе</td><td>±5 °C на выходе сопла</td></tr><tr><td>Нижний подогрев платы</td><td>140–160 °C на текстолите</td><td>Контроль термопарой K-типа</td></tr><tr><td>Флюс для пайки</td><td>ROL0 / RMA безотмывочный</td><td>Вязкость 35–45 Па·с</td></tr><tr><td>Время расплава (TAL)</td><td>45–60 секунд</td><td>Не более 75 секунд (IPC)</td></tr></tbody></table></figure>
+<figure class="wp-block-table bom-table"><table class="has-fixed-layout"><thead><tr><th>Параметр / Инструмент</th><th>Режим техпроцесса</th><th>Допуск / Спецификация</th></tr></thead><tbody><tr><td>[Название термоинструмента]</td><td>[Рабочая уставка температуры]</td><td>[Допустимый коридор по ТУ]</td></tr><tr><td>[Подогрев платы / термостол]</td><td>[Температура предварительного прогрева]</td><td>[Датчик контроля / термопара]</td></tr><tr><td>[Флюс / паяльная паста]</td><td>[Классификация по J-STD-004]</td><td>[Метод удаления остатков]</td></tr><tr><td>[Время контакта / выдержка]</td><td>[Длительность пайки (сек)]</td><td>[Стандарт IPC / ГОСТ]</td></tr></tbody></table></figure>
 <!-- /wp:table -->',
         ]);
 
@@ -322,7 +322,7 @@ add_action('init', function () {
             'description' => __('Фирменная рукописная пометка от руки со скетчевой стрелочкой', 'site2'),
             'content'     => '<!-- wp:group {"className":"marginalia-box"} -->
 <div class="wp-block-group marginalia-box"><!-- wp:paragraph {"className":"marginalia-text"} -->
-<p class="marginalia-text">Важная деталь: никогда не дуйте воздухом прямо в центр кристалла! Направляйте фен по спирали от периметра к центру, иначе кремний треснет от перепада температур.</p>
+<p class="marginalia-text">[Важная инженерная деталь: практический нюанс операции с обоснованием физического механизма процесса под конкретный компонент].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
