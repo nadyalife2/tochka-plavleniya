@@ -126,7 +126,7 @@ add_action('init', function () {
             'description' => __('Строгий нормативный блок со ссылкой на отраслевой регламент', 'site2'),
             'content'     => '<!-- wp:group {"className":"callout-ipc"} -->
 <div class="wp-block-group callout-ipc"><!-- wp:paragraph {"className":"m-0"} -->
-<p class="m-0"><strong>Стандарт IPC-A-610G (Класс 3):</strong> Заполнение припоем металлизированного сквозного отверстия должно составлять не менее 75% толщины платы при угле смачивания галтели &lt; 90°.</p>
+<p class="m-0"><strong>Стандарт IPC / ГОСТ:</strong> [Нормативное требование стандарта к проверяемому соединению со ссылкой на класс приемки Class 1/2/3 и пункт спецификации].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->',
         ]);
@@ -138,9 +138,9 @@ add_action('init', function () {
             'description' => __('Двухколоночный блок с фото детали и пояснительным текстом', 'site2'),
             'content'     => '<!-- wp:media-text {"mediaPosition":"left","mediaType":"image","className":"my-6"} -->
 <div class="wp-block-media-text alignwide is-stacked-on-mobile my-6"><figure class="wp-block-media-text__media"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 250\' width=\'400\' height=\'250\'%3E%3Crect width=\'400\' height=\'250\' fill=\'%23f5f3ee\' stroke=\'%23d1cbbe\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%23706d64\'%3E%5B%D0%A7%D0%95%D0%A0%D0%A2%D0%81%D0%96 // %D0%97%D0%90%D0%93%D0%A0%D0%A3%D0%97%D0%98%D0%A2%D0%95 %D0%A4%D0%9E%D0%A2%D0%9E%5D%3C/text%3E%3C/svg%3E" alt="Контроль пайки под микроскопом"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Контроль галтели под микроскопом</h3>
+<h3 class="wp-block-heading">[Контроль паяного соединения под микроскопом]</h3>
 <!-- /wp:heading --><!-- wp:paragraph -->
-<p>Качественное паяное соединение имеет зеркальную поверхность с вогнутым мениском смачивания. Тусклая зернистая структура свидетельствует о перегреве или вибрации платы в момент кристаллизации припоя.</p>
+<p>[Критерии визуального контроля галтели по IPC-A-610G для конкретного сплава: вогнутый мениск, угол смачивания и допустимый вид поверхности (глянцевый для ПОС-61 / полуматовый сатиновый для бессвинцовых сплавов)].</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->',
         ]);
@@ -152,9 +152,9 @@ add_action('init', function () {
             'description' => __('Зеркальный блок для чередования ритма в лонгриде', 'site2'),
             'content'     => '<!-- wp:media-text {"mediaPosition":"right","mediaType":"image","className":"my-6"} -->
 <div class="wp-block-media-text alignwide has-media-on-the-right is-stacked-on-mobile my-6"><figure class="wp-block-media-text__media"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 400 250\' width=\'400\' height=\'250\'%3E%3Crect width=\'400\' height=\'250\' fill=\'%23f5f3ee\' stroke=\'%23d1cbbe\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'12\' fill=\'%23706d64\'%3E%5B%D0%A7%D0%95%D0%A0%D0%A2%D0%81%D0%96 // %D0%97%D0%90%D0%93%D0%A0%D0%A3%D0%97%D0%98%D0%A2%D0%95 %D0%A4%D0%9E%D0%A2%D0%9E%5D%3C/text%3E%3C/svg%3E" alt="Посадка шаров BGA"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Равномерность посадки BGA-шаров</h3>
+<h3 class="wp-block-heading">[Позиционирование и контроль монтажа]</h3>
 <!-- /wp:heading --><!-- wp:paragraph -->
-<p>При оплавлении шаров через трафарет прямого нагрева держите сопло фена на высоте не менее 20 мм. Слишком сильный воздушный поток сдувает шары до момента смачивания пятака.</p>
+<p>[Технологические указания по монтажу конкретного компонента: позиционирование, высота сопла инструмента и интенсивность воздушного потока].</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:media-text -->',
         ]);
@@ -171,7 +171,7 @@ add_action('init', function () {
 <!-- /wp:paragraph --><!-- wp:image {"className":"my-2"} -->
 <figure class="wp-block-image my-2"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 200\' width=\'300\' height=\'200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%23fef2f2\' stroke=\'%23f87171\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'11\' fill=\'%23b91c1c\'%3E%5B%D0%A4%D0%9E%D0%A2%D0%9E %D0%94%D0%95%D0%A4%D0%95%D0%9A%D0%A2%D0%90%5D%3C/text%3E%3C/svg%3E" alt="Дефект пайки"/></figure>
 <!-- /wp:image --><!-- wp:paragraph {"className":"text-xs text-ink-muted leading-relaxed"} -->
-<p class="text-xs text-ink-muted leading-relaxed"><strong>Холодная пайка:</strong> тусклая зернистая поверхность, микротрещина по границе смачивания из-за недогрева или раннего перемещения платы.</p>
+<p class="text-xs text-ink-muted leading-relaxed"><strong>[Признаки брака соединения]:</strong> [Описание недопустимых дефектов по IPC-A-610: холодная пайка, каверны, мостики припоя].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --><!-- wp:column {"className":"compare-col compare-card norm"} -->
 <div class="wp-block-column compare-col compare-card norm"><!-- wp:paragraph -->
@@ -179,7 +179,7 @@ add_action('init', function () {
 <!-- /wp:paragraph --><!-- wp:image {"className":"my-2"} -->
 <figure class="wp-block-image my-2"><img src="data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 300 200\' width=\'300\' height=\'200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%23f0fdf4\' stroke=\'%234ade80\' stroke-width=\'2\' stroke-dasharray=\'4\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' font-family=\'monospace\' font-size=\'11\' fill=\'%2315803d\'%3E%5B%D0%A4%D0%9E%D0%A2%D0%9E %D0%9D%D0%9E%D0%A0%D0%9C%D0%AB%5D%3C/text%3E%3C/svg%3E" alt="Норма пайки"/></figure>
 <!-- /wp:image --><!-- wp:paragraph {"className":"text-xs text-ink-muted leading-relaxed"} -->
-<p class="text-xs text-ink-muted leading-relaxed"><strong>Норма Class 3:</strong> плавный вогнутый мениск, угол контакта &lt; 30°, полное смачивание контактной площадки без пор и каверн.</p>
+<p class="text-xs text-ink-muted leading-relaxed"><strong>[Критерии нормы Class 2/3]:</strong> [Описание признаков качественного соединения: вогнутый мениск, угол контакта &lt; 30°, смачивание контактных площадок].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->',
@@ -194,7 +194,7 @@ add_action('init', function () {
 <div class="sketch-frame p-4 sm:p-6 my-6 relative overflow-hidden bg-card border border-paper-border rounded-lg shadow-xs">
   <div class="font-hand text-xl font-bold text-ink mb-3 flex items-center gap-2">
     <svg class="tp-icon w-4 h-4 text-accent" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
-    <span>Схема нагрева: T°C / Время (сек) — SAC305</span>
+    <span>Схема нагрева: [Пример нормированного термопрофиля оплавления]</span>
   </div>
   <div class="w-full overflow-x-auto">
     <svg viewBox="0 0 540 220" width="100%" height="auto" fill="none" class="max-w-full">
@@ -216,8 +216,8 @@ add_action('init', function () {
     </svg>
   </div>
   <div class="mt-2 text-xs font-mono text-ink-muted flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-    <span>Рис. Нормированный термопрофиль SAC305 (Liquidus 217°C)</span>
-    <span>IPC/JEDEC J-STD-020D</span>
+    <span>Рис. Учебный пример термопрофиля оплавления SAC305 (Liquidus 217°C) при толщине платы &gt; 1.6 мм</span>
+    <span>IPC/JEDEC J-STD-020D (Справочный пример)</span>
   </div>
 </div>
 <!-- /wp:html -->',
@@ -301,15 +301,15 @@ add_action('init', function () {
             'content'     => '<!-- wp:group {"className":"space-y-3 my-6"} -->
 <div class="wp-block-group space-y-3 my-6"><!-- wp:group {"className":"faq-item"} -->
 <div class="wp-block-group faq-item"><!-- wp:heading {"level":4,"className":"text-base font-bold text-ink mb-1"} -->
-<h4 class="wp-block-heading text-base font-bold text-ink mb-1">Какая максимальная температура допустима для бессвинцовой пайки BGA?</h4>
+<h4 class="wp-block-heading text-base font-bold text-ink mb-1">[Вопрос 1: Допустимый температурный предел для конкретного компонента]</h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"text-sm text-ink-muted leading-relaxed m-0"} -->
-<p class="text-sm text-ink-muted leading-relaxed m-0">По стандарту IPC/JEDEC J-STD-020 абсолютный пиковый предел составляет 250°C (не дольше 10 секунд). Оптимальный рабочий пик оплавления SAC305 — ровно 238–242°C.</p>
+<p class="text-sm text-ink-muted leading-relaxed m-0">[Ответ: Укажите проверенный пиковый температурный предел и максимальное время воздействия со ссылкой на документацию производителя (datasheet) или стандарт J-STD-020].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --><!-- wp:group {"className":"faq-item"} -->
 <div class="wp-block-group faq-item"><!-- wp:heading {"level":4,"className":"text-base font-bold text-ink mb-1"} -->
-<h4 class="wp-block-heading text-base font-bold text-ink mb-1">Сколько секунд припой должен находиться в жидком состоянии (TAL)?</h4>
+<h4 class="wp-block-heading text-base font-bold text-ink mb-1">[Вопрос 2: Время нахождения припоя над ликвидусом (TAL)]</h4>
 <!-- /wp:heading --><!-- wp:paragraph {"className":"text-sm text-ink-muted leading-relaxed m-0"} -->
-<p class="text-sm text-ink-muted leading-relaxed m-0">Время над ликвидусом (TAL) должно составлять от 45 до 60 секунд. Меньше 40 с — риск несмачивания. Дольше 90 с — интерметаллический слой становится слишком толстым и хрупким.</p>
+<p class="text-sm text-ink-muted leading-relaxed m-0">[Ответ: Укажите расчетный диапазон времени над ликвидусом для используемого сплава и паяльной пасты с учетом теплоемкости платы].</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group --></div>
 <!-- /wp:group -->',

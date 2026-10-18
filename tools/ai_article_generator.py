@@ -99,99 +99,34 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 
 
 def validate_article_contract(article: Dict[str, Any]) -> None:
-    """Проверяет соответствие статьи схеме schemas/article-contract-v1.schema.json."""
+    """
+    Строго валидирует статью исключительно по канонической схеме schemas/article-contract-v1.schema.json.
+    Никаких ручных послаблений или обходов схемы не допускается.
+    """
+    try:
+        import jsonschema
+    except ImportError as e:
+        raise RuntimeError(
+            "Для строгой валидации контракта требуется библиотека jsonschema. "
+            "Установите зависимость: pip install jsonschema"
+        ) from e
+
     schema_path = ROOT_DIR / "schemas" / "article-contract-v1.schema.json"
-    if schema_path.exists():
-        try:
-            import jsonschema
-            with open(schema_path, "r", encoding="utf-8") as f:
-                schema = json.load(f)
-            jsonschema.validate(instance=article, schema=schema)
-            return
-        except ImportError:
-            pass
-
-    required = [
-        "content_id",
-        "schema_version",
-        "title",
-        "slug",
-        "excerpt",
-        "category_slug",
-        "tags",
-        "reading_time",
-        "difficulty",
-        "solder_alloy",
-        "temp_data",
-        "tools",
-        "content_html",
-    ]
-
-    missing = [field for field in required if not article.get(field)]
-    if missing:
-        raise ContractValidationError(
-            "Отсутствуют обязательные поля контракта: " + ", ".join(missing)
+    if not schema_path.exists():
+        raise FileNotFoundError(
+            f"Критическая ошибка конфигурации: файл канонической схемы не найден по пути '{schema_path}'."
         )
 
-    slug = str(article["slug"]).strip()
-    if not re.fullmatch(r"^[a-z0-9-]+$", slug):
+    with open(schema_path, "r", encoding="utf-8") as f:
+        schema = json.load(f)
+
+    try:
+        jsonschema.validate(instance=article, schema=schema)
+    except jsonschema.ValidationError as err:
+        path = " -> ".join(str(p) for p in err.absolute_path) or "root"
         raise ContractValidationError(
-            "slug должен состоять из строчных латинских букв, цифр и дефисов."
-        )
-
-    alloy = normalize_alloy(article["solder_alloy"])
-    if not alloy:
-        raise ContractValidationError(
-            "solder_alloy должен быть одним из канонических идентификаторов: "
-            + ", ".join(sorted(CANONICAL_ALLOYS))
-        )
-
-    temp_data = article.get("temp_data")
-    if not isinstance(temp_data, dict) or not temp_data.get("kind") or not temp_data.get("range"):
-        raise ContractValidationError(
-            "temp_data должен быть объектом с обязательными полями kind и range."
-        )
-
-    if temp_data["kind"] not in {
-        "station_setpoint",
-        "joint_temperature",
-        "reflow_profile",
-    }:
-        raise ContractValidationError(
-            "temp_data.kind должен быть station_setpoint, joint_temperature или reflow_profile."
-        )
-
-    if not isinstance(article["tools"], list):
-        raise ContractValidationError("tools должен быть массивом.")
-
-    for index, tool in enumerate(article["tools"]):
-        if not isinstance(tool, dict) or not clean_text(tool.get("name"), 150):
-            raise ContractValidationError(
-                f"tools[{index}].name обязателен и не может быть пустым."
-            )
-
-    if not isinstance(article.get("faq", []), list):
-        raise ContractValidationError("faq должен быть массивом.")
-
-    for index, item in enumerate(article.get("faq", [])):
-        if not isinstance(item, dict):
-            raise ContractValidationError(f"faq[{index}] должен быть объектом.")
-        if not clean_text(item.get("q"), 250) or not clean_text(item.get("a"), 2000):
-            raise ContractValidationError(
-                f"faq[{index}] должен содержать непустые q и a."
-            )
-
-    if not isinstance(article.get("sources", []), list):
-        raise ContractValidationError("sources должен быть массивом.")
-
-    for index, source in enumerate(article.get("sources", [])):
-        if not isinstance(source, dict) or not clean_text(source.get("title"), 200):
-            raise ContractValidationError(
-                f"sources[{index}].title обязателен и не может быть пустым."
-            )
-
-    if len(clean_text(article["content_html"], 10 ** 9)) < 100:
-        raise ContractValidationError("content_html слишком короткий.")
+            f"Статья нарушает строгий контракт схемы [{path}]: {err.message}"
+        ) from err
 
 
 def normalize_article(article: Dict[str, Any]) -> Dict[str, Any]:
@@ -199,12 +134,18 @@ def normalize_article(article: Dict[str, Any]) -> Dict[str, Any]:
     Приводит ответ модели к канонической форме контракта TCHP (schemas/article-contract-v1.schema.json).
     Температурные данные и стандарты сохраняются строго во вложенных объектах temp_data и standard_data;
     плоские вспомогательные ключи удаляются из корня для соблюдения additionalProperties: false.
+
+    Внимание: выдуманные значения по умолчанию для физических параметров (температура, сплав)
+    категорически запрещены. При отсутствии обязательных параметров возбуждается ContractValidationError.
     """
     normalized: Dict[str, Any] = {}
 
     slug = clean_text(article.get("slug", ""), 100).strip().lower()
     if not slug:
-        slug = "statya-" + hashlib.sha1(clean_text(article.get("title", ""), 100).encode("utf-8")).hexdigest()[:8]
+        title_for_slug = clean_text(article.get("title", ""), 100)
+        if not title_for_slug:
+            raise ContractValidationError("Не указан slug или title статьи для генерации идентификаторов.")
+        slug = "statya-" + hashlib.sha1(title_for_slug.encode("utf-8")).hexdigest()[:8]
     normalized["slug"] = slug
     normalized["schema_version"] = "1.0"
     normalized["content_id"] = article.get("content_id") or (
@@ -213,9 +154,20 @@ def normalize_article(article: Dict[str, Any]) -> Dict[str, Any]:
     if "content_hash" in article:
         normalized["content_hash"] = str(article["content_hash"])
 
-    normalized["title"] = clean_text(article.get("title", ""), 200)
-    normalized["excerpt"] = clean_text(article.get("excerpt", ""), 400)
-    normalized["content_html"] = str(article.get("content_html", "")).strip()
+    title = clean_text(article.get("title", ""), 200)
+    if not title:
+        raise ContractValidationError("Не указан обязательный заголовок title.")
+    normalized["title"] = title
+
+    excerpt = clean_text(article.get("excerpt", ""), 400)
+    if not excerpt:
+        raise ContractValidationError("Не указан обязательный лид (аннотация) excerpt.")
+    normalized["excerpt"] = excerpt
+
+    content_html = str(article.get("content_html", "")).strip()
+    if not content_html:
+        raise ContractValidationError("Не указано тело статьи content_html.")
+    normalized["content_html"] = content_html
 
     cat_slug = str(article.get("category_slug", "praktika")).strip().lower()
     if cat_slug not in {"start", "materialy", "praktika", "oshibki"}:
@@ -239,17 +191,38 @@ def normalize_article(article: Dict[str, Any]) -> Dict[str, Any]:
         normalized["reading_time"] = 5
 
     normalized["difficulty"] = normalize_difficulty(article.get("difficulty"))
-    normalized["solder_alloy"] = normalize_alloy(article.get("solder_alloy"))
 
-    # Вложенный объект temp_data (без плоских ключей в корне)
+    # Сплав: строгая проверка без подмены
+    alloy = normalize_alloy(article.get("solder_alloy"))
+    if not alloy:
+        raise ContractValidationError(
+            f"Не указан или не опознан канонический идентификатор solder_alloy: '{article.get('solder_alloy')}'. "
+            f"Разрешены: {', '.join(sorted(CANONICAL_ALLOYS))}"
+        )
+    normalized["solder_alloy"] = alloy
+
+    # Вложенный объект temp_data (без выдуманных дефолтов)
     raw_temp = article.get("temp_data") if isinstance(article.get("temp_data"), dict) else {}
-    t_kind = raw_temp.get("kind") or article.get("temp_kind") or "joint_temperature"
+    t_kind = raw_temp.get("kind") or article.get("temp_kind")
+    if not t_kind:
+        raise ContractValidationError(
+            "Не указан обязательный параметр temp_data.kind. "
+            "Разрешены: station_setpoint, joint_temperature, reflow_profile."
+        )
     if t_kind not in {"station_setpoint", "joint_temperature", "reflow_profile"}:
-        t_kind = "joint_temperature"
-    t_range = clean_text(raw_temp.get("range") or article.get("temp_range", ""), 100) or "217 – 235 °C"
+        raise ContractValidationError(
+            f"Недопустимый temp_data.kind: '{t_kind}'. "
+            "Разрешены: station_setpoint, joint_temperature, reflow_profile."
+        )
+
+    t_range = clean_text(raw_temp.get("range") or article.get("temp_range", ""), 100)
+    if not t_range:
+        raise ContractValidationError(
+            "Не указан обязательный параметр temp_data.range. Уточните режим по исследовательскому брифу."
+        )
     t_peak = clean_text(raw_temp.get("peak") or article.get("temp_peak", ""), 100)
 
-    temp_obj = {
+    temp_obj: Dict[str, str] = {
         "kind": t_kind,
         "range": t_range,
     }

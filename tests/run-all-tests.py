@@ -88,6 +88,7 @@ def run_php_lint():
     print(f"\n[STEP 2/4] Running PHP Syntax Check using '{PHP_EXE}'...")
     php_files = [
         ROOT_DIR / "wp-content" / "plugins" / "tchp-content" / "tchp-content.php",
+        ROOT_DIR / "theme4" / "functions.php",
         ROOT_DIR / "theme4" / "single.php",
         ROOT_DIR / "theme4" / "includes" / "functions.php",
         ROOT_DIR / "tests" / "test-package-a1.php",
@@ -109,13 +110,17 @@ def run_php_unit_tests():
 
 def run_python_unit_tests():
     print("\n[STEP 3b/4] Running Python Delivery CLI & Contract Unit Tests...")
-    test_script = ROOT_DIR / "tests" / "test_delivery_cli_unit.py"
-    res = subprocess.run([sys.executable, "-m", "unittest", str(test_script)], capture_output=True, text=True, encoding="utf-8")
-    print(res.stdout)
-    if res.returncode != 0:
-        print(res.stderr, file=sys.stderr)
-        sys.exit(res.returncode)
-    print("  [PASS] Python Delivery CLI Unit Tests passed.")
+    test_scripts = [
+        ROOT_DIR / "tests" / "test_delivery_cli_unit.py",
+        ROOT_DIR / "tests" / "test_article_generator.py",
+    ]
+    for script in test_scripts:
+        res = subprocess.run([sys.executable, "-m", "unittest", str(script)], capture_output=True, text=True, encoding="utf-8")
+        print(res.stdout)
+        if res.returncode != 0:
+            print(res.stderr, file=sys.stderr)
+            sys.exit(res.returncode)
+    print("  [PASS] Python Delivery CLI & Generator Unit Tests passed.")
 
 def verify_distribution_archives():
     print("\n[STEP 4/4] Verifying Distribution Packages Composition & Byte Parity...")
