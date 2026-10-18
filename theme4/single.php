@@ -274,32 +274,71 @@ if (function_exists('have_posts') && have_posts()) {
                     }, $post_content_html);
                 }
 
-                // 2. Extract Headings for TOC and add anchor IDs safely (preserving existing id attributes)
+                // 2. Extract Headings for TOC and ensure document-wide anchor uniqueness
                 $article_toc = [];
-                $post_content_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc) {
+                // Pre-reserve template IDs to prevent collisions with UI controls
+                $seen_ids = [
+                    'main-content'          => true,
+                    'article-faq'           => true,
+                    'reading-progress'      => true,
+                    'copy-article-link-btn' => true,
+                    'mobile-menu'           => true,
+                    'theme-toggle'          => true,
+                    'table-of-contents'     => true,
+                ];
+
+                $post_content_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc, &$seen_ids) {
                     $attrs = $matches[1];
-                    $heading_title = trim(strip_tags($matches[2]));
+                    $heading_content = $matches[2];
+                    $heading_title = trim(strip_tags($heading_content));
 
-                    // Check if an id is already present in existing attributes
-                    if (preg_match('/\bid=["\']([^"\']+)["\']/i', $attrs, $id_match)) {
-                        $existing_id = $id_match[1];
+                    // Case A: id is already present in attributes
+                    if (preg_match('/\bid=(["\'])([^"\']+)\1/i', $attrs, $id_match)) {
+                        $existing_id = $id_match[2];
+                        if (!isset($seen_ids[$existing_id])) {
+                            // Unique and not colliding with template: preserve untouched
+                            $seen_ids[$existing_id] = true;
+                            $article_toc[] = [
+                                'id'    => $existing_id,
+                                'title' => $heading_title,
+                            ];
+                            return $matches[0];
+                        }
+
+                        // Duplicate or template collision: generate unique suffix (-2, -3, ...)
+                        $counter = 2;
+                        $candidate = $existing_id . '-' . $counter;
+                        while (isset($seen_ids[$candidate])) {
+                            $counter++;
+                            $candidate = $existing_id . '-' . $counter;
+                        }
+                        $seen_ids[$candidate] = true;
                         $article_toc[] = [
-                            'id'    => $existing_id,
+                            'id'    => $candidate,
                             'title' => $heading_title,
                         ];
-                        return $matches[0]; // Keep existing heading untouched without duplicate id!
+                        // Replace existing id in attrs
+                        $new_attrs = preg_replace('/\bid=(["\'])' . preg_quote($existing_id, '/') . '\1/i', 'id="' . esc_attr($candidate) . '"', $attrs, 1);
+                        return '<h2' . $new_attrs . '>' . $heading_content . '</h2>';
                     }
 
-                    // Otherwise generate clean unique slug
+                    // Case B: No id present -> generate slug from title
                     $heading_slug = sanitize_title($heading_title);
-                    if (!empty($heading_slug)) {
-                        $article_toc[] = [
-                            'id'    => $heading_slug,
-                            'title' => $heading_title,
-                        ];
-                        return '<h2 id="' . esc_attr($heading_slug) . '"' . $attrs . '>' . $matches[2] . '</h2>';
+                    if (empty($heading_slug)) {
+                        $heading_slug = 'section';
                     }
-                    return $matches[0];
+                    $candidate = $heading_slug;
+                    $counter = 2;
+                    while (isset($seen_ids[$candidate])) {
+                        $candidate = $heading_slug . '-' . $counter;
+                        $counter++;
+                    }
+                    $seen_ids[$candidate] = true;
+                    $article_toc[] = [
+                        'id'    => $candidate,
+                        'title' => $heading_title,
+                    ];
+                    return '<h2 id="' . esc_attr($candidate) . '"' . $attrs . '>' . $heading_content . '</h2>';
                 }, $post_content_html);
                 ?>
 
@@ -446,9 +485,19 @@ if (function_exists('have_posts') && have_posts()) {
                   <div class="space-y-2 text-xs font-mono">
                     <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
                       <span class="text-ink-muted">Статус:</span>
-                      <span class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> Регламент готов
-                      </span>
+                      <?php if (!empty($editorial['is_verified'])): ?>
+                        <span class="font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
+                          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> Регламент готов
+                        </span>
+                      <?php elseif (!empty($editorial['is_outdated'])): ?>
+                        <span class="font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1" title="Контент изменен после последней проверки">
+                          <span class="w-1.5 h-1.5 rounded-full bg-amber-500 inline-block"></span> На ревизии
+                        </span>
+                      <?php else: ?>
+                        <span class="font-bold text-ink-muted flex items-center gap-1">
+                          <span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span> Черновик
+                        </span>
+                      <?php endif; ?>
                     </div>
                     <div class="flex items-center justify-between py-1 border-b border-paper-border/60">
                       <span class="text-ink-muted">Категория:</span>
@@ -553,14 +602,24 @@ if (function_exists('have_posts') && have_posts()) {
                       ТП
                     </div>
                     <div>
-                      <div class="font-bold text-ink text-xs font-sans"><?= esc_html(get_the_author()) ?></div>
+                      <div class="font-bold text-ink text-xs font-sans"><?= !empty($editorial['reviewer_name']) ? esc_html($editorial['reviewer_name']) : esc_html(get_the_author()) ?></div>
                       <div class="text-stamp text-ink-muted font-mono">Лаборатория ТОЧКА ПЛАВЛЕНИЯ</div>
                     </div>
                   </div>
                   <div class="border-t border-paper-border pt-2">
-                    <span class="pill-tag-mint text-stamp font-mono">
-                      ✓ Инженерная верификация
-                    </span>
+                    <?php if (!empty($editorial['is_verified'])): ?>
+                      <span class="pill-tag-mint text-stamp font-mono">
+                        ✓ Инженерная верификация
+                      </span>
+                    <?php elseif (!empty($editorial['is_outdated'])): ?>
+                      <span class="text-stamp font-mono text-amber-600 dark:text-amber-400">
+                        ⚠️ Требуется повторная верификация
+                      </span>
+                    <?php else: ?>
+                      <span class="text-stamp font-mono text-ink-muted">
+                        ⏳ Ожидает проверки инженером
+                      </span>
+                    <?php endif; ?>
                   </div>
                 </div>
 

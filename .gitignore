@@ -4,6 +4,7 @@
 php_portable/
 *.zip
 !theme4.zip
+!tchp-content.zip
 *.log
 *.png
 !site2/assets/img/og-cover.png

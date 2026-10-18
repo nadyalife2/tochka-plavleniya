@@ -1,5 +1,4 @@
 {
-  "$schema": "./article-contract-v1.schema.json",
   "content_id": "tchp-bga-qfn-20261018-01",
   "content_hash": "sha256-e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
   "schema_version": "1.0",

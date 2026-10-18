@@ -71,8 +71,19 @@
     },
     "solder_alloy": {
       "type": "string",
-      "enum": ["pos61", "pos40", "sac305", "roze", "wood", "sn42bi58", "universal"],
-      "description": "Стабильный ID сплава из реестра материалов"
+      "enum": [
+        "pos61",
+        "sn63pb37",
+        "pos40",
+        "sac305",
+        "sac405",
+        "sn42bi58",
+        "snbiago",
+        "roze",
+        "vuda",
+        "universal"
+      ],
+      "description": "Канонический идентификатор сплава из реестра материалов ТЧП"
     },
     "temp_data": {
       "type": "object",
@@ -85,6 +96,7 @@
         },
         "range": {
           "type": "string",
+          "minLength": 3,
           "description": "Рабочий диапазон, напр. '217 – 235 °C'"
         },
         "peak": {
@@ -99,6 +111,7 @@
       "properties": {
         "standard": {
           "type": "string",
+          "minLength": 2,
           "description": "Обозначение стандарта (ГОСТ 21931, IPC-A-610G, J-STD-004)"
         },
         "class": {
