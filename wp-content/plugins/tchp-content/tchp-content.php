@@ -98,6 +98,81 @@ add_filter('rest_pre_dispatch', function ($result, $server, $request) {
 }, 10, 3);
 
 /**
+ * Валидация метаполей перед записью в базу через REST API
+ * Защищает от молчаливой очистки существующих данных и отклоняет пустые/невалидные значения с кодом 400.
+ */
+add_filter('rest_pre_insert_post', function ($prepared_post, $request) {
+    $meta = $request->get_param('meta');
+    if (!is_array($meta)) {
+        return $prepared_post;
+    }
+
+    // 1. Проверка FAQ: если поле передано, валидируем каждый элемент
+    if (array_key_exists('tchp_faq_items', $meta)) {
+        if (!is_array($meta['tchp_faq_items'])) {
+            return new WP_Error('rest_invalid_param', 'Поле meta.tchp_faq_items должно быть массивом.', ['status' => 400]);
+        }
+        foreach ($meta['tchp_faq_items'] as $idx => $item) {
+            if (!is_array($item)) {
+                return new WP_Error('rest_invalid_param', sprintf('Элемент meta.tchp_faq_items[%d] должен быть объектом.', $idx), ['status' => 400]);
+            }
+            if (!isset($item['q']) || !is_string($item['q']) || trim($item['q']) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Вопрос в meta.tchp_faq_items[%d].q не может быть пустым.', $idx), ['status' => 400]);
+            }
+            if (!isset($item['a']) || !is_string($item['a']) || trim($item['a']) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Ответ в meta.tchp_faq_items[%d].a не может быть пустым.', $idx), ['status' => 400]);
+            }
+        }
+    }
+
+    // 2. Проверка Инструментов
+    if (array_key_exists('tchp_tools', $meta)) {
+        if (!is_array($meta['tchp_tools'])) {
+            return new WP_Error('rest_invalid_param', 'Поле meta.tchp_tools должно быть массивом.', ['status' => 400]);
+        }
+        foreach ($meta['tchp_tools'] as $idx => $item) {
+            if (!is_array($item)) {
+                return new WP_Error('rest_invalid_param', sprintf('Элемент meta.tchp_tools[%d] должен быть объектом.', $idx), ['status' => 400]);
+            }
+            if (!isset($item['name']) || !is_string($item['name']) || trim($item['name']) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Название инструмента в meta.tchp_tools[%d].name не может быть пустым.', $idx), ['status' => 400]);
+            }
+        }
+    }
+
+    // 3. Проверка Источников
+    if (array_key_exists('tchp_sources', $meta)) {
+        if (!is_array($meta['tchp_sources'])) {
+            return new WP_Error('rest_invalid_param', 'Поле meta.tchp_sources должно быть массивом.', ['status' => 400]);
+        }
+        foreach ($meta['tchp_sources'] as $idx => $item) {
+            if (!is_array($item)) {
+                return new WP_Error('rest_invalid_param', sprintf('Элемент meta.tchp_sources[%d] должен быть объектом.', $idx), ['status' => 400]);
+            }
+            if (!isset($item['title']) || !is_string($item['title']) || trim($item['title']) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Название источника в meta.tchp_sources[%d].title не может быть пустым.', $idx), ['status' => 400]);
+            }
+        }
+    }
+
+    // 4. Проверка припоя (неизвестный припой -> отказ 400)
+    if (array_key_exists('tchp_solder_alloy', $meta)) {
+        $raw_alloy = (string) $meta['tchp_solder_alloy'];
+        $norm_alloy = tchp_normalize_solder_alloy($raw_alloy);
+        if (empty($norm_alloy)) {
+            $allowed = tchp_get_canonical_alloys();
+            return new WP_Error(
+                'rest_invalid_param',
+                sprintf('Недопустимый припой "%s". Разрешенные канонические: %s', esc_html($raw_alloy), implode(', ', $allowed)),
+                ['status' => 400]
+            );
+        }
+    }
+
+    return $prepared_post;
+}, 10, 2);
+
+/**
  * 3. Регистрация мета-полей для REST API и системы
  */
 add_action('init', function () {
@@ -324,7 +399,7 @@ add_action('init', function () {
                     'type'                 => 'object',
                     'required'             => ['name'],
                     'properties'           => [
-                        'name'    => ['type' => 'string', 'maxLength' => 150],
+                        'name'    => ['type' => 'string', 'minLength' => 1, 'pattern' => '\\S', 'maxLength' => 150],
                         'model'   => ['type' => 'string', 'maxLength' => 100],
                         'purpose' => ['type' => 'string', 'maxLength' => 250],
                     ],
@@ -364,8 +439,8 @@ add_action('init', function () {
                     'type'                 => 'object',
                     'required'             => ['q', 'a'],
                     'properties'           => [
-                        'q' => ['type' => 'string', 'maxLength' => 250],
-                        'a' => ['type' => 'string', 'maxLength' => 2000],
+                        'q' => ['type' => 'string', 'minLength' => 1, 'pattern' => '\\S', 'maxLength' => 250],
+                        'a' => ['type' => 'string', 'minLength' => 1, 'pattern' => '\\S', 'maxLength' => 2000],
                     ],
                     'additionalProperties' => false,
                 ],
@@ -403,7 +478,7 @@ add_action('init', function () {
                     'type'                 => 'object',
                     'required'             => ['title'],
                     'properties'           => [
-                        'title'    => ['type' => 'string', 'maxLength' => 200],
+                        'title'    => ['type' => 'string', 'minLength' => 1, 'pattern' => '\\S', 'maxLength' => 200],
                         'standard' => ['type' => 'string', 'maxLength' => 120],
                         'url'      => ['type' => 'string', 'format' => 'uri'],
                     ],
@@ -817,7 +892,7 @@ add_action('rest_api_init', function () {
         'methods'             => 'POST',
         'callback'            => 'tchp_rest_verify_post',
         'permission_callback' => function ($request) {
-            $post_id = (int) $request['id'];
+            $post_id = is_object($request) && method_exists($request, 'get_param') ? (int) $request->get_param('id') : (int) ($request['id'] ?? 0);
             return tchp_can_user_review_post(get_current_user_id(), $post_id);
         },
         'args' => [
@@ -831,22 +906,57 @@ add_action('rest_api_init', function () {
 });
 
 function tchp_rest_verify_post($request) {
-    $post_id = (int) $request['id'];
+    $post_id = is_object($request) && method_exists($request, 'get_param') ? (int) $request->get_param('id') : (int) ($request['id'] ?? 0);
     $user_id = get_current_user_id();
 
+    // 1. Проверка прав
+    if (!tchp_can_user_review_post($user_id, $post_id)) {
+        return new WP_Error('rest_forbidden', 'Недостаточно прав для подтверждения проверки.', ['status' => 403]);
+    }
+
+    // 2. Получение expected_hash
+    $params = $request->get_json_params();
+    if (!is_array($params)) {
+        $params = $request->get_params();
+    }
+    $expected_hash = isset($params['expected_hash']) ? sanitize_text_field($params['expected_hash']) : '';
+
+    if (empty($expected_hash)) {
+        return new WP_Error(
+            'tchp_missing_expected_hash',
+            'Параметр expected_hash обязателен для подтверждения редакции.',
+            ['status' => 400]
+        );
+    }
+
+    // 3. Расчет актуального отпечатка статьи
+    $current_hash = tchp_calculate_article_hash($post_id);
+
+    // 4. Сравнение с expected_hash (при несовпадении — 409 Conflict без изменения полей!)
+    if ($expected_hash !== $current_hash) {
+        return new WP_Error(
+            'tchp_hash_conflict',
+            sprintf('Версия статьи была изменена. Ожидался отпечаток %s, текущий: %s', $expected_hash, $current_hash),
+            [
+                'status'        => 409,
+                'expected_hash' => $expected_hash,
+                'current_hash'  => $current_hash,
+            ]
+        );
+    }
+
+    // 5. Отпечаток строго совпадает — применяем подтверждение
     update_post_meta($post_id, 'tchp_review_status', 'verified');
     update_post_meta($post_id, 'tchp_reviewer_id', $user_id);
     update_post_meta($post_id, 'tchp_reviewed_at', current_time('c'));
     delete_post_meta($post_id, 'tchp_review_outdated');
-
-    $hash = tchp_calculate_article_hash($post_id);
-    update_post_meta($post_id, 'tchp_reviewed_content_hash', $hash);
+    update_post_meta($post_id, 'tchp_reviewed_content_hash', $current_hash);
 
     $editorial = tchp_get_editorial_data($post_id);
     return rest_ensure_response([
         'success'   => true,
         'post_id'   => $post_id,
-        'hash'      => $hash,
+        'hash'      => $current_hash,
         'editorial' => $editorial,
     ]);
 }
@@ -1121,11 +1231,12 @@ function tchp_render_article_editorial_box($post) {
         </div>
 
         <div style="margin-top:12px; padding-top:10px; border-top:1px dashed #ccc;">
+          <input type="hidden" name="tchp_expected_hash" value="<?= esc_attr($editorial['current_hash']) ?>">
           <button type="submit" name="tchp_action_verify_now" value="1" class="button button-primary" style="width:100%; text-align:center;">
             🛡️ Подтвердить проверку (ОТК)
           </button>
           <p class="description" style="margin:4px 0 0; font-size:11px; color:#137333;">
-            При нажатии этой кнопки сервер зафиксирует текущий отпечаток контента статьи от вашего имени.
+            Подтверждает текущую сохранённую редакцию статьи.
           </p>
         </div>
       <?php else: ?>
@@ -1196,12 +1307,20 @@ add_action('save_post', function ($post_id) {
         if (tchp_can_user_review_post(get_current_user_id(), $post_id)) {
             // Случай 1: Явное подтверждение проверки кнопкой
             if (!empty($_POST['tchp_action_verify_now'])) {
-                update_post_meta($post_id, 'tchp_review_status', 'verified');
-                update_post_meta($post_id, 'tchp_reviewer_id', get_current_user_id());
-                update_post_meta($post_id, 'tchp_reviewed_at', current_time('c'));
-                delete_post_meta($post_id, 'tchp_review_outdated');
-                $hash = tchp_calculate_article_hash($post_id);
-                update_post_meta($post_id, 'tchp_reviewed_content_hash', $hash);
+                $expected_hash = isset($_POST['tchp_expected_hash']) ? sanitize_text_field($_POST['tchp_expected_hash']) : '';
+                $current_hash  = tchp_calculate_article_hash($post_id);
+
+                if (!empty($expected_hash) && $expected_hash === $current_hash) {
+                    update_post_meta($post_id, 'tchp_review_status', 'verified');
+                    update_post_meta($post_id, 'tchp_reviewer_id', get_current_user_id());
+                    update_post_meta($post_id, 'tchp_reviewed_at', current_time('c'));
+                    delete_post_meta($post_id, 'tchp_review_outdated');
+                    update_post_meta($post_id, 'tchp_reviewed_content_hash', $current_hash);
+                } else {
+                    // Контент изменился или не сохранен перед подтверждением — отправляем на ревизию
+                    update_post_meta($post_id, 'tchp_review_status', 'in_review');
+                    update_post_meta($post_id, 'tchp_review_outdated', '1');
+                }
             } else {
                 // Случай 2: Обычное сохранение — обновляем только не-verified статусы
                 $req_status = isset($_POST['tchp_review_status']) ? sanitize_key($_POST['tchp_review_status']) : '';

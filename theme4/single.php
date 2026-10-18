@@ -287,6 +287,19 @@ if (function_exists('have_posts') && have_posts()) {
                     'table-of-contents'     => true,
                 ];
 
+                // PASS 1: Pre-collect all existing IDs from non-H2 tags in article content
+                // (e.g. <section id="...">, <div id="...">, etc.) so no H2 can clash with them!
+                if (preg_match_all('/<([a-z0-9]+)\b[^>]*\bid=(["\'])([^"\']+)\2[^>]*>/i', $post_content_html, $all_tag_matches, PREG_SET_ORDER)) {
+                    foreach ($all_tag_matches as $tag_match) {
+                        $tag_name = strtolower($tag_match[1]);
+                        $found_id = $tag_match[3];
+                        if ($tag_name !== 'h2') {
+                            $seen_ids[$found_id] = true;
+                        }
+                    }
+                }
+
+                // PASS 2: Process H2 headings sequentially, ensuring 100% document-wide uniqueness
                 $post_content_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc, &$seen_ids) {
                     $attrs = $matches[1];
                     $heading_content = $matches[2];
