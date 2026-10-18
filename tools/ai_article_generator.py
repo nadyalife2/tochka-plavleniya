@@ -173,9 +173,31 @@ def normalize_article(article: Dict[str, Any]) -> Dict[str, Any]:
     normalized["solder_alloy"] = normalize_alloy(normalized.get("solder_alloy"))
     normalized["difficulty"] = normalize_difficulty(normalized.get("difficulty"))
 
-    normalized["temp_kind"] = normalized.get("temp_kind") or "joint_temperature"
-    normalized["temp_range"] = clean_text(normalized.get("temp_range"), 100)
-    normalized["temp_peak"] = clean_text(normalized.get("temp_peak"), 100)
+    temp_data = normalized.get("temp_data")
+    if isinstance(temp_data, dict):
+        normalized["temp_kind"] = normalized.get("temp_kind") or temp_data.get("kind") or "joint_temperature"
+        normalized["temp_range"] = clean_text(normalized.get("temp_range") or temp_data.get("range"), 100)
+        normalized["temp_peak"] = clean_text(normalized.get("temp_peak") or temp_data.get("peak"), 100)
+    else:
+        normalized["temp_kind"] = normalized.get("temp_kind") or "joint_temperature"
+        normalized["temp_range"] = clean_text(normalized.get("temp_range"), 100)
+        normalized["temp_peak"] = clean_text(normalized.get("temp_peak"), 100)
+
+    std_data = normalized.get("standard_data")
+    if isinstance(std_data, dict):
+        normalized["standard"] = clean_text(normalized.get("standard") or std_data.get("standard"), 120)
+        normalized["standard_class"] = clean_text(normalized.get("standard_class") or std_data.get("class"), 60)
+        normalized["standard_description"] = clean_text(normalized.get("standard_description") or std_data.get("description"), 255)
+    else:
+        normalized["standard"] = clean_text(normalized.get("standard"), 120)
+        normalized["standard_class"] = clean_text(normalized.get("standard_class"), 60)
+        normalized["standard_description"] = clean_text(normalized.get("standard_description"), 255)
+
+    normalized["temp_data"] = {
+        "kind": normalized["temp_kind"],
+        "range": normalized["temp_range"],
+        "peak": normalized["temp_peak"],
+    }
 
     tools = []
     for tool in normalized.get("tools") or normalized.get("tools_needed") or []:
@@ -333,6 +355,9 @@ class WordPressPublisher:
             "tchp_temp_kind": article["temp_kind"],
             "tchp_temp_range": article["temp_range"],
             "tchp_temp_peak": article.get("temp_peak", ""),
+            "tchp_standard": article.get("standard", ""),
+            "tchp_standard_class": article.get("standard_class", ""),
+            "tchp_standard_description": article.get("standard_description", ""),
             "tchp_tools": article["tools"],
             "tchp_faq_items": article["faq"],
             "tchp_sources": article["sources"],

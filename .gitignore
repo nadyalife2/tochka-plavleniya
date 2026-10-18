@@ -28,3 +28,6 @@ tochka-plavleniya.ru/
 все/
 .codex/
 .impeccable/
+__pycache__/
+*.pyc
+delivery-journal*.json*

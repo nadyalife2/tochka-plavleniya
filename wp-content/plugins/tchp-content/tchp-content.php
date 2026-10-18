@@ -714,7 +714,7 @@ function tchp_calculate_article_hash($post_id) {
         'standard_desc' => $std_desc,
     ];
 
-    return hash('sha256', json_encode($fingerprint_data, JSON_UNESCAPED_UNICODE));
+    return hash('sha256', json_encode($fingerprint_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
 }
 
 /**

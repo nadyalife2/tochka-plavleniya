@@ -15,6 +15,7 @@ import shutil
 import zipfile
 import subprocess
 from pathlib import Path
+import argparse
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
 
@@ -106,44 +107,86 @@ def run_php_unit_tests():
         sys.exit(res.returncode)
     print("  [PASS] Business Logic & Contract Unit Tests completed with 100% success rate.")
 
-def build_and_verify_archives():
-    print("\n[STEP 4/4] Building and Verifying Distribution Packages...")
+def verify_distribution_archives():
+    print("\n[STEP 4/4] Verifying Distribution Packages Composition & Byte Parity...")
+
+    # 1. Verify theme4.zip full composition and byte-exact parity
+    theme_zip = ROOT_DIR / "theme4.zip"
+    theme_src = ROOT_DIR / "theme4"
+    assert theme_zip.exists(), f"theme4.zip was not found at {theme_zip}"
+
+    with zipfile.ZipFile(theme_zip, "r") as zf:
+        zip_files = set(zf.namelist())
+        src_files = set()
+        for root, dirs, files in os.walk(theme_src):
+            dirs[:] = [d for d in dirs if not d.startswith('.') and d != '__pycache__']
+            for file in sorted(files):
+                if file.startswith('.') and file != '.htaccess':
+                    continue
+                if file.endswith('.pyc'):
+                    continue
+                full_path = Path(root) / file
+                rel_path = full_path.relative_to(theme_src).as_posix()
+                arcname = f"theme4/{rel_path}"
+                src_files.add(arcname)
+
+                # Verify byte-exact match for EVERY single file
+                with open(full_path, "rb") as f_src:
+                    assert zf.read(arcname) == f_src.read(), f"Byte mismatch between theme4.zip and {full_path}!"
+
+        # Ensure no extra or missing files
+        assert zip_files == src_files, f"Archive composition mismatch! Extra: {zip_files - src_files}, Missing: {src_files - zip_files}"
+        print(f"  [PASS] theme4.zip verified: 100% composition & byte-exact parity ({len(zip_files)} files, {theme_zip.stat().st_size} bytes).")
+
+    # 2. Verify tchp-content.zip full composition and byte-exact parity
+    plugin_zip = ROOT_DIR / "tchp-content.zip"
+    plugin_src = ROOT_DIR / "wp-content" / "plugins" / "tchp-content"
+    assert plugin_zip.exists(), f"tchp-content.zip was not found at {plugin_zip}"
+
+    with zipfile.ZipFile(plugin_zip, "r") as zf:
+        zip_files = set(zf.namelist())
+        src_files = set()
+        for root, dirs, files in os.walk(plugin_src):
+            dirs[:] = [d for d in dirs if not d.startswith('.') and d != '__pycache__']
+            for file in sorted(files):
+                if file.startswith('.') and file != '.htaccess':
+                    continue
+                if file.endswith('.pyc'):
+                    continue
+                full_path = Path(root) / file
+                rel_path = full_path.relative_to(plugin_src).as_posix()
+                arcname = f"tchp-content/{rel_path}"
+                src_files.add(arcname)
+
+                # Verify byte-exact match
+                with open(full_path, "rb") as f_src:
+                    assert zf.read(arcname) == f_src.read(), f"Byte mismatch between tchp-content.zip and {full_path}!"
+
+        assert zip_files == src_files, f"Plugin archive composition mismatch! Extra: {zip_files - src_files}, Missing: {src_files - zip_files}"
+        print(f"  [PASS] tchp-content.zip verified: 100% composition & byte-exact parity ({len(zip_files)} files, {plugin_zip.stat().st_size} bytes).")
+
+def build_distribution_archives():
+    print("\n[BUILD] Compiling fresh distribution packages...")
     build_script = ROOT_DIR / "tools" / "build_distribution_archives.py"
     res = subprocess.run([sys.executable, str(build_script)], capture_output=True, text=True)
     assert res.returncode == 0, f"Build archives failed:\n{res.stderr}"
     print(res.stdout.strip())
 
-    # Verify theme4.zip structure and byte-exact parity with tracked sources
-    theme_zip = ROOT_DIR / "theme4.zip"
-    assert theme_zip.exists(), "theme4.zip was not created"
-    with zipfile.ZipFile(theme_zip, "r") as zf:
-        namelist = zf.namelist()
-        assert "theme4/style.css" in namelist, "Missing theme4/style.css in theme4.zip"
-        assert "theme4/single.php" in namelist, "Missing theme4/single.php in theme4.zip"
-        assert "theme4/index.php" in namelist, "Missing theme4/index.php in theme4.zip"
-
-        with open(ROOT_DIR / "theme4" / "single.php", "rb") as f_src:
-            assert zf.read("theme4/single.php") == f_src.read(), "Byte mismatch between theme4.zip and theme4/single.php!"
-        with open(ROOT_DIR / "theme4" / "style.css", "rb") as f_src:
-            assert zf.read("theme4/style.css") == f_src.read(), "Byte mismatch between theme4.zip and theme4/style.css!"
-    print(f"  [PASS] theme4.zip verified (byte-exact match with working directory, {theme_zip.stat().st_size} bytes).")
-
-    # Verify tchp-content.zip structure and byte-exact parity with plugin source
-    plugin_zip = ROOT_DIR / "tchp-content.zip"
-    assert plugin_zip.exists(), "tchp-content.zip was not created"
-    with zipfile.ZipFile(plugin_zip, "r") as zf:
-        namelist = zf.namelist()
-        assert "tchp-content/tchp-content.php" in namelist, "Missing tchp-content/tchp-content.php in tchp-content.zip"
-
-        with open(ROOT_DIR / "wp-content" / "plugins" / "tchp-content" / "tchp-content.php", "rb") as f_src:
-            assert zf.read("tchp-content/tchp-content.php") == f_src.read(), "Byte mismatch between tchp-content.zip and plugin source!"
-    print(f"  [PASS] tchp-content.zip verified (byte-exact match with plugin source, {plugin_zip.stat().st_size} bytes).")
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="TCHP Local Quality Gate & Test Runner")
+    parser.add_argument("--verify-only", action="store_true", help="Only verify existing archives without rebuilding them")
+    parser.add_argument("--build", action="store_true", help="Explicitly rebuild archives before verification")
+    args = parser.parse_args()
+
     run_json_schema_tests()
     run_php_lint()
     run_php_unit_tests()
-    build_and_verify_archives()
+
+    if not args.verify_only:
+        build_distribution_archives()
+
+    verify_distribution_archives()
+
     print("\n" + "=" * 55)
     print("ALL TESTS & INTEGRITY CHECKS PASSED SUCCESSFULLY!")
     print("=" * 55 + "\n")
