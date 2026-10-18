@@ -302,9 +302,16 @@ class LiveWpIntegrationTester:
                     f"/wp-json/tchp/v1/posts/{post_id}/verify",
                     {"expected_hash": valid_hash}
                 )
+                editorial = res_v_ok.get("editorial", {})
+                verification_ok = (
+                    code_v_ok == 200
+                    and res_v_ok.get("success") is True
+                    and editorial.get("status") == "verified"
+                    and editorial.get("is_verified") is True
+                )
                 self.assert_test(
                     "11. Editor verification with valid expected_hash succeeds (HTTP 200 OK)",
-                    code_v_ok == 200 and res_v_ok.get("review_status") == "verified",
+                    verification_ok,
                     details=f"Received HTTP {code_v_ok}: {res_v_ok}"
                 )
             else:
@@ -314,7 +321,7 @@ class LiveWpIntegrationTester:
             print("\n🔄 Running delivery_cli.py subprocess tests against live WordPress...")
             with tempfile.TemporaryDirectory() as tmp_dir:
                 tmp_dir_path = Path(tmp_dir)
-                test_cid = f"live-cli-test-{int(time.time())}"
+                test_cid = f"tchp-live-cli-test-{int(time.time())}"
                 example_json_path = ROOT_DIR / "schemas" / "article-example-v1.json"
                 with open(example_json_path, "r", encoding="utf-8") as f:
                     article_data = json.load(f)
