@@ -107,6 +107,16 @@ def run_php_unit_tests():
         sys.exit(res.returncode)
     print("  [PASS] Business Logic & Contract Unit Tests completed with 100% success rate.")
 
+def run_python_unit_tests():
+    print("\n[STEP 3b/4] Running Python Delivery CLI & Contract Unit Tests...")
+    test_script = ROOT_DIR / "tests" / "test_delivery_cli_unit.py"
+    res = subprocess.run([sys.executable, "-m", "unittest", str(test_script)], capture_output=True, text=True, encoding="utf-8")
+    print(res.stdout)
+    if res.returncode != 0:
+        print(res.stderr, file=sys.stderr)
+        sys.exit(res.returncode)
+    print("  [PASS] Python Delivery CLI Unit Tests passed.")
+
 def verify_distribution_archives():
     print("\n[STEP 4/4] Verifying Distribution Packages Composition & Byte Parity...")
 
@@ -181,6 +191,7 @@ if __name__ == "__main__":
     run_json_schema_tests()
     run_php_lint()
     run_php_unit_tests()
+    run_python_unit_tests()
 
     if not args.verify_only:
         build_distribution_archives()

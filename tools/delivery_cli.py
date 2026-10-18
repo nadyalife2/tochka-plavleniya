@@ -68,18 +68,72 @@ def normalize_alloy(value: Any) -> str:
     return raw if raw in CANONICAL_ALLOYS else ""
 
 
+def normalize_canonical_tools(tools_data: Any) -> list:
+    """Normalizes tools array into strict dictionary structure with ordered keys: name, model, purpose."""
+    if not isinstance(tools_data, list):
+        return []
+    clean = []
+    for item in tools_data:
+        if isinstance(item, str) and item.strip():
+            clean.append({
+                "name": item.strip(),
+                "model": "",
+                "purpose": ""
+            })
+        elif isinstance(item, dict) and str(item.get("name", "")).strip():
+            clean.append({
+                "name": str(item.get("name", "")).strip(),
+                "model": str(item.get("model", "")).strip(),
+                "purpose": str(item.get("purpose", "")).strip()
+            })
+    return clean
+
+
+def normalize_canonical_faq(faq_data: Any) -> list:
+    """Normalizes FAQ array into strict dictionary structure with ordered keys: q, a."""
+    if not isinstance(faq_data, list):
+        return []
+    clean = []
+    for item in faq_data:
+        if isinstance(item, dict):
+            q = str(item.get("q", "")).strip()
+            a = str(item.get("a", "")).strip()
+            if q and a:
+                clean.append({
+                    "q": q,
+                    "a": a
+                })
+    return clean
+
+
+def normalize_canonical_sources(sources_data: Any) -> list:
+    """Normalizes sources array into strict dictionary structure with ordered keys: title, standard, url."""
+    if not isinstance(sources_data, list):
+        return []
+    clean = []
+    for item in sources_data:
+        if isinstance(item, dict) and str(item.get("title", "")).strip():
+            clean.append({
+                "title": str(item.get("title", "")).strip(),
+                "standard": str(item.get("standard", "")).strip(),
+                "url": str(item.get("url", "")).strip()
+            })
+    return clean
+
+
 def compute_canonical_fingerprint(article_data: dict) -> str:
     """
     Calculates SHA-256 fingerprint from canonical normalized fields.
-    Byte-for-byte identical to tchp_calculate_article_hash() in tchp-content.php.
+    Byte-for-byte identical to tchp_calculate_article_hash() in tchp-content.php,
+    independent of dictionary key ordering or omitted optional fields in input.
     """
     title = str(article_data.get("title", "")).strip()
-    content = str(article_data.get("content_html", "")).strip()
+    content = str(article_data.get("content_html", article_data.get("content", ""))).strip()
     excerpt = str(article_data.get("excerpt", "")).strip()
 
-    tools = article_data.get("tools", [])
-    faq = article_data.get("faq", [])
-    sources = article_data.get("sources", [])
+    tools = normalize_canonical_tools(article_data.get("tools", []))
+    faq = normalize_canonical_faq(article_data.get("faq", []))
+    sources = normalize_canonical_sources(article_data.get("sources", []))
 
     alloy = normalize_alloy(article_data.get("solder_alloy", ""))
 
@@ -119,13 +173,17 @@ def compute_server_post_fingerprint(post: dict) -> str:
     content = str(post.get("content", {}).get("raw", post.get("content", {}).get("rendered", ""))).strip()
     excerpt = str(post.get("excerpt", {}).get("raw", post.get("excerpt", {}).get("rendered", ""))).strip()
 
+    tools = normalize_canonical_tools(meta.get("tchp_tools", []))
+    faq = normalize_canonical_faq(meta.get("tchp_faq_items", []))
+    sources = normalize_canonical_sources(meta.get("tchp_sources", []))
+
     fingerprint_data = {
         "title": title,
         "content": content,
         "excerpt": excerpt,
-        "tools": meta.get("tchp_tools", []),
-        "faq": meta.get("tchp_faq_items", []),
-        "sources": meta.get("tchp_sources", []),
+        "tools": tools,
+        "faq": faq,
+        "sources": sources,
         "alloy": normalize_alloy(meta.get("tchp_solder_alloy", "")),
         "t_kind": str(meta.get("tchp_temp_kind", "")),
         "t_range": str(meta.get("tchp_temp_range", "")),
@@ -189,17 +247,25 @@ class WordPressRestClient:
             return data[0].get("id")
         return None
 
-    def resolve_tag(self, tag_name: str) -> Optional[int]:
+    def resolve_tag(self, tag_name: str) -> Tuple[Optional[int], Optional[str]]:
+        """
+        Resolves tag by name or creates it if not found.
+        Returns (tag_id, error_message).
+        Halts immediately on network/server errors to avoid blind creation.
+        """
         code, data = self.request("GET", f"/wp-json/wp/v2/tags", params={"search": tag_name})
-        if code == 200 and isinstance(data, list):
+        if code != 200:
+            return None, f"Tag search failed with HTTP {code}: {data}"
+        if isinstance(data, list):
             for t in data:
                 if t.get("name", "").lower() == tag_name.lower():
-                    return t.get("id")
-        # Attempt to create tag if missing
+                    return t.get("id"), None
+
+        # Definitively not found: create tag
         code_create, res_create = self.request("POST", "/wp-json/wp/v2/tags", data={"name": tag_name})
         if code_create in (200, 201) and isinstance(res_create, dict):
-            return res_create.get("id")
-        return None
+            return res_create.get("id"), None
+        return None, f"Tag creation failed with HTTP {code_create}: {res_create}"
 
 
 @contextlib.contextmanager
@@ -228,6 +294,8 @@ def file_lock(lock_path: Path):
 
 
 class DeliveryJournal:
+    JOURNAL_VERSION = "2.0"
+
     def __init__(self, log_path: Path):
         self.log_path = log_path
         self.lock_path = log_path.with_suffix(".lock")
@@ -239,20 +307,31 @@ class DeliveryJournal:
                 with open(self.log_path, "r", encoding="utf-8") as f:
                     content = f.read().strip()
                     if not content:
-                        return {"sites": {}}
-                    return json.loads(content)
+                        raise RuntimeError(
+                            f"CRITICAL: Delivery journal at '{self.log_path}' is 0 bytes (empty/truncated). "
+                            "Refusing to reset to avoid duplicate deliveries or data loss."
+                        )
+                    data = json.loads(content)
+                    if not isinstance(data, dict):
+                        raise ValueError("Journal root must be a JSON object")
+                    if "version" not in data:
+                        data["version"] = self.JOURNAL_VERSION
+                    if "sites" not in data:
+                        data["sites"] = {}
+                    return data
             except Exception as e:
-                # Corrupted journal must NEVER be silently treated as empty!
+                # Corrupted or truncated journal must NEVER be silently treated as empty!
                 raise RuntimeError(
                     f"CRITICAL: Delivery journal at '{self.log_path}' is corrupted or unparseable: {e}. "
                     "Halting to avoid duplicate deliveries or data loss."
                 ) from e
-        return {"sites": {}}
+        return {"version": self.JOURNAL_VERSION, "sites": {}}
 
     def save(self):
         """Atomic write to prevent partially-written journal files."""
         self.log_path.parent.mkdir(parents=True, exist_ok=True)
         tmp_path = self.log_path.with_suffix(".tmp")
+        self.data["version"] = self.JOURNAL_VERSION
         with open(tmp_path, "w", encoding="utf-8") as f:
             json.dump(self.data, f, ensure_ascii=False, indent=2)
         os.replace(tmp_path, self.log_path)
@@ -298,9 +377,9 @@ def build_wp_payload(article_data: dict, client: WordPressRestClient, status: st
         "tchp_standard": std_data.get("standard", ""),
         "tchp_standard_class": std_data.get("class", ""),
         "tchp_standard_description": std_data.get("description", ""),
-        "tchp_tools": article_data.get("tools", []),
-        "tchp_faq_items": article_data.get("faq", []),
-        "tchp_sources": article_data.get("sources", []),
+        "tchp_tools": normalize_canonical_tools(article_data.get("tools", [])),
+        "tchp_faq_items": normalize_canonical_faq(article_data.get("faq", [])),
+        "tchp_sources": normalize_canonical_sources(article_data.get("sources", [])),
     }
 
     payload = {
@@ -312,21 +391,29 @@ def build_wp_payload(article_data: dict, client: WordPressRestClient, status: st
         "meta": meta
     }
 
-    # Resolve category if provided
+    # Strict category resolution: must resolve or halt
     cat_slug = article_data.get("category_slug")
     if cat_slug:
         cat_id = client.resolve_category(cat_slug)
-        if cat_id:
-            payload["categories"] = [cat_id]
+        if not cat_id:
+            raise RuntimeError(
+                f"Category slug '{cat_slug}' could not be resolved in WordPress (not found or API error). "
+                "Halting delivery to prevent unassigned category."
+            )
+        payload["categories"] = [cat_id]
 
-    # Resolve tags if provided
+    # Strict tag resolution: must resolve/create without network/server failure
     tags = article_data.get("tags")
-    if isinstance(tags, list):
+    if isinstance(tags, list) and tags:
         tag_ids = []
         for tag_name in tags:
-            tid = client.resolve_tag(str(tag_name))
-            if tid:
-                tag_ids.append(tid)
+            tid, err = client.resolve_tag(str(tag_name))
+            if not tid:
+                raise RuntimeError(
+                    f"Tag '{tag_name}' could not be resolved or created in WordPress: {err}. "
+                    "Halting delivery."
+                )
+            tag_ids.append(tid)
         if tag_ids:
             payload["tags"] = tag_ids
 
@@ -334,22 +421,67 @@ def build_wp_payload(article_data: dict, client: WordPressRestClient, status: st
 
 
 def verify_read_back(sent_payload: dict, stored_post: dict) -> Tuple[bool, List[str]]:
-    """Performs deep comparison of stored WordPress data against payload."""
+    """
+    Performs full deep comparison of stored WordPress data against payload.
+    Checks: ID, status, slug, title, raw content, excerpt, categories, tags,
+    scalar metadata, and array metadata (tools, FAQ, sources).
+    """
     mismatches = []
     meta = stored_post.get("meta", {})
     sent_meta = sent_payload.get("meta", {})
 
-    # Title check
+    # 1. Post ID check (if sent)
+    if "id" in sent_payload and stored_post.get("id") != sent_payload["id"]:
+        mismatches.append(f"id: expected {sent_payload['id']}, got {stored_post.get('id')}")
+
+    # 2. Status check (strictly draft or pending, matching requested status)
+    stored_status = stored_post.get("status", "")
+    expected_status = sent_payload.get("status", "draft")
+    if stored_status != expected_status:
+        mismatches.append(f"status: expected '{expected_status}', got '{stored_status}'")
+
+    # 3. Slug check
+    expected_slug = sent_payload.get("slug", "")
+    if expected_slug:
+        stored_slug = stored_post.get("slug", "")
+        if stored_slug != expected_slug:
+            mismatches.append(f"slug: expected '{expected_slug}', got '{stored_slug}'")
+
+    # 4. Title check
     stored_title = stored_post.get("title", {}).get("raw", stored_post.get("title", {}).get("rendered", ""))
     if stored_title.strip() != sent_payload.get("title", "").strip():
         mismatches.append(f"title: expected '{sent_payload.get('title')}', got '{stored_title}'")
 
-    # Excerpt check
+    # 5. Content check (raw content preserved, ignoring trailing whitespace differences)
+    stored_content = stored_post.get("content", {}).get("raw", "")
+    if not stored_content:
+        stored_content = stored_post.get("content", {}).get("rendered", "")
+    expected_content = sent_payload.get("content", "")
+    if stored_content.strip() != expected_content.strip():
+        mismatches.append(
+            f"content: content mismatch (length expected {len(expected_content.strip())}, got {len(stored_content.strip())})"
+        )
+
+    # 6. Excerpt check
     stored_excerpt = stored_post.get("excerpt", {}).get("raw", stored_post.get("excerpt", {}).get("rendered", ""))
     if stored_excerpt.strip() != sent_payload.get("excerpt", "").strip():
-        mismatches.append(f"excerpt: mismatch")
+        mismatches.append(f"excerpt: mismatch (expected '{sent_payload.get('excerpt')}', got '{stored_excerpt}')")
 
-    # Meta comparisons
+    # 7. Categories check (set equality of term IDs)
+    if "categories" in sent_payload:
+        expected_cats = set(sent_payload["categories"])
+        stored_cats = set(stored_post.get("categories", []))
+        if expected_cats != stored_cats:
+            mismatches.append(f"categories: expected {expected_cats}, got {stored_cats}")
+
+    # 8. Tags check (set equality of term IDs)
+    if "tags" in sent_payload:
+        expected_tags = set(sent_payload["tags"])
+        stored_tags = set(stored_post.get("tags", []))
+        if expected_tags != stored_tags:
+            mismatches.append(f"tags: expected {expected_tags}, got {stored_tags}")
+
+    # 9. Meta scalar comparisons
     meta_keys = [
         "tchp_content_id", "tchp_schema_version", "tchp_reading_time",
         "tchp_difficulty", "tchp_solder_alloy", "tchp_temp_kind",
@@ -362,12 +494,21 @@ def verify_read_back(sent_payload: dict, stored_post: dict) -> Tuple[bool, List[
         if expected != actual:
             mismatches.append(f"meta.{k}: expected '{expected}', got '{actual}'")
 
-    # Arrays comparison
-    for arr_key in ("tchp_tools", "tchp_faq_items", "tchp_sources"):
-        expected_arr = sent_meta.get(arr_key, [])
-        actual_arr = meta.get(arr_key, [])
-        if expected_arr != actual_arr:
-            mismatches.append(f"meta.{arr_key}: count/content mismatch (expected {len(expected_arr)}, got {len(actual_arr)})")
+    # 10. Meta array comparisons (canonical deep normalized equality)
+    norm_expected_tools = normalize_canonical_tools(sent_meta.get("tchp_tools", []))
+    norm_stored_tools = normalize_canonical_tools(meta.get("tchp_tools", []))
+    if norm_expected_tools != norm_stored_tools:
+        mismatches.append(f"meta.tchp_tools: content mismatch")
+
+    norm_expected_faq = normalize_canonical_faq(sent_meta.get("tchp_faq_items", []))
+    norm_stored_faq = normalize_canonical_faq(meta.get("tchp_faq_items", []))
+    if norm_expected_faq != norm_stored_faq:
+        mismatches.append(f"meta.tchp_faq_items: content mismatch")
+
+    norm_expected_sources = normalize_canonical_sources(sent_meta.get("tchp_sources", []))
+    norm_stored_sources = normalize_canonical_sources(meta.get("tchp_sources", []))
+    if norm_expected_sources != norm_stored_sources:
+        mismatches.append(f"meta.tchp_sources: content mismatch")
 
     return len(mismatches) == 0, mismatches
 
@@ -511,14 +652,38 @@ def send_draft_command(args) -> int:
                 print(f"✨ Creating new draft post for '{content_id}'...")
                 status_code, resp = client.request("POST", "/wp-json/wp/v2/posts", data=wp_payload)
 
+            # Indeterminate outcome on connection loss or HTTP 5xx codes
+            if status_code in (0, 500, 502, 503, 504):
+                journal.set_entry(
+                    site_url=args.wp_url,
+                    content_id=content_id,
+                    entry={
+                        "wp_post_id": target_post_id,
+                        "status": "outcome_unknown",
+                        "content_hash": content_hash,
+                        "http_status": status_code,
+                        "error": str(resp),
+                        "failed_at": datetime.now(timezone.utc).isoformat()
+                    }
+                )
+                print(
+                    f"⛔ INDETERMINATE NETWORK/SERVER OUTCOME (HTTP {status_code}):\n"
+                    f"   The post may have been created or modified in MySQL before the connection dropped.\n"
+                    f"   Recorded 'outcome_unknown' in journal to prevent duplicate re-sends.\n"
+                    f"   Inspect WordPress and update journal before retrying.",
+                    file=sys.stderr
+                )
+                return 2
+
             if status_code not in (200, 201):
                 journal.set_entry(
                     site_url=args.wp_url,
                     content_id=content_id,
                     entry={
                         "wp_post_id": target_post_id,
-                        "status": "outcome_unknown" if status_code == 0 else "failed",
+                        "status": "failed",
                         "content_hash": content_hash,
+                        "http_status": status_code,
                         "error": str(resp),
                         "failed_at": datetime.now(timezone.utc).isoformat()
                     }
@@ -527,6 +692,21 @@ def send_draft_command(args) -> int:
                 return 2
 
             created_id = resp.get("id")
+            wp_payload["id"] = created_id
+
+            # IMMEDIATELY record created_id in journal prior to read-back verification!
+            journal.set_entry(
+                site_url=args.wp_url,
+                content_id=content_id,
+                entry={
+                    "wp_post_id": created_id,
+                    "status": "delivered_unconfirmed",
+                    "content_hash": content_hash,
+                    "title": article_data.get("title"),
+                    "delivered_at": datetime.now(timezone.utc).isoformat()
+                }
+            )
+
             print(f"✅ Draft saved successfully! WordPress Post #{created_id}, Status: {resp.get('status')}")
 
             # 6. Read-after-write verification
@@ -539,7 +719,7 @@ def send_draft_command(args) -> int:
                     content_id=content_id,
                     entry={
                         "wp_post_id": created_id,
-                        "status": "draft",
+                        "status": args.status,
                         "read_back_status": "unconfirmed",
                         "content_hash": content_hash,
                         "error": f"Read-back failed with HTTP {v_code}",
@@ -558,7 +738,7 @@ def send_draft_command(args) -> int:
                     content_id=content_id,
                     entry={
                         "wp_post_id": created_id,
-                        "status": "draft",
+                        "status": args.status,
                         "read_back_status": "unconfirmed",
                         "mismatches": mismatches,
                         "content_hash": content_hash,
@@ -567,7 +747,9 @@ def send_draft_command(args) -> int:
                 )
                 return 4
 
-            print("  [PASS] Stored title matches expected.")
+            print("  [PASS] Stored post ID, status and slug match expected.")
+            print("  [PASS] Stored title and raw content match expected.")
+            print("  [PASS] Stored categories and tags match expected.")
             print("  [PASS] Stored alloy, temperatures and standards match expected.")
             print("  [PASS] Stored tools, FAQ and sources match expected.")
             print("  [PASS] Read-after-write deep equality 100% verified.")
@@ -578,7 +760,7 @@ def send_draft_command(args) -> int:
                 content_id=content_id,
                 entry={
                     "wp_post_id": created_id,
-                    "status": "draft",
+                    "status": args.status,
                     "read_back_status": "verified",
                     "content_hash": content_hash,
                     "title": article_data.get("title"),

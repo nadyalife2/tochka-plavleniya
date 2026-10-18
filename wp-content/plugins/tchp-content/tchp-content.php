@@ -677,6 +677,46 @@ function tchp_sanitize_sources_meta($sources) {
  * температурный режим, стандарт, класс и ОПИСАНИЕ СТАНДАРТА.
  */
 function tchp_calculate_article_hash($post_id) {
+    if (is_array($post_id)) {
+        $data     = $post_id;
+        $title    = trim((string)($data['title'] ?? ''));
+        $content  = trim((string)($data['content_html'] ?? ($data['content'] ?? '')));
+        $excerpt  = trim((string)($data['excerpt'] ?? ''));
+
+        $tools    = tchp_sanitize_tools_meta($data['tools'] ?? ($data['tchp_tools'] ?? []));
+        $faq      = tchp_sanitize_faq_meta($data['faq'] ?? ($data['tchp_faq_items'] ?? []));
+        $sources  = tchp_sanitize_sources_meta($data['sources'] ?? ($data['tchp_sources'] ?? []));
+
+        $alloy    = tchp_normalize_solder_alloy((string)($data['solder_alloy'] ?? ($data['alloy'] ?? ($data['tchp_solder_alloy'] ?? ''))));
+        $temp_data = is_array($data['temp_data'] ?? null) ? $data['temp_data'] : [];
+        $t_kind   = (string)($temp_data['kind'] ?? ($data['t_kind'] ?? ($data['tchp_temp_kind'] ?? '')));
+        $t_range  = (string)($temp_data['range'] ?? ($data['t_range'] ?? ($data['tchp_temp_range'] ?? '')));
+        $t_peak   = (string)($temp_data['peak'] ?? ($data['t_peak'] ?? ($data['tchp_temp_peak'] ?? '')));
+
+        $std_data = is_array($data['standard_data'] ?? null) ? $data['standard_data'] : [];
+        $std      = (string)($std_data['standard'] ?? ($data['standard'] ?? ($data['tchp_standard'] ?? '')));
+        $std_cls  = (string)($std_data['class'] ?? ($data['std_class'] ?? ($data['tchp_standard_class'] ?? '')));
+        $std_desc = (string)($std_data['description'] ?? ($data['standard_desc'] ?? ($data['tchp_standard_description'] ?? '')));
+
+        $fingerprint_data = [
+            'title'         => $title,
+            'content'       => $content,
+            'excerpt'       => $excerpt,
+            'tools'         => $tools,
+            'faq'           => $faq,
+            'sources'       => $sources,
+            'alloy'         => $alloy,
+            't_kind'        => $t_kind,
+            't_range'       => $t_range,
+            't_peak'        => $t_peak,
+            'standard'      => $std,
+            'std_class'     => $std_cls,
+            'standard_desc' => $std_desc,
+        ];
+
+        return hash('sha256', json_encode($fingerprint_data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES));
+    }
+
     $post = get_post($post_id);
     if (!$post) {
         return '';

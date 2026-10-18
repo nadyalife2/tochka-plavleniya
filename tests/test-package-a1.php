@@ -493,6 +493,55 @@ assert_test("Rank Math rich-snippet active -> Theme schema suppressed", tchp_sho
 $mock_options['rank_math_modules'] = ['sitemap'];
 assert_test("Rank Math rich-snippet inactive -> Theme schema active fallback", tchp_should_render_theme_schema(101) === true);
 
+// -----------------------------------------------------------------------------
+// SCENARIO 10: Canonical Fingerprint Parity under Key Reordering & Missing Optional Fields
+// -----------------------------------------------------------------------------
+echo "\nScenario 10: Canonical Fingerprint Parity (Key Reordering, Missing Fields, Cross-Language Parity):\n";
+
+// 10.1 Tool key reordering invariance
+$art1 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'tools' => [['name' => 'Iron', 'model' => 'T12', 'purpose' => 'Soldering']], 'solder_alloy' => 'pos61'];
+$art2 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'tools' => [['purpose' => 'Soldering', 'name' => 'Iron', 'model' => 'T12']], 'solder_alloy' => 'pos61'];
+$h1 = tchp_calculate_article_hash($art1);
+$h2 = tchp_calculate_article_hash($art2);
+assert_test("Tool key reordering produces identical fingerprint", $h1 === $h2);
+
+// 10.2 Missing optional tool fields match empty strings default
+$art3 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'tools' => [['name' => 'Iron']], 'solder_alloy' => 'pos61'];
+$art4 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'tools' => [['name' => 'Iron', 'model' => '', 'purpose' => '']], 'solder_alloy' => 'pos61'];
+$h3 = tchp_calculate_article_hash($art3);
+$h4 = tchp_calculate_article_hash($art4);
+assert_test("Missing optional tool fields match empty strings default", $h3 === $h4);
+
+// 10.3 Sources key reordering & missing optional fields
+$art5 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'sources' => [['url' => 'https://ipc.org', 'title' => 'IPC']], 'solder_alloy' => 'pos61'];
+$art6 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'sources' => [['title' => 'IPC', 'standard' => '', 'url' => 'https://ipc.org']], 'solder_alloy' => 'pos61'];
+$h5 = tchp_calculate_article_hash($art5);
+$h6 = tchp_calculate_article_hash($art6);
+assert_test("Source key reordering & missing fields match empty string default", $h5 === $h6);
+
+// 10.4 FAQ key reordering
+$art7 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'faq' => [['a' => 'Ans', 'q' => 'Que']], 'solder_alloy' => 'pos61'];
+$art8 = ['title' => 'T', 'content' => 'C', 'excerpt' => 'E', 'faq' => [['q' => 'Que', 'a' => 'Ans']], 'solder_alloy' => 'pos61'];
+$h7 = tchp_calculate_article_hash($art7);
+$h8 = tchp_calculate_article_hash($art8);
+assert_test("FAQ key reordering produces identical fingerprint", $h7 === $h8);
+
+// 10.5 Cross-language byte-exact reference test vector parity with Python delivery_cli
+$canonical_vector = [
+    'title' => 'Руководство по монтажу',
+    'content_html' => '<p>Текст статьи</p>',
+    'excerpt' => 'Лид статьи',
+    'tools' => [['name' => 'Паяльник T12', 'model' => 'T12-D24', 'purpose' => 'Монтаж']],
+    'faq' => [['q' => 'Температура?', 'a' => '230 °C']],
+    'sources' => [['title' => 'ГОСТ 21931-76', 'standard' => 'ГОСТ', 'url' => 'https://gost.ru']],
+    'solder_alloy' => 'pos61',
+    'temp_data' => ['kind' => 'joint_temperature', 'range' => '210–230 °C', 'peak' => '245 °C'],
+    'standard_data' => ['standard' => 'IPC-A-610G', 'class' => 'КЛАСС 2', 'description' => 'Электронные изделия']
+];
+$vector_hash = tchp_calculate_article_hash($canonical_vector);
+$expected_python_hash = 'da915292ff91fd3c61973ce5e6e9012bc0d1e1f80770b677663f63cdee4977b0';
+assert_test("PHP tchp_calculate_article_hash matches Python compute_canonical_fingerprint byte-exact", $vector_hash === $expected_python_hash);
+
 echo "\n=======================================================\n";
 echo "SUMMARY: {$tests_passed} / {$tests_total} tests passed.\n";
 if ($tests_passed === $tests_total) {
