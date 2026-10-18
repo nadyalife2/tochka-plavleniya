@@ -489,4 +489,134 @@ if (!function_exists('tchp_get_express_workbench_matrix')) {
     }
 }
 
+if (!function_exists('tchp_process_article_anchors')) {
+    /**
+     * Обработка якорей и TOC в HTML статьи с обеспечением 100% документной уникальности всех ID.
+     * 
+     * 1. Резервирует системные ID шаблона (main-content, reading-progress, sec-tools, etc.).
+     * 2. Обнаруживает и устраняет дубликаты ID среди любых тегов (<div id="step-one">, <section id="step-one">),
+     *    присваивая суффиксы -2, -3.
+     * 3. Обрабатывает заголовки <h2>, формирует $article_toc,
+     *    устраняет коллизии с уже занятыми ID.
+     * 
+     * @param string $content_html Исходный HTML контента статьи
+     * @param array  &$article_toc Массив TOC: [['id' => '...', 'title' => '...'], ...]
+     * @param array  &$detected_duplicates Массив обнаруженных дубликатов non-H2 ID
+     * @return string Итоговый HTML со 100% уникальными ID
+     */
+    function tchp_process_article_anchors(string $content_html, array &$article_toc = [], array &$detected_duplicates = []): string {
+        $article_toc = [];
+        $detected_duplicates = [];
+        
+        // Системные зарезервированные ID интерфейса
+        $reserved_ids = [
+            'main-content'          => true,
+            'article-faq'           => true,
+            'reading-progress'      => true,
+            'copy-article-link-btn' => true,
+            'mobile-menu'           => true,
+            'theme-toggle'          => true,
+            'table-of-contents'     => true,
+            'sec-tools'             => true,
+            'sec-faq'               => true,
+            'sec-sources'           => true,
+            'sec-calc'              => true,
+        ];
+        
+        $used_ids = $reserved_ids;
+
+        // ЭТАП 1: Обработка всех элементов кроме <h2> (div, section, p, etc.)
+        // Если у двух не-H2 элементов одинаковый ID, второму присваиваем -2, -3...
+        // чтобы гарантировать отсутствие дублей ID в документе.
+        $content_html = preg_replace_callback('/<([a-z0-9]+)\b([^>]*\bid=(["\'])([^"\']+)\3[^>]*)>/i', function($matches) use (&$used_ids, &$detected_duplicates) {
+            $tag = strtolower($matches[1]);
+            $attrs = $matches[2];
+            $id = $matches[4];
+
+            if ($tag === 'h2') {
+                return $matches[0]; // H2 обрабатываются на Этапе 2
+            }
+
+            if (!isset($used_ids[$id])) {
+                $used_ids[$id] = true;
+                return $matches[0];
+            }
+
+            // Коллизия обнаружена среди не-H2 тегов или с системным ID
+            $detected_duplicates[] = $id;
+            $counter = 2;
+            $new_id = $id . '-' . $counter;
+            while (isset($used_ids[$new_id])) {
+                $counter++;
+                $new_id = $id . '-' . $counter;
+            }
+            $used_ids[$new_id] = true;
+
+            $esc_fn = function_exists('esc_attr') ? 'esc_attr' : 'htmlspecialchars';
+            $new_attrs = preg_replace('/\bid=(["\'])' . preg_quote($id, '/') . '\1/i', 'id="' . $esc_fn($new_id) . '"', $attrs, 1);
+            return '<' . $matches[1] . $new_attrs . '>';
+        }, $content_html);
+
+        // ЭТАП 2: Последовательная обработка <h2> заголовков
+        $content_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc, &$used_ids) {
+            $attrs = $matches[1];
+            $heading_content = $matches[2];
+            $heading_title = trim(strip_tags($heading_content));
+            $esc_fn = function_exists('esc_attr') ? 'esc_attr' : 'htmlspecialchars';
+
+            // Вариант А: ID уже был задан в атрибутах
+            if (preg_match('/\bid=(["\'])([^"\']+)\1/i', $attrs, $id_match)) {
+                $existing_id = $id_match[2];
+                if (!isset($used_ids[$existing_id])) {
+                    $used_ids[$existing_id] = true;
+                    $article_toc[] = [
+                        'id'    => $existing_id,
+                        'title' => $heading_title,
+                    ];
+                    return $matches[0];
+                }
+
+                // Коллизия: добавляем инкрементный суффикс
+                $counter = 2;
+                $candidate = $existing_id . '-' . $counter;
+                while (isset($used_ids[$candidate])) {
+                    $counter++;
+                    $candidate = $existing_id . '-' . $counter;
+                }
+                $used_ids[$candidate] = true;
+                $article_toc[] = [
+                    'id'    => $candidate,
+                    'title' => $heading_title,
+                ];
+                $new_attrs = preg_replace('/\bid=(["\'])' . preg_quote($existing_id, '/') . '\1/i', 'id="' . $esc_fn($candidate) . '"', $attrs, 1);
+                return '<h2' . $new_attrs . '>' . $heading_content . '</h2>';
+            }
+
+            // Вариант Б: ID отсутствует -> генерируем slug из заголовка
+            $slug_fn = function_exists('sanitize_title') ? 'sanitize_title' : function($str) {
+                return strtolower(trim(preg_replace('/[^a-z0-9]+/i', '-', (string)$str), '-'));
+            };
+            $heading_slug = $slug_fn($heading_title);
+            if (empty($heading_slug)) {
+                $heading_slug = 'section';
+            }
+            $candidate = $heading_slug;
+            $counter = 2;
+            while (isset($used_ids[$candidate])) {
+                $candidate = $heading_slug . '-' . $counter;
+                $counter++;
+            }
+            $used_ids[$candidate] = true;
+            $article_toc[] = [
+                'id'    => $candidate,
+                'title' => $heading_title,
+            ];
+            return '<h2 id="' . $esc_fn($candidate) . '"' . $attrs . '>' . $heading_content . '</h2>';
+        }, $content_html);
+
+        return $content_html;
+    }
+}
+
+
 

@@ -276,83 +276,8 @@ if (function_exists('have_posts') && have_posts()) {
 
                 // 2. Extract Headings for TOC and ensure document-wide anchor uniqueness
                 $article_toc = [];
-                // Pre-reserve template IDs to prevent collisions with UI controls
-                $seen_ids = [
-                    'main-content'          => true,
-                    'article-faq'           => true,
-                    'reading-progress'      => true,
-                    'copy-article-link-btn' => true,
-                    'mobile-menu'           => true,
-                    'theme-toggle'          => true,
-                    'table-of-contents'     => true,
-                ];
-
-                // PASS 1: Pre-collect all existing IDs from non-H2 tags in article content
-                // (e.g. <section id="...">, <div id="...">, etc.) so no H2 can clash with them!
-                if (preg_match_all('/<([a-z0-9]+)\b[^>]*\bid=(["\'])([^"\']+)\2[^>]*>/i', $post_content_html, $all_tag_matches, PREG_SET_ORDER)) {
-                    foreach ($all_tag_matches as $tag_match) {
-                        $tag_name = strtolower($tag_match[1]);
-                        $found_id = $tag_match[3];
-                        if ($tag_name !== 'h2') {
-                            $seen_ids[$found_id] = true;
-                        }
-                    }
-                }
-
-                // PASS 2: Process H2 headings sequentially, ensuring 100% document-wide uniqueness
-                $post_content_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc, &$seen_ids) {
-                    $attrs = $matches[1];
-                    $heading_content = $matches[2];
-                    $heading_title = trim(strip_tags($heading_content));
-
-                    // Case A: id is already present in attributes
-                    if (preg_match('/\bid=(["\'])([^"\']+)\1/i', $attrs, $id_match)) {
-                        $existing_id = $id_match[2];
-                        if (!isset($seen_ids[$existing_id])) {
-                            // Unique and not colliding with template: preserve untouched
-                            $seen_ids[$existing_id] = true;
-                            $article_toc[] = [
-                                'id'    => $existing_id,
-                                'title' => $heading_title,
-                            ];
-                            return $matches[0];
-                        }
-
-                        // Duplicate or template collision: generate unique suffix (-2, -3, ...)
-                        $counter = 2;
-                        $candidate = $existing_id . '-' . $counter;
-                        while (isset($seen_ids[$candidate])) {
-                            $counter++;
-                            $candidate = $existing_id . '-' . $counter;
-                        }
-                        $seen_ids[$candidate] = true;
-                        $article_toc[] = [
-                            'id'    => $candidate,
-                            'title' => $heading_title,
-                        ];
-                        // Replace existing id in attrs
-                        $new_attrs = preg_replace('/\bid=(["\'])' . preg_quote($existing_id, '/') . '\1/i', 'id="' . esc_attr($candidate) . '"', $attrs, 1);
-                        return '<h2' . $new_attrs . '>' . $heading_content . '</h2>';
-                    }
-
-                    // Case B: No id present -> generate slug from title
-                    $heading_slug = sanitize_title($heading_title);
-                    if (empty($heading_slug)) {
-                        $heading_slug = 'section';
-                    }
-                    $candidate = $heading_slug;
-                    $counter = 2;
-                    while (isset($seen_ids[$candidate])) {
-                        $candidate = $heading_slug . '-' . $counter;
-                        $counter++;
-                    }
-                    $seen_ids[$candidate] = true;
-                    $article_toc[] = [
-                        'id'    => $candidate,
-                        'title' => $heading_title,
-                    ];
-                    return '<h2 id="' . esc_attr($candidate) . '"' . $attrs . '>' . $heading_content . '</h2>';
-                }, $post_content_html);
+                $detected_duplicates = [];
+                $post_content_html = tchp_process_article_anchors($post_content_html, $article_toc, $detected_duplicates);
                 ?>
 
                 <!-- Gutenberg / Editor Dynamic Post Content (Cards rendered inside) -->

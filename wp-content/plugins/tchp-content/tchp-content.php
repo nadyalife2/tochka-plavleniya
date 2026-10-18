@@ -116,11 +116,13 @@ add_filter('rest_pre_insert_post', function ($prepared_post, $request) {
             if (!is_array($item)) {
                 return new WP_Error('rest_invalid_param', sprintf('Элемент meta.tchp_faq_items[%d] должен быть объектом.', $idx), ['status' => 400]);
             }
-            if (!isset($item['q']) || !is_string($item['q']) || trim($item['q']) === '') {
-                return new WP_Error('rest_invalid_param', sprintf('Вопрос в meta.tchp_faq_items[%d].q не может быть пустым.', $idx), ['status' => 400]);
+            $stripped_q = function_exists('wp_strip_all_tags') ? wp_strip_all_tags($item['q']) : strip_tags($item['q']);
+            if (!isset($item['q']) || !is_string($item['q']) || trim($stripped_q) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Вопрос в meta.tchp_faq_items[%d].q не может быть пустым (в том числе после очистки HTML).', $idx), ['status' => 400]);
             }
-            if (!isset($item['a']) || !is_string($item['a']) || trim($item['a']) === '') {
-                return new WP_Error('rest_invalid_param', sprintf('Ответ в meta.tchp_faq_items[%d].a не может быть пустым.', $idx), ['status' => 400]);
+            $stripped_a = function_exists('wp_strip_all_tags') ? wp_strip_all_tags($item['a']) : strip_tags($item['a']);
+            if (!isset($item['a']) || !is_string($item['a']) || trim($stripped_a) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Ответ в meta.tchp_faq_items[%d].a не может быть пустым (в том числе после очистки HTML).', $idx), ['status' => 400]);
             }
         }
     }
@@ -134,8 +136,9 @@ add_filter('rest_pre_insert_post', function ($prepared_post, $request) {
             if (!is_array($item)) {
                 return new WP_Error('rest_invalid_param', sprintf('Элемент meta.tchp_tools[%d] должен быть объектом.', $idx), ['status' => 400]);
             }
-            if (!isset($item['name']) || !is_string($item['name']) || trim($item['name']) === '') {
-                return new WP_Error('rest_invalid_param', sprintf('Название инструмента в meta.tchp_tools[%d].name не может быть пустым.', $idx), ['status' => 400]);
+            $stripped_name = function_exists('wp_strip_all_tags') ? wp_strip_all_tags($item['name']) : strip_tags($item['name']);
+            if (!isset($item['name']) || !is_string($item['name']) || trim($stripped_name) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Название инструмента в meta.tchp_tools[%d].name не может быть пустым (в том числе после очистки HTML).', $idx), ['status' => 400]);
             }
         }
     }
@@ -149,8 +152,9 @@ add_filter('rest_pre_insert_post', function ($prepared_post, $request) {
             if (!is_array($item)) {
                 return new WP_Error('rest_invalid_param', sprintf('Элемент meta.tchp_sources[%d] должен быть объектом.', $idx), ['status' => 400]);
             }
-            if (!isset($item['title']) || !is_string($item['title']) || trim($item['title']) === '') {
-                return new WP_Error('rest_invalid_param', sprintf('Название источника в meta.tchp_sources[%d].title не может быть пустым.', $idx), ['status' => 400]);
+            $stripped_title = function_exists('wp_strip_all_tags') ? wp_strip_all_tags($item['title']) : strip_tags($item['title']);
+            if (!isset($item['title']) || !is_string($item['title']) || trim($stripped_title) === '') {
+                return new WP_Error('rest_invalid_param', sprintf('Название источника в meta.tchp_sources[%d].title не может быть пустым (в том числе после очистки HTML).', $idx), ['status' => 400]);
             }
         }
     }

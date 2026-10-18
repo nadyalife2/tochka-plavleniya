@@ -220,8 +220,9 @@ function register_post_meta($post_type, $meta_key, $args) {
     $registered_post_meta[$meta_key] = $args;
 }
 
-// Load plugin code under test
+// Load plugin and theme code under test
 require_once __DIR__ . '/../wp-content/plugins/tchp-content/tchp-content.php';
+require_once __DIR__ . '/../theme4/includes/functions.php';
 
 // Trigger init & rest_api_init
 foreach ($mock_hooks['init'] as $cb) { $cb(); }
@@ -242,7 +243,8 @@ function assert_test($description, $condition) {
 }
 
 echo "\n=======================================================\n";
-echo "       PACKAGE A.1 INTEGRATION TEST SUITE              \n";
+echo "    PACKAGE A.1 BUSINESS LOGIC & CONTRACTS UNIT TESTS  \n";
+echo "              (Mock WordPress Environment)             \n";
 echo "=======================================================\n";
 
 // Set up sample post 101 in database
@@ -341,6 +343,18 @@ assert_test("Whitespace-only q/a rejected with WP_Error (400)", is_wp_error($res
 $faq_after2 = get_post_meta(101, 'tchp_faq_items', true);
 assert_test("Previously saved FAQ remains completely intact", $faq_after2 === $faq_before);
 
+// 1.3 HTML-only tags that become empty after stripping
+$res_html = dispatch_mock_rest_update(101, [
+    'meta' => [
+        'tchp_faq_items' => [
+            ['q' => '<b></b>', 'a' => '<p>   </p>']
+        ]
+    ]
+]);
+assert_test("HTML tags stripped to empty rejected with WP_Error (400)", is_wp_error($res_html) && $res_html->data['status'] === 400);
+$faq_after_html = get_post_meta(101, 'tchp_faq_items', true);
+assert_test("Previously saved FAQ remains intact after HTML-stripped attempt", $faq_after_html === $faq_before);
+
 // -----------------------------------------------------------------------------
 // SCENARIO 2: Unknown solder alloy rejected with 400
 // -----------------------------------------------------------------------------
@@ -422,22 +436,11 @@ assert_test("Modified post has is_outdated = TRUE", $editorial_after_edit['is_ou
 assert_test("Post status automatically downgraded to 'in_review'", get_post_meta(101, 'tchp_review_status', true) === 'in_review');
 
 // -----------------------------------------------------------------------------
-// SCENARIO 7: Document-wide anchor uniqueness (Section vs H2 collision & DOM test)
+// SCENARIO 7: Document-wide anchor uniqueness (Section vs H2 collision & non-H2 duplicate IDs)
 // -----------------------------------------------------------------------------
 echo "\nScenario 7: Document-Wide Anchor Uniqueness (No DOM duplicates):\n";
 
-$article_toc = [];
-$seen_ids = [
-    'main-content'          => true,
-    'article-faq'           => true,
-    'reading-progress'      => true,
-    'copy-article-link-btn' => true,
-    'mobile-menu'           => true,
-    'theme-toggle'          => true,
-    'table-of-contents'     => true,
-];
-
-// Complex HTML containing section id, div id, duplicate H2, template clash, and untitled H2
+// Complex HTML containing section id, div id, duplicate non-H2 ID, duplicate H2, template clash, and untitled H2
 $input_html = '
 <section id="preparation">
   <div id="step-one">
@@ -445,77 +448,31 @@ $input_html = '
   </div>
   <p>Описание шага подготовки.</p>
 </section>
-<section id="process">
+<section id="step-one">
   <h2 id="step-one">Пайка выводов</h2>
   <h2>Пайка выводов</h2>
   <h2 id="main-content">Контроль пайки</h2>
 </section>
 ';
 
-// PASS 1: Pre-collect non-H2 IDs
-if (preg_match_all('/<([a-z0-9]+)\b[^>]*\bid=(["\'])([^"\']+)\2[^>]*>/i', $input_html, $all_tag_matches, PREG_SET_ORDER)) {
-    foreach ($all_tag_matches as $tag_match) {
-        $tag_name = strtolower($tag_match[1]);
-        $found_id = $tag_match[3];
-        if ($tag_name !== 'h2') {
-            $seen_ids[$found_id] = true;
-        }
-    }
-}
-
-// PASS 2: Sequential H2 processing
-$output_html = preg_replace_callback('/<h2([^>]*)>(.*?)<\/h2>/i', function($matches) use (&$article_toc, &$seen_ids) {
-    $attrs = $matches[1];
-    $heading_content = $matches[2];
-    $heading_title = trim(strip_tags($heading_content));
-
-    if (preg_match('/\bid=(["\'])([^"\']+)\1/i', $attrs, $id_match)) {
-        $existing_id = $id_match[2];
-        if (!isset($seen_ids[$existing_id])) {
-            $seen_ids[$existing_id] = true;
-            $article_toc[] = ['id' => $existing_id, 'title' => $heading_title];
-            return $matches[0];
-        }
-
-        $counter = 2;
-        $candidate = $existing_id . '-' . $counter;
-        while (isset($seen_ids[$candidate])) {
-            $counter++;
-            $candidate = $existing_id . '-' . $counter;
-        }
-        $seen_ids[$candidate] = true;
-        $article_toc[] = ['id' => $candidate, 'title' => $heading_title];
-        $new_attrs = preg_replace('/\bid=(["\'])' . preg_quote($existing_id, '/') . '\1/i', 'id="' . esc_attr($candidate) . '"', $attrs, 1);
-        return '<h2' . $new_attrs . '>' . $heading_content . '</h2>';
-    }
-
-    $heading_slug = sanitize_title($heading_title);
-    if (empty($heading_slug)) {
-        $heading_slug = 'section';
-    }
-    $candidate = $heading_slug;
-    $counter = 2;
-    while (isset($seen_ids[$candidate])) {
-        $candidate = $heading_slug . '-' . $counter;
-        $counter++;
-    }
-    $seen_ids[$candidate] = true;
-    $article_toc[] = ['id' => $candidate, 'title' => $heading_title];
-    return '<h2 id="' . esc_attr($candidate) . '"' . $attrs . '>' . $heading_content . '</h2>';
-}, $input_html);
+$article_toc = [];
+$detected_duplicates = [];
+$output_html = tchp_process_article_anchors($input_html, $article_toc, $detected_duplicates);
 
 // Extract ALL IDs across the whole output HTML document
 preg_match_all('/\bid=(["\'])([^"\']+)\1/i', $output_html, $final_dom_id_matches);
 $all_dom_ids = $final_dom_id_matches[2];
 
 assert_test("Section id 'preparation' and H2 id collision resolved to 'preparation-2'", strpos($output_html, 'id="preparation-2"') !== false);
-assert_test("Div id 'step-one' and H2 id collision resolved to 'step-one-2'", strpos($output_html, 'id="step-one-2"') !== false);
+assert_test("Duplicate non-H2 ID 'step-one' resolved to 'step-one-2'", strpos($output_html, 'id="step-one-2"') !== false);
+assert_test("Duplicate non-H2 collision recorded in audit detected_duplicates", in_array('step-one', $detected_duplicates, true));
 assert_test("Duplicate H2 title resolved to next free candidate", strpos($output_html, 'id="payka-vyvodov"') !== false);
 assert_test("Template id 'main-content' collision resolved to 'main-content-2'", strpos($output_html, 'id="main-content-2"') !== false);
 
 // Global DOM uniqueness check:
 $unique_dom_ids = array_unique($all_dom_ids);
 assert_test("ALL IDs in generated DOM are 100% unique (no duplicates)", count($all_dom_ids) === count($unique_dom_ids));
+assert_test("Theme canonical function tchp_process_article_anchors was executed directly", count($article_toc) === 4);
 
 // -----------------------------------------------------------------------------
 // SCENARIO 8: Canonical alloy normalization
@@ -539,7 +496,7 @@ assert_test("Rank Math rich-snippet inactive -> Theme schema active fallback", t
 echo "\n=======================================================\n";
 echo "SUMMARY: {$tests_passed} / {$tests_total} tests passed.\n";
 if ($tests_passed === $tests_total) {
-    echo "VERDICT: ALL TESTS PASSED! PACKAGE A.1 IS 100% VERIFIED.\n";
+    echo "VERDICT: ALL TESTS PASSED! PACKAGE A.1 BUSINESS LOGIC & CONTRACTS VERIFIED.\n";
     exit(0);
 } else {
     echo "VERDICT: TEST SUITE FAILED.\n";
