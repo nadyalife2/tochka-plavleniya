@@ -1,225 +1,390 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-🔬 ИИ-Генератор технических статей «Точка Плавления» (ТЧП)
-Использует бесплатный Google Gemini API (2.5 Flash / 1.5 Flash)
-и автоматически публикует структурированные статьи в WordPress через REST API.
+ИИ-генератор технических статей «Точка Плавления» (ТЧП).
+Использует Google Gemini API и создаёт черновики WordPress через REST API.
+
+Важно: этот модуль не публикует статьи автоматически. Он создаёт только draft.
 """
 
 import os
 import sys
 import json
+import re
+import hashlib
 import urllib.request
-import urllib.parse
+import urllib.error
 import base64
 from typing import Dict, Any, Optional
 
-# Системный промпт с инженерным контекстом и правилами верстки
-SYSTEM_INSTRUCTION = """Ты — ведущий инженер-технолог по монтажу и пайке радиоэлектронной аппаратуры (РЭА) лаборатории «ТОЧКА ПЛАВЛЕНИЯ».
-Твоя задача: писать исчерпывающие, глубокие, научно-практические и полезные статьи для инженеров, мастеров сервисных центров и радиолюбителей.
-
-ПРАВИЛА И СТАНДАРТЫ:
-1. Никакой «воды», общих фраз или банальностей. Сразу к сути, цифрам, температурам и физико-химическим процессам.
-2. Все параметры должны соответствовать международным стандартам IPC (IPC-A-610, IPC-7095, J-STD-004, J-STD-020) и ГОСТ (ГОСТ 21931).
-3. Используй точные марки сплавов (ПОС-61, SAC305, Sn42Bi58, сплав Розе), флюсов (RMA, No-Clean, WS) и оборудования (Quick, JBC, Hakko, Aixun).
-
-ТРЕБОВАНИЯ К HTML ВЕРСТКЕ (Используй классы дизайн-системы ТЧП):
-- Выделения маркером: <mark class="marker-yellow">важный текст</mark>
-- Инженерные плашки параметров: <span class="sketch-pill-yellow">T = 217°C</span> или <span class="sketch-pill-gray">SAC305</span>
-- Блоки предупреждений:
-  <div class="border-l-4 border-ink bg-paper-subtle/70 p-4 my-4 rounded-r">
-    <div class="font-mono text-xs font-bold uppercase text-ink flex items-center gap-1.5">
-      <span class="material-symbols-outlined text-[15px] text-brand-orange">warning</span>
-      <span>ВАЖНО / РЕГЛАМЕНТ IPC</span>
-    </div>
-    <p class="text-sm text-ink-muted mt-1">Текст предупреждения...</p>
-  </div>
-- Таблицы характеристик:
-  <div class="overflow-x-auto my-6">
-    <table class="w-full text-left font-mono text-xs border-collapse">
-      <thead><tr class="border-b border-paper-border bg-paper-subtle text-ink"><th class="p-2.5">Параметр</th><th class="p-2.5">Значение</th><th class="p-2.5">Допуск</th></tr></thead>
-      <tbody class="divide-y divide-paper-border text-ink-muted">...</tbody>
-    </table>
-  </div>
-- Пошаговые фазы: разделы с <h2 id="step-1" class="text-xl font-bold text-ink mt-8 mb-3">1. Название раздела</h2>
-
-ФОРМАТ ВЫВОДА:
-Ты ДОЛЖЕН вернуть ТОЛЬКО валидный JSON-объект следующей структуры (без лишнего текста вокруг markdown):
-{
-  "title": "Точный технический заголовок статьи",
-  "slug": "url-slug-latinicey",
-  "excerpt": "Краткое инженерное резюме статьи (2-3 предложения для сниппета и лида)",
-  "category": "Категория (BGA Монтаж / SMD Компоненты / Флюсы и Химия / Оборудование)",
-  "tags": ["BGA", "SAC305", "Термопрофиль"],
-  "reading_time": 7,
-  "difficulty": "Инженерный уровень (или Базовый / Профессиональный)",
-  "solder_alloy": "SAC305 / ПОС-61",
-  "temp_range": "217°C – 245°C",
-  "tools_needed": [
-    {"name": "Термовоздушная станция", "model": "Quick 861DW", "purpose": "Бесконтактный локальный прогрев"},
-    {"name": "Флюс-гель безотмывочный", "model": "Cyberflux RMA-218", "purpose": "Удаление оксидов без отмывки"}
-  ],
-  "specs_summary": [
-    {"label": "Температура ликвидуса", "value": "217°C"},
-    {"label": "Скорость нагрева (Ramp-up)", "value": "1-3°C / сек"}
-  ],
-  "content_html": "<p class=\"lead text-lg font-serif italic text-ink\">...</p><section id=\"step-1\">...</section>",
-  "faq": [
-    {"q": "Вопрос 1?", "a": "Развернутый технический ответ 1."},
-    {"q": "Вопрос 2?", "a": "Развернутый технический ответ 2."}
-  ]
+CANONICAL_ALLOYS = {
+    "pos61",
+    "sn63pb37",
+    "pos40",
+    "sac305",
+    "sac405",
+    "sn42bi58",
+    "snbiago",
+    "roze",
+    "vuda",
+    "universal",
 }
+
+ALLOY_ALIASES = {
+    "wood": "vuda",
+    "rose": "roze",
+}
+
+ALLOWED_DIFFICULTY = {"Базовый", "Инженер", "Эксперт"}
+
+SYSTEM_INSTRUCTION = """Ты — практический автор инженерных материалов для сайта «Точка Плавления».
+
+Пиши по утверждённому голосу Practico:
+- Читатель — новичок по знаниям, но коллега по достоинству.
+- Формула абзаца: термин → механизм одной фразой → наблюдение или последствие.
+- Используй наблюдаемые признаки: цвет, блеск, текучесть, дым, звук, время.
+- Разбирай ошибки по схеме: симптом → причина → решение.
+- Не выдумывай личный опыт, фотографии, измерения или историю работы в мастерской.
+- Не используй обещания результата, хайп, FOMO и пустые похвалы без механизма.
+- Не используй бытовые и кулинарные метафоры.
+
+Технические правила:
+- Используй только подтверждённые данные из предоставленного брифа и источников.
+- Не придумывай температуру, марку, модель, цену или категоричный совет.
+- Если критичный факт не подтверждён, используй безопасную нейтральную формулировку.
+- Для каждого материала указывай канонический идентификатор сплава из разрешённого списка.
+
+GEO-правила:
+- Начинай раздел с прямого содержательного ответа.
+- Делай разделы самодостаточными и цитируемыми.
+- Используй понятные термины и объясняй аббревиатуры при первом упоминании.
+- Добавляй FAQ только для реальных вопросов читателя.
+- Не создавай FAQ ради разметки.
+
+Формат вывода: только валидный JSON без Markdown-ограждений.
 """
 
 
+class ContractValidationError(ValueError):
+    """Статья не соответствует обязательному контракту TCHP."""
+
+
+def normalize_alloy(value: Any) -> str:
+    raw = str(value or "").strip().lower()
+    raw = ALLOY_ALIASES.get(raw, raw)
+    return raw if raw in CANONICAL_ALLOYS else ""
+
+
+def normalize_difficulty(value: Any) -> str:
+    raw = str(value or "").strip()
+    if raw in ALLOWED_DIFFICULTY:
+        return raw
+    lowered = raw.lower()
+    if "баз" in lowered or "нович" in lowered:
+        return "Базовый"
+    if "эксперт" in lowered or "профессиональн" in lowered:
+        return "Эксперт"
+    return "Инженер"
+
+
+def clean_text(value: Any, max_length: int) -> str:
+    text = re.sub(r"<[^>]+>", "", str(value or ""))
+    text = re.sub(r"\s+", " ", text).strip()
+    return text[:max_length]
+
+
+def validate_article_contract(article: Dict[str, Any]) -> None:
+    required = [
+        "title",
+        "slug",
+        "excerpt",
+        "solder_alloy",
+        "temp_kind",
+        "temp_range",
+        "tools",
+        "content_html",
+    ]
+
+    missing = [field for field in required if not article.get(field)]
+    if missing:
+        raise ContractValidationError(
+            "Отсутствуют обязательные поля контракта: " + ", ".join(missing)
+        )
+
+    slug = str(article["slug"]).strip()
+    if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", slug):
+        raise ContractValidationError(
+            "slug должен состоять из строчных латинских букв, цифр и дефисов."
+        )
+
+    alloy = normalize_alloy(article["solder_alloy"])
+    if not alloy:
+        raise ContractValidationError(
+            "solder_alloy должен быть одним из канонических идентификаторов: "
+            + ", ".join(sorted(CANONICAL_ALLOYS))
+        )
+
+    if article["temp_kind"] not in {
+        "station_setpoint",
+        "joint_temperature",
+        "reflow_profile",
+    }:
+        raise ContractValidationError(
+            "temp_kind должен быть station_setpoint, joint_temperature или reflow_profile."
+        )
+
+    if not isinstance(article["tools"], list):
+        raise ContractValidationError("tools должен быть массивом.")
+
+    for index, tool in enumerate(article["tools"]):
+        if not isinstance(tool, dict) or not clean_text(tool.get("name"), 150):
+            raise ContractValidationError(
+                f"tools[{index}].name обязателен и не может быть пустым."
+            )
+
+    if not isinstance(article.get("faq", []), list):
+        raise ContractValidationError("faq должен быть массивом.")
+
+    for index, item in enumerate(article["faq"]):
+        if not isinstance(item, dict):
+            raise ContractValidationError(f"faq[{index}] должен быть объектом.")
+        if not clean_text(item.get("q"), 250) or not clean_text(item.get("a"), 2000):
+            raise ContractValidationError(
+                f"faq[{index}] должен содержать непустые q и a."
+            )
+
+    if not isinstance(article.get("sources", []), list):
+        raise ContractValidationError("sources должен быть массивом.")
+
+    for index, source in enumerate(article["sources"]):
+        if not isinstance(source, dict) or not clean_text(source.get("title"), 200):
+            raise ContractValidationError(
+                f"sources[{index}].title обязателен и не может быть пустым."
+            )
+
+    if len(clean_text(article["content_html"], 10 ** 9)) < 100:
+        raise ContractValidationError("content_html слишком короткий.")
+
+
+def normalize_article(article: Dict[str, Any]) -> Dict[str, Any]:
+    """Приводит ответ модели к контракту статьи TCHP."""
+    normalized = dict(article)
+    normalized["slug"] = str(normalized.get("slug", "")).strip().lower()
+    normalized["solder_alloy"] = normalize_alloy(normalized.get("solder_alloy"))
+    normalized["difficulty"] = normalize_difficulty(normalized.get("difficulty"))
+
+    normalized["temp_kind"] = normalized.get("temp_kind") or "joint_temperature"
+    normalized["temp_range"] = clean_text(normalized.get("temp_range"), 100)
+    normalized["temp_peak"] = clean_text(normalized.get("temp_peak"), 100)
+
+    tools = []
+    for tool in normalized.get("tools") or normalized.get("tools_needed") or []:
+        if isinstance(tool, dict):
+            name = clean_text(tool.get("name"), 150)
+            if not name:
+                continue
+            tools.append(
+                {
+                    "name": name,
+                    "model": clean_text(tool.get("model"), 100),
+                    "purpose": clean_text(tool.get("purpose"), 250),
+                }
+            )
+    normalized["tools"] = tools
+
+    faq = []
+    for item in normalized.get("faq") or []:
+        if isinstance(item, dict):
+            question = clean_text(item.get("q"), 250)
+            answer = clean_text(item.get("a"), 2000)
+            if question and answer:
+                faq.append({"q": question, "a": answer})
+    normalized["faq"] = faq
+
+    sources = []
+    for source in normalized.get("sources") or []:
+        if isinstance(source, dict):
+            title = clean_text(source.get("title"), 200)
+            if not title:
+                continue
+            sources.append(
+                {
+                    "title": title,
+                    "standard": clean_text(source.get("standard"), 120),
+                    "url": clean_text(source.get("url"), 500),
+                }
+            )
+    normalized["sources"] = sources
+
+    normalized["schema_version"] = "1.0"
+    normalized["content_id"] = normalized.get("content_id") or (
+        "tchp-" + hashlib.sha1(normalized["slug"].encode("utf-8")).hexdigest()[:12]
+    )
+
+    validate_article_contract(normalized)
+    return normalized
+
+
 class GeminiArticleGenerator:
-    """Генератор статей на базе Google Gemini API (бесплатный тариф)"""
+    """Генератор статей на базе Google Gemini API."""
 
     def __init__(self, api_key: Optional[str] = None, model: str = "gemini-2.5-flash"):
         self.api_key = api_key or os.environ.get("GEMINI_API_KEY", "")
         self.model = model
-        self.api_url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        self.api_url = (
+            "https://generativelanguage.googleapis.com/v1beta/models/"
+            f"{self.model}:generateContent"
+        )
 
-    def generate_article(self, topic: str, target_audience: str = "Инженеры СЦ и радиолюбители") -> Dict[str, Any]:
-        """Генерирует полную структурированную статью по заданной теме"""
+    def generate_article(self, topic: str, target_audience: str = "Новички в пайке") -> Dict[str, Any]:
         if not self.api_key:
-            raise ValueError(
-                "GEMINI_API_KEY не указан! Получите бесплатный ключ в https://aistudio.google.com/ "
-                "и установите переменную окружения GEMINI_API_KEY или передайте в конструктор."
-            )
+            raise ValueError("GEMINI_API_KEY не указан.")
 
-        user_prompt = f"""Напиши исчерпывающую техническую статью для портала «ТОЧКА ПЛАВЛЕНИЯ».
-ТЕМА СТАТЬИ: {topic}
-ЦЕЛЕВАЯ АУДИТОРИЯ: {target_audience}
+        user_prompt = f"""Напиши техническую статью для портала «Точка Плавления».
 
-Включи:
-1. Физико-химические основы процесса.
-2. Температурные режимы и допуски по стандартам IPC.
-3. Пошаговый практический алгоритм работы.
-4. Ошибки, дефекты пайки и способы их предотвращения.
-5. Блок FAQ из 3-4 вопросов.
-6. Рекомендуемый список проверенных инструментов и химии.
+ТЕМА: {topic}
+АУДИТОРИЯ: {target_audience}
 
-Верни ответ строго в формате JSON."""
+Обязательные поля JSON:
+- title, slug, excerpt
+- category_slug: start | materialy | praktika | oshibki
+- tags: массив непустых строк
+- reading_time: целое число от 1 до 60
+- difficulty: Базовый | Инженер | Эксперт
+- solder_alloy: один канонический ID
+- temp_kind: station_setpoint | joint_temperature | reflow_profile
+- temp_range, temp_peak
+- tools: массив объектов name, model, purpose
+- sources: массив объектов title, standard, url
+- content_html: HTML статьи
+- faq: массив объектов q, a
+
+Если материал не требует выбора одного сплава, используй "universal".
+Не выдумывай источники. Если точного источника нет, не указывай URL.
+"""
 
         payload = {
             "contents": [
                 {
                     "parts": [
                         {"text": SYSTEM_INSTRUCTION},
-                        {"text": user_prompt}
+                        {"text": user_prompt},
                     ]
                 }
             ],
             "generationConfig": {
                 "temperature": 0.3,
                 "topP": 0.95,
-                "responseMimeType": "application/json"
-            }
+                "responseMimeType": "application/json",
+            },
         }
 
-        url = f"{self.api_url}?key={self.api_key}"
-        req = urllib.request.Request(
-            url,
+        request = urllib.request.Request(
+            f"{self.api_url}?key={self.api_key}",
             data=json.dumps(payload).encode("utf-8"),
-            headers={"Content-Type": "application/json"}
+            headers={"Content-Type": "application/json"},
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=60) as response:
-                res_body = response.read().decode("utf-8")
-                res_json = json.loads(res_body)
-                
-                # Извлекаем текст ответа
-                candidates = res_json.get("candidates", [])
-                if not candidates:
-                    raise RuntimeError("Gemini API вернул пустой список кандидатов.")
-                
-                raw_text = candidates[0]["content"]["parts"][0]["text"]
-                article_data = json.loads(raw_text)
-                return article_data
+            with urllib.request.urlopen(request, timeout=60) as response:
+                response_body = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as error:
+            details = error.read().decode("utf-8", errors="ignore")
+            raise RuntimeError(
+                f"Ошибка Gemini API (HTTP {error.code}): {details}"
+            ) from error
 
-        except urllib.error.HTTPError as e:
-            err_msg = e.read().decode("utf-8", errors="ignore")
-            raise RuntimeError(f"Ошибка Gemini API (HTTP {e.code}): {err_msg}")
+        candidates = response_body.get("candidates", [])
+        if not candidates:
+            raise RuntimeError("Gemini API вернул пустой список кандидатов.")
+
+        raw_text = candidates[0]["content"]["parts"][0]["text"]
+        article = json.loads(raw_text)
+        return normalize_article(article)
 
 
 class WordPressPublisher:
-    """Публикатор статей в WordPress через WP REST API"""
+    """Создаёт черновик WordPress из статьи, соответствующей контракту TCHP."""
+
+    ALLOWED_STATUSES = {"draft", "pending"}
 
     def __init__(self, site_url: str, username: str, app_password: str):
         self.site_url = site_url.rstrip("/")
         self.username = username
         self.app_password = app_password
-        self.auth_header = "Basic " + base64.b64encode(f"{username}:{app_password}".encode()).decode()
+        self.auth_header = "Basic " + base64.b64encode(
+            f"{username}:{app_password}".encode()
+        ).decode()
 
-    def publish_article(self, article: Dict[str, Any], status: str = "draft") -> Dict[str, Any]:
-        """Публикует статью в WordPress со всеми кастомными мета-полями"""
-        endpoint = f"{self.site_url}/wp-json/wp/v2/posts"
+    def build_payload(self, article: Dict[str, Any], status: str = "draft") -> Dict[str, Any]:
+        if status not in self.ALLOWED_STATUSES:
+            raise ValueError(
+                "Автоматическая доставка разрешает только draft или pending."
+            )
 
-        # Формируем мета-поля
+        article = normalize_article(article)
+
         meta = {
+            "tchp_content_id": article["content_id"],
+            "tchp_schema_version": article["schema_version"],
             "tchp_reading_time": int(article.get("reading_time", 5)),
-            "tchp_difficulty": str(article.get("difficulty", "Инженерный уровень")),
-            "tchp_solder_alloy": str(article.get("solder_alloy", "ПОС-61 / SAC305")),
-            "tchp_temp_range": str(article.get("temp_range", "")),
-            "tchp_tools_needed": json.dumps(article.get("tools_needed", []), ensure_ascii=False),
-            "tchp_faq_items": json.dumps(article.get("faq", []), ensure_ascii=False)
+            "tchp_difficulty": article["difficulty"],
+            "tchp_solder_alloy": article["solder_alloy"],
+            "tchp_temp_kind": article["temp_kind"],
+            "tchp_temp_range": article["temp_range"],
+            "tchp_temp_peak": article.get("temp_peak", ""),
+            "tchp_tools": article["tools"],
+            "tchp_faq_items": article["faq"],
+            "tchp_sources": article["sources"],
         }
 
-        # Тело запроса к WordPress
-        wp_payload = {
+        return {
             "title": article["title"],
-            "slug": article.get("slug", ""),
-            "excerpt": article.get("excerpt", ""),
+            "slug": article["slug"],
+            "excerpt": article["excerpt"],
             "content": article["content_html"],
             "status": status,
-            "meta": meta
+            "meta": meta,
         }
 
-        req = urllib.request.Request(
+    def publish_article(self, article: Dict[str, Any], status: str = "draft") -> Dict[str, Any]:
+        payload = self.build_payload(article, status=status)
+        endpoint = f"{self.site_url}/wp-json/wp/v2/posts"
+        request = urllib.request.Request(
             endpoint,
-            data=json.dumps(wp_payload).encode("utf-8"),
+            data=json.dumps(payload).encode("utf-8"),
             headers={
                 "Content-Type": "application/json",
-                "Authorization": self.auth_header
-            }
+                "Authorization": self.auth_header,
+            },
         )
 
         try:
-            with urllib.request.urlopen(req, timeout=30) as response:
-                res_body = response.read().decode("utf-8")
-                return json.loads(res_body)
-        except urllib.error.HTTPError as e:
-            err_msg = e.read().decode("utf-8", errors="ignore")
-            raise RuntimeError(f"Ошибка WordPress REST API (HTTP {e.code}): {err_msg}")
+            with urllib.request.urlopen(request, timeout=30) as response:
+                return json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as error:
+            details = error.read().decode("utf-8", errors="ignore")
+            raise RuntimeError(
+                f"Ошибка WordPress REST API (HTTP {error.code}): {details}"
+            ) from error
 
 
 def save_local_preview(article_data: Dict[str, Any], output_path: str) -> None:
-    """Сохраняет локальный HTML-файл для предварительного просмотра"""
     html_content = f"""<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <title>{article_data.get('title', 'Предпросмотр статьи')}</title>
-  <link rel="stylesheet" href="../site2/assets/css/fonts.css">
-  <link rel="stylesheet" href="../site2/assets/css/build.css">
+<meta charset="UTF-8">
+<title>{article_data.get('title', 'Предпросмотр статьи')}</title>
 </head>
-<body class="p-8 max-w-4xl mx-auto bg-[#faf8f5]">
-  <h1 class="text-3xl font-bold mb-4">{article_data.get('title')}</h1>
-  <div class="mb-4 text-sm font-mono text-gray-600">
-    Сложность: <b>{article_data.get('difficulty')}</b> | Сплав: <b>{article_data.get('solder_alloy')}</b> | Время: <b>{article_data.get('reading_time')} мин</b>
-  </div>
-  <div class="prose max-w-none">
-    {article_data.get('content_html')}
-  </div>
+<body>
+<h1>{article_data.get('title', '')}</h1>
+<div>{article_data.get('content_html', '')}</div>
 </body>
 </html>"""
-    with open(output_path, "w", encoding="utf-8") as f:
-        f.write(html_content)
-    print(f"✅ Локальный предпросмотр сохранен: {output_path}")
+
+    with open(output_path, "w", encoding="utf-8") as file:
+        file.write(html_content)
 
 
 if __name__ == "__main__":
-    print("🔬 Модуль генератора статей ТЧП загружен.")
-    print("Используйте CLI: python tools/generate_article_cli.py --topic 'Тема статьи'")
+    print("Модуль генератора статей TCHP загружен.")
