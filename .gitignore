@@ -31,3 +31,5 @@ tochka-plavleniya.ru/
 __pycache__/
 *.pyc
 delivery-journal*.json*
+_archive/
+
