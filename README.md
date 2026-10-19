@@ -47,6 +47,9 @@ python tests/run-all-tests.py
 
 * [`docs/START_HERE.md`](docs/START_HERE.md) — навигатор по проекту.
 * [`docs/ROADMAP-TWO-SITES.md`](docs/ROADMAP-TWO-SITES.md) — мастер-план двух сайтов до дохода.
+* [`docs/business-model-two-sites.md`](docs/business-model-two-sites.md) — Lean Canvas и потоки дохода.
+* [`docs/unit-economics-two-sites.md`](docs/unit-economics-two-sites.md) — финмодель и сценарии.
+* [`docs/invention-device.md`](docs/invention-device.md) — ТРИЗ, prior art и черновик формулы.
 * [`docs/STRATEGY-90-DAY.md`](docs/STRATEGY-90-DAY.md) — быстрый трек до первого дохода.
 * [`docs/STRATEGY-6-MONTH.md`](docs/STRATEGY-6-MONTH.md) — бюджет, второй сайт, гранты, устройство.
 * [`docs/STRATEGY-2026.md`](docs/STRATEGY-2026.md) — портфель и долгий горизонт.

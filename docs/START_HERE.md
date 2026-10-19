@@ -23,6 +23,10 @@
 |---|---|
 | Понять, куда идём и сколько это стоит | [`STRATEGY-2026.md`](STRATEGY-2026.md) |
 | План двух сайтов до первого дохода | [`ROADMAP-TWO-SITES.md`](ROADMAP-TWO-SITES.md) |
+| Бизнес-модель и Lean Canvas | [`business-model-two-sites.md`](business-model-two-sites.md) |
+| Юнит-экономика и финмодель | [`unit-economics-two-sites.md`](unit-economics-two-sites.md) |
+| Гайд интервью (JTBD) | [`customer-interviews-guide.md`](customer-interviews-guide.md) |
+| Устройство: ТРИЗ, prior art, формула | [`invention-device.md`](invention-device.md) |
 | Быстрый трек на 90 дней | [`STRATEGY-90-DAY.md`](STRATEGY-90-DAY.md) |
 | Бюджет на 6 месяцев, второй сайт, гранты | [`STRATEGY-6-MONTH.md`](STRATEGY-6-MONTH.md) |
 | Патентный поиск и прототип устройства | [`PATENT-SEARCH-TEG-FAN.md`](PATENT-SEARCH-TEG-FAN.md), [`DEVICE-MOUNT-BOM.md`](DEVICE-MOUNT-BOM.md) |

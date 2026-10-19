@@ -36,6 +36,10 @@ metadata:
 - `docs/PATENT-SEARCH-TEG-FAN.md` — предварительный патентный поиск.
 - `docs/DEVICE-MOUNT-BOM.md` — крепление, BOM, испытания.
 - `docs/FACELESS-VIDEO-KIT.md` — съёмка без лица, монтаж, Gemini.
+- `docs/business-model-two-sites.md` — Lean Canvas и потоки дохода.
+- `docs/unit-economics-two-sites.md` — финмодель и сценарии.
+- `docs/customer-interviews-guide.md` — гайд интервью JTBD.
+- `docs/invention-device.md` — ТРИЗ, prior art, черновик формулы.
 - `docs/03-editorial-publishing/GUIDE.md` — оформление и публикация статьи.
 - `docs/02-wordpress-setup/GUIDE.md` — установка темы/плагина.
 - `theme4.zip`, `tchp-content.zip`, `schemas/article-contract-v1.schema.json`,

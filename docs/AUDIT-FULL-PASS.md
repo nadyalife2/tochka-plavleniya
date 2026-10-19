@@ -13,7 +13,9 @@
 | Проект `.agents/skills` | `solder-researcher`, `solder-reviewer`, `solder-seo-planner` | аудит инструкций | прочитаны как чек-листы структуры, фактов, SEO-кластеров |
 | Проект `.agents/skills` | `solder-wordpress-publisher` | деплой-гайды | сверка шагов установки темы/плагина |
 | Пользовательские каталоги | `positioning-angles`, `seo-strategy`, `keyword-research` | аудит стратегии | проверка офферов, кластеров, монетизации в `ROADMAP-TWO-SITES` |
-| FindSkills | не подключался | — | каталог найден, но требует GitHub-логин; внешние скиллы не устанавливались |
+| FindSkills | `jtbd-knowledge-skill` | JTBD | установлен единственный verified/high (20 КБ SKILL.md) |
+| FindSkills | community-кандидаты | бизнес-анализ | проверены метаданные; 10 из 11 — medium/community без SKILL.md, не устанавливались |
+| Проект `.agents/skills` | `tchp-business-model`, `tchp-unit-economics`, `tchp-invention-patent` | бизнес-анализ | созданы через шаблон `build-partner`, `validate-skill` → PASS |
 
 ## 2. Что прогнано
 
@@ -28,10 +30,15 @@ python tests/run-all-tests.py
 
 * `SUMMARY: 43 / 43 tests passed.`
 * Python unit — passed;
-* `[PASS] all relative markdown links resolve` (40 файлов);
+* `[PASS] all relative markdown links resolve` (48 файлов);
 * `theme4.zip` — 162 файла, 1 388 366 байт, byte-parity;
 * `tchp-content.zip` — 1 файл, 14 642 байта, byte-parity;
 * финал: `ALL TESTS & INTEGRITY CHECKS PASSED SUCCESSFULLY!`.
+
+Бизнес-анализ: [`business-model-two-sites.md`](business-model-two-sites.md),
+[`unit-economics-two-sites.md`](unit-economics-two-sites.md),
+[`customer-interviews-guide.md`](customer-interviews-guide.md),
+[`invention-device.md`](invention-device.md).
 
 ## 3. Что нашёл аудит инструкций
 
