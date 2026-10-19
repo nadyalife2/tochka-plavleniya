@@ -3,14 +3,14 @@
  * Plugin Name: ТЧП Контент и Регламент (TCHP Content Core)
  * Plugin URI: https://tochka-plavleniya.ru/
  * Description: Регистрация инженерных метаполей, строгая REST-валидация, защита прав на редакционную проверку, вычисление отпечатка контента и интерфейс редактора.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: Лаборатория «ТОЧКА ПЛАВЛЕНИЯ»
  * License: GPL-2.0+
  */
 
 defined('ABSPATH') || exit;
 
-define('TCHP_CONTENT_VERSION', '1.1.0');
+define('TCHP_CONTENT_VERSION', '1.1.1');
 
 /**
  * 1. Роли и права (Capabilities)
@@ -1036,10 +1036,15 @@ function tchp_render_article_spec_box($post) {
 
     $post_id   = $post->ID;
     $diff      = get_post_meta($post_id, 'tchp_difficulty', true) ?: 'Инженер';
-    $alloy     = tchp_normalize_solder_alloy(get_post_meta($post_id, 'tchp_solder_alloy', true) ?: 'pos61');
+    $alloy_raw = trim((string) get_post_meta($post_id, 'tchp_solder_alloy', true));
+    $alloy     = $alloy_raw !== '' ? tchp_normalize_solder_alloy($alloy_raw) : 'none';
+    if ($alloy === '') {
+        $alloy = 'none';
+    }
     $t_kind    = get_post_meta($post_id, 'tchp_temp_kind', true) ?: 'joint_temperature';
     $t_range   = get_post_meta($post_id, 'tchp_temp_range', true) ?: '';
     $t_peak    = get_post_meta($post_id, 'tchp_temp_peak', true) ?: '';
+    $temp_applicable = ($t_range !== '' || $t_peak !== '');
     $standard  = get_post_meta($post_id, 'tchp_standard', true) ?: '';
     $std_class = get_post_meta($post_id, 'tchp_standard_class', true) ?: '';
     $std_desc  = get_post_meta($post_id, 'tchp_standard_description', true) ?: '';
@@ -1071,6 +1076,7 @@ function tchp_render_article_spec_box($post) {
       <div class="tchp-meta-field">
         <label for="tchp_solder_alloy">Припой (канонический реестр):</label>
         <select name="tchp_solder_alloy" id="tchp_solder_alloy">
+          <option value="none" <?= selected($alloy, 'none', false) ?>>— не применимо (статья не про конкретный сплав) —</option>
           <option value="pos61" <?= selected($alloy, 'pos61', false) ?>>ПОС-61 (183–190 °C)</option>
           <option value="sn63pb37" <?= selected($alloy, 'sn63pb37', false) ?>>Sn63Pb37 (183 °C эвтектика)</option>
           <option value="pos40" <?= selected($alloy, 'pos40', false) ?>>ПОС-40 (183–238 °C)</option>
@@ -1084,6 +1090,15 @@ function tchp_render_article_spec_box($post) {
         </select>
       </div>
 
+      <div class="tchp-meta-field" style="grid-column: 1 / -1;">
+        <label style="display:flex; align-items:center; gap:6px; font-weight:600;">
+          <input type="checkbox" name="tchp_temp_applicable" id="tchp_temp_applicable" value="1" <?= $temp_applicable ? 'checked' : '' ?>>
+          Температурный режим применим к этой статье
+        </label>
+        <p class="description" style="margin:2px 0 0; font-size:11px;">Не для каждой темы: статьи про оборудование, химию или организацию места могут быть без температур.</p>
+      </div>
+
+      <div id="tchp-temp-fields" style="<?= $temp_applicable ? 'display: contents;' : 'display: none;' ?>">
       <div class="tchp-meta-field">
         <label for="tchp_temp_kind">Тип температуры:</label>
         <select name="tchp_temp_kind" id="tchp_temp_kind">
@@ -1102,10 +1117,22 @@ function tchp_render_article_spec_box($post) {
         <label for="tchp_temp_peak">Пиковая допустимая T:</label>
         <input type="text" name="tchp_temp_peak" id="tchp_temp_peak" value="<?= esc_attr($t_peak) ?>" placeholder="напр. 245 °C">
       </div>
+      </div><!-- /#tchp-temp-fields -->
 
       <div class="tchp-meta-field">
         <label for="tchp_standard">Стандарт:</label>
-        <input type="text" name="tchp_standard" id="tchp_standard" value="<?= esc_attr($standard) ?>" placeholder="напр. IPC-A-610G">
+        <input type="text" name="tchp_standard" id="tchp_standard" value="<?= esc_attr($standard) ?>" placeholder="напр. IPC-A-610G" list="tchp-standard-presets">
+        <datalist id="tchp-standard-presets">
+          <option value="IPC-A-610G"></option>
+          <option value="J-STD-001"></option>
+          <option value="J-STD-020E"></option>
+          <option value="J-STD-004B"></option>
+          <option value="IPC-7095C"></option>
+          <option value="ГОСТ 21931-76"></option>
+          <option value="ГОСТ 21930-76"></option>
+          <option value="ANSI/ESD S20.20"></option>
+          <option value="IEC 61010-1"></option>
+        </datalist>
       </div>
 
       <div class="tchp-meta-field">
@@ -1311,17 +1338,31 @@ add_action('save_post', function ($post_id) {
             update_post_meta($post_id, 'tchp_difficulty', sanitize_text_field($_POST['tchp_difficulty']));
         }
         if (isset($_POST['tchp_solder_alloy'])) {
-            $norm = tchp_normalize_solder_alloy($_POST['tchp_solder_alloy']);
-            update_post_meta($post_id, 'tchp_solder_alloy', $norm ?: 'pos61');
+            $raw_alloy = sanitize_text_field(wp_unslash((string) $_POST['tchp_solder_alloy']));
+            if ($raw_alloy === 'none' || $raw_alloy === '') {
+                delete_post_meta($post_id, 'tchp_solder_alloy');
+            } else {
+                $norm = tchp_normalize_solder_alloy($raw_alloy);
+                if ($norm !== '') {
+                    update_post_meta($post_id, 'tchp_solder_alloy', $norm);
+                }
+            }
         }
-        if (isset($_POST['tchp_temp_kind'])) {
-            update_post_meta($post_id, 'tchp_temp_kind', sanitize_key($_POST['tchp_temp_kind']));
-        }
-        if (isset($_POST['tchp_temp_range'])) {
-            update_post_meta($post_id, 'tchp_temp_range', sanitize_text_field($_POST['tchp_temp_range']));
-        }
-        if (isset($_POST['tchp_temp_peak'])) {
-            update_post_meta($post_id, 'tchp_temp_peak', sanitize_text_field($_POST['tchp_temp_peak']));
+        $temp_applicable = !empty($_POST['tchp_temp_applicable']);
+        if ($temp_applicable) {
+            if (isset($_POST['tchp_temp_kind'])) {
+                update_post_meta($post_id, 'tchp_temp_kind', sanitize_key($_POST['tchp_temp_kind']));
+            }
+            if (isset($_POST['tchp_temp_range'])) {
+                update_post_meta($post_id, 'tchp_temp_range', sanitize_text_field($_POST['tchp_temp_range']));
+            }
+            if (isset($_POST['tchp_temp_peak'])) {
+                update_post_meta($post_id, 'tchp_temp_peak', sanitize_text_field($_POST['tchp_temp_peak']));
+            }
+        } else {
+            delete_post_meta($post_id, 'tchp_temp_kind');
+            delete_post_meta($post_id, 'tchp_temp_range');
+            delete_post_meta($post_id, 'tchp_temp_peak');
         }
         if (isset($_POST['tchp_standard'])) {
             update_post_meta($post_id, 'tchp_standard', sanitize_text_field($_POST['tchp_standard']));
@@ -1375,3 +1416,109 @@ add_action('save_post', function ($post_id) {
         }
     }
 });
+
+/**
+ * 11. UX паспорта статьи: автоподстановка температур по сплаву,
+ * скрытие температурных полей для «не применимо» и колонка GEO в списке записей.
+ */
+add_action('admin_enqueue_scripts', function ($hook) {
+    if (!in_array($hook, ['post.php', 'post-new.php'], true)) {
+        return;
+    }
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    if (!$screen || $screen->post_type !== 'post') {
+        return;
+    }
+    wp_register_script('tchp-geo-admin', '', [], TCHP_CONTENT_VERSION, true);
+    wp_enqueue_script('tchp-geo-admin');
+
+    $presets = [
+        'pos61'     => ['range' => '260–295 °C', 'peak' => '320 °C'],
+        'sn63pb37'  => ['range' => '260–290 °C', 'peak' => '300 °C'],
+        'pos40'     => ['range' => '280–330 °C', 'peak' => '350 °C'],
+        'sac305'    => ['range' => '310–350 °C', 'peak' => '245 °C'],
+        'sac405'    => ['range' => '310–350 °C', 'peak' => '245 °C'],
+        'sn42bi58'  => ['range' => '200–230 °C', 'peak' => '190 °C'],
+        'snbiago'   => ['range' => '200–230 °C', 'peak' => '190 °C'],
+        'roze'      => ['range' => '140–180 °C', 'peak' => ''],
+        'vuda'      => ['range' => '90–120 °C',  'peak' => ''],
+    ];
+    wp_add_inline_script('tchp-geo-admin', 'window.TCHP_GEO_PRESETS = ' . wp_json_encode($presets, JSON_UNESCAPED_UNICODE) . ';');
+
+    $js = <<<'JS'
+(function () {
+  var D = window.TCHP_GEO_PRESETS || {};
+  function init() {
+    var alloy = document.getElementById('tchp_solder_alloy');
+    var toggle = document.getElementById('tchp_temp_applicable');
+    var fields = document.getElementById('tchp-temp-fields');
+    var range = document.getElementById('tchp_temp_range');
+    var peak = document.getElementById('tchp_temp_peak');
+    if (!alloy || !toggle || !fields) { return false; }
+    function visibility() { fields.style.display = toggle.checked ? 'contents' : 'none'; }
+    function preset() {
+      var p = D[alloy.value];
+      if (!p) { return; }
+      if (range && !range.value.trim()) { range.value = p.range || ''; }
+      if (peak && !peak.value.trim()) { peak.value = p.peak || ''; }
+    }
+    toggle.addEventListener('change', function () { visibility(); if (toggle.checked) { preset(); } });
+    alloy.addEventListener('change', function () {
+      toggle.checked = (alloy.value !== 'none');
+      visibility();
+      if (toggle.checked) { preset(); }
+    });
+    visibility();
+    if (toggle.checked) { preset(); }
+    return true;
+  }
+  function boot() {
+    if (init()) { return; }
+    var tries = 0;
+    var timer = setInterval(function () {
+      if (init() || ++tries > 20) { clearInterval(timer); }
+    }, 250);
+  }
+  if (document.readyState !== 'loading') { boot(); } else { document.addEventListener('DOMContentLoaded', boot); }
+})();
+JS;
+    wp_add_inline_script('tchp-geo-admin', $js);
+});
+
+add_filter('manage_post_posts_columns', function ($columns) {
+    $new = [];
+    foreach ($columns as $key => $label) {
+        $new[$key] = $label;
+        if ($key === 'title') {
+            $new['tchp_geo'] = 'GEO';
+        }
+    }
+    return $new;
+});
+
+add_action('manage_post_posts_custom_column', function ($column, $post_id) {
+    if ($column !== 'tchp_geo') {
+        return;
+    }
+    $score = 0;
+    $missing = [];
+    $alloy = trim((string) get_post_meta($post_id, 'tchp_solder_alloy', true));
+    if ($alloy !== '') { $score++; } else { $missing[] = 'припой'; }
+    if (trim((string) get_post_meta($post_id, 'tchp_temp_range', true)) !== ''
+        || trim((string) get_post_meta($post_id, 'tchp_temp_peak', true)) !== '') {
+        $score++;
+    } else { $missing[] = 'температуры'; }
+    if (trim((string) get_post_meta($post_id, 'tchp_standard', true)) !== '') { $score++; } else { $missing[] = 'стандарт'; }
+    if (function_exists('tchp_get_article_sources') && !empty(tchp_get_article_sources($post_id))) { $score++; } else { $missing[] = 'источники'; }
+    if (function_exists('tchp_get_article_faq') && !empty(tchp_get_article_faq($post_id))) { $score++; } else { $missing[] = 'FAQ'; }
+    $editorial = function_exists('tchp_get_editorial_data') ? tchp_get_editorial_data($post_id) : null;
+    if (!empty($editorial['is_verified'])) { $score++; } else { $missing[] = 'ОТК'; }
+    $color = $score >= 6 ? '#137333' : ($score >= 3 ? '#b06000' : '#d93025');
+    $title = empty($missing) ? 'Все GEO-поля заполнены' : 'Не заполнено: ' . implode(', ', $missing);
+    printf(
+        '<span style="display:inline-block;min-width:32px;text-align:center;padding:2px 6px;border-radius:10px;background:%s;color:#fff;font-weight:600;" title="%s">%d/6</span>',
+        esc_attr($color),
+        esc_attr($title),
+        (int) $score
+    );
+}, 10, 2);

@@ -8,42 +8,60 @@
 
 ## 🏗️ Архитектура проекта
 
-* **`theme4/`** — Актуальная тема оформления WordPress (Site2 / ТЧП). Эстетика sketch/paper, адаптивная типографика, оглавление со строгой документной дедупликацией якорей, паспорта техпроцессов.
-* **`wp-content/plugins/tchp-content/`** — Ядро контента и метаполей (`tchp-content`). Отвечает за паспорта статей, оснастку, FAQ, источники, канонические идентификаторы сплавов, защиту прав на редакционную проверку (ОТК) и защиту от рассинхронизации версий по отпечатку (`expected_hash`).
-* **`schemas/`** — Строгие контракты данных:
-  * [`article-contract-v1.schema.json`](schemas/article-contract-v1.schema.json) — Draft-07 JSON-схема контракта статьи.
-  * [`article-example-v1.json`](schemas/article-example-v1.json) — эталонный валидируемый пример.
-* **`tests/`** — Комплексный набор автоматизированных тестов и CI/CD раннеров.
-* **`tools/`** — Утилиты сборки дистрибутивов и CLI-генерации.
+* **`theme4/`** — действующая тема WordPress (v4.0.0). Эстетика Editorial Lab: бумажный холст, янтарный акцент `#FFC700`, паспорта техпроцессов, калькуляторы, строгая дедупликация DOM-якорей.
+* **`wp-content/plugins/tchp-content/`** — контентное ядро: паспорт статьи, оснастка, FAQ, источники, канонические сплавы, редакционная проверка (ОТК) и защита от рассинхронизации по `expected_hash`.
+* **`schemas/`** — контракты данных: [`article-contract-v1.schema.json`](schemas/article-contract-v1.schema.json) и эталонный [`article-example-v1.json`](schemas/article-example-v1.json).
+* **`tests/`** — мастер-раннер, mock-WP тесты, Python unit-тесты и раннеры пакетов.
+* **`tools/`** — сборка дистрибутивов, генерация статей и доставка черновиков (`delivery_cli.py`).
+* **`docs/`** — навигатор [`docs/START_HERE.md`](docs/START_HERE.md), 4 тематических гида, стратегия роста, патентный трек и верификация.
+* **`prompts/`, `gem-knowledge/`, `media/`, `semantic_core.xlsx`** — промпты, редполитика и голос, фирменная графика, семантическое ядро.
 
 ---
 
 ## 🧪 Тестирование и CI/CD
 
-В проекте настроен автоматический CI/CD конвейер через **GitHub Actions** ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)).
-
-Каждый `git push` и `pull request` в ветку `main` автоматически проходит 4 этапа проверки:
-1. **JSON Schema Validation**: Проверка контракта статьи и реестра канонических сплавов.
-2. **PHP Syntax Lint**: Проверка синтаксиса файлов плагина и темы.
-3. **REST API Integration Tests**: 9 сценариев проверки безопасности и корректности (отклонение пустых FAQ с 400 без потери данных, отклонение невалидных сплавов, сохранение частичных PATCH-обновлений, защита верификации по `expected_hash` с 409 Conflict, проверка устаревания контента, 100% документная уникальность якорей в DOM).
-4. **Package Build & Verification**: Автоматическая сборка `theme4.zip` и `tchp-content.zip` с публикацией в артефактах GitHub Actions.
-
-### Локальный запуск всех тестов
+GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) запускает мастер-раннер
+[`tests/run-all-tests.py`](tests/run-all-tests.py). Локально — тот же прогон:
 
 ```bash
-# 1. Установите зависимость валидатора JSON-схем
-pip install jsonschema
-
-# 2. Запустите мастер-тестер
+python -m pip install jsonschema
 python tests/run-all-tests.py
 ```
 
-Подробная документация по тест-кейсам и интеграции: [**`tests/README.md`**](tests/README.md).
+Раннер выполняет **6 шагов**:
+
+1. **JSON Schema**: Draft-07 мета-схема, эталонный контракт, реестр канонических сплавов, негативные тесты.
+2. **PHP Lint**: все PHP-файлы `theme4/`, плагина `tchp-content` и тестового набора.
+3. **Mock-WP бизнес-логика**: 43 проверки, 10 сценариев (REST-валидация, `expected_hash`/409, инвалидация ОТК, DOM-якоря, сплавы, владелец Schema.org, паритет отпечатков PHP↔Python).
+4. **Python unit**: delivery CLI и генератор статей.
+5. **Package build**: сборка `theme4.zip` и `tchp-content.zip`.
+6. **Byte-parity**: побайтовая сверка каждого файла архивов с исходниками.
+
+Живой REST-тест `tools/test_live_wp_integration.py` требует WordPress, URL и application password
+пользователя автоматизации — в CI он не запускается. Подробности: [`tests/README.md`](tests/README.md).
+
+---
+
+## 📚 Документация и стратегия
+
+* [`docs/START_HERE.md`](docs/START_HERE.md) — навигатор по проекту.
+* [`docs/ROADMAP-TWO-SITES.md`](docs/ROADMAP-TWO-SITES.md) — мастер-план двух сайтов до дохода.
+* [`docs/STRATEGY-90-DAY.md`](docs/STRATEGY-90-DAY.md) — быстрый трек до первого дохода.
+* [`docs/STRATEGY-6-MONTH.md`](docs/STRATEGY-6-MONTH.md) — бюджет, второй сайт, гранты, устройство.
+* [`docs/STRATEGY-2026.md`](docs/STRATEGY-2026.md) — портфель и долгий горизонт.
+* [`docs/PATENT-SEARCH-TEG-FAN.md`](docs/PATENT-SEARCH-TEG-FAN.md) — предварительный патентный поиск.
+* [`docs/DEVICE-MOUNT-BOM.md`](docs/DEVICE-MOUNT-BOM.md) — крепление, BOM и испытания прототипа.
+* [`docs/FACELESS-VIDEO-KIT.md`](docs/FACELESS-VIDEO-KIT.md) — съёмка без лица, монтаж, Gemini.
+* [`docs/VERIFICATION.md`](docs/VERIFICATION.md) — как прогнать проект целиком и что считается «зелёным».
 
 ---
 
 ## 📦 Дистрибутивные пакеты
 
-Для установки на сервер WordPress используются готовые архивы:
-* **`theme4.zip`** — Тема оформления (устанавливается в *Внешний вид → Темы*).
-* **`tchp-content.zip`** — Плагин полей и регламента (устанавливается в *Плагины → Добавить новый*).
+Для установки на WordPress используются готовые архивы:
+
+* **`theme4.zip`** — тема (Внешний вид → Темы).
+* **`tchp-content.zip`** — плагин полей и регламента (Плагины → Добавить новый).
+
+Порядок установки и проверки: [`docs/02-wordpress-setup/GUIDE.md`](docs/02-wordpress-setup/GUIDE.md).
+Требования к теме: WordPress 6.4+, PHP 8.0+.

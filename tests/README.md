@@ -1,6 +1,7 @@
 # Автоматизированное тестирование и CI/CD // ТОЧКА ПЛАВЛЕНИЯ
 
-В репозитории развернута автоматизированная система непрерывной интеграции (CI/CD) на базе **GitHub Actions** и локальных раннеров тестов.
+В репозитории развернута система непрерывной интеграции (CI/CD) на базе **GitHub Actions**
+и локального мастер-раннера.
 
 ---
 
@@ -8,93 +9,113 @@
 
 | Файл | Назначение |
 | :--- | :--- |
-| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | Конфигурация GitHub Actions CI: автоматический прогон тестов при `git push` и `pull_request`. |
-| [`tests/run-all-tests.py`](run-all-tests.py) | Главный мастер-раннер: проверяет JSON-схемы, синтаксис PHP, интеграционные тесты и целостность ZIP-архивов. |
-| [`tests/test-package-a1.php`](test-package-a1.php) | Интеграционный тестовый набор: REST API, жизненный цикл верификации, хэширование, якоря single.php. |
-| [`tools/build_distribution_archives.py`](../tools/build_distribution_archives.py) | Сборщик дистрибутивов `theme4.zip` и `tchp-content.zip` с POSIX-путями для Linux/WordPress. |
-| [`schemas/article-contract-v1.schema.json`](../schemas/article-contract-v1.schema.json) | Строгая Draft-07 JSON-схема контракта статьи. |
-| [`schemas/article-example-v1.json`](../schemas/article-example-v1.json) | Эталонный пример статьи, валидируемый схемой. |
+| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | GitHub Actions: прогон мастер-раннера при push/PR в `main` и вручную. |
+| [`tests/run-all-tests.py`](run-all-tests.py) | Мастер-раннер: 6 шагов — схемы, PHP lint, mock-WP, Python unit, сборка, byte-parity. |
+| [`tests/test-package-a1.php`](test-package-a1.php) | Mock-WP тесты: REST, верификация, отпечатки, DOM-якоря, владелец Schema.org. |
+| [`tests/test_delivery_cli_unit.py`](test_delivery_cli_unit.py) | Unit-тесты delivery CLI. |
+| [`tests/test_article_generator.py`](test_article_generator.py) | Unit-тесты генератора и нормализации контракта. |
+| [`tools/test_live_wp_integration.py`](../tools/test_live_wp_integration.py) | Живой REST-тест против WordPress (не входит в CI, требует стенд и пароль). |
+| [`tools/build_distribution_archives.py`](../tools/build_distribution_archives.py) | Сборка `theme4.zip` и `tchp-content.zip` с POSIX-путями. |
+| [`schemas/article-contract-v1.schema.json`](../schemas/article-contract-v1.schema.json) | Draft-07 JSON-схема контракта статьи. |
+| [`schemas/article-example-v1.json`](../schemas/article-example-v1.json) | Эталонный валидируемый пример. |
 
 ---
 
-## 2. Что проверяется в CI/CD (Матрица тестов)
+## 2. Что проверяет мастер-раннер (6 шагов)
 
-При каждом пуше на GitHub автоматически выполняются **4 этапа верификации**:
+### Шаг 1. JSON-схемы и контракт статьи
+1. Draft-07 meta-schema: синтаксис `article-contract-v1.schema.json`.
+2. Эталонный пример: `article-example-v1.json` соответствует схеме, `additionalProperties: false`.
+3. Канонические сплавы: строгий enum `pos61`, `sn63pb37`, `pos40`, `sac305`, `sac405`,
+   `sn42bi58`, `snbiago`, `roze`, `vuda`, `universal`.
+4. Негативные тесты: лишнее поле и устаревший алиас `wood` отклоняются.
 
-### Этап 1. Валидация JSON-схем и контракта статьи
-1. **Draft-07 Meta-Schema**: Проверка корректности синтаксиса `article-contract-v1.schema.json`.
-2. **Эталонный контракт**: Проверка `article-example-v1.json` на соответствие схеме без лишних полей (`additionalProperties: false`).
-3. **Канонические припои**: Строгое соответствие реестру: `pos61`, `sn63pb37`, `pos40`, `sac305`, `sac405`, `sn42bi58`, `snbiago`, `roze`, `vuda`, `universal`.
-4. **Негативные тесты**: Отклонение запросов с неавторизованными полями или устаревшими алиасами (напр. `wood`).
+### Шаг 2. PHP Lint
+* Рекурсивная проверка **всех** PHP-файлов `theme4/`, `wp-content/plugins/tchp-content/`
+  и `tests/test-package-a1.php`.
 
-### Этап 2. Проверка синтаксиса PHP (PHP Lint)
-* Проверка компилируемости `wp-content/plugins/tchp-content/tchp-content.php`, `theme4/single.php`, `theme4/includes/functions.php` и тестового набора.
+### Шаг 3. Mock-WP бизнес-логика (10 сценариев, 43 проверки)
+> Запускается в изолированном mock-окружении без MySQL.
 
-### Этап 3. Модульные тесты бизнес-логики и контрактов схем (Mock WP)
-> **Примечание:** Данный этап запускается в изолированном mock-окружении WordPress для быстрой и строгой проверки бизнес-правил, хуков и контрактов без необходимости поднимать базу данных MySQL.
-* **Сценарий 1 (REST-валидация FAQ и очистки HTML)**: 
-  - Запрос с пустыми строками или строками из пробелов отклоняется с кодом `400 Bad Request`.
-  - Запрос с HTML-тегами, очищаемыми до пустоты (например, `{"q": "<b></b>", "a": "<p></p>"}`), также отклоняется с кодом `400 Bad Request`.
-  - Ранее сохранённый FAQ в БД **не очищается** и не повреждается.
-* **Сценарий 2 (Неизвестный припой)**: Запрос с невалидным сплавом отклоняется с кодом `400 Bad Request`.
-* **Сценарий 3 (Частичные обновления PATCH)**: Запрос без поля `tchp_faq_items` успешно обновляет переданные поля, оставляя существующий FAQ нетронутым.
-* **Сценарий 4 (Защита от перезаписи по expected_hash)**: Вызов подтверждения проверки с устаревшим или несовпадающим `expected_hash` возвращает **`409 Conflict`**. Редакционные метаполя (статус, дата, проверяющий, хэш) остаются без изменений.
-* **Сценарий 5 (Успешное подтверждение)**: Вызов с валидным `expected_hash` возвращает **`200 OK`**, фиксирует серверные метаполя, `is_verified` становится `true`.
-* **Сценарий 6 (Инвалидация при правках)**: Любая модификация контента статьи после верификации переводит запись в `is_outdated = true`, `is_verified = false`, а статус автоматически понижается до `in_review`.
-* **Сценарий 7 (Документная уникальность якорей и не-H2 элементов)**: 
-  - Вызывает каноническую функцию темы `tchp_process_article_anchors()` напрямую.
-  - Разрешает коллизии между секциями (`<section id="preparation">`) и заголовками (`<h2 id="preparation">`).
-  - Разрешает дублирующиеся ID среди любых других элементов документа (`<div id="step-one"></div><section id="step-one"></section>`).
-  - В итоговом DOM-дереве все `[id]` становятся на 100% уникальными.
-* **Сценарий 8 (Нормализация сплавов)**: Алиасы `wood → vuda` и `rose → roze` автоматически приводятся к каноническим ID.
-* **Сценарий 9 (Владелец SEO Schema.org)**: Тема уступает разметку Rank Math при включенном модуле `rich-snippet`, либо выводит резервную схему.
+1. **REST-валидация FAQ**: пустые строки и HTML, очищаемый до пустоты, отклоняются с `400`;
+   ранее сохранённый FAQ не повреждается.
+2. **Неизвестный припой**: `400 Bad Request`.
+3. **Частичные PATCH-обновления**: отсутствие `tchp_faq_items` не затирает существующий FAQ.
+4. **Защита `expected_hash`**: устаревший/несовпадающий хеш → `409 Conflict`, метаполя не меняются;
+   отсутствие `expected_hash` → `400`.
+5. **Успешная верификация**: валидный хеш → `200 OK`, фиксируются reviewer, дата, `reviewed_content_hash`.
+6. **Инвалидация при правках**: изменение контента → `is_outdated = true`, `is_verified = false`,
+   статус `in_review`.
+7. **Уникальность DOM-якорей**: коллизии H2/секций/прочих `[id]` устраняются, все ID уникальны.
+8. **Нормализация сплавов**: `wood → vuda`, `rose → roze`, `universal` сохраняется.
+9. **Владелец Schema.org**: тема уступает разметку Rank Math при активном `rich-snippet`,
+   иначе выводит резервную схему.
+10. **Паритет отпечатков PHP↔Python**: `tchp_calculate_article_hash()` и
+    `compute_canonical_fingerprint()` совпадают байт-в-байт при перестановке ключей,
+    отсутствующих полях и разных языках значений.
 
-### Этап 4. Сборка и побайтовая верификация дистрибутивных ZIP-пакетов
-* Генерация `theme4.zip` (с префиксом `theme4/` и файлами `style.css`, `single.php`, `index.php`).
-* Генерация `tchp-content.zip` (с префиксом `tchp-content/` и файлом `tchp-content.php`).
-* Побайтовая сверка каждого файла в ZIP-архивах с текущими исходниками в репозитории (гарантия соответствия архивов коммиту).
-* В GitHub Actions оба архива автоматически прикрепляются к сборке как артефакты (**Artifacts**) и доступны для скачивания.
+### Шаг 4. Python unit-тесты
+* `tests/test_delivery_cli_unit.py` — журнал доставки, ошибки, идемпотентность.
+* `tests/test_article_generator.py` — нормализация, отказ от выдуманных температур,
+  невалидные сплавы, контракт.
+
+### Шаг 5. Сборка пакетов
+* `theme4.zip` с корнем `theme4/`.
+* `tchp-content.zip` с корнем `tchp-content/`.
+
+### Шаг 6. Byte-parity
+* Каждый файл архива сверяется с исходником побайтово; проверяется отсутствие лишних
+  и пропавших файлов.
 
 ---
 
-## 3. Локальный запуск тестов
+## 3. Локальный запуск
 
-### Требования
-* **Python**: 3.10 или новее.
-* **PHP**: 8.0 или новее (путь можно задать через переменную окружения `PHP_BIN` или `PHP_EXE`).
-* Установленная библиотека `jsonschema`:
-  ```bash
-  pip install jsonschema
-  ```
+Требования: Python 3.10+, PHP 8.0+, `jsonschema`.
 
-### Запуск полного набора проверок
-Выполните из корня проекта:
 ```bash
+python -m pip install jsonschema
 python tests/run-all-tests.py
 ```
-*Порядок поиска PHP:*
-1. Переменная окружения `PHP_BIN` или `PHP_EXE`.
-2. Системный `PATH` (`php`).
-3. Локальный портативный PHP на Windows (`C:\Users\nadya\php_portable\php.exe`).
 
-### Запуск только модульных PHP-тестов
+Порядок поиска PHP:
+1. `PHP_BIN` / `PHP_EXE`;
+2. системный `php` в `PATH`;
+3. Windows-портативный `C:\Users\nadya\php_portable\php.exe`;
+4. `php` по умолчанию.
+
+Только mock-WP тесты:
+
 ```bash
 php tests/test-package-a1.php
 ```
 
+Только сборка и сверка без пересборки:
+
+```bash
+python tests/run-all-tests.py --verify-only
+```
+
 ---
 
-## 4. Как работает CI/CD на GitHub
+## 4. Живой REST-тест (отдельно от CI)
 
-1. При выполнении команды:
-   ```bash
-   git push origin main
-   ```
-2. GitHub автоматически запускает workflow `.github/workflows/ci.yml`.
-3. Запускается виртуальная машина Ubuntu с установленным PHP 8.2 и Python 3.11.
-4. Выполняется `python tests/run-all-tests.py`.
-5. Если все тесты пройдены:
-   * Коммит получает зелёный бейдж ✓ (`All checks have passed`).
-   * Свежие сборки `theme4.zip` и `tchp-content.zip` публикуются во вкладке **Actions → Artifacts**.
-6. Если обнаружена ошибка:
-   * Сборка падает с красным крестом ✗, коммит помечается как непрошедший проверку качества.
+`tools/test_live_wp_integration.py` проверяет реальный WordPress: REST, права, `expected_hash`,
+создание и удаление тестовых записей. Требует:
+
+* работающий WordPress (локальный Docker или хостинг);
+* URL сайта;
+* application password пользователя автоматизации (роль без `publish_posts`);
+* переменные окружения/аргументы, см. `--help`.
+
+В CI не включается: нет стенда и секретов. Запускать вручную перед релизом на стейджинге.
+
+---
+
+## 5. CI на GitHub
+
+1. `git push origin main` или pull request.
+2. Workflow `.github/workflows/ci.yml` поднимает Ubuntu, PHP 8.2, Python 3.11.
+3. Устанавливает `jsonschema`, запускает `python tests/run-all-tests.py`.
+4. При успехе публикует `theme4.zip` и `tchp-content.zip` в Artifacts.
+5. При ошибке сборка красная, коммит не проходит quality gate.

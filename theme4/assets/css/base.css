@@ -935,7 +935,7 @@ html.dark .box-caution-orange {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-accent);
+  color: var(--color-ink);
   flex-shrink: 0;
   transform: rotate(-1.5deg);
   transition: transform 0.2s ease;
@@ -1498,3 +1498,34 @@ html.dark .cad-blueprint-canvas {
   font-weight: 700;
 }
 
+/* ==========================================================================
+   15. ACCENT UTILITIES RESTORE (theme4-fixed)
+   build.css собран без accent-утилит: варианты hover:/group-hover:/group-open:/
+   ring: были «мёртвыми» (0 правил). Возвращаем их без изменения палитры:
+   текст — blueprint navy #0f4c81 (8.9:1 на белом, 7.9:1 на #f6f6f6),
+   заливки и рамки — фирменный жёлтый var(--color-accent).
+   ========================================================================== */
+.hover\:text-accent:hover,
+.group:hover .group-hover\:text-accent,
+.group[open] .group-open\:text-accent {
+  color: #0f4c81 !important;
+}
+html.dark .hover\:text-accent:hover,
+html.dark .group:hover .group-hover\:text-accent,
+html.dark .group[open] .group-open\:text-accent {
+  color: #60a5fa !important;
+}
+.hover\:border-accent:hover,
+.group:hover .group-hover\:border-accent,
+.group[open] .group-open\:border-accent {
+  border-color: var(--color-accent) !important;
+}
+.focus-visible\:ring-accent:focus-visible {
+  --tw-ring-color: #0f4c81;
+}
+.bg-accent\/15 { background-color: rgba(255, 199, 0, 0.15) !important; }
+.border-accent\/40 { border-color: rgba(255, 199, 0, 0.4) !important; }
+.focus\:bg-accent:focus { background-color: var(--color-accent) !important; }
+.decoration-accent { text-decoration-color: #0f4c81 !important; }
+.accent-\[\#FF6B2B\] { accent-color: #FF6B2B; }
+.text-accent-on-dark { color: var(--color-accent) !important; }

@@ -25,11 +25,13 @@ $tchp_head_escape = static function ($value) {
   <meta name="description" content="<?= $tchp_head_escape($page_desc) ?>">
   <?php if (!empty($canonical_url)): ?>
   <link rel="canonical" href="<?= $tchp_head_escape($canonical_url) ?>">
+  <meta property="og:url" content="<?= $tchp_head_escape($canonical_url) ?>"/>
   <?php endif; ?>
   <meta property="og:type" content="<?= function_exists('is_singular') && is_singular('post') ? 'article' : 'website' ?>"/>
   <meta property="og:title" content="<?= $tchp_head_escape($page_title) ?>"/>
   <meta property="og:description" content="<?= $tchp_head_escape($page_desc) ?>"/>
   <meta property="og:site_name" content="<?= $tchp_head_escape(function_exists('get_bloginfo') ? get_bloginfo('name') : 'ТОЧКА ПЛАВЛЕНИЯ') ?>"/>
+  <meta property="og:locale" content="ru_RU"/>
   <meta property="og:image" content="<?= $tchp_head_escape($page_og_image ?? ($assets_base . '/assets/img/og-cover.png')) ?>"/>
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="<?= $tchp_head_escape($page_title) ?>"/>
@@ -41,7 +43,8 @@ $tchp_head_escape = static function ($value) {
   <script>
     (function() {
       const saved = localStorage.getItem('tp_theme');
-      if (saved === 'dark') {
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (saved === 'dark' || (!saved && prefersDark)) {
         document.documentElement.classList.add('dark');
       } else {
         document.documentElement.classList.remove('dark');
@@ -53,16 +56,20 @@ $tchp_head_escape = static function ($value) {
     $tchp_hp_path     = dirname(__DIR__) . '/assets/css/headphones-style.css';
     $tchp_tokens_ver  = file_exists($tchp_tokens_path) ? filemtime($tchp_tokens_path) : '1.0.0';
     $tchp_hp_ver      = file_exists($tchp_hp_path) ? filemtime($tchp_hp_path) : '1.0.0';
+    $tchp_fonts_ver   = file_exists(dirname(__DIR__) . '/assets/css/fonts.css') ? filemtime(dirname(__DIR__) . '/assets/css/fonts.css') : '1.0.0';
+    $tchp_build_ver   = file_exists(dirname(__DIR__) . '/assets/css/build.css') ? filemtime(dirname(__DIR__) . '/assets/css/build.css') : '1.0.0';
+    $tchp_base_ver    = file_exists(dirname(__DIR__) . '/assets/css/base.css') ? filemtime(dirname(__DIR__) . '/assets/css/base.css') : '1.0.0';
   ?>
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/tokens.css?v=<?= $tchp_tokens_ver ?>">
-  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css">
-  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css">
-  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css?v=<?= $tchp_fonts_ver ?>">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css?v=<?= $tchp_build_ver ?>">
+  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css?v=<?= $tchp_base_ver ?>">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/headphones-style.css?v=<?= $tchp_hp_ver ?>">
   <?php if (!empty($extra_head)) echo $extra_head; ?>
   <?php if (function_exists('wp_head')) wp_head(); ?>
   <script>
     window.TCHP_MATERIALS = <?= json_encode(function_exists('tchp_get_materials_registry') ? (tchp_get_materials_registry()['solders'] ?? []) : [], JSON_UNESCAPED_UNICODE) ?>;
+    window.TCHP_BASE = <?= json_encode(function_exists('home_url') ? home_url('/') : '/', JSON_UNESCAPED_SLASHES) ?>;
     window.TCHP_EXPRESS_MATRIX = <?= json_encode(function_exists('tchp_get_express_workbench_matrix') ? tchp_get_express_workbench_matrix() : [], JSON_UNESCAPED_UNICODE) ?>;
   </script>
 </head>

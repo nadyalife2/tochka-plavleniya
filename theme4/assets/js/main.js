@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
             `;
         } else {
             headerSearchResults.innerHTML = matches.map(art => `
-                <a href="/article.php?slug=${encodeURIComponent(art.slug)}" class="search-dropdown-item">
+                <a href="${window.TCHP_BASE || '/'}${encodeURIComponent(art.slug)}/" class="search-dropdown-item">
                     <span class="tag" style="margin-bottom:0.2rem; font-size:0.65rem; width:fit-content;">${art.tag}</span>
                     <strong style="font-size:0.9rem;">${art.title}</strong>
                     <span style="font-size:0.8rem; color:var(--text-muted);">${art.excerpt}</span>

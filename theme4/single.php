@@ -2,8 +2,8 @@
 /**
  * The template for displaying all single posts
  *
- * @package Site2
- * @version 2.2.0
+ * @package ТОЧКА ПЛАВЛЕНИЯ
+ * @version 4.0.0
  */
 
 require_once __DIR__ . '/includes/functions.php';
@@ -94,29 +94,9 @@ if (function_exists('have_posts') && have_posts()) {
         $should_render_schema = function_exists('tchp_should_render_theme_schema')
             ? tchp_should_render_theme_schema($post_id)
             : !class_exists('RankMath');
-        if ($should_render_schema):
-        ?>
-        <script type="application/ld+json">
-        {
-          "@context": "https://schema.org",
-          "@type": "TechArticle",
-          "headline": <?= json_encode(get_the_title(), JSON_UNESCAPED_UNICODE) ?>,
-          "description": <?= json_encode($page_desc, JSON_UNESCAPED_UNICODE) ?>,
-          "datePublished": "<?= get_the_date('c') ?>",
-          "dateModified": "<?= get_the_modified_date('c') ?>",
-          "author": {
-            "@type": "Person",
-            "name": <?= json_encode(get_the_author(), JSON_UNESCAPED_UNICODE) ?>
-          },
-          "publisher": {
-            "@type": "Organization",
-            "name": "ТОЧКА ПЛАВЛЕНИЯ",
-            "url": "<?= esc_url($site_root) ?>"
-          }
+        if ($should_render_schema && function_exists('tchp_render_wp_article_schema')) {
+            echo tchp_render_wp_article_schema($post_id);
         }
-        </script>
-        <?php endif; ?>
-        <?php
         $extra_head = ob_get_clean();
 
         // Include unified header

@@ -283,12 +283,13 @@ if (!function_exists('get_semantic_tag_pill')) {
 if (!function_exists('render_rubric_schema')) {
     function render_rubric_schema(array $rubric, array $articles): string {
         $rslug = $rubric['slug'] ?? 'materialy';
+        $site_root_url = function_exists('home_url') ? home_url('/') : 'https://tochka-plavleniya.ru/';
         if ($rslug === 'all') {
-            $canonical_url = "https://tochka-plavleniya.ru/archive/";
+            $canonical_url = $site_root_url;
         } elseif (function_exists('get_category_by_slug') && ($cat = get_category_by_slug($rslug))) {
             $canonical_url = get_category_link($cat->term_id);
         } else {
-            $canonical_url = "https://tochka-plavleniya.ru/category/" . urlencode($rslug) . "/";
+            $canonical_url = $site_root_url . 'category/' . urlencode($rslug) . '/';
         }
         $itemList = [];
         $pos = 1;
@@ -618,5 +619,224 @@ if (!function_exists('tchp_process_article_anchors')) {
     }
 }
 
+/**
+ * GEO: машиночитаемые факты статьи из метаполей плагина tchp-content.
+ * Возвращает PropertyValue (припой, температуры, стандарт), citation (источники)
+ * и reviewedBy (редакционная проверка ОТК) для JSON-LD.
+ */
+if (!function_exists('tchp_get_geo_facts')) {
+    function tchp_get_geo_facts($post_id) {
+        $post_id = (int) $post_id;
+        $empty = ['additionalProperty' => [], 'citation' => [], 'reviewedBy' => null, 'keywords' => []];
+        if ($post_id <= 0 || !function_exists('get_post_meta')) {
+            return $empty;
+        }
+        $props = [];
+        $add = static function ($name, $value) use (&$props) {
+            $value = is_scalar($value) ? trim((string) $value) : '';
+            if ($value !== '') {
+                $props[] = ['@type' => 'PropertyValue', 'name' => $name, 'value' => $value];
+            }
+        };
+        // Припой и температуры — только если применимы к теме статьи.
+        // 'universal' в метаполе означает «обзор/не про конкретный сплав».
+        $alloy = trim((string) get_post_meta($post_id, 'tchp_solder_alloy', true));
+        if ($alloy !== '' && $alloy !== 'universal') {
+            $add('Припой (канонический ID)', $alloy);
+        }
+        $temp_range = trim((string) get_post_meta($post_id, 'tchp_temp_range', true));
+        $temp_peak  = trim((string) get_post_meta($post_id, 'tchp_temp_peak', true));
+        if ($temp_range !== '' || $temp_peak !== '') {
+            $add('Тип температуры', get_post_meta($post_id, 'tchp_temp_kind', true));
+            $add('Температурный диапазон, °C', $temp_range);
+            $add('Пиковая температура, °C', $temp_peak);
+        }
+        $add('Стандарт', get_post_meta($post_id, 'tchp_standard', true));
+        $add('Класс стандарта', get_post_meta($post_id, 'tchp_standard_class', true));
+        $add('Пояснение к стандарту', get_post_meta($post_id, 'tchp_standard_description', true));
 
+        $citations = [];
+        if (function_exists('tchp_get_article_sources')) {
+            foreach ((array) tchp_get_article_sources($post_id) as $src) {
+                if (empty($src['title'])) {
+                    continue;
+                }
+                $c = ['@type' => 'CreativeWork', 'name' => $src['title']];
+                if (!empty($src['url'])) {
+                    $c['url'] = $src['url'];
+                }
+                if (!empty($src['standard'])) {
+                    $c['identifier'] = $src['standard'];
+                }
+                $citations[] = $c;
+            }
+        }
+
+        $reviewed_by = null;
+        if (function_exists('tchp_get_editorial_data')) {
+            $ed = tchp_get_editorial_data($post_id);
+            if (!empty($ed['is_verified']) && !empty($ed['reviewer_name'])) {
+                $reviewed_by = ['@type' => 'Person', 'name' => $ed['reviewer_name']];
+                if (!empty($ed['reviewed_at'])) {
+                    $reviewed_by['dateModified'] = $ed['reviewed_at'];
+                }
+            }
+        }
+
+        $keywords = [];
+        $alloy = trim((string) get_post_meta($post_id, 'tchp_solder_alloy', true));
+        if ($alloy !== '' && $alloy !== 'universal') {
+            $keywords[] = $alloy;
+        }
+        $standard = trim((string) get_post_meta($post_id, 'tchp_standard', true));
+        if ($standard !== '') {
+            $keywords[] = $standard;
+        }
+        if (function_exists('get_the_tags')) {
+            foreach ((array) get_the_tags($post_id) as $tag) {
+                if (!empty($tag->name)) {
+                    $keywords[] = $tag->name;
+                }
+            }
+        }
+        if (function_exists('get_the_category')) {
+            foreach ((array) get_the_category($post_id) as $cat) {
+                if (!empty($cat->name)) {
+                    $keywords[] = $cat->name;
+                }
+            }
+        }
+
+        return [
+            'additionalProperty' => $props,
+            'citation'           => $citations,
+            'reviewedBy'         => $reviewed_by,
+            'keywords'           => array_values(array_unique($keywords)),
+        ];
+    }
+}
+
+/**
+ * GEO: полный JSON-LD статьи для WordPress (TechArticle + Breadcrumb + FAQPage).
+ * Используется в single.php, когда разметкой владеет тема, а не Rank Math.
+ */
+if (!function_exists('tchp_render_wp_article_schema')) {
+    function tchp_render_wp_article_schema($post_id) {
+        $post_id = (int) $post_id;
+        if ($post_id <= 0 || !function_exists('get_permalink')) {
+            return '';
+        }
+        $permalink  = get_permalink($post_id);
+        $title      = get_the_title($post_id);
+        $excerpt    = function_exists('get_the_excerpt') ? (string) get_the_excerpt($post_id) : '';
+        $desc       = trim(wp_strip_all_tags($excerpt));
+        if ($desc === '') {
+            $desc = wp_trim_words(wp_strip_all_tags((string) get_post_field('post_content', $post_id)), 30, '…');
+        }
+        $author_id  = (int) get_post_field('post_author', $post_id);
+        $author     = $author_id && function_exists('get_the_author_meta') ? (string) get_the_author_meta('display_name', $author_id) : '';
+        $site_name  = function_exists('get_bloginfo') ? (string) get_bloginfo('name') : 'ТОЧКА ПЛАВЛЕНИЯ';
+        $home       = function_exists('home_url') ? home_url('/') : '/';
+        $logo       = function_exists('get_template_directory_uri') ? get_template_directory_uri() . '/assets/img/og-cover.png' : '';
+        $facts      = tchp_get_geo_facts($post_id);
+        $content    = (string) get_post_field('post_content', $post_id);
+        $words      = preg_split('/\s+/u', trim(wp_strip_all_tags($content)), -1, PREG_SPLIT_NO_EMPTY);
+
+        $article = [
+            '@type'              => 'TechArticle',
+            '@id'                => $permalink . '#article',
+            'headline'           => $title,
+            'description'        => $desc,
+            'inLanguage'         => 'ru-RU',
+            'url'                => $permalink,
+            'mainEntityOfPage'   => $permalink,
+            'datePublished'      => get_the_date('c', $post_id),
+            'dateModified'       => get_the_modified_date('c', $post_id),
+            'isAccessibleForFree'=> true,
+            'wordCount'          => is_array($words) ? count($words) : 0,
+            'author'             => [
+                '@type' => 'Person',
+                'name'  => $author !== '' ? $author : $site_name,
+            ],
+            'publisher'          => [
+                '@type' => 'Organization',
+                'name'  => $site_name,
+                'url'   => $home,
+            ],
+        ];
+        if ($logo !== '') {
+            $article['publisher']['logo'] = ['@type' => 'ImageObject', 'url' => $logo];
+        }
+        $difficulty = trim((string) get_post_meta($post_id, 'tchp_difficulty', true));
+        if ($difficulty !== '') {
+            $article['proficiencyLevel'] = $difficulty;
+        }
+        if (!empty($facts['additionalProperty'])) {
+            $article['additionalProperty'] = $facts['additionalProperty'];
+        }
+        if (!empty($facts['citation'])) {
+            $article['citation'] = $facts['citation'];
+        }
+        if (!empty($facts['reviewedBy'])) {
+            $article['reviewedBy'] = $facts['reviewedBy'];
+        }
+        if (!empty($facts['keywords'])) {
+            $article['keywords'] = implode(', ', $facts['keywords']);
+        }
+        $cats = function_exists('get_the_category') ? (array) get_the_category($post_id) : [];
+        if (!empty($cats)) {
+            $cat_names = [];
+            foreach ($cats as $cat) {
+                if (!empty($cat->name)) {
+                    $cat_names[] = $cat->name;
+                }
+            }
+            if ($cat_names) {
+                $article['articleSection'] = implode(', ', $cat_names);
+            }
+        }
+
+        $graph = [$article];
+
+        $items = [['@type' => 'ListItem', 'position' => 1, 'name' => 'Главная', 'item' => $home]];
+        if (!empty($cats[0])) {
+            $items[] = [
+                '@type'    => 'ListItem',
+                'position' => 2,
+                'name'     => $cats[0]->name,
+                'item'     => get_category_link($cats[0]->term_id),
+            ];
+        }
+        $items[] = [
+            '@type'    => 'ListItem',
+            'position' => count($items) + 1,
+            'name'     => $title,
+            'item'     => $permalink,
+        ];
+        $graph[] = ['@type' => 'BreadcrumbList', 'itemListElement' => $items];
+
+        if (function_exists('tchp_get_article_faq')) {
+            $faq = tchp_get_article_faq($post_id);
+            if (!empty($faq)) {
+                $questions = [];
+                foreach ((array) $faq as $item) {
+                    if (!empty($item['q']) && !empty($item['a'])) {
+                        $questions[] = [
+                            '@type'          => 'Question',
+                            'name'           => $item['q'],
+                            'acceptedAnswer' => ['@type' => 'Answer', 'text' => $item['a']],
+                        ];
+                    }
+                }
+                if ($questions) {
+                    $graph[] = ['@type' => 'FAQPage', '@id' => $permalink . '#faq', 'mainEntity' => $questions];
+                }
+            }
+        }
+
+        return "<script type=\"application/ld+json\">\n"
+            . json_encode(['@context' => 'https://schema.org', '@graph' => $graph], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT)
+            . "\n</script>";
+    }
+}
 

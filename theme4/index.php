@@ -9,6 +9,7 @@ $current_page = 'index';
 
 $assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
 $site_root = function_exists('home_url') ? home_url('/') : '/';
+$tchp_home = $site_root;
 
 // Динамическая выборка опубликованных статей из WordPress с fallback на справочник
 $recent_articles = [];
@@ -109,27 +110,27 @@ $index_faq = [
 
 ob_start();
 ?>
-  <link rel="canonical" href="https://tochka-plavleniya.ru/">
+  <?php if (!defined('RANK_MATH_VERSION')): ?><link rel="canonical" href="<?= $tchp_home ?>"><?php endif; ?>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "WebSite",
-        "@id": "https://tochka-plavleniya.ru/#website",
-        "url": "https://tochka-plavleniya.ru/",
+        "@id": "<?= $tchp_home ?>#website",
+        "url": "<?= $tchp_home ?>",
         "name": "ТОЧКА ПЛАВЛЕНИЯ",
         "description": "Инженерный справочник по пайке, температурные режимы жала и интерактивный верстак.",
         "inLanguage": "ru-RU",
         "potentialAction": {
           "@type": "SearchAction",
-          "target": "https://tochka-plavleniya.ru/?s={search_term_string}",
+          "target": "<?= $tchp_home ?>?s={search_term_string}",
           "query-input": "required name=search_term_string"
         }
       },
       {
         "@type": "FAQPage",
-        "@id": "https://tochka-plavleniya.ru/#faq",
+        "@id": "<?= $tchp_home ?>#faq",
         "inLanguage": "ru-RU",
         "mainEntity": [
           <?php foreach ($index_faq as $i => $item): ?>

@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (tempArticleLink && tempArticleTitle) {
-        tempArticleLink.href = 'article.php?slug=chto-kupit-dlya-pervoj-payki';
+        tempArticleLink.href = (window.TCHP_BASE || '/') + 'chto-kupit-dlya-pervoj-payki/';
         tempArticleTitle.textContent = 'С чего начать: базовые правила пайки и безопасность';
       }
       return;
@@ -681,7 +681,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (tempArticleLink && tempArticleTitle) {
-        tempArticleLink.href = 'article.php?slug=temperaturnye-profili';
+        tempArticleLink.href = (window.TCHP_BASE || '/') + 'temperaturnye-profili/';
         tempArticleTitle.textContent = 'Температурные профили и ограничения оборудования';
       }
       return;
@@ -756,13 +756,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (tempArticleLink && tempArticleTitle) {
       if (wVal.startsWith('wire')) {
-        tempArticleLink.href = 'article.php?slug=luzhenie-provoda';
+        tempArticleLink.href = (window.TCHP_BASE || '/') + 'luzhenie-provoda/';
         tempArticleTitle.textContent = 'Микроурок: Лужение провода без «деревянного» кончика';
       } else if (wVal === 'gnd' || wVal === 'pth' || wVal === 'smd_heavy') {
-        tempArticleLink.href = 'article.php?slug=podbor-zhala-k-polygonu';
+        tempArticleLink.href = (window.TCHP_BASE || '/') + 'podbor-zhala-k-polygonu/';
         tempArticleTitle.textContent = 'Микроурок: Подбор жала к массивному полигону (GND)';
       } else {
-        tempArticleLink.href = 'article.php?slug=pravilo-treh-sekund';
+        tempArticleLink.href = (window.TCHP_BASE || '/') + 'pravilo-treh-sekund/';
         tempArticleTitle.textContent = 'Микроурок: Тепловое окно и правило 2–3 секунд';
       }
     }
@@ -1078,7 +1078,7 @@ document.addEventListener('DOMContentLoaded', () => {
         lBlock.className = 'pt-2 border-t border-paper-border flex flex-wrap items-center gap-2 text-xs font-mono';
         lBlock.innerHTML = `
           <span class="text-ink-muted">Статьи по теме:</span>
-          ${node.links.map(l => `<a href="/article.php?slug=${encodeURIComponent(l)}" class="text-accent hover:underline font-bold">${l} →</a>`).join(', ')}
+          ${node.links.map(l => `<a href="${window.TCHP_BASE || '/'}${encodeURIComponent(l)}/" class="text-accent hover:underline font-bold">${l} →</a>`).join(', ')}
         `;
         card.appendChild(lBlock);
       }

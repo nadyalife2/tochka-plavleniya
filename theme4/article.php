@@ -4,6 +4,10 @@ require_once __DIR__ . '/includes/functions.php';
 
 // Select article or micro-lesson
 $slug = $_GET['slug'] ?? 'temperaturnye-profili';
+$tchp_home = function_exists('home_url') ? home_url('/') : 'https://tochka-plavleniya.ru/';
+$tchp_article_canonical = function_exists('home_url')
+    ? home_url('/' . rawurlencode($slug) . '/')
+    : 'article.php?slug=' . urlencode($slug);
 $lesson = get_lesson_by_slug($slug);
 $article = get_article_by_slug($slug);
 if (!$article && !$lesson) { 
@@ -80,15 +84,15 @@ foreach ($faq_items as $q => $a) {
   "@graph": [
     {
       "@type": "TechArticle",
-      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#article",
-      "mainEntityOfPage": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>",
+      "@id": "<?= $tchp_article_canonical ?>#article",
+      "mainEntityOfPage": "<?= $tchp_article_canonical ?>",
       "headline": <?= json_encode($article['title'], JSON_UNESCAPED_UNICODE) ?>,
       "description": <?= json_encode($article['excerpt'], JSON_UNESCAPED_UNICODE) ?>,
       "datePublished": "<?= $iso_date ?>",
       "dateModified": "<?= $iso_date ?>",
       "author": {
         "@type": "Person",
-        "@id": "https://tochka-plavleniya.ru/author/<?= md5($article['author']) ?>",
+        "@id": "<?= $tchp_home ?>author/<?= md5($article['author']) ?>",
         "name": <?= json_encode($article['author'], JSON_UNESCAPED_UNICODE) ?>,
         "sameAs": [
           "https://t.me/tochkaplavleniya"
@@ -96,47 +100,47 @@ foreach ($faq_items as $q => $a) {
       },
       "publisher": {
         "@type": "Organization",
-        "@id": "https://tochka-plavleniya.ru/#organization",
+        "@id": "<?= $tchp_home ?>#organization",
         "name": "ТОЧКА ПЛАВЛЕНИЯ",
-        "url": "https://tochka-plavleniya.ru"
+        "url": "<?= $tchp_home ?>"
       },
       "inLanguage": "ru-RU",
       "proficiencyLevel": "Expert"
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#breadcrumb",
+      "@id": "<?= $tchp_article_canonical ?>#breadcrumb",
       "itemListElement": [
         {
           "@type": "ListItem",
           "position": 1,
           "name": "Главная",
-          "item": "https://tochka-plavleniya.ru/"
+          "item": "<?= $tchp_home ?>"
         },
         {
           "@type": "ListItem",
           "position": 2,
           "name": "Гайды",
-          "item": "https://tochka-plavleniya.ru/"
+          "item": "<?= $tchp_home ?>"
         },
         {
           "@type": "ListItem",
           "position": 3,
           "name": <?= json_encode($article['title'], JSON_UNESCAPED_UNICODE) ?>,
-          "item": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>"
+          "item": "<?= $tchp_article_canonical ?>"
         }
       ]
     },
     {
       "@type": "FAQPage",
-      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#faq",
+      "@id": "<?= $tchp_article_canonical ?>#faq",
       "mainEntity": <?= json_encode($faq_schema_items, JSON_UNESCAPED_UNICODE) ?>
     }
     <?php if ($slug === 'temperaturnye-profili'): ?>
     ,
     {
       "@type": "HowTo",
-      "@id": "https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>#howto",
+      "@id": "<?= $tchp_article_canonical ?>#howto",
       "name": "Настройка 4 фаз термопрофиля пайки BGA и SMD компонентов",
       "description": "Пошаговый инженерный регламент пайки без коробления текстолита и деламинации.",
       "step": [
@@ -277,7 +281,7 @@ foreach ($faq_items as $q => $a) {
 </style>
 
 <!-- Canonical URL -->
-<link rel="canonical" href="https://tochka-plavleniya.ru/article.php?slug=<?= e($slug) ?>"/>
+<?php if (!defined('RANK_MATH_VERSION')): ?><link rel="canonical" href="<?= htmlspecialchars($tchp_article_canonical, ENT_QUOTES, 'UTF-8') ?>"/><?php endif; ?>
 
 <!-- Schema.org JSON-LD -->
 <?= render_article_schema($article, $faq_items) ?>

@@ -3,9 +3,11 @@
 Master Test Runner for Package A.1 (ТОЧКА ПЛАВЛЕНИЯ)
 Executes:
 1. JSON Schema validation (article contract & example) + negative tests
-2. PHP Lint on plugin, theme, and test suite
-3. PHP Integration Test Suite (7 scenarios requested in audit)
-4. Distribution packaging & integrity check for theme4.zip and tchp-content.zip
+2. PHP Lint on all theme, plugin and test PHP files
+3. Mock-WP business logic & contract tests (10 scenarios)
+4. Python delivery CLI & generator unit tests
+5. Distribution packaging
+6. Byte-parity verification for theme4.zip and tchp-content.zip
 """
 
 import os
@@ -42,7 +44,7 @@ PHP_EXE = get_php_executable()
 
 def run_json_schema_tests():
     import jsonschema
-    print("\n[STEP 1/4] Validating JSON Schemas & Article Contracts...")
+    print("\n[STEP 1/6] Validating JSON Schemas & Article Contracts...")
     schema_file = ROOT_DIR / "schemas" / "article-contract-v1.schema.json"
     example_file = ROOT_DIR / "schemas" / "article-example-v1.json"
 
@@ -85,21 +87,20 @@ def run_json_schema_tests():
         print("  [PASS] Negative test: legacy alias 'wood' correctly rejected in strict schema.")
 
 def run_php_lint():
-    print(f"\n[STEP 2/4] Running PHP Syntax Check using '{PHP_EXE}'...")
-    php_files = [
-        ROOT_DIR / "wp-content" / "plugins" / "tchp-content" / "tchp-content.php",
-        ROOT_DIR / "theme4" / "functions.php",
-        ROOT_DIR / "theme4" / "single.php",
-        ROOT_DIR / "theme4" / "includes" / "functions.php",
-        ROOT_DIR / "tests" / "test-package-a1.php",
-    ]
+    print(f"\n[STEP 2/6] Running PHP Syntax Check using '{PHP_EXE}'...")
+    php_files = []
+    for scan_root in (ROOT_DIR / "theme4", ROOT_DIR / "wp-content" / "plugins" / "tchp-content"):
+        php_files.extend(sorted(scan_root.rglob("*.php")))
+    php_files.append(ROOT_DIR / "tests" / "test-package-a1.php")
+    php_files = [p for p in php_files if "__pycache__" not in p.parts]
+    print(f"  Scanning {len(php_files)} PHP files...")
     for p in php_files:
         res = subprocess.run([PHP_EXE, "-l", str(p)], capture_output=True, text=True)
         assert res.returncode == 0, f"PHP Lint failed on {p.name}:\n{res.stderr}"
-        print(f"  [PASS] {p.name} syntax OK.")
+    print(f"  [PASS] PHP syntax OK for all {len(php_files)} files.")
 
 def run_php_unit_tests():
-    print("\n[STEP 3/4] Running Business Logic & Schema Contract Unit Tests (Mock WP)...")
+    print("\n[STEP 3/6] Running Business Logic & Schema Contract Unit Tests (Mock WP)...")
     test_script = ROOT_DIR / "tests" / "test-package-a1.php"
     res = subprocess.run([PHP_EXE, str(test_script)], capture_output=True, text=True, encoding="utf-8", errors="replace")
     print(res.stdout)
@@ -109,7 +110,7 @@ def run_php_unit_tests():
     print("  [PASS] Business Logic & Contract Unit Tests completed with 100% success rate.")
 
 def run_python_unit_tests():
-    print("\n[STEP 3b/4] Running Python Delivery CLI & Contract Unit Tests...")
+    print("\n[STEP 4/6] Running Python Delivery CLI & Contract Unit Tests...")
     test_scripts = [
         ROOT_DIR / "tests" / "test_delivery_cli_unit.py",
         ROOT_DIR / "tests" / "test_article_generator.py",
@@ -123,7 +124,7 @@ def run_python_unit_tests():
     print("  [PASS] Python Delivery CLI & Generator Unit Tests passed.")
 
 def verify_distribution_archives():
-    print("\n[STEP 4/4] Verifying Distribution Packages Composition & Byte Parity...")
+    print("\n[STEP 6/6] Verifying Distribution Packages Composition & Byte Parity...")
 
     # 1. Verify theme4.zip full composition and byte-exact parity
     theme_zip = ROOT_DIR / "theme4.zip"
@@ -181,7 +182,7 @@ def verify_distribution_archives():
         print(f"  [PASS] tchp-content.zip verified: 100% composition & byte-exact parity ({len(zip_files)} files, {plugin_zip.stat().st_size} bytes).")
 
 def build_distribution_archives():
-    print("\n[BUILD] Compiling fresh distribution packages...")
+    print("\n[STEP 5/6] Compiling fresh distribution packages...")
     build_script = ROOT_DIR / "tools" / "build_distribution_archives.py"
     res = subprocess.run([sys.executable, str(build_script)], capture_output=True, text=True)
     assert res.returncode == 0, f"Build archives failed:\n{res.stderr}"

@@ -223,7 +223,7 @@
   transition: color 0.15s ease, text-decoration-color 0.15s ease;
 }
 .article-content a:hover {
-  color: var(--color-accent);
+  color: var(--color-ink);
   text-decoration-color: var(--color-accent);
 }
 
@@ -328,7 +328,7 @@ table.bom-table tr:hover td {
 
 .toc-link:hover,
 .toc-link.active {
-  color: var(--color-accent);
+  color: var(--color-ink);
   font-weight: 600;
 }
 
@@ -418,7 +418,7 @@ html.dark .article-content img {
 
 .article-content figcaption::before {
   content: "▸ ";
-  color: var(--color-accent);
+  color: var(--color-ink);
   font-weight: bold;
 }
 
@@ -847,7 +847,7 @@ html.dark .article-content img {
   content: "▸";
   position: absolute;
   left: 0;
-  color: var(--color-accent);
+  color: var(--color-ink);
   font-weight: bold;
   transition: transform var(--duration-fast, 150ms) ease, color var(--duration-fast, 150ms) ease;
 }

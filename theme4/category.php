@@ -126,9 +126,9 @@ if ($is_tag_view && $queried_tag) {
 } elseif ($queried_cat) {
     $canonical_url = get_category_link($queried_cat->term_id);
 } elseif ($current_slug === 'all') {
-    $canonical_url = "https://tochka-plavleniya.ru/archive/";
+    $canonical_url = ''; // архив без собственного URL: canonical не выводим (Rank Math / шаблон)
 } else {
-    $canonical_url = "https://tochka-plavleniya.ru/category/" . urlencode($current_slug) . "/";
+    $canonical_url = $site_root . 'category/' . urlencode($current_slug) . '/';
 }
 
 // Collect articles for this rubric

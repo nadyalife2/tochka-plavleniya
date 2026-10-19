@@ -2,7 +2,7 @@
 /**
  * Theme Setup & Functions for ТОЧКА ПЛАВЛЕНИЯ (site2)
  *
- * @package Site2
+ * @package ТОЧКА ПЛАВЛЕНИЯ
  * @version 2.1.0
  */
 
@@ -31,7 +31,15 @@ add_action('after_setup_theme', function () {
     add_theme_support('responsive-embeds');
     add_theme_support('align-wide');
     add_theme_support('editor-styles');
-    add_editor_style('assets/css/article.css');
+    // Стили темы для редактора блоков: без tokens/build/base паттерны и
+    // типографика статьи выглядели в редакторе «бесцветными» (301 var(--…)).
+    add_editor_style([
+        'assets/css/tokens.css',
+        'assets/css/fonts.css',
+        'assets/css/build.css',
+        'assets/css/base.css',
+        'assets/css/article.css',
+    ]);
 
     register_nav_menus([
         'primary' => __('Основное меню', 'site2'),
@@ -415,18 +423,6 @@ add_filter('comments_array', '__return_empty_array', 10, 2);
 // 6. Подключение модуля импорта базы знаний и регламентов ТЧП
 require_once __DIR__ . '/includes/demo-importer.php';
 
-// 7. Asset Enqueuing & Cache-Busting for Headphones System
-add_action('wp_enqueue_scripts', function () {
-    $theme_dir = get_template_directory();
-    $theme_uri = get_template_directory_uri();
-
-    $tokens_ver = file_exists($theme_dir . '/assets/css/tokens.css') ? filemtime($theme_dir . '/assets/css/tokens.css') : '1.0.0';
-    $headphones_ver = file_exists($theme_dir . '/assets/css/headphones-style.css') ? filemtime($theme_dir . '/assets/css/headphones-style.css') : '1.0.0';
-
-    wp_enqueue_style('theme3-tokens', $theme_uri . '/assets/css/tokens.css', [], $tokens_ver);
-    wp_enqueue_style('theme3-headphones', $theme_uri . '/assets/css/headphones-style.css', ['theme3-tokens'], $headphones_ver);
-});
-
 // 8. Резервная отдача GEO и LLM файлов (llms.txt, llms-full.txt, robots.txt) через WordPress
 add_action('init', function () {
     $uri = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH);
@@ -443,4 +439,64 @@ add_action('init', function () {
         }
     }
 });
+
+/**
+ * GEO: если rich-snippet Rank Math активен (тема свою схему не выводит),
+ * добавляем факты из полей tchp-content прямо в его JSON-LD:
+ * припой/температуры/стандарт (additionalProperty), источники (citation),
+ * редакционную проверку (reviewedBy).
+ */
+add_filter('rank_math/json_ld', function ($data, $jsonld = null) {
+    if (!is_array($data) || !function_exists('is_singular') || !is_singular()) {
+        return $data;
+    }
+    if (!function_exists('tchp_get_geo_facts')) {
+        return $data;
+    }
+    $post_id = function_exists('get_queried_object_id') ? (int) get_queried_object_id() : 0;
+    if ($post_id <= 0) {
+        return $data;
+    }
+    $facts = tchp_get_geo_facts($post_id);
+    if (empty($facts['additionalProperty']) && empty($facts['citation']) && empty($facts['reviewedBy'])) {
+        return $data;
+    }
+    $enrich = static function (array &$node) use ($facts) {
+        $type  = $node['@type'] ?? '';
+        $types = is_array($type) ? $type : [$type];
+        if (!array_intersect($types, ['Article', 'TechArticle', 'BlogPosting', 'NewsArticle'])) {
+            return false;
+        }
+        if (!empty($facts['additionalProperty'])) {
+            $existing = isset($node['additionalProperty']) && is_array($node['additionalProperty']) ? $node['additionalProperty'] : [];
+            $node['additionalProperty'] = array_merge($existing, $facts['additionalProperty']);
+        }
+        if (!empty($facts['citation']) && empty($node['citation'])) {
+            $node['citation'] = $facts['citation'];
+        }
+        if (!empty($facts['reviewedBy'])) {
+            $node['reviewedBy'] = $facts['reviewedBy'];
+        }
+        if (!empty($facts['keywords']) && empty($node['keywords'])) {
+            $node['keywords'] = implode(', ', $facts['keywords']);
+        }
+        return true;
+    };
+    foreach ($data as $key => $node) {
+        if (!is_array($node)) {
+            continue;
+        }
+        if ($enrich($data[$key])) {
+            return $data;
+        }
+        if (!empty($node['@graph']) && is_array($node['@graph'])) {
+            foreach ($node['@graph'] as $gkey => $gnode) {
+                if (is_array($gnode) && $enrich($data[$key]['@graph'][$gkey])) {
+                    return $data;
+                }
+            }
+        }
+    }
+    return $data;
+}, 99, 2);
 

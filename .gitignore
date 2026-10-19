@@ -7,8 +7,6 @@ php_portable/
 !tchp-content.zip
 *.log
 *.png
-!site2/assets/img/og-cover.png
-!theme3/**/*.png
 !theme4/**/*.png
 !media/**/*.png
 !media/**/*.webp
@@ -32,4 +30,8 @@ __pycache__/
 *.pyc
 delivery-journal*.json*
 _archive/
+_tmp/
+.tmp/
+theme4-fixed/
+tchp-content-fixed/
 

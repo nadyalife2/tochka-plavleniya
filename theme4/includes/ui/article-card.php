@@ -28,7 +28,7 @@ $tools = $article['tools'] ?? 'Паяльник, припой, флюс';
   <!-- Title & Excerpt -->
   <div class="space-y-2 flex-grow">
     <h2 class="<?= $is_featured ? 'text-2xl sm:text-[28px]' : 'text-lg sm:text-xl' ?> font-bold text-ink tracking-tight leading-[1.25]">
-      <a class="hover:text-accent hover:underline decoration-accent decoration-1 underline-offset-4 transition-colors before:absolute before:inset-0" href="article.php?slug=<?= e($article['slug']) ?>">
+      <a class="hover:text-accent hover:underline decoration-accent decoration-1 underline-offset-4 transition-colors before:absolute before:inset-0" href="<?= function_exists('tchp_get_article_url') ? esc_url(tchp_get_article_url($article['slug'], $article['id'] ?? 0)) : e($article['slug'] . '/') ?>">
         <?= e($article['title']) ?>
       </a>
     </h2>

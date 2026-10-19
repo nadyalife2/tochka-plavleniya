@@ -3,7 +3,7 @@
  * The template for displaying post tags
  *
  * @package ТОЧКА ПЛАВЛЕНИЯ
- * @version 2.2.0
+ * @version 4.0.0
  */
 
 require __DIR__ . '/category.php';

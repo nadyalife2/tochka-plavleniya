@@ -70,6 +70,7 @@
 
 <script>
 (function() {
+  const TCHP_BASE = <?= json_encode(function_exists('home_url') ? home_url('/') : '/', JSON_UNESCAPED_SLASHES) ?>;
   const KNOWLEDGE_BASE = [
     // Сплавы и припои
     {
@@ -77,7 +78,7 @@
       category: "сплавы",
       badge: "183–190 °C // ГОСТ",
       desc: "Отечественный оловянно-свинцовый припой (59–61% Sn, остальное Pb). Имеет интервал кристаллизации 7 °C (не эвтектика). Сортамент проволоки с флюсом — ГОСТ 21931-76.",
-      url: "/interactive.php#table",
+      url: TCHP_BASE + "interactive.php#table",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -85,7 +86,7 @@
       category: "сплавы",
       badge: "183 °C // Эвтектика",
       desc: "Зарубежный эвтектический оловянно-свинцовый припой (63% Sn / 37% Pb) с фиксированной точкой затвердевания 183 °C без пастообразного состояния.",
-      url: "/interactive.php#table",
+      url: TCHP_BASE + "interactive.php#table",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -93,7 +94,7 @@
       category: "сплавы",
       badge: "217–220 °C // Lead-Free",
       desc: "Основной промышленный бессвинцовый стандарт (IPC J-STD-006C). Матовая сатинированная фактура галтели является естественной физической нормой.",
-      url: "/article.php?slug=temperaturnye-profili#simulator",
+      url: TCHP_BASE + "temperaturnye-profili/#simulator",
       badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
     },
     {
@@ -101,7 +102,7 @@
       category: "сплавы",
       badge: "94 °C // Демонтажный",
       desc: "Низкотемпературный сплав для безопасного демонтажа разъемов и экранов без перегрева текстолита. Хрупок, не предназначен для силовой пайки.",
-      url: "/category.php?slug=materialy",
+      url: TCHP_BASE + "category/materialy/",
       badgeColor: "bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300"
     },
     {
@@ -109,7 +110,7 @@
       category: "сплавы",
       badge: "68 °C // Токсичен (кадмий)",
       desc: "Сверхнизкотемпературный сплав. Содержит кадмий — требует вытяжки и не применяется для пищевой или бытовой электроники.",
-      url: "/category.php?slug=materialy",
+      url: TCHP_BASE + "category/materialy/",
       badgeColor: "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300"
     },
     {
@@ -117,7 +118,7 @@
       category: "сплавы",
       badge: "183–238 °C // Интервал 55°C",
       desc: "Неэвтектический припой с широким пастообразным состоянием. Подходит для пайки проводов и радиаторов, но противопоказан для прецизионного SMD.",
-      url: "/category.php?slug=materialy",
+      url: TCHP_BASE + "category/materialy/",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     // Флюсы
@@ -126,7 +127,7 @@
       category: "флюсы",
       badge: "ROL0 / Безотмывочный",
       desc: "Слабоактивированный канифольный гелевый флюс. Идеален для BGA, реболлинга и SMD микромонтажа. Не кипит и не разбрасывает шары при 240°C.",
-      url: "/article.php?slug=temperaturnye-profili#materials-toolkit",
+      url: TCHP_BASE + "temperaturnye-profili/#materials-toolkit",
       badgeColor: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300"
     },
     {
@@ -134,7 +135,7 @@
       category: "флюсы",
       badge: "ROL0 // Чистый остаток",
       desc: "Универсальный безотмывочный флюс средней вязкости с высоким поверхностным натяжением для центровки BGA чипов.",
-      url: "/category.php?slug=materialy",
+      url: TCHP_BASE + "category/materialy/",
       badgeColor: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300"
     },
     {
@@ -142,7 +143,7 @@
       category: "флюсы",
       badge: "R0 // Нейтральный",
       desc: "Базовый флюс класса R. Диэлектрик при комнатной температуре. Требует очистки изопропанолом из-за хрупкости остатков и сбора пыли.",
-      url: "/category.php?slug=materialy",
+      url: TCHP_BASE + "category/materialy/",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -150,7 +151,7 @@
       category: "флюсы",
       badge: "ROM1 // Смывка обязательна",
       desc: "Содержит активаторы (триэтаноламин). Отлично лудит медь и сталь, но остатки гидрофильны — обязательна тщательная промывка плат.",
-      url: "/category.php?slug=materialy",
+      url: TCHP_BASE + "category/materialy/",
       badgeColor: "bg-red-100 dark:bg-red-950/40 text-red-800 dark:text-red-300 border-red-300"
     },
     // Дефекты пайки
@@ -159,7 +160,7 @@
       category: "дефекты",
       badge: "Короткое замыкание",
       desc: "Замыкание между соседними выводами QFP/SOIC. Причины: избыток пасты, низкая активность флюса или перекос трафарета. Устраняется медной оплеткой.",
-      url: "/category.php?slug=oshibki",
+      url: TCHP_BASE + "category/oshibki/",
       badgeColor: "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300"
     },
     {
@@ -167,7 +168,7 @@
       category: "дефекты",
       badge: "Обрыв SMD 0402/0603",
       desc: "Подъем пассивного компонента вертикально на одной контактной площадке из-за разницы скоростей расплавления припоя на противоположных концах.",
-      url: "/category.php?slug=oshibki",
+      url: TCHP_BASE + "category/oshibki/",
       badgeColor: "bg-orange-100 dark:bg-orange-950/40 text-orange-800 dark:text-orange-300 border-orange-300"
     },
     {
@@ -175,7 +176,7 @@
       category: "дефекты",
       badge: "IPC-A-610 Дефект",
       desc: "Зернистая тусклая поверхность галтели, отсутствие интерметаллического слоя. Возникает из-за недостаточного прогрева или сдвига детали при остывании.",
-      url: "/category.php?slug=oshibki",
+      url: TCHP_BASE + "category/oshibki/",
       badgeColor: "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300"
     },
     {
@@ -183,7 +184,7 @@
       category: "дефекты",
       badge: "IPC-7095 Class 3",
       desc: "Газовые пустоты в шариковых выводах свыше 25% площади сечения. Вызваны недостаточным временем фазы Soak (выпаривания растворителей флюса).",
-      url: "/article.php?slug=temperaturnye-profili#simulator",
+      url: TCHP_BASE + "temperaturnye-profili/#simulator",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -191,7 +192,7 @@
       category: "дефекты",
       badge: "Критический перегрев",
       desc: "Расслоение слоев FR-4 при превышении температуры стеклования Tg (130–170°C) без предварительного нижнего подогрева.",
-      url: "/article.php?slug=temperaturnye-profili",
+      url: TCHP_BASE + "temperaturnye-profili/",
       badgeColor: "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300"
     },
     // Оборудование и инструменты
@@ -200,7 +201,7 @@
       category: "инструменты",
       badge: "Турбинный термофен",
       desc: "Эталонная термовоздушная станция с прямым потоком воздуха до 120 л/мин и керамическим нагревателем. Быстрый выход на режим за 3 секунды.",
-      url: "/article.php?slug=temperaturnye-profili#materials-toolkit",
+      url: TCHP_BASE + "temperaturnye-profili/#materials-toolkit",
       badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
     },
     {
@@ -208,7 +209,7 @@
       category: "инструменты",
       badge: "Сравнение нагревателей",
       desc: "Картриджи со встроенной термопарой и нагревателем. JBC передает до 130 Вт в пятно контакта за счет моментального ПИД-отклика.",
-      url: "/category.php?slug=start",
+      url: TCHP_BASE + "category/start/",
       badgeColor: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300"
     },
     {
@@ -216,7 +217,7 @@
       category: "инструменты",
       badge: "Обязательно для BGA",
       desc: "Снижает температурный градиент между верхней и нижней стороной платы, предотвращая коробление и тепловой удар по микросхемам.",
-      url: "/category.php?slug=praktika",
+      url: TCHP_BASE + "category/praktika/",
       badgeColor: "bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300"
     },
     // Стандарты и регламенты
@@ -225,7 +226,7 @@
       category: "стандарты",
       badge: "Международный стандарт",
       desc: "Определяет требования к галтелям припоя, смачиваемости выводов и дефектам для изделий Класса 1, 2 и 3 (High Reliability).",
-      url: "/article.php?slug=temperaturnye-profili",
+      url: TCHP_BASE + "temperaturnye-profili/",
       badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     {
@@ -233,7 +234,7 @@
       category: "стандарты",
       badge: "Reflow термопрофили",
       desc: "Регламентирует максимальные температуры пика (260°C) и времена выдержки для предотвращения эффекта попкорна в корпусах микросхем.",
-      url: "/article.php?slug=temperaturnye-profili#thermal-zones",
+      url: TCHP_BASE + "temperaturnye-profili/#thermal-zones",
       badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     {
@@ -241,7 +242,7 @@
       category: "стандарты",
       badge: "ГОСТ РФ // Сплавы",
       desc: "Государственный стандарт на химический состав, марки и температуры солидус/ликвидус отечественных припоев серии ПОС.",
-      url: "/category.php?slug=materialy",
+      url: TCHP_BASE + "category/materialy/",
       badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     // 10 Прикладных микроуроков ТЧП (2–3 мин)
@@ -250,7 +251,7 @@
       category: "инструменты",
       badge: "Урок 2 мин // Монтаж",
       desc: "Физика капиллярного затекания: как защитить провод от ломкости под изоляцией и сохранить гибкость жил.",
-      url: "article.php?slug=luzhenie-provoda",
+      url: TCHP_BASE + "luzhenie-provoda/",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -258,7 +259,7 @@
       category: "инструменты",
       badge: "Урок 3 мин // Ремонт",
       desc: "Метод разбавления сплавом Розе: безопасный демонтаж разъемов без расплавления пластика и отрыва пятаков.",
-      url: "article.php?slug=zamena-razema-payalnikom",
+      url: TCHP_BASE + "zamena-razema-payalnikom/",
       badgeColor: "bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300"
     },
     {
@@ -266,7 +267,7 @@
       category: "инструменты",
       badge: "Урок 2 мин // Теплопередача",
       desc: "Геометрия теплопередачи: почему игла типа I бесполезна на земляных шинах и как клин 2.4D решает проблему.",
-      url: "article.php?slug=podbor-zhala-k-polygonu",
+      url: TCHP_BASE + "podbor-zhala-k-polygonu/",
       badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
     },
     {
@@ -274,7 +275,7 @@
       category: "флюсы",
       badge: "Урок 3 мин // Химия",
       desc: "Паразитные утечки в цепях ОУ и кварцев, белые разводы активаторов и двухстадийная отмывка изопропилом.",
-      url: "article.php?slug=smyvka-flyusa-pravila",
+      url: TCHP_BASE + "smyvka-flyusa-pravila/",
       badgeColor: "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300"
     },
     {
@@ -282,7 +283,7 @@
       category: "инструменты",
       badge: "Урок 2 мин // Безопасность",
       desc: "Почему невидимый разряд в 50 Вольт пробивает затворы полевиков и как организовать правильное заземление через 1 МОм.",
-      url: "article.php?slug=antistatika-esd-praktika",
+      url: TCHP_BASE + "antistatika-esd-praktika/",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -290,7 +291,7 @@
       category: "дефекты",
       badge: "Урок 2 мин // Демонтаж",
       desc: "Механика поверхностного натяжения: почему нельзя тянуть остывающую медь и как синхронно уводить жало.",
-      url: "article.php?slug=vypayka-opletkoy",
+      url: TCHP_BASE + "vypayka-opletkoy/",
       badgeColor: "bg-rose-100 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-300"
     },
     {
@@ -298,7 +299,7 @@
       category: "стандарты",
       badge: "Урок 2 мин // Контроль",
       desc: "Анатомия идеальной пайки: почему выпуклый «шарик» считается браком и как получить правильный вогнутый мениск.",
-      url: "article.php?slug=dozirovanie-menisk-ipc",
+      url: TCHP_BASE + "dozirovanie-menisk-ipc/",
       badgeColor: "bg-teal-50 dark:bg-teal-900/40 text-teal-800 dark:text-teal-300 border-teal-300"
     },
     {
@@ -306,7 +307,7 @@
       category: "стандарты",
       badge: "Урок 2 мин // Термодинамика",
       desc: "Термическая деструкция связующего FR-4: почему долгий нагрев при 260 °C опаснее быстрого контакта при 320 °C.",
-      url: "article.php?slug=pravilo-treh-sekund",
+      url: TCHP_BASE + "pravilo-treh-sekund/",
       badgeColor: "bg-sky-100 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-300"
     },
     {
@@ -314,7 +315,7 @@
       category: "инструменты",
       badge: "Урок 2 мин // Оснастка",
       desc: "Восстановление смачиваемости без наждачки и напильников: химический Tip Tinner, латунная стружка и консервация.",
-      url: "article.php?slug=reanimaciya-zhala",
+      url: TCHP_BASE + "reanimaciya-zhala/",
       badgeColor: "bg-amber-100 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-300"
     },
     {
@@ -322,7 +323,7 @@
       category: "инструменты",
       badge: "Урок 3 мин // Электромонтаж",
       desc: "Скрутка Western Union (линкольн), пропайка по всей длине и 100% герметизация клеевой термоусадкой IP67.",
-      url: "article.php?slug=srashchivanie-provodov",
+      url: TCHP_BASE + "srashchivanie-provodov/",
       badgeColor: "bg-purple-100 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-300"
     }
   ];
@@ -390,6 +391,21 @@
     } else if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
       e.preventDefault();
       closeSearch();
+    } else if (e.key === 'Tab' && modal && modal.classList.contains('active')) {
+      // Focus trap: Tab не уходит за пределы модального окна
+      const focusables = Array.from(modal.querySelectorAll('a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])'))
+        .filter(el => el.offsetParent !== null);
+      if (focusables.length) {
+        const firstEl = focusables[0];
+        const lastEl = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === firstEl) {
+          e.preventDefault();
+          lastEl.focus();
+        } else if (!e.shiftKey && document.activeElement === lastEl) {
+          e.preventDefault();
+          firstEl.focus();
+        }
+      }
     }
   });
 

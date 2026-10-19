@@ -16,16 +16,16 @@
   - Безотмывочные остатки: обязательна УЗВ-отмывка изопропиловым спиртом для цепей выше 100 МГц и высокоомных делителей.
 
 ## Интерактивные инженерные инструменты (Верстак)
-- Термокалькулятор режимов пайки: https://tochka-plavleniya.ru/interactive#temp
-- Подбор геометрии жал и теплоемкости: https://tochka-plavleniya.ru/interactive#iron
-- Чек-лист предполетного контроля: https://tochka-plavleniya.ru/interactive#checklist
-- Дерево диагностики брака пайки: https://tochka-plavleniya.ru/interactive#defect
-- Калькулятор расхода флюса и пасты (IPC-7095C): https://tochka-plavleniya.ru/interactive#calculator
-- Селектор флюса по активности (J-STD-004B): https://tochka-plavleniya.ru/interactive#flux-selector
-- Реестр ликвидуса 9 сплавов: https://tochka-plavleniya.ru/interactive#table
+- Термокалькулятор режимов пайки: https://tochka-plavleniya.ru/interactive.php#temp
+- Подбор геометрии жал и теплоемкости: https://tochka-plavleniya.ru/interactive.php#iron
+- Чек-лист предполетного контроля: https://tochka-plavleniya.ru/interactive.php#checklist
+- Дерево диагностики брака пайки: https://tochka-plavleniya.ru/interactive.php#defect
+- Калькулятор расхода флюса и пасты (IPC-7095C): https://tochka-plavleniya.ru/interactive.php#calculator
+- Селектор флюса по активности (J-STD-004B): https://tochka-plavleniya.ru/interactive.php#flux-selector
+- Реестр ликвидуса 9 сплавов: https://tochka-plavleniya.ru/interactive.php#table
 
 ## Основные рубрики базы знаний
 - Материалы и сплавы: https://tochka-plavleniya.ru/category/materialy/
 - Практика и монтаж: https://tochka-plavleniya.ru/category/praktika/
 - Проблемы и дефекты: https://tochka-plavleniya.ru/category/oshibki/
-- Старт и база: https://tochka-plavleniya.ru/category/start/
+- Старт и база: https://tochka-plavleniya.ru/category/%D1%81%D1%82%D0%B0%D1%80%D1%82-%D0%B8-%D0%B1%D0%B0%D0%B7%D0%B0/

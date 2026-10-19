@@ -416,7 +416,7 @@ include __DIR__ . '/includes/header.php';
                       <div class="relative rounded overflow-hidden border border-paper-border bg-[#14161a]">
                         <canvas id="thermal-canvas" width="480" height="130" class="w-full h-[120px] block cursor-crosshair touch-none" aria-label="Интерактивная учебная модель теплопроводности паяльного соединения"></canvas>
                         <div class="absolute bottom-1.5 left-2 flex items-center gap-2 text-stamp font-mono text-white/80 select-none pointer-events-none">
-                          <span>● УСТАВКА ЖАЛА: <span id="heatmap-tip-temp" class="text-accent font-bold">--</span></span>
+                          <span>● УСТАВКА ЖАЛА: <span id="heatmap-tip-temp" class="text-accent-on-dark font-bold">--</span></span>
                           <span>● ПЛОЩАДКА: <span id="heatmap-joint-temp" class="text-emerald-400 font-bold">--</span></span>
                         </div>
                         <div class="absolute top-1.5 right-2 text-stamp font-mono text-white/50 uppercase select-none pointer-events-none">

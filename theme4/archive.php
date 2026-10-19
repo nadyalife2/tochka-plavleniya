@@ -3,7 +3,7 @@
  * The template for displaying archive pages
  *
  * @package ТОЧКА ПЛАВЛЕНИЯ
- * @version 2.2.0
+ * @version 4.0.0
  */
 
 if (empty($_GET['slug']) && empty($_GET['tag']) && empty($_GET['cat'])) {
