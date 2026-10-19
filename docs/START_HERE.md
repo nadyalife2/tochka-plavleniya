@@ -33,6 +33,7 @@
 | Съёмка без лица и монтаж | [`FACELESS-VIDEO-KIT.md`](FACELESS-VIDEO-KIT.md) |
 | Как проверить проект целиком | [`VERIFICATION.md`](VERIFICATION.md) |
 | Полный аудит и скиллы по этапам | [`AUDIT-FULL-PASS.md`](AUDIT-FULL-PASS.md) |
+| Инвентарь всех скиллов | [`SKILLS-INVENTORY.md`](SKILLS-INVENTORY.md) |
 
 ---
 

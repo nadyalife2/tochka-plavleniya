@@ -57,6 +57,7 @@ python tests/run-all-tests.py
 * [`docs/DEVICE-MOUNT-BOM.md`](docs/DEVICE-MOUNT-BOM.md) — крепление, BOM и испытания прототипа.
 * [`docs/FACELESS-VIDEO-KIT.md`](docs/FACELESS-VIDEO-KIT.md) — съёмка без лица, монтаж, Gemini.
 * [`docs/VERIFICATION.md`](docs/VERIFICATION.md) — как прогнать проект целиком и что считается «зелёным».
+* [`docs/SKILLS-INVENTORY.md`](docs/SKILLS-INVENTORY.md) — все установленные и доступные скиллы.
 * [`docs/AUDIT-FULL-PASS.md`](docs/AUDIT-FULL-PASS.md) — полный аудит, скиллы по этапам и список правок.
 
 ---

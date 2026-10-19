@@ -16,6 +16,7 @@
 | FindSkills | `jtbd-knowledge-skill` | JTBD | установлен единственный verified/high (20 КБ SKILL.md) |
 | FindSkills | community-кандидаты | бизнес-анализ | проверены метаданные; 10 из 11 — medium/community без SKILL.md, не устанавливались |
 | Проект `.agents/skills` | `tchp-business-model`, `tchp-unit-economics`, `tchp-invention-patent` | бизнес-анализ | созданы через шаблон `build-partner`, `validate-skill` → PASS |
+| Marketingskills | `product-marketing`, `customer-research`, `competitor-profiling`, `offers`, `pricing`, `seo-audit` | этап 1 | установлены в `.agents/skills`, `skills-lock.json` с хешами |
 
 ## 2. Что прогнано
 
