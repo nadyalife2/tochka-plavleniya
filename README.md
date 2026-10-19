@@ -49,6 +49,7 @@ python tests/run-all-tests.py
 * [`docs/ROADMAP-TWO-SITES.md`](docs/ROADMAP-TWO-SITES.md) — мастер-план двух сайтов до дохода.
 * [`docs/STRATEGY-TWO-BRANDS.md`](docs/STRATEGY-TWO-BRANDS.md) — понятная стратегия двух брендов.
 * [`docs/BLOG-PLAN.md`](docs/BLOG-PLAN.md) — простой план блога без бизнес-давления.
+* [`docs/LAUNCH-20-ARTICLES.md`](docs/LAUNCH-20-ARTICLES.md) — 20 статей и 5 первых видео.
 * [`docs/business-model-two-sites.md`](docs/business-model-two-sites.md) — Lean Canvas и потоки дохода.
 * [`docs/unit-economics-two-sites.md`](docs/unit-economics-two-sites.md) — финмодель и сценарии.
 * [`docs/invention-device.md`](docs/invention-device.md) — ТРИЗ, prior art и черновик формулы.

@@ -25,6 +25,7 @@
 | План двух сайтов до первого дохода | [`ROADMAP-TWO-SITES.md`](ROADMAP-TWO-SITES.md) |
 | Понятная стратегия двух брендов | [`STRATEGY-TWO-BRANDS.md`](STRATEGY-TWO-BRANDS.md) |
 | Простой блог без бизнес-плана | [`BLOG-PLAN.md`](BLOG-PLAN.md) |
+| 20 статей и 5 первых видео | [`LAUNCH-20-ARTICLES.md`](LAUNCH-20-ARTICLES.md) |
 | Бизнес-модель и Lean Canvas | [`business-model-two-sites.md`](business-model-two-sites.md) |
 | Юнит-экономика и финмодель | [`unit-economics-two-sites.md`](unit-economics-two-sites.md) |
 | Гайд интервью (JTBD) | [`customer-interviews-guide.md`](customer-interviews-guide.md) |
