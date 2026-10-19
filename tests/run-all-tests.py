@@ -6,8 +6,9 @@ Executes:
 2. PHP Lint on all theme, plugin and test PHP files
 3. Mock-WP business logic & contract tests (10 scenarios)
 4. Python delivery CLI & generator unit tests
-5. Distribution packaging
-6. Byte-parity verification for theme4.zip and tchp-content.zip
+5. Relative Markdown link check
+6. Distribution packaging
+7. Byte-parity verification for theme4.zip and tchp-content.zip
 """
 
 import os
@@ -44,7 +45,7 @@ PHP_EXE = get_php_executable()
 
 def run_json_schema_tests():
     import jsonschema
-    print("\n[STEP 1/6] Validating JSON Schemas & Article Contracts...")
+    print("\n[STEP 1/7] Validating JSON Schemas & Article Contracts...")
     schema_file = ROOT_DIR / "schemas" / "article-contract-v1.schema.json"
     example_file = ROOT_DIR / "schemas" / "article-example-v1.json"
 
@@ -87,7 +88,7 @@ def run_json_schema_tests():
         print("  [PASS] Negative test: legacy alias 'wood' correctly rejected in strict schema.")
 
 def run_php_lint():
-    print(f"\n[STEP 2/6] Running PHP Syntax Check using '{PHP_EXE}'...")
+    print(f"\n[STEP 2/7] Running PHP Syntax Check using '{PHP_EXE}'...")
     php_files = []
     for scan_root in (ROOT_DIR / "theme4", ROOT_DIR / "wp-content" / "plugins" / "tchp-content"):
         php_files.extend(sorted(scan_root.rglob("*.php")))
@@ -100,7 +101,7 @@ def run_php_lint():
     print(f"  [PASS] PHP syntax OK for all {len(php_files)} files.")
 
 def run_php_unit_tests():
-    print("\n[STEP 3/6] Running Business Logic & Schema Contract Unit Tests (Mock WP)...")
+    print("\n[STEP 3/7] Running Business Logic & Schema Contract Unit Tests (Mock WP)...")
     test_script = ROOT_DIR / "tests" / "test-package-a1.php"
     res = subprocess.run([PHP_EXE, str(test_script)], capture_output=True, text=True, encoding="utf-8", errors="replace")
     print(res.stdout)
@@ -110,7 +111,7 @@ def run_php_unit_tests():
     print("  [PASS] Business Logic & Contract Unit Tests completed with 100% success rate.")
 
 def run_python_unit_tests():
-    print("\n[STEP 4/6] Running Python Delivery CLI & Contract Unit Tests...")
+    print("\n[STEP 4/7] Running Python Delivery CLI & Contract Unit Tests...")
     test_scripts = [
         ROOT_DIR / "tests" / "test_delivery_cli_unit.py",
         ROOT_DIR / "tests" / "test_article_generator.py",
@@ -123,8 +124,18 @@ def run_python_unit_tests():
             sys.exit(res.returncode)
     print("  [PASS] Python Delivery CLI & Generator Unit Tests passed.")
 
+def run_docs_link_check():
+    print("\n[STEP 5/7] Checking relative Markdown links...")
+    checker = ROOT_DIR / "tools" / "check_docs_links.py"
+    res = subprocess.run([sys.executable, str(checker)], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    print(res.stdout.strip())
+    if res.returncode != 0:
+        print(res.stderr, file=sys.stderr)
+        sys.exit(res.returncode)
+    print("  [PASS] Documentation links are consistent.")
+
 def verify_distribution_archives():
-    print("\n[STEP 6/6] Verifying Distribution Packages Composition & Byte Parity...")
+    print("\n[STEP 7/7] Verifying Distribution Packages Composition & Byte Parity...")
 
     # 1. Verify theme4.zip full composition and byte-exact parity
     theme_zip = ROOT_DIR / "theme4.zip"
@@ -182,7 +193,7 @@ def verify_distribution_archives():
         print(f"  [PASS] tchp-content.zip verified: 100% composition & byte-exact parity ({len(zip_files)} files, {plugin_zip.stat().st_size} bytes).")
 
 def build_distribution_archives():
-    print("\n[STEP 5/6] Compiling fresh distribution packages...")
+    print("\n[STEP 6/7] Compiling fresh distribution packages...")
     build_script = ROOT_DIR / "tools" / "build_distribution_archives.py"
     res = subprocess.run([sys.executable, str(build_script)], capture_output=True, text=True)
     assert res.returncode == 0, f"Build archives failed:\n{res.stderr}"
@@ -198,6 +209,7 @@ if __name__ == "__main__":
     run_php_lint()
     run_php_unit_tests()
     run_python_unit_tests()
+    run_docs_link_check()
 
     if not args.verify_only:
         build_distribution_archives()

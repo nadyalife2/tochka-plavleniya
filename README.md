@@ -28,14 +28,15 @@ python -m pip install jsonschema
 python tests/run-all-tests.py
 ```
 
-Раннер выполняет **6 шагов**:
+Раннер выполняет **7 шагов**:
 
 1. **JSON Schema**: Draft-07 мета-схема, эталонный контракт, реестр канонических сплавов, негативные тесты.
 2. **PHP Lint**: все PHP-файлы `theme4/`, плагина `tchp-content` и тестового набора.
 3. **Mock-WP бизнес-логика**: 43 проверки, 10 сценариев (REST-валидация, `expected_hash`/409, инвалидация ОТК, DOM-якоря, сплавы, владелец Schema.org, паритет отпечатков PHP↔Python).
 4. **Python unit**: delivery CLI и генератор статей.
-5. **Package build**: сборка `theme4.zip` и `tchp-content.zip`.
-6. **Byte-parity**: побайтовая сверка каждого файла архивов с исходниками.
+5. **Docs links**: проверка относительных Markdown-ссылок в README, `docs/` и `SKILL.md`.
+6. **Package build**: сборка `theme4.zip` и `tchp-content.zip`.
+7. **Byte-parity**: побайтовая сверка каждого файла архивов с исходниками.
 
 Живой REST-тест `tools/test_live_wp_integration.py` требует WordPress, URL и application password
 пользователя автоматизации — в CI он не запускается. Подробности: [`tests/README.md`](tests/README.md).
@@ -53,6 +54,7 @@ python tests/run-all-tests.py
 * [`docs/DEVICE-MOUNT-BOM.md`](docs/DEVICE-MOUNT-BOM.md) — крепление, BOM и испытания прототипа.
 * [`docs/FACELESS-VIDEO-KIT.md`](docs/FACELESS-VIDEO-KIT.md) — съёмка без лица, монтаж, Gemini.
 * [`docs/VERIFICATION.md`](docs/VERIFICATION.md) — как прогнать проект целиком и что считается «зелёным».
+* [`docs/AUDIT-FULL-PASS.md`](docs/AUDIT-FULL-PASS.md) — полный аудит, скиллы по этапам и список правок.
 
 ---
 

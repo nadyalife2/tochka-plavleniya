@@ -9,8 +9,8 @@
 
 | Файл | Назначение |
 | :--- | :--- |
-| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | GitHub Actions: прогон мастер-раннера при push/PR в `main` и вручную. |
-| [`tests/run-all-tests.py`](run-all-tests.py) | Мастер-раннер: 6 шагов — схемы, PHP lint, mock-WP, Python unit, сборка, byte-parity. |
+| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | GitHub Actions: прогон мастер-раннера при push/PR в любую ветку и вручную. |
+| [`tests/run-all-tests.py`](run-all-tests.py) | Мастер-раннер: 7 шагов — схемы, PHP lint, mock-WP, Python unit, docs-links, сборка, byte-parity. |
 | [`tests/test-package-a1.php`](test-package-a1.php) | Mock-WP тесты: REST, верификация, отпечатки, DOM-якоря, владелец Schema.org. |
 | [`tests/test_delivery_cli_unit.py`](test_delivery_cli_unit.py) | Unit-тесты delivery CLI. |
 | [`tests/test_article_generator.py`](test_article_generator.py) | Unit-тесты генератора и нормализации контракта. |
@@ -21,7 +21,7 @@
 
 ---
 
-## 2. Что проверяет мастер-раннер (6 шагов)
+## 2. Что проверяет мастер-раннер (7 шагов)
 
 ### Шаг 1. JSON-схемы и контракт статьи
 1. Draft-07 meta-schema: синтаксис `article-contract-v1.schema.json`.
@@ -59,11 +59,15 @@
 * `tests/test_article_generator.py` — нормализация, отказ от выдуманных температур,
   невалидные сплавы, контракт.
 
-### Шаг 5. Сборка пакетов
+### Шаг 5. Проверка Markdown-ссылок
+* `tools/check_docs_links.py` сканирует `README.md`, `PROJECT_OVERVIEW.md`, `docs/**/*.md`
+  и `SKILL.md`; битые относительные ссылки валят гейт.
+
+### Шаг 6. Сборка пакетов
 * `theme4.zip` с корнем `theme4/`.
 * `tchp-content.zip` с корнем `tchp-content/`.
 
-### Шаг 6. Byte-parity
+### Шаг 7. Byte-parity
 * Каждый файл архива сверяется с исходником побайтово; проверяется отсутствие лишних
   и пропавших файлов.
 
@@ -114,8 +118,8 @@ python tests/run-all-tests.py --verify-only
 
 ## 5. CI на GitHub
 
-1. `git push origin main` или pull request.
+1. `git push origin <branch>` или pull request в любую ветку.
 2. Workflow `.github/workflows/ci.yml` поднимает Ubuntu, PHP 8.2, Python 3.11.
-3. Устанавливает `jsonschema`, запускает `python tests/run-all-tests.py`.
+3. Устанавливает зависимости из `requirements.txt` и запускает `python tests/run-all-tests.py`.
 4. При успехе публикует `theme4.zip` и `tchp-content.zip` в Artifacts.
 5. При ошибке сборка красная, коммит не проходит quality gate.

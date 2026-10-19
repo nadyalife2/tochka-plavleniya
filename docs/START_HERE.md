@@ -28,6 +28,7 @@
 | Патентный поиск и прототип устройства | [`PATENT-SEARCH-TEG-FAN.md`](PATENT-SEARCH-TEG-FAN.md), [`DEVICE-MOUNT-BOM.md`](DEVICE-MOUNT-BOM.md) |
 | Съёмка без лица и монтаж | [`FACELESS-VIDEO-KIT.md`](FACELESS-VIDEO-KIT.md) |
 | Как проверить проект целиком | [`VERIFICATION.md`](VERIFICATION.md) |
+| Полный аудит и скиллы по этапам | [`AUDIT-FULL-PASS.md`](AUDIT-FULL-PASS.md) |
 
 ---
 

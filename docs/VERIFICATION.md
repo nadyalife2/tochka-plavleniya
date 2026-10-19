@@ -6,15 +6,16 @@
 ## 1. Быстрый полный прогон
 
 ```bash
-python -m pip install jsonschema
+python -m pip install -r requirements.txt
 python tests/run-all-tests.py
 ```
 
 Ожидаемый результат:
 
-* 6 шагов: схемы → PHP lint → mock-WP → Python unit → сборка → byte-parity;
+* 7 шагов: схемы → PHP lint → mock-WP → Python unit → docs-links → сборка → byte-parity;
 * `SUMMARY: 43 / 43 tests passed.` в mock-WP;
 * `Python Delivery CLI & Generator Unit Tests passed`;
+* `[PASS] all relative markdown links resolve`;
 * `theme4.zip` и `tchp-content.zip` побайтово совпадают с исходниками;
 * финальная строка `ALL TESTS & INTEGRITY CHECKS PASSED SUCCESSFULLY!`.
 
@@ -32,7 +33,8 @@ python tests/run-all-tests.py --verify-only
 | PHP | синтаксис всех PHP темы, плагина и тестов | шаг 2 |
 | Бизнес-логика | 43 проверки / 10 сценариев mock-WP | `tests/test-package-a1.php` |
 | Python | delivery CLI и генератор | `tests/test_*_unit.py` |
-| Дистрибутивы | сборка и побайтовая сверка | шаги 5–6 |
+| Docs | относительные Markdown-ссылки | `tools/check_docs_links.py` |
+| Дистрибутивы | сборка и побайтовая сверка | шаги 6–7 |
 
 ## 3. Что в прогон НЕ входит
 
