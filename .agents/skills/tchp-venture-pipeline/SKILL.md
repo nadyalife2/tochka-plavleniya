@@ -38,7 +38,7 @@ metadata:
 - `docs/FACELESS-VIDEO-KIT.md` — съёмка без лица, монтаж, Gemini.
 - `docs/03-editorial-publishing/GUIDE.md` — оформление и публикация статьи.
 - `docs/02-wordpress-setup/GUIDE.md` — установка темы/плагина.
-- `theme4-fixed.zip`, `tchp-content-fixed.zip`, `schemas/article-contract-v1.schema.json`,
+- `theme4.zip`, `tchp-content.zip`, `schemas/article-contract-v1.schema.json`,
   `tools/delivery_cli.py`, `semantic_core.xlsx`.
 
 ## Режимы
@@ -76,7 +76,7 @@ metadata:
 
 ### 3. Запуск сайта (`site`)
 1. Бренд: название, домен, лого, палитра (по `DESIGN.md`).
-2. WordPress: `theme4-fixed` + `tchp-content-fixed`, Rank Math, кэш, SSL.
+2. WordPress: `theme4` + `tchp-content`, Rank Math, кэш, SSL.
 3. Рубрики, семантика (100–150 запросов), 5–10 эталонных статей.
 4. Калькуляторы: 1–2 на старте.
 5. SEO/GEO: canonical, OG, JSON-LD, `llms.txt`, sitemap, скорость.
