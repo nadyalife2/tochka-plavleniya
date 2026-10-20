@@ -1,0 +1,191 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tochka-plavleniya.ru/schemas/article-contract-v1.1.schema.json",
+  "title": "TchpArticleContractV1_1",
+  "description": "Строгий контракт данных для технических статей портала «Точка Плавления» (Версия 1.1: обязательные FAQ и источники)",
+  "type": "object",
+  "required": [
+    "content_id",
+    "schema_version",
+    "title",
+    "slug",
+    "excerpt",
+    "category_slug",
+    "tags",
+    "reading_time",
+    "difficulty",
+    "solder_alloy",
+    "temp_data",
+    "tools",
+    "content_html",
+    "faq",
+    "sources"
+  ],
+  "properties": {
+    "content_id": {
+      "type": "string",
+      "pattern": "^tchp-[a-z0-9-]+$",
+      "description": "Постоянный уникальный идентификатор материала (генерируется системой)"
+    },
+    "content_hash": {
+      "type": "string",
+      "description": "Хэш содержимого для контроля версий и детекции изменений"
+    },
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.1"]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 10,
+      "maxLength": 200,
+      "description": "Точный технический заголовок статьи"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "Канонический URL slug статьи"
+    },
+    "excerpt": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 300,
+      "description": "Инженерный лид (анонс) статьи для карточек и сниппетов"
+    },
+    "category_slug": {
+      "type": "string",
+      "enum": [
+        "materialy",
+        "praktika",
+        "oshibki",
+        "start-i-baza",
+        "baza-znanij",
+        "oborudovanie"
+      ],
+      "description": "Основная рубрика статьи"
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1,
+      "description": "Ключевые теги материала"
+    },
+    "reading_time": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 60,
+      "description": "Ориентировочное время чтения в минутах"
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": ["Новичок", "Любитель", "Практик", "Инженер", "Эксперт"],
+      "description": "Уровень сложности материала"
+    },
+    "solder_alloy": {
+      "type": "string",
+      "enum": [
+        "pos61",
+        "sn63pb37",
+        "pos40",
+        "sac305",
+        "sac405",
+        "sn42bi58",
+        "snbiago",
+        "roze",
+        "vuda",
+        "universal"
+      ],
+      "description": "Канонический ключ сплава из реестра materials-registry.php"
+    },
+    "temp_data": {
+      "type": "object",
+      "required": ["kind", "range"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["station_setpoint", "joint_temperature", "reflow_profile"],
+          "description": "Тип температурного параметра"
+        },
+        "range": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Рабочий диапазон, напр. '217 – 235 °C'"
+        },
+        "peak": {
+          "type": "string",
+          "description": "Пиковая допустимая температура, напр. '245 °C'"
+        }
+      },
+      "additionalProperties": false
+    },
+    "standard_data": {
+      "type": "object",
+      "properties": {
+        "standard": {
+          "type": "string",
+          "minLength": 2,
+          "description": "Обозначение стандарта (ГОСТ 21931, IPC-A-610G, J-STD-004)"
+        },
+        "class": {
+          "type": "string",
+          "description": "Класс или категория (КЛАСС 1, КЛАСС 2, КЛАСС 3)"
+        },
+        "description": {
+          "type": "string",
+          "description": "Краткое описание применимости стандарта"
+        }
+      },
+      "additionalProperties": false
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 2 },
+          "model": { "type": "string" },
+          "purpose": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "content_html": {
+      "type": "string",
+      "minLength": 100,
+      "description": "Основное тело статьи в HTML формате с разметкой ТЧП"
+    },
+    "faq": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "required": ["q", "a"],
+        "properties": {
+          "q": { "type": "string", "minLength": 5 },
+          "a": { "type": "string", "minLength": 10 }
+        },
+        "additionalProperties": false
+      },
+      "description": "Вопросы и ответы FAQ (4–6 пар, строго соответствующие видимому блоку FAQ в статье)"
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": { "type": "string", "minLength": 5 },
+          "standard": { "type": "string" },
+          "url": { "type": "string" }
+        },
+        "additionalProperties": false
+      },
+      "description": "Нормативные источники и даташиты (2–4 источника, без плейсхолдеров [web:*])"
+    }
+  },
+  "additionalProperties": false
+}

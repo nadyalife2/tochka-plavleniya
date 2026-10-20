@@ -37,4 +37,5 @@ _tmp/
 .tmp/
 theme4-fixed/
 tchp-content-fixed/
-
+# Temporary office files
+~$*

@@ -87,6 +87,37 @@ def run_json_schema_tests():
     except jsonschema.ValidationError:
         print("  [PASS] Negative test: legacy alias 'wood' correctly rejected in strict schema.")
 
+    # 6. Check v1.1 schema and example if present
+    schema_v1_1_file = ROOT_DIR / "schemas" / "article-contract-v1.1.schema.json"
+    example_v1_1_file = ROOT_DIR / "schemas" / "article-example-v1.1.json"
+    if schema_v1_1_file.exists() and example_v1_1_file.exists():
+        with open(schema_v1_1_file, "r", encoding="utf-8") as f:
+            schema_v1_1 = json.load(f)
+        with open(example_v1_1_file, "r", encoding="utf-8") as f:
+            example_v1_1 = json.load(f)
+        jsonschema.Draft7Validator.check_schema(schema_v1_1)
+        validator_v1_1 = jsonschema.Draft7Validator(schema_v1_1)
+        validator_v1_1.validate(example_v1_1)
+        print("  [PASS] article-example-v1.1.json strictly conforms to article-contract-v1.1.schema.json.")
+
+        # Negative test v1.1: FAQ less than 4 items
+        bad_faq = dict(example_v1_1)
+        bad_faq["faq"] = example_v1_1["faq"][:2]
+        try:
+            validator_v1_1.validate(bad_faq)
+            raise AssertionError("Failed: FAQ with fewer than 4 items was not rejected by v1.1 schema!")
+        except jsonschema.ValidationError:
+            print("  [PASS] Negative test v1.1: fewer than 4 FAQ items successfully rejected.")
+
+        # Negative test v1.1: sources missing
+        bad_sources = dict(example_v1_1)
+        del bad_sources["sources"]
+        try:
+            validator_v1_1.validate(bad_sources)
+            raise AssertionError("Failed: missing sources was not rejected by v1.1 schema!")
+        except jsonschema.ValidationError:
+            print("  [PASS] Negative test v1.1: missing sources successfully rejected.")
+
 def run_php_lint():
     print(f"\n[STEP 2/7] Running PHP Syntax Check using '{PHP_EXE}'...")
     php_files = []
