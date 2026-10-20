@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 180" width="100%" height="100%" fill="none">
+  <!-- Clean technical background -->
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <!-- Subtle technical grid -->
+  <defs>
+    <pattern id="ink-grid-tc" width="14" height="14" patternUnits="userSpaceOnUse">
+      <path d="M 14 0 L 0 0 0 14" fill="none" stroke="#e2e8f0" stroke-width="0.6"/>
+    </pattern>
+    <pattern id="hatch-fr4-tc" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="#cbd5e1" stroke-width="0.8"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#ink-grid-tc)"/>
+
+  <!-- BGA COMPONENT (Top Left) -->
+  <rect x="20" y="24" width="140" height="24" rx="1" fill="#0f172a" stroke="#0f172a" stroke-width="1.4"/>
+  <text x="32" y="40" font-family="Consolas, ui-monospace, monospace" font-size="10.5" fill="#ffffff" font-weight="bold">BGA КОМПОНЕНТ</text>
+
+  <!-- BGA SOLDER BALLS -->
+  <path d="M 40 48 C 36 56, 36 64, 40 72 L 56 72 C 60 64, 60 56, 56 48 Z" fill="#f8fafc" stroke="#0f172a" stroke-width="1.4"/>
+  <path d="M 75 48 C 71 56, 71 64, 75 72 L 91 72 C 95 64, 95 56, 91 48 Z" fill="#f8fafc" stroke="#0f172a" stroke-width="1.4"/>
+  <!-- Corner Solder Ball (Target measurement zone) -->
+  <path d="M 115 48 C 111 56, 111 64, 115 72 L 131 72 C 135 64, 135 56, 131 48 Z" fill="#fef08a" stroke="#0f172a" stroke-width="1.6"/>
+
+  <!-- PCB FR-4 BASE -->
+  <rect x="15" y="72" width="310" height="10" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.2"/>
+  <rect x="15" y="82" width="310" height="40" fill="url(#hatch-fr4-tc)" stroke="#0f172a" stroke-width="1.4"/>
+  <text x="24" y="106" font-family="Consolas, ui-monospace, monospace" font-size="10" fill="#0f172a" font-weight="bold">ПЕЧАТНАЯ ПЛАТА FR-4 (МНОГОСЛОЙНАЯ)</text>
+
+  <!-- THERMOCOUPLE WIRES (Chromel / Alumel) -->
+  <path d="M 320 54 C 270 54, 210 66, 150 68" stroke="#dc2626" stroke-width="1.6" fill="none"/>
+  <path d="M 320 62 C 270 62, 210 70, 150 70" stroke="#2563eb" stroke-width="1.6" fill="none"/>
+
+  <!-- Thermocouple Welded Bead Junction (Touching corner solder ball) -->
+  <circle cx="145" cy="69" r="4" fill="#0f172a" stroke="#0f172a" stroke-width="1.2"/>
+
+  <!-- KAPTON TAPE FIXATION (Amber / Polyimide film) -->
+  <rect x="135" y="58" width="55" height="24" rx="2" fill="#f59e0b" fill-opacity="0.45" stroke="#b45309" stroke-width="1.4" stroke-dasharray="3 2"/>
+
+  <!-- LEADER LINES & TECHNICAL CALLOUTS -->
+  <!-- Callout 1: Kapton Tape -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <polyline points="165,58 165,22 230,22" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+    <circle cx="165" cy="58" r="2.5" fill="#0f172a"/>
+    <text x="180" y="16" font-size="10" font-weight="700">1. Каптоновый скотч (300°C)</text>
+  </g>
+
+  <!-- Callout 2: Welded Bead Junction -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <polyline points="145,69 145,138 90,138" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+    <circle cx="145" cy="69" r="2.5" fill="#0f172a"/>
+    <text x="25" y="152" font-size="10" font-weight="700">2. Спай термопары К-типа (вплотную к шарику)</text>
+  </g>
+
+  <!-- Callout 3: K-Type Wire Specs -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <text x="210" y="80" font-size="9" font-weight="700" fill="#64748b">Провод AWG 36/40</text>
+  </g>
+</svg>

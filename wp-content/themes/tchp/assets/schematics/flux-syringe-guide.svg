@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 180" width="100%" height="100%" fill="none">
+  <!-- Clean technical background -->
+  <rect width="100%" height="100%" fill="#ffffff"/>
+
+  <!-- Subtle technical grid -->
+  <defs>
+    <pattern id="ink-grid-flux" width="14" height="14" patternUnits="userSpaceOnUse">
+      <path d="M 14 0 L 0 0 0 14" fill="none" stroke="#e2e8f0" stroke-width="0.6"/>
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#ink-grid-flux)"/>
+
+  <!-- SYRINGE BODY -->
+  <!-- Flange / Plunger push plate -->
+  <rect x="18" y="58" width="8" height="64" rx="2" fill="#0f172a" stroke="#0f172a" stroke-width="1.2"/>
+  <rect x="26" y="84" width="46" height="12" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.4"/>
+  <!-- Rubber Piston Seal -->
+  <rect x="72" y="66" width="14" height="48" rx="1" fill="#0f172a" stroke="#0f172a" stroke-width="1.2"/>
+
+  <!-- Barrel Body (Transparent / Amber Flux Gel) -->
+  <rect x="86" y="66" width="130" height="48" rx="2" fill="#fffbeb" stroke="#0f172a" stroke-width="1.6"/>
+  <!-- Graduation marks -->
+  <line x1="105" y1="66" x2="105" y2="76" stroke="#0f172a" stroke-width="1"/>
+  <line x1="125" y1="66" x2="125" y2="80" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="145" y1="66" x2="145" y2="76" stroke="#0f172a" stroke-width="1"/>
+  <line x1="165" y1="66" x2="165" y2="80" stroke="#0f172a" stroke-width="1.4"/>
+  <line x1="185" y1="66" x2="185" y2="76" stroke="#0f172a" stroke-width="1"/>
+  <line x1="205" y1="66" x2="205" y2="80" stroke="#0f172a" stroke-width="1.4"/>
+
+  <!-- Flux Label Stamp -->
+  <rect x="110" y="82" width="84" height="20" rx="1" fill="#ffffff" stroke="#0f172a" stroke-width="1"/>
+  <text x="116" y="96" font-family="Consolas, ui-monospace, monospace" font-size="9.5" font-weight="bold" fill="#0f172a">ROL0 / NO-CLEAN</text>
+
+  <!-- Luer Lock Shoulder -->
+  <path d="M 216 66 L 230 76 L 230 104 L 216 114 Z" fill="#e2e8f0" stroke="#0f172a" stroke-width="1.4"/>
+  <!-- Dispensing Tip / Needle (Gauge 22 / Blue Hub) -->
+  <rect x="230" y="82" width="16" height="16" rx="1" fill="#0284c7" stroke="#0f172a" stroke-width="1.2"/>
+  <rect x="246" y="88" width="45" height="4" fill="#cbd5e1" stroke="#0f172a" stroke-width="1.4"/>
+
+  <!-- Flux Droplet at Needle Tip -->
+  <path d="M 291 90 C 298 90, 304 96, 304 102 C 304 107, 298 111, 292 111 C 286 111, 282 107, 282 102 C 282 96, 288 90, 291 90 Z" fill="#fbbf24" stroke="#0f172a" stroke-width="1.4"/>
+
+  <!-- TECHNICAL CALLOUTS -->
+  <!-- Callout 1: Active Gel -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <polyline points="150,66 150,34 60,34" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+    <circle cx="150" cy="66" r="2.5" fill="#0f172a"/>
+    <text x="18" y="28" font-size="10.5" font-weight="700">1. Гель ROL0 (Канифоль)</text>
+  </g>
+
+  <!-- Callout 2: Droplet / Dispensing Volume -->
+  <g font-family="Consolas, ui-monospace, monospace" fill="#0f172a">
+    <polyline points="296,111 296,145 220,145" stroke="#0f172a" stroke-width="1.2" fill="none"/>
+    <circle cx="296" cy="111" r="2.5" fill="#0f172a"/>
+    <text x="180" y="160" font-size="10" font-weight="700">2. Дозатор 0.05 мл (BGA/QFN)</text>
+  </g>
+</svg>

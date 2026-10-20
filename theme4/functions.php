@@ -1,9 +1,9 @@
 <?php
 /**
- * Theme Setup & Functions for ТОЧКА ПЛАВЛЕНИЯ (site2)
+ * Theme Setup & Functions for ТОЧКА ПЛАВЛЕНИЯ
  *
  * @package ТОЧКА ПЛАВЛЕНИЯ
- * @version 2.1.0
+ * @version 4.0.0
  */
 
 defined('ABSPATH') || exit;
