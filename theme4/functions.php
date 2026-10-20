@@ -72,7 +72,7 @@ add_action('init', function () {
         ]);
     }
 
-    // 3.3. Block Patterns (15 complete editorial patterns)
+    // 3.3. Block Patterns (21 complete editorial patterns)
     if (function_exists('register_block_pattern')) {
 
         // 1. TL;DR Стикер по центру
@@ -332,6 +332,138 @@ add_action('init', function () {
 <div class="wp-block-group marginalia-box"><!-- wp:paragraph {"className":"marginalia-text"} -->
 <p class="marginalia-text">[Важная инженерная деталь: практический нюанс операции с обоснованием физического механизма процесса под конкретный компонент].</p>
 <!-- /wp:paragraph --></div>
+<!-- /wp:group -->',
+        ]);
+
+        // 16. Секция: где ошибаются
+        register_block_pattern('tochka-plavleniya/section-mistakes', [
+            'title'       => __('16. Секция: Где ошибаются и почему это важно', 'site2'),
+            'categories'  => ['tochka-plavleniya'],
+            'description' => __('Раздел с типичными ошибками, последствиями и ценой ошибки', 'site2'),
+            'content'     => '<!-- wp:group {"className":"my-10"} -->
+<div class="wp-block-group my-10"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Где ошибаются и почему это важно</h2>
+<!-- /wp:heading --><!-- wp:paragraph -->
+<p>[Одно предложение: какое заблуждение встречается чаще всего и почему оно возникает].</p>
+<!-- /wp:paragraph --><!-- wp:table {"className":"bom-table"} -->
+<figure class="wp-block-table bom-table"><table class="has-fixed-layout"><thead><tr><th>Ошибка</th><th>Что происходит</th><th>Цена ошибки</th></tr></thead><tbody><tr><td>[Типичная ошибка 1]</td><td>[Наблюдаемое последствие]</td><td>[Время, деньги, риск]</td></tr><tr><td>[Типичная ошибка 2]</td><td>[Наблюдаемое последствие]</td><td>[Время, деньги, риск]</td></tr><tr><td>[Типичная ошибка 3]</td><td>[Наблюдаемое последствие]</td><td>[Время, деньги, риск]</td></tr></tbody></table></figure>
+<!-- /wp:table --></div>
+<!-- /wp:group -->',
+        ]);
+
+        // 17. Секция: признаки результата
+        register_block_pattern('tochka-plavleniya/section-result-signs', [
+            'title'       => __('17. Секция: Признаки результата по шагам', 'site2'),
+            'categories'  => ['tochka-plavleniya'],
+            'description' => __('Проверки после каждого шага: что видно, слышно или измеримо', 'site2'),
+            'content'     => '<!-- wp:group {"className":"my-10"} -->
+<div class="wp-block-group my-10"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Признаки результата по шагам</h2>
+<!-- /wp:heading --><!-- wp:paragraph -->
+<p>[Одно предложение: зачем проверять результат после каждого шага, а не только в конце].</p>
+<!-- /wp:paragraph --><!-- wp:group {"className":"checklist-box"} -->
+<div class="wp-block-group checklist-box"><!-- wp:paragraph {"className":"checklist-item"} -->
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Шаг 1 — [название]:</strong> [что должно быть видно, слышно или измеримо].</p>
+<!-- /wp:paragraph --><!-- wp:paragraph {"className":"checklist-item"} -->
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Шаг 2 — [название]:</strong> [признак правильного результата].</p>
+<!-- /wp:paragraph --><!-- wp:paragraph {"className":"checklist-item"} -->
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Шаг 3 — [название]:</strong> [признак правильного результата].</p>
+<!-- /wp:paragraph --><!-- wp:paragraph {"className":"checklist-item"} -->
+<p class="checklist-item"><span class="check-icon">[✓]</span> <strong>Шаг 4 — [название]:</strong> [признак правильного результата].</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->',
+        ]);
+
+        // 18. Секция: нюансы
+        register_block_pattern('tochka-plavleniya/section-nuances', [
+            'title'       => __('18. Секция: Нюансы, которых не ждут', 'site2'),
+            'categories'  => ['tochka-plavleniya'],
+            'description' => __('2–4 ситуации, которые ломают ожидания новичка', 'site2'),
+            'content'     => '<!-- wp:group {"className":"my-10"} -->
+<div class="wp-block-group my-10"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Нюансы, которых не ждут</h2>
+<!-- /wp:heading --><!-- wp:columns {"className":"my-6"} -->
+<div class="wp-block-columns my-6"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"className":"step-card"} -->
+<div class="wp-block-group step-card"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">[Нюанс 1]</h3>
+<!-- /wp:heading --><!-- wp:paragraph -->
+<p>[Почему это неочевидно и как меняет действие].</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column --><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"className":"step-card"} -->
+<div class="wp-block-group step-card"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">[Нюанс 2]</h3>
+<!-- /wp:heading --><!-- wp:paragraph -->
+<p>[Почему это неочевидно и как меняет действие].</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --><!-- wp:columns {"className":"my-6"} -->
+<div class="wp-block-columns my-6"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"className":"step-card"} -->
+<div class="wp-block-group step-card"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">[Нюанс 3]</h3>
+<!-- /wp:heading --><!-- wp:paragraph -->
+<p>[Почему это неочевидно и как меняет действие].</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column --><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:group {"className":"step-card"} -->
+<div class="wp-block-group step-card"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">[Нюанс 4]</h3>
+<!-- /wp:heading --><!-- wp:paragraph -->
+<p>[Почему это неочевидно и как меняет действие].</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns --></div>
+<!-- /wp:group -->',
+        ]);
+
+        // 19. Секция: диагностика
+        register_block_pattern('tochka-plavleniya/section-diagnostics', [
+            'title'       => __('19. Секция: Диагностика «симптом → причина → решение»', 'site2'),
+            'categories'  => ['tochka-plavleniya'],
+            'description' => __('Таблица диагностики: что видно, почему и что делать', 'site2'),
+            'content'     => '<!-- wp:group {"className":"my-10"} -->
+<div class="wp-block-group my-10"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Диагностика: симптом → причина → решение</h2>
+<!-- /wp:heading --><!-- wp:table {"className":"bom-table"} -->
+<figure class="wp-block-table bom-table"><table class="has-fixed-layout"><thead><tr><th>Симптом</th><th>Вероятная причина</th><th>Что сделать</th></tr></thead><tbody><tr><td>[Что видно]</td><td>[Почему так]</td><td>[Действие]</td></tr><tr><td>[Что видно]</td><td>[Почему так]</td><td>[Действие]</td></tr><tr><td>[Что видно]</td><td>[Почему так]</td><td>[Действие]</td></tr><tr><td>[Что видно]</td><td>[Почему так]</td><td>[Действие]</td></tr></tbody></table></figure>
+<!-- /wp:table --></div>
+<!-- /wp:group -->',
+        ]);
+
+        // 20. Секция: сравнение
+        register_block_pattern('tochka-plavleniya/section-comparison', [
+            'title'       => __('20. Секция: Сравнение вариантов', 'site2'),
+            'categories'  => ['tochka-plavleniya'],
+            'description' => __('Таблица вариантов по понятным параметрам', 'site2'),
+            'content'     => '<!-- wp:group {"className":"my-10"} -->
+<div class="wp-block-group my-10"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Сравнение вариантов</h2>
+<!-- /wp:heading --><!-- wp:table {"className":"bom-table"} -->
+<figure class="wp-block-table bom-table"><table class="has-fixed-layout"><thead><tr><th>Вариант</th><th>Плюсы</th><th>Минусы</th><th>Когда выбирать</th></tr></thead><tbody><tr><td>[Вариант 1]</td><td>[Плюсы]</td><td>[Минусы]</td><td>[Условие]</td></tr><tr><td>[Вариант 2]</td><td>[Плюсы]</td><td>[Минусы]</td><td>[Условие]</td></tr><tr><td>[Вариант 3]</td><td>[Плюсы]</td><td>[Минусы]</td><td>[Условие]</td></tr></tbody></table></figure>
+<!-- /wp:table --></div>
+<!-- /wp:group -->',
+        ]);
+
+        // 21. Секция: если не получилось
+        register_block_pattern('tochka-plavleniya/section-if-failed', [
+            'title'       => __('21. Секция: Что делать, если не получилось', 'site2'),
+            'categories'  => ['tochka-plavleniya'],
+            'description' => __('Короткий откат и повторная попытка без паники', 'site2'),
+            'content'     => '<!-- wp:group {"className":"my-10"} -->
+<div class="wp-block-group my-10"><!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Что делать, если не получилось</h2>
+<!-- /wp:heading --><!-- wp:paragraph -->
+<p>[Одно предложение: одна неудача не означает, что режим или инструмент не подходят].</p>
+<!-- /wp:paragraph --><!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item --><li>[Остановиться и не греть повторно]</li><!-- /wp:list-item --><!-- wp:list-item --><li>[Проверить контакт и флюс]</li><!-- /wp:list-item --><!-- wp:list-item --><li>[Вернуться на шаг назад]</li><!-- /wp:list-item --><!-- wp:list-item --><li>[Повторить с меньшим теплом]</li><!-- /wp:list-item --><!-- wp:list-item --><li>[Зафиксировать, что изменилось]</li><!-- /wp:list-item --></ol>
+<!-- /wp:list --></div>
 <!-- /wp:group -->',
         ]);
     }
