@@ -23,6 +23,8 @@ scratch/
 *.pdf
 tochka-plavleniya.ru/
 *.sql
+*.tar.gz
+custom.*.tar*
 все/
 .codex/
 .impeccable/
