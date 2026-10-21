@@ -14,6 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 FILES = [ROOT / "README.md", ROOT / "PROJECT_OVERVIEW.md"]
 FILES += sorted((ROOT / "docs").rglob("*.md"))
+FILES += sorted((ROOT / "gem-knowledge").rglob("*.md"))
 FILES += sorted((ROOT / ".agents" / "skills").rglob("SKILL.md"))
 
 LINK_RE = re.compile(r"\[[^\]]*\]\(([^)]+)\)")

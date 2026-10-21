@@ -4,45 +4,19 @@ description: Format and publish soldering articles to WordPress: populate passpo
 argument-hint: "[publish-draft|validate-payload|check-anchors] [post-data]"
 metadata:
   author: claudekit
-  version: "1.0.0"
+  version: "1.1.0"
 ---
 
-# Solder WordPress Publisher — Инженер Публикации и Интеграции
+# Solder WordPress Publisher
 
-Специализированный скилл для подготовки, валидации и отправки контента в WordPress через плагин `tchp-content` и тему `theme4`.
+Использовать для технической упаковки контракта (Режим 2) и контролируемой доставки черновика в WordPress (Режим 3).
+Обязательно прочитать [редакционную книгу](../../../gem-knowledge/MASTER_EDITORIAL_BOOK.md) и [инструкцию Агента 3](../../../gem-knowledge/AGENT_03_REVIEW_AND_PUBLISH.md).
 
-## When to Use
+Спецификация 3 слоёв данных, двух веток упаковки и протокол скрипта доставки зафиксированы в [`AGENT_03_REVIEW_AND_PUBLISH.md`](../../../gem-knowledge/AGENT_03_REVIEW_AND_PUBLISH.md).
 
-- При подготовке JSON-пейлоада для отправки статьи в WordPress REST API.
-- При заполнении метаполей статьи (Паспорт, Инструменты, FAQ, Источники).
-- При проверке DOM-якорей на уникальность перед публикацией.
-- При запуске процедуры верификации ревизии (`POST /wp-json/tchp/v1/posts/{id}/verify`).
-
-## Quick Start
-
-**Сформировать REST-пейлоад для статьи:**
-```bash
-# Статус строго 'draft' или 'pending' (авто-publish запрещён!)
-```
-
----
-
-## 1. Спецификация Метаполей (`tchp-content`)
-
-| Ключ поля | Тип | Описание |
-| :--- | :--- | :--- |
-| `tchp_solder_alloy` | `string` | Канонический slug (`pos61`, `sac305`, etc.) |
-| `tchp_temp_min` | `integer` | Минимальная температура ликвидуса (°C) |
-| `tchp_temp_max` | `integer` | Рабочая температура жала (°C) |
-| `tchp_difficulty` | `string` | `beginner` / `intermediate` / `advanced` |
-| `tchp_tools` | `array` | Список объектов `{ name, model, purpose }` |
-| `tchp_faq_items` | `array` | Список объектов `{ q, a }` (не пустые!) |
-| `tchp_sources` | `array` | Список объектов `{ title, url, standard }` |
-
----
-
-## 2. Правила Доставки Контента
-
-1. **Только черновики:** Никогда не отправлять статус `publish`. Публикацию осуществляет человек-редактор в админке.
-2. **Защита от зачистки данных:** Запрещено отправлять пустые массивы или пробельные строки, чтобы не затереть существующие поля.
-3. **Уникальность якорей:** В теме `theme4` работает двухпроходный фильтр DOM. Убедитесь, что заголовки не конфликтуют с ID секций (`sec-tools`, `sec-faq`, `sec-sources`).
+Ключевые правила:
+1. Контракт JSON (`package.json`) строго валидируется по `schemas/article-contract-v1.1.schema.json`.
+2. Блок FAQ передаётся массивом объектов строго с ключами `q` и `a` (`meta.tchp_faq_items`). Использование `question`/`answer` запрещено.
+3. Доставка черновика выполняется скриптом `tools/delivery_cli.py` строго в статусе `draft` или `pending`.
+4. Автоматическое присвоение статуса `publish` и подделка `is_verified` категорически запрещены. Публикация и ОТК осуществляются исключительно человеком.
+5. Для тем без термопрофиля (инструменты, оптика, организация верстака) применяется ветка Б (ручная/специальная публикация без подгонки под паяльный контракт).
