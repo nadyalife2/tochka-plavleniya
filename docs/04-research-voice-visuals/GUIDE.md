@@ -52,9 +52,9 @@
 
 ## 4.3. Профиль авторского голоса (Practico Voice)
 
-Действующий профиль голоса находится в главе 2 [редакционной книги](../../gem-knowledge/MASTER_EDITORIAL_BOOK.md). Процесс подготовки и публикации описан в [конвейере](../../gem-knowledge/EDITORIAL_WORKFLOW.md). Этот раздел оставлен как указатель, чтобы не держать две версии правил.
+Действующий профиль голоса находится в главе 2 [редакционной книги](../../gem-knowledge/MASTER_EDITORIAL_BOOK.md). Регламенты работы агентов закреплены в инструкциях: [`AGENT_01_RESEARCH_AND_SEO.md`](../../gem-knowledge/AGENT_01_RESEARCH_AND_SEO.md), [`AGENT_02_AUTHOR.md`](../../gem-knowledge/AGENT_02_AUTHOR.md) и [`AGENT_03_REVIEW_AND_PUBLISH.md`](../../gem-knowledge/AGENT_03_REVIEW_AND_PUBLISH.md). Этот раздел оставлен как указатель, чтобы не держать две версии правил.
 
-Прежние универсальные формулы (температуры, времена, признаки процесса) не используются как нормы без источника. Список запрещённых оборотов: [`04_forbidden_phrases.txt`](../../gem-knowledge/04_forbidden_phrases.txt).
+Прежние универсальные формулы (температуры, времена, признаки процесса) не используются как нормы без источника. Список запрещённых стоп-фраз: [`MASTER_EDITORIAL_BOOK.md`](../../gem-knowledge/MASTER_EDITORIAL_BOOK.md) (раздел 2.6).
 
 ---
 

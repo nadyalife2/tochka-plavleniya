@@ -25,6 +25,9 @@ Never:
 
 ## Editorial routing
 Для исследования, статей, редактуры и подготовки публикации сначала прочитай:
-1. [MASTER_EDITORIAL_BOOK.md](gem-knowledge/MASTER_EDITORIAL_BOOK.md) — стратегия, голос и содержание.
-2. [EDITORIAL_WORKFLOW.md](gem-knowledge/EDITORIAL_WORKFLOW.md) — роли, таблицы, контракты и WordPress.
-Эти документы имеют приоритет над редакционными дублями в legacy-файлах. Они не меняют схемы, PHP и правила Git. Не копируй голос и таблицы температур в каждый skill. Не подтверждай тесты, ОТК и публикацию без фактической проверки.
+1. [MASTER_EDITORIAL_BOOK.md](gem-knowledge/MASTER_EDITORIAL_BOOK.md) — единая редакционная книга (стратегия, голос Practico, терминология, факты, типы статей, SEO, таблицы, приёмка).
+2. Инструкции профильных агентов в `gem-knowledge/`:
+   - [AGENT_01_RESEARCH_AND_SEO.md](gem-knowledge/AGENT_01_RESEARCH_AND_SEO.md) — исследование, доказательства и бриф.
+   - [AGENT_02_AUTHOR.md](gem-knowledge/AGENT_02_AUTHOR.md) — написание и расширение статьи голосом Practico.
+   - [AGENT_03_REVIEW_AND_PUBLISH.md](gem-knowledge/AGENT_03_REVIEW_AND_PUBLISH.md) — рецензирование, технический паспорт статьи, валидация по схеме v1.1 и контролируемая доставка.
+Эти документы имеют приоритет над любыми устаревшими правилами. Они не меняют схемы, PHP и правила Git. Не подтверждай тесты, ОТК и публикацию без фактической проверки.
