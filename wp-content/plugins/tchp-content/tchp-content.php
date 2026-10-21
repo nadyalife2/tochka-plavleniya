@@ -3,14 +3,14 @@
  * Plugin Name: ТЧП Контент и Регламент (TCHP Content Core)
  * Plugin URI: https://tochka-plavleniya.ru/
  * Description: Регистрация инженерных метаполей, строгая REST-валидация, защита прав на редакционную проверку, вычисление отпечатка контента и интерфейс редактора.
- * Version: 1.1.1
+ * Version: 1.1.2
  * Author: Лаборатория «ТОЧКА ПЛАВЛЕНИЯ»
  * License: GPL-2.0+
  */
 
 defined('ABSPATH') || exit;
 
-define('TCHP_CONTENT_VERSION', '1.1.1');
+define('TCHP_CONTENT_VERSION', '1.1.2');
 
 /**
  * 1. Роли и права (Capabilities)
@@ -1127,7 +1127,8 @@ function tchp_render_article_spec_box($post) {
           <option value="J-STD-001"></option>
           <option value="J-STD-020E"></option>
           <option value="J-STD-004B"></option>
-          <option value="IPC-7095C"></option>
+          <option value="IPC-7093"></option>
+          <option value="IPC-7095D"></option>
           <option value="ГОСТ 21931-76"></option>
           <option value="ГОСТ 21930-76"></option>
           <option value="ANSI/ESD S20.20"></option>
@@ -1509,8 +1510,26 @@ add_action('manage_post_posts_custom_column', function ($column, $post_id) {
         $score++;
     } else { $missing[] = 'температуры'; }
     if (trim((string) get_post_meta($post_id, 'tchp_standard', true)) !== '') { $score++; } else { $missing[] = 'стандарт'; }
-    if (function_exists('tchp_get_article_sources') && !empty(tchp_get_article_sources($post_id))) { $score++; } else { $missing[] = 'источники'; }
-    if (function_exists('tchp_get_article_faq') && !empty(tchp_get_article_faq($post_id))) { $score++; } else { $missing[] = 'FAQ'; }
+    $sources = function_exists('tchp_get_article_sources') ? tchp_get_article_sources($post_id) : [];
+    if (!empty($sources)) {
+        $score++;
+        if (count($sources) < 2) {
+            $missing[] = 'источники (рекомендуется ≥2)';
+        }
+    } else {
+        $missing[] = 'источники (≥2)';
+    }
+
+    $faq = function_exists('tchp_get_article_faq') ? tchp_get_article_faq($post_id) : [];
+    if (!empty($faq)) {
+        $score++;
+        if (count($faq) < 4) {
+            $missing[] = 'FAQ (рекомендуется 4–6)';
+        }
+    } else {
+        $missing[] = 'FAQ (4–6)';
+    }
+
     $editorial = function_exists('tchp_get_editorial_data') ? tchp_get_editorial_data($post_id) : null;
     if (!empty($editorial['is_verified'])) { $score++; } else { $missing[] = 'ОТК'; }
     $color = $score >= 6 ? '#137333' : ($score >= 3 ? '#b06000' : '#d93025');

@@ -46,14 +46,14 @@
 Чтобы правила и код не противоречили друг другу, в проекте закреплены канонические источники:
 
 1. **Контракт статьи и типы данных:**
-   * Источник: [`schemas/article-contract-v1.schema.json`](../schemas/article-contract-v1.schema.json)
-   * Пример: [`schemas/article-example-v1.json`](../schemas/article-example-v1.json)
+   * Источник: [`schemas/article-contract-v1.1.schema.json`](../schemas/article-contract-v1.1.schema.json) (актуальный стандарт v1.1) и [`schemas/article-contract-v1.schema.json`](../schemas/article-contract-v1.schema.json) (v1.0).
+   * Пример: [`schemas/article-example-v1.1.json`](../schemas/article-example-v1.1.json) и [`schemas/article-example-v1.json`](../schemas/article-example-v1.json).
    * *Никакие скиллы или скрипты не имеют права придумывать собственные форматы полей.*
 
 2. **Реестр сплавов и физические свойства:**
    * **Физические характеристики и температурные диапазоны:** [`theme4/data/materials-registry.php`](../theme4/data/materials-registry.php) (справочник сплавов `$MATERIALS_REGISTRY`, температуры солидус/ликвидус, ГОСТы).
    * **Канонические идентификаторы (slugs) и нормализация:** `pos61`, `sn63pb37`, `pos40`, `sac305`, `sac405`, `sn42bi58`, `snbiago`, `roze`, `vuda`, `universal`. Источник валидации: функции `tchp_get_canonical_alloys()` и `tchp_normalize_solder_alloy()` в [`wp-content/plugins/tchp-content/tchp-content.php`](../wp-content/plugins/tchp-content/tchp-content.php).
-   * **Формат данных статьи:** объект `solder_alloy` и `temp_data` в [`schemas/article-contract-v1.schema.json`](../schemas/article-contract-v1.schema.json).
+   * **Формат данных статьи:** объект `solder_alloy` и `temp_data` в [`schemas/article-contract-v1.1.schema.json`](../schemas/article-contract-v1.1.schema.json).
 
 3. **Редакционная верификация и отпечаток (Fingerprint):**
    * Регистрация метаполей и расчёт SHA-256: [`wp-content/plugins/tchp-content/tchp-content.php`](../wp-content/plugins/tchp-content/tchp-content.php).

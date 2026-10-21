@@ -527,11 +527,15 @@ def send_draft_command(args) -> int:
         return 1
 
     # 1. Validate against strict schema
-    schema_path = ROOT_DIR / "schemas" / "article-contract-v1.schema.json"
+    version = str(article_data.get("schema_version", "1.0"))
+    if version == "1.1":
+        schema_path = ROOT_DIR / "schemas" / "article-contract-v1.1.schema.json"
+    else:
+        schema_path = ROOT_DIR / "schemas" / "article-contract-v1.schema.json"
     print(f"🔍 Validating article against schema: {schema_path.name}...")
     try:
         validate_contract_schema(article_data, schema_path)
-        print("  [PASS] Article strictly conforms to article-contract-v1.schema.json")
+        print(f"  [PASS] Article strictly conforms to {schema_path.name}")
     except jsonschema.ValidationError as e:
         print(f"❌ Schema Validation Error: {e.message}", file=sys.stderr)
         print(f"   At path: {'/'.join(str(p) for p in e.path)}", file=sys.stderr)
