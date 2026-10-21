@@ -59,6 +59,6 @@ CLAUDE.md/AGENTS.md маршрутизируют редакционные зад
 | gem-knowledge/02_style_guide.md и копии в папках Gem 1–5 | справочные копии старого руководства; при конфликте — книга | главы 2 и 4 книги |
 | gem-knowledge/06_article_template.md и копии в Gem 2, Gem 3 | устаревший единый шаблон; не универсален | глава 4 книги (структура по 5 типам статей) |
 | gem-knowledge/09_habr_like_style.md, 10_habr_article_openers.md | справочные копии; при конфликте — книга | глава 2 книги |
-| gem-knowledge/Gem 2 - Solder Writer/# SKILL-03 — Solder Article Writer.md | устаревший черновик промпта; не использовать | gem-knowledge/04_prompt_writer.md и книга |
+| gem-knowledge/# SKILL-03 — Solder Article Writer | устаревшая инструкция, помечена; не использовать как действующий промпт | MASTER_EDITORIAL_BOOK.md и EDITORIAL_WORKFLOW.md |
 | docs/04-research-voice-visuals/GUIDE.md, раздел 4.3 | указатель на книгу | глава 2 книги |
 Удаление или объединение этих файлов — отдельный шаг после поиска ссылок и проверки тестов.
