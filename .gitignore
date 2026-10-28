@@ -39,3 +39,8 @@ theme4-fixed/
 tchp-content-fixed/
 # Temporary office files
 ~$*
+# SEO database temporary files and backups
+seo/data/_backup/
+seo/data/tmp/
+*.db-wal
+*.db-shm

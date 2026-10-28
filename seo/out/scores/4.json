@@ -1,0 +1,65 @@
+{
+  "article_id": "4",
+  "generated_at": "2026-10-28T15:16:23",
+  "file": "seo\\data\\article_4.md",
+  "metrics": {
+    "chars": 6298,
+    "h1": [
+      "⚡ Как научиться паять быстро и без брака: система тренировки для начинающих"
+    ],
+    "h2_count": 9,
+    "avg_sentence_words": 12.9,
+    "avg_paragraph_sentences": 2.0,
+    "faq": 0,
+    "internal_links": 3,
+    "sources": 0,
+    "temps": 6,
+    "alloys": true,
+    "answer_first_words": 50,
+    "stop_phrases": [],
+    "bureaucratic": [],
+    "ai_patterns": [],
+    "dangerous": []
+  },
+  "blocks": {
+    "intent": {
+      "points": 15,
+      "max": 20
+    },
+    "facts": {
+      "points": 17,
+      "max": 25
+    },
+    "voice": {
+      "points": 15,
+      "max": 15
+    },
+    "seo": {
+      "points": 12,
+      "max": 20
+    },
+    "links": {
+      "points": 10,
+      "max": 10
+    },
+    "ai": {
+      "points": 10,
+      "max": 10
+    }
+  },
+  "total": 79,
+  "verdict": "черновик",
+  "issues": [
+    "Answer First: 50 слов в первом абзаце (нужно ≤ 40)",
+    "H2: 9 (цель 4–8; для справочников допустимо до 10)",
+    "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)",
+    "FAQ: 0 вопросов (нужно 4–6)",
+    "Нет раздела «Источники/Стандарты»"
+  ],
+  "blockers": [],
+  "manual": [
+    "проверить факты по первоисточникам",
+    "проверить уникальность (text.ru/Главред)",
+    "прочитать голосом вслух (голос Practico)"
+  ]
+}

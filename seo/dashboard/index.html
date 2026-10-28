@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Точка Плавления — SEO Конвейер & Публикации v3.2</title>
+<style>
+  :root {
+    --bg: #F6F6F6;
+    --card: #FFFFFF;
+    --ink: #111111;
+    --muted: #6B6B6B;
+    --accent: #FFC700;
+    --accent-light: #FFF4C2;
+    --border: #111111;
+    --border-light: #E0E0E0;
+    --success: #059669;
+    --success-bg: #D1FAE5;
+    --warning: #D97706;
+    --warning-bg: #FEF3C7;
+    --danger: #DC2626;
+    --danger-bg: #FEE2E2;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --mono: "JetBrains Mono", Consolas, monospace;
+    --radius: 2px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 14px/1.45 var(--font);
+    -webkit-font-smoothing: antialiased;
+  }
+  .app-container {
+    max-width: 1540px;
+    margin: 0 auto;
+    padding: 18px 24px 80px;
+  }
+
+  /* Top Bar */
+  .brand-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand-bar__left h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand-bar__tag {
+    background: var(--accent);
+    color: var(--ink);
+    padding: 2px 7px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 700;
+    border: 1px solid var(--border);
+  }
+  .brand-bar__actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  /* Agent Status Strip */
+  .agents-status-strip {
+    display: flex;
+    gap: 10px;
+    background: #EAEAEA;
+    border: 1.5px solid var(--border);
+    padding: 8px 12px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: 12px;
+  }
+  .agent-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #9CA3AF;
+  }
+  .status-dot.active { background: var(--success); box-shadow: 0 0 6px var(--success); }
+
+  /* Decision Alert Banner */
+  .decision-banner {
+    background: var(--card);
+    border: 2px solid var(--border);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 14px;
+    box-shadow: 3px 3px 0px rgba(0,0,0,0.06);
+  }
+  .decision-col {
+    border-right: 1px dashed var(--border-light);
+    padding-right: 12px;
+  }
+  .decision-col:last-child { border-right: none; }
+  .decision-col__title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .decision-col__list {
+    margin: 0;
+    padding-left: 16px;
+    font-size: 12px;
+  }
+  .decision-col__list li { margin-bottom: 3px; }
+
+  /* Buttons */
+  .btn {
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: var(--radius);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.1s;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.06);
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 3px 3px 0px rgba(0,0,0,0.12); }
+  .btn:active { transform: translateY(1px); box-shadow: 1px 1px 0px rgba(0,0,0,0.06); }
+  .btn--primary { background: var(--accent); }
+  .btn--success { background: var(--success-bg); color: #065F46; border-color: #065F46; }
+  .btn--warning { background: var(--warning-bg); color: #92400E; border-color: #92400E; }
+  .btn--danger { background: var(--danger-bg); color: var(--danger); border-color: var(--danger); }
+  .btn--sm { padding: 3px 8px; font-size: 11px; }
+
+  /* Tabs Nav */
+  .tabs-nav {
+    display: flex;
+    gap: 4px;
+    border-bottom: 1.5px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .tab-btn {
+    padding: 8px 15px;
+    background: #EAEAEA;
+    border: 1.5px solid var(--border);
+    border-bottom: none;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: var(--radius) var(--radius) 0 0;
+    margin-bottom: -1.5px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .tab-btn.active {
+    background: var(--card);
+    border-bottom: 2px solid var(--card);
+  }
+  .tab-badge {
+    background: var(--accent);
+    color: var(--ink);
+    padding: 1px 6px;
+    font-size: 10px;
+    font-family: var(--mono);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+  }
+
+  /* Tab View containers */
+  .tab-view { display: none; }
+  .tab-view.active { display: block; }
+
+  /* Kanban */
+  .kanban-board {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 12px;
+    align-items: start;
+  }
+  @media(max-width: 1200px) { .kanban-board { grid-template-columns: repeat(3, 1fr); } }
+  @media(max-width: 768px) { .kanban-board { grid-template-columns: repeat(1, 1fr); } }
+
+  .board-column {
+    background: #EAEAEA;
+    border: 1.5px solid var(--border);
+    padding: 10px;
+    min-height: 520px;
+  }
+  .board-column__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px dashed var(--border);
+  }
+  .board-column__title { font-size: 12px; font-weight: 800; text-transform: uppercase; }
+  .board-column__badge {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    font-size: 11px;
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+  .board-column__cards { display: flex; flex-direction: column; gap: 8px; }
+
+  /* Cards */
+  .task-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    padding: 10px;
+    cursor: pointer;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.05);
+    transition: transform 0.1s;
+  }
+  .task-card:hover { transform: translateY(-2px); border-color: #000; box-shadow: 3px 3px 0px rgba(0,0,0,0.12); }
+  .task-card__top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .task-card__id { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--muted); }
+  .task-card__badges { display: flex; gap: 4px; }
+  .task-card__title { margin: 0 0 6px; font-size: 13px; font-weight: 600; line-height: 1.35; }
+  .task-card__footer { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--muted); }
+  .task-card__cluster { background: var(--bg); padding: 1px 5px; border: 1px solid var(--border-light); }
+  .task-card__warn {
+    background: #FEF2F2;
+    border: 1px solid #FCA5A5;
+    padding: 4px 6px;
+    font-size: 11px;
+    color: #991B1B;
+    margin-top: 6px;
+    border-radius: var(--radius);
+  }
+
+  .prio-pill { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 1px 5px; border: 1px solid var(--border); }
+  .prio-pill--hot { background: #FFC700; color: #111; }
+  .prio-pill--warm { background: #FFF3C4; color: #713F12; }
+  .prio-pill--cold { background: #F0F0F0; color: #6B6B6B; }
+
+  .score-pill { font-family: var(--mono); font-size: 10px; font-weight: 700; padding: 1px 5px; border: 1px solid var(--border); }
+  .score-pill--high { background: #A7F3D0; color: #064E3B; }
+  .score-pill--mid { background: #FEF08A; color: #713F12; }
+  .score-pill--low { background: #FECACA; color: #7F1D1D; }
+
+  /* Tables */
+  .data-table-container {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    overflow-x: auto;
+    box-shadow: 2px 2px 0px rgba(0,0,0,0.06);
+  }
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+  }
+  .data-table th {
+    background: #EAEAEA;
+    border-bottom: 1.5px solid var(--border);
+    padding: 10px 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .data-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border-light);
+    vertical-align: middle;
+  }
+  .data-table tr:hover td { background: #FAFAFA; }
+
+  /* Agent Grid */
+  .agents-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .agent-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    padding: 16px;
+    box-shadow: 3px 3px 0px rgba(0,0,0,0.06);
+  }
+  .agent-card__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .agent-card__title { font-size: 15px; font-weight: 800; margin: 0; }
+  .agent-card__desc { font-size: 12px; color: var(--muted); margin-bottom: 12px; min-height: 38px; }
+  .agent-card__meta { font-size: 11px; font-family: var(--mono); color: var(--muted); margin-bottom: 14px; }
+
+  .log-console {
+    background: #111;
+    color: #A7F3D0;
+    font-family: var(--mono);
+    font-size: 12px;
+    padding: 14px;
+    border: 1.5px solid var(--border);
+    height: 190px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    margin-top: 14px;
+  }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.active { display: flex; }
+  .modal-content {
+    background: var(--card);
+    border: 2px solid var(--border);
+    max-width: 820px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 24px;
+    position: relative;
+    box-shadow: 8px 8px 0px rgba(0,0,0,0.2);
+  }
+  .modal-close {
+    position: absolute;
+    top: 16px; right: 16px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    width: 28px; height: 28px;
+    cursor: pointer;
+    font-weight: 800;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px; right: 24px;
+    background: #111;
+    color: #FFF;
+    padding: 12px 18px;
+    border: 1.5px solid var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: 4px 4px 0px rgba(0,0,0,0.3);
+    z-index: 9999;
+    display: none;
+  }
+</style>
+</head>
+<body>
+<div class="app-container">
+
+  <!-- Brand & Header -->
+  <header class="brand-bar">
+    <div class="brand-bar__left">
+      <h1>ТОЧКА ПЛАВЛЕНИЯ <span class="brand-bar__tag">SEO КОНВЕЙЕР v3.2</span></h1>
+      <div style="font-family:var(--mono);font-size:12px;background:var(--card);padding:3px 8px;border:1px solid var(--border);">
+        ● База SQLite: <strong id="statTopicsCount">61</strong> тем · <strong id="statWrittenCount">4</strong> написано
+      </div>
+    </div>
+    <div class="brand-bar__actions">
+      <button class="btn btn--primary" onclick="createBackup()">💾 Создать бэкап БД</button>
+      <button class="btn" onclick="refreshData()">🔄 Обновить</button>
+    </div>
+  </header>
+
+  <!-- Live Agents Status Bar -->
+  <section class="agents-status-strip">
+    <span style="font-weight:700;font-size:11px;text-transform:uppercase;">Субагенты конвейера:</span>
+    <span class="agent-badge"><span class="status-dot active"></span> 00-Разведчик (Perplexity Sonar)</span>
+    <span class="agent-badge"><span class="status-dot active"></span> 01-Исследователь (OpenCode Zen)</span>
+    <span class="agent-badge"><span class="status-dot active" style="background:#FFC700;"></span> 02-Автор Practico (Claude Sonnet Antigravity)</span>
+    <span class="agent-badge"><span class="status-dot active" style="background:#818CF8;"></span> 03-Рецензент (Claude Opus Antigravity)</span>
+    <span class="agent-badge"><span class="status-dot active"></span> 04-Скорер (score_article.py)</span>
+  </section>
+
+  <!-- Decision / Action Required Banner -->
+  <section class="decision-banner" id="decisionBanner">
+    <!-- Решения шеф-редактора генерируются JS -->
+  </section>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('kanban')">📋 Канбан статей <span class="tab-badge" id="bCountTopics">61</span></button>
+    <button class="tab-btn" onclick="switchTab('export')">🚀 Готовые к выгрузке <span class="tab-badge" id="bCountExport" style="background:#A7F3D0;color:#064E3B;">0</span></button>
+    <button class="tab-btn" onclick="switchTab('gaps')">💡 Темы из пробелов <span class="tab-badge" id="bCountProposed">10</span></button>
+    <button class="tab-btn" onclick="switchTab('competitors')">🔎 Конкуренты и фишки <span class="tab-badge" id="bCountComps">17</span></button>
+    <button class="tab-btn" onclick="switchTab('agents')">🤖 Центр агентов</button>
+    <button class="tab-btn" onclick="switchTab('backups')">💾 Бэкапы и архивы <span class="tab-badge" id="bCountBackups">1</span></button>
+  </nav>
+
+  <!-- TAB 1: KANBAN -->
+  <section class="tab-view active" id="view-kanban">
+    <div style="background:#EAEAEA;border:1.5px solid var(--border);padding:10px 14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;gap:10px;align-items:center;">
+        <label style="font-size:13px;font-weight:600;">Кластер:
+          <select id="clusterSelect" onchange="filterKanban()" style="padding:4px 8px;border:1px solid var(--border);">
+            <option value="">Все кластеры</option>
+          </select>
+        </label>
+        <input type="text" id="kanbanSearch" placeholder="Поиск по названию или #ID..." oninput="filterKanban()" style="padding:4px 8px;border:1px solid var(--border);width:220px;">
+      </div>
+      <div style="font-size:12px;font-family:var(--mono);color:var(--muted);">
+        Кликните на карточку: оценка 0-100, замечания и утверждение шеф-редактором
+      </div>
+    </div>
+
+    <div class="kanban-board" id="kanbanBoard"></div>
+  </section>
+
+  <!-- TAB 2: READY TO EXPORT (WORDPRESS DELIVERY) -->
+  <section class="tab-view" id="view-export">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <h2 style="margin:0;font-size:17px;font-weight:800;">Статьи, готовые к выгрузке в WordPress</h2>
+        <div style="font-size:12px;color:var(--muted);">Материалы, набравшие ≥80 баллов, проверенные рецензентом (Claude Opus) и утверждённые Вами к ОТК.</div>
+      </div>
+      <button class="btn btn--primary" onclick="exportAllReady()">🚀 Выгрузить черновики в WordPress (delivery_cli.py)</button>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Балл</th>
+            <th>Заголовок статьи</th>
+            <th>Slug</th>
+            <th>Кластер</th>
+            <th>Знаков</th>
+            <th>Контракт v1.1</th>
+            <th>Статус ОТК</th>
+            <th>Действие</th>
+          </tr>
+        </thead>
+        <tbody id="exportTableBody">
+          <!-- Рендерится JS -->
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 3: PROPOSED TOPICS FROM GAPS -->
+  <section class="tab-view" id="view-gaps">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <h2 style="margin:0;font-size:17px;font-weight:800;">Предложенные темы из контентных пробелов</h2>
+        <div style="font-size:12px;color:var(--muted);">Темы, найденные у конкурентов в незакрытых кластерах. Одобрите подходящие — они попадут в рабочий бэклог.</div>
+      </div>
+      <button class="btn btn--primary" onclick="runAgent('topics-gaps')">⚡ Пересчитать пробелы</button>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Приоритет</th>
+            <th>Заголовок темы</th>
+            <th>Кластер</th>
+            <th>Тип</th>
+            <th>Источник / Доказательство</th>
+            <th>Статус</th>
+            <th>Действие</th>
+          </tr>
+        </thead>
+        <tbody id="proposedTopicsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 4: COMPETITORS & FEATURES -->
+  <section class="tab-view" id="view-competitors">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <h2 style="margin:0;font-size:17px;font-weight:800;">Анализ конкурентов, SEO-слов и фишек</h2>
+        <div style="font-size:12px;color:var(--muted);">Досье на ключевые сайты: сила 0-100, калькуляторы, таблицы сравнения, PDF-даташиты и ключевые слова.</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn--primary" onclick="runAgent('bot-analyzer')">🤖 Запустить глубокий анализ всех сайтов</button>
+        <button class="btn" onclick="runAgent('00-research')">🌐 Собрать новые статьи</button>
+      </div>
+    </div>
+
+    <div class="data-table-container" style="margin-bottom:24px;">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Домен</th>
+            <th>Сила</th>
+            <th>Главные SEO-слова</th>
+            <th>Обнаруженные фишки</th>
+            <th>Статей</th>
+            <th>Тип / Ниша</th>
+            <th>Действие</th>
+          </tr>
+        </thead>
+        <tbody id="competitorsBody"></tbody>
+      </table>
+    </div>
+
+    <h3 style="margin:20px 0 10px;font-size:15px;font-weight:800;">Новые сайты-кандидаты (competitors_proposed)</h3>
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Домен</th>
+            <th>Ниша</th>
+            <th>Частота в поиске</th>
+            <th>Статей</th>
+            <th>Пример URL</th>
+            <th>Статус</th>
+            <th>Действие</th>
+          </tr>
+        </thead>
+        <tbody id="proposedCompetitorsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 5: AGENT CENTER -->
+  <section class="tab-view" id="view-agents">
+    <div style="margin-bottom:16px;">
+      <h2 style="margin:0;font-size:17px;font-weight:800;">Центр запуска субагентов</h2>
+      <div style="font-size:12px;color:var(--muted);">Каждый агент решает строгую инженерную задачу по стандартам MASTER_EDITORIAL_BOOK.md.</div>
+    </div>
+
+    <div class="agents-grid">
+      <!-- Agent 00 -->
+      <div class="agent-card">
+        <div class="agent-card__header">
+          <h3 class="agent-card__title">00-research</h3>
+          <span class="prio-pill prio-pill--cold">Perplexity · 0 ₽</span>
+        </div>
+        <div class="agent-card__desc">Скан конкурентов, живой поиск доменов через Perplexity Sonar и расчёт матрицы приоритетов 0–100.</div>
+        <div class="agent-card__meta">Модель: Perplexity Sonar / Python CLI</div>
+        <button class="btn btn--primary" onclick="runAgent('00-research')">▶ Запустить разведку</button>
+      </div>
+
+      <!-- Bot Analyzer -->
+      <div class="agent-card">
+        <div class="agent-card__header">
+          <h3 class="agent-card__title">bot-analyzer</h3>
+          <span class="prio-pill prio-pill--hot">Фишки & SEO</span>
+        </div>
+        <div class="agent-card__desc">Парсит сайты конкурентов, находит калькуляторы, таблицы, схемы, извлекает SEO-слова и считает силу домена.</div>
+        <div class="agent-card__meta">Модель: HTML/LSI Parser · Стоимость: 0 токенов</div>
+        <button class="btn btn--primary" onclick="runAgent('bot-analyzer')">▶ Анализировать фишки</button>
+      </div>
+
+      <!-- Agent 01 -->
+      <div class="agent-card">
+        <div class="agent-card__header">
+          <h3 class="agent-card__title">01-researcher</h3>
+          <span class="prio-pill prio-pill--cold">0 ₽ · Zen</span>
+        </div>
+        <div class="agent-card__desc">Сбор LSI, формулировка интента, выбор типа статьи, драфты FAQ 4–6 шт. и паспорт фактов по ГОСТ/IPC.</div>
+        <div class="agent-card__meta">Модель: OpenCode Zen / freetap</div>
+        <button class="btn" onclick="promptAgentTarget('01-researcher')">▶ Подготовить бриф (#ID)</button>
+      </div>
+
+      <!-- Agent 02: Writer Claude Sonnet Antigravity -->
+      <div class="agent-card" style="border:2px solid var(--border);">
+        <div class="agent-card__header">
+          <h3 class="agent-card__title">02-writer (Practico)</h3>
+          <span class="prio-pill prio-pill--hot">Claude Sonnet</span>
+        </div>
+        <div class="agent-card__desc">Написание статьи Вашим голосом Practico (триада, ритм, сухая ирония §2.4, Answer First ≤40 слов, паттерны theme4).</div>
+        <div class="agent-card__meta">Модель: claude-sonnet-4-6 (Antigravity CLI)</div>
+        <button class="btn btn--primary" onclick="promptAgentTarget('02-writer')">▶ Написать статью (#ID)</button>
+      </div>
+
+      <!-- Agent 03: Reviewer Claude Opus Antigravity -->
+      <div class="agent-card" style="border:2px solid var(--border);">
+        <div class="agent-card__header">
+          <h3 class="agent-card__title">03-reviewer (ОТК)</h3>
+          <span class="prio-pill prio-pill--warm">Claude Opus</span>
+        </div>
+        <div class="agent-card__desc">Независимый аудит Claude Opus: сверка температур по реестру, ТБ, отлов блокеров и упаковка по схеме JSON v1.1.</div>
+        <div class="agent-card__meta">Модель: claude-opus-4-6-thinking (Antigravity CLI)</div>
+        <button class="btn btn--primary" onclick="promptAgentTarget('03-reviewer')">▶ Провести аудит (#ID)</button>
+      </div>
+
+      <!-- Agent 04 -->
+      <div class="agent-card">
+        <div class="agent-card__header">
+          <h3 class="agent-card__title">04-scorer</h3>
+          <span class="prio-pill prio-pill--cold">0 ₽ · Local</span>
+        </div>
+        <div class="agent-card__desc">Математический расчёт 100 баллов по 6 блокам (Факты, Интент, Голос, SEO, Ссылки, ИИ) без субъективности.</div>
+        <div class="agent-card__meta">Модель: score_article.py · Стоимость: 0 токенов</div>
+        <button class="btn btn--primary" onclick="promptAgentTarget('04-scorer')">▶ Запустить скоринг (#ID)</button>
+      </div>
+    </div>
+
+    <h3 style="margin:16px 0 6px;font-size:14px;font-weight:800;">Терминальный лог агентов:</h3>
+    <div class="log-console" id="agentConsole">> Готов к выполнению задач. Выберите агента выше.</div>
+  </section>
+
+  <!-- TAB 6: BACKUPS -->
+  <section class="tab-view" id="view-backups">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <div>
+        <h2 style="margin:0;font-size:17px;font-weight:800;">Резервные копии и архивы БД</h2>
+        <div style="font-size:12px;color:var(--muted);">Каждая операция защищена авто-бэкапом SQLite. Вы можете создать моментальный снимок в любой момент.</div>
+      </div>
+      <button class="btn btn--primary" onclick="createBackup()">💾 Создать резервную копию сейчас</button>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Имя архива</th>
+            <th>Размер</th>
+            <th>Количество тем</th>
+            <th>Дата создания</th>
+            <th>Путь на диске</th>
+          </tr>
+        </thead>
+        <tbody id="backupsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<!-- Modal Inspector -->
+<div class="modal-overlay" id="inspectorModal" onclick="closeInspector(event)">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeInspector()">✕</button>
+    <div style="border-bottom:2px solid var(--border);padding-bottom:12px;margin-bottom:14px;">
+      <div style="font-family:var(--mono);font-size:11px;color:var(--muted);">
+        <span id="mId">#15</span> · <span id="mCluster">Материалы</span> · статус: <strong id="mStatus">Готово</strong> · <span id="mChars">0</span> знаков
+      </div>
+      <h2 id="mTitle" style="margin:4px 0 0;font-size:17px;font-weight:800;">Название статьи</h2>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <h3 style="margin:0;font-size:14px;">Инженерная оценка качества (0–100):</h3>
+      <span id="mTotalScore" style="font-family:var(--mono);font-size:18px;font-weight:800;padding:2px 8px;border:1px solid #111;">—</span>
+    </div>
+
+    <div id="mScoreGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
+
+    <div id="mBlockersBox" style="display:none;background:#FEE2E2;border:1.5px solid #B91C1C;padding:10px;margin-bottom:10px;">
+      <strong style="color:#B91C1C;">❌ КРИТИЧЕСКИЕ БЛОКЕРЫ:</strong>
+      <ul id="mBlockersList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#7F1D1D;"></ul>
+    </div>
+
+    <div id="mIssuesBox" style="display:none;background:#FEF9C3;border:1.5px solid #A16207;padding:10px;margin-bottom:10px;">
+      <strong style="color:#854D0E;">⚠️ Замечания к доработке (требуются правки):</strong>
+      <ul id="mIssuesList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#713F12;"></ul>
+    </div>
+
+    <div style="border-top:1px dashed var(--border);padding-top:10px;margin-top:10px;">
+      <h4 style="margin:0 0 6px;font-size:13px;">Перелинковка темы:</h4>
+      <div id="mLinksText" style="font-size:12px;color:var(--muted);">—</div>
+    </div>
+
+    <div style="display:flex;gap:10px;margin-top:18px;padding-top:14px;border-top:2px solid var(--border);flex-wrap:wrap;">
+      <button class="btn btn--success" onclick="approveArticle()">✓ Утвердить к публикации (ОТК)</button>
+      <button class="btn btn--danger" onclick="rejectArticle()">↺ Вернуть автору на доработку</button>
+      <button class="btn btn--primary" onclick="scoreCurrentArticle()">⚡ Пересчитать оценку (0-100)</button>
+      <button class="btn" onclick="closeInspector()">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+let DB_DATA = {"status": "ok", "timestamp": "2026-10-28T22:40:02", "topics": [{"id": 15, "title": "Припой для пайки: виды и как выбрать правильный", "slug": "pripoj-dlya-pajki-vidy", "cluster": "Материалы / Припои", "type": "гайд", "priority": "🔴 Высокий", "priority_score": 97, "status": "brief_ready", "next_action": "Написать статью (solder-article-writer)", "bot": "solder-article-writer", "content_markdown": "# Припой для пайки: виды и как выбрать правильный\n\nПрипой выбирают по двум параметрам: составу сплава и форме выпуска. Состав задает температуру плавления, а форма определяет подачу в зону нагрева. Марка на катушке важнее цены и упаковки.\n\n## Краткий ответ\n\nДля ручной пайки плат берут оловянно-свинцовый припой ПОС-61 в проволоке 0,6–0,8 мм. Бессвинцовый сплав SAC305 выбирают под требования RoHS и бессвинцовые фабричные платы. Паяльная паста нужна для группового монтажа SMD горячим воздухом.\n\n**Порядок действий мастера:**\n\n1. Определите тип монтажа: выводные детали, SMD или пайка проводов.\n2. Выберите группу сплава: свинцовый для ремонта или бессвинцовый под регламент RoHS.\n3. Подберите диаметр: 0,5–0,8 мм для плат, 1,0–1,5 мм для проводов и клемм.\n4. Проверьте состав на заводской катушке по ГОСТ 21930-76 или стандарту IPC J-STD-006C.\n5. Настройте уставку паяльника с запасом 60–90 °C над точкой плавления.\n\n## Какие бывают припои\n\n### Оловянно-свинцовые сплавы (ПОС)\n\nЭто легкоплавкие сплавы олова и свинца. Цифра в марке показывает процент олова по ГОСТ 21930-76.\n\nПОС-61 содержит 61 % олова и 39 % свинца. Он плавится при 183–190 °C. Интервал кристаллизации равен 7 °C. Расплав мгновенно застывает, что снижает риск брака при дрожании руки.\n\nПОС-40 плавится в диапазоне 183–238 °C. Широкий интервал в 55 °C удобен для лужения проводов, но опасен для мелких микросхем. Разницу описывает статья [сравнение ПОС-61 и ПОС-40](/pos-61-i-pos-40-raznica).\n\n### Бессвинцовые сплавы (Lead-Free)\n\nСтандарт современной заводской электроники — сплав SAC305. Он состоит из 96,5 % олова, 3 % серебра и 0,5 % меди по IPC J-STD-006C.\n\nSAC305 плавится при 217–220 °C. Это на 30–35 °C горячее ПОС-61. Бессвинцовый металл хуже смачивает медь и дает матовый шов. Специфика монтажа собрана в статье [бессвинцовый припой](/bessvincovyj-pripoj).\n\n### Трубчатый припой с флюсом внутри\n\nПроволока представляет собой полую трубку с сердечником из флюса. Флюс поступает в зону пайки одновременно с расплавом.\n\nДля электроники берут канифольный нейтральный флюс класса ROL0 по IPC J-STD-004. Кислотные припои для плат запрещены: кислота разъедает медные дорожки.\n\n### Паяльная паста\n\nПаста состоит из порошка микросфер припоя и безотмывочного связующего флюса. Ее наносят дозатором или через металлический трафарет.\n\nПаста предназначена для оплавления термофеном или в печи. Паять пастой обычным паяльником нерационально: флюс сгорает раньше прогрева контакта. Выбор формы разобран в статье [паяльная паста или припой в проволоке](/payalnaya-pasta-ili-pripoj).\n\n## Таблица выбора припоя под задачу\n\n| Задача монтажа | Рекомендуемый состав | Диаметр и форма | Рабочая уставка станции |\n|---|---|---|---|\n| Сборка и ремонт бытовых плат | ПОС-61 (Sn61Pb39) | Проволока с флюсом 0,6–0,8 мм | 260 – 290 °C |\n| Миниатюрные SMD (0603, 0402) | ПОС-61 или SAC305 | Проволока 0,3–0,5 мм | 270 – 310 °C |\n| Заводские платы по RoHS | SAC305 (Sn96.5Ag3Cu0.5) | Проволока с флюсом 0,8 мм | 310 – 340 °C |\n| Пайка проводов и разъемов | ПОС-40 (Sn40Pb60) | Проволока 1,0–1,5 мм | 300 – 330 °C |\n| Монтаж QFN и BGA чипов | Паста SAC305 Type 4 | Паяльная паста в шприце | Профиль фена до 245 °C |\n\n## Как выбрать за три шага\n\n### Шаг 1. Оцените теплоемкость деталей\n\nДля микросхем берите проволоку не толще 0,5 мм. Для разъемов и трансформаторов нужна толщина 1,0–1,2 мм: тонкая нить расплавится раньше прогрева полигона.\n\n### Шаг 2. Проверьте заводскую этикетку\n\nНа катушке должен быть указан стандарт, марка сплава и тип флюса. Безымянные катушки с надписью «Solder» содержат оксиды и примеси, разрушающие жало.\n\n### Шаг 3. Согласуйте флюс с платой\n\nДля плат пригоден трубчатый припой с канифольным флюсом ROL0. Активные водосмываемые составы требуют обязательной промывки спиртом в ультразвуковой ванне.\n\n## Температурный режим паяльника\n\nУставка регулятора станции всегда выше точки плавления металла. Запас компенсирует потери тепла в воздухе и печатных дорожках.\n\n* **ПОС-61 (ликвидус 190 °C):** рабочая зона жала 260–290 °C.\n* **ПОС-40 (ликвидус 238 °C):** рабочая температура жала 300–330 °C.\n* **SAC305 (ликвидус 217 °C):** рабочая зона жала 310–340 °C.\n* Время касания вывода жалом не должно превышать 2–3 секунд. Длительный нагрев отслаивает медь от текстолита.\n\n## Признаки результата по шагам\n\nПроверяйте паяное соединение сразу после застывания металла:\n\n- **Смачивание.** Припой растекается по площадке под углом менее 30 градусов.\n- **Галтель.** Шов вогнутый по стандарту IPC-A-610G, контур ножки детали различим.\n- **Поверхность.** ПОС-61 дает зеркальный глянец, а SAC305 — гладкий полуматовый оттенок.\n- **Неподвижность.** Деталь зафиксирована до полной кристаллизации расплава.\n- **Остатки.** Вокруг шва виден прозрачный янтарный ореол без черного нагара.\n\n## Где ошибаются и почему это важно\n\n| Ошибка монтажника | Что происходит с контактом | Цена ошибки | Как исправить |\n|---|---|---|---|\n| Пайка бессвинца на 260 °C | Припой комкуется, медь не смачивается | Холодная пайка, отказ узла от тряски | Поднять уставку до 320 °C, добавить флюс |\n| Смешивание ПОС-61 и SAC305 | Образуется фаза Sn-Pb-Bi с ликвидусом 98 °C | Шов трескается при рабочем нагреве | Удалить старый припой оплеткой |\n| Пайка мелких SMD толстым прутком | Избыток металла заливает соседние площадки | Короткое замыкание выводов чипа | Перейти на проволоку диаметром 0,5 мм |\n| Катушка без маркировки сплава | Неизвестные примеси сурьмы и цинка | Коррозия дорожек, разрушение жала | Использовать марочный припой с паспортом |\n| Перегрев выше 350 °C | Флюс мгновенно сгорает до зачистки оксидов | Отслоение дорожки от текстолита | Убавить нагрев, взять жало большей площади |\n\n## Нюансы, которых не ждут\n\n### Коварство тройных сплавов при ремонте\n\nПри смешивании бессвинцового заводского припоя с висмутом и свинцового ПОС-61 температура плавления смеси падает до 98 °C. Шов размягчается при нагреве процессора или видеокарты.\n\n### Теплоемкость полигонов заземления\n\nШирокие земляные полигоны рассеивают тепло быстрее дорожек. Новички завышают температуру до 400 °C и портят жало. Правильнее поставить клиновидное жало или включить нижний подогрев.\n\n### Окисление жала при бессвинцовой пайке\n\nНа температуре выше 320 °C олово жала окисляется за 20 секунд. Защищайте жало свежим припоем перед каждым возвращением паяльника на подставку.\n\n## Диагностика: симптом → причина → решение\n\n| Что видно под лупой | Причина дефекта | Практическое действие |\n|---|---|---|\n| Припой собирается в круглый шарик | На меди оксидная пленка, флюс выгорел | Зачистить медь, нанести свежий флюс-гель |\n| Шов зернистый, серый и с трещинами | Вывод сместился во время остывания | Зафиксировать пинцетом, прогреть заново |\n| Припой тянется за жалом сосулькой | Остывание контакта или выгорание флюса | Очистить жало, добавить каплю флюса |\n| Перемычка припоя между выводами | Избыточная подача проволоки в контакт | Собрать излишек медной оплеткой |\n| Каверны и поры внутри застывшего шва | Закипание растворителя дешевого флюса | Прогреть контакт с паузой для дегазации |\n| Припой держится на жале, но не липнет к плате | Теплоемкость детали выше мощности паяльника | Сменить жало на скос (BC2), увеличить площадь |\n\n## Что делать, если не получилось\n\n1. Уберите паяльник от платы и дайте контакту остыть 10 секунд.\n2. Не сдирайте застывший металл отверткой: это оторвет контактную площадку.\n3. Нанесите на дефектный шов каплю гелевого канифольного флюса.\n4. Прижмите к шву медную оплетку для выпайки и прогрейте широким жалом.\n5. Уберите оплетку вместе с паяльником, протрите плату спиртом и повторите пайку.\n\n## Безопасность на рабочем месте\n\n* Свинцовые сплавы токсичны. Оборудуйте рабочее место вытяжкой или дымоуловителем.\n* Мойте руки теплой водой с мылом после работы с припоем ПОС-61.\n* Не принимайте пищу и напитки за паяльным столом.\n* Храните катушки припоя в закрытых коробках, недоступных для детей.\n\n## FAQ\n\n**Какой припой купить новичку для первых тренировок?**\nВыбирайте отечественный ПОС-61 диаметром 0,8 мм с канифольным флюсом внутри. Он плавится при 183–190 °C и прощает небольшие неточности в скорости пайки.\n\n**Чем опасен китайский припой без маркировки?**\nВ дешевые сплавы добавляют сторонние примеси сурьмы и цинка. Такой состав плохо смачивает медь, быстро окисляется и дает скрытые раковины внутри контакта.\n\n**Зачем серебро в бессвинцовом сплаве SAC305?**\nТри процента серебра снижают точку плавления чистого олова с 232 °C до 217 °C. Серебро улучшает смачиваемость и повышает прочность шва при нагреве.\n\n**Можно ли паять платы паяльной пастой без фена?**\nОбычным паяльником паять пасту нерационально. Связующий флюс вскипает и разбрасывает шарики металла по плате, создавая замыкания под микросхемами.\n\n**Нужно ли смывать флюс после пайки трубчатым припоем?**\nКанифольные остатки классов ROL0 и RMA не разъедают медь при комнатной температуре. Но липкая смола собирает пыль и влагу, поэтому качественные платы промывают изопропиловым спиртом.\n\n**Как отличить свинцовый припой от бессвинцового на глаз?**\nКачественный шов ПОС-61 имеет зеркальный серебристый глянец. Бессвинцовый припой SAC305 после остывания всегда сохраняет гладкий полуматовый оттенок.\n\n## Нормативная база и стандарты\n\n* **ГОСТ 21930-76** — Припои оловянно-свинцовые в чушках. Технические условия.\n* **ГОСТ 21931-76** — Припои оловянно-свинцовые в виде проволоки, прутков и трубок с флюсом.\n* **IPC J-STD-006C** — Requirements for Electronic Grade Solder Alloys and Fluxed and Non-Fluxed Solders.\n* **IPC-A-610G** — Acceptability of Electronic Assemblies (Критерии качества паяных соединений Class 1, 2, 3).\n", "chars": 9541, "score_total": 90, "score_json": "{\"article_id\": \"15\", \"generated_at\": \"2026-10-28T14:59:46\", \"file\": \"сами статьи\\\\15-pripoj-dlya-pajki-vidy.md\", \"metrics\": {\"chars\": 7982, \"h1\": [\"Припой для пайки: виды и как выбрать правильный\"], \"h2_count\": 13, \"avg_sentence_words\": 13.3, \"avg_paragraph_sentences\": 2.6, \"faq\": 6, \"internal_links\": 3, \"sources\": 20, \"temps\": 27, \"alloys\": true, \"answer_first_words\": 28, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 14, \"max\": 20}, \"facts\": {\"points\": 21, \"max\": 25}, \"voice\": {\"points\": 15, \"max\": 15}, \"seo\": {\"points\": 20, \"max\": 20}, \"links\": {\"points\": 10, \"max\": 10}, \"ai\": {\"points\": 10, \"max\": 10}}, \"total\": 90, \"verdict\": \"готово к ОТК\", \"issues\": [\"H2: 13 (цель 4–8; для справочников допустимо до 10)\", \"Объём: 7,982 знаков (цель 5 500–7 000)\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 40, "source_id": 15, "target_id": 16, "anchor": "сравнение ПОС-61 и ПОС-40", "status": "planned"}, {"id": 41, "source_id": 15, "target_id": 17, "anchor": "бессвинцовые припои", "status": "planned"}, {"id": 42, "source_id": 15, "target_id": 18, "anchor": "трубчатый припой с флюсом", "status": "planned"}, {"id": 43, "source_id": 15, "target_id": 52, "anchor": "паяльная паста vs припой", "status": "planned"}], "in_links": [{"id": 2, "source_id": 1, "target_id": 15, "anchor": "выбор припоя ПОС-61", "status": "planned"}, {"id": 9, "source_id": 3, "target_id": 15, "anchor": "припой для медных жил", "status": "planned"}, {"id": 44, "source_id": 16, "target_id": 15, "anchor": "все виды припоев", "status": "planned"}, {"id": 46, "source_id": 17, "target_id": 15, "anchor": "классификация припоев", "status": "planned"}, {"id": 48, "source_id": 18, "target_id": 15, "anchor": "марки припоев", "status": "planned"}, {"id": 50, "source_id": 19, "target_id": 15, "anchor": "виды припоев", "status": "planned"}, {"id": 120, "source_id": 48, "target_id": 15, "anchor": "припой HTS-2000", "status": "planned"}, {"id": 128, "source_id": 52, "target_id": 15, "anchor": "проволочный припой", "status": "planned"}], "score_data": {"article_id": "15", "generated_at": "2026-10-28T14:59:46", "file": "сами статьи\\15-pripoj-dlya-pajki-vidy.md", "metrics": {"chars": 7982, "h1": ["Припой для пайки: виды и как выбрать правильный"], "h2_count": 13, "avg_sentence_words": 13.3, "avg_paragraph_sentences": 2.6, "faq": 6, "internal_links": 3, "sources": 20, "temps": 27, "alloys": true, "answer_first_words": 28, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 14, "max": 20}, "facts": {"points": 21, "max": 25}, "voice": {"points": 15, "max": 15}, "seo": {"points": 20, "max": 20}, "links": {"points": 10, "max": 10}, "ai": {"points": 10, "max": 10}}, "total": 90, "verdict": "готово к ОТК", "issues": ["H2: 13 (цель 4–8; для справочников допустимо до 10)", "Объём: 7,982 знаков (цель 5 500–7 000)"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 20, "title": "Флюс для пайки: какой выбрать и как использовать", "slug": "flyus-dlya-pajki-kakoj-vybrat", "cluster": "Материалы / Флюсы", "type": "гайд", "priority": "🔴 Высокий", "priority_score": 93, "status": "brief", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 52, "source_id": 20, "target_id": 21, "anchor": "канифоль или жидкий флюс", "status": "planned"}, {"id": 53, "source_id": 20, "target_id": 22, "anchor": "активный флюс", "status": "planned"}, {"id": 54, "source_id": 20, "target_id": 23, "anchor": "маркировки RMA и RA", "status": "planned"}, {"id": 55, "source_id": 20, "target_id": 52, "anchor": "флюс-гель и паста", "status": "planned"}], "in_links": [{"id": 3, "source_id": 1, "target_id": 20, "anchor": "применение флюса", "status": "planned"}, {"id": 49, "source_id": 18, "target_id": 20, "anchor": "выбор флюса", "status": "planned"}, {"id": 56, "source_id": 21, "target_id": 20, "anchor": "все виды флюсов", "status": "planned"}, {"id": 58, "source_id": 22, "target_id": 20, "anchor": "выбор нейтрального флюса", "status": "planned"}, {"id": 60, "source_id": 23, "target_id": 20, "anchor": "классификация флюсов", "status": "planned"}, {"id": 62, "source_id": 24, "target_id": 20, "anchor": "готовые флюсы", "status": "planned"}, {"id": 130, "source_id": 52, "target_id": 20, "anchor": "флюс-гели", "status": "planned"}], "score_data": null}, {"id": 16, "title": "ПОС-61 и ПОС-40: в чём разница и что выбрать", "slug": "pos-61-i-pos-40-raznica", "cluster": "Материалы / Припои", "type": "сравнение", "priority": "🔴 Высокий", "priority_score": 91, "status": "brief_ready", "next_action": "Написать статью (solder-article-writer)", "bot": "solder-article-writer", "content_markdown": "# ПОС-61 и ПОС-40: в чём разница и что выбрать\n\nЧисло в названии припоя показывает процент олова, и больше оно ничего не обещает. Реальная разница в том, как сплав остывает: у ПОС-61 между «жидкий» и «твёрдый» всего 7 °C, а у ПОС-40 целых 55 °C. Пока припой проходит этот интервал, шов выглядит застывшим, но ещё подвижен.\n\n## Краткий ответ\n\nПОС-61 содержит 61 % олова и 39 % свинца, плавится с 183 °C и становится полностью жидким при 190 °C. ПОС-40 содержит 40 % олова и 60 % свинца, начинает плавиться при тех же 183 °C, но полностью жидким становится только при 238 °C.\n\nДля плат, SMD и тонких выводов берите ПОС-61. ПОС-40 оставьте для проводов, лужения и крупных деталей, где шов никто не двигает.\n\n## Что означают цифры\n\nНижняя граница плавления называется солидус, верхняя — ликвидус. Между ними сплав состоит из твёрдых кристаллов и жидкости одновременно.\n\n| Параметр | ПОС-61 | ПОС-40 |\n|---|---|---|\n| Олово / свинец | 61 % / 39 % | 40 % / 60 % |\n| Солидус | 183 °C | 183 °C |\n| Ликвидус | 190 °C | 238 °C |\n| Интервал | 7 °C | 55 °C |\n| Типичное применение | радиоаппаратура, платы | лужение и пайка проводов, латунь, оцинкованные детали |\n\nДанные по маркам приведены по ГОСТ 21930-76 и 21931-76 в справочных таблицах. [web:64][web:65]\n\nОдна оговорка. Строго эвтектическим, то есть плавящимся при одной температуре, считается ПОС-63. ПОС-61 к нему очень близок, но интервал в 7 °C у него есть. [web:64] Поэтому «мгновенно» в применении к ПОС-61 означает «почти сразу», а не «без промежуточной стадии».\n\n## Почему это важно при пайке\n\nПока температура шва находится между ликвидусом и солидусом, внутри уже растут твёрдые кристаллы, а между ними ещё есть жидкость. Если деталь в этот момент сдвинуть, кристаллы разорвут связи, и шов получится матовым и зернистым.\n\nУ ПОС-61 это окно узкое, у ПОС-40 широкое. Отсюда и главный практический вывод: с ПОС-40 деталь нужно держать неподвижно дольше. На массивной детали, которая медленно остывает, окно растягивается ещё сильнее.\n\n## Какую температуру выставлять\n\nВ техническом задании проекта указаны ориентиры по уставке станции: 270–300 °C для ПОС-61 и 310–340 °C для ПОС-40. Это уставка станции, а не температура шва, и зависит она от жала, массы детали и станции. Начинайте с нижней границы и поднимайте, если припой вязкий и не растекается.\n\nПоказатель правильного режима: припой растекается по площадке и образует гладкий блестящий шов, а не шарик.\n\n## Когда какой припой брать\n\n1. Платы, SMD и тонкие выводы — ПОС-61. Нагрев нужен короткий, и шов не должен долго оставаться подвижным.\n2. Толстые провода, клеммы, радиаторы — подойдёт ПОС-40, если деталь надёжно зафиксирована.\n3. Не уверены — берите ПОС-61. Универсальнее, и его проще довести до хорошего шва.\n\n## Частые ошибки\n\n- **Двигать деталь, пока шов остывает.** С ПОС-40 это даёт матовый зернистый шов. Зафиксируйте деталь и ждите, пока всё затвердеет.\n- **Греть ПОС-40 как ПОС-61.** Припой вязкий и плохо растекается. Поднимите уставку, но не держите жало дольше необходимого.\n- **Паять плату ПОС-40 на высокой уставке.** Текстолит не любит долгого тепла, и дорожка может отойти.\n- **Брать катушку без маркировки.** Состав неизвестен, режим подобрать нельзя.\n\n## Безопасность\n\nВ ПОС-40 свинца 60 %, в ПОС-61 — 39 %. Паяйте с вытяжкой или хотя бы при проветривании, мойте руки после работы и не ешьте за рабочим местом. Дым флюса не вдыхайте.\n\n## FAQ\n\n**Можно ли паять плату припоем ПОС-40?**\nМожно, но шов проще испортить: пока припой не затвердел полностью, любое смещение деталей даёт матовый шов. Для плат лучше ПОС-61.\n\n**Почему ПОС-40 дешевле?**\nВ нём меньше олова, а олово дороже свинца.\n\n**Чем эвтектический припой отличается от обычного?**\nУ эвтектики солидус и ликвидус совпадают, поэтому промежуточной зоны нет. ПОС-63 эвтектический, ПОС-61 очень близок к нему.\n\n**Можно ли смешивать ПОС-61 и ПОС-40?**\nЛучше не стоит: температура затвердевания смеси станет промежуточной. Старый припой перед доработкой лучше убрать оплёткой или помпой.\n", "chars": 3970, "score_total": 78, "score_json": "{\"article_id\": \"16\", \"generated_at\": \"2026-10-28T15:15:59\", \"file\": \"сами статьи\\\\16-pos-61-i-pos-40-raznica.md\", \"metrics\": {\"chars\": 3308, \"h1\": [\"ПОС-61 и ПОС-40: в чём разница и что выбрать\"], \"h2_count\": 8, \"avg_sentence_words\": 12.4, \"avg_paragraph_sentences\": 2.5, \"faq\": 4, \"internal_links\": 0, \"sources\": 3, \"temps\": 12, \"alloys\": true, \"answer_first_words\": 46, \"stop_phrases\": [], \"bureaucratic\": [\"необходимо\"], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 12, \"max\": 20}, \"facts\": {\"points\": 25, \"max\": 25}, \"voice\": {\"points\": 15, \"max\": 15}, \"seo\": {\"points\": 13, \"max\": 20}, \"links\": {\"points\": 5, \"max\": 10}, \"ai\": {\"points\": 8, \"max\": 10}}, \"total\": 78, \"verdict\": \"черновик\", \"issues\": [\"Answer First: 46 слов в первом абзаце (нужно ≤ 40)\", \"Объём: 3,308 знаков (цель 5 500–7 000)\", \"Внутренние ссылки: 0 (нужно 3–5)\", \"Нет раздела «Источники/Стандарты»\", \"Ссылки: 0 (цель 3–5)\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 44, "source_id": 16, "target_id": 15, "anchor": "все виды припоев", "status": "planned"}, {"id": 45, "source_id": 16, "target_id": 1, "anchor": "пайка припоем ПОС-61", "status": "planned"}], "in_links": [{"id": 40, "source_id": 15, "target_id": 16, "anchor": "сравнение ПОС-61 и ПОС-40", "status": "planned"}], "score_data": {"article_id": "16", "generated_at": "2026-10-28T15:15:59", "file": "сами статьи\\16-pos-61-i-pos-40-raznica.md", "metrics": {"chars": 3308, "h1": ["ПОС-61 и ПОС-40: в чём разница и что выбрать"], "h2_count": 8, "avg_sentence_words": 12.4, "avg_paragraph_sentences": 2.5, "faq": 4, "internal_links": 0, "sources": 3, "temps": 12, "alloys": true, "answer_first_words": 46, "stop_phrases": [], "bureaucratic": ["необходимо"], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 12, "max": 20}, "facts": {"points": 25, "max": 25}, "voice": {"points": 15, "max": 15}, "seo": {"points": 13, "max": 20}, "links": {"points": 5, "max": 10}, "ai": {"points": 8, "max": 10}}, "total": 78, "verdict": "черновик", "issues": ["Answer First: 46 слов в первом абзаце (нужно ≤ 40)", "Объём: 3,308 знаков (цель 5 500–7 000)", "Внутренние ссылки: 0 (нужно 3–5)", "Нет раздела «Источники/Стандарты»", "Ссылки: 0 (цель 3–5)"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 25, "title": "5 типичных ошибок новичка при пайке и как их избежать", "slug": "oshibki-novichka-pri-pajke", "cluster": "Ошибки / Проблемы новичка", "type": "топ ошибок", "priority": "🔴 Высокий", "priority_score": 91, "status": "brief", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 64, "source_id": 25, "target_id": 26, "anchor": "дефект холодной пайки", "status": "planned"}, {"id": 65, "source_id": 25, "target_id": 27, "anchor": "почему припой скатывается", "status": "planned"}, {"id": 66, "source_id": 25, "target_id": 28, "anchor": "как убрать мостик припоя", "status": "planned"}, {"id": 67, "source_id": 25, "target_id": 29, "anchor": "перегрев деталей", "status": "planned"}], "in_links": [{"id": 4, "source_id": 1, "target_id": 25, "anchor": "типичные ошибки новичков", "status": "planned"}, {"id": 12, "source_id": 4, "target_id": 25, "anchor": "причины брака", "status": "planned"}, {"id": 68, "source_id": 26, "target_id": 25, "anchor": "все ошибки новичка", "status": "planned"}, {"id": 70, "source_id": 27, "target_id": 25, "anchor": "типичные проблемы пайки", "status": "planned"}, {"id": 72, "source_id": 28, "target_id": 25, "anchor": "дефекты пайки", "status": "planned"}, {"id": 74, "source_id": 29, "target_id": 25, "anchor": "ошибки при пайке", "status": "planned"}], "score_data": null}, {"id": 22, "title": "Активный флюс: когда использовать и как смыть остатки", "slug": "aktivnyj-flyus-kak-smyt", "cluster": "Материалы / Флюсы", "type": "гайд", "priority": "🟡 Средний", "priority_score": 90, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 58, "source_id": 22, "target_id": 20, "anchor": "выбор нейтрального флюса", "status": "planned"}, {"id": 59, "source_id": 22, "target_id": 29, "anchor": "промывка платы от флюса", "status": "planned"}], "in_links": [{"id": 53, "source_id": 20, "target_id": 22, "anchor": "активный флюс", "status": "planned"}, {"id": 119, "source_id": 48, "target_id": 22, "anchor": "активный флюс для алюминия", "status": "planned"}, {"id": 121, "source_id": 49, "target_id": 22, "anchor": "ортофосфорная кислота", "status": "planned"}], "score_data": null}, {"id": 11, "title": "Лучшие паяльники для дома: ТОП-10 моделей 2026", "slug": "luchshie-payalniki-dlya-doma", "cluster": "Инструменты / Рейтинг паяльников", "type": "рейтинг", "priority": "🔴 Высокий", "priority_score": 88, "status": "brief", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 30, "source_id": 11, "target_id": 6, "anchor": "параметры выбора", "status": "planned"}, {"id": 31, "source_id": 11, "target_id": 12, "anchor": "станции до 5000 рублей", "status": "planned"}, {"id": 32, "source_id": 11, "target_id": 13, "anchor": "паяльники T12", "status": "planned"}, {"id": 33, "source_id": 11, "target_id": 54, "anchor": "смарт-паяльники Type-C", "status": "planned"}], "in_links": [{"id": 18, "source_id": 6, "target_id": 11, "anchor": "ТОП паяльников 2026", "status": "planned"}, {"id": 34, "source_id": 12, "target_id": 11, "anchor": "общий рейтинг паяльников", "status": "planned"}, {"id": 36, "source_id": 13, "target_id": 11, "anchor": "рейтинг домашних паяльников", "status": "planned"}, {"id": 38, "source_id": 14, "target_id": 11, "anchor": "ТОП паяльников", "status": "planned"}], "score_data": null}, {"id": 6, "title": "Какой паяльник выбрать: советы для новичка в 2026 году", "slug": "kakoj-payalnik-vybrat", "cluster": "Инструменты / Выбор паяльника", "type": "buyer's guide", "priority": "🔴 Высокий", "priority_score": 87, "status": "review", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": 43, "score_json": "{\"article_id\": \"6\", \"generated_at\": \"2026-10-28T15:16:20\", \"file\": \"seo\\\\data\\\\article_6.md\", \"metrics\": {\"chars\": 702, \"h1\": [], \"h2_count\": 0, \"avg_sentence_words\": 38.7, \"avg_paragraph_sentences\": 3.0, \"faq\": 0, \"internal_links\": 0, \"sources\": 0, \"temps\": 0, \"alloys\": false, \"answer_first_words\": 116, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 5, \"max\": 20}, \"facts\": {\"points\": 9, \"max\": 25}, \"voice\": {\"points\": 12, \"max\": 15}, \"seo\": {\"points\": 4, \"max\": 20}, \"links\": {\"points\": 5, \"max\": 10}, \"ai\": {\"points\": 8, \"max\": 10}}, \"total\": 43, \"verdict\": \"в доработку\", \"issues\": [\"Answer First: 116 слов в первом абзаце (нужно ≤ 40)\", \"H1: найдено 0 (нужен ровно один)\", \"H2: 0 (цель 4–8; для справочников допустимо до 10)\", \"Объём: 702 знаков (цель 5 500–7 000)\", \"Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)\", \"Сплавы: в тексте нет ни одного канонического сплава\", \"Температуры: 0 значений с °C (нужно ≥ 3 в паяльной теме)\", \"Средняя длина предложения 38.666666666666664 слов (цель ≤ 20)\", \"FAQ: 0 вопросов (нужно 4–6)\", \"Внутренние ссылки: 0 (нужно 3–5)\", \"Нет раздела «Источники/Стандарты»\", \"Ссылки: 0 (цель 3–5)\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 16, "source_id": 6, "target_id": 7, "anchor": "паяльник или станция", "status": "planned"}, {"id": 17, "source_id": 6, "target_id": 8, "anchor": "подбор мощности", "status": "planned"}, {"id": 18, "source_id": 6, "target_id": 11, "anchor": "ТОП паяльников 2026", "status": "planned"}, {"id": 19, "source_id": 6, "target_id": 54, "anchor": "смарт-паяльники Type-C", "status": "planned"}], "in_links": [{"id": 6, "source_id": 2, "target_id": 6, "anchor": "как выбрать паяльник", "status": "planned"}, {"id": 20, "source_id": 7, "target_id": 6, "anchor": "как выбрать паяльник", "status": "planned"}, {"id": 23, "source_id": 8, "target_id": 6, "anchor": "выбор паяльника", "status": "planned"}, {"id": 25, "source_id": 9, "target_id": 6, "anchor": "сетевые паяльники", "status": "planned"}, {"id": 27, "source_id": 10, "target_id": 6, "anchor": "критерии выбора паяльника", "status": "planned"}, {"id": 30, "source_id": 11, "target_id": 6, "anchor": "параметры выбора", "status": "planned"}, {"id": 118, "source_id": 47, "target_id": 6, "anchor": "выбор паяльника", "status": "planned"}, {"id": 133, "source_id": 54, "target_id": 6, "anchor": "выбор смарт-паяльника", "status": "planned"}], "score_data": {"article_id": "6", "generated_at": "2026-10-28T15:16:20", "file": "seo\\data\\article_6.md", "metrics": {"chars": 702, "h1": [], "h2_count": 0, "avg_sentence_words": 38.7, "avg_paragraph_sentences": 3.0, "faq": 0, "internal_links": 0, "sources": 0, "temps": 0, "alloys": false, "answer_first_words": 116, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 5, "max": 20}, "facts": {"points": 9, "max": 25}, "voice": {"points": 12, "max": 15}, "seo": {"points": 4, "max": 20}, "links": {"points": 5, "max": 10}, "ai": {"points": 8, "max": 10}}, "total": 43, "verdict": "в доработку", "issues": ["Answer First: 116 слов в первом абзаце (нужно ≤ 40)", "H1: найдено 0 (нужен ровно один)", "H2: 0 (цель 4–8; для справочников допустимо до 10)", "Объём: 702 знаков (цель 5 500–7 000)", "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)", "Сплавы: в тексте нет ни одного канонического сплава", "Температуры: 0 значений с °C (нужно ≥ 3 в паяльной теме)", "Средняя длина предложения 38.666666666666664 слов (цель ≤ 20)", "FAQ: 0 вопросов (нужно 4–6)", "Внутренние ссылки: 0 (нужно 3–5)", "Нет раздела «Источники/Стандарты»", "Ссылки: 0 (цель 3–5)"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 7, "title": "Паяльная станция или обычный паяльник: что выбрать", "slug": "payalnaya-stanciya-ili-payalnik", "cluster": "Инструменты / Выбор паяльника", "type": "сравнение", "priority": "🔴 Высокий", "priority_score": 87, "status": "brief", "next_action": "Сформировать ТЗ в solder-seo-researcher", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 20, "source_id": 7, "target_id": 6, "anchor": "как выбрать паяльник", "status": "planned"}, {"id": 21, "source_id": 7, "target_id": 12, "anchor": "бюджетные паяльные станции", "status": "planned"}, {"id": 22, "source_id": 7, "target_id": 33, "anchor": "термофен для SMD", "status": "planned"}], "in_links": [{"id": 16, "source_id": 6, "target_id": 7, "anchor": "паяльник или станция", "status": "planned"}, {"id": 35, "source_id": 12, "target_id": 7, "anchor": "станция или паяльник", "status": "planned"}, {"id": 85, "source_id": 33, "target_id": 7, "anchor": "комбо-станции с феном", "status": "planned"}], "score_data": null}, {"id": 8, "title": "Какая мощность паяльника нужна для разных задач", "slug": "moschnost-payalnika-dlya-zadach", "cluster": "Инструменты / Выбор паяльника", "type": "гайд", "priority": "🟡 Средний", "priority_score": 87, "status": "brief", "next_action": "Сформировать ТЗ в solder-seo-researcher", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 23, "source_id": 8, "target_id": 6, "anchor": "выбор паяльника", "status": "planned"}, {"id": 24, "source_id": 8, "target_id": 29, "anchor": "защита деталей от перегрева", "status": "planned"}], "in_links": [{"id": 14, "source_id": 5, "target_id": 8, "anchor": "маломощный паяльник", "status": "planned"}, {"id": 17, "source_id": 6, "target_id": 8, "anchor": "подбор мощности", "status": "planned"}, {"id": 75, "source_id": 29, "target_id": 8, "anchor": "настройка температуры паяльника", "status": "planned"}], "score_data": null}, {"id": 21, "title": "Канифоль или жидкий флюс: что лучше для новичка", "slug": "kanifol-ili-zhidkij-flyus", "cluster": "Материалы / Флюсы", "type": "сравнение", "priority": "🔴 Высокий", "priority_score": 87, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 56, "source_id": 21, "target_id": 20, "anchor": "все виды флюсов", "status": "planned"}, {"id": 57, "source_id": 21, "target_id": 1, "anchor": "нанесение флюса при пайке", "status": "planned"}], "in_links": [{"id": 52, "source_id": 20, "target_id": 21, "anchor": "канифоль или жидкий флюс", "status": "planned"}, {"id": 63, "source_id": 24, "target_id": 21, "anchor": "спиртоканифольный флюс СКФ", "status": "planned"}], "score_data": null}, {"id": 23, "title": "Флюс RMA и RA: расшифровка маркировки и отличия", "slug": "flyus-rma-i-ra-otlichiya", "cluster": "Материалы / Флюсы", "type": "обучающий", "priority": "🟢 Низкий", "priority_score": 87, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 60, "source_id": 23, "target_id": 20, "anchor": "классификация флюсов", "status": "planned"}, {"id": 61, "source_id": 23, "target_id": 30, "anchor": "флюс-гель для SMD", "status": "planned"}], "in_links": [{"id": 54, "source_id": 20, "target_id": 23, "anchor": "маркировки RMA и RA", "status": "planned"}], "score_data": null}, {"id": 29, "title": "Перегрев компонентов при пайке: как не сжечь деталь", "slug": "peregrev-komponentov-pri-pajke", "cluster": "Ошибки / Проблемы новичка", "type": "гайд", "priority": "🟡 Средний", "priority_score": 87, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 74, "source_id": 29, "target_id": 25, "anchor": "ошибки при пайке", "status": "planned"}, {"id": 75, "source_id": 29, "target_id": 8, "anchor": "настройка температуры паяльника", "status": "planned"}], "in_links": [{"id": 24, "source_id": 8, "target_id": 29, "anchor": "защита деталей от перегрева", "status": "planned"}, {"id": 59, "source_id": 22, "target_id": 29, "anchor": "промывка платы от флюса", "status": "planned"}, {"id": 67, "source_id": 25, "target_id": 29, "anchor": "перегрев деталей", "status": "planned"}], "score_data": null}, {"id": 17, "title": "Бессвинцовый припой: плюсы, минусы, когда использовать", "slug": "bessvincovyj-pripoj", "cluster": "Материалы / Припои", "type": "гайд", "priority": "🟡 Средний", "priority_score": 86, "status": "backlog", "next_action": "", "bot": "", "content_markdown": "# Бессвинцовый припой: плюсы, минусы, когда использовать\n\nБессвинцовый припой не лучше и не хуже оловянно-свинцового. Это другой материал с другими условиями: он плавится выше, хуже смачивает поверхность и требует более горячей работы. Зато в современной электронике он стал стандартом.\n\n## Краткий ответ\n\nСамый распространённый бессвинцовый сплав — SAC305: 96,5 % олова, 3 % серебра, 0,5 % меди. Он плавится при 217–220 °C, то есть на 30–40 °C выше, чем ПОС-61. [web:60][web:63] Из-за этого он требует более высокой уставки станции и аккуратной работы с флюсом.\n\n**Что делать:**\n\n1. Проверьте, под какой припой сделана Ваша плата, и по возможности паяйте тем же типом.\n2. Поднимите уставку станции: для SAC305 в справочных материалах называют 320–350 °C. [web:69]\n3. Используйте достаточно активный флюс: смачиваемость у бессвинцовых сплавов хуже. [web:63]\n4. Не смешивайте на одном шве бессвинцовый и оловянно-свинцовый припой.\n5. Если сомневаетесь, сначала потренируйтесь на ненужной плате.\n\n## Чем отличается от ПОС-61\n\n| Параметр | ПОС-61 | SAC305 |\n|---|---|---|\n| Состав | 61 % олова, 39 % свинца | 96,5 % олова, 3 % серебра, 0,5 % меди |\n| Температура плавления | 183–190 °C | 217–220 °C |\n| Смачиваемость | лучше | хуже |\n| Свинец | есть | нет |\n\nПо данным справочных таблиц. [web:63][web:60]\n\n## Плюсы\n\n- **Нет свинца.** Это снижает вред для здоровья и позволяет соответствовать требованиям RoHS. [web:69]\n- **Сплав подходит для современной электроники.** Его используют в смартфонах, компьютерах и бытовой технике. [web:69]\n- **Лучшая электропроводность.** По справочным данным, бессвинцовые припои обладают более высокой электропроводностью. [web:63]\n\n## Минусы\n\n- **Более высокая температура.** Выше нагрев, значит больше риск перегреть плату и компоненты.\n- **Хуже смачивает.** Припой растекается менее охотно, поэтому флюс и чистота поверхности важнее.\n- **Шов выглядит иначе.** Бессвинцовый шов часто бывает менее блестящим, и новичок легко принимает это за дефект. Блеск как единственный критерий качества здесь работает хуже.\n\n## Когда использовать\n\n- Вы паяете новые платы, сделанные под бессвинцовый процесс.\n- Вы делаете устройство, к которому предъявляются требования по свинцу. Конкретные требования для Вашего случая лучше уточнить отдельно.\n- Вам нужна безсвинцовая альтернатива из соображений здоровья и экологии.\n\nОловянно-свинцовый припой остаётся удобным вариантом для ремонта старой техники и для тех, кто хочет паять при более низкой температуре.\n\n## Частые ошибки\n\n- **Паять SAC305 на уставке для ПОС-61.** Припой вязкий и не растекается. Поднимайте температуру ступенчато.\n- **Греть плату слишком долго.** Высокая уставка плюс долгий контакт греют текстолит сильнее.\n- **Смешивать припои.** Температура затвердевания получится промежуточной и непредсказуемой.\n- **Экономить на флюсе.** С бессвинцовым сплавом он нужен больше, чем с ПОС.\n\n## Безопасность\n\nОтсутствие свинца не делает пайку безопасной во всём остальном: дым флюса вредно вдыхать, горячий припой обжигает, брызги летят в глаза. Нужна вытяжка или проветривание, защита глаз и аккуратность с жалом.\n\n## FAQ\n\n**Бессвинцовый припой безопаснее?**\nВ нём нет свинца, но дым флюса и ожоги остаются. Вытяжка нужна в любом случае.\n\n**Можно ли паять бессвинцовым припоем обычным паяльником?**\nМожно, если он выдерживает нужную температуру и держит её под нагрузкой.\n\n**Почему шов получается тусклым?**\nДля бессвинцовых сплавов это нормально. Оценивайте шов по растеканию и по тому, как припой смочил площадку и вывод, а не только по блеску.\n\n**Можно ли добавлять бессвинцовый припой к старому оловянно-свинцовому шву?**\nЛучше убрать старый припой оплёткой или помпой и пропаять заново, чем смешивать составы.\n", "chars": 3695, "score_total": 81, "score_json": "{\"article_id\": \"17\", \"generated_at\": \"2026-10-28T15:16:00\", \"file\": \"сами статьи\\\\17-bessvincovyj-pripoj.md\", \"metrics\": {\"chars\": 3138, \"h1\": [\"Бессвинцовый припой: плюсы, минусы, когда использовать\"], \"h2_count\": 8, \"avg_sentence_words\": 12.0, \"avg_paragraph_sentences\": 2.6, \"faq\": 4, \"internal_links\": 0, \"sources\": 2, \"temps\": 5, \"alloys\": true, \"answer_first_words\": 32, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 15, \"max\": 20}, \"facts\": {\"points\": 25, \"max\": 25}, \"voice\": {\"points\": 15, \"max\": 15}, \"seo\": {\"points\": 13, \"max\": 20}, \"links\": {\"points\": 5, \"max\": 10}, \"ai\": {\"points\": 8, \"max\": 10}}, \"total\": 81, \"verdict\": \"готово к ОТК\", \"issues\": [\"Объём: 3,138 знаков (цель 5 500–7 000)\", \"Внутренние ссылки: 0 (нужно 3–5)\", \"Нет раздела «Источники/Стандарты»\", \"Ссылки: 0 (цель 3–5)\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 46, "source_id": 17, "target_id": 15, "anchor": "классификация припоев", "status": "planned"}, {"id": 47, "source_id": 17, "target_id": 43, "anchor": "безопасность при работе со свинцом", "status": "planned"}], "in_links": [{"id": 41, "source_id": 15, "target_id": 17, "anchor": "бессвинцовые припои", "status": "planned"}, {"id": 109, "source_id": 43, "target_id": 17, "anchor": "свинец в припое", "status": "planned"}], "score_data": {"article_id": "17", "generated_at": "2026-10-28T15:16:00", "file": "сами статьи\\17-bessvincovyj-pripoj.md", "metrics": {"chars": 3138, "h1": ["Бессвинцовый припой: плюсы, минусы, когда использовать"], "h2_count": 8, "avg_sentence_words": 12.0, "avg_paragraph_sentences": 2.6, "faq": 4, "internal_links": 0, "sources": 2, "temps": 5, "alloys": true, "answer_first_words": 32, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 15, "max": 20}, "facts": {"points": 25, "max": 25}, "voice": {"points": 15, "max": 15}, "seo": {"points": 13, "max": 20}, "links": {"points": 5, "max": 10}, "ai": {"points": 8, "max": 10}}, "total": 81, "verdict": "готово к ОТК", "issues": ["Объём: 3,138 знаков (цель 5 500–7 000)", "Внутренние ссылки: 0 (нужно 3–5)", "Нет раздела «Источники/Стандарты»", "Ссылки: 0 (цель 3–5)"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 18, "title": "Припой с флюсом внутри: что это и зачем нужен", "slug": "pripoj-s-flyusom-vnutri", "cluster": "Материалы / Припои", "type": "обучающий", "priority": "🟡 Средний", "priority_score": 86, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 48, "source_id": 18, "target_id": 15, "anchor": "марки припоев", "status": "planned"}, {"id": 49, "source_id": 18, "target_id": 20, "anchor": "выбор флюса", "status": "planned"}], "in_links": [{"id": 42, "source_id": 15, "target_id": 18, "anchor": "трубчатый припой с флюсом", "status": "planned"}], "score_data": null}, {"id": 24, "title": "Как сделать флюс в домашних условиях", "slug": "kak-sdelat-flyus-doma", "cluster": "Материалы / Флюсы", "type": "инструкция", "priority": "🟢 Низкий", "priority_score": 85, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 62, "source_id": 24, "target_id": 20, "anchor": "готовые флюсы", "status": "planned"}, {"id": 63, "source_id": 24, "target_id": 21, "anchor": "спиртоканифольный флюс СКФ", "status": "planned"}], "in_links": [], "score_data": null}, {"id": 26, "title": "Холодная пайка: как распознать и переделать", "slug": "holodnaya-pajka-kak-raspoznat", "cluster": "Ошибки / Проблемы новичка", "type": "гайд", "priority": "🔴 Высокий", "priority_score": 85, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 68, "source_id": 26, "target_id": 25, "anchor": "все ошибки новичка", "status": "planned"}, {"id": 69, "source_id": 26, "target_id": 1, "anchor": "правильный прогрев контакта", "status": "planned"}], "in_links": [{"id": 64, "source_id": 25, "target_id": 26, "anchor": "дефект холодной пайки", "status": "planned"}], "score_data": null}, {"id": 27, "title": "Почему припой не плавится или скатывается: причины", "slug": "pripoj-ne-plavitsya-prichiny", "cluster": "Ошибки / Проблемы новичка", "type": "проблема-решение", "priority": "🟡 Средний", "priority_score": 85, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 70, "source_id": 27, "target_id": 25, "anchor": "типичные проблемы пайки", "status": "planned"}, {"id": 71, "source_id": 27, "target_id": 42, "anchor": "чистка и лужение жала", "status": "planned"}], "in_links": [{"id": 65, "source_id": 25, "target_id": 27, "anchor": "почему припой скатывается", "status": "planned"}, {"id": 106, "source_id": 42, "target_id": 27, "anchor": "очистка почерневшего жала", "status": "planned"}], "score_data": null}, {"id": 28, "title": "Как убрать мост припоя между контактами", "slug": "kak-ubrat-most-pripoya", "cluster": "Ошибки / Проблемы новичка", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 85, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 72, "source_id": 28, "target_id": 25, "anchor": "дефекты пайки", "status": "planned"}, {"id": 73, "source_id": 28, "target_id": 39, "anchor": "удаление припоя медной оплеткой", "status": "planned"}], "in_links": [{"id": 66, "source_id": 25, "target_id": 28, "anchor": "как убрать мостик припоя", "status": "planned"}, {"id": 100, "source_id": 39, "target_id": 28, "anchor": "устранение мостиков припоя", "status": "planned"}], "score_data": null}, {"id": 51, "title": "Пайка BGA микросхем для начинающих: что такое реболлинг и как его сделать", "slug": "payka-bga-rebolling-dlya-nachinayushchih", "cluster": "BGA и Реболлинг", "type": "гайд / инструкция", "priority": "🔴 Высокий", "priority_score": 85, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 125, "source_id": 51, "target_id": 56, "anchor": "накатка шаров на трафарете", "status": "planned"}, {"id": 126, "source_id": 51, "target_id": 59, "anchor": "нижний подогрев для BGA", "status": "planned"}, {"id": 127, "source_id": 51, "target_id": 52, "anchor": "паяльная паста BGA", "status": "planned"}], "in_links": [{"id": 89, "source_id": 34, "target_id": 51, "anchor": "реболлинг BGA чипов", "status": "planned"}, {"id": 138, "source_id": 56, "target_id": 51, "anchor": "реболлинг BGA", "status": "planned"}, {"id": 144, "source_id": 59, "target_id": 51, "anchor": "BGA монтаж", "status": "planned"}], "score_data": null}, {"id": 1, "title": "Как паять паяльником: пошаговый гайд для начинающих", "slug": "kak-payat-payalnikom-dlya-nachinayuschih", "cluster": "Основы пайки / Как паять", "type": "гайд", "priority": "🔴 Высокий", "priority_score": 84, "status": "ready", "next_action": "Опубликовать в WordPress", "bot": "solder-wordpress-publisher", "content_markdown": null, "chars": 0, "score_total": 81, "score_json": "{\"article_id\": \"1\", \"generated_at\": \"2026-10-28T15:16:19\", \"file\": \"seo\\\\data\\\\article_1.md\", \"metrics\": {\"chars\": 5941, \"h1\": [\"Как паять паяльником: пошаговый гайд для начинающих\"], \"h2_count\": 10, \"avg_sentence_words\": 17.0, \"avg_paragraph_sentences\": 2.0, \"faq\": 3, \"internal_links\": 2, \"sources\": 0, \"temps\": 10, \"alloys\": true, \"answer_first_words\": 37, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 18, \"max\": 20}, \"facts\": {\"points\": 17, \"max\": 25}, \"voice\": {\"points\": 15, \"max\": 15}, \"seo\": {\"points\": 13, \"max\": 20}, \"links\": {\"points\": 8, \"max\": 10}, \"ai\": {\"points\": 10, \"max\": 10}}, \"total\": 81, \"verdict\": \"готово к ОТК\", \"issues\": [\"H2: 10 (цель 4–8; для справочников допустимо до 10)\", \"Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)\", \"FAQ: 3 вопросов (нужно 4–6)\", \"Внутренние ссылки: 2 (нужно 3–5)\", \"Нет раздела «Источники/Стандарты»\", \"Ссылки: 2 (цель 3–5)\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 1, "source_id": 1, "target_id": 2, "anchor": "что купить новичку", "status": "planned"}, {"id": 2, "source_id": 1, "target_id": 15, "anchor": "выбор припоя ПОС-61", "status": "planned"}, {"id": 3, "source_id": 1, "target_id": 20, "anchor": "применение флюса", "status": "planned"}, {"id": 4, "source_id": 1, "target_id": 25, "anchor": "типичные ошибки новичков", "status": "planned"}], "in_links": [{"id": 5, "source_id": 2, "target_id": 1, "anchor": "пошаговая техника пайки", "status": "planned"}, {"id": 8, "source_id": 3, "target_id": 1, "anchor": "базовый гайд по пайке", "status": "planned"}, {"id": 11, "source_id": 4, "target_id": 1, "anchor": "пошаговый алгоритм", "status": "planned"}, {"id": 45, "source_id": 16, "target_id": 1, "anchor": "пайка припоем ПОС-61", "status": "planned"}, {"id": 57, "source_id": 21, "target_id": 1, "anchor": "нанесение флюса при пайке", "status": "planned"}, {"id": 69, "source_id": 26, "target_id": 1, "anchor": "правильный прогрев контакта", "status": "planned"}, {"id": 80, "source_id": 31, "target_id": 1, "anchor": "пайка DIP элементов", "status": "planned"}], "score_data": {"article_id": "1", "generated_at": "2026-10-28T15:16:19", "file": "seo\\data\\article_1.md", "metrics": {"chars": 5941, "h1": ["Как паять паяльником: пошаговый гайд для начинающих"], "h2_count": 10, "avg_sentence_words": 17.0, "avg_paragraph_sentences": 2.0, "faq": 3, "internal_links": 2, "sources": 0, "temps": 10, "alloys": true, "answer_first_words": 37, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 18, "max": 20}, "facts": {"points": 17, "max": 25}, "voice": {"points": 15, "max": 15}, "seo": {"points": 13, "max": 20}, "links": {"points": 8, "max": 10}, "ai": {"points": 10, "max": 10}}, "total": 81, "verdict": "готово к ОТК", "issues": ["H2: 10 (цель 4–8; для справочников допустимо до 10)", "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)", "FAQ: 3 вопросов (нужно 4–6)", "Внутренние ссылки: 2 (нужно 3–5)", "Нет раздела «Источники/Стандарты»", "Ссылки: 2 (цель 3–5)"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 12, "title": "Лучшие паяльные станции до 5000 рублей", "slug": "payalnye-stancii-do-5000", "cluster": "Инструменты / Рейтинг паяльников", "type": "рейтинг", "priority": "🟡 Средний", "priority_score": 84, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 34, "source_id": 12, "target_id": 11, "anchor": "общий рейтинг паяльников", "status": "planned"}, {"id": 35, "source_id": 12, "target_id": 7, "anchor": "станция или паяльник", "status": "planned"}], "in_links": [{"id": 21, "source_id": 7, "target_id": 12, "anchor": "бюджетные паяльные станции", "status": "planned"}, {"id": 31, "source_id": 11, "target_id": 12, "anchor": "станции до 5000 рублей", "status": "planned"}], "score_data": null}, {"id": 13, "title": "Обзор паяльников T12: что это и почему их выбирают", "slug": "payalniki-t12-obzor", "cluster": "Инструменты / Рейтинг паяльников", "type": "обзор", "priority": "🟡 Средний", "priority_score": 84, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 36, "source_id": 13, "target_id": 11, "anchor": "рейтинг домашних паяльников", "status": "planned"}, {"id": 37, "source_id": 13, "target_id": 41, "anchor": "картриджи и жала T12", "status": "planned"}], "in_links": [{"id": 32, "source_id": 11, "target_id": 13, "anchor": "паяльники T12", "status": "planned"}, {"id": 104, "source_id": 41, "target_id": 13, "anchor": "жала системы T12", "status": "planned"}], "score_data": null}, {"id": 19, "title": "Какой диаметр припоя выбрать для разных работ", "slug": "diametr-pripoya-dlya-rabot", "cluster": "Материалы / Припои", "type": "гайд", "priority": "🟢 Низкий", "priority_score": 84, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 50, "source_id": 19, "target_id": 15, "anchor": "виды припоев", "status": "planned"}, {"id": 51, "source_id": 19, "target_id": 30, "anchor": "припой для SMD", "status": "planned"}], "in_links": [], "score_data": null}, {"id": 46, "title": "Как организовать рабочее место для пайки дома", "slug": "kak-organizovat-mesto-dlya-pajki", "cluster": "Организация рабочего места", "type": "гайд", "priority": "🟡 Средний", "priority_score": 84, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 114, "source_id": 46, "target_id": 47, "anchor": "инструменты радиолюбителя", "status": "planned"}, {"id": 115, "source_id": 46, "target_id": 45, "anchor": "вентиляция и вытяжка", "status": "planned"}], "in_links": [{"id": 26, "source_id": 9, "target_id": 46, "anchor": "пайка вне дома", "status": "planned"}, {"id": 113, "source_id": 45, "target_id": 46, "anchor": "оборудование рабочего места", "status": "planned"}, {"id": 116, "source_id": 47, "target_id": 46, "anchor": "организация рабочего места", "status": "planned"}], "score_data": null}, {"id": 47, "title": "Набор инструментов для начинающего радиолюбителя", "slug": "nabor-instrumentov-dlya-nachinayuschih", "cluster": "Организация рабочего места", "type": "buyer's guide", "priority": "🔴 Высокий", "priority_score": 84, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 116, "source_id": 47, "target_id": 46, "anchor": "организация рабочего места", "status": "planned"}, {"id": 117, "source_id": 47, "target_id": 2, "anchor": "минимальный набор", "status": "planned"}, {"id": 118, "source_id": 47, "target_id": 6, "anchor": "выбор паяльника", "status": "planned"}], "in_links": [{"id": 7, "source_id": 2, "target_id": 47, "anchor": "набор инструментов радиолюбителя", "status": "planned"}, {"id": 114, "source_id": 46, "target_id": 47, "anchor": "инструменты радиолюбителя", "status": "planned"}], "score_data": null}, {"id": 52, "title": "Паяльная паста или припой в проволоке: что выбрать и в чём разница", "slug": "payalnaya-pasta-ili-pripoj", "cluster": "Паяльные пасты и химия", "type": "сравнение / гайд", "priority": "🔴 Высокий", "priority_score": 84, "status": "backlog", "next_action": "", "bot": "", "content_markdown": "# Паяльная паста или припой в проволоке: что выбрать и в чём разница\n\nПаяльная паста и проволочный припой делают одно дело, но устроены по-разному. Проволока — это металл, который подаёт жало. Паста — это порошок припоя вместе с флюсом, который сначала наносят на площадки, а потом оплавляют.\n\n## Краткий ответ\n\nДля обычной ручной пайки проводов и выводов берите проволочный припой и отдельный флюс. Паяльная паста нужна для монтажа SMD-компонентов методом оплавления. [web:70]\n\n**Что делать:**\n\n1. Определите задачу: провод и выводы — проволока, SMD с оплавлением — паста.\n2. Если паяете мелкие SMD вручную в небольшом объёме, проволока плюс жидкий флюс часто удобнее. [web:70]\n3. Для пасты нужен способ нагрева всей зоны: фен, плита или печь.\n4. Проверьте состав пасты: сплав должен подходить к Вашим платам.\n5. Не используйте пасту как замену флюса для обычной пайки проводов.\n\n## Из чего состоят\n\nПаста — это однородная масса из порошка припоя и флюса-связки. [web:71] Обычно она также содержит добавки, которые помогают ей держать форму. [web:70]\n\nПроволочный припой — чистый металлический сплав, а флюс в нём может быть только в виде сердцевины. [web:70] Если в проволоке нет флюса, его добавляют отдельно.\n\n## Сравнение\n\n| Параметр | Паяльная паста | Припой в проволоке |\n|---|---|---|\n| Состав | порошок припоя + флюс | металлический сплав, иногда с флюсом внутри |\n| Как наносят | шприцем, дозатором, через трафарет | подают жалом паяльника |\n| Нагрев | оплавление всей зоны | локальный нагрев жалом |\n| Где применяют | SMD, BGA, серийный монтаж | ручная пайка, ремонт, провода |\n| Объём работы | много однотипных площадок | единичные и разнородные швы |\n\nПринцип деления взят из справочных материалов. [web:70][web:61]\n\n## Когда брать пасту\n\n- Вы монтируете много SMD-компонентов на одной плате.\n- Вам нужна одинаковая доза припоя на каждой площадке.\n- У Вас есть способ равномерно прогреть плату.\n- Вы занимаетесь реболлингом или сборкой плат с нуля. [web:61]\n\n## Когда брать проволоку\n\n- Вы паяете провода, выводы, разъёмы.\n- Вы ремонтируете отдельные узлы.\n- Вам нужно точечно перепаять одну деталь.\n- Вы паяете немного SMD вручную: проволока с жидким флюсом даёт больше контроля. [web:70]\n\n## Частые ошибки\n\n- **Использовать пасту для пайки провода.** Паста рассчитана на оплавление, а не на подачу жалом.\n- **Нанести слишком много пасты.** Лишний припой при оплавлении собирается в шарики и мосты.\n- **Греть пасту только жалом.** Без равномерного прогрева шов будет холодным.\n- **Забыть про флюс при работе с проволокой без сердцевины.** Припой не смочит поверхность.\n\n## Безопасность\n\nИ паста, и флюс выделяют дым при нагреве: нужна вытяжка или проветривание. Если сплав свинцовый, соблюдайте гигиену: мойте руки и не ешьте за рабочим столом. Паяйте в защитных очках.\n\n## FAQ\n\n**Можно ли заменить пасту проволокой?**\nДля отдельных SMD вручную можно: проволока с жидким флюсом даёт контроль. Для серийной сборки паста удобнее.\n\n**Паяльная паста заменяет флюс?**\nНет, в пасте флюс уже есть, но это не отменяет флюс для других операций.\n\n**Подходит ли паста для обычного паяльника?**\nПаста рассчитана на оплавление всей зоны, поэтому нужен фен, плита или печь. Жалом её можно использовать, но результат менее предсказуем.\n\n**Можно ли смешивать пасту и проволоку?**\nЛучше не стоит, если сплавы разные: температуры плавления и свойства могут не совпасть.\n", "chars": 3366, "score_total": 70, "score_json": "{\"article_id\": \"52\", \"generated_at\": \"2026-10-28T15:16:01\", \"file\": \"сами статьи\\\\52-payalnaya-pasta-ili-pripoj.md\", \"metrics\": {\"chars\": 2820, \"h1\": [\"Паяльная паста или припой в проволоке: что выбрать и в чём разница\"], \"h2_count\": 8, \"avg_sentence_words\": 11.6, \"avg_paragraph_sentences\": 2.4, \"faq\": 4, \"internal_links\": 0, \"sources\": 5, \"temps\": 0, \"alloys\": false, \"answer_first_words\": 32, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 15, \"max\": 20}, \"facts\": {\"points\": 17, \"max\": 25}, \"voice\": {\"points\": 15, \"max\": 15}, \"seo\": {\"points\": 10, \"max\": 20}, \"links\": {\"points\": 5, \"max\": 10}, \"ai\": {\"points\": 8, \"max\": 10}}, \"total\": 70, \"verdict\": \"черновик\", \"issues\": [\"Объём: 2,820 знаков (цель 5 500–7 000)\", \"Сплавы: в тексте нет ни одного канонического сплава\", \"Температуры: 0 значений с °C (нужно ≥ 3 в паяльной теме)\", \"Внутренние ссылки: 0 (нужно 3–5)\", \"Нет раздела «Источники/Стандарты»\", \"Ссылки: 0 (цель 3–5)\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 128, "source_id": 52, "target_id": 15, "anchor": "проволочный припой", "status": "planned"}, {"id": 129, "source_id": 52, "target_id": 55, "anchor": "пайка пастой дома", "status": "planned"}, {"id": 130, "source_id": 52, "target_id": 20, "anchor": "флюс-гели", "status": "planned"}], "in_links": [{"id": 43, "source_id": 15, "target_id": 52, "anchor": "паяльная паста vs припой", "status": "planned"}, {"id": 55, "source_id": 20, "target_id": 52, "anchor": "флюс-гель и паста", "status": "planned"}, {"id": 127, "source_id": 51, "target_id": 52, "anchor": "паяльная паста BGA", "status": "planned"}, {"id": 136, "source_id": 55, "target_id": 52, "anchor": "выбор паяльной пасты", "status": "planned"}], "score_data": {"article_id": "52", "generated_at": "2026-10-28T15:16:01", "file": "сами статьи\\52-payalnaya-pasta-ili-pripoj.md", "metrics": {"chars": 2820, "h1": ["Паяльная паста или припой в проволоке: что выбрать и в чём разница"], "h2_count": 8, "avg_sentence_words": 11.6, "avg_paragraph_sentences": 2.4, "faq": 4, "internal_links": 0, "sources": 5, "temps": 0, "alloys": false, "answer_first_words": 32, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 15, "max": 20}, "facts": {"points": 17, "max": 25}, "voice": {"points": 15, "max": 15}, "seo": {"points": 10, "max": 20}, "links": {"points": 5, "max": 10}, "ai": {"points": 8, "max": 10}}, "total": 70, "verdict": "черновик", "issues": ["Объём: 2,820 знаков (цель 5 500–7 000)", "Сплавы: в тексте нет ни одного канонического сплава", "Температуры: 0 значений с °C (нужно ≥ 3 в паяльной теме)", "Внутренние ссылки: 0 (нужно 3–5)", "Нет раздела «Источники/Стандарты»", "Ссылки: 0 (цель 3–5)"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 56, "title": "Трафареты и шарики для BGA: как правильно накатать шары на чип", "slug": "trafarety-i-shariki-dlya-bga", "cluster": "BGA и Реболлинг", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 83, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 138, "source_id": 56, "target_id": 51, "anchor": "реболлинг BGA", "status": "planned"}, {"id": 139, "source_id": 56, "target_id": 59, "anchor": "термостол", "status": "planned"}], "in_links": [{"id": 125, "source_id": 51, "target_id": 56, "anchor": "накатка шаров на трафарете", "status": "planned"}, {"id": 145, "source_id": 59, "target_id": 56, "anchor": "трафареты BGA", "status": "planned"}], "score_data": null}, {"id": 59, "title": "Нижний подогрев для пайки плат: зачем нужен и как выбрать термостол", "slug": "nizhnij-podogrev-dlya-pajki", "cluster": "BGA и Реболлинг", "type": "гайд / выбор", "priority": "🟡 Средний", "priority_score": 83, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 144, "source_id": 59, "target_id": 51, "anchor": "BGA монтаж", "status": "planned"}, {"id": 145, "source_id": 59, "target_id": 56, "anchor": "трафареты BGA", "status": "planned"}], "in_links": [{"id": 126, "source_id": 51, "target_id": 59, "anchor": "нижний подогрев для BGA", "status": "planned"}, {"id": 139, "source_id": 56, "target_id": 59, "anchor": "термостол", "status": "planned"}], "score_data": null}, {"id": 9, "title": "Беспроводной паяльник: плюсы, минусы, когда нужен", "slug": "besprovodnoj-payalnik", "cluster": "Инструменты / Выбор паяльника", "type": "обзор", "priority": "🟡 Средний", "priority_score": 82, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 25, "source_id": 9, "target_id": 6, "anchor": "сетевые паяльники", "status": "planned"}, {"id": 26, "source_id": 9, "target_id": 46, "anchor": "пайка вне дома", "status": "planned"}], "in_links": [], "score_data": null}, {"id": 10, "title": "Паяльник для SMD: какой выбрать для мелких деталей", "slug": "payalnik-dlya-smd", "cluster": "Инструменты / Выбор паяльника", "type": "buyer's guide", "priority": "🟡 Средний", "priority_score": 82, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 27, "source_id": 10, "target_id": 6, "anchor": "критерии выбора паяльника", "status": "planned"}, {"id": 28, "source_id": 10, "target_id": 30, "anchor": "ручная пайка SMD", "status": "planned"}, {"id": 29, "source_id": 10, "target_id": 41, "anchor": "микрожала для SMD", "status": "planned"}], "in_links": [], "score_data": null}, {"id": 2, "title": "С чего начать пайку: что нужно новичку", "slug": "s-chego-nachat-pajku", "cluster": "Основы пайки / Как паять", "type": "гайд", "priority": "🔴 Высокий", "priority_score": 81, "status": "written", "next_action": "Опубликовать", "bot": "solder-article-writer", "content_markdown": null, "chars": 0, "score_total": 50, "score_json": "{\"article_id\": \"2\", \"generated_at\": \"2026-10-28T15:16:21\", \"file\": \"seo\\\\data\\\\article_2.md\", \"metrics\": {\"chars\": 1171, \"h1\": [], \"h2_count\": 0, \"avg_sentence_words\": 22.3, \"avg_paragraph_sentences\": 9.0, \"faq\": 0, \"internal_links\": 0, \"sources\": 0, \"temps\": 1, \"alloys\": true, \"answer_first_words\": 205, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 5, \"max\": 20}, \"facts\": {\"points\": 14, \"max\": 25}, \"voice\": {\"points\": 11, \"max\": 15}, \"seo\": {\"points\": 7, \"max\": 20}, \"links\": {\"points\": 5, \"max\": 10}, \"ai\": {\"points\": 8, \"max\": 10}}, \"total\": 50, \"verdict\": \"в доработку\", \"issues\": [\"Answer First: 205 слов в первом абзаце (нужно ≤ 40)\", \"H1: найдено 0 (нужен ровно один)\", \"H2: 0 (цель 4–8; для справочников допустимо до 10)\", \"Объём: 1,171 знаков (цель 5 500–7 000)\", \"Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)\", \"Температуры: 1 значений с °C (нужно ≥ 3 в паяльной теме)\", \"Средняя длина предложения 22.333333333333332 слов (цель ≤ 20)\", \"Абзацы по 9.0 предложений (цель 1–3)\", \"FAQ: 0 вопросов (нужно 4–6)\", \"Внутренние ссылки: 0 (нужно 3–5)\", \"Нет раздела «Источники/Стандарты»\", \"Ссылки: 0 (цель 3–5)\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 5, "source_id": 2, "target_id": 1, "anchor": "пошаговая техника пайки", "status": "planned"}, {"id": 6, "source_id": 2, "target_id": 6, "anchor": "как выбрать паяльник", "status": "planned"}, {"id": 7, "source_id": 2, "target_id": 47, "anchor": "набор инструментов радиолюбителя", "status": "planned"}], "in_links": [{"id": 1, "source_id": 1, "target_id": 2, "anchor": "что купить новичку", "status": "planned"}, {"id": 117, "source_id": 47, "target_id": 2, "anchor": "минимальный набор", "status": "planned"}], "score_data": {"article_id": "2", "generated_at": "2026-10-28T15:16:21", "file": "seo\\data\\article_2.md", "metrics": {"chars": 1171, "h1": [], "h2_count": 0, "avg_sentence_words": 22.3, "avg_paragraph_sentences": 9.0, "faq": 0, "internal_links": 0, "sources": 0, "temps": 1, "alloys": true, "answer_first_words": 205, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 5, "max": 20}, "facts": {"points": 14, "max": 25}, "voice": {"points": 11, "max": 15}, "seo": {"points": 7, "max": 20}, "links": {"points": 5, "max": 10}, "ai": {"points": 8, "max": 10}}, "total": 50, "verdict": "в доработку", "issues": ["Answer First: 205 слов в первом абзаце (нужно ≤ 40)", "H1: найдено 0 (нужен ровно один)", "H2: 0 (цель 4–8; для справочников допустимо до 10)", "Объём: 1,171 знаков (цель 5 500–7 000)", "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)", "Температуры: 1 значений с °C (нужно ≥ 3 в паяльной теме)", "Средняя длина предложения 22.333333333333332 слов (цель ≤ 20)", "Абзацы по 9.0 предложений (цель 1–3)", "FAQ: 0 вопросов (нужно 4–6)", "Внутренние ссылки: 0 (нужно 3–5)", "Нет раздела «Источники/Стандарты»", "Ссылки: 0 (цель 3–5)"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 3, "title": "Пайка проводов: как правильно соединить и изолировать", "slug": "pajka-provodov-kak-soedinit", "cluster": "Основы пайки / Как паять", "type": "инструкция", "priority": "🔴 Высокий", "priority_score": 81, "status": "written", "next_action": "Передать на ревью (solder-reviewer)", "bot": "solder-reviewer", "content_markdown": null, "chars": 0, "score_total": 79, "score_json": "{\"article_id\": \"3\", \"generated_at\": \"2026-10-28T15:16:22\", \"file\": \"seo\\\\data\\\\article_3.md\", \"metrics\": {\"chars\": 7615, \"h1\": [\"🔥 Пайка проводов: как правильно соединить, спаять и надежно изолировать\"], \"h2_count\": 9, \"avg_sentence_words\": 13.4, \"avg_paragraph_sentences\": 1.6, \"faq\": 0, \"internal_links\": 3, \"sources\": 1, \"temps\": 7, \"alloys\": true, \"answer_first_words\": 44, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 13, \"max\": 20}, \"facts\": {\"points\": 21, \"max\": 25}, \"voice\": {\"points\": 15, \"max\": 15}, \"seo\": {\"points\": 12, \"max\": 20}, \"links\": {\"points\": 8, \"max\": 10}, \"ai\": {\"points\": 10, \"max\": 10}}, \"total\": 79, \"verdict\": \"черновик\", \"issues\": [\"Answer First: 44 слов в первом абзаце (нужно ≤ 40)\", \"H2: 9 (цель 4–8; для справочников допустимо до 10)\", \"Объём: 7,615 знаков (цель 5 500–7 000)\", \"Источники: найдено 1 упоминаний ГОСТ/IPC/TDS (нужно 2–4)\", \"FAQ: 0 вопросов (нужно 4–6)\", \"Нет раздела «Источники/Стандарты»\", \"Анкоры «тут/здесь» — заменить\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 8, "source_id": 3, "target_id": 1, "anchor": "базовый гайд по пайке", "status": "planned"}, {"id": 9, "source_id": 3, "target_id": 15, "anchor": "припой для медных жил", "status": "planned"}, {"id": 10, "source_id": 3, "target_id": 50, "anchor": "изоляция термоусадкой", "status": "planned"}], "in_links": [{"id": 92, "source_id": 36, "target_id": 3, "anchor": "пайка тонких проводов", "status": "planned"}, {"id": 123, "source_id": 50, "target_id": 3, "anchor": "пайка и изоляция проводов", "status": "planned"}], "score_data": {"article_id": "3", "generated_at": "2026-10-28T15:16:22", "file": "seo\\data\\article_3.md", "metrics": {"chars": 7615, "h1": ["🔥 Пайка проводов: как правильно соединить, спаять и надежно изолировать"], "h2_count": 9, "avg_sentence_words": 13.4, "avg_paragraph_sentences": 1.6, "faq": 0, "internal_links": 3, "sources": 1, "temps": 7, "alloys": true, "answer_first_words": 44, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 13, "max": 20}, "facts": {"points": 21, "max": 25}, "voice": {"points": 15, "max": 15}, "seo": {"points": 12, "max": 20}, "links": {"points": 8, "max": 10}, "ai": {"points": 10, "max": 10}}, "total": 79, "verdict": "черновик", "issues": ["Answer First: 44 слов в первом абзаце (нужно ≤ 40)", "H2: 9 (цель 4–8; для справочников допустимо до 10)", "Объём: 7,615 знаков (цель 5 500–7 000)", "Источники: найдено 1 упоминаний ГОСТ/IPC/TDS (нужно 2–4)", "FAQ: 0 вопросов (нужно 4–6)", "Нет раздела «Источники/Стандарты»", "Анкоры «тут/здесь» — заменить"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 14, "title": "Паяльники Hakko: обзор моделей и для чего подходят", "slug": "payalniki-hakko-obzor", "cluster": "Инструменты / Рейтинг паяльников", "type": "обзор бренда", "priority": "🟢 Низкий", "priority_score": 81, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 38, "source_id": 14, "target_id": 11, "anchor": "ТОП паяльников", "status": "planned"}, {"id": 39, "source_id": 14, "target_id": 41, "anchor": "стандарты жал Hakko", "status": "planned"}], "in_links": [], "score_data": null}, {"id": 5, "title": "Пайка для детей: безопасное обучение основам", "slug": "pajka-dlya-detej-bezopasnost", "cluster": "Основы пайки / Как паять", "type": "гайд", "priority": "🟢 Низкий", "priority_score": 80, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 14, "source_id": 5, "target_id": 8, "anchor": "маломощный паяльник", "status": "planned"}, {"id": 15, "source_id": 5, "target_id": 43, "anchor": "техника безопасности", "status": "planned"}], "in_links": [], "score_data": null}, {"id": 30, "title": "SMD пайка своими руками: как паять мелкие компоненты", "slug": "smd-pajka-svoimi-rukami", "cluster": "Типы монтажа / SMD", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 80, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 76, "source_id": 30, "target_id": 31, "anchor": "разница SMD и DIP", "status": "planned"}, {"id": 77, "source_id": 30, "target_id": 32, "anchor": "пайка SMD без фена", "status": "planned"}, {"id": 78, "source_id": 30, "target_id": 33, "anchor": "термофен для SMD", "status": "planned"}, {"id": 79, "source_id": 30, "target_id": 58, "anchor": "пайка 0201 и 0402", "status": "planned"}], "in_links": [{"id": 28, "source_id": 10, "target_id": 30, "anchor": "ручная пайка SMD", "status": "planned"}, {"id": 51, "source_id": 19, "target_id": 30, "anchor": "припой для SMD", "status": "planned"}, {"id": 61, "source_id": 23, "target_id": 30, "anchor": "флюс-гель для SMD", "status": "planned"}, {"id": 81, "source_id": 31, "target_id": 30, "anchor": "ручная пайка SMD", "status": "planned"}, {"id": 82, "source_id": 32, "target_id": 30, "anchor": "гайд по SMD пайке", "status": "planned"}, {"id": 84, "source_id": 33, "target_id": 30, "anchor": "ручной монтаж SMD", "status": "planned"}, {"id": 131, "source_id": 53, "target_id": 30, "anchor": "пайка мелких планарных чипов", "status": "planned"}, {"id": 137, "source_id": 55, "target_id": 30, "anchor": "ручной SMD монтаж", "status": "planned"}, {"id": 142, "source_id": 58, "target_id": 30, "anchor": "базовый SMD монтаж", "status": "planned"}], "score_data": null}, {"id": 41, "title": "Жало для паяльника: типы, уход, когда менять", "slug": "zhalo-dlya-payalnika-tipy", "cluster": "Инструменты / Жала", "type": "гайд", "priority": "🟡 Средний", "priority_score": 80, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 103, "source_id": 41, "target_id": 42, "anchor": "чистка и лужение жала", "status": "planned"}, {"id": 104, "source_id": 41, "target_id": 13, "anchor": "жала системы T12", "status": "planned"}], "in_links": [{"id": 29, "source_id": 10, "target_id": 41, "anchor": "микрожала для SMD", "status": "planned"}, {"id": 37, "source_id": 13, "target_id": 41, "anchor": "картриджи и жала T12", "status": "planned"}, {"id": 39, "source_id": 14, "target_id": 41, "anchor": "стандарты жал Hakko", "status": "planned"}, {"id": 105, "source_id": 42, "target_id": 41, "anchor": "типы жал", "status": "planned"}], "score_data": null}, {"id": 42, "title": "Как правильно чистить и лудить жало паяльника", "slug": "kak-chistit-i-ludit-zhalo", "cluster": "Инструменты / Жала", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 80, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 105, "source_id": 42, "target_id": 41, "anchor": "типы жал", "status": "planned"}, {"id": 106, "source_id": 42, "target_id": 27, "anchor": "очистка почерневшего жала", "status": "planned"}], "in_links": [{"id": 13, "source_id": 4, "target_id": 42, "anchor": "лужение жала", "status": "planned"}, {"id": 71, "source_id": 27, "target_id": 42, "anchor": "чистка и лужение жала", "status": "planned"}, {"id": 102, "source_id": 40, "target_id": 42, "anchor": "губка и стружка для очистки жала", "status": "planned"}, {"id": 103, "source_id": 41, "target_id": 42, "anchor": "чистка и лужение жала", "status": "planned"}], "score_data": null}, {"id": 55, "title": "Как паять паяльной пастой без фена и печи: пошаговый метод", "slug": "kak-payat-payalnoj-pastoj-bez-fena", "cluster": "Паяльные пасты и химия", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 80, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 136, "source_id": 55, "target_id": 52, "anchor": "выбор паяльной пасты", "status": "planned"}, {"id": 137, "source_id": 55, "target_id": 30, "anchor": "ручной SMD монтаж", "status": "planned"}], "in_links": [{"id": 129, "source_id": 52, "target_id": 55, "anchor": "пайка пастой дома", "status": "planned"}], "score_data": null}, {"id": 54, "title": "Смарт-паяльники на Type-C: обзор и сравнение TS101, Pinecil V2 и FNC88", "slug": "smart-payalniki-type-c-obzor", "cluster": "Смарт-паяльники Type-C", "type": "рейтинг / обзор", "priority": "🔴 Высокий", "priority_score": 79, "status": "brief", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 133, "source_id": 54, "target_id": 6, "anchor": "выбор смарт-паяльника", "status": "planned"}, {"id": 134, "source_id": 54, "target_id": 57, "anchor": "прошивка IronOS", "status": "planned"}, {"id": 135, "source_id": 54, "target_id": 60, "anchor": "питание от Power Delivery", "status": "planned"}], "in_links": [{"id": 19, "source_id": 6, "target_id": 54, "anchor": "смарт-паяльники Type-C", "status": "planned"}, {"id": 33, "source_id": 11, "target_id": 54, "anchor": "смарт-паяльники Type-C", "status": "planned"}, {"id": 140, "source_id": 57, "target_id": 54, "anchor": "смарт-паяльники TS101 и Pinecil", "status": "planned"}, {"id": 146, "source_id": 60, "target_id": 54, "anchor": "паяльники Type-C", "status": "planned"}], "score_data": null}, {"id": 43, "title": "Техника безопасности при пайке: что важно соблюдать", "slug": "tehnika-bezopasnosti-pri-pajke", "cluster": "Безопасность", "type": "гайд", "priority": "🔴 Высокий", "priority_score": 78, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 107, "source_id": 43, "target_id": 44, "anchor": "вред дыма от канифоли", "status": "planned"}, {"id": 108, "source_id": 43, "target_id": 45, "anchor": "вытяжка для пайки", "status": "planned"}, {"id": 109, "source_id": 43, "target_id": 17, "anchor": "свинец в припое", "status": "planned"}], "in_links": [{"id": 15, "source_id": 5, "target_id": 43, "anchor": "техника безопасности", "status": "planned"}, {"id": 47, "source_id": 17, "target_id": 43, "anchor": "безопасность при работе со свинцом", "status": "planned"}, {"id": 110, "source_id": 44, "target_id": 43, "anchor": "техника безопасности", "status": "planned"}, {"id": 112, "source_id": 45, "target_id": 43, "anchor": "безопасность дома", "status": "planned"}], "score_data": null}, {"id": 4, "title": "Как научиться паять быстро и без брака", "slug": "kak-nauchitsya-payat-bystro", "cluster": "Основы пайки / Как паять", "type": "гайд", "priority": "🟡 Средний", "priority_score": 76, "status": "written", "next_action": "Передать на аудит (solder-article-auditor)", "bot": "solder-article-auditor", "content_markdown": null, "chars": 0, "score_total": 79, "score_json": "{\"article_id\": \"4\", \"generated_at\": \"2026-10-28T15:16:23\", \"file\": \"seo\\\\data\\\\article_4.md\", \"metrics\": {\"chars\": 6298, \"h1\": [\"⚡ Как научиться паять быстро и без брака: система тренировки для начинающих\"], \"h2_count\": 9, \"avg_sentence_words\": 12.9, \"avg_paragraph_sentences\": 2.0, \"faq\": 0, \"internal_links\": 3, \"sources\": 0, \"temps\": 6, \"alloys\": true, \"answer_first_words\": 50, \"stop_phrases\": [], \"bureaucratic\": [], \"ai_patterns\": [], \"dangerous\": []}, \"blocks\": {\"intent\": {\"points\": 15, \"max\": 20}, \"facts\": {\"points\": 17, \"max\": 25}, \"voice\": {\"points\": 15, \"max\": 15}, \"seo\": {\"points\": 12, \"max\": 20}, \"links\": {\"points\": 10, \"max\": 10}, \"ai\": {\"points\": 10, \"max\": 10}}, \"total\": 79, \"verdict\": \"черновик\", \"issues\": [\"Answer First: 50 слов в первом абзаце (нужно ≤ 40)\", \"H2: 9 (цель 4–8; для справочников допустимо до 10)\", \"Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)\", \"FAQ: 0 вопросов (нужно 4–6)\", \"Нет раздела «Источники/Стандарты»\"], \"blockers\": [], \"manual\": [\"проверить факты по первоисточникам\", \"проверить уникальность (text.ru/Главред)\", \"прочитать голосом вслух (голос Practico)\"]}", "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 11, "source_id": 4, "target_id": 1, "anchor": "пошаговый алгоритм", "status": "planned"}, {"id": 12, "source_id": 4, "target_id": 25, "anchor": "причины брака", "status": "planned"}, {"id": 13, "source_id": 4, "target_id": 42, "anchor": "лужение жала", "status": "planned"}], "in_links": [], "score_data": {"article_id": "4", "generated_at": "2026-10-28T15:16:23", "file": "seo\\data\\article_4.md", "metrics": {"chars": 6298, "h1": ["⚡ Как научиться паять быстро и без брака: система тренировки для начинающих"], "h2_count": 9, "avg_sentence_words": 12.9, "avg_paragraph_sentences": 2.0, "faq": 0, "internal_links": 3, "sources": 0, "temps": 6, "alloys": true, "answer_first_words": 50, "stop_phrases": [], "bureaucratic": [], "ai_patterns": [], "dangerous": []}, "blocks": {"intent": {"points": 15, "max": 20}, "facts": {"points": 17, "max": 25}, "voice": {"points": 15, "max": 15}, "seo": {"points": 12, "max": 20}, "links": {"points": 10, "max": 10}, "ai": {"points": 10, "max": 10}}, "total": 79, "verdict": "черновик", "issues": ["Answer First: 50 слов в первом абзаце (нужно ≤ 40)", "H2: 9 (цель 4–8; для справочников допустимо до 10)", "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)", "FAQ: 0 вопросов (нужно 4–6)", "Нет раздела «Источники/Стандарты»"], "blockers": [], "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)", "прочитать голосом вслух (голос Practico)"]}}, {"id": 45, "title": "Вентиляция и вытяжка для рабочего места пайки", "slug": "ventilyaciya-dlya-pajki", "cluster": "Безопасность", "type": "гайд", "priority": "🟢 Низкий", "priority_score": 76, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 112, "source_id": 45, "target_id": 43, "anchor": "безопасность дома", "status": "planned"}, {"id": 113, "source_id": 45, "target_id": 46, "anchor": "оборудование рабочего места", "status": "planned"}], "in_links": [{"id": 108, "source_id": 43, "target_id": 45, "anchor": "вытяжка для пайки", "status": "planned"}, {"id": 111, "source_id": 44, "target_id": 45, "anchor": "дымоуловитель для пайки", "status": "planned"}, {"id": 115, "source_id": 46, "target_id": 45, "anchor": "вентиляция и вытяжка", "status": "planned"}], "score_data": null}, {"id": 34, "title": "Пайка платы телефона: что нужно знать перед началом", "slug": "pajka-platy-telefona", "cluster": "Ремонт электроники", "type": "гайд", "priority": "🟡 Средний", "priority_score": 75, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 86, "source_id": 34, "target_id": 35, "anchor": "замена разъёма Type-C", "status": "planned"}, {"id": 87, "source_id": 34, "target_id": 36, "anchor": "пайка шнуров и наушников", "status": "planned"}, {"id": 88, "source_id": 34, "target_id": 37, "anchor": "выпайка деталей с платы", "status": "planned"}, {"id": 89, "source_id": 34, "target_id": 51, "anchor": "реболлинг BGA чипов", "status": "planned"}], "in_links": [{"id": 90, "source_id": 35, "target_id": 34, "anchor": "пайка плат телефонов", "status": "planned"}, {"id": 95, "source_id": 37, "target_id": 34, "anchor": "ремонт плат", "status": "planned"}], "score_data": null}, {"id": 57, "title": "Прошивка IronOS для паяльников TS100, TS101 и Pinecil: зачем менять и как настроить", "slug": "proshivka-ironos-dlya-payalnikov", "cluster": "Смарт-паяльники Type-C", "type": "обучающий / гайд", "priority": "🟢 Низкий", "priority_score": 75, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 140, "source_id": 57, "target_id": 54, "anchor": "смарт-паяльники TS101 и Pinecil", "status": "planned"}, {"id": 141, "source_id": 57, "target_id": 60, "anchor": "настройка профилей мощности", "status": "planned"}], "in_links": [{"id": 134, "source_id": 54, "target_id": 57, "anchor": "прошивка IronOS", "status": "planned"}, {"id": 147, "source_id": 60, "target_id": 57, "anchor": "настройка параметров IronOS", "status": "planned"}], "score_data": null}, {"id": 60, "title": "Как паять от повербанка: протоколы Power Delivery (PD) и Quick Charge (QC)", "slug": "kak-payat-ot-powerbanka-pd-qc", "cluster": "Смарт-паяльники Type-C", "type": "гайд", "priority": "🟢 Низкий", "priority_score": 75, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 146, "source_id": 60, "target_id": 54, "anchor": "паяльники Type-C", "status": "planned"}, {"id": 147, "source_id": 60, "target_id": 57, "anchor": "настройка параметров IronOS", "status": "planned"}], "in_links": [{"id": 135, "source_id": 54, "target_id": 60, "anchor": "питание от Power Delivery", "status": "planned"}, {"id": 141, "source_id": 57, "target_id": 60, "anchor": "настройка профилей мощности", "status": "planned"}], "score_data": null}, {"id": 32, "title": "Как паять SMD без паяльной станции с горячим воздухом", "slug": "kak-payat-smd-bez-fena", "cluster": "Типы монтажа / SMD", "type": "инструкция", "priority": "🟢 Низкий", "priority_score": 74, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 82, "source_id": 32, "target_id": 30, "anchor": "гайд по SMD пайке", "status": "planned"}, {"id": 83, "source_id": 32, "target_id": 39, "anchor": "демонтаж оплеткой", "status": "planned"}], "in_links": [{"id": 77, "source_id": 30, "target_id": 32, "anchor": "пайка SMD без фена", "status": "planned"}], "score_data": null}, {"id": 33, "title": "Термофен для пайки: нужен ли новичку и как выбрать", "slug": "termofen-dlya-pajki-vybor", "cluster": "Типы монтажа / SMD", "type": "buyer's guide", "priority": "🟢 Низкий", "priority_score": 74, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 84, "source_id": 33, "target_id": 30, "anchor": "ручной монтаж SMD", "status": "planned"}, {"id": 85, "source_id": 33, "target_id": 7, "anchor": "комбо-станции с феном", "status": "planned"}], "in_links": [{"id": 22, "source_id": 7, "target_id": 33, "anchor": "термофен для SMD", "status": "planned"}, {"id": 78, "source_id": 30, "target_id": 33, "anchor": "термофен для SMD", "status": "planned"}], "score_data": null}, {"id": 44, "title": "Вреден ли дым от флюса и как защититься", "slug": "vreden-li-dym-ot-flyusa", "cluster": "Безопасность", "type": "обучающий", "priority": "🟡 Средний", "priority_score": 74, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 110, "source_id": 44, "target_id": 43, "anchor": "техника безопасности", "status": "planned"}, {"id": 111, "source_id": 44, "target_id": 45, "anchor": "дымоуловитель для пайки", "status": "planned"}], "in_links": [{"id": 107, "source_id": 43, "target_id": 44, "anchor": "вред дыма от канифоли", "status": "planned"}], "score_data": null}, {"id": 58, "title": "Ручная пайка мелких компонентов 0201 и 0402: технологии и инструменты", "slug": "pajka-komponentov-0201-0402", "cluster": "Типы монтажа / SMD", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 74, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 142, "source_id": 58, "target_id": 30, "anchor": "базовый SMD монтаж", "status": "planned"}, {"id": 143, "source_id": 58, "target_id": 53, "anchor": "микроскоп для мелких чипов", "status": "planned"}], "in_links": [{"id": 79, "source_id": 30, "target_id": 58, "anchor": "пайка 0201 и 0402", "status": "planned"}], "score_data": null}, {"id": 35, "title": "Как перепаять разъём зарядки на плате", "slug": "kak-perepayat-razyom-zaryadki", "cluster": "Ремонт электроники", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 73, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 90, "source_id": 35, "target_id": 34, "anchor": "пайка плат телефонов", "status": "planned"}, {"id": 91, "source_id": 35, "target_id": 37, "anchor": "демонтаж разъёма", "status": "planned"}], "in_links": [{"id": 86, "source_id": 34, "target_id": 35, "anchor": "замена разъёма Type-C", "status": "planned"}], "score_data": null}, {"id": 36, "title": "Ремонт наушников своими руками: пайка проводов", "slug": "remont-naushnikov-pajka", "cluster": "Ремонт электроники", "type": "инструкция", "priority": "🟢 Низкий", "priority_score": 73, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 92, "source_id": 36, "target_id": 3, "anchor": "пайка тонких проводов", "status": "planned"}, {"id": 93, "source_id": 36, "target_id": 50, "anchor": "изоляция термоусадкой", "status": "planned"}], "in_links": [{"id": 87, "source_id": 34, "target_id": 36, "anchor": "пайка шнуров и наушников", "status": "planned"}, {"id": 124, "source_id": 50, "target_id": 36, "anchor": "ремонт кабеля", "status": "planned"}], "score_data": null}, {"id": 37, "title": "Как выпаять деталь с платы без повреждений", "slug": "kak-vypayat-detal-s-platy", "cluster": "Ремонт электроники", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 73, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 94, "source_id": 37, "target_id": 39, "anchor": "медная оплетка для демонтажа", "status": "planned"}, {"id": 95, "source_id": 37, "target_id": 34, "anchor": "ремонт плат", "status": "planned"}], "in_links": [{"id": 88, "source_id": 34, "target_id": 37, "anchor": "выпайка деталей с платы", "status": "planned"}, {"id": 91, "source_id": 35, "target_id": 37, "anchor": "демонтаж разъёма", "status": "planned"}], "score_data": null}, {"id": 53, "title": "Как выбрать микроскоп для пайки плат: оптика vs цифра с HDMI/Type-C", "slug": "vybor-mikroskopa-dlya-pajki", "cluster": "Оптические приборы / Микроскопы", "type": "buyer's guide", "priority": "🟡 Средний", "priority_score": 67, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 131, "source_id": 53, "target_id": 30, "anchor": "пайка мелких планарных чипов", "status": "planned"}, {"id": 132, "source_id": 53, "target_id": 38, "anchor": "оснастка", "status": "planned"}], "in_links": [{"id": 98, "source_id": 38, "target_id": 53, "anchor": "микроскопы для пайки", "status": "planned"}, {"id": 143, "source_id": 58, "target_id": 53, "anchor": "микроскоп для мелких чипов", "status": "planned"}], "score_data": null}, {"id": 61, "title": "Как выбрать качественный флюс для пайки SMD", "slug": "smd-61", "cluster": "Флюсы / Расходники", "type": "форум / вопрос-ответ", "priority": "средний", "priority_score": 67, "status": "backlog", "next_action": "одобрена из topics_proposed", "bot": null, "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": null, "updated_at": null, "out_links": [], "in_links": [], "score_data": null}, {"id": 31, "title": "SMD или DIP: чем отличаются и что выбрать для проекта", "slug": "smd-ili-dip-chem-otlichayutsya", "cluster": "Типы монтажа / SMD vs DIP", "type": "сравнение", "priority": "🟡 Средний", "priority_score": 66, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 80, "source_id": 31, "target_id": 1, "anchor": "пайка DIP элементов", "status": "planned"}, {"id": 81, "source_id": 31, "target_id": 30, "anchor": "ручная пайка SMD", "status": "planned"}], "in_links": [{"id": 76, "source_id": 30, "target_id": 31, "anchor": "разница SMD и DIP", "status": "planned"}], "score_data": null}, {"id": 39, "title": "Оплётка для снятия припоя: как использовать правильно", "slug": "opletka-dlya-snyatiya-pripoya", "cluster": "Аксессуары / Оснастка", "type": "инструкция", "priority": "🟢 Низкий", "priority_score": 64, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 99, "source_id": 39, "target_id": 38, "anchor": "оснастка для пайки", "status": "planned"}, {"id": 100, "source_id": 39, "target_id": 28, "anchor": "устранение мостиков припоя", "status": "planned"}], "in_links": [{"id": 73, "source_id": 28, "target_id": 39, "anchor": "удаление припоя медной оплеткой", "status": "planned"}, {"id": 83, "source_id": 32, "target_id": 39, "anchor": "демонтаж оплеткой", "status": "planned"}, {"id": 94, "source_id": 37, "target_id": 39, "anchor": "медная оплетка для демонтажа", "status": "planned"}, {"id": 96, "source_id": 38, "target_id": 39, "anchor": "медная оплетка", "status": "planned"}], "score_data": null}, {"id": 38, "title": "Держатель для пайки (третья рука): нужен ли и какой выбрать", "slug": "derzhatel-dlya-pajki-tretya-ruka", "cluster": "Аксессуары / Оснастка", "type": "buyer's guide", "priority": "🟢 Низкий", "priority_score": 62, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 96, "source_id": 38, "target_id": 39, "anchor": "медная оплетка", "status": "planned"}, {"id": 97, "source_id": 38, "target_id": 40, "anchor": "подставка под паяльник", "status": "planned"}, {"id": 98, "source_id": 38, "target_id": 53, "anchor": "микроскопы для пайки", "status": "planned"}], "in_links": [{"id": 99, "source_id": 39, "target_id": 38, "anchor": "оснастка для пайки", "status": "planned"}, {"id": 101, "source_id": 40, "target_id": 38, "anchor": "оснастка", "status": "planned"}, {"id": 132, "source_id": 53, "target_id": 38, "anchor": "оснастка", "status": "planned"}], "score_data": null}, {"id": 40, "title": "Подставка и губка для паяльника: зачем нужны", "slug": "podstavka-i-gubka-dlya-payalnika", "cluster": "Аксессуары / Оснастка", "type": "гайд", "priority": "🟢 Низкий", "priority_score": 59, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 101, "source_id": 40, "target_id": 38, "anchor": "оснастка", "status": "planned"}, {"id": 102, "source_id": 40, "target_id": 42, "anchor": "губка и стружка для очистки жала", "status": "planned"}], "in_links": [{"id": 97, "source_id": 38, "target_id": 40, "anchor": "подставка под паяльник", "status": "planned"}], "score_data": null}, {"id": 48, "title": "Пайка алюминия: особенности и какой припой использовать", "slug": "pajka-alyuminiya-osobennosti", "cluster": "Материалы / Специфичные", "type": "гайд", "priority": "🟢 Низкий", "priority_score": 59, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 119, "source_id": 48, "target_id": 22, "anchor": "активный флюс для алюминия", "status": "planned"}, {"id": 120, "source_id": 48, "target_id": 15, "anchor": "припой HTS-2000", "status": "planned"}], "in_links": [{"id": 122, "source_id": 49, "target_id": 48, "anchor": "пайка сложных металлов", "status": "planned"}], "score_data": null}, {"id": 50, "title": "Термоусадка после пайки: как использовать правильно", "slug": "termousadka-posle-pajki", "cluster": "Материалы / Специфичные", "type": "инструкция", "priority": "🟡 Средний", "priority_score": 59, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 123, "source_id": 50, "target_id": 3, "anchor": "пайка и изоляция проводов", "status": "planned"}, {"id": 124, "source_id": 50, "target_id": 36, "anchor": "ремонт кабеля", "status": "planned"}], "in_links": [{"id": 10, "source_id": 3, "target_id": 50, "anchor": "изоляция термоусадкой", "status": "planned"}, {"id": 93, "source_id": 36, "target_id": 50, "anchor": "изоляция термоусадкой", "status": "planned"}], "score_data": null}, {"id": 49, "title": "Пайка нержавейки: можно ли и как это сделать", "slug": "pajka-nerzhavejki", "cluster": "Материалы / Специфичные", "type": "гайд", "priority": "🟢 Низкий", "priority_score": 57, "status": "backlog", "next_action": "", "bot": "", "content_markdown": null, "chars": 0, "score_total": null, "score_json": null, "created_at": "2026-10-28T22:09:11", "updated_at": "2026-10-28T22:09:11", "out_links": [{"id": 121, "source_id": 49, "target_id": 22, "anchor": "ортофосфорная кислота", "status": "planned"}, {"id": 122, "source_id": 49, "target_id": 48, "anchor": "пайка сложных металлов", "status": "planned"}], "in_links": [], "score_data": null}], "clusters": [{"name": "BGA и Реболлинг", "description": "Замена и посадка BGA-чипов, трафареты, шарики, паяльная паста", "keywords": "BGA пайка, реболлинг, паяльная паста BGA, трафарет BGA, нижний подогрев", "type": "гайд / инструкция", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "supereyes.ru, est-smt.ru, YouTube", "gap": "Нет простого пошагового текстового руководства для новичков без перегрузки промышленными терминами.", "status": "не начато"}, {"name": "Инструменты / Выбор паяльника", "description": "Как выбрать паяльник: типы, мощность, станции, беспроводные модели", "keywords": "какой паяльник выбрать, лучший паяльник, паяльник для новичка, паяльная станция, мощность паяльника", "type": "buyer's guide", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "xakep.ru, t-j.ru, alexgyver.ru", "gap": "Нет актуального гайда выбора с моделями 2025-2026 на нишевом сайте; alexgyver.ru даёт подборку без сравнения", "status": "не начато"}, {"name": "Инструменты / Рейтинг паяльников", "description": "Топ паяльников по цене, бренду и качеству", "keywords": "рейтинг паяльников, лучший паяльник 2026, Hakko, JBC, TS100, T12, T80", "type": "рейтинг / обзор бренда", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "t-j.ru, alexgyver.ru", "gap": "Ни один нишевый магазин не даёт рейтинг под новичков; AlexGyver рекомендует T80/T245 но без сводной таблицы цен", "status": "не начато"}, {"name": "Материалы / Припои", "description": "Виды припоев: свинцовые, бессвинцовые, диаметр, маркировки", "keywords": "припой для пайки, какой припой выбрать, ПОС-61, ПОС-40, SAC305, бессвинцовый припой", "type": "гайд / обучающий", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "нет сильного контента в РФ", "gap": "Практически нет доступного контента для новичков на русском языке", "status": "не начато"}, {"name": "Материалы / Флюсы", "description": "Виды флюсов, когда какой использовать, как очищать остатки", "keywords": "флюс для пайки, канифоль, RMA флюс, активный флюс, отмывочный флюс", "type": "гайд / обучающий", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "нет сильного контента в РФ", "gap": "Тема почти не закрыта нишевыми блогами; AlexGyver даёт обзор в видео, но текстового гайда нет", "status": "не начато"}, {"name": "Организация рабочего места", "description": "Обустройство места для пайки, базовый набор инструментов", "keywords": "рабочее место для пайки, набор инструментов радиолюбителя", "type": "гайд / buyer's guide", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "alexgyver.ru (product-led страницы наборов, не SEO-статьи)", "gap": "Нет нишевого SEO-гайда 'как обустроить место для пайки дома' — высокая коммерческая ценность", "status": "не начато"}, {"name": "Основы пайки / Как паять", "description": "Базовые гайды для новичков: процесс пайки от начала до конца", "keywords": "как паять, техника пайки, пайка для начинающих, как правильно паять, пайка проводов", "type": "гайд для новичков", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "dns-shop.ru, vseinstrumenti.ru, habr.com, sea.com.ua, AlexGyver (YouTube)", "gap": "У конкурентов нет пошагового гайда с фото + разбором физики процесса на нишевом магазине", "status": "не начато"}, {"name": "Ошибки / Проблемы новичка", "description": "Частые ошибки при пайке: холодная пайка, мосты, перегрев, скатывание припоя", "keywords": "ошибки при пайке, холодная пайка, мост при пайке, перегрев компонентов, припой не плавится", "type": "топ ошибок / проблема-решение", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "solderpoint.ru (про производство), sea.com.ua", "gap": "Нет отдельного гайда про ошибки новичка при ручной пайке (sea.com.ua даёт список, но без детального разбора)", "status": "не начато"}, {"name": "Паяльные пасты и химия", "description": "Использование паяльной пасты, гелей, легкоплавких сплавов Розе/Вуда", "keywords": "паяльная паста, чем отличается паста от припоя, шприц с пастой Sn63Pb37", "type": "обучающий / гайд", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "supereyes.ru, ozon.ru", "gap": "Мало материалов с наглядным сравнением: когда брать проволочный припой, а когда пасту в шприце.", "status": "не начато"}, {"name": "Смарт-паяльники Type-C", "description": "Портативные паяльники с поддержкой PD/QC, OLED-экраном и прошивкой IronOS", "keywords": "смарт паяльник type-c, TS101 vs Pinecil V2, паяльник от повербанка, IronOS прошивка", "type": "buyer's guide / обзор", "priority": "🔴 Высокий", "priority_rank": 1, "competitors": "habr.com, mysku.club, YouTube", "gap": "Отсутствует единый гайд по выбору блоков питания Power Delivery и настройке профилей нагрева.", "status": "не начато"}, {"name": "Безопасность", "description": "Техника безопасности, вредность дыма флюса, вентиляция", "keywords": "техника безопасности при пайке, дым от флюса, вентиляция для пайки", "type": "гайд / обучающий", "priority": "🟡 Средний", "priority_rank": 2, "competitors": "lemanapro.ru (закрытый контент, 401)", "gap": "Тема почти не закрыта текстовым контентом — занять топ по 'техника безопасности при пайке' реально с 1 статьёй", "status": "не начато"}, {"name": "Инструменты / Жала", "description": "Жала для паяльника: типы, уход, замена, очистка", "keywords": "жало для паяльника, T12 жало, как ухаживать за жалом, зачистка жала, лужение жала", "type": "гайд / инструкция", "priority": "🟡 Средний", "priority_rank": 2, "competitors": "xakep.ru (раздел в обзоре, не отдельная статья)", "gap": "Нет ни одной отдельной статьи о жалах в РФ-выдаче — лёгкий топ", "status": "не начато"}, {"name": "Оптические приборы / Микроскопы", "description": "Выбор и использование микроскопа для ремонта и контроля пайки", "keywords": "микроскоп для пайки, оптический микроскоп плата, цифровой USB микроскоп", "type": "buyer's guide", "priority": "🟡 Средний", "priority_rank": 2, "competitors": "supereyes.ru, mysku.club", "gap": "Отсутствует статья с тестом задержки вывода изображения (Input Lag) у бюджетных цифровых микроскопов.", "status": "не начато"}, {"name": "Ремонт электроники", "description": "Практический ремонт: телефоны, наушники, разъёмы, выпайка деталей", "keywords": "пайка платы телефона, ремонт наушников, выпайка детали, разъём зарядки", "type": "инструкция", "priority": "🟡 Средний", "priority_rank": 2, "competitors": "youtube.com (Паялыч 46К просм.), ruselectronic.com, youtube.com (Galactic Express)", "gap": "Нет нишевого блога с текстовыми пошаговыми гайдами: конкуренты — только YouTube видео без текста и устаревшие статьи 2013-2019 г.", "status": "не начато"}, {"name": "Типы монтажа / SMD", "description": "SMD пайка руками, термофен, мелкие компоненты", "keywords": "ручная пайка SMD, как паять SMD, пинцет, паяльная паста, термофен", "type": "инструкция / buyer's guide", "priority": "🟡 Средний", "priority_rank": 2, "competitors": "solderpoint.ru, sea.com.ua", "gap": "Нет практического гайда для новичков (конкуренты дают B2B или общий обзор без пошагового алгоритма)", "status": "не начато"}, {"name": "Типы монтажа / SMD vs DIP", "description": "Разница SMD и DIP монтажа, когда что применять", "keywords": "SMD пайка, DIP монтаж, чем отличается SMD от DIP, поверхностный монтаж", "type": "сравнение", "priority": "🟡 Средний", "priority_rank": 2, "competitors": "solderpoint.ru", "gap": "Контент конкурента ориентирован на производство, не на новичков", "status": "не начато"}, {"name": "Аксессуары / Оснастка", "description": "Держатель, оплётка, подставка, губка для паяльника", "keywords": "третья рука для пайки, оплётка для снятия припоя, подставка для паяльника", "type": "buyer's guide / гайд", "priority": "🟢 Низкий", "priority_rank": 3, "competitors": "нет прямых конкурентов", "gap": "Ниша полностью свободна", "status": "не начато"}, {"name": "Материалы / Специфичные", "description": "Пайка алюминия, нержавейки, термоусадка", "keywords": "пайка алюминия, пайка нержавейки, термоусадка после пайки", "type": "гайд / инструкция", "priority": "🟢 Низкий", "priority_rank": 3, "competitors": "нет прямых", "gap": "Узкие темы с низкой конкуренцией, легко занять топ", "status": "не начато"}], "competitors": [{"domain": "solderpoint.ru", "niche": "Контрактное производство электроники + блог", "type": "Прямой конкурент", "blog_url": "https://solderpoint.ru/blog", "articles_count": 32, "features": "калькулятор", "seo_keywords": "bga, smd", "score": 55, "notes": "~54 статьи всего, 9 страниц пагинации. Фокус B2B, не на новичках. Хорошие статьи про типы монтажа", "updated_at": "2026-10-28 22:10"}, {"domain": "mobile-shrek.com.ua", "niche": "Магазин запчастей и расходников для пайки (Украина)", "type": "Косвенный конкурент", "blog_url": "https://mobile-shrek.com.ua/ru/blog/payalniky", "articles_count": 21, "features": null, "seo_keywords": null, "score": 50, "notes": "Активный блог: SMD-пайка, обзоры T12D, OSS T210, прошивка TS101. Индексируется в РФ.", "updated_at": "2026-10-28 22:09"}, {"domain": "supereyes.ru", "niche": "Нишевый гипермаркет измерительных приборов и паяльного оборудования", "type": "Прямой B2C конкурент", "blog_url": "https://supereyes.ru/articles/", "articles_count": 8, "features": null, "seo_keywords": null, "score": 50, "notes": "Сильный экспертный блог. Высокий авторитет по BGA, оптике, выбору станций и рейтингам.", "updated_at": "2026-10-28 22:09"}, {"domain": "est-smt.ru", "niche": "Поставщик SMT и BGA оборудования", "type": "Тематический B2B/B2C конкурент", "blog_url": "https://est-smt.ru/stati/", "articles_count": 4, "features": null, "seo_keywords": null, "score": 50, "notes": "Глубокие статьи по технологии реболлинга, монтажу BGA и работе с паяльными пастами.", "updated_at": "2026-10-28 22:09"}, {"domain": "alexgyver.ru", "niche": "DIY электроника, обучающий контент", "type": "Косвенный конкурент / эталон", "blog_url": "https://alexgyver.ru/all-for-soldering/", "articles_count": 3, "features": null, "seo_keywords": null, "score": 50, "notes": "Видео 2.1M+ просмотров о пайке, подборка товаров. Сильный авторитет у новичков. Текстового блога нет — наша возможность занять нишу статьями", "updated_at": "2026-10-28 22:09"}, {"domain": "ruselectronic.com", "niche": "Практическая электроника — обучающие статьи по ремонту", "type": "Косвенный конкурент", "blog_url": "https://ruselectronic.com/", "articles_count": 3, "features": null, "seo_keywords": null, "score": 50, "notes": "Пошаговые инструкции по замене разъёмов, ремонту телефонов. Тексты без видео, есть фото. Хорошо индексируется Яндексом. Нишевый блог-конкурент в кластере 'Ремонт электроники'", "updated_at": "2026-10-28 22:09"}, {"domain": "sea.com.ua", "niche": "Поставки паяльного оборудования (Украина)", "type": "Косвенный конкурент", "blog_url": "https://www.sea.com.ua/ua/payalnoe-oborudovanie-i-instrument/news/", "articles_count": 2, "features": null, "seo_keywords": null, "score": 50, "notes": "Детальные статьи для новичков на украинском + рус. Хороший структурный бенчмарк, но аудитория другая. Статья \"Как научиться паять\" — 25K просмотров", "updated_at": "2026-10-28 22:09"}, {"domain": "dns-shop.ru", "niche": "Крупный ритейлер электроники", "type": "Эталон формата", "blog_url": "https://club.dns-shop.ru/blog/t-375-payalnyie-instrumentyi/", "articles_count": 1, "features": null, "seo_keywords": null, "score": 50, "notes": "Гайд для новичков с пошаговой структурой — бенчмарк формата", "updated_at": "2026-10-28 22:09"}, {"domain": "vseinstrumenti.ru", "niche": "Крупный магазин инструментов", "type": "Эталон формата", "blog_url": "https://www.vseinstrumenti.ru/publication/", "articles_count": 1, "features": null, "seo_keywords": null, "score": 50, "notes": "Подробные статьи для новичков, хорошая структура шагов", "updated_at": "2026-10-28 22:09"}, {"domain": "habr.com", "niche": "IT-медиа, технический контент", "type": "Эталон экспертности", "blog_url": "https://habr.com/ru/articles/148656/", "articles_count": 1, "features": null, "seo_keywords": null, "score": 50, "notes": "Экспертный лонгрид с нюансами — бенчмарк глубины контента. 889K охват, 131 голос", "updated_at": "2026-10-28 22:09"}, {"domain": "xakep.ru", "niche": "Техническое медиа", "type": "Эталон формата", "blog_url": "https://xakep.ru/2022/08/17/soldering-art/", "articles_count": 1, "features": null, "seo_keywords": null, "score": 50, "notes": "Обзор инструментов — структура buyer's guide", "updated_at": "2026-10-28 22:09"}, {"domain": "t-j.ru", "niche": "Лайфстайл/рейтинговое медиа", "type": "Эталон формата", "blog_url": "https://t-j.ru/best-soldering-irons/", "articles_count": 1, "features": null, "seo_keywords": null, "score": 50, "notes": "Рейтинг паяльников 2026 — бенчмарк для рейтинговых статей", "updated_at": "2026-10-28 22:09"}, {"domain": "lemanapro.ru", "niche": "Строительный гипермаркет (Leroy Merlin)", "type": "Косвенный конкурент", "blog_url": "https://lemanapro.ru/advice/instrumenty/", "articles_count": 1, "features": null, "seo_keywords": null, "score": 50, "notes": "Статья о пайке в домашних условиях. Закрыт для парсинга (401), но присутствует в выдаче по нашим ключевым запросам", "updated_at": "2026-10-28 22:09"}, {"domain": "5353.by", "niche": "Сервис ремонта техники (Беларусь)", "type": "Косвенный конкурент", "blog_url": "https://5353.by/kak-pochinit-zamenit-propayt-raziem-tupe-c/", "articles_count": 1, "features": null, "seo_keywords": null, "score": 50, "notes": "Статья по замене разъёма Type-C, контент закрыт за формой. Продвигается в РФ-выдаче по запросу 'поменять разъём зарядки'. Слабый конкурент по E-E-A-T", "updated_at": "2026-10-28 22:09"}, {"domain": "payalniki.ru", "niche": "Поставки паяльного оборудования", "type": "Прямой конкурент", "blog_url": "https://www.payalniki.ru/catalog/", "articles_count": 0, "features": null, "seo_keywords": null, "score": 50, "notes": "Каталог без блога — слабый контент, наша возможность", "updated_at": "2026-10-28 22:09"}, {"domain": "electronix.ru", "niche": "Профессиональный форум по электронике", "type": "Косвенный конкурент / Сообщество", "blog_url": "https://electronix.ru/forum/forum/38-payka-i-montazh/", "articles_count": 0, "features": null, "seo_keywords": null, "score": 50, "notes": "Крупнейший форум РФ, раздел «Пайка и монтаж». Источник семантики, формирует ожидания аудитории.", "updated_at": "2026-10-28 22:09"}, {"domain": "pcbasic.com", "niche": "Контрактный производитель PCB (рус. блог)", "type": "Косвенный информационный конкурент", "blog_url": "[link removed]", "articles_count": 0, "features": null, "seo_keywords": null, "score": 50, "notes": "Попадает в выдачу по «пайка SMD компонентов». B2B аудитория.", "updated_at": "2026-10-28 22:09"}], "competitors_proposed": [{"domain": "radioskot.ru", "niche": "Схемы и статьи по пайке для радиолюбителей", "type": "Косвенный конкурент", "source": "Схемы и статьи по пайке для радиолюбителей", "queries": "профильный ресурс", "hits": 1, "articles_count": 0, "example_url": "https://radioskot.ru", "status": "предложен", "updated_at": "2026-10-28 22:09"}, {"domain": "cxem.net", "niche": "Портал Паяльник: статьи и мастерская", "type": "Косвенный конкурент", "source": "Портал Паяльник: статьи и мастерская", "queries": "профильный ресурс", "hits": 1, "articles_count": 0, "example_url": "https://cxem.net", "status": "предложен", "updated_at": "2026-10-28 22:09"}, {"domain": "masteram-online.ru", "niche": "Статьи и обзоры паяльного оборудования", "type": "Косвенный конкурент", "source": "Статьи и обзоры паяльного оборудования", "queries": "профильный ресурс", "hits": 1, "articles_count": 0, "example_url": "https://masteram-online.ru", "status": "предложен", "updated_at": "2026-10-28 22:09"}, {"domain": "radio-hobby.org", "niche": "Радиодетали и пайка: инструкции", "type": "Косвенный конкурент", "source": "Радиодетали и пайка: инструкции", "queries": "профильный ресурс", "hits": 1, "articles_count": 0, "example_url": "https://radio-hobby.org", "status": "предложен", "updated_at": "2026-10-28 22:09"}, {"domain": "easyelectronics.ru", "niche": "Обучающие статьи по пайке и электронике", "type": "Косвенный конкурент", "source": "Обучающие статьи по пайке и электронике", "queries": "профильный ресурс", "hits": 1, "articles_count": 0, "example_url": "https://easyelectronics.ru", "status": "предложен", "updated_at": "2026-10-28 22:09"}, {"domain": "service-core.ru", "niche": "Практика ремонта и пайки микросхем", "type": "Косвенный конкурент", "source": "Практика ремонта и пайки микросхем", "queries": "профильный ресурс", "hits": 1, "articles_count": 0, "example_url": "https://service-core.ru", "status": "предложен", "updated_at": "2026-10-28 22:09"}], "topics_proposed": [{"id": "P02", "title": "Что такое BGA компоненты и почему их монтаж сложнее", "cluster": "Типы компонентов / BGA", "type": "обучающий / что такое", "source": "solderpoint.ru", "evidence": "solderpoint.ru: Что такое BGA компоненты и почему их монтаж сложнее", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P03", "title": "Типовые ошибки при проектировании печатных плат под производство", "cluster": "Ошибки / Проектирование", "type": "ошибки / топ N", "source": "solderpoint.ru", "evidence": "solderpoint.ru: Типовые ошибки при проектировании печатных плат под производство", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P05", "title": "Монтаж алюминиевых плат", "cluster": "Типы плат / Алюминиевые", "type": "обучающий", "source": "solderpoint.ru", "evidence": "solderpoint.ru: Монтаж алюминиевых плат", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P06", "title": "Монтаж двусторонних плат", "cluster": "Типы плат / Двусторонние", "type": "обучающий", "source": "solderpoint.ru", "evidence": "solderpoint.ru: Монтаж двусторонних плат", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P07", "title": "Пайка для начинающих", "cluster": "Основы пайки / Начинающим", "type": "экспертный лонгрид", "source": "habr.com", "evidence": "habr.com: Пайка для начинающих", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P08", "title": "Как паять в домашних условиях безопасно и правильно", "cluster": "Основы пайки / Безопасность", "type": "гайд для новичков", "source": "mobile-shrek.com.ua", "evidence": "mobile-shrek.com.ua: Как паять в домашних условиях безопасно и правильно", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P09", "title": "Почему паяльник плохо нагревается и что с этим делать", "cluster": "Ошибки / Диагностика", "type": "проблема / решение", "source": "mobile-shrek.com.ua", "evidence": "mobile-shrek.com.ua: Почему паяльник плохо нагревается и что с этим делать", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P10", "title": "Детальный анализ паяльной станции OSS T210 с жалом JBC C210", "cluster": "Инструменты / Паяльные станции", "type": "обзор станции", "source": "mobile-shrek.com.ua", "evidence": "mobile-shrek.com.ua: Детальный анализ паяльной станции OSS T210 с жалом JBC C210", "hits": 1, "priority_score": 70, "status": "предложен", "created_at": "2026-10-28 22:09"}, {"id": "P01", "title": "Как выбрать качественный флюс для пайки SMD", "cluster": "Флюсы / Расходники", "type": "форум / вопрос-ответ", "source": "electronix.ru", "evidence": "electronix.ru: Посоветуйте качественный флюс для пайки SMD", "hits": 2, "priority_score": 67, "status": "принят", "created_at": "2026-10-28 22:09"}, {"id": "P04", "title": "Как выбрать между SMD и DIP монтажом", "cluster": "Типы монтажа / SMD vs DIP", "type": "сравнение / выбор", "source": "solderpoint.ru", "evidence": "solderpoint.ru: Как выбрать между SMD и DIP монтажом", "hits": 1, "priority_score": 67, "status": "предложен", "created_at": "2026-10-28 22:09"}], "backups": [{"id": 1, "filename": "seo_2026-10-28_22-16-09.db", "filepath": "D:\\сайт для пайки\\seo\\data\\_backup\\seo_2026-10-28_22-16-09.db", "size_bytes": 241664, "records_count": 60, "created_at": "2026-10-28T22:16:09"}], "agent_runs": [], "competitor_features": [{"id": 1, "domain": "solderpoint.ru", "feature_type": "калькулятор", "title": "Калькулятор", "description": "Интерактивный расчёт параметров пайки или компонентов", "example_url": "https://solderpoint.ru", "seo_value": "Удержание внимания, глубина страницы, сниппет", "found_at": "2026-10-28 22:10"}], "counts": {"topics": 61, "written": 4, "competitors": 17, "proposed_topics": 10, "proposed_competitors": 6, "backups": 1}};
+let CURRENT_TOPIC_ID = null;
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('view-' + name).classList.add('active');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerText = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 3500);
+}
+
+async function apiPost(route, payload) {
+  try {
+    const res = await fetch('http://127.0.0.1:8765' + route, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload || {})
+    });
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
+async function refreshData() {
+  try {
+    const res = await fetch('http://127.0.0.1:8765/api/data');
+    if (res.ok) {
+      DB_DATA = await res.json();
+      renderAll();
+      showToast('✓ Данные обновлены из SQLite БД');
+      return;
+    }
+  } catch (e) {}
+  renderAll();
+  showToast('✓ Интерфейс перерисован');
+}
+
+async function createBackup() {
+  showToast('Создание бэкапа базы данных...');
+  const res = await apiPost('/api/backup', {});
+  if (res && res.status === 'ok') {
+    showToast(`✓ Бэкап создан: ${res.backup.filename} (${Math.round(res.backup.size_bytes/1024)} КБ)`);
+    await refreshData();
+  } else {
+    const blob = new Blob([JSON.stringify(DB_DATA, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `seo_backup_${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    showToast('✓ Экспорт данных скачан (офлайн JSON бэкап)');
+  }
+}
+
+async function approveTopic(id) {
+  if (!confirm(`Одобрить тему ${id} и перенести в рабочий бэклог?`)) return;
+  const res = await apiPost('/api/topics/approve', { id });
+  if (res && res.status === 'ok') {
+    showToast(`✓ Тема одобрена! Присвоен новый ID #${res.new_topic_id}`);
+    await refreshData();
+  }
+}
+
+async function rejectTopic(id) {
+  await apiPost('/api/topics/reject', { id });
+  const item = DB_DATA.topics_proposed.find(t => t.id === id);
+  if (item) item.status = 'отклонён';
+  renderAll();
+  showToast('Тема отклонена.');
+}
+
+async function approveCompetitor(domain) {
+  await apiPost('/api/competitors/approve', { domain });
+  showToast(`✓ Конкурент ${domain} добавлен в список мониторинга!`);
+  await refreshData();
+}
+
+async function approveArticle() {
+  if (!CURRENT_TOPIC_ID) return;
+  await apiPost('/api/articles/approve', { id: CURRENT_TOPIC_ID });
+  showToast(`✓ Статья #${CURRENT_TOPIC_ID} утверждена к публикации! Перенесена во вкладку «Готовые к выгрузке».`);
+  closeInspector();
+  await refreshData();
+}
+
+async function rejectArticle() {
+  if (!CURRENT_TOPIC_ID) return;
+  const reason = prompt('Укажите замечания для автора Claude Sonnet:') || 'Требуется доработка текста';
+  await apiPost('/api/articles/reject', { id: CURRENT_TOPIC_ID, reason });
+  showToast(`Статья #${CURRENT_TOPIC_ID} возвращена на доработку автору.`);
+  closeInspector();
+  await refreshData();
+}
+
+async function scoreCurrentArticle() {
+  if (!CURRENT_TOPIC_ID) return;
+  showToast(`Запуск скоринга статьи #${CURRENT_TOPIC_ID}...`);
+  const res = await apiPost('/api/agent/run', { agent: '04-scorer', target_id: CURRENT_TOPIC_ID });
+  if (res && res.log) {
+    document.getElementById('agentConsole').innerText = res.log;
+    showToast('✓ Скоринг завершён!');
+    await refreshData();
+    openInspector(CURRENT_TOPIC_ID);
+  }
+}
+
+async function exportSingleArticle(id) {
+  showToast(`Выгрузка черновика статьи #${id} в WordPress...`);
+  const c = document.getElementById('agentConsole');
+  c.innerText = `[${new Date().toLocaleTimeString()}] Запуск delivery_cli.py для статьи #${id}...`;
+  switchTab('agents');
+  const res = await apiPost('/api/agent/run', { agent: 'delivery', target_id: id });
+  if (res && res.log) {
+    c.innerText = res.log;
+    showToast(`✓ Черновик #${id} передан в WordPress! Подтвердите ОТК в админке.`);
+  }
+}
+
+async function exportAllReady() {
+  showToast('Выгрузка всех готовых черновиков в WordPress...');
+  switchTab('agents');
+  runAgent('delivery-all');
+}
+
+async function runAgent(agentName) {
+  showToast(`Запуск агента ${agentName}...`);
+  const c = document.getElementById('agentConsole');
+  c.innerText = `[${new Date().toLocaleTimeString()}] Запуск ${agentName}...
+Ожидание ответа...`;
+  const res = await apiPost('/api/agent/run', { agent: agentName });
+  if (res && res.log) {
+    c.innerText = res.log;
+    showToast(`✓ Агент ${agentName} завершил работу!`);
+    await refreshData();
+  }
+}
+
+function promptAgentTarget(agentName) {
+  const tid = prompt(`Введите ID статьи для ${agentName}:`);
+  if (!tid) return;
+  if (agentName === '04-scorer') {
+    CURRENT_TOPIC_ID = tid;
+    scoreCurrentArticle();
+  } else {
+    runAgent(agentName);
+  }
+}
+
+// Render Decision Alert Banner
+function renderDecisionBanner() {
+  const banner = document.getElementById('decisionBanner');
+  
+  // 1. Статьи требующие правок (score < 80 and chars > 500)
+  const needsFix = DB_DATA.topics.filter(t => (t.chars || 0) > 500 && (t.score_total === null || t.score_total < 80) && t.status !== 'ready' && t.status !== 'published');
+  
+  // 2. Статьи ожидающие утверждения шеф-редактором (score >= 80 and status != ready and status != published)
+  const readyForApproval = DB_DATA.topics.filter(t => (t.score_total || 0) >= 80 && t.status !== 'ready' && t.status !== 'published');
+  
+  // 3. Предложенные темы ожидающие решения
+  const proposedWaiting = DB_DATA.topics_proposed.filter(t => t.status === 'предложен');
+
+  let fixHtml = needsFix.map(t => `
+    <li>
+      <strong>#${t.id}</strong> ${t.title.slice(0, 36)}… 
+      <span style="color:#B91C1C;font-weight:700;">(${t.score_total || '—'}/100)</span>
+      <a href="javascript:void(0)" onclick="openInspector(${t.id})" style="font-size:11px;margin-left:4px;">правки ↗</a>
+    </li>
+  `).join('');
+
+  let approveHtml = readyForApproval.map(t => `
+    <li>
+      <strong>#${t.id}</strong> ${t.title.slice(0, 36)}… 
+      <span style="color:#059669;font-weight:700;">(${t.score_total}/100)</span>
+      <a href="javascript:void(0)" onclick="openInspector(${t.id})" style="font-size:11px;margin-left:4px;">утвердить ↗</a>
+    </li>
+  `).join('');
+
+  let propHtml = proposedWaiting.slice(0, 3).map(t => `
+    <li>
+      <span class="prio-pill prio-pill--warm">P${t.priority_score}</span>
+      ${t.title.slice(0, 38)}…
+    </li>
+  `).join('');
+
+  banner.innerHTML = `
+    <div class="decision-col">
+      <div class="decision-col__title" style="color:#B91C1C;">
+        ⚠️ Требуются правки автора (${needsFix.length})
+      </div>
+      <ul class="decision-col__list">
+        ${fixHtml || '<li style="color:var(--muted);">Нет замечаний, все черновики в норме</li>'}
+      </ul>
+    </div>
+
+    <div class="decision-col">
+      <div class="decision-col__title" style="color:#059669;">
+        🛡️ Готово к Вашему утверждению (${readyForApproval.length})
+      </div>
+      <ul class="decision-col__list">
+        ${approveHtml || '<li style="color:var(--muted);">Нет новых статей на приёмку</li>'}
+      </ul>
+    </div>
+
+    <div class="decision-col">
+      <div class="decision-col__title" style="color:#D97706;">
+        💡 Темы из пробелов на одобрение (${proposedWaiting.length})
+      </div>
+      <ul class="decision-col__list">
+        ${propHtml || '<li style="color:var(--muted);">Все предложенные темы обработаны</li>'}
+      </ul>
+      <div style="margin-top:6px;font-size:11px;">
+        <a href="javascript:void(0)" onclick="switchTab('gaps')">Перейти к списку тем (${proposedWaiting.length}) →</a>
+      </div>
+    </div>
+  `;
+}
+
+// Render Export Tab (Ready for WordPress)
+function renderExportTab() {
+  const tb = document.getElementById('exportTableBody');
+  tb.innerHTML = '';
+  
+  const readyTopics = DB_DATA.topics.filter(t => t.status === 'ready' || (t.score_total >= 80 && (t.chars || 0) > 1000));
+  document.getElementById('bCountExport').innerText = readyTopics.length;
+
+  if (readyTopics.length === 0) {
+    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted);">Пока нет статей, утверждённых к выгрузке. Утвердите статьи с оценкой ≥80 в канбане.</td></tr>';
+    return;
+  }
+
+  readyTopics.forEach(t => {
+    tb.innerHTML += `
+      <tr>
+        <td style="font-family:var(--mono);font-weight:700;">#${t.id}</td>
+        <td><span class="score-pill score-pill--high">${t.score_total || 80}/100</span></td>
+        <td><strong>${t.title}</strong></td>
+        <td><code style="font-size:11px;">${t.slug}</code></td>
+        <td><span class="task-card__cluster">${t.cluster}</span></td>
+        <td style="font-family:var(--mono);">${t.chars || '—'}</td>
+        <td><span class="prio-pill prio-pill--warm">Valid v1.1</span></td>
+        <td>
+          <span style="color:#059669;font-weight:700;font-size:11px;">
+            ${t.status === 'ready' ? '🛡️ Утверждено к ОТК' : 'Готово к утверждению'}
+          </span>
+        </td>
+        <td>
+          <button class="btn btn--sm btn--primary" onclick="exportSingleArticle(${t.id})">🚀 Выгрузить в WP</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// Kanban Renderer
+const COLUMNS = [
+  { code: 'backlog', title: '1. Бэклог' },
+  { code: 'work', title: '2. В работе' },
+  { code: 'written', title: '3. Написано' },
+  { code: 'review', title: '4. На ревью' },
+  { code: 'ready', title: '5. Готово к ОТК' },
+  { code: 'published', title: '6. Опубликовано' }
+];
+
+const STATUS_COL = {
+  'backlog': 'backlog', 'brief': 'work', 'brief_ready': 'work', 'writing': 'work',
+  'written': 'written', 'review': 'review', 'scored': 'review', 'ready': 'ready',
+  'published': 'published', 'blocked': 'work'
+};
+
+function renderKanban() {
+  const board = document.getElementById('kanbanBoard');
+  board.innerHTML = '';
+
+  const clusterFilter = document.getElementById('clusterSelect').value.toLowerCase();
+  const searchFilter = document.getElementById('kanbanSearch').value.toLowerCase().trim();
+
+  COLUMNS.forEach(col => {
+    const colDiv = document.createElement('div');
+    colDiv.className = 'board-column';
+
+    let colCardsHtml = '';
+    let count = 0;
+
+    DB_DATA.topics.forEach(t => {
+      const cCode = STATUS_COL[t.status] || 'backlog';
+      if (cCode !== col.code) return;
+
+      if (clusterFilter && (t.cluster || '').toLowerCase() !== clusterFilter) return;
+      if (searchFilter && !t.title.toLowerCase().includes(searchFilter) && !('#' + t.id).includes(searchFilter)) return;
+
+      count++;
+      const pScore = t.priority_score || 50;
+      const pClass = pScore >= 90 ? 'prio-pill--hot' : (pScore >= 75 ? 'prio-pill--warm' : 'prio-pill--cold');
+
+      let scoreBadge = '';
+      let warnBlock = '';
+
+      if (t.score_total !== null && t.score_total !== undefined) {
+        const sClass = t.score_total >= 80 ? 'score-pill--high' : (t.score_total >= 60 ? 'score-pill--mid' : 'score-pill--low');
+        scoreBadge = `<span class="score-pill ${sClass}">${t.score_total}/100</span>`;
+        if (t.score_total < 80 && (t.chars || 0) > 500) {
+          warnBlock = `<div class="task-card__warn">⚠️ Требуются правки: ${t.score_data && t.score_data.issues ? t.score_data.issues[0] : 'доработать текст'}</div>`;
+        }
+      } else if ((t.chars || 0) > 500) {
+        scoreBadge = `<span class="score-pill score-pill--mid">текст есть</span>`;
+      }
+
+      colCardsHtml += `
+        <article class="task-card" onclick='openInspector(${t.id})'>
+          <div class="task-card__top">
+            <span class="task-card__id">#${t.id}</span>
+            <div class="task-card__badges">
+              <span class="prio-pill ${pClass}">P${pScore}</span>
+              ${scoreBadge}
+            </div>
+          </div>
+          <h3 class="task-card__title">${t.title}</h3>
+          <div class="task-card__footer">
+            <span class="task-card__cluster">${(t.cluster || '').slice(0, 22)}</span>
+            <span>🔗 ${ (t.out_links || []).length + (t.in_links || []).length }</span>
+          </div>
+          ${warnBlock}
+        </article>
+      `;
+    });
+
+    colDiv.innerHTML = `
+      <div class="board-column__header">
+        <span class="board-column__title">${col.title}</span>
+        <span class="board-column__badge">${count}</span>
+      </div>
+      <div class="board-column__cards">
+        ${colCardsHtml || '<div style="color:var(--muted);font-size:12px;text-align:center;padding:20px 0;">—</div>'}
+      </div>
+    `;
+    board.appendChild(colDiv);
+  });
+}
+
+function filterKanban() {
+  renderKanban();
+}
+
+// Render Proposed Topics
+function renderProposedTopics() {
+  const tb = document.getElementById('proposedTopicsBody');
+  tb.innerHTML = '';
+  DB_DATA.topics_proposed.forEach(t => {
+    const isAccepted = t.status === 'принят';
+    const isRejected = t.status === 'отклонён';
+    tb.innerHTML += `
+      <tr>
+        <td style="font-family:var(--mono);font-weight:700;">${t.id}</td>
+        <td><span class="prio-pill prio-pill--warm">P${t.priority_score}</span></td>
+        <td><strong>${t.title}</strong></td>
+        <td><span class="task-card__cluster">${t.cluster}</span></td>
+        <td>${t.type || 'гайд'}</td>
+        <td style="font-size:12px;color:var(--muted);">${t.evidence || t.source || '—'}</td>
+        <td>
+          <span style="font-weight:700;color:${isAccepted ? '#059669' : (isRejected ? '#DC2626' : '#D97706')}">
+            ${t.status}
+          </span>
+        </td>
+        <td>
+          ${!isAccepted && !isRejected ? `
+            <button class="btn btn--sm btn--success" onclick="approveTopic('${t.id}')">✓ Одобрить</button>
+            <button class="btn btn--sm btn--danger" onclick="rejectTopic('${t.id}')">✕</button>
+          ` : '—'}
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// Render Competitors
+function renderCompetitors() {
+  const tb = document.getElementById('competitorsBody');
+  tb.innerHTML = '';
+  DB_DATA.competitors.forEach(c => {
+    tb.innerHTML += `
+      <tr>
+        <td><strong>${c.domain}</strong><br><a href="${c.blog_url || 'https://' + c.domain}" target="_blank" style="font-size:11px;color:var(--muted);">перейти ↗</a></td>
+        <td><span class="prio-pill ${c.score >= 70 ? 'prio-pill--hot' : 'prio-pill--cold'}">${c.score || 50}/100</span></td>
+        <td style="font-size:12px;color:#065F46;max-width:240px;">${c.seo_keywords || 'Общая электроника'}</td>
+        <td style="font-size:12px;max-width:280px;">${c.features || 'Базовый контент'}</td>
+        <td style="font-family:var(--mono);">${c.articles_count || 0}</td>
+        <td style="font-size:12px;color:var(--muted);">${c.type}</td>
+        <td>
+          <button class="btn btn--sm btn--primary" onclick="runAgent('bot-analyzer')">Анализ фишек</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  const ptb = document.getElementById('proposedCompetitorsBody');
+  ptb.innerHTML = '';
+  DB_DATA.competitors_proposed.forEach(c => {
+    const isAccepted = c.status === 'принят';
+    ptb.innerHTML += `
+      <tr>
+        <td><strong>${c.domain}</strong></td>
+        <td>${c.niche || '—'}</td>
+        <td>${c.hits || 1} запросов</td>
+        <td>${c.articles_count || 0}</td>
+        <td><a href="${c.example_url || '#'}" target="_blank" style="font-size:11px;">${(c.example_url || '').slice(0,35)}</a></td>
+        <td><span style="font-weight:700;color:${isAccepted ? '#059669' : '#D97706'}">${c.status}</span></td>
+        <td>
+          ${!isAccepted ? `<button class="btn btn--sm btn--success" onclick="approveCompetitor('${c.domain}')">✓ Добавить</button>` : '—'}
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// Render Backups
+function renderBackups() {
+  const tb = document.getElementById('backupsBody');
+  tb.innerHTML = '';
+  DB_DATA.backups.forEach((b, idx) => {
+    tb.innerHTML += `
+      <tr>
+        <td style="font-family:var(--mono);">${idx + 1}</td>
+        <td><strong>${b.filename}</strong></td>
+        <td style="font-family:var(--mono);">${Math.round(b.size_bytes / 1024)} КБ</td>
+        <td>${b.records_count} тем</td>
+        <td style="font-size:12px;color:var(--muted);">${b.created_at}</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${b.filepath}</td>
+      </tr>
+    `;
+  });
+}
+
+// Open Inspector Modal
+function openInspector(topicId) {
+  CURRENT_TOPIC_ID = topicId;
+  const t = DB_DATA.topics.find(x => x.id === topicId);
+  if (!t) return;
+
+  document.getElementById('mId').innerText = '#' + t.id;
+  document.getElementById('mCluster').innerText = t.cluster;
+  document.getElementById('mStatus').innerText = t.status;
+  document.getElementById('mChars').innerText = (t.chars || 0) + ' знаков';
+  document.getElementById('mTitle').innerText = t.title;
+
+  const scoreEl = document.getElementById('mTotalScore');
+  const grid = document.getElementById('mScoreGrid');
+  const bBox = document.getElementById('mBlockersBox');
+  const bList = document.getElementById('mBlockersList');
+  const iBox = document.getElementById('mIssuesBox');
+  const iList = document.getElementById('mIssuesList');
+
+  if (t.score_total !== null && t.score_total !== undefined) {
+    scoreEl.innerText = t.score_total + ' / 100';
+    scoreEl.style.background = t.score_total >= 80 ? '#A7F3D0' : (t.score_total >= 60 ? '#FEF08A' : '#FECACA');
+  } else {
+    scoreEl.innerText = 'Не оценено';
+    scoreEl.style.background = '#E5E5E5';
+  }
+
+  grid.innerHTML = '';
+  const sData = t.score_data;
+  if (sData && sData.blocks) {
+    for (const [k, v] of Object.entries(sData.blocks)) {
+      grid.innerHTML += `<div style="background:var(--bg);border:1px solid var(--border);padding:8px 10px;font-size:12px;"><strong>${v.points} / ${v.max}</strong><span>${k}</span></div>`;
+    }
+  } else {
+    grid.innerHTML = '<div style="grid-column:1/-1;padding:8px;background:var(--bg);border:1px solid var(--border);">Текст ещё не проходил скоринг. Нажмите «Пересчитать оценку» ниже.</div>';
+  }
+
+  if (sData && sData.blockers && sData.blockers.length > 0) {
+    bBox.style.display = 'block';
+    bList.innerHTML = sData.blockers.map(b => `<li>${b}</li>`).join('');
+  } else {
+    bBox.style.display = 'none';
+  }
+
+  if (sData && sData.issues && sData.issues.length > 0) {
+    iBox.style.display = 'block';
+    iList.innerHTML = sData.issues.map(i => `<li>${i}</li>`).join('');
+  } else {
+    iBox.style.display = 'none';
+  }
+
+  const linksEl = document.getElementById('mLinksText');
+  let linksStr = '';
+  if (t.out_links && t.out_links.length > 0) {
+    linksStr += '<strong>Исходящие:</strong> ' + t.out_links.map(l => `#${l.target_id} (${l.anchor || 'ссылка'})`).join(', ') + '<br>';
+  }
+  if (t.in_links && t.in_links.length > 0) {
+    linksStr += '<strong>Входящие:</strong> ' + t.in_links.map(l => `#${l.source_id}`).join(', ');
+  }
+  linksEl.innerHTML = linksStr || 'Связи не заданы';
+
+  document.getElementById('inspectorModal').classList.add('active');
+}
+
+function closeInspector(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  document.getElementById('inspectorModal').classList.remove('active');
+}
+
+function renderAll() {
+  const sel = document.getElementById('clusterSelect');
+  sel.innerHTML = '<option value="">Все кластеры</option>';
+  DB_DATA.clusters.forEach(c => {
+    sel.innerHTML += `<option value="${c.name.toLowerCase()}">${c.name}</option>`;
+  });
+
+  document.getElementById('statTopicsCount').innerText = DB_DATA.counts.topics;
+  document.getElementById('statWrittenCount').innerText = DB_DATA.counts.written;
+  document.getElementById('bCountTopics').innerText = DB_DATA.counts.topics;
+  document.getElementById('bCountProposed').innerText = DB_DATA.counts.proposed_topics;
+  document.getElementById('bCountComps').innerText = DB_DATA.counts.competitors;
+  document.getElementById('bCountBackups').innerText = DB_DATA.counts.backups;
+
+  renderDecisionBanner();
+  renderExportTab();
+  renderKanban();
+  renderProposedTopics();
+  renderCompetitors();
+  renderBackups();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderAll();
+  fetch('http://127.0.0.1:8765/api/status')
+    .then(r => r.json())
+    .then(() => refreshData())
+    .catch(() => {});
+});
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeInspector();
+});
+</script>
+</body>
+</html>
