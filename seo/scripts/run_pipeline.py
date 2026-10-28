@@ -34,19 +34,23 @@ try:
 except Exception:
     pass
 
-from excel_io import OUT, STATUSES, build_plan
+from db import build_db_plan as build_plan, get_connection
+from excel_io import OUT, STATUSES
 from linkgraph import outbound_candidates
 
 
 def get_topic_data(plan: dict, article_id: str) -> dict:
+    tid_int = int(article_id) if str(article_id).isdigit() else article_id
     try:
-        from db import get_connection
         with get_connection() as conn:
-            row = conn.execute("SELECT * FROM topics WHERE id = ?", (article_id,)).fetchone()
+            row = conn.execute("SELECT * FROM topics WHERE id = ?", (tid_int,)).fetchone()
             if row:
                 t = dict(row)
-                t["has_text"] = bool(t.get("content_markdown")) or len(t.get("content_markdown") or "") > 500
-                t["has_brief"] = False
+                t["id"] = str(t["id"])
+                t["has_text"] = bool(t.get("content_markdown")) and len(t.get("content_markdown") or "") > 400
+                has_brief = conn.execute("SELECT COUNT(*) FROM briefs WHERE topic_id = ?", (tid_int,)).fetchone()[0] > 0
+                t["has_brief"] = has_brief
+                t["status_raw"] = t["status"]
                 return t
     except Exception:
         pass
@@ -201,11 +205,15 @@ def step_prompt_reviewer(topic: dict) -> None:
 
 def step_score(topic: dict) -> None:
     tid = topic["id"]
-    file_path = find_article_file(tid, topic["slug"])
-    if not file_path:
-        raise SystemExit(f"Ошибка: Файл статьи #{tid} не найден в папке `сами статьи/`.")
     scorer_script = Path(__file__).resolve().parent / "score_article.py"
-    cmd = [sys.executable, str(scorer_script), "--file", str(file_path), "--id", str(tid)]
+    if topic.get("content_markdown"):
+        cmd = [sys.executable, str(scorer_script), "--text", topic["content_markdown"], "--id", str(tid)]
+    else:
+        file_path = find_article_file(tid, topic["slug"])
+        if file_path:
+            cmd = [sys.executable, str(scorer_script), "--file", str(file_path), "--id", str(tid)]
+        else:
+            raise SystemExit(f"Ошибка: Текст статьи #{tid} не найден ни в SQLite, ни в `сами статьи/`.")
     subprocess.run(cmd)
 
 

@@ -21,7 +21,8 @@ try:
 except Exception:
     pass
 
-from excel_io import DATA, OUT, build_plan
+from db import build_db_plan as build_plan
+from excel_io import DATA, OUT
 
 SCORES = OUT / "scores"
 
@@ -111,15 +112,16 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
     bur_hits = [w for w in BUREAUCRATIC if re.search(rf"\b{w}", plain.lower())]
     ai_hits = [p for p in AI_PATTERNS if p in plain.lower()]
 
-    # Проверка опасных советов с учётом отрицания (не паять под напряжением = норма!)
+    # Проверка опасных советов с учётом предложения (отрицание/запрет в любом месте фразы = норма ТБ!)
     danger_hits = []
+    NEGATION_RE = re.compile(r"\b(не|нельзя|запрещ\w*|исключ\w*|никогда|без|опасн\w*|внимани\w*|предостереж\w*|риск\w*)\b", re.I)
     for p in DANGEROUS:
-        for m in re.finditer(re.escape(p), plain.lower()):
-            start = max(0, m.start() - 30)
-            prefix = plain.lower()[start:m.start()]
-            if not re.search(r"\b(не|нельзя|запрещ\w*|исключ\w*|никогда|без|опасно)\s*$", prefix):
-                danger_hits.append(p)
-                break
+        for s in sents:
+            s_low = s.lower()
+            if p in s_low:
+                if not NEGATION_RE.search(s_low):
+                    danger_hits.append(f"«{s[:80]}»")
+                    break
     first_para = paras[0] if paras else ""
     answer_words = len(words(first_para))
 

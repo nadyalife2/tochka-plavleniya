@@ -30,7 +30,8 @@ try:
 except Exception:
     pass
 
-from excel_io import build_plan, clean, save_priority_scores
+from db import build_db_plan as build_plan, get_connection
+from excel_io import clean, save_priority_scores
 
 # ---------------------------------------------------------------- веса ------
 
@@ -141,33 +142,15 @@ def score_readiness(topic: dict) -> int:
 
 
 def competitor_hits_from_raw(plan: dict) -> dict[str, int]:
-    """Считает, сколько собранных статей конкурентов попало в каждый кластер."""
+    """Считает, сколько собранных статей конкурентов попало в каждый кластер (из SQLite)."""
     hits: dict[str, int] = {}
-    # raw_data читается тем же мастером; берём через build_plan-совместимый путь
-    import openpyxl
-    from excel_io import MASTER, clean as cl
-
-    if not MASTER.exists():
-        return hits
-    wb = openpyxl.load_workbook(MASTER, read_only=True, data_only=True)
     try:
-        if "raw_data" not in wb.sheetnames:
-            return hits
-        ws = wb["raw_data"]
-        rows = ws.iter_rows(values_only=True)
-        header = [cl(h) for h in next(rows, [])]
-        idx = {name: i for i, name in enumerate(header) if name}
-        c_idx = idx.get("cluster")
-        if c_idx is None:
-            return hits
-        for row in rows:
-            if not row or c_idx >= len(row):
-                continue
-            cluster = cl(row[c_idx])
-            if cluster:
-                hits[cluster] = hits.get(cluster, 0) + 1
-    finally:
-        wb.close()
+        with get_connection() as conn:
+            rows = conn.execute("SELECT cluster, COUNT(*) FROM raw_articles WHERE cluster IS NOT NULL AND length(cluster) > 0 GROUP BY cluster").fetchall()
+            for c, cnt in rows:
+                hits[c] = cnt
+    except Exception:
+        pass
     return hits
 
 

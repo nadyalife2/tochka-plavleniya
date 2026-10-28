@@ -933,14 +933,18 @@ async function importFirecrawlData() {{
 }}
 
 async function exportSingleArticle(id) {{
-  showToast(`Выгрузка черновика статьи #${{id}} в WordPress...`);
+  showToast(`Проверка пакета статьи #${{id}} по схеме v1.1...`);
   const c = document.getElementById('agentConsole');
-  c.innerText = `[${{new Date().toLocaleTimeString()}}] Запуск delivery_cli.py для статьи #${{id}}...`;
+  c.innerText = `[${{new Date().toLocaleTimeString()}}] Проверка схемы v1.1 и упаковка пакета для статьи #${{id}}...`;
   switchTab('agents');
   const res = await apiPost('/api/agent/run', {{ agent: 'delivery', target_id: id }});
   if (res && res.log) {{
     c.innerText = res.log;
-    showToast(`✓ Черновик #${{id}} передан в WordPress! Подтвердите ОТК в админке.`);
+    if (res.status === 'succeeded') {{
+      showToast(`✓ Пакет статьи #${{id}} 100% валиден!`);
+    }} else {{
+      showToast(`⚠️ Статья #${{id}}: не хватает данных по схеме v1.1`);
+    }}
   }}
 }}
 
@@ -1071,7 +1075,7 @@ function renderExportTab() {{
           </span>
         </td>
         <td>
-          <button class="btn btn--sm btn--primary" onclick="exportSingleArticle(${{t.id}})">🚀 Выгрузить в WP</button>
+          <button class="btn btn--sm btn--primary" onclick="exportSingleArticle(${{t.id}})">📦 Проверить пакет v1.1</button>
         </td>
       </tr>
     `;

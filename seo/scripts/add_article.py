@@ -49,32 +49,49 @@ def main() -> int:
     tid = int(args.id) if str(args.id).isdigit() else args.id
     now_str = datetime.now().isoformat(timespec="seconds")
 
-    # Сохраняем в SQLite БД (Единый первоисточник)
+    # 1. Авто-бэкап базы данных ДО изменений (точка восстановления)
+    bk = backup_database()
+    print(f"✓ Точка восстановления БД создана: {bk['filename']}")
+
+    # 2. Сохраняем в SQLite БД (Единый первоисточник)
     with get_connection() as conn:
         row = conn.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
-        title = args.title or (row["title"] if row else f"Статья #{tid}")
-        slug = args.slug or (row["slug"] if row else f"article-{tid}")
-        cluster = args.cluster or (row["cluster"] if row else "Материалы")
-
-        conn.execute("""
-            UPDATE topics
-            SET content_markdown = ?, chars = ?, status = ?, updated_at = ?
-            WHERE id = ?
-        """, (text, len(text), args.status, now_str, tid))
+        if not row:
+            # Если темы ещё нет, создаём её
+            title = args.title or f"Статья #{tid}"
+            slug = args.slug or f"article-{tid}"
+            cluster = args.cluster or "Материалы"
+            conn.execute("""
+                INSERT INTO topics
+                (id, title, slug, cluster, status, content_markdown, chars, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (tid, title, slug, cluster, args.status, text, len(text), now_str, now_str))
+        else:
+            title = args.title or row["title"]
+            slug = args.slug or row["slug"]
+            cluster = args.cluster or row["cluster"]
+            conn.execute("""
+                UPDATE topics
+                SET content_markdown = ?, chars = ?, status = ?,
+                    title = ?, slug = ?, cluster = ?, updated_at = ?
+                WHERE id = ?
+            """, (text, len(text), args.status, title, slug, cluster, now_str, tid))
         conn.commit()
 
     print(f"✓ Записано в SQLite (seo.db): ID #{tid}, статус «{STATUSES.get(args.status, args.status)}», {len(text)} знаков.")
 
-    # Авто-бэкап базы данных
-    bk = backup_database()
-    print(f"✓ Авто-бэкап БД создан: {bk['filename']}")
-
     if not args.no_score and score_blocks:
-        report = score_blocks(text, plan, args.id)
+        report = score_blocks(text, None, str(args.id))
         out = Path(__file__).resolve().parents[1] / "out" / "scores"
         out.mkdir(parents=True, exist_ok=True)
         (out / f"{args.id}.md").write_text(to_markdown(report), encoding="utf-8")
-        print(f"Оценка: {report['total']}/100 — {report['verdict']} (см. seo/out/scores/{args.id}.md)")
+        # Сохраняем балл в БД
+        with get_connection() as conn:
+            import json
+            conn.execute("UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
+                         (report["total"], json.dumps(report, ensure_ascii=False), tid))
+            conn.commit()
+        print(f"✓ Оценка: {report['total']}/100 — {report['verdict']} (сохранено в seo/out/scores/{args.id}.md и seo.db)")
     return 0
 
 

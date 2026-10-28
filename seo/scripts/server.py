@@ -310,36 +310,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     log_output = p.stdout + "\n" + p.stderr
                     status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent == "delivery" and target_id:
-                    with get_connection() as conn:
-                        row = conn.execute("SELECT * FROM topics WHERE id = ?", (target_id,)).fetchone()
-                    if not row or not row["content_markdown"]:
-                        log_output = f"Ошибка: Статья #{target_id} не найдена или не имеет текста."
+                    from package_contract import package_article
+                    res = package_article(target_id)
+                    if not res["valid"]:
+                        errors_str = "\n".join([f"  • {e}" for e in (res.get("missing_warnings", []) + res.get("errors", []))])
+                        log_output = f"❌ Статья #{target_id} не готова к доставке в WordPress (нарушение схемы v1.1):\n{errors_str}\n\nУстраните замечания перед отправкой черновика."
                         status = "failed"
                     else:
-                        article_contract = {
-                            "content_id": f"art-{target_id}",
-                            "title": row["title"],
-                            "slug": row["slug"],
-                            "content_html": f"<!-- Markdown body -->\n{row['content_markdown']}",
-                            "excerpt": (row["content_markdown"][:160] + "..."),
-                            "author_id": 1,
-                            "solder_alloy": "pos61",
-                            "difficulty": "medium",
-                            "tools_needed": [{"name": "Паяльник", "model": "T12", "purpose": "Монтаж"}],
-                            "sources": ["ГОСТ 21930-76"],
-                            "faq_items": [
-                                {"q": "Какой припой использовать?", "a": "Рекомендуется ПОС-61 с канифольным сердечником."},
-                                {"q": "Какая температура жала?", "a": "Для ПОС-61 рабочая температура 280-320 °C."},
-                                {"q": "Нужно ли смывать флюс?", "a": "Канифоль смывать спиртом, активные флюсы — обязательно водой."},
-                                {"q": "Как избежать перегрева?", "a": "Держите жало на контакте не дольше 2-3 секунд."}
-                            ]
-                        }
                         contract_path = DATA / f"contract_{target_id}.json"
-                        contract_path.write_text(json.dumps(article_contract, ensure_ascii=False, indent=2), encoding="utf-8")
+                        contract_path.write_text(json.dumps(res["contract"], ensure_ascii=False, indent=2), encoding="utf-8")
                         delivery_tool = ROOT / "tools" / "delivery_cli.py"
                         cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path), "--dry-run"]
                         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
-                        log_output = p.stdout + "\n" + p.stderr
+                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\n" + p.stdout + "\n" + p.stderr
                         status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent == "04-scorer" and target_id:
                     with get_connection() as conn:
@@ -350,8 +333,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         tmp_file.write_text(content, encoding="utf-8")
                         cmd = [sys.executable, str(SCRIPTS / "score_article.py"), "--file", str(tmp_file), "--id", str(target_id)]
                         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
-                        log_output = p.stdout + "\n" + p.stderr
-                        status = "succeeded" if p.returncode == 0 else "failed"
+                        log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
+                        # Коды скорера: 0 (passed >=80), 2 (needs_revision 60-79), 3 (low <60), 4 (blocker).
+                        # Все они являются успешным завершением аналитической проверки, а не падением сервера!
+                        status = "succeeded" if p.returncode in (0, 2, 3, 4) else "failed"
+                        if tmp_file.exists():
+                            try:
+                                tmp_file.unlink()
+                            except Exception:
+                                pass
                         # Обновляем скор в БД
                         score_json_file = SEO / "out" / "scores" / f"{target_id}.json"
                         if score_json_file.exists():

@@ -36,7 +36,8 @@ except Exception:
 
 from bs4 import BeautifulSoup
 
-from excel_io import DATA, build_plan, clean, save_competitors, save_raw_data
+from db import build_db_plan as build_plan, get_connection
+from excel_io import DATA, clean, save_competitors, save_raw_data
 
 UA = "Mozilla/5.0 (compatible; TchP-ResearchBot/1.0; +https://tochka-plavleniya.ru)"
 TIMEOUT = 15
@@ -398,29 +399,33 @@ def main() -> int:
         return 1
 
     # Сохраняем напрямую в SQLite (Единый первоисточник)
-    from db import get_connection
     added_db = 0
     with get_connection() as conn:
         for r in all_records:
             try:
-                conn.execute("""
+                cur = conn.execute("""
                     INSERT OR IGNORE INTO raw_articles
                     (url, domain, title, h1, date, content_type, cluster, status, crawled_at)
                     VALUES (?, ?, ?, ?, ?, ?, ?, 'собрано', ?)
                 """, (r["url"], r["source"], r["title"], r.get("h1", ""), r.get("date", ""),
                       r.get("content_type", "статья"), r.get("cluster", "Прочее"),
                       datetime.now().strftime("%Y-%m-%d %H:%M")))
-                added_db += 1
+                if cur.rowcount > 0:
+                    added_db += 1
             except Exception:
                 pass
+        # Обновляем счётчик статей конкурента ТОЧНЫМ числом из raw_articles!
         for s in summary:
+            domain = s["domain"]
+            cnt_row = conn.execute("SELECT COUNT(*) FROM raw_articles WHERE domain = ?", (domain,)).fetchone()
+            cnt = cnt_row[0] if cnt_row else 0
             conn.execute("""
                 UPDATE competitors
-                SET articles_count = articles_count + ?, updated_at = ?
+                SET articles_count = ?, updated_at = ?
                 WHERE domain = ?
-            """, (s["found"], datetime.now().strftime("%Y-%m-%d %H:%M"), s["domain"]))
+            """, (cnt, datetime.now().strftime("%Y-%m-%d %H:%M"), domain))
         conn.commit()
-    print(f"✓ Записано в SQLite seo.db (raw_articles): {added_db} записей.")
+    print(f"✓ Записано в SQLite seo.db (raw_articles): добавлено новых {added_db} записей.")
 
     # Дополнительно обновляем Excel, если файл доступен
     try:
