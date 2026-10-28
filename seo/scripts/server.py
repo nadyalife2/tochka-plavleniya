@@ -14,6 +14,7 @@ import argparse
 import json
 import mimetypes
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -35,6 +36,26 @@ DASHBOARD_DIR = SEO / "dashboard"
 sys.path.insert(0, str(SCRIPTS))
 
 from db import DB_PATH, backup_database, get_connection, init_db, list_backups
+
+
+def slugify(title: str) -> str:
+    table = {
+        "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e",
+        "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+        "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+        "ф": "f", "х": "h", "ц": "c", "ч": "ch", "ш": "sh", "щ": "sch", "ъ": "",
+        "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
+    }
+    out = []
+    for char in (title or "").lower():
+        if char in table:
+            out.append(table[char])
+        elif char.isalnum():
+            out.append(char)
+        else:
+            out.append("-")
+    slug = re.sub(r"-{2,}", "-", "".join(out)).strip("-")
+    return slug[:70] or "article"
 
 
 def fetch_all_data() -> dict:
@@ -292,6 +313,113 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 conn.commit()
 
             self.send_json({"status": status, "agent": agent, "log": log_output})
+            return
+
+        # 8. Импорт выгрузки Firecrawl (Markdown / JSON)
+        if path == "/api/import/firecrawl":
+            raw_text = payload.get("content", "").strip()
+            source_domain = payload.get("domain", "").strip().lower()
+            default_cluster = payload.get("cluster", "").strip() or "Материалы / Припои"
+
+            if not raw_text:
+                self.send_json({"status": "error", "message": "Вставьте текст выгрузки Firecrawl"}, 400)
+                return
+
+            articles_to_save = []
+            parsed_json = None
+            try:
+                parsed_json = json.loads(raw_text)
+            except Exception:
+                pass
+
+            if isinstance(parsed_json, dict):
+                data_obj = parsed_json.get("data", parsed_json)
+                items = data_obj if isinstance(data_obj, list) else [data_obj]
+                for item in items:
+                    meta = item.get("metadata", {})
+                    url = meta.get("sourceURL") or meta.get("url") or item.get("url") or ""
+                    title = meta.get("title") or item.get("title") or ""
+                    md = item.get("markdown") or item.get("content") or ""
+                    if not title and md:
+                        m_h1 = re.search(r"^#\s+(.+)$", md, re.M)
+                        title = m_h1.group(1).strip() if m_h1 else "Статья Firecrawl"
+                    d = source_domain or (urlparse(url).netloc.replace("www.", "") if url else "firecrawl-import")
+                    articles_to_save.append({
+                        "url": url or f"https://{d}/{slugify(title)}",
+                        "domain": d,
+                        "title": title,
+                        "content": md,
+                    })
+            else:
+                m_h1 = re.search(r"^#\s+(.+)$", raw_text, re.M)
+                title = m_h1.group(1).strip() if m_h1 else "Импортированная статья Firecrawl"
+                d = source_domain or "firecrawl-import"
+                articles_to_save.append({
+                    "url": f"https://{d}/{slugify(title)}",
+                    "domain": d,
+                    "title": title,
+                    "content": raw_text,
+                })
+
+            from bot_competitor_analyzer import FEATURE_PATTERNS, SOLDERING_KEYWORDS
+
+            features_found = []
+            keywords_found = []
+            saved_count = 0
+
+            with get_connection() as conn:
+                for art in articles_to_save:
+                    text_blob = f"{art['title']} {art['content']}".lower()
+
+                    for kw in SOLDERING_KEYWORDS:
+                        if re.search(rf"\b{re.escape(kw)}", text_blob) and kw not in keywords_found:
+                            keywords_found.append(kw)
+
+                    for f_name, pattern, desc in FEATURE_PATTERNS:
+                        if re.search(pattern, art["content"], flags=re.I) and f_name not in features_found:
+                            features_found.append(f_name)
+                            conn.execute("""
+                                INSERT INTO competitor_features
+                                (domain, feature_type, title, description, example_url, seo_value, found_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)
+                            """, (art["domain"], f_name, f_name.capitalize(), desc, art["url"], "Из выгрузки Firecrawl", datetime.now().strftime("%Y-%m-%d %H:%M")))
+
+                    conn.execute("""
+                        INSERT OR REPLACE INTO raw_articles
+                        (url, domain, title, h1, date, content_type, cluster, status, crawled_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, 'импортировано из Firecrawl', ?)
+                    """, (
+                        art["url"], art["domain"], art["title"], art["title"],
+                        datetime.now().strftime("%Y-%m-%d"),
+                        "импорт / гайд", default_cluster, datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    ))
+
+                    if art["domain"] and art["domain"] != "firecrawl-import":
+                        conn.execute("""
+                            INSERT INTO competitors (domain, niche, type, blog_url, articles_count, features, seo_keywords, score, notes, updated_at)
+                            VALUES (?, 'электроника и пайка', 'Конкурент (Firecrawl)', ?, 1, ?, ?, 70, 'Импортировано из выгрузки Firecrawl', ?)
+                            ON CONFLICT(domain) DO UPDATE SET
+                                articles_count = articles_count + 1,
+                                features = CASE WHEN length(features) > 0 THEN features || ', ' || ? ELSE ? END,
+                                seo_keywords = CASE WHEN length(seo_keywords) > 0 THEN seo_keywords || ', ' || ? ELSE ? END,
+                                updated_at = ?
+                        """, (
+                            art["domain"], art["url"],
+                            ", ".join(features_found), ", ".join(keywords_found[:8]), datetime.now().strftime("%Y-%m-%d %H:%M"),
+                            ", ".join(features_found), ", ".join(features_found),
+                            ", ".join(keywords_found[:6]), ", ".join(keywords_found[:6]),
+                            datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        ))
+                    saved_count += 1
+                conn.commit()
+
+            self.send_json({
+                "status": "ok",
+                "saved_articles": saved_count,
+                "domain": source_domain or "разные",
+                "features": features_found,
+                "keywords": keywords_found[:12],
+            })
             return
 
         self.send_error(404, "Unknown API route")

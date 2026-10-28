@@ -549,6 +549,29 @@ def generate_html() -> str:
       </div>
     </div>
 
+    <!-- Блок ручного импорта выгрузки Firecrawl -->
+    <div style="background:var(--card);border:2px solid var(--border);padding:14px 16px;margin-bottom:20px;box-shadow:3px 3px 0px rgba(0,0,0,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3 style="margin:0;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+          📥 Импорт выгрузки Firecrawl (Markdown / JSON)
+        </h3>
+        <span style="font-size:11px;font-family:var(--mono);color:var(--muted);">Вставьте скопированный текст из Firecrawl</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 220px 240px;gap:10px;margin-bottom:10px;">
+        <input type="text" id="fcDomain" placeholder="Домен сайта (например: masterpaiki.ru)..." style="padding:6px 10px;border:1px solid var(--border);font-size:12px;">
+        <select id="fcCluster" style="padding:6px 10px;border:1px solid var(--border);font-size:12px;">
+          <option value="Материалы / Припои">Материалы / Припои</option>
+          <option value="Инструменты / Паяльники">Инструменты / Паяльники</option>
+          <option value="Ошибки / Дефекты">Ошибки / Дефекты</option>
+          <option value="Типы компонентов / SMD">Типы компонентов / SMD</option>
+          <option value="Основы пайки / Начинающим">Основы пайки / Начинающим</option>
+        </select>
+        <button class="btn btn--primary" onclick="importFirecrawlData()">⚡ Разобрать и добавить сведения</button>
+      </div>
+      <textarea id="fcContent" placeholder="Вставьте сюда текст страницы из Firecrawl (Markdown страницы или JSON результат скрейпинга)..." rows="4" style="width:100%;padding:8px 10px;border:1px solid var(--border);font-family:var(--mono);font-size:12px;resize:vertical;"></textarea>
+      <div id="fcResult" style="display:none;margin-top:8px;padding:8px 12px;background:#F0FDF4;border:1px solid #86EFAC;font-size:12px;color:#166534;"></div>
+    </div>
+
     <div class="data-table-container" style="margin-bottom:24px;">
       <table class="data-table">
         <thead>
@@ -849,6 +872,35 @@ async function scoreCurrentArticle() {{
     showToast('✓ Скоринг завершён!');
     await refreshData();
     openInspector(CURRENT_TOPIC_ID);
+  }}
+}}
+
+async function importFirecrawlData() {{
+  const content = document.getElementById('fcContent').value.trim();
+  const domain = document.getElementById('fcDomain').value.trim();
+  const cluster = document.getElementById('fcCluster').value;
+  const resBox = document.getElementById('fcResult');
+
+  if (!content) {{
+    alert('Пожалуйста, вставьте текст выгрузки из Firecrawl!');
+    return;
+  }}
+
+  showToast('Разбор выгрузки Firecrawl...');
+  const res = await apiPost('/api/import/firecrawl', {{ content, domain, cluster }});
+  if (res && res.status === 'ok') {{
+    resBox.style.display = 'block';
+    resBox.innerHTML = `
+      <strong>✓ Успешно разобрано и добавлено в БД!</strong><br>
+      • Статей сохранено: <strong>${{res.saved_articles}}</strong><br>
+      • Обнаруженные фишки: <strong>${{res.features.length ? res.features.join(', ') : 'базовый контент'}}</strong><br>
+      • Извлечённые SEO-слова: <strong>${{res.keywords.length ? res.keywords.join(', ') : '—'}}</strong>
+    `;
+    document.getElementById('fcContent').value = '';
+    showToast(`✓ Сведения по сайту ${{res.domain}} добавлены в базу!`);
+    await refreshData();
+  }} else {{
+    alert('Ошибка при импорте выгрузки Firecrawl.');
   }}
 }}
 
