@@ -801,6 +801,7 @@ def generate_html() -> str:
     </div>
 
     <div style="display:flex;gap:10px;margin-top:18px;padding-top:14px;border-top:2px solid var(--border);flex-wrap:wrap;">
+      <button class="btn btn--primary" id="mBtnWriteArticle" onclick="writeArticleForCurrentTopic()">✍️ Написать (Claude Sonnet Practico)</button>
       <button class="btn btn--success" onclick="approveArticle()">✓ Утвердить к публикации (ОТК)</button>
       <button class="btn btn--danger" onclick="rejectArticle()">↺ Вернуть автору на доработку</button>
       <button class="btn btn--primary" onclick="scoreCurrentArticle()">⚡ Пересчитать оценку (0-100)</button>
@@ -989,12 +990,31 @@ async function runAgent(agentName) {{
   }}
 }}
 
+async function writeArticleForCurrentTopic() {{
+  if (!CURRENT_TOPIC_ID) return;
+  closeInspector();
+  showToast(`Запуск написания статьи #${{CURRENT_TOPIC_ID}} голосом Practico (Claude Sonnet)...`);
+  const c = document.getElementById('agentConsole');
+  c.innerText = `[${{new Date().toLocaleTimeString()}}] Запуск Агента 02 (Claude Sonnet Practico)...\nГолос: Глава 2 MASTER_EDITORIAL_BOOK.md (§2.4 сухая ирония, Answer First ≤ 40 слов, целевой объём 5 500 – 7 000 знаков)...\nОжидание генерации текста...`;
+  switchTab('agents');
+  const res = await apiPost('/api/agent/run', {{ agent: '02-writer', target_id: CURRENT_TOPIC_ID }});
+  if (res && res.log) {{
+    c.innerText = res.log;
+    showToast(`✓ Статья #${{CURRENT_TOPIC_ID}} написана и оценена!`);
+    await refreshData();
+    openInspector(CURRENT_TOPIC_ID);
+  }}
+}}
+
 function promptAgentTarget(agentName) {{
   const tid = prompt(`Введите ID статьи для ${{agentName}}:`);
   if (!tid) return;
   if (agentName === '04-scorer') {{
     CURRENT_TOPIC_ID = tid;
     scoreCurrentArticle();
+  }} else if (agentName === '02-writer') {{
+    CURRENT_TOPIC_ID = tid;
+    writeArticleForCurrentTopic();
   }} else {{
     runAgent(agentName);
   }}

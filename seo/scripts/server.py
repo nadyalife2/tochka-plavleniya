@@ -380,6 +380,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     else:
                         log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
                         status = "failed"
+                elif agent == "02-writer" and target_id:
+                    cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"), "--id", str(target_id)]
+                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=180)
+                    log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
+                    status = "succeeded" if p.returncode == 0 else "failed"
                 else:
                     log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."
                     status = "not_implemented"
