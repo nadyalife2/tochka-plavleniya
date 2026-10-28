@@ -1,0 +1,66 @@
+{
+  "article_id": "1",
+  "generated_at": "2026-10-28T15:16:19",
+  "file": "seo\\data\\article_1.md",
+  "metrics": {
+    "chars": 5941,
+    "h1": [
+      "Как паять паяльником: пошаговый гайд для начинающих"
+    ],
+    "h2_count": 10,
+    "avg_sentence_words": 17.0,
+    "avg_paragraph_sentences": 2.0,
+    "faq": 3,
+    "internal_links": 2,
+    "sources": 0,
+    "temps": 10,
+    "alloys": true,
+    "answer_first_words": 37,
+    "stop_phrases": [],
+    "bureaucratic": [],
+    "ai_patterns": [],
+    "dangerous": []
+  },
+  "blocks": {
+    "intent": {
+      "points": 18,
+      "max": 20
+    },
+    "facts": {
+      "points": 17,
+      "max": 25
+    },
+    "voice": {
+      "points": 15,
+      "max": 15
+    },
+    "seo": {
+      "points": 13,
+      "max": 20
+    },
+    "links": {
+      "points": 8,
+      "max": 10
+    },
+    "ai": {
+      "points": 10,
+      "max": 10
+    }
+  },
+  "total": 81,
+  "verdict": "готово к ОТК",
+  "issues": [
+    "H2: 10 (цель 4–8; для справочников допустимо до 10)",
+    "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)",
+    "FAQ: 3 вопросов (нужно 4–6)",
+    "Внутренние ссылки: 2 (нужно 3–5)",
+    "Нет раздела «Источники/Стандарты»",
+    "Ссылки: 2 (цель 3–5)"
+  ],
+  "blockers": [],
+  "manual": [
+    "проверить факты по первоисточникам",
+    "проверить уникальность (text.ru/Главред)",
+    "прочитать голосом вслух (голос Practico)"
+  ]
+}

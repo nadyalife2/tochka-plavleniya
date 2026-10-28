@@ -1,0 +1,66 @@
+{
+  "article_id": "52",
+  "generated_at": "2026-10-28T15:16:01",
+  "file": "сами статьи\\52-payalnaya-pasta-ili-pripoj.md",
+  "metrics": {
+    "chars": 2820,
+    "h1": [
+      "Паяльная паста или припой в проволоке: что выбрать и в чём разница"
+    ],
+    "h2_count": 8,
+    "avg_sentence_words": 11.6,
+    "avg_paragraph_sentences": 2.4,
+    "faq": 4,
+    "internal_links": 0,
+    "sources": 5,
+    "temps": 0,
+    "alloys": false,
+    "answer_first_words": 32,
+    "stop_phrases": [],
+    "bureaucratic": [],
+    "ai_patterns": [],
+    "dangerous": []
+  },
+  "blocks": {
+    "intent": {
+      "points": 15,
+      "max": 20
+    },
+    "facts": {
+      "points": 17,
+      "max": 25
+    },
+    "voice": {
+      "points": 15,
+      "max": 15
+    },
+    "seo": {
+      "points": 10,
+      "max": 20
+    },
+    "links": {
+      "points": 5,
+      "max": 10
+    },
+    "ai": {
+      "points": 8,
+      "max": 10
+    }
+  },
+  "total": 70,
+  "verdict": "черновик",
+  "issues": [
+    "Объём: 2,820 знаков (цель 5 500–7 000)",
+    "Сплавы: в тексте нет ни одного канонического сплава",
+    "Температуры: 0 значений с °C (нужно ≥ 3 в паяльной теме)",
+    "Внутренние ссылки: 0 (нужно 3–5)",
+    "Нет раздела «Источники/Стандарты»",
+    "Ссылки: 0 (цель 3–5)"
+  ],
+  "blockers": [],
+  "manual": [
+    "проверить факты по первоисточникам",
+    "проверить уникальность (text.ru/Главред)",
+    "прочитать голосом вслух (голос Practico)"
+  ]
+}

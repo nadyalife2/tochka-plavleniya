@@ -1,0 +1,62 @@
+{
+  "article_id": "15",
+  "generated_at": "2026-10-28T14:59:46",
+  "file": "сами статьи\\15-pripoj-dlya-pajki-vidy.md",
+  "metrics": {
+    "chars": 7982,
+    "h1": [
+      "Припой для пайки: виды и как выбрать правильный"
+    ],
+    "h2_count": 13,
+    "avg_sentence_words": 13.3,
+    "avg_paragraph_sentences": 2.6,
+    "faq": 6,
+    "internal_links": 3,
+    "sources": 20,
+    "temps": 27,
+    "alloys": true,
+    "answer_first_words": 28,
+    "stop_phrases": [],
+    "bureaucratic": [],
+    "ai_patterns": [],
+    "dangerous": []
+  },
+  "blocks": {
+    "intent": {
+      "points": 14,
+      "max": 20
+    },
+    "facts": {
+      "points": 21,
+      "max": 25
+    },
+    "voice": {
+      "points": 15,
+      "max": 15
+    },
+    "seo": {
+      "points": 20,
+      "max": 20
+    },
+    "links": {
+      "points": 10,
+      "max": 10
+    },
+    "ai": {
+      "points": 10,
+      "max": 10
+    }
+  },
+  "total": 90,
+  "verdict": "готово к ОТК",
+  "issues": [
+    "H2: 13 (цель 4–8; для справочников допустимо до 10)",
+    "Объём: 7,982 знаков (цель 5 500–7 000)"
+  ],
+  "blockers": [],
+  "manual": [
+    "проверить факты по первоисточникам",
+    "проверить уникальность (text.ru/Главред)",
+    "прочитать голосом вслух (голос Practico)"
+  ]
+}
