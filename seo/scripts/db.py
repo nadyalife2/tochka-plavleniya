@@ -69,7 +69,20 @@ def init_db() -> None:
             source_id INTEGER NOT NULL,
             target_id INTEGER NOT NULL,
             anchor TEXT,
-            status TEXT DEFAULT 'planned'
+            status TEXT DEFAULT 'planned',
+            UNIQUE(source_id, target_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS jobs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            job_type TEXT NOT NULL,
+            target_id TEXT,
+            params_json TEXT,
+            status TEXT DEFAULT 'queued',
+            return_code INTEGER,
+            log TEXT,
+            created_at TEXT,
+            updated_at TEXT
         );
 
         CREATE TABLE IF NOT EXISTS competitors (

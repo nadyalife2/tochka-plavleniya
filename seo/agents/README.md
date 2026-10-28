@@ -47,7 +47,7 @@
 [ Скрипт add_article.py ]
             │
             ▼
-[ Внесение в semantic_core_FULL_v11.xlsx ]
+[ Внесение в базу данных SQLite (seo.db) ]
             │
             ▼
 [ Доставка в WordPress и кнопка ОТК в админке ]
@@ -59,15 +59,14 @@
 
 Разведка и приоритеты — до всего остального, стоит 0 ₽ и 0 токенов:
 ```bash
-# 0.1. Обойти конкурентов и наполнить лист raw_data:
+# 0.1. Обойти конкурентов и наполнить базу SQLite:
 python seo/scripts/research_competitors.py --limit 60
 
-# 0.2. Посчитать приоритет всех тем 0–100 и записать в Excel:
+# 0.2. Посчитать приоритет всех тем 0–100 и сохранить в БД:
 python seo/scripts/priority_matrix.py --top 20
 
-# 0.3. Пересобрать очередь и дашборд:
-python seo/scripts/build_worklist.py
-python seo/scripts/build_dashboard.py
+# 0.3. Пересобрать дашборд:
+python seo/scripts/build_dashboard_ui.py
 ```
 
 Дальше — единый раннер по одной теме:
@@ -75,11 +74,11 @@ python seo/scripts/build_dashboard.py
 # 1. Собрать входные данные для темы #16 (для Исследователя):
 python seo/scripts/run_pipeline.py --id 16 --step research
 
-# 2. Сгенерировать бриф и передать Автору (Claude / Gemini):
-python seo/scripts/run_pipeline.py --id 16 --step write
+# 2. Сгенерировать бриф и промпт для Автора (Claude Sonnet через Antigravity):
+python seo/scripts/run_pipeline.py --id 16 --step prompt-writer
 
-# 3. Запустить проверку Рецензента:
-python seo/scripts/run_pipeline.py --id 16 --step review
+# 3. Сгенерировать промпт для проверки Рецензента (Claude Opus через Antigravity):
+python seo/scripts/run_pipeline.py --id 16 --step prompt-reviewer
 
 # 4. Прогнать авто-скоринг 0–100:
 python seo/scripts/run_pipeline.py --id 16 --step score

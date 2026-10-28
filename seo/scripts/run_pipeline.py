@@ -39,9 +39,20 @@ from linkgraph import outbound_candidates
 
 
 def get_topic_data(plan: dict, article_id: str) -> dict:
+    try:
+        from db import get_connection
+        with get_connection() as conn:
+            row = conn.execute("SELECT * FROM topics WHERE id = ?", (article_id,)).fetchone()
+            if row:
+                t = dict(row)
+                t["has_text"] = bool(t.get("content_markdown")) or len(t.get("content_markdown") or "") > 500
+                t["has_brief"] = False
+                return t
+    except Exception:
+        pass
     topic = plan["topics"].get(str(article_id))
     if not topic:
-        raise SystemExit(f"Ошибка: Тема #{article_id} не найдена в мастер-таблице.")
+        raise SystemExit(f"Ошибка: Тема #{article_id} не найдена в базе данных.")
     return topic
 
 
@@ -246,7 +257,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Оркестратор SEO-конвейера")
     parser.add_argument("--id", required=True, help="ID темы из плана")
     parser.add_argument("--step", required=True,
-                        choices=["status", "research", "prompt-writer", "prompt-reviewer", "score", "approve"])
+                        choices=["status", "research", "prompt-writer", "write", "prompt-reviewer", "review", "score", "approve"])
     args = parser.parse_args()
 
     plan = build_plan()
@@ -256,9 +267,9 @@ def main() -> None:
         step_status(topic)
     elif args.step == "research":
         step_research(plan, topic)
-    elif args.step == "prompt-writer":
+    elif args.step in ("prompt-writer", "write"):
         step_prompt_writer(plan, topic)
-    elif args.step == "prompt-reviewer":
+    elif args.step in ("prompt-reviewer", "review"):
         step_prompt_reviewer(topic)
     elif args.step == "score":
         step_score(topic)

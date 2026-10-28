@@ -394,12 +394,40 @@ def main() -> int:
         return 0
 
     if not all_records:
-        print("Нечего записывать в Excel.")
+        print("Нечего записывать.")
         return 1
 
-    result = save_raw_data(all_records, update_competitor_counts=True)
-    print(f"\nExcel raw_data: добавлено {result['added']}, пропущено дублей {result['skipped']}")
-    print(f"Бэкап: {result['backup']}")
+    # Сохраняем напрямую в SQLite (Единый первоисточник)
+    from db import get_connection
+    added_db = 0
+    with get_connection() as conn:
+        for r in all_records:
+            try:
+                conn.execute("""
+                    INSERT OR IGNORE INTO raw_articles
+                    (url, domain, title, h1, date, content_type, cluster, status, crawled_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'собрано', ?)
+                """, (r["url"], r["source"], r["title"], r.get("h1", ""), r.get("date", ""),
+                      r.get("content_type", "статья"), r.get("cluster", "Прочее"),
+                      datetime.now().strftime("%Y-%m-%d %H:%M")))
+                added_db += 1
+            except Exception:
+                pass
+        for s in summary:
+            conn.execute("""
+                UPDATE competitors
+                SET articles_count = articles_count + ?, updated_at = ?
+                WHERE domain = ?
+            """, (s["found"], datetime.now().strftime("%Y-%m-%d %H:%M"), s["domain"]))
+        conn.commit()
+    print(f"✓ Записано в SQLite seo.db (raw_articles): {added_db} записей.")
+
+    # Дополнительно обновляем Excel, если файл доступен
+    try:
+        result = save_raw_data(all_records, update_competitor_counts=True)
+        print(f"Excel raw_data: добавлено {result['added']}, пропущено дублей {result['skipped']}")
+    except Exception as e:
+        print(f"(Синхронизация с Excel пропущена: {e})")
     return 0
 
 

@@ -241,24 +241,34 @@ def main() -> int:
         print("\n--dry-run: в Excel ничего не записано.")
         return 0
 
-    payload = [
-        {
-            "article_id": r["article_id"],
-            "score": r["score"],
-            "cluster_score": r["cluster_score"],
-            "gap_score": r["gap_score"],
-            "coverage_score": r["coverage_score"],
-            "links_score": r["links_score"],
-            "readiness_score": r["readiness_score"],
-            "keywords_score": r["keywords_score"],
-            "notes": f"кластер: {r['cluster']}",
-        }
-        for r in results
-    ]
-    res = save_priority_scores(payload, write_plan_column=True)
-    print(f"\nExcel: записано {res['written']} оценок в лист `{res['sheet']}` "
-          f"и колонку «Оценка_приоритета_0_100»")
-    print(f"Бэкап: {res['backup']}")
+    # 1. Сохраняем в SQLite БД (Единый первоисточник)
+    from db import get_connection
+    with get_connection() as conn:
+        for r in results:
+            conn.execute("UPDATE topics SET priority_score = ? WHERE id = ?", (r["score"], r["article_id"]))
+        conn.commit()
+    print(f"✓ Записано в SQLite seo.db: обновлено {len(results)} тем.")
+
+    # 2. Дополнительно обновляем Excel, если файл доступен
+    try:
+        payload = [
+            {
+                "article_id": r["article_id"],
+                "score": r["score"],
+                "cluster_score": r["cluster_score"],
+                "gap_score": r["gap_score"],
+                "coverage_score": r["coverage_score"],
+                "links_score": r["links_score"],
+                "readiness_score": r["readiness_score"],
+                "keywords_score": r["keywords_score"],
+                "notes": f"кластер: {r['cluster']}",
+            }
+            for r in results
+        ]
+        res = save_priority_scores(payload, write_plan_column=True)
+        print(f"Excel: записано {res['written']} оценок в лист `{res['sheet']}`")
+    except Exception as e:
+        print(f"(Синхронизация с Excel пропущена: {e})")
     return 0
 
 

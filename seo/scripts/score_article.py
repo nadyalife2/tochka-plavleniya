@@ -80,7 +80,8 @@ def strip_markdown(text: str) -> str:
 
 
 def internal_links(text: str) -> list[str]:
-    return re.findall(r"\]\((/(?:[a-z0-9\-]+)/?)\)", text) + re.findall(r"\]\((https?://[^)]+)\)", text)
+    # Только внутренние относительные ссылки сайта: /slug/ или /slug
+    return re.findall(r"\]\((/(?:[a-z0-9\-]+)/?)\)", text)
 
 
 def count_faq(text: str) -> int:
@@ -95,7 +96,8 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
     h = headings(text)
     h1 = [t for lvl, t in h if lvl == 1]
     h2 = [t for lvl, t in h if lvl == 2]
-    chars = len(re.sub(r"\s+", "", plain))
+    # Объём текста: с пробелами (редакционный стандарт)
+    chars = len(plain.strip())
     paras = paragraphs(plain)
     sents = [s for p in paras for s in sentences(p)]
     avg_len = sum(len(words(s)) for s in sents) / max(1, len(sents))
@@ -108,7 +110,16 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
     stop_hits = [p for p in STOP_PHRASES if p in plain.lower()]
     bur_hits = [w for w in BUREAUCRATIC if re.search(rf"\b{w}", plain.lower())]
     ai_hits = [p for p in AI_PATTERNS if p in plain.lower()]
-    danger_hits = [p for p in DANGEROUS if p in plain.lower()]
+
+    # Проверка опасных советов с учётом отрицания (не паять под напряжением = норма!)
+    danger_hits = []
+    for p in DANGEROUS:
+        for m in re.finditer(re.escape(p), plain.lower()):
+            start = max(0, m.start() - 30)
+            prefix = plain.lower()[start:m.start()]
+            if not re.search(r"\b(не|нельзя|запрещ\w*|исключ\w*|никогда|без|опасно)\s*$", prefix):
+                danger_hits.append(p)
+                break
     first_para = paras[0] if paras else ""
     answer_words = len(words(first_para))
 

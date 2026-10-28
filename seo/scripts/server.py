@@ -31,6 +31,7 @@ except Exception:
 
 ROOT = Path(__file__).resolve().parents[2]
 SEO = ROOT / "seo"
+DATA = SEO / "data"
 SCRIPTS = SEO / "scripts"
 DASHBOARD_DIR = SEO / "dashboard"
 sys.path.insert(0, str(SCRIPTS))
@@ -178,6 +179,43 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": str(e)}, 500)
             return
 
+        # 1.5. Создание темы вручную (из головы)
+        if path == "/api/topics/create":
+            title = payload.get("title", "").strip()
+            cluster = payload.get("cluster", "").strip() or "Материалы / Припои"
+            ctype = payload.get("type", "гайд").strip()
+            priority = payload.get("priority", "средний").strip()
+            notes = payload.get("notes", "").strip()
+
+            if not title:
+                self.send_json({"status": "error", "message": "Введите название темы"}, 400)
+                return
+
+            with get_connection() as conn:
+                cur = conn.cursor()
+                max_id = cur.execute("SELECT MAX(id) FROM topics").fetchone()[0] or 0
+                next_id = max_id + 1
+                slug = slugify(title) + f"-{next_id}"
+                priority_score = 85 if priority.lower() in ("высокий", "hot") else 60
+                now_str = datetime.now().isoformat(timespec="seconds")
+
+                cur.execute("""
+                    INSERT INTO topics
+                    (id, title, slug, cluster, type, priority, priority_score, status, next_action, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'backlog', ?, ?, ?)
+                """, (next_id, title, slug, cluster, ctype, priority, priority_score, f"добавлено вручную: {notes}" if notes else "добавлено вручную", now_str, now_str))
+                conn.commit()
+
+            self.send_json({
+                "status": "ok",
+                "id": next_id,
+                "title": title,
+                "slug": slug,
+                "cluster": cluster,
+                "priority_score": priority_score,
+            })
+            return
+
         # 2. Одобрить предложенную тему -> в topics
         if path == "/api/topics/approve":
             pid = payload.get("id")
@@ -260,6 +298,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"), "--limit", "20"]
                     p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
                     log_output = p.stdout + "\n" + p.stderr
+                    status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent == "bot-analyzer":
                     domain = payload.get("domain", "")
                     cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
@@ -269,14 +308,39 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         cmd.append("--all")
                     p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
                     log_output = p.stdout + "\n" + p.stderr
+                    status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent == "delivery" and target_id:
-                    delivery_tool = ROOT / "tools" / "delivery_cli.py"
-                    if delivery_tool.exists():
-                        cmd = [sys.executable, str(delivery_tool), "--article-id", str(target_id)]
-                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
-                        log_output = p.stdout + "\n" + p.stderr
+                    with get_connection() as conn:
+                        row = conn.execute("SELECT * FROM topics WHERE id = ?", (target_id,)).fetchone()
+                    if not row or not row["content_markdown"]:
+                        log_output = f"Ошибка: Статья #{target_id} не найдена или не имеет текста."
+                        status = "failed"
                     else:
-                        log_output = f"Черновик статьи #{target_id} упакован по схеме v1.1. Готов к отправке в WordPress."
+                        article_contract = {
+                            "content_id": f"art-{target_id}",
+                            "title": row["title"],
+                            "slug": row["slug"],
+                            "content_html": f"<!-- Markdown body -->\n{row['content_markdown']}",
+                            "excerpt": (row["content_markdown"][:160] + "..."),
+                            "author_id": 1,
+                            "solder_alloy": "pos61",
+                            "difficulty": "medium",
+                            "tools_needed": [{"name": "Паяльник", "model": "T12", "purpose": "Монтаж"}],
+                            "sources": ["ГОСТ 21930-76"],
+                            "faq_items": [
+                                {"q": "Какой припой использовать?", "a": "Рекомендуется ПОС-61 с канифольным сердечником."},
+                                {"q": "Какая температура жала?", "a": "Для ПОС-61 рабочая температура 280-320 °C."},
+                                {"q": "Нужно ли смывать флюс?", "a": "Канифоль смывать спиртом, активные флюсы — обязательно водой."},
+                                {"q": "Как избежать перегрева?", "a": "Держите жало на контакте не дольше 2-3 секунд."}
+                            ]
+                        }
+                        contract_path = DATA / f"contract_{target_id}.json"
+                        contract_path.write_text(json.dumps(article_contract, ensure_ascii=False, indent=2), encoding="utf-8")
+                        delivery_tool = ROOT / "tools" / "delivery_cli.py"
+                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path), "--dry-run"]
+                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
+                        log_output = p.stdout + "\n" + p.stderr
+                        status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent == "04-scorer" and target_id:
                     with get_connection() as conn:
                         row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (target_id,)).fetchone()
@@ -287,6 +351,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         cmd = [sys.executable, str(SCRIPTS / "score_article.py"), "--file", str(tmp_file), "--id", str(target_id)]
                         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
                         log_output = p.stdout + "\n" + p.stderr
+                        status = "succeeded" if p.returncode == 0 else "failed"
                         # Обновляем скор в БД
                         score_json_file = SEO / "out" / "scores" / f"{target_id}.json"
                         if score_json_file.exists():
@@ -296,12 +361,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                              (s_data.get("total"), json.dumps(s_data, ensure_ascii=False), target_id))
                                 conn.commit()
                     else:
-                        log_output = f"У темы #{target_id} нет текста для оценки."
-                        status = "error"
+                        log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
+                        status = "failed"
                 else:
-                    log_output = f"Агент {agent} инициирован. Задача передана в очередь."
+                    log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."
+                    status = "not_implemented"
             except Exception as ex:
-                status = "error"
+                status = "failed"
                 log_output = str(ex)
 
             # Сохраняем запуск в agent_runs

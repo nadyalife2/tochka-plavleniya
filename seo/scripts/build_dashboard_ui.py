@@ -467,8 +467,36 @@ def generate_html() -> str:
         </label>
         <input type="text" id="kanbanSearch" placeholder="Поиск по названию или #ID..." oninput="filterKanban()" style="padding:4px 8px;border:1px solid var(--border);width:220px;">
       </div>
-      <div style="font-size:12px;font-family:var(--mono);color:var(--muted);">
-        Кликните на карточку: оценка 0-100, замечания и утверждение шеф-редактором
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn btn--sm btn--primary" onclick="toggleNewTopicBox()">✍️ + Добавить тему из головы</button>
+      </div>
+    </div>
+
+    <!-- Окно быстрого добавления темы из головы -->
+    <div id="newTopicBox" style="display:none;background:var(--card);border:2px solid var(--border);padding:14px 16px;margin-bottom:14px;box-shadow:3px 3px 0px rgba(0,0,0,0.06);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h3 style="margin:0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+          ✍️ Добавить тему в бэклог (Ваша идея / из головы)
+        </h3>
+        <span style="font-size:11px;font-family:var(--mono);color:var(--muted);">Тема сразу попадёт в колонку «Бэклог» для обработки агентами</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 220px 150px 150px 180px;gap:8px;margin-bottom:8px;">
+        <input type="text" id="newTopicTitle" placeholder="Название темы (например: Как паять алюминиевые радиаторы)..." style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;">
+        <select id="newTopicCluster" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;"></select>
+        <select id="newTopicType" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;">
+          <option value="гайд">гайд / мануал</option>
+          <option value="выбор">выбор припоя</option>
+          <option value="ошибки">дефекты пайки</option>
+          <option value="обзор">обзор станции</option>
+        </select>
+        <select id="newTopicPriority" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;">
+          <option value="высокий">Высокий (P85)</option>
+          <option value="средний" selected>Средний (P60)</option>
+        </select>
+        <button class="btn btn--primary" onclick="createNewTopicFromInput()">+ Добавить в бэклог</button>
+      </div>
+      <div>
+        <input type="text" id="newTopicNotes" placeholder="Ваши мысли, ключевые тезисы или акценты статьи (необязательно)..." style="width:100%;padding:5px 10px;border:1px dashed var(--border);font-size:11px;background:var(--bg);">
       </div>
     </div>
 
@@ -1298,12 +1326,53 @@ function closeInspector(e) {{
   document.getElementById('inspectorModal').classList.remove('active');
 }}
 
+function toggleNewTopicBox() {{
+  const box = document.getElementById('newTopicBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  if (box.style.display === 'block') {{
+    document.getElementById('newTopicTitle').focus();
+  }}
+}}
+
+async function createNewTopicFromInput() {{
+  const title = document.getElementById('newTopicTitle').value.trim();
+  const cluster = document.getElementById('newTopicCluster').value;
+  const type = document.getElementById('newTopicType').value;
+  const priority = document.getElementById('newTopicPriority').value;
+  const notes = document.getElementById('newTopicNotes').value.trim();
+
+  if (!title) {{
+    alert('Пожалуйста, введите название темы!');
+    return;
+  }}
+
+  showToast('Добавление темы в бэклог...');
+  const res = await apiPost('/api/topics/create', {{ title, cluster, type, priority, notes }});
+  if (res && res.status === 'ok') {{
+    showToast(`✓ Тема #${{res.id}} добавлена в бэклог!`);
+    document.getElementById('newTopicTitle').value = '';
+    document.getElementById('newTopicNotes').value = '';
+    document.getElementById('newTopicBox').style.display = 'none';
+    await refreshData();
+  }} else {{
+    alert('Ошибка при добавлении темы.');
+  }}
+}}
+
 function renderAll() {{
   const sel = document.getElementById('clusterSelect');
   sel.innerHTML = '<option value="">Все кластеры</option>';
   DB_DATA.clusters.forEach(c => {{
     sel.innerHTML += `<option value="${{c.name.toLowerCase()}}">${{c.name}}</option>`;
   }});
+
+  const nSel = document.getElementById('newTopicCluster');
+  if (nSel) {{
+    nSel.innerHTML = '';
+    DB_DATA.clusters.forEach(c => {{
+      nSel.innerHTML += `<option value="${{c.name}}">${{c.name}}</option>`;
+    }});
+  }}
 
   document.getElementById('statTopicsCount').innerText = DB_DATA.counts.topics;
   document.getElementById('statWrittenCount').innerText = DB_DATA.counts.written;
