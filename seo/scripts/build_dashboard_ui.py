@@ -755,26 +755,49 @@ def generate_html() -> str:
       <h2 id="mTitle" style="margin:4px 0 0;font-size:17px;font-weight:800;">Название статьи</h2>
     </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-      <h3 style="margin:0;font-size:14px;">Инженерная оценка качества (0–100):</h3>
-      <span id="mTotalScore" style="font-family:var(--mono);font-size:18px;font-weight:800;padding:2px 8px;border:1px solid #111;">—</span>
+    <!-- Вкладки модального окна: Оценка vs Текст статьи -->
+    <div style="display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:14px;">
+      <button class="tab-btn active" id="modalTabBtnScore" onclick="switchModalTab('score')">📊 Оценка и замечания (0-100)</button>
+      <button class="tab-btn" id="modalTabBtnText" onclick="switchModalTab('text')">📄 Текст статьи (Markdown) <span class="tab-badge" id="mTextCharsBadge">0 зн.</span></button>
     </div>
 
-    <div id="mScoreGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
+    <!-- Вкладка 1: Оценка и замечания -->
+    <div id="modalPanelScore">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <h3 style="margin:0;font-size:14px;">Инженерная оценка качества (0–100):</h3>
+        <span id="mTotalScore" style="font-family:var(--mono);font-size:18px;font-weight:800;padding:2px 8px;border:1px solid #111;">—</span>
+      </div>
 
-    <div id="mBlockersBox" style="display:none;background:#FEE2E2;border:1.5px solid #B91C1C;padding:10px;margin-bottom:10px;">
-      <strong style="color:#B91C1C;">❌ КРИТИЧЕСКИЕ БЛОКЕРЫ:</strong>
-      <ul id="mBlockersList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#7F1D1D;"></ul>
+      <div id="mScoreGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
+
+      <div id="mBlockersBox" style="display:none;background:#FEE2E2;border:1.5px solid #B91C1C;padding:10px;margin-bottom:10px;">
+        <strong style="color:#B91C1C;">❌ КРИТИЧЕСКИЕ БЛОКЕРЫ:</strong>
+        <ul id="mBlockersList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#7F1D1D;"></ul>
+      </div>
+
+      <div id="mIssuesBox" style="display:none;background:#FEF9C3;border:1.5px solid #A16207;padding:10px;margin-bottom:10px;">
+        <strong style="color:#854D0E;">⚠️ Замечания к доработке (требуются правки):</strong>
+        <ul id="mIssuesList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#713F12;"></ul>
+      </div>
+
+      <div style="border-top:1px dashed var(--border);padding-top:10px;margin-top:10px;">
+        <h4 style="margin:0 0 6px;font-size:13px;">Перелинковка темы:</h4>
+        <div id="mLinksText" style="font-size:12px;color:var(--muted);">—</div>
+      </div>
     </div>
 
-    <div id="mIssuesBox" style="display:none;background:#FEF9C3;border:1.5px solid #A16207;padding:10px;margin-bottom:10px;">
-      <strong style="color:#854D0E;">⚠️ Замечания к доработке (требуются правки):</strong>
-      <ul id="mIssuesList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#713F12;"></ul>
-    </div>
-
-    <div style="border-top:1px dashed var(--border);padding-top:10px;margin-top:10px;">
-      <h4 style="margin:0 0 6px;font-size:13px;">Перелинковка темы:</h4>
-      <div id="mLinksText" style="font-size:12px;color:var(--muted);">—</div>
+    <!-- Вкладка 2: Полный текст статьи (Markdown) -->
+    <div id="modalPanelText" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <span style="font-size:12px;color:var(--muted);font-family:var(--mono);">
+          Файл на диске: <strong id="mDiskFilePath" style="color:var(--ink);">сами статьи/...</strong>
+        </span>
+        <button class="btn btn--sm btn--primary" onclick="saveEditedArticleText()">💾 Сохранить изменения текста</button>
+      </div>
+      <textarea id="mTextEditor" rows="18" style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;background:#FAFAFA;resize:vertical;" placeholder="Текст статьи ещё не написан..."></textarea>
+      <div style="margin-top:6px;font-size:11px;color:var(--muted);">
+        💡 Вы можете читать, проверять или редактировать текст прямо здесь. Кнопка «Сохранить» синхронизирует и базу данных SQLite, и файл на диске.
+      </div>
     </div>
 
     <div style="display:flex;gap:10px;margin-top:18px;padding-top:14px;border-top:2px solid var(--border);flex-wrap:wrap;">
@@ -1322,7 +1345,35 @@ function openInspector(topicId) {{
   }}
   linksEl.innerHTML = linksStr || 'Связи не заданы';
 
+  // Редактор текста статьи
+  document.getElementById('mTextEditor').value = t.content_markdown || '';
+  document.getElementById('mDiskFilePath').innerText = `сами статьи/${{t.id}}-${{t.slug}}.md`;
+  document.getElementById('mTextCharsBadge').innerText = (t.chars || 0) + ' зн.';
+  switchModalTab('score');
+
   document.getElementById('inspectorModal').classList.add('active');
+}}
+
+function switchModalTab(tab) {{
+  document.getElementById('modalTabBtnScore').classList.toggle('active', tab === 'score');
+  document.getElementById('modalTabBtnText').classList.toggle('active', tab === 'text');
+  document.getElementById('modalPanelScore').style.display = tab === 'score' ? 'block' : 'none';
+  document.getElementById('modalPanelText').style.display = tab === 'text' ? 'block' : 'none';
+}}
+
+async function saveEditedArticleText() {{
+  if (!CURRENT_TOPIC_ID) return;
+  const newText = document.getElementById('mTextEditor').value;
+  showToast('Сохранение текста статьи...');
+  const res = await apiPost('/api/topics/update-text', {{ id: CURRENT_TOPIC_ID, content_markdown: newText }});
+  if (res && res.status === 'ok') {{
+    showToast(`✓ Текст сохранён в SQLite и на диск! (${{res.chars}} зн.)`);
+    document.getElementById('mChars').innerText = res.chars + ' знаков';
+    document.getElementById('mTextCharsBadge').innerText = res.chars + ' зн.';
+    await refreshData();
+  }} else {{
+    alert('Ошибка при сохранении текста.');
+  }}
 }}
 
 function closeInspector(e) {{

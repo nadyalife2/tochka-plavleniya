@@ -285,6 +285,33 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "id": tid})
             return
 
+        # 6.5. Сохранить отредактированный текст статьи
+        if path == "/api/topics/update-text":
+            tid = payload.get("id")
+            new_text = payload.get("content_markdown", "")
+            now_str = datetime.now().isoformat(timespec="seconds")
+            chars = len(new_text.strip())
+
+            with get_connection() as conn:
+                row = conn.execute("SELECT slug FROM topics WHERE id = ?", (tid,)).fetchone()
+                slug = row["slug"] if row else f"article-{tid}"
+                conn.execute("""
+                    UPDATE topics
+                    SET content_markdown = ?, chars = ?, updated_at = ?
+                    WHERE id = ?
+                """, (new_text, chars, now_str, tid))
+                conn.commit()
+
+            # Синхронизируем файл на диске в `сами статьи/`
+            art_file = ROOT / "сами статьи" / f"{tid}-{slug}.md"
+            try:
+                art_file.write_text(new_text, encoding="utf-8")
+            except Exception:
+                pass
+
+            self.send_json({"status": "ok", "id": tid, "chars": chars})
+            return
+
         # 7. Запуск субагента
         if path == "/api/agent/run":
             agent = payload.get("agent")
