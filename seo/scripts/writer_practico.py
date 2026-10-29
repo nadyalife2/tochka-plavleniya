@@ -23,6 +23,8 @@ import json
 import re
 import subprocess
 import sys
+import urllib.error
+import urllib.request
 from datetime import datetime
 from pathlib import Path
 
@@ -105,7 +107,6 @@ def call_antigravity_cli(prompt: str) -> str | None:
 
 def call_openrouter_claude(prompt: str, system_prompt: str) -> str:
     """Вызов Claude Sonnet через OpenRouter API."""
-    import urllib.request
     provider, api_key = get_credentials()
     if not api_key:
         raise RuntimeError("OPENROUTER_API_KEY не найден в ~/.dsh/.credentials.yaml.")
@@ -131,9 +132,30 @@ def call_openrouter_claude(prompt: str, system_prompt: str) -> str:
         },
     )
 
-    with urllib.request.urlopen(req, timeout=90) as resp:
-        data = json.loads(resp.read().decode("utf-8"))
-        return data["choices"][0]["message"]["content"]
+    try:
+        with urllib.request.urlopen(req, timeout=90) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            return data["choices"][0]["message"]["content"]
+    except urllib.error.HTTPError as e:
+        body = ""
+        try:
+            body = e.read().decode("utf-8", "replace")[:300]
+        except Exception:
+            pass
+        if e.code == 403:
+            raise RuntimeError(
+                "HTTP 403 «Access denied by security policy». "
+                "OpenRouter блокирует запросы из РФ на уровне гео-политики.\n"
+                "Что делать: включите VPN/прокси и повторите. Без VPN работает только локальный конвейер "
+                "(скоринг, приоритеты, упаковка контракта) — он не требует интернета."
+            ) from None
+        if e.code == 401:
+            raise RuntimeError("HTTP 401: ключ OPENROUTER_API_KEY недействителен. Проверьте ~/.dsh/.credentials.yaml.") from None
+        if e.code == 402:
+            raise RuntimeError("HTTP 402: на балансе OpenRouter недостаточно средств.") from None
+        if e.code == 429:
+            raise RuntimeError("HTTP 429: слишком много запросов к OpenRouter. Подождите минуту.") from None
+        raise RuntimeError(f"HTTP {e.code} от OpenRouter: {body}") from None
 
 
 def write_article_for_topic(topic_id: int | str) -> dict:
