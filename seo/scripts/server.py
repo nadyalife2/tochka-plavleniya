@@ -219,6 +219,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "running", "time": datetime.now().isoformat()})
             return
 
+        if path == "/api/keywords/suggest":
+            # Подсказки фраз из SEO-данных конкурентов и хвостов Вордстата
+            qs = parse_qs(url.query)
+            try:
+                limit = int((qs.get("limit") or ["10"])[0])
+            except ValueError:
+                limit = 10
+            limit = max(1, min(50, limit))
+            contains = (qs.get("q") or [""])[0].strip()
+            try:
+                import keyword_suggestions
+                items = keyword_suggestions.collect(limit=limit, contains=contains)
+                self.send_json({"status": "ok", "count": len(items), "suggestions": items})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:120]}"}, 500)
+            return
+
         if path == "/api/keyword/trend":
             # История измерений по конкретной фразе (что менялось и когда)
             phrase = (parse_qs(url.query).get("phrase") or [""])[0].strip()
@@ -452,9 +469,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
             tid = payload.get("id")
             reason = payload.get("reason", "Замечания редактора")
             with get_connection() as conn:
-                conn.execute("UPDATE topics SET status = 'writing', next_action = ? WHERE id = ?", (f"доработка: {reason}", tid))
+                # needs_fix — отдельный статус, чтобы статья ГАРАНТИРОВАННО
+                # попала в колонку «Требует правок», даже если балл был ≥ 80
+                conn.execute(
+                    "UPDATE topics SET status = 'needs_fix', next_action = ? WHERE id = ?",
+                    (f"доработка: {reason}", tid),
+                )
                 conn.commit()
-            self.send_json({"status": "ok", "id": tid})
+            self.send_json({"status": "ok", "id": tid, "new_status": "needs_fix"})
             return
 
         # 6.5. Сохранить отредактированный текст статьи

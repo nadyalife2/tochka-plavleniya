@@ -158,6 +158,87 @@ def call_openrouter_claude(prompt: str, system_prompt: str) -> str:
         raise RuntimeError(f"HTTP {e.code} от OpenRouter: {body}") from None
 
 
+def _keyword_context(title: str) -> str:
+    """Собирает реальные SEO-данные из базы для включения в задание автору.
+
+    Берём то, что уже измерено инструментами (Вордстат/Мутаген), чтобы автор
+    строил разделы и FAQ вокруг настоящих запросов, а не выдумывал их.
+    """
+    parts: list[str] = []
+    matched = ""
+    try:
+        with get_connection() as conn:
+            mg = None
+            try:
+                mg = conn.execute(
+                    "SELECT keyword, strong, wordstat, tails, vital_site FROM keyword_metrics WHERE keyword = ?",
+                    (title,),
+                ).fetchone()
+            except Exception:
+                mg = None
+            ws = None
+            try:
+                ws = conn.execute(
+                    "SELECT phrase, total_count, top_json FROM wordstat_metrics WHERE phrase = ?", (title,)
+                ).fetchone()
+            except Exception:
+                ws = None
+            # если точного совпадения нет — ищем ближайшую измеренную фразу по словам
+            if not mg and not ws:
+                for w in [x for x in title.lower().split() if len(x) > 4][:2]:
+                    try:
+                        row = conn.execute(
+                            "SELECT keyword, strong, wordstat, tails, vital_site FROM keyword_metrics "
+                            "WHERE keyword LIKE ? ORDER BY wordstat DESC LIMIT 1",
+                            (f"%{w}%",),
+                        ).fetchone()
+                    except Exception:
+                        row = None
+                    if row:
+                        mg = row
+                        matched = row["keyword"]
+                        try:
+                            ws = conn.execute(
+                                "SELECT phrase, total_count, top_json FROM wordstat_metrics WHERE phrase = ?",
+                                (matched,),
+                            ).fetchone()
+                        except Exception:
+                            ws = None
+                        break
+    except Exception:
+        return ""
+
+    if matched:
+        parts.append(f"- Ближайшая измеренная фраза к теме: «{matched}» (точного замера по заголовку нет)")
+
+    if mg:
+        mg = dict(mg)
+        strong = mg.get("strong")
+        demand = mg.get("wordstat")
+        tails = mg.get("tails")
+        vital = mg.get("vital_site")
+        parts.append(
+            f"- Замеренная конкуренция фразы: {strong}/25 "
+            f"({'низкая' if strong is not None and strong <= 10 else 'средняя' if strong is not None and strong <= 18 else 'высокая'})"
+        )
+        if demand is not None:
+            parts.append(f"- Точная частотность фразы (в кавычках): {demand} показов/мес")
+        if tails:
+            parts.append(f"- Объём хвостов вокруг темы: {tails} показов/мес")
+        if vital:
+            parts.append(f"- В топе есть витальный сайт: {vital} (обойти можно только точностью фактов и глубиной)")
+    if ws:
+        ws = dict(ws)
+        parts.append(f"- Широкая частотность темы (Вордстат): {ws.get('total_count')} показов/мес")
+        try:
+            tops = [it.get("phrase") for it in (json.loads(ws.get("top_json") or "[]"))[:8] if it.get("phrase")]
+        except Exception:
+            tops = []
+        if tops:
+            parts.append("- Реальные запросы людей (использовать в подзаголовках и FAQ): " + "; ".join(tops))
+    return "\n".join(parts)
+
+
 def write_article_for_topic(topic_id: int | str) -> dict:
     tid = int(topic_id) if str(topic_id).isdigit() else topic_id
 
@@ -184,6 +265,18 @@ def write_article_for_topic(topic_id: int | str) -> dict:
 - Целевой интент: {brief_row['intent']}
 - Боль читателя: {brief_row['reader_pain']}
 - LSI-ключи: {brief_row['lsi']}
+"""
+
+    kw_ctx = _keyword_context(topic["title"])
+    if kw_ctx:
+        user_prompt += f"""
+РЕАЛЬНЫЕ SEO-ДАННЫЕ ПО ТЕМЕ (измерено Вордстатом и Мутагеном, не выдумывать своё):
+{kw_ctx}
+Как их использовать:
+- главную фразу поставь в H1 и в первый абзац (Answer First) без переспама;
+- 2–3 подзаголовка H2 сформулируй из реальных запросов людей выше;
+- 3–4 вопроса FAQ возьми из этих запросов дословно, ответь по существу;
+- не повторяй одну фразу в каждом абзаце: поисковик считает это переспамом.
 """
 
     user_prompt += """

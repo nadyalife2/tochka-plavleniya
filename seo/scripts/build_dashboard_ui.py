@@ -904,8 +904,15 @@ def generate_html() -> str:
     </div>
 
     <div style="background:var(--card);border:1.5px solid var(--border);padding:12px;margin-bottom:14px;">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
+        💡 Подсказки берутся из SEO-ключей конкурентов, хвостов Вордстата и уже измеренных фраз — выберите из списка или впишите свою.
+      </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <input type="text" id="analysisPhrase" placeholder="Введите фразу (например: пайка проводов)" style="flex:1;min-width:260px;padding:7px 10px;border:1.5px solid var(--border);font-size:12px;">
+        <input type="text" id="analysisPhrase" list="kwSuggestList" placeholder="Введите или выберите фразу" style="flex:1;min-width:260px;padding:7px 10px;border:1.5px solid var(--border);font-size:12px;">
+        <datalist id="kwSuggestList"></datalist>
+        <select id="kwSuggestSelect" onchange="pickSuggestion(this)" style="padding:7px 10px;border:1.5px solid var(--border);font-size:12px;max-width:280px;">
+          <option value="">— подсказки от конкурентов —</option>
+        </select>
         <button class="btn btn--primary" onclick="checkPhrase('auto')">📊 Узнать спрос (бесплатно)</button>
         <button class="btn btn--warning" onclick="checkPhrase('mutagen')">🔬 Проверить Мутагеном (0,30 ₽)</button>
       </div>
@@ -1150,6 +1157,9 @@ const COLUMNS = [
 function getTopicColumn(t) {
   if (t.status === 'published') return 'published';
   if (t.status === 'ready') return 'ready';
+  // Явный возврат на доработку редактором имеет приоритет над баллом
+  if (t.status === 'needs_fix') return 'needs_fix';
+  if (t.status === 'blocked') return 'needs_fix';
   const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
   const hasContent = chars >= 200;
   if (hasContent) {
@@ -1173,6 +1183,7 @@ function switchTab(name) {
   if (view) view.classList.add('active');
   if (name === 'analysis') {
     renderAnalysisHistory();
+    loadKeywordSuggestions();
   }
 }
 
@@ -1249,6 +1260,44 @@ function checkTopicPhrase(topicId) {
   const input = document.getElementById('analysisPhrase');
   if (input) input.value = t.title;
   checkPhrase('auto');
+}
+
+// ---------------------------------------------------------------------------
+// Подсказки фраз из SEO-данных конкурентов (выпадающий список)
+// ---------------------------------------------------------------------------
+let KW_SUGGESTIONS = [];
+
+async function loadKeywordSuggestions(contains) {
+  const sel = document.getElementById('kwSuggestSelect');
+  const dl = document.getElementById('kwSuggestList');
+  if (!sel || !dl) return;
+  try {
+    const route = '/api/keywords/suggest?limit=10' + (contains ? '&q=' + encodeURIComponent(contains) : '');
+    const data = await apiGet(route);
+    KW_SUGGESTIONS = (data && data.suggestions) || [];
+
+    sel.innerHTML = '<option value="">— подсказки от конкурентов —</option>';
+    dl.innerHTML = '';
+    KW_SUGGESTIONS.forEach((s, i) => {
+      const demand = s.demand != null ? Number(s.demand).toLocaleString('ru-RU') : '—';
+      const comp = s.competition != null ? s.competition + '/25' : '—';
+      const label = `${s.phrase} · ${s.source} · спрос ${demand} · конкур ${comp}`;
+      sel.innerHTML += `<option value="${i}">${esc(label)}</option>`;
+      dl.innerHTML += `<option value="${esc(s.phrase)}">${esc(s.source)}</option>`;
+    });
+  } catch (e) {
+    sel.innerHTML = '<option value="">— подсказки недоступны —</option>';
+  }
+}
+
+function pickSuggestion(selectEl) {
+  const idx = selectEl.value;
+  if (idx === '') return;
+  const item = KW_SUGGESTIONS[parseInt(idx, 10)];
+  if (!item) return;
+  const input = document.getElementById('analysisPhrase');
+  if (input) input.value = item.phrase;
+  selectEl.value = '';
 }
 
 async function checkPhrase(source) {
