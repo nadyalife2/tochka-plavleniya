@@ -163,6 +163,46 @@ def call_antigravity_cli(prompt: str) -> str | None:
     return None
 
 
+def call_yandex_ai_studio(prompt: str, system_prompt: str) -> str | None:
+    """Третий резерв: Yandex AI Studio (YandexGPT). Работает из РФ без VPN.
+
+    Ключ и folderId берутся из config/api-keys.local.yaml (см. keys.py).
+    Модель: YandexGPT Pro 32k — слабее Claude по голосу, но канал доступен всегда.
+    """
+    try:
+        from keys import get_key
+        api_key = get_key("YANDEX_AI_API_KEY")
+        folder_id = get_key("YANDEX_FOLDER_ID")
+    except Exception:
+        return None
+    if not api_key or not folder_id:
+        return None
+
+    body = {
+        "modelUri": f"gpt://{folder_id}/yandexgpt-32k/latest",
+        "completionOptions": {"stream": False, "temperature": 0.35, "maxTokens": 4000},
+        "messages": [
+            {"role": "system", "text": system_prompt},
+            {"role": "user", "text": prompt},
+        ],
+    }
+    req = urllib.request.Request(
+        "https://llm.api.cloud.yandex.net/foundationModels/v1/completion",
+        data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+        headers={"Authorization": f"Api-Key {api_key}", "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=180) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        alternatives = data.get("result", {}).get("alternatives") or []
+        if not alternatives:
+            return None
+        text = alternatives[0].get("message", {}).get("text", "")
+        return text or None
+    except Exception:
+        return None
+
+
 def call_openrouter_claude(prompt: str, system_prompt: str) -> str:
     """Вызов Claude Sonnet через OpenRouter API."""
     provider, api_key = get_credentials()
@@ -359,9 +399,18 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico") -> dic
     model_used = f"Claude Sonnet (Antigravity CLI), {voice_name}"
 
     if not generated_text:
-        print(f"   (Antigravity CLI недоступен без VPN — переключение на резервный шлюз OpenRouter: {CLAUDE_OPENROUTER_MODEL})...", flush=True)
-        generated_text = call_openrouter_claude(user_prompt, system_prompt)
-        model_used = f"{CLAUDE_OPENROUTER_MODEL} (OpenRouter), {voice_name}"
+        print(f"   (Antigravity CLI недоступен без VPN — пробую OpenRouter: {CLAUDE_OPENROUTER_MODEL})...", flush=True)
+        try:
+            generated_text = call_openrouter_claude(user_prompt, system_prompt)
+            model_used = f"{CLAUDE_OPENROUTER_MODEL} (OpenRouter), {voice_name}"
+        except Exception as ex:  # noqa: BLE001
+            print(f"   (OpenRouter недоступен: {str(ex)[:90]})...", flush=True)
+            generated_text = None
+
+    if not generated_text:
+        print("   (Переключаюсь на Yandex AI Studio — YandexGPT 32k, работает из РФ без VPN)...", flush=True)
+        generated_text = call_yandex_ai_studio(user_prompt, system_prompt)
+        model_used = f"YandexGPT Pro 32k (AI Studio), {voice_name}"
 
     if not generated_text or len(generated_text) < 1500:
         raise RuntimeError("Модель вернула слишком короткий текст.")

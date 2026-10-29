@@ -305,21 +305,35 @@ def main() -> int:
                    if l.strip() and not l.startswith("#")]
         print(f"Фраз в файле: {len(phrases)}")
         import time as _time
+        requests_made = 0
+        hourly_limit = 90  # в AI Studio бесплатная квота — 100 запросов в час
         for phrase in phrases:
             if not args.refresh:
                 cached = get_cached(phrase)
                 if cached:
                     print(f"  [кэш] {phrase[:38]:<40} {cached['totalCount']}")
                     continue
+            if requests_made >= hourly_limit:
+                print(f"⏹ Достигнут безопасный лимит {hourly_limit} запросов/час. Остальное — в следующий час.")
+                break
             try:
                 data = top_requests(phrase, num_phrases=10)
+                requests_made += 1
             except Exception as e:  # noqa: BLE001
-                print(f"  [ошибка] {phrase[:38]:<40} {e}")
+                msg = str(e)
+                print(f"  [ошибка] {phrase[:38]:<40} {msg[:90]}")
+                if "429" in msg or "quota" in msg.lower():
+                    print("⏹ Квота на час исчерпана — запустите скрипт снова позже. Кэш уже сохранён.")
+                    break
                 _time.sleep(1.0)
                 continue
-            save_cache(phrase, data)
-            print(f"  {phrase[:38]:<40} {data.get('totalCount')}")
-            _time.sleep(0.2)  # вежливая пауза, чтобы не ловить 429
+            # Нулевые результаты не кэшируем: иначе фразу нельзя будет перепроверить
+            if data.get("totalCount"):
+                save_cache(phrase, data)
+                print(f"  {phrase[:38]:<40} {data.get('totalCount')}")
+            else:
+                print(f"  [пусто] {phrase[:38]:<40} нет спроса или фраза слишком узкая")
+            _time.sleep(0.3)
         return 0
 
     if args.table:
