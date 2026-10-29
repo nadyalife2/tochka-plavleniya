@@ -61,41 +61,49 @@ def load_schema() -> dict:
 
 
 def parse_faq_from_text(text: str) -> list[dict]:
-    """Извлекает реальные вопросы-ответы из блока ### FAQ: в тексте статьи."""
+    """Извлекает реальные вопросы-ответы из блока ## FAQ или ### FAQ: в тексте статьи."""
     faq_items = []
-    faq_block_match = re.search(r"(?is)###\s*FAQ[^:]*:(.+?)(?:---|\Z)", text)
+    faq_block_match = re.search(r"(?im)^#{2,3}\s*(?:FAQ|Частые вопросы|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
     if faq_block_match:
-        block = faq_block_match.group(1)
-        # Ищем паттерны: q: "..." \n a: "..."
+        block = faq_block_match.group(1).strip()
+        # 1. Формат q: "..." \n a: "..."
         qa_pairs = re.findall(r'(?i)q:\s*["«](.+?)["»]\s*\n\s*a:\s*["«](.+?)["»]', block)
         if qa_pairs:
             for q, a in qa_pairs:
                 faq_items.append({"q": q.strip(), "a": a.strip()})
         else:
-            # Ищем нумерованные списки 1. **Вопрос?** \n Ответ
-            pairs = re.findall(r'(?m)^\s*\d+[.)]\s*\*\*([^*]+)\*\*\s*\n+(.+?)(?=\n\s*\d+[.)]|\Z)', block, re.S)
-            for q, a in pairs:
-                faq_items.append({"q": q.strip(), "a": a.strip()})
+            # 2. Формат **Вопрос?** \n Ответ (до следующего вопроса или конца)
+            pairs = re.findall(r'(?m)^\s*(?:\d+[.)]\s*)?\*\*([^*]+\?)\*\*\s*\n+([\s\S]+?)(?=\n\s*(?:\d+[.)]\s*)?\*\*[^*]+\?\*\*|\Z)', block)
+            if pairs:
+                for q, a in pairs:
+                    ans_clean = "\n".join([line.strip() for line in a.strip().splitlines() if not line.strip().startswith("#")])
+                    faq_items.append({"q": q.strip(), "a": ans_clean[:500].strip()})
+            else:
+                # 3. Нумерованный список
+                pairs_num = re.findall(r'(?m)^\s*\d+[.)]\s*\*\*([^*]+)\*\*\s*\n+([^\n]+)', block)
+                for q, a in pairs_num:
+                    faq_items.append({"q": q.strip(), "a": a.strip()})
     return faq_items
 
 
 def parse_sources_from_text(text: str) -> list[dict]:
-    """Извлекает реальные источники из раздела ## Источники."""
+    """Извлекает реальные источники из раздела ## Источники / ## Нормативная база."""
     sources = []
-    src_block_match = re.search(r"(?is)##\s*Источники[^\n]*\n(.+?)(?:---|\Z)", text)
+    src_block_match = re.search(r"(?im)^#{2,3}\s*(?:Источники|Нормативная база|Стандарты)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
     if src_block_match:
         lines = src_block_match.group(1).strip().splitlines()
         for line in lines:
-            line = line.strip(" -*0123456789.)")
-            if not line or len(line) < 5:
+            line_clean = line.strip(" -*0123456789.)").replace("**", "")
+            if not line_clean or len(line_clean) < 5:
                 continue
-            stype = "standard" if re.search(r"гост|ipc|j-std|iso|iec", line, re.I) else "manufacturer_tds"
-            sources.append({
-                "title": line[:150],
-                "type": stype,
-                "standard_or_url": line[:150],
-            })
-    return sources
+            stype = "standard" if re.search(r"гост|ipc|j-std|iso|iec", line_clean, re.I) else "manufacturer_tds"
+            # Извлекаем стандарт если есть
+            m_std = re.search(r"(ГОСТ\s+[\d\-]+|IPC[\s\-A-Za-z0-9]+|J-STD-[\w]+|ISO\s+\d+)", line_clean, re.I)
+            src_obj = {"title": line_clean[:150]}
+            if m_std:
+                src_obj["standard"] = m_std.group(1).strip()
+            sources.append(src_obj)
+    return sources[:4]
 
 
 def parse_tools_from_text(text: str) -> list[dict]:

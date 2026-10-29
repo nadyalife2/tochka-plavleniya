@@ -36,7 +36,10 @@ SCRIPTS = ROOT / "seo" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from db import backup_database, get_connection
-from perplexity import get_api_key
+from perplexity import get_credentials
+
+# Резервный шлюз: актуальный Claude Sonnet на OpenRouter (июль 2026)
+CLAUDE_OPENROUTER_MODEL = "anthropic/claude-sonnet-4.6"
 
 PRACTICO_SYSTEM_PROMPT = """Ты — ведущий инженерный автор проекта «Точка Плавления».
 Твоя задача — написать полноценную техническую статью по утверждённому ТЗ в авторском голосе Practico.
@@ -103,12 +106,12 @@ def call_antigravity_cli(prompt: str) -> str | None:
 def call_openrouter_claude(prompt: str, system_prompt: str) -> str:
     """Вызов Claude Sonnet через OpenRouter API."""
     import urllib.request
-    api_key = get_api_key()
+    provider, api_key = get_credentials()
     if not api_key:
         raise RuntimeError("OPENROUTER_API_KEY не найден в ~/.dsh/.credentials.yaml.")
 
     payload = {
-        "model": "anthropic/claude-3.7-sonnet",
+        "model": CLAUDE_OPENROUTER_MODEL,
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
