@@ -274,10 +274,13 @@ def package_article(topic_id: int | str) -> dict:
             "В тексте не найдено ни одного инструмента (паяльник, фен, станция, микроскоп). "
             "Паспорт требует минимум один — добавьте упоминание в статье, выдумывать нельзя."
         )
+
+    # Не блокирует выгрузку: `universal` — легальный ключ схемы (обзорные материалы)
+    notes = []
     if alloy == canonical.UNIVERSAL:
-        missing_data_warnings.append(
-            "Сплав не определён однозначно (статья обзорная или сплав не назван). "
-            "Проверьте вручную: если материал про конкретный сплав — назовите его по ГОСТ."
+        notes.append(
+            "Сплав не определён однозначно (обзорная тема или сплав не назван) — в паспорт ушёл ключ universal. "
+            "Это допустимо по схеме v1.1; уточните сплав, только если материал про конкретную марку."
         )
 
     is_valid = len(validation_errors) == 0 and len(missing_data_warnings) == 0
@@ -288,6 +291,7 @@ def package_article(topic_id: int | str) -> dict:
         "contract": contract_data,
         "errors": validation_errors,
         "missing_warnings": missing_data_warnings,
+        "notes": notes,
         "faq_count": len(faq),
         "sources_count": len(sources),
         "alloy": alloy,
@@ -318,6 +322,8 @@ def main():
             print(f"  ⚠️ {w}")
         for e in res.get("errors", []):
             print(f"  ❌ {e}")
+    for note in res.get("notes", []):
+        print(f"  ℹ️ {note}")
     print("=" * 60)
 
 

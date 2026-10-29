@@ -11,15 +11,14 @@
   ],
   "reading_time": 11,
   "difficulty": "Практик",
-  "solder_alloy": "sac305",
+  "solder_alloy": "universal",
   "temp_data": {
     "kind": "station_setpoint",
-    "range": "60 – 90 °C",
-    "peak": "110 °C"
+    "range": "183 – 190 °C"
   },
   "tools": [
     {
-      "name": "Паяльника",
+      "name": "Паяльник",
       "model": "",
       "purpose": "Пайка и демонтаж"
     },
@@ -29,17 +28,12 @@
       "purpose": "Пайка и демонтаж"
     },
     {
-      "name": "Паяльником",
+      "name": "Оплётка",
       "model": "",
       "purpose": "Пайка и демонтаж"
     },
     {
-      "name": "Фен",
-      "model": "",
-      "purpose": "Пайка и демонтаж"
-    },
-    {
-      "name": "Паяльник",
+      "name": "Термопинцет",
       "model": "",
       "purpose": "Пайка и демонтаж"
     }

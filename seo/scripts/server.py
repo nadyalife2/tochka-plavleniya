@@ -18,7 +18,8 @@ import re
 import subprocess
 import sys
 import threading
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -57,6 +58,78 @@ def slugify(title: str) -> str:
             out.append("-")
     slug = re.sub(r"-{2,}", "-", "".join(out)).strip("-")
     return slug[:70] or "article"
+
+
+# Долгие агенты выполняются в фоновом потоке: обход сайтов не влезает в HTTP-таймаут.
+LONG_AGENTS = {"00-research", "bot-analyzer"}
+JOB_TIMEOUT_SECONDS = 600
+
+
+def start_background_job(agent: str, cmd: list[str], target_id=None) -> int:
+    """Ставит задачу в таблицу jobs и запускает её в отдельном потоке."""
+    now_str = datetime.now().isoformat(timespec="seconds")
+    with get_connection() as conn:
+        cur = conn.execute(
+            "INSERT INTO jobs (job_type, target_id, params_json, status, created_at, updated_at) "
+            "VALUES (?, ?, ?, 'running', ?, ?)",
+            (agent, str(target_id or ""), json.dumps(cmd, ensure_ascii=False), now_str, now_str),
+        )
+        job_id = cur.lastrowid
+        conn.commit()
+
+    def worker() -> None:
+        status, return_code, output = "failed", None, ""
+        try:
+            proc = subprocess.run(
+                cmd, capture_output=True, text=True, encoding="utf-8",
+                timeout=JOB_TIMEOUT_SECONDS, cwd=str(ROOT),
+            )
+            output = (proc.stdout or "") + (("\n" + proc.stderr) if proc.stderr else "")
+            return_code = proc.returncode
+            status = "succeeded" if return_code == 0 else "failed"
+        except subprocess.TimeoutExpired:
+            output = f"Таймаут: задача выполнялась дольше {JOB_TIMEOUT_SECONDS} секунд."
+        except Exception as ex:  # noqa: BLE001
+            output = f"{type(ex).__name__}: {ex}"
+
+        ts = datetime.now().isoformat(timespec="seconds")
+        # Обновление статуса с повторами: SQLite может быть занят дашбордом.
+        for attempt in range(5):
+            try:
+                with get_connection() as conn:
+                    conn.execute(
+                        "UPDATE jobs SET status = ?, return_code = ?, log = ?, updated_at = ? WHERE id = ?",
+                        (status, return_code, output[:20000], ts, job_id),
+                    )
+                    conn.execute(
+                        "INSERT INTO agent_runs (agent_name, action, target_id, status, log, created_at) "
+                        "VALUES (?, 'background', ?, ?, ?, ?)",
+                        (agent, str(target_id or ""), status, output[:2000], ts),
+                    )
+                    conn.commit()
+                break
+            except Exception:
+                time.sleep(1 + attempt)
+
+    threading.Thread(target=worker, daemon=True).start()
+    return job_id
+
+
+def mark_stale_jobs() -> int:
+    """Помечает задачи, зависшие дольше таймаута: статус не должен висеть «running» вечно."""
+    cutoff = (datetime.now() - timedelta(seconds=JOB_TIMEOUT_SECONDS + 120)).isoformat(timespec="seconds")
+    try:
+        with get_connection() as conn:
+            cur = conn.execute(
+                "UPDATE jobs SET status = 'failed', log = COALESCE(log, '') || ?, updated_at = ? "
+                "WHERE status = 'running' AND updated_at < ?",
+                ("\nТаймаут: задача не завершилась за отведённое время (процесс мог зависнуть).",
+                 datetime.now().isoformat(timespec="seconds"), cutoff),
+            )
+            conn.commit()
+            return cur.rowcount or 0
+    except Exception:
+        return 0
 
 
 def fetch_all_data() -> dict:
@@ -144,6 +217,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         if path == "/api/status":
             self.send_json({"status": "running", "time": datetime.now().isoformat()})
+            return
+
+        # --- фоновые задания (долгие агенты) ---
+        if path == "/api/jobs":
+            mark_stale_jobs()
+            with get_connection() as conn:
+                rows = conn.execute(
+                    "SELECT id, job_type, target_id, status, return_code, created_at, updated_at "
+                    "FROM jobs ORDER BY id DESC LIMIT 20"
+                ).fetchall()
+            self.send_json({"jobs": [dict(r) for r in rows]})
+            return
+
+        if path.startswith("/api/jobs/"):
+            mark_stale_jobs()
+            try:
+                job_id = int(path.rsplit("/", 1)[-1])
+            except ValueError:
+                self.send_json({"status": "error", "message": "bad job id"}, 400)
+                return
+            with get_connection() as conn:
+                row = conn.execute("SELECT * FROM jobs WHERE id = ?", (job_id,)).fetchone()
+            if not row:
+                self.send_json({"status": "error", "message": "job not found"}, 404)
+                return
+            self.send_json(dict(row))
             return
 
         # Статика: index.html
@@ -317,26 +416,30 @@ class DashboardHandler(BaseHTTPRequestHandler):
             agent = payload.get("agent")
             target_id = payload.get("target_id")
 
+            # Долгие агенты (обход сайтов) выполняются в фоне: HTTP-запрос
+            # не должен ждать десятки секунд и обрываться по таймауту.
+            if agent in LONG_AGENTS:
+                if agent == "00-research":
+                    cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"),
+                           "--limit", "10", "--max-domains", "5", "--budget", "60"]
+                else:
+                    domain = payload.get("domain", "")
+                    cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
+                    cmd.extend(["--domain", domain] if domain else ["--all"])
+                job_id = start_background_job(agent, cmd, target_id)
+                self.send_json({
+                    "status": "queued",
+                    "agent": agent,
+                    "job_id": job_id,
+                    "log": f"Задача поставлена в очередь (job #{job_id}). Прогресс: /api/jobs/{job_id}",
+                })
+                return
+
             log_output = f"Запуск {agent}..."
             status = "completed"
 
             try:
-                if agent == "00-research":
-                    cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"), "--limit", "20"]
-                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
-                    log_output = p.stdout + "\n" + p.stderr
-                    status = "succeeded" if p.returncode == 0 else "failed"
-                elif agent == "bot-analyzer":
-                    domain = payload.get("domain", "")
-                    cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
-                    if domain:
-                        cmd.extend(["--domain", domain])
-                    else:
-                        cmd.append("--all")
-                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
-                    log_output = p.stdout + "\n" + p.stderr
-                    status = "succeeded" if p.returncode == 0 else "failed"
-                elif agent == "delivery" and target_id:
+                if agent == "delivery" and target_id:
                     from package_contract import package_article
                     res = package_article(target_id)
                     if not res["valid"]:

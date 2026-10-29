@@ -14,7 +14,7 @@
    - Источники: 2–4 документа в блоке `## Источники:`
 3. Исполнитель:
    - Приоритет: claude-sonnet-4-6 через Antigravity CLI (скилл antigravity-consult)
-   - Резерв: anthropic/claude-3.7-sonnet через OPENROUTER_API_KEY
+   - Резерв: anthropic/claude-sonnet-4.6 через OPENROUTER_API_KEY
 """
 from __future__ import annotations
 
@@ -207,9 +207,9 @@ def write_article_for_topic(topic_id: int | str) -> dict:
     model_used = "Claude Sonnet (Antigravity CLI)"
 
     if not generated_text:
-        print("   (Antigravity CLI недоступен без VPN — переключение на резервный шлюз OpenRouter Claude 3.7 Sonnet)...", flush=True)
+        print(f"   (Antigravity CLI недоступен без VPN — переключение на резервный шлюз OpenRouter: {CLAUDE_OPENROUTER_MODEL})...", flush=True)
         generated_text = call_openrouter_claude(user_prompt, PRACTICO_SYSTEM_PROMPT)
-        model_used = "Claude 3.7 Sonnet (OpenRouter)"
+        model_used = f"{CLAUDE_OPENROUTER_MODEL} (OpenRouter)"
 
     if not generated_text or len(generated_text) < 1500:
         raise RuntimeError("Модель вернула слишком короткий текст.")

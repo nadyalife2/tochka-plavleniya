@@ -547,6 +547,26 @@ def send_draft_command(args) -> int:
     content_id = article_data["content_id"]
     content_hash = compute_canonical_fingerprint(article_data)
 
+    # Проверка без отправки: контракт валиден, WordPress не нужен.
+    if getattr(args, "dry_run", False):
+        print("🧪 DRY-RUN: дальше отправки не будет — проверяем только контракт и журнал.")
+        print(f"  • content_id: {content_id}")
+        print(f"  • schema:     {version}")
+        print(f"  • hash:       {content_hash[:16]}…")
+        print(f"  • wp_url:     {args.wp_url}")
+        journal_file = Path(args.journal)
+        if journal_file.exists():
+            try:
+                existing = DeliveryJournal(journal_file).get_entry(args.wp_url, content_id)
+            except Exception as e:  # noqa: BLE001
+                print(f"  ⚠️ журнал не прочитан: {e}")
+                existing = None
+            print(f"  • журнал:     {'запись найдена (будет обновление)' if existing else 'записи нет (будет создание)'}")
+        else:
+            print("  • журнал:     файла нет (первая доставка)")
+        print("✅ DRY-RUN PASS: пакет готов к реальной отправке.")
+        return 0
+
     client = WordPressRestClient(args.wp_url, args.wp_user, args.wp_pass)
     journal_path = Path(args.journal)
 
@@ -796,6 +816,11 @@ def main():
         help="Target WordPress post status (draft or pending only)"
     )
     send_parser.add_argument("--journal", default=str(ROOT_DIR / "delivery-journal.json"), help="Path to delivery journal JSON")
+    send_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Проверить контракт и журнал без обращения к WordPress",
+    )
 
     args = parser.parse_args()
     if args.command == "send-draft":

@@ -253,8 +253,18 @@ def scan_html_index(url: str, source_domain: str, limit: int) -> list[dict]:
 # ------------------------------------------------------------------ сканер ---
 
 
-def scan_competitor(domain: str, blog_url: str, limit: int) -> list[dict]:
-    """Пытается собрать максимум статей конкурента."""
+def scan_competitor(domain: str, blog_url: str, limit: int, budget_seconds: float = 75.0) -> list[dict]:
+    """Пытается собрать максимум статей конкурента.
+
+    Работа ограничена бюджетом времени: у части сайтов sitemap/RSS отвечают
+    по 15 секунд таймаута на каждый путь, и без ограничения один домен
+    способен занять десятки минут.
+    """
+    started = time.monotonic()
+
+    def over_budget() -> bool:
+        return (time.monotonic() - started) > budget_seconds
+
     base = blog_url or f"https://{domain}"
     candidates: list[dict] = []
     seen: set[str] = set()
@@ -270,12 +280,17 @@ def scan_competitor(domain: str, blog_url: str, limit: int) -> list[dict]:
     sitemap_paths = ["/sitemap.xml", "/sitemap_index.xml", "/wp-sitemap.xml",
                      "/sitemap-1.xml", "/blog/sitemap.xml"]
     for path in sitemap_paths:
+        if over_budget():
+            print(f"    (бюджет времени исчерпан на sitemap: {budget_seconds:.0f}с)")
+            break
         status, _, xml = fetch(urllib.parse.urljoin(base, path))
         if status != 200 or not xml.lstrip().startswith("<?xml"):
             continue
         urls, nested = parse_sitemap(xml, limit)
         add([{"url": u, "title": "", "date": ""} for u in urls])
         for n in nested[:4]:
+            if over_budget():
+                break
             st, _, sub = fetch(n)
             if st == 200:
                 sub_urls, _ = parse_sitemap(sub, limit)
@@ -287,23 +302,30 @@ def scan_competitor(domain: str, blog_url: str, limit: int) -> list[dict]:
     # 2) RSS (главная + автопоиск)
     rss_paths = ["/rss", "/rss.xml", "/feed", "/feed.xml", "/atom.xml", "/blog/rss.xml", "/ru/rss/"]
     for path in rss_paths:
+        if over_budget():
+            break
         status, _, xml = fetch(urllib.parse.urljoin(base, path))
         if status == 200 and "<rss" in xml[:500] or (status == 200 and "<feed" in xml[:800]):
             add(parse_rss(xml, limit))
             break
     for feed in discover_feeds(base)[:2]:
+        if over_budget():
+            break
         st, _, xml = fetch(urllib.parse.urljoin(base, feed))
         if st == 200:
             add(parse_rss(xml, limit))
         time.sleep(PAUSE)
 
     # 3) HTML-архив блога
-    if len(candidates) < limit:
+    if len(candidates) < limit and not over_budget():
         add(scan_html_index(base, domain, limit))
 
     # 4) обогащение: если нет заголовка — берём <title> страницы
     enriched: list[dict] = []
     for i, item in enumerate(candidates[:limit]):
+        if over_budget():
+            print(f"    (бюджет времени исчерпан на обогащении: собрано {len(enriched)} из {len(candidates[:limit])})")
+            break
         title = item.get("title", "")
         if not title:
             st, _, html = fetch(item["url"])
@@ -340,6 +362,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description="Разведка конкурентов (бесплатно, без API)")
     ap.add_argument("--domain", help="только один домен")
     ap.add_argument("--limit", type=int, default=60, help="максимум URL с одного сайта")
+    ap.add_argument("--max-domains", type=int, default=0, help="ограничить число обходимых доменов (0 = все)")
+    ap.add_argument("--budget", type=float, default=75.0, help="бюджет времени на домен, секунды")
     ap.add_argument("--dry-run", action="store_true", help="не писать в Excel")
     args = ap.parse_args()
 
@@ -351,7 +375,9 @@ def main() -> int:
         return 1
 
     todo = [c for c in competitors if not args.domain or args.domain.lower() in c["domain"].lower()]
-    print(f"Разведка: {len(todo)} конкурентов, лимит {args.limit} URL на сайт")
+    if args.max_domains and args.max_domains > 0:
+        todo = todo[: args.max_domains]
+    print(f"Разведка: {len(todo)} конкурентов, лимит {args.limit} URL на сайт, бюджет {args.budget:.0f}с на домен")
     print("=" * 70)
 
     all_records: list[dict] = []
@@ -360,7 +386,7 @@ def main() -> int:
     for comp in todo:
         domain = comp["domain"]
         print(f"\n>>> {domain}  ({comp['type'] or 'без типа'})")
-        records = scan_competitor(domain, comp.get("blog", ""), args.limit)
+        records = scan_competitor(domain, comp.get("blog", ""), args.limit, budget_seconds=args.budget)
         print(f"    найдено статей: {len(records)}")
         by_type: dict[str, int] = {}
         by_cluster: dict[str, int] = {}
