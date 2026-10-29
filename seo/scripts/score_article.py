@@ -112,16 +112,27 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
     bur_hits = [w for w in BUREAUCRATIC if re.search(rf"\b{w}", plain.lower())]
     ai_hits = [p for p in AI_PATTERNS if p in plain.lower()]
 
-    # Проверка опасных советов с учётом предложения (отрицание/запрет в любом месте фразы = норма ТБ!)
+    # Проверка опасных советов: отрицание ищем ВБЛИЗИ фразы, а не в любом месте предложения.
+    # Иначе «Паяйте под напряжением, чтобы не тратить время» ошибочно считается предупреждением.
     danger_hits = []
-    NEGATION_RE = re.compile(r"\b(не|нельзя|запрещ\w*|исключ\w*|никогда|без|опасн\w*|внимани\w*|предостереж\w*|риск\w*)\b", re.I)
-    for p in DANGEROUS:
-        for s in sents:
-            s_low = s.lower()
-            if p in s_low:
-                if not NEGATION_RE.search(s_low):
-                    danger_hits.append(f"«{s[:80]}»")
+    NEGATION_RE = re.compile(
+        r"\b(не|нельзя|запрещ\w*|исключ\w*|никогда|недопустим\w*|опасн\w*|внимани\w*|предостереж\w*|риск\w*)\b",
+        re.I,
+    )
+    for s in sents:
+        s_low = s.lower()
+        for p in DANGEROUS:
+            caught = False
+            for m in re.finditer(re.escape(p), s_low):
+                pre_words = re.findall(r"[\w\-]+", s_low[: m.start()])[-5:]
+                post_words = re.findall(r"[\w\-]+", s_low[m.end():])[:1]
+                window = " ".join(pre_words + post_words)
+                if not NEGATION_RE.search(window):
+                    danger_hits.append(f"«{s.strip()[:80]}»")
+                    caught = True
                     break
+            if caught:
+                break
     first_para = paras[0] if paras else ""
     answer_words = len(words(first_para))
 

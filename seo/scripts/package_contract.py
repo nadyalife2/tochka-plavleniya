@@ -33,6 +33,7 @@ SCRIPTS = ROOT / "seo" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from db import get_connection
+import canonical_alloys as canonical
 
 SCHEMA_PATH = ROOT / "schemas" / "article-contract-v1.1.schema.json"
 
@@ -50,10 +51,7 @@ CATEGORY_MAP = {
     "станции": "oborudovanie",
 }
 
-CANONICAL_ALLOYS = [
-    "pos61", "sn63pb37", "pos40", "sac305", "sac405",
-    "sn42bi58", "snbiago", "roze", "vuda", "universal",
-]
+CANONICAL_ALLOYS = canonical.canonical_keys()
 
 
 def load_schema() -> dict:
@@ -107,61 +105,58 @@ def parse_sources_from_text(text: str) -> list[dict]:
 
 
 def parse_tools_from_text(text: str) -> list[dict]:
-    """Извлекает упомянутые инструменты."""
-    tools = []
-    t_matches = re.findall(r"(?i)\b(паяльник[а-я]*|паяльная станция|фен|термофен|микроскоп|оловоотсос|оплетка|термопинцет)\s*([A-Za-z0-9\-]+)?", text)
-    seen = set()
-    for name, model in t_matches:
-        name_clean = name.capitalize()
-        if name_clean in seen:
-            continue
-        seen.add(name_clean)
-        tools.append({
-            "name": name_clean,
-            "model": model or "",
-            "purpose": "Пайка и демонтаж",
-        })
-    if not tools:
-        tools.append({"name": "Паяльник", "model": "", "purpose": "Монтаж"})
-    return tools[:5]
+    """Извлекает упомянутые инструменты и приводит названия к каноническим."""
+    # каноническое имя -> шаблон упоминания
+    CATALOG = [
+        ("Паяльная станция", r"паяльн\w*\s+станци"),
+        ("Паяльник", r"\bпаяльник\w*"),
+        ("Термофен", r"термофен\w*|\bфен\w*"),
+        ("Микроскоп", r"микроскоп\w*|\bлупа\b"),
+        ("Оловоотсос", r"оловоотсос\w*|помп\w*"),
+        ("Оплётка", r"оплётк\w*|оплетк\w*"),
+        ("Термопинцет", r"термопинцет\w*|пинцет\w*"),
+    ]
+    tools: list[dict] = []
+    for name, pattern in CATALOG:
+        if re.search(pattern, text, re.I):
+            tools.append({"name": name, "model": "", "purpose": "Пайка и демонтаж"})
+    return tools
 
 
-def detect_alloy(text: str) -> str:
-    text_low = text.lower()
-    if "sac305" in text_low or "бессвинцов" in text_low:
-        return "sac305"
-    if "пос-61" in text_low or "pos61" in text_low or "sn63" in text_low:
-        return "pos61"
-    if "пос-40" in text_low or "pos40" in text_low:
-        return "pos40"
-    if "розе" in text_low or "roze" in text_low:
-        return "roze"
-    if "вуда" in text_low or "vuda" in text_low:
-        return "vuda"
-    if "sn42bi58" in text_low or "висмут" in text_low:
-        return "sn42bi58"
-    return "universal"
+def detect_alloy(text: str, title: str = "") -> str:
+    """Канонический сплав из реестра theme4/data/materials-registry.php."""
+    key, _ = canonical.detect_alloy(text, title)
+    return key
 
 
 def detect_temp_data(text: str, alloy: str) -> dict | None:
-    text_low = text.lower()
-    m_temp = re.findall(r"(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text)
-    if m_temp:
-        low, high = m_temp[0]
-        return {
-            "kind": "station_setpoint",
-            "range": f"{low} – {high} °C",
-            "peak": f"{int(high) + 20} °C",
-        }
-    m_single = re.findall(r"(\d{2,3})\s*°\s*[CС]", text)
-    if m_single:
-        t = m_single[0]
-        return {
-            "kind": "joint_temperature",
-            "range": f"{t} °C",
-        }
-    if alloy == "pos61":
-        return {"kind": "joint_temperature", "range": "183 – 190 °C"}
+    """Температурные данные только из текста или из реестра. Без искусственных «пиков»."""
+    def plausible(low: int, high: int) -> int:
+        """Приоритет диапазонов, реально относящихся к пайке (а не к сплаву Розе в таблице)."""
+        if 170 <= low and high <= 400:
+            return 3
+        if 120 <= low and high <= 450:
+            return 2
+        return 0
+
+    ranges = [
+        (int(lo), int(hi))
+        for lo, hi in re.findall(r"(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text)
+        if int(lo) < int(hi)
+    ]
+    if ranges:
+        best = max(ranges, key=lambda r: (plausible(r[0], r[1]), -ranges.index(r)))
+        if plausible(*best) > 0:
+            return {"kind": "station_setpoint", "range": f"{best[0]} – {best[1]} °C"}
+
+    singles = [int(t) for t in re.findall(r"(\d{2,3})\s*°\s*[CС]", text)]
+    steering = [t for t in singles if 150 <= t <= 450]
+    if steering:
+        return {"kind": "station_setpoint", "range": f"{steering[0]} °C"}
+
+    melt = canonical.melt_range(alloy)
+    if melt:
+        return {"kind": "joint_temperature", "range": f"{melt[0]} – {melt[1]} °C"}
     return None
 
 
@@ -209,7 +204,7 @@ def package_article(topic_id: int | str) -> dict:
     first_para_clean = re.sub(r"^#+.*?\n", "", first_para).strip()
     excerpt = first_para_clean[:280] if len(first_para_clean) >= 20 else (topic["title"] + ": техническое руководство.")
 
-    alloy = detect_alloy(md_text)
+    alloy = detect_alloy(md_text, topic["title"])
     temp_data = detect_temp_data(md_text, alloy)
     tools = parse_tools_from_text(md_text)
     faq = parse_faq_from_text(md_text)
@@ -247,7 +242,7 @@ def package_article(topic_id: int | str) -> dict:
         "reading_time": reading_time,
         "difficulty": "Практик",
         "solder_alloy": alloy,
-        "temp_data": temp_data or {"kind": "joint_temperature", "range": "183 – 190 °C"},
+        "temp_data": temp_data,
         "tools": tools,
         "content_html": markdown_to_html(md_text),
         "faq": faq,
@@ -274,6 +269,16 @@ def package_article(topic_id: int | str) -> dict:
         )
     if not temp_data:
         missing_data_warnings.append("В тексте не указаны температурные режимы (напр. '280 – 320 °C').")
+    if not tools:
+        missing_data_warnings.append(
+            "В тексте не найдено ни одного инструмента (паяльник, фен, станция, микроскоп). "
+            "Паспорт требует минимум один — добавьте упоминание в статье, выдумывать нельзя."
+        )
+    if alloy == canonical.UNIVERSAL:
+        missing_data_warnings.append(
+            "Сплав не определён однозначно (статья обзорная или сплав не назван). "
+            "Проверьте вручную: если материал про конкретный сплав — назовите его по ГОСТ."
+        )
 
     is_valid = len(validation_errors) == 0 and len(missing_data_warnings) == 0
 
