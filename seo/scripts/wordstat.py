@@ -105,6 +105,16 @@ def init_cache():
                 checked_at    TEXT NOT NULL
             )
         """)
+        # История: каждое измерение сохраняется отдельно, прошлые данные не затираются
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS wordstat_history (
+                id          INTEGER PRIMARY KEY AUTOINCREMENT,
+                phrase      TEXT NOT NULL,
+                total_count INTEGER,
+                checked_at  TEXT NOT NULL
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_wsh_phrase ON wordstat_history(phrase, checked_at)")
         conn.commit()
 
 
@@ -123,6 +133,7 @@ def save_cache(phrase: str, data: dict):
         "results": [{"phrase": r.get("phrase"), "count": to_int(r.get("count"))} for r in results],
         "associations": [{"phrase": r.get("phrase"), "count": to_int(r.get("count"))} for r in assoc],
     }
+    now_str = datetime.now().isoformat(timespec="seconds")
     with get_connection() as conn:
         conn.execute("""
             INSERT INTO wordstat_metrics (phrase, total_count, top_json, assoc_json, checked_at)
@@ -137,8 +148,13 @@ def save_cache(phrase: str, data: dict):
             to_int(data.get("totalCount")),
             json.dumps(serializable["results"], ensure_ascii=False),
             json.dumps(serializable["associations"], ensure_ascii=False),
-            datetime.now().isoformat(timespec="seconds"),
+            now_str,
         ))
+        # История: прошлые значения сохраняются навсегда
+        conn.execute(
+            "INSERT INTO wordstat_history (phrase, total_count, checked_at) VALUES (?, ?, ?)",
+            (phrase, to_int(data.get("totalCount")), now_str),
+        )
         conn.commit()
 
 

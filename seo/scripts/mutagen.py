@@ -148,6 +148,23 @@ def init_cache():
                 checked_at   TEXT NOT NULL
             )
         """)
+        # История: каждое измерение сохраняется отдельной строкой и НЕ перезаписывается.
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS keyword_metrics_history (
+                id         INTEGER PRIMARY KEY AUTOINCREMENT,
+                keyword    TEXT NOT NULL,
+                strong     INTEGER,
+                wordstat   INTEGER,
+                tails      INTEGER,
+                bid_spec   REAL,
+                bid_first  REAL,
+                bid_garant REAL,
+                vital      INTEGER,
+                vital_site TEXT,
+                checked_at TEXT NOT NULL
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_kmh_keyword ON keyword_metrics_history(keyword, checked_at)")
         conn.commit()
 
 
@@ -183,6 +200,24 @@ def save_metrics(keyword: str, res: dict):
             1 if res.get("vital") else 0,
             res.get("vital_site") or "",
             json.dumps(res, ensure_ascii=False),
+            now_str,
+        ))
+        # Дублируем в историю (append-only): прошлые замеры не теряются
+        conn.execute("""
+            INSERT INTO keyword_metrics_history
+                (keyword, strong, wordstat, tails, bid_spec, bid_first, bid_garant,
+                 vital, vital_site, checked_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            keyword,
+            res.get("strong"),
+            res.get("wordstat"),
+            res.get("tails"),
+            direct.get("spec"),
+            direct.get("first"),
+            direct.get("garant"),
+            1 if res.get("vital") else 0,
+            res.get("vital_site") or "",
             now_str,
         ))
         conn.commit()

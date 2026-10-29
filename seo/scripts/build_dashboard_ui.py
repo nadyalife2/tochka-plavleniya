@@ -922,6 +922,7 @@ def generate_html() -> str:
             <th>Конкуренция</th>
             <th>Витальный сайт</th>
             <th>Проверено</th>
+            <th>Действия</th>
           </tr>
         </thead>
         <tbody id="analysisBody"></tbody>
@@ -1214,6 +1215,15 @@ async function apiPost(route, payload) {
   }
 }
 
+async function apiGet(route) {
+  try {
+    const res = await fetch('http://127.0.0.1:8765' + route);
+    return await res.json();
+  } catch (e) {
+    return null;
+  }
+}
+
 async function refreshData() {
   try {
     const res = await fetch('http://127.0.0.1:8765/api/data');
@@ -1248,12 +1258,25 @@ async function checkPhrase(source) {
     alert('Введите фразу для проверки');
     return;
   }
+  return checkPhraseValue(phrase, source, false);
+}
+
+// Перепроверка фразы из таблицы истории (игнорирует кэш)
+function recheckPhraseByIndex(index, source) {
+  const row = ANALYSIS_ROWS[index];
+  if (!row) return;
+  const input = document.getElementById('analysisPhrase');
+  if (input) input.value = row.phrase;
+  checkPhraseValue(row.phrase, source, true);
+}
+
+async function checkPhraseValue(phrase, source, refresh) {
   const box = document.getElementById('analysisResult');
   box.style.display = 'block';
   box.innerHTML = `<div style="padding:10px;background:var(--bg);border:1px solid var(--border);font-size:12px;">
-    ⏳ Проверяю «${esc(phrase)}»${source === 'mutagen' ? ' (Мутаген, 0,30 ₽)' : ' (Вордстат, бесплатно)'}...</div>`;
+    ⏳ ${refresh ? 'Перепроверяю' : 'Проверяю'} «${esc(phrase)}»${source === 'mutagen' ? ' (Мутаген, 0,30 ₽)' : ' (Вордстат, бесплатно)'}...</div>`;
 
-  const res = await apiPost('/api/keyword/check', { phrase: phrase, source: source });
+  const res = await apiPost('/api/keyword/check', { phrase: phrase, source: source, refresh: refresh });
   if (!res || res.status !== 'ok') {
     box.innerHTML = `<div style="padding:10px;background:#FEE2E2;border:1px solid #B91C1C;font-size:12px;">
       ❌ Не удалось проверить фразу.</div>`;
@@ -1309,6 +1332,8 @@ async function checkPhrase(source) {
   await renderAnalysisHistory();
 }
 
+let ANALYSIS_ROWS = [];
+
 async function renderAnalysisHistory() {
   const tb = document.getElementById('analysisBody');
   if (!tb) return;
@@ -1316,14 +1341,15 @@ async function renderAnalysisHistory() {
     const res = await fetch('http://127.0.0.1:8765/api/keyword/history');
     const data = await res.json();
     const rows = data.history || [];
+    ANALYSIS_ROWS = rows;
     const badge = document.getElementById('bCountAnalysis');
     if (badge) badge.innerText = rows.length;
 
     if (!rows.length) {
-      tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted);">Проверок пока нет. Введите фразу выше.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">Проверок пока нет. Введите фразу выше.</td></tr>';
       return;
     }
-    tb.innerHTML = rows.map(r => `
+    tb.innerHTML = rows.map((r, i) => `
       <tr>
         <td><strong>${esc(r.phrase)}</strong></td>
         <td><span class="prio-pill ${r.source === 'mutagen' ? 'prio-pill--warm' : 'prio-pill--cold'}">${r.source === 'mutagen' ? 'Мутаген' : 'Вордстат'}</span></td>
@@ -1331,10 +1357,54 @@ async function renderAnalysisHistory() {
         <td style="font-family:var(--mono);">${r.competition != null ? r.competition + '/25' : '—'}</td>
         <td style="font-size:11px;">${esc(r.vital_site || '—')}</td>
         <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${(r.checked_at || '').replace('T', ' ').slice(0, 16)}</td>
+        <td style="white-space:nowrap;">
+          <button class="btn btn--xs" title="Перепроверить в Вордстате (бесплатно)" onclick="recheckPhraseByIndex(${i}, 'auto')">↻ Вордстат</button>
+          <button class="btn btn--xs btn--warning" title="Перепроверить в Мутагене (0,30 ₽)" onclick="recheckPhraseByIndex(${i}, 'mutagen')">↻ Мутаген</button>
+          <button class="btn btn--xs" title="Показать историю измерений" onclick="showPhraseTrend(${i})">📈 История</button>
+        </td>
       </tr>`).join('');
   } catch (e) {
-    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">История недоступна</td></tr>';
+    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);">История недоступна</td></tr>';
   }
+}
+
+// Показывает все прошлые измерения фразы: как менялись спрос и конкуренция
+async function showPhraseTrend(index) {
+  const row = ANALYSIS_ROWS[index];
+  if (!row) return;
+  const box = document.getElementById('analysisResult');
+  box.style.display = 'block';
+  box.innerHTML = '<div style="padding:10px;font-size:12px;">⏳ Загружаю историю измерений...</div>';
+
+  const data = await apiGet('/api/keyword/trend?phrase=' + encodeURIComponent(row.phrase));
+  if (!data || data.status !== 'ok') {
+    box.innerHTML = '<div style="padding:10px;color:#B91C1C;font-size:12px;">История недоступна</div>';
+    return;
+  }
+
+  let html = `<div style="border:1.5px solid var(--border);background:var(--card);padding:12px;">
+    <div style="font-size:13px;font-weight:800;margin-bottom:8px;">📈 История: «${esc(data.phrase)}»</div>`;
+
+  if (data.wordstat_history && data.wordstat_history.length) {
+    html += '<div style="font-weight:700;font-size:12px;margin-bottom:4px;">Вордстат (широкая частотность):</div><ul style="margin:0 0 10px 16px;font-size:12px;">';
+    data.wordstat_history.forEach(h => {
+      html += `<li><code>${(h.checked_at || '').replace('T', ' ').slice(0, 16)}</code> — ${h.total_count != null ? Number(h.total_count).toLocaleString('ru-RU') : '—'} показов/мес</li>`;
+    });
+    html += '</ul>';
+  }
+
+  if (data.mutagen_history && data.mutagen_history.length) {
+    html += '<div style="font-weight:700;font-size:12px;margin-bottom:4px;">Мутаген (конкуренция и точный спрос):</div><ul style="margin:0 0 6px 16px;font-size:12px;">';
+    data.mutagen_history.forEach(h => {
+      html += `<li><code>${(h.checked_at || '').replace('T', ' ').slice(0, 16)}</code> — конкуренция <strong>${h.strong}/25</strong>, точный спрос <code>${h.wordstat != null ? Number(h.wordstat).toLocaleString('ru-RU') : '—'}</code>${h.vital_site ? ', витальный: ' + esc(h.vital_site) : ''}</li>`;
+    });
+    html += '</ul>';
+  }
+
+  const total = (data.wordstat_history || []).length + (data.mutagen_history || []).length;
+  if (!total) html += '<div style="font-size:12px;color:var(--muted);">Измерений ещё не было.</div>';
+  html += '</div>';
+  box.innerHTML = html;
 }
 
 async function createBackup() {

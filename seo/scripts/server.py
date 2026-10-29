@@ -219,6 +219,41 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "running", "time": datetime.now().isoformat()})
             return
 
+        if path == "/api/keyword/trend":
+            # История измерений по конкретной фразе (что менялось и когда)
+            phrase = (parse_qs(url.query).get("phrase") or [""])[0].strip()
+            if not phrase:
+                self.send_json({"status": "error", "message": "Укажите ?phrase="}, 400)
+                return
+            ws_hist, mg_hist = [], []
+            try:
+                with get_connection() as conn:
+                    for r in conn.execute(
+                        "SELECT total_count, checked_at FROM wordstat_history WHERE phrase = ? ORDER BY checked_at ASC",
+                        (phrase,),
+                    ).fetchall():
+                        ws_hist.append({"total_count": r["total_count"], "checked_at": r["checked_at"]})
+            except Exception:
+                pass
+            try:
+                with get_connection() as conn:
+                    for r in conn.execute(
+                        "SELECT strong, wordstat, tails, vital_site, checked_at FROM keyword_metrics_history "
+                        "WHERE keyword = ? ORDER BY checked_at ASC",
+                        (phrase,),
+                    ).fetchall():
+                        mg_hist.append({
+                            "strong": r["strong"],
+                            "wordstat": r["wordstat"],
+                            "tails": r["tails"],
+                            "vital_site": r["vital_site"] or "",
+                            "checked_at": r["checked_at"],
+                        })
+            except Exception:
+                pass
+            self.send_json({"status": "ok", "phrase": phrase, "wordstat_history": ws_hist, "mutagen_history": mg_hist})
+            return
+
         if path == "/api/keyword/history":
             # Единая история проверок: Вордстат (бесплатно) + Мутаген (платно)
             rows = []
