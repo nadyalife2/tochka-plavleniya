@@ -1089,10 +1089,11 @@ def generate_html() -> str:
       <h2 id="mTitle" style="margin:6px 0 0;font-size:17px;font-weight:800;line-height:1.3;">Название статьи</h2>
     </div>
 
-    <!-- Вкладки модального окна: Оценка vs Текст статьи -->
+    <!-- Вкладки модального окна: Оценка vs Текст статьи vs Бриф для автора -->
     <div style="display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:12px;">
       <button class="tab-btn active" id="modalTabBtnScore" onclick="switchModalTab('score')">📊 Оценка и замечания (0-100)</button>
       <button class="tab-btn" id="modalTabBtnText" onclick="switchModalTab('text')">📄 Текст статьи (Markdown) <span class="tab-badge" id="mTextCharsBadge">0 зн.</span></button>
+      <button class="tab-btn" id="modalTabBtnBrief" onclick="switchModalTab('brief')">📋 Бриф для автора (ТЗ)</button>
     </div>
 
     <!-- Вкладка 1: Оценка и замечания -->
@@ -1131,6 +1132,18 @@ def generate_html() -> str:
       <textarea id="mTextEditor" rows="18" style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;background:#FAFAFA;resize:vertical;" placeholder="Текст статьи ещё не написан..."></textarea>
       <div style="margin-top:6px;font-size:11px;color:var(--muted);">
         💡 Вы можете читать, проверять или редактировать текст прямо здесь. Кнопка «Сохранить» синхронизирует и базу данных SQLite, и файл на диске.
+      </div>
+    </div>
+
+    <!-- Вкладка 3: Бриф для автора (ТЗ) -->
+    <div id="modalPanelBrief" style="display:none;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:12px;font-weight:700;color:var(--text);">ТЗ для самостоятельного написания статьи:</span>
+        <button class="btn btn--sm" onclick="copyBriefToClipboard()">📋 Скопировать ТЗ в буфер</button>
+      </div>
+      <pre id="mBriefContent" style="width:100%;max-height:380px;overflow-y:auto;padding:12px;border:1.5px solid var(--border);font-family:var(--mono);font-size:11.5px;line-height:1.5;background:#FAFAFA;white-space:pre-wrap;margin:0;">Загрузка брифа...</pre>
+      <div style="margin-top:8px;font-size:11px;color:var(--muted);">
+        💡 Напишите статью своим голосом по этому ТЗ, вставьте текст во вкладку «📄 Текст статьи» и нажмите «Сохранить». Затем ИИ адаптирует разметку и стандарты, а вы утвердите правки.
       </div>
     </div>
 
@@ -2199,10 +2212,12 @@ function openInspector(topicId) {
   } else {
     btnRow.innerHTML += `<button class="btn btn--primary" onclick="writeArticleForCurrentTopic('practico')">✍️ Написать (Practico 1)</button>`;
     btnRow.innerHTML += `<button class="btn btn--primary" style="background:#111;color:#FFC700;" onclick="writeArticleForCurrentTopic('practico2')">✍️ Написать (Practico 2)</button>`;
+    btnRow.innerHTML += `<button class="btn" onclick="switchModalTab('brief')">📋 Напишу сама (показать ТЗ)</button>`;
   }
 
   if (hasText) {
     btnRow.innerHTML += `<button class="btn btn--danger" onclick="rejectArticle(${t.id})">↺ Вернуть на доработку</button>`;
+    btnRow.innerHTML += `<button class="btn" onclick="switchModalTab('brief')">📋 Бриф темы</button>`;
   }
   // Проверка спроса и конкуренции по заголовку статьи
   btnRow.innerHTML += `<button class="btn" onclick="checkTopicPhrase(${t.id})">🔬 Проверить запрос</button>`;
@@ -2214,8 +2229,38 @@ function openInspector(topicId) {
 function switchModalTab(tab) {
   document.getElementById('modalTabBtnScore').classList.toggle('active', tab === 'score');
   document.getElementById('modalTabBtnText').classList.toggle('active', tab === 'text');
+  document.getElementById('modalTabBtnBrief').classList.toggle('active', tab === 'brief');
   document.getElementById('modalPanelScore').style.display = tab === 'score' ? 'block' : 'none';
   document.getElementById('modalPanelText').style.display = tab === 'text' ? 'block' : 'none';
+  document.getElementById('modalPanelBrief').style.display = tab === 'brief' ? 'block' : 'none';
+  if (tab === 'brief') {
+    loadModalBrief();
+  }
+}
+
+async function loadModalBrief() {
+  if (!CURRENT_TOPIC_ID) return;
+  const el = document.getElementById('mBriefContent');
+  if (!el) return;
+  el.innerText = '⏳ Загрузка брифа и SEO-метрик...';
+  try {
+    const res = await apiGet('/api/brief?id=' + CURRENT_TOPIC_ID);
+    if (res && res.status === 'ok' && res.brief) {
+      el.innerText = res.brief.markdown;
+    } else {
+      el.innerText = 'Не удалось загрузить бриф для этой темы.';
+    }
+  } catch (e) {
+    el.innerText = 'Ошибка соединения при загрузке брифа.';
+  }
+}
+
+function copyBriefToClipboard() {
+  const el = document.getElementById('mBriefContent');
+  if (!el) return;
+  navigator.clipboard.writeText(el.innerText)
+    .then(() => showToast('✓ Бриф скопирован в буфер обмена!'))
+    .catch(() => showToast('Выделите и скопируйте текст вручную'));
 }
 
 async function saveEditedArticleText() {

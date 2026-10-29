@@ -216,7 +216,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/status":
-            self.send_json({"status": "running", "time": datetime.now().isoformat()})
+            try:
+                with get_connection() as conn:
+                    cnt = conn.execute("SELECT COUNT(*) FROM topics").fetchone()[0]
+            except Exception:
+                cnt = 0
+            self.send_json({"status": "running", "topics_count": cnt, "time": datetime.now().isoformat()})
+            return
+
+        if path == "/api/brief":
+            qs = parse_qs(url.query)
+            tid = (qs.get("id") or [""])[0].strip()
+            if not tid:
+                self.send_json({"status": "error", "message": "Укажите ?id="}, 400)
+                return
+            try:
+                import generate_brief
+                brief_data = generate_brief.build_author_brief(tid)
+                self.send_json({"status": "ok", "brief": brief_data})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": str(ex)}, 500)
             return
 
         if path == "/api/priority/top":
@@ -617,8 +636,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     voice = (payload.get("voice") or "practico").strip().lower()
                     if voice not in ("practico", "practico2"):
                         voice = "practico"
+                    provider = (payload.get("provider") or "auto").strip().lower()
+                    if provider not in ("auto", "claude", "deepseek", "yandex"):
+                        provider = "auto"
                     cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
-                           "--id", str(target_id), "--voice", voice]
+                           "--id", str(target_id), "--voice", voice, "--provider", provider]
                     p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
                     log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
                     status = "succeeded" if p.returncode == 0 else "failed"
