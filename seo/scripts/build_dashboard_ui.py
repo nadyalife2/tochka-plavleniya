@@ -915,7 +915,9 @@ def generate_html() -> str:
         </select>
         <button class="btn btn--primary" onclick="checkPhrase('auto')">📊 Узнать спрос (бесплатно)</button>
         <button class="btn btn--warning" onclick="checkPhrase('mutagen')">🔬 Проверить Мутагеном (0,30 ₽)</button>
+        <button class="btn" onclick="recalcPriorities()">⚡ Пересчитать приоритет тем</button>
       </div>
+      <div id="priorityBox" style="margin-top:12px;display:none;"></div>
       <div id="analysisResult" style="margin-top:12px;display:none;"></div>
     </div>
 
@@ -1309,6 +1311,36 @@ function pickSuggestion(selectEl) {
   const input = document.getElementById('analysisPhrase');
   if (input) input.value = item.phrase;
   selectEl.value = '';
+}
+
+// Пересчёт приоритета тем и показ топа по бальной системе
+async function recalcPriorities() {
+  const box = document.getElementById('priorityBox');
+  box.style.display = 'block';
+  box.innerHTML = '<div style="padding:10px;font-size:12px;">⏳ Пересчитываю приоритет тем...</div>';
+  const res = await apiPost('/api/priority/recalc', {});
+  if (!res || res.status !== 'ok') {
+    box.innerHTML = '<div style="padding:10px;color:#B91C1C;font-size:12px;">Не удалось пересчитать приоритет.</div>';
+    return;
+  }
+  await refreshData();
+
+  const top = res.top || [];
+  let html = `<div style="border:1.5px solid var(--border);background:var(--card);padding:12px;">
+    <div style="font-size:13px;font-weight:800;margin-bottom:6px;">⚡ Приоритет пересчитан: ${res.total} тем</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
+      Формула: Спрос (до 40) + Конкуренция (до 30) + Интент (до 15) + Готовность (до 15).
+      Класс A — писать первым, D — не тратить силы.
+    </div>
+    <ul style="margin:0 0 0 16px;font-size:12px;">`;
+  top.forEach(t => {
+    const g = t.grade;
+    const color = g === 'A' ? '#059669' : (g === 'B' ? '#B45309' : (g === 'C' ? '#6B7280' : '#B91C1C'));
+    html += `<li><strong style="color:${color};">[${g}] ${t.score}</strong> — ${esc(t.title)}</li>`;
+  });
+  html += '</ul></div>';
+  box.innerHTML = html;
+  showToast('✓ Приоритет тем пересчитан');
 }
 
 async function checkPhrase(source) {
@@ -1824,7 +1856,18 @@ function renderKanban() {
 
       let scoreBadge = '';
       let warnBlock = '';
+      let seoBadge = '';
       const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
+
+      // Приоритет темы по спросу и конкуренции (0–100, класс A/B/C/D)
+      if (t.seo_priority != null) {
+        let detail = {};
+        try { detail = JSON.parse(t.seo_priority_json || '{}'); } catch (e) { detail = {}; }
+        const grade = detail.grade || '?';
+        const gColor = grade === 'A' ? '#059669' : (grade === 'B' ? '#B45309' : (grade === 'C' ? '#6B7280' : '#B91C1C'));
+        const gBg = grade === 'A' ? '#A7F3D0' : (grade === 'B' ? '#FEF08A' : (grade === 'C' ? '#E5E7EB' : '#FECACA'));
+        seoBadge = `<span class="prio-pill" style="background:${gBg};color:${gColor};font-weight:800;" title="Спрос+конкуренция+интент+готовность">SEO ${t.seo_priority} · ${grade}</span>`;
+      }
 
       if (t.score_total !== null && t.score_total !== undefined) {
         const sClass = t.score_total >= 80 ? 'score-pill--high' : (t.score_total >= 60 ? 'score-pill--mid' : 'score-pill--low');
@@ -1859,6 +1902,7 @@ function renderKanban() {
             <span class="task-card__id">#${t.id}</span>
             <div class="task-card__badges">
               <span class="prio-pill ${pClass}">P${pScore}</span>
+              ${seoBadge}
               ${scoreBadge}
             </div>
           </div>

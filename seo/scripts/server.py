@@ -219,6 +219,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "running", "time": datetime.now().isoformat()})
             return
 
+        if path == "/api/priority/top":
+            try:
+                with get_connection() as conn:
+                    rows = conn.execute(
+                        "SELECT id, title, seo_priority, seo_priority_json FROM topics "
+                        "WHERE seo_priority IS NOT NULL ORDER BY seo_priority DESC LIMIT 30"
+                    ).fetchall()
+                items = []
+                for r in rows:
+                    detail = {}
+                    try:
+                        detail = json.loads(r["seo_priority_json"] or "{}")
+                    except Exception:
+                        detail = {}
+                    items.append({"id": r["id"], "title": r["title"], "score": r["seo_priority"], "detail": detail})
+                self.send_json({"status": "ok", "items": items})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:150]}"}, 500)
+            return
+
         if path == "/api/keywords/suggest":
             # Подсказки фраз из SEO-данных конкурентов и хвостов Вордстата
             qs = parse_qs(url.query)
@@ -453,6 +473,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 cur.execute("UPDATE competitors_proposed SET status = 'принят' WHERE domain = ?", (domain,))
                 conn.commit()
             self.send_json({"status": "ok", "domain": domain})
+            return
+
+        # 4.9. Пересчёт приоритета тем (спрос + конкуренция + интент + готовность)
+        if path == "/api/priority/recalc":
+            try:
+                import priority_v2
+                results = priority_v2.recalculate()
+                top = results[:10]
+                self.send_json({
+                    "status": "ok",
+                    "total": len(results),
+                    "top": [{"id": r["id"], "title": r["title"], "score": r["total"], "grade": r["grade"]} for r in top],
+                })
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:150]}"}, 500)
             return
 
         # 5. Утвердить статью к публикации
