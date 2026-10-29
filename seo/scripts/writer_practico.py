@@ -163,6 +163,44 @@ def call_antigravity_cli(prompt: str) -> str | None:
     return None
 
 
+def call_deepseek(prompt: str, system_prompt: str) -> str | None:
+    """DeepSeek официальный API (platform.deepseek.com). Работает из РФ без VPN."""
+    try:
+        from keys import get_key
+        api_key = get_key("DEEPSEEK_API_KEY")
+    except Exception:
+        api_key = ""
+    if not api_key:
+        print("   (DeepSeek: ключ DEEPSEEK_API_KEY пустой в config/api-keys.local.yaml)...", flush=True)
+        return None
+
+    body = {
+        "model": "deepseek-chat",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.35,
+        "max_tokens": 4000,
+    }
+    req = urllib.request.Request(
+        "https://api.deepseek.com/chat/completions",
+        data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=300) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        return data["choices"][0]["message"]["content"]
+    except urllib.error.HTTPError as e:
+        err_body = e.read().decode("utf-8", "replace")[:300]
+        print(f"   (DeepSeek HTTP {e.code}: {err_body})...", flush=True)
+        return None
+    except Exception as e:  # noqa: BLE001
+        print(f"   (DeepSeek ошибка: {type(e).__name__}: {str(e)[:150]})...", flush=True)
+        return None
+
+
 def call_yandex_ai_studio(prompt: str, system_prompt: str) -> str | None:
     """Третий резерв: Yandex AI Studio (YandexGPT). Работает из РФ без VPN.
 
@@ -337,9 +375,12 @@ def _keyword_context(title: str) -> str:
     return "\n".join(parts)
 
 
-def write_article_for_topic(topic_id: int | str, voice: str = "practico") -> dict:
+def write_article_for_topic(topic_id: int | str, voice: str = "practico", provider: str = "auto") -> dict:
     tid = int(topic_id) if str(topic_id).isdigit() else topic_id
     system_prompt, voice_name = VOICES.get(voice, VOICES["practico"])
+    provider = (provider or "auto").lower()
+    if provider not in ("auto", "claude", "deepseek", "yandex"):
+        provider = "auto"
 
     with get_connection() as conn:
         topic = conn.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
@@ -349,7 +390,7 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico") -> dic
         raise SystemExit(f"Тема #{tid} не найдена в базе данных.")
 
     print(f"✍️ Написание статьи #{tid}: «{topic['title']}» голосом Practico...")
-    print(f"   Кластер: {topic['cluster']} | Модель: Claude Sonnet")
+    print(f"   Кластер: {topic['cluster']} | Голос: {voice_name} | Канал: {provider}")
 
     # Формируем задание для модели
     user_prompt = f"""НАПИШИ ПОЛНУЮ СТАТЬЮ ГОЛОСОМ PRACTICO ПО СЛЕДУЮЩЕМУ ТЗ:
@@ -394,23 +435,53 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico") -> dic
 НАПИШИ ПОЛНЫЙ ТЕКСТ СТАТЬИ В MARKDOWN (ОБЪЁМ 5 500 – 7 000 ЗНАКОВ С ПРОБЕЛАМИ).
 """
 
-    print(f"   [1/3] Запрос к модели Claude Sonnet (голос: {voice_name})...", flush=True)
-    generated_text = call_antigravity_cli(f"{system_prompt}\n\n{user_prompt}")
-    model_used = f"Claude Sonnet (Antigravity CLI), {voice_name}"
+    generated_text = None
+    model_used = ""
 
-    if not generated_text:
+    def try_claude() -> str | None:
+        nonlocal model_used
+        text = call_antigravity_cli(f"{system_prompt}\n\n{user_prompt}")
+        if text:
+            model_used = f"Claude Sonnet (Antigravity CLI), {voice_name}"
+            return text
         print(f"   (Antigravity CLI недоступен без VPN — пробую OpenRouter: {CLAUDE_OPENROUTER_MODEL})...", flush=True)
         try:
-            generated_text = call_openrouter_claude(user_prompt, system_prompt)
+            text = call_openrouter_claude(user_prompt, system_prompt)
             model_used = f"{CLAUDE_OPENROUTER_MODEL} (OpenRouter), {voice_name}"
+            return text
         except Exception as ex:  # noqa: BLE001
             print(f"   (OpenRouter недоступен: {str(ex)[:90]})...", flush=True)
-            generated_text = None
+            return None
 
-    if not generated_text:
-        print("   (Переключаюсь на Yandex AI Studio — YandexGPT 32k, работает из РФ без VPN)...", flush=True)
-        generated_text = call_yandex_ai_studio(user_prompt, system_prompt)
-        model_used = f"YandexGPT Pro 32k (AI Studio), {voice_name}"
+    def try_deepseek() -> str | None:
+        nonlocal model_used
+        print("   (Пробую DeepSeek официальный API из РФ)...", flush=True)
+        text = call_deepseek(user_prompt, system_prompt)
+        if text:
+            model_used = f"DeepSeek Chat (api.deepseek.com), {voice_name}"
+        else:
+            print("   (DeepSeek недоступен: нет ключа или сеть блокирует)...", flush=True)
+        return text
+
+    def try_yandex() -> str | None:
+        nonlocal model_used
+        print("   (Пробую Yandex AI Studio — YandexGPT 32k)...", flush=True)
+        text = call_yandex_ai_studio(user_prompt, system_prompt)
+        if text:
+            model_used = f"YandexGPT Pro 32k (AI Studio), {voice_name}"
+        else:
+            print("   (Yandex AI Studio недоступен)...", flush=True)
+        return text
+
+    if provider == "claude":
+        generated_text = try_claude()
+    elif provider == "deepseek":
+        generated_text = try_deepseek()
+    elif provider == "yandex":
+        generated_text = try_yandex()
+    else:  # auto: максимальный шанс получить текст
+        print(f"   [1/3] Запрос к модели (голос: {voice_name}, канал: авто)...", flush=True)
+        generated_text = try_claude() or try_deepseek() or try_yandex()
 
     if not generated_text or len(generated_text) < 1500:
         raise RuntimeError("Модель вернула слишком короткий текст.")
@@ -470,8 +541,10 @@ def main():
     parser.add_argument("--id", required=True, help="ID темы из базы")
     parser.add_argument("--voice", default="practico", choices=sorted(VOICES.keys()),
                         help="голос автора: practico (инженер) или practico2 (голос заказчика)")
+    parser.add_argument("--provider", default="auto", choices=["auto", "claude", "deepseek", "yandex"],
+                        help="канал генерации: auto (каскад) / claude / deepseek / yandex")
     args = parser.parse_args()
-    write_article_for_topic(args.id, voice=args.voice)
+    write_article_for_topic(args.id, voice=args.voice, provider=args.provider)
 
 
 if __name__ == "__main__":

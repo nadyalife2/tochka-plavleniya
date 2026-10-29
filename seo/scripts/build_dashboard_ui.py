@@ -946,6 +946,21 @@ def generate_html() -> str:
       <div style="font-size:12px;color:var(--muted);">Каждый агент решает строгую инженерную задачу по стандартам MASTER_EDITORIAL_BOOK.md.</div>
     </div>
 
+    <div style="background:#FFF;border:1.5px solid var(--border);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span style="font-weight:800;font-size:13px;">🤖 Канал генерации статей:</span>
+        <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;">
+          <option value="auto">⚡ Авто-каскад (Claude → DeepSeek → Yandex)</option>
+          <option value="claude">🟣 Claude Sonnet (нужен VPN через Antigravity / OpenRouter)</option>
+          <option value="deepseek">🔵 DeepSeek Chat (без VPN, platform.deepseek.com)</option>
+          <option value="yandex">🟡 YandexGPT Pro 32k (без VPN, Yandex AI Studio)</option>
+        </select>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">
+        💡 Выбор действует и для карточек канбана, и при запуске агентов ниже
+      </div>
+    </div>
+
     <div class="agents-grid">
       <!-- Agent 00 -->
       <div class="agent-card">
@@ -1119,8 +1134,24 @@ def generate_html() -> str:
       </div>
     </div>
 
+    <!-- Model Provider Selection Toolbar -->
+    <div style="margin-top:16px;padding:8px 12px;background:#F5F5F5;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;font-weight:800;color:var(--text);">🤖 Канал ИИ:</span>
+        <select id="modalProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:5px 8px;border:1.5px solid var(--border);font-size:12px;font-weight:700;background:#FFF;cursor:pointer;">
+          <option value="auto">⚡ Авто-каскад (Claude → DeepSeek → Yandex)</option>
+          <option value="claude">🟣 Claude Sonnet (нужен VPN через Antigravity / OpenRouter)</option>
+          <option value="deepseek">🔵 DeepSeek Chat (без VPN, ключ в api-keys.local.yaml)</option>
+          <option value="yandex">🟡 YandexGPT Pro 32k (без VPN, ключ AI Studio)</option>
+        </select>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">
+        Claude даёт эталонный голос (с VPN). DeepSeek и Yandex работают из РФ.
+      </div>
+    </div>
+
     <!-- Contextual Action Buttons in Modal -->
-    <div id="modalActionButtons" style="display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:2px solid var(--border);flex-wrap:wrap;">
+    <div id="modalActionButtons" style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);flex-wrap:wrap;">
       <!-- Генерируются динамически в openInspector() -->
     </div>
   </div>
@@ -1133,6 +1164,22 @@ def generate_html() -> str:
 let DB_DATA = __JSON_DATA__;
 let CURRENT_TOPIC_ID = null;
 let ACTIVE_STEP_FILTER = null;
+let CURRENT_AI_PROVIDER = 'auto';
+
+function setGlobalProvider(val) {
+  CURRENT_AI_PROVIDER = val || 'auto';
+  const mSel = document.getElementById('modalProviderSelect');
+  if (mSel && mSel.value !== CURRENT_AI_PROVIDER) mSel.value = CURRENT_AI_PROVIDER;
+  const aSel = document.getElementById('agentProviderSelect');
+  if (aSel && aSel.value !== CURRENT_AI_PROVIDER) aSel.value = CURRENT_AI_PROVIDER;
+  const pNames = {
+    auto: '⚡ Авто (каскад Claude → DeepSeek → Yandex)',
+    claude: '🟣 Claude Sonnet (нужен VPN)',
+    deepseek: '🔵 DeepSeek Chat (без VPN)',
+    yandex: '🟡 YandexGPT Pro 32k (без VPN)'
+  };
+  showToast(`Канал генерации: ${pNames[CURRENT_AI_PROVIDER] || CURRENT_AI_PROVIDER}`);
+}
 
 function esc(str) {
   if (str === null || str === undefined) return '';
@@ -1586,13 +1633,20 @@ function confirmRewriteCurrentTopic(voice) {
 async function writeArticleForCurrentTopic(voice) {
   if (!CURRENT_TOPIC_ID) return;
   const v = voice || 'practico';
+  const provider = CURRENT_AI_PROVIDER || 'auto';
+  const providerNames = {
+    auto: 'Авто (Claude → DeepSeek → Yandex)',
+    claude: 'Claude Sonnet (с VPN)',
+    deepseek: 'DeepSeek Chat (без VPN)',
+    yandex: 'YandexGPT Pro 32k (без VPN)'
+  };
   const voiceLabel = v === 'practico2' ? 'Practico 2 — голос заказчика' : 'Practico 1 — инженер';
   closeInspector();
-  showToast(`Запуск написания статьи #${CURRENT_TOPIC_ID} (${voiceLabel})...`);
+  showToast(`Запуск #${CURRENT_TOPIC_ID}: ${voiceLabel}, канал ${providerNames[provider] || provider}...`);
   const c = document.getElementById('agentConsole');
-  c.innerText = `[${new Date().toLocaleTimeString()}] Запуск Агента 02 (Claude Sonnet)\nГолос: ${voiceLabel}\nОжидание генерации текста...`;
+  c.innerText = `[${new Date().toLocaleTimeString()}] Запуск Агента 02\nГолос: ${voiceLabel}\nКанал ИИ: ${providerNames[provider] || provider}\nОжидание генерации текста...`;
   switchTab('agents');
-  const res = await apiPost('/api/agent/run', { agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice: v });
+  const res = await apiPost('/api/agent/run', { agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice: v, provider: provider });
   if (res && res.log) {
     c.innerText = res.log;
     showToast(res.status === 'succeeded' ? `✓ Статья #${CURRENT_TOPIC_ID} написана!` : `⚠️ Ошибка генерации`);
@@ -1610,9 +1664,16 @@ function promptAgentTarget(agentName) {
   } else if (agentName === '02-writer') {
     const t = DB_DATA.topics.find(x => x.id === CURRENT_TOPIC_ID);
     if (t && (t.chars || 0) >= 200) {
-      confirmRewriteCurrentTopic();
+      confirmRewriteCurrentTopic('practico');
     } else {
-      writeArticleForCurrentTopic();
+      writeArticleForCurrentTopic('practico');
+    }
+  } else if (agentName === '02-writer-2') {
+    const t = DB_DATA.topics.find(x => x.id === CURRENT_TOPIC_ID);
+    if (t && (t.chars || 0) >= 200) {
+      confirmRewriteCurrentTopic('practico2');
+    } else {
+      writeArticleForCurrentTopic('practico2');
     }
   } else {
     runAgent(agentName);
@@ -2118,6 +2179,8 @@ function openInspector(topicId) {
   switchModalTab('score');
 
   // Поправка #2: Контекстные кнопки действий с защитой от затирания
+  const mProv = document.getElementById('modalProviderSelect');
+  if (mProv) mProv.value = CURRENT_AI_PROVIDER || 'auto';
   const btnRow = document.getElementById('modalActionButtons');
   btnRow.innerHTML = '';
 
