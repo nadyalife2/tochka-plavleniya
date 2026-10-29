@@ -981,12 +981,23 @@ def generate_html() -> str:
       <!-- Agent 02: Writer Claude Sonnet Antigravity -->
       <div class="agent-card" style="border:2px solid var(--border);">
         <div class="agent-card__header">
-          <h3 class="agent-card__title">02-writer (Practico)</h3>
+          <h3 class="agent-card__title">02-writer (Practico 1)</h3>
           <span class="prio-pill prio-pill--hot">Claude Sonnet</span>
         </div>
-        <div class="agent-card__desc">Написание статьи голосом Practico (триада, ритм, сухая ирония §2.4, Answer First ≤40 слов, паттерны theme4).</div>
-        <div class="agent-card__meta">Модель: claude-sonnet-4-6 (Antigravity CLI)</div>
-        <button class="btn btn--primary" onclick="promptAgentTarget('02-writer')">▶ Написать статью (#ID)</button>
+        <div class="agent-card__desc">Инженерный голос: триада «факт → физика → последствие», ГОСТ и IPC, сухая ирония, Answer First ≤ 40 слов.</div>
+        <div class="agent-card__meta">Модель: claude-sonnet-4-6 · голос: practico</div>
+        <button class="btn btn--primary" onclick="promptAgentTarget('02-writer')">▶ Написать (Practico 1)</button>
+      </div>
+
+      <!-- Agent 02b: Writer Practico 2 (голос заказчика) -->
+      <div class="agent-card" style="border:2px solid var(--border);background:#1a1a1a;">
+        <div class="agent-card__header">
+          <h3 class="agent-card__title" style="color:#FFC700;">02-writer (Practico 2)</h3>
+          <span class="prio-pill prio-pill--warm">Claude Sonnet</span>
+        </div>
+        <div class="agent-card__desc" style="color:#ddd;">Голос заказчика: короткие рубленые фразы, деньги и время в каждом разделе, «что купить / где обманут», без лекций и эрудиции.</div>
+        <div class="agent-card__meta" style="color:#aaa;">Модель: claude-sonnet-4-6 · голос: practico2</div>
+        <button class="btn btn--primary" onclick="promptAgentTarget('02-writer-2')">▶ Написать (Practico 2)</button>
       </div>
 
       <!-- Agent 03: Reviewer Claude Opus Antigravity -->
@@ -1528,27 +1539,31 @@ async function scoreCurrentArticle() {
 }
 
 // Поправка #2: Защита от затирания существующего текста
-function confirmRewriteCurrentTopic() {
+function confirmRewriteCurrentTopic(voice) {
   if (!CURRENT_TOPIC_ID) return;
+  const v = voice || 'practico';
+  const vName = v === 'practico2' ? 'Practico 2' : 'Practico 1';
   const t = DB_DATA.topics.find(x => x.id === CURRENT_TOPIC_ID);
   const chars = (t && t.chars) || 0;
-  if (!confirm(`⚠️ ВНИМАНИЕ: У статьи #${CURRENT_TOPIC_ID} уже написан текст (${chars.toLocaleString('ru-RU')} зн.)!\n\nВы действительно хотите стереть текущий текст и заново сгенерировать статью с нуля через Claude Sonnet?`)) {
+  if (!confirm(`⚠️ ВНИМАНИЕ: У статьи #${CURRENT_TOPIC_ID} уже написан текст (${chars.toLocaleString('ru-RU')} зн.)!\n\nПереписать заново голосом ${vName}? Текущий текст будет заменён.`)) {
     return;
   }
-  writeArticleForCurrentTopic();
+  writeArticleForCurrentTopic(v);
 }
 
-async function writeArticleForCurrentTopic() {
+async function writeArticleForCurrentTopic(voice) {
   if (!CURRENT_TOPIC_ID) return;
+  const v = voice || 'practico';
+  const voiceLabel = v === 'practico2' ? 'Practico 2 — голос заказчика' : 'Practico 1 — инженер';
   closeInspector();
-  showToast(`Запуск написания статьи #${CURRENT_TOPIC_ID} голосом Practico (Claude Sonnet)...`);
+  showToast(`Запуск написания статьи #${CURRENT_TOPIC_ID} (${voiceLabel})...`);
   const c = document.getElementById('agentConsole');
-  c.innerText = `[${new Date().toLocaleTimeString()}] Запуск Агента 02 (Claude Sonnet Practico)...\nГолос: Глава 2 MASTER_EDITORIAL_BOOK.md (§2.4 сухая ирония, Answer First ≤ 40 слов, целевой объём 5 500 – 7 000 знаков)...\nОжидание генерации текста...`;
+  c.innerText = `[${new Date().toLocaleTimeString()}] Запуск Агента 02 (Claude Sonnet)\nГолос: ${voiceLabel}\nОжидание генерации текста...`;
   switchTab('agents');
-  const res = await apiPost('/api/agent/run', { agent: '02-writer', target_id: CURRENT_TOPIC_ID });
+  const res = await apiPost('/api/agent/run', { agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice: v });
   if (res && res.log) {
     c.innerText = res.log;
-    showToast(`✓ Статья #${CURRENT_TOPIC_ID} написана и оценена!`);
+    showToast(res.status === 'succeeded' ? `✓ Статья #${CURRENT_TOPIC_ID} написана!` : `⚠️ Ошибка генерации`);
     await refreshData();
     openInspector(CURRENT_TOPIC_ID);
   }
@@ -2072,9 +2087,11 @@ function openInspector(topicId) {
       btnRow.innerHTML += `<button class="btn" onclick="scoreCurrentArticle()">⚡ Пересчитать оценку (0-100)</button>`;
     }
     // Кнопка переписать с нуля — второстепенная с подтверждением
-    btnRow.innerHTML += `<button class="btn btn--warning" onclick="confirmRewriteCurrentTopic()">↻ Переписать с нуля (Claude Sonnet)</button>`;
+    btnRow.innerHTML += `<button class="btn btn--warning" onclick="confirmRewriteCurrentTopic('practico')">↻ Переписать (Practico 1)</button>`;
+    btnRow.innerHTML += `<button class="btn btn--warning" onclick="confirmRewriteCurrentTopic('practico2')">↻ Переписать (Practico 2)</button>`;
   } else {
-    btnRow.innerHTML += `<button class="btn btn--primary" onclick="writeArticleForCurrentTopic()">✍️ Написать (Claude Sonnet Practico)</button>`;
+    btnRow.innerHTML += `<button class="btn btn--primary" onclick="writeArticleForCurrentTopic('practico')">✍️ Написать (Practico 1)</button>`;
+    btnRow.innerHTML += `<button class="btn btn--primary" style="background:#111;color:#FFC700;" onclick="writeArticleForCurrentTopic('practico2')">✍️ Написать (Practico 2)</button>`;
   }
 
   if (hasText) {

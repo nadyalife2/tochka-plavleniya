@@ -579,8 +579,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
                         status = "failed"
                 elif agent == "02-writer" and target_id:
-                    cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"), "--id", str(target_id)]
-                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=180)
+                    voice = (payload.get("voice") or "practico").strip().lower()
+                    if voice not in ("practico", "practico2"):
+                        voice = "practico"
+                    cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
+                           "--id", str(target_id), "--voice", voice]
+                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
                     log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
                     status = "succeeded" if p.returncode == 0 else "failed"
                 else:

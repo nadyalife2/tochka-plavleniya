@@ -72,11 +72,57 @@ def _post(method: str, body: dict, timeout: int = 40) -> dict:
 # ------------------------------------------------------------------ API ---
 
 
+def sanitize_phrase(phrase: str) -> str:
+    """Готовит фразу для Wordstat API.
+
+    API отвечает HTTP 400 «Invalid query», если в фразе есть двоеточие,
+    точка с запятой, кавычки-ёлочки и другие знаки препинания.
+    Заголовок статьи как запрос не годится — оставляем только слова.
+    """
+    cleaned = re.sub(r"[«»\"'`()\[\]{}<>:;,!?—–|/\\]", " ", phrase or "")
+    cleaned = re.sub(r"\s+", " ", cleaned).strip(" .-")
+    return cleaned[:400]
+
+
+STOPWORDS = {
+    "как", "что", "чем", "для", "или", "при", "без", "над", "под", "про", "это",
+    "когда", "нужно", "нужен", "нужна", "лучше", "какой", "какая", "какие", "почему",
+    "можно", "ли", "в", "на", "и", "с", "по", "из", "от", "до", "не", "а", "же",
+    "своими", "руками", "правильно", "знать", "выбрать", "делать",
+}
+
+
+def shorten_phrase(phrase: str, max_words: int = 3) -> str:
+    """Сокращает длинный заголовок до короткого запроса (2–3 значимых слова)."""
+    words = [w for w in sanitize_phrase(phrase).lower().split() if w not in STOPWORDS and len(w) > 2]
+    return " ".join(words[:max_words])
+
+
 def top_requests(phrase: str, num_phrases: int = 30, regions: list[str] | None = None) -> dict:
-    body: dict = {"phrase": phrase, "numPhrases": num_phrases}
+    query = sanitize_phrase(phrase) or phrase
+    body: dict = {"phrase": query, "numPhrases": num_phrases}
     if regions:
         body["regions"] = regions
-    return _post("topRequests", body)
+    data = _post("topRequests", body)
+
+    # Длинный заголовок статьи часто не является поисковым запросом:
+    # если спроса нет, пробуем всё более короткие версии (3 слова → 2 слова).
+    if not data.get("totalCount"):
+        for n in (3, 2):
+            short = shorten_phrase(phrase, max_words=n)
+            if not short or short == query.lower():
+                continue
+            try:
+                data2 = _post("topRequests", {"phrase": short, "numPhrases": num_phrases})
+                if data2.get("totalCount"):
+                    data2["_query_used"] = short
+                    data2["_shortened_from"] = phrase
+                    return data2
+            except Exception:
+                continue
+
+    data["_query_used"] = query
+    return data
 
 
 def dynamics(phrase: str, period: str = "PERIOD_MONTHLY", months_back: int = 6) -> dict:
@@ -258,6 +304,7 @@ def main() -> int:
         phrases = [l.strip() for l in path.read_text(encoding="utf-8-sig").splitlines()
                    if l.strip() and not l.startswith("#")]
         print(f"Фраз в файле: {len(phrases)}")
+        import time as _time
         for phrase in phrases:
             if not args.refresh:
                 cached = get_cached(phrase)
@@ -268,9 +315,11 @@ def main() -> int:
                 data = top_requests(phrase, num_phrases=10)
             except Exception as e:  # noqa: BLE001
                 print(f"  [ошибка] {phrase[:38]:<40} {e}")
+                _time.sleep(1.0)
                 continue
             save_cache(phrase, data)
             print(f"  {phrase[:38]:<40} {data.get('totalCount')}")
+            _time.sleep(0.2)  # вежливая пауза, чтобы не ловить 429
         return 0
 
     if args.table:

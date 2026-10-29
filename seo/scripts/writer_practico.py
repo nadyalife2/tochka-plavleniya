@@ -86,6 +86,64 @@ PRACTICO_SYSTEM_PROMPT = """Ты — ведущий инженерный авт�
 """
 
 
+PRACTICO2_SYSTEM_PROMPT = """Ты — автор проекта «Точка Плавления» во втором голосе: PRACTICO 2 «Голос заказчика».
+Это голос владельца мастерской, который платит за инструмент и материалы из своего кармана.
+Он не читает лекций и не показывает эрудицию. Он объясняет так, чтобы человек завтра сделал работу и не потерял деньги.
+
+ЧЕМ ЭТОТ ГОЛОС ОТЛИЧАЕТСЯ ОТ PRACTICO 1:
+- Practico 1 — инженер: физика процесса, ГОСТ, сухая ирония.
+- Practico 2 — заказчик: польза, цена ошибки, время, «делай так и не мучайся».
+- Practico 2 короче и прямее. Меньше теории, больше «что купить», «сколько это стоит», «где вас обманут».
+
+1. ОТНОШЕНИЕ К ЧИТАТЕЛЮ:
+   - Обращение на «Вы», без заискивания и без снисходительности.
+   - Читатель — взрослый человек, у которого есть задача и ограниченный бюджет. Его время дороже вашего текста.
+
+2. ГЛАВНЫЙ ПРИНЦИП: СНАЧАЛА ВЫГОДА, ПОТОМ ТЕХНИКА.
+   - Каждый раздел отвечает на вопрос «что мне это даёт» или «сколько мне это будет стоить».
+   - Формула абзаца: что делать -> сколько стоит / сколько времени -> что будет, если сделать наоборот.
+
+3. ANSWER FIRST (ПЕРВЫЙ АБЗАЦ):
+   - Первое предложение — прямой ответ. Строго до 40 слов.
+   - Сразу цифра или решение. Без «в современном мире», «многие задаются вопросом», «на первый взгляд кажется».
+
+4. РИТМ — РУБЛЕНЫЙ:
+   - Предложения короткие: в среднем до 15–18 слов. Максимум 22.
+   - Абзацы по 1–2 предложения. Один абзац — одна мысль.
+   - Разрешены короткие вставки-констатации: «Это дорого. Это не нужно. Это работает.»
+
+5. ИНТОНАЦИЯ:
+   - Спокойная деловая прямота. Допустима лёгкая ирония над рынком и маркетингом — но без сарказма в адрес читателя.
+   - ТАБУ: шутить в разделах про безопасность, свинец, электричество и здоровье. Там только факты.
+   - Запрещены канцелярит и «умные» слова без расшифровки.
+
+6. ЧЕСТНОСТЬ ПРО ДЕНЬГИ И ОГРАНИЧЕНИЯ (обязательно):
+   - Указывайте, где дешёвое решение работает, а где выброшенные деньги.
+   - Если что-то нельзя сделать без оборудования — так и скажите, без обтекаемых формулировок.
+   - Не обещать «вечный» результат и «100% гарантию».
+
+7. СТРУКТУРА (обязательно):
+   - H1 — задача читателя, без кликбейта.
+   - 4–7 разделов H2. Хотя бы один раздел — с цифрами затрат, временем или расходом материалов.
+   - Хотя бы один раздел «где ошибаются и сколько это стоит».
+   - Раздел «## Безопасность и средства защиты» — коротко и по делу.
+   - Раздел «## Источники и нормативные документы» — 2–4 реальных ГОСТ / IPC / TDS.
+   - Служебный блок в самом конце «### FAQ:» — 4–6 практических вопросов, ответы в 1–3 предложения.
+
+8. ОБЪЁМ: строго 5 500 – 7 000 знаков с пробелами.
+
+9. СТОП-ФРАЗЫ (запрещены):
+   - «идеальный результат», «абсолютно безопасно», «проще простого», «справится любой», «в заключение», «подводя итоги», «стоит отметить».
+   - Вопросов читателю в конце не задавать.
+"""
+
+# Реестр голосов: ключ -> (системный промпт, читаемое имя)
+VOICES: dict[str, tuple[str, str]] = {
+    "practico": (PRACTICO_SYSTEM_PROMPT, "Practico 1 — инженер"),
+    "practico2": (PRACTICO2_SYSTEM_PROMPT, "Practico 2 — голос заказчика"),
+}
+
+
 def call_antigravity_cli(prompt: str) -> str | None:
     """Попытка вызова Claude Sonnet через Antigravity CLI."""
     ask_ps1 = ROOT / ".agents" / "skills" / "antigravity-consult" / "scripts" / "ask.ps1"
@@ -239,8 +297,9 @@ def _keyword_context(title: str) -> str:
     return "\n".join(parts)
 
 
-def write_article_for_topic(topic_id: int | str) -> dict:
+def write_article_for_topic(topic_id: int | str, voice: str = "practico") -> dict:
     tid = int(topic_id) if str(topic_id).isdigit() else topic_id
+    system_prompt, voice_name = VOICES.get(voice, VOICES["practico"])
 
     with get_connection() as conn:
         topic = conn.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
@@ -295,14 +354,14 @@ def write_article_for_topic(topic_id: int | str) -> dict:
 НАПИШИ ПОЛНЫЙ ТЕКСТ СТАТЬИ В MARKDOWN (ОБЪЁМ 5 500 – 7 000 ЗНАКОВ С ПРОБЕЛАМИ).
 """
 
-    print("   [1/3] Запрос к модели Claude Sonnet...", flush=True)
-    generated_text = call_antigravity_cli(f"{PRACTICO_SYSTEM_PROMPT}\n\n{user_prompt}")
-    model_used = "Claude Sonnet (Antigravity CLI)"
+    print(f"   [1/3] Запрос к модели Claude Sonnet (голос: {voice_name})...", flush=True)
+    generated_text = call_antigravity_cli(f"{system_prompt}\n\n{user_prompt}")
+    model_used = f"Claude Sonnet (Antigravity CLI), {voice_name}"
 
     if not generated_text:
         print(f"   (Antigravity CLI недоступен без VPN — переключение на резервный шлюз OpenRouter: {CLAUDE_OPENROUTER_MODEL})...", flush=True)
-        generated_text = call_openrouter_claude(user_prompt, PRACTICO_SYSTEM_PROMPT)
-        model_used = f"{CLAUDE_OPENROUTER_MODEL} (OpenRouter)"
+        generated_text = call_openrouter_claude(user_prompt, system_prompt)
+        model_used = f"{CLAUDE_OPENROUTER_MODEL} (OpenRouter), {voice_name}"
 
     if not generated_text or len(generated_text) < 1500:
         raise RuntimeError("Модель вернула слишком короткий текст.")
@@ -342,7 +401,7 @@ def write_article_for_topic(topic_id: int | str) -> dict:
                      (report["total"], json.dumps(report, ensure_ascii=False), tid))
         conn.commit()
 
-    print(f"\n✓ СТАТЬЯ #{tid} УСПЕШНО НАПИСАНА ГОЛОСОМ PRACTICO!")
+    print(f"\n✓ СТАТЬЯ #{tid} УСПЕШНО НАПИСАНА ГОЛОСОМ: {voice_name.upper()}")
     print(f"  • Объём: {chars_count} знаков")
     print(f"  • Оценка качества: {report['total']}/100 — {report['verdict']}")
     print(f"  • Файл: {out_file}")
@@ -353,14 +412,17 @@ def write_article_for_topic(topic_id: int | str) -> dict:
         "verdict": report["verdict"],
         "file": str(out_file),
         "model": model_used,
+        "voice": voice,
     }
 
 
 def main():
     parser = argparse.ArgumentParser(description="Написание статьи голосом Practico через Claude Sonnet")
     parser.add_argument("--id", required=True, help="ID темы из базы")
+    parser.add_argument("--voice", default="practico", choices=sorted(VOICES.keys()),
+                        help="голос автора: practico (инженер) или practico2 (голос заказчика)")
     args = parser.parse_args()
-    res = write_article_for_topic(args.id)
+    write_article_for_topic(args.id, voice=args.voice)
 
 
 if __name__ == "__main__":
