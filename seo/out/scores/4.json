@@ -1,18 +1,18 @@
 {
   "article_id": "4",
-  "generated_at": "2026-10-29T18:00:10",
+  "generated_at": "2026-10-29T22:16:24",
   "file": null,
   "metrics": {
-    "chars": 7459,
+    "chars": 8695,
     "h1": [
       "⚡ Как научиться паять быстро и без брака: система тренировки для начинающих"
     ],
-    "h2_count": 9,
-    "avg_sentence_words": 12.9,
-    "avg_paragraph_sentences": 2.0,
-    "faq": 0,
-    "internal_links": 3,
-    "sources": 0,
+    "h2_count": 10,
+    "avg_sentence_words": 12.8,
+    "avg_paragraph_sentences": 2.1,
+    "faq": 5,
+    "internal_links": 4,
+    "sources": 4,
     "temps": 6,
     "alloys": true,
     "answer_first_words": 50,
@@ -23,11 +23,11 @@
   },
   "blocks": {
     "intent": {
-      "points": 13,
+      "points": 10,
       "max": 20
     },
     "facts": {
-      "points": 17,
+      "points": 25,
       "max": 25
     },
     "voice": {
@@ -35,7 +35,7 @@
       "max": 15
     },
     "seo": {
-      "points": 12,
+      "points": 18,
       "max": 20
     },
     "links": {
@@ -47,14 +47,12 @@
       "max": 10
     }
   },
-  "total": 77,
-  "verdict": "черновик",
+  "total": 88,
+  "verdict": "готово к ОТК",
   "issues": [
     "Answer First: 50 слов в первом абзаце (нужно ≤ 40)",
-    "H2: 9 (цель 4–8; для справочников допустимо до 10)",
-    "Объём: 7,459 знаков (цель 5 500–7 000)",
-    "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)",
-    "FAQ: 0 вопросов (нужно 4–6)",
+    "H2: 10 (цель 4–8; для справочников допустимо до 10)",
+    "Объём: 8,695 знаков (цель 5 500–7 000)",
     "Нет раздела «Источники/Стандарты»"
   ],
   "blockers": [],

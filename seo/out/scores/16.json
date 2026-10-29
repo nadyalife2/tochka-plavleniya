@@ -1,18 +1,18 @@
 {
   "article_id": "16",
-  "generated_at": "2026-10-29T18:00:12",
+  "generated_at": "2026-10-29T22:16:25",
   "file": null,
   "metrics": {
-    "chars": 3969,
+    "chars": 4613,
     "h1": [
       "ПОС-61 и ПОС-40: в чём разница и что выбрать"
     ],
-    "h2_count": 8,
-    "avg_sentence_words": 12.4,
-    "avg_paragraph_sentences": 2.5,
+    "h2_count": 9,
+    "avg_sentence_words": 12.8,
+    "avg_paragraph_sentences": 2.6,
     "faq": 4,
-    "internal_links": 0,
-    "sources": 3,
+    "internal_links": 3,
+    "sources": 8,
     "temps": 12,
     "alloys": true,
     "answer_first_words": 46,
@@ -25,7 +25,7 @@
   },
   "blocks": {
     "intent": {
-      "points": 12,
+      "points": 13,
       "max": 20
     },
     "facts": {
@@ -37,26 +37,25 @@
       "max": 15
     },
     "seo": {
-      "points": 13,
+      "points": 18,
       "max": 20
     },
     "links": {
-      "points": 5,
+      "points": 10,
       "max": 10
     },
     "ai": {
-      "points": 8,
+      "points": 10,
       "max": 10
     }
   },
-  "total": 78,
-  "verdict": "черновик",
+  "total": 91,
+  "verdict": "готово к ОТК",
   "issues": [
     "Answer First: 46 слов в первом абзаце (нужно ≤ 40)",
-    "Объём: 3,969 знаков (цель 5 500–7 000)",
-    "Внутренние ссылки: 0 (нужно 3–5)",
-    "Нет раздела «Источники/Стандарты»",
-    "Ссылки: 0 (цель 3–5)"
+    "H2: 9 (цель 4–8; для справочников допустимо до 10)",
+    "Объём: 4,613 знаков (цель 5 500–7 000)",
+    "Нет раздела «Источники/Стандарты»"
   ],
   "blockers": [],
   "manual": [

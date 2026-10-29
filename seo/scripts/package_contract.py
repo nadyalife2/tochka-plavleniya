@@ -61,7 +61,7 @@ def load_schema() -> dict:
 def parse_faq_from_text(text: str) -> list[dict]:
     """Извлекает реальные вопросы-ответы из блока ## FAQ или ### FAQ: в тексте статьи."""
     faq_items = []
-    faq_block_match = re.search(r"(?im)^#{2,3}\s*(?:FAQ|Частые вопросы|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
+    faq_block_match = re.search(r"(?im)^#{2,3}\s*[^a-zA-Zа-яА-Я0-9\n]*(?:FAQ|Частые вопросы|Часто задаваемые|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
     if faq_block_match:
         block = faq_block_match.group(1).strip()
         # 1. Формат q: "..." \n a: "..."
@@ -81,6 +81,13 @@ def parse_faq_from_text(text: str) -> list[dict]:
                 pairs_num = re.findall(r'(?m)^\s*\d+[.)]\s*\*\*([^*]+)\*\*\s*\n+([^\n]+)', block)
                 for q, a in pairs_num:
                     faq_items.append({"q": q.strip(), "a": a.strip()})
+
+        # 4. Формат подзаголовков ### Вопрос? \n Ответ
+        if not faq_items:
+            pairs_h3 = re.findall(r'(?m)^#{3,4}\s+([^\n]+\?)\s*\n+([\s\S]+?)(?=\n#{3,4}\s+[^\n]+\?|\Z)', block)
+            for q, a in pairs_h3:
+                ans_clean = "\n".join([line.strip() for line in a.strip().splitlines() if not line.strip().startswith("#")])
+                faq_items.append({"q": q.strip(), "a": ans_clean[:500].strip()})
     return faq_items
 
 

@@ -51,7 +51,16 @@ def load_text(args) -> str:
         return Path(args.file).read_text(encoding="utf-8", errors="replace")
     if args.text:
         return args.text
-    raise SystemExit("Нужен --file или --text")
+    if args.id:
+        try:
+            from db import get_connection
+            with get_connection() as conn:
+                row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (args.id,)).fetchone()
+                if row and row["content_markdown"]:
+                    return row["content_markdown"]
+        except Exception:
+            pass
+    raise SystemExit("Нужен --file, --text или валидный --id с текстом в базе")
 
 
 def words(text: str) -> list[str]:
@@ -81,13 +90,21 @@ def strip_markdown(text: str) -> str:
 
 
 def internal_links(text: str) -> list[str]:
-    # Только внутренние относительные ссылки сайта: /slug/ или /slug
-    return re.findall(r"\]\((/(?:[a-z0-9\-]+)/?)\)", text)
+    # Внутренние относительные ссылки сайта: /slug/, /slug или ../slug/
+    return re.findall(r"\]\(((?:/|\.\./)(?:[a-z0-9\-]+)/?)\)", text)
 
 
 def count_faq(text: str) -> int:
+    try:
+        from package_contract import parse_faq_from_text
+        items = parse_faq_from_text(text)
+        if items:
+            return len(items)
+    except Exception:
+        pass
+
     if re.search(r"(?im)^#{2,3}\s*(faq|частые вопросы|вопросы и ответы)", text):
-        questions = re.findall(r"(?m)^\s*(?:\d+[.)]\s*)?\*\*[^*]+\?\*\*|\?\s*$", text)
+        questions = re.findall(r'(?m)^\s*(?:\d+[.)]\s*)?(?:\*\*[^*]+\?\*\*|q:\s*["«]?[^"\n\r]+\?|[^.\n\r]+\?\s*["»]?\s*$)', text)
         return len([q for q in questions if q])
     return len(re.findall(r"(?m)^\s*(?:[-*]|\d+[.)])\s+[^.\n]+\?", text))
 
@@ -290,6 +307,18 @@ def main() -> int:
     slug = args.id or "article"
     (SCORES / f"{slug}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     (SCORES / f"{slug}.md").write_text(to_markdown(report), encoding="utf-8")
+
+    if args.id:
+        try:
+            from db import get_connection
+            with get_connection() as conn:
+                conn.execute(
+                    "UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
+                    (report["total"], json.dumps(report, ensure_ascii=False), args.id)
+                )
+                conn.commit()
+        except Exception:
+            pass
 
     print(f"#{args.id or '—'}: {report['total']}/100 — {report['verdict']}")
     print(f"    {SCORES / (slug + '.md')}")

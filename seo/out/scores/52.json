@@ -1,20 +1,20 @@
 {
   "article_id": "52",
-  "generated_at": "2026-10-29T18:00:13",
+  "generated_at": "2026-10-29T22:16:26",
   "file": null,
   "metrics": {
-    "chars": 3365,
+    "chars": 4305,
     "h1": [
       "Паяльная паста или припой в проволоке: что выбрать и в чём разница"
     ],
-    "h2_count": 8,
-    "avg_sentence_words": 11.6,
-    "avg_paragraph_sentences": 2.4,
+    "h2_count": 9,
+    "avg_sentence_words": 12.8,
+    "avg_paragraph_sentences": 2.6,
     "faq": 4,
-    "internal_links": 0,
-    "sources": 5,
-    "temps": 0,
-    "alloys": false,
+    "internal_links": 4,
+    "sources": 9,
+    "temps": 3,
+    "alloys": true,
     "answer_first_words": 32,
     "stop_phrases": [],
     "bureaucratic": [],
@@ -23,11 +23,11 @@
   },
   "blocks": {
     "intent": {
-      "points": 15,
+      "points": 13,
       "max": 20
     },
     "facts": {
-      "points": 17,
+      "points": 21,
       "max": 25
     },
     "voice": {
@@ -35,11 +35,11 @@
       "max": 15
     },
     "seo": {
-      "points": 10,
+      "points": 18,
       "max": 20
     },
     "links": {
-      "points": 5,
+      "points": 10,
       "max": 10
     },
     "ai": {
@@ -47,15 +47,12 @@
       "max": 10
     }
   },
-  "total": 70,
-  "verdict": "черновик",
+  "total": 85,
+  "verdict": "готово к ОТК",
   "issues": [
-    "Объём: 3,365 знаков (цель 5 500–7 000)",
-    "Сплавы: в тексте нет ни одного канонического сплава",
-    "Температуры: 0 значений с °C (нужно ≥ 3 в паяльной теме)",
-    "Внутренние ссылки: 0 (нужно 3–5)",
-    "Нет раздела «Источники/Стандарты»",
-    "Ссылки: 0 (цель 3–5)"
+    "H2: 9 (цель 4–8; для справочников допустимо до 10)",
+    "Объём: 4,305 знаков (цель 5 500–7 000)",
+    "Нет раздела «Источники/Стандарты»"
   ],
   "blockers": [],
   "manual": [
