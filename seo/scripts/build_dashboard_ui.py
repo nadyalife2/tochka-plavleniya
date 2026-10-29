@@ -1012,7 +1012,8 @@ def generate_html() -> str:
         <span>статус: <strong id="mStatus" style="color:var(--ink);">В работе</strong></span> · 
         <span id="mChars" style="font-weight:600;">0 зн.</span>
       </div>
-      <h2 id="mTitle" style="margin:4px 0 0;font-size:17px;font-weight:800;line-height:1.3;">Название статьи</h2>
+      <div id="mStageBadge" style="margin-top:6px;display:inline-block;padding:3px 9px;font-size:11px;font-family:var(--mono);font-weight:700;border:1px solid var(--border);background:var(--accent-light);">Этап конвейера</div>
+      <h2 id="mTitle" style="margin:6px 0 0;font-size:17px;font-weight:800;line-height:1.3;">Название статьи</h2>
     </div>
 
     <!-- Вкладки модального окна: Оценка vs Текст статьи -->
@@ -1227,19 +1228,21 @@ async function approveCompetitor(domain) {
   await refreshData();
 }
 
-async function approveArticle() {
-  if (!CURRENT_TOPIC_ID) return;
-  await apiPost('/api/articles/approve', { id: CURRENT_TOPIC_ID });
-  showToast(`✓ Статья #${CURRENT_TOPIC_ID} утверждена к публикации! Перенесена во вкладку «Готовые к выгрузке».`);
+async function approveArticle(topicId) {
+  const tid = topicId || CURRENT_TOPIC_ID;
+  if (!tid) return;
+  await apiPost('/api/articles/approve', { id: tid });
+  showToast(`✓ Статья #${tid} утверждена к публикации! Перенесена во вкладку «Готовые к выгрузке».`);
   closeInspector();
   await refreshData();
 }
 
-async function rejectArticle() {
-  if (!CURRENT_TOPIC_ID) return;
+async function rejectArticle(topicId) {
+  const tid = topicId || CURRENT_TOPIC_ID;
+  if (!tid) return;
   const reason = prompt('Укажите замечания для автора Claude Sonnet:') || 'Требуется доработка текста';
-  await apiPost('/api/articles/reject', { id: CURRENT_TOPIC_ID, reason });
-  showToast(`Статья #${CURRENT_TOPIC_ID} возвращена на доработку автору.`);
+  await apiPost('/api/articles/reject', { id: tid, reason });
+  showToast(`Статья #${tid} возвращена на доработку автору.`);
   closeInspector();
   await refreshData();
 }
@@ -1504,6 +1507,12 @@ function renderKanban() {
   const board = document.getElementById('kanbanBoard');
   board.innerHTML = '';
 
+  if (ACTIVE_STEP_FILTER) {
+    board.style.gridTemplateColumns = 'minmax(320px, 480px)';
+  } else {
+    board.style.gridTemplateColumns = '';
+  }
+
   const clusterFilter = document.getElementById('clusterSelect').value.toLowerCase();
   const searchFilter = document.getElementById('kanbanSearch').value.toLowerCase().trim();
 
@@ -1554,7 +1563,7 @@ function renderKanban() {
       } else if (col.code === 'needs_fix') {
         actionBtn = `<button class="btn btn--xs btn--warning" onclick="event.stopPropagation(); openInspector(${t.id});">⚠️ Замечания (${t.score_total || '—'})</button>`;
       } else if (col.code === 'review') {
-        actionBtn = `<button class="btn btn--xs btn--success" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; approveArticle();">✓ В приёмку</button>`;
+        actionBtn = `<button class="btn btn--xs btn--success" onclick="event.stopPropagation(); approveArticle(${t.id});">✓ В приёмку</button>`;
       } else if (col.code === 'ready') {
         actionBtn = `<button class="btn btn--xs btn--primary" onclick="event.stopPropagation(); exportSingleArticle(${t.id});">📦 Проверить v1.1</button>`;
       } else if (col.code === 'published') {
@@ -1706,10 +1715,25 @@ function openInspector(topicId) {
   document.getElementById('mId').innerText = '#' + t.id;
   document.getElementById('mCluster').innerText = t.cluster;
   
-  // Поправка #4: Корректный статус на русском и единичное обозначение знаков (без "знаков знаков")
+  // Поправка #4: Корректный статус на русском и единичное обозначение знаков (без дублирования слова знаков)
   document.getElementById('mStatus').innerText = STATUS_RU[t.status] || t.status;
   document.getElementById('mChars').innerText = chars > 0 ? chars.toLocaleString('ru-RU') + ' зн.' : '0 зн.';
   document.getElementById('mTitle').innerText = t.title;
+
+  // Индикатор этапа жизненного цикла статьи
+  const stageLabels = {
+    'backlog': 'Этап 1/5: В бэклоге (ожидает исследования и брифа)',
+    'work': 'Этап 2/5: В работе (сбор фактов / подготовка брифа)',
+    'needs_fix': `Этап 3/5: Черновик написан (${chars.toLocaleString('ru-RU')} зн.), требует доработки (${t.score_total !== null && t.score_total !== undefined ? t.score_total : '—'}/100)`,
+    'review': `Этап 4/5: Готово к ОТК (${chars.toLocaleString('ru-RU')} зн., ${t.score_total}/100 баллов)`,
+    'ready': 'Этап 5/5: Утверждено шеф-редактором (готово к выгрузке в WordPress)',
+    'published': 'Этап 5/5: Опубликовано на сайте tochka-plavleniya.ru'
+  };
+  const stageEl = document.getElementById('mStageBadge');
+  if (stageEl) {
+    stageEl.innerText = stageLabels[colCode] || colCode;
+    stageEl.style.background = (colCode === 'review' || colCode === 'ready' || colCode === 'published') ? '#A7F3D0' : (colCode === 'needs_fix' ? '#FEF08A' : 'var(--accent-light)');
+  }
 
   const scoreEl = document.getElementById('mTotalScore');
   const grid = document.getElementById('mScoreGrid');
@@ -1772,7 +1796,7 @@ function openInspector(topicId) {
 
   if (hasText) {
     if (t.score_total !== null && t.score_total >= 80 && t.status !== 'ready') {
-      btnRow.innerHTML += `<button class="btn btn--primary" onclick="approveArticle()">✓ Утвердить к выгрузке (ОТК)</button>`;
+      btnRow.innerHTML += `<button class="btn btn--success" onclick="approveArticle(${t.id})">✓ Утвердить к выгрузке (ОТК)</button>`;
     } else if (t.status === 'ready') {
       btnRow.innerHTML += `<button class="btn btn--primary" onclick="exportSingleArticle(${t.id})">📦 Проверить пакет v1.1</button>`;
     } else {
@@ -1786,7 +1810,7 @@ function openInspector(topicId) {
   }
 
   if (hasText) {
-    btnRow.innerHTML += `<button class="btn btn--danger" onclick="rejectArticle()">↺ Вернуть на доработку</button>`;
+    btnRow.innerHTML += `<button class="btn btn--danger" onclick="rejectArticle(${t.id})">↺ Вернуть на доработку</button>`;
   }
   btnRow.innerHTML += `<button class="btn" onclick="closeInspector()">Закрыть</button>`;
 
