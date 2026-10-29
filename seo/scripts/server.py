@@ -219,6 +219,44 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "running", "time": datetime.now().isoformat()})
             return
 
+        if path == "/api/keyword/history":
+            # Единая история проверок: Вордстат (бесплатно) + Мутаген (платно)
+            rows = []
+            try:
+                with get_connection() as conn:
+                    ws_rows = conn.execute(
+                        "SELECT phrase, total_count, checked_at FROM wordstat_metrics ORDER BY checked_at DESC LIMIT 100"
+                    ).fetchall()
+                for r in ws_rows:
+                    rows.append({
+                        "phrase": r["phrase"],
+                        "source": "wordstat",
+                        "demand": r["total_count"],
+                        "competition": None,
+                        "checked_at": r["checked_at"],
+                    })
+            except Exception:
+                pass
+            try:
+                with get_connection() as conn:
+                    mg_rows = conn.execute(
+                        "SELECT keyword, strong, wordstat, vital_site, checked_at FROM keyword_metrics ORDER BY checked_at DESC LIMIT 100"
+                    ).fetchall()
+                for r in mg_rows:
+                    rows.append({
+                        "phrase": r["keyword"],
+                        "source": "mutagen",
+                        "demand": r["wordstat"],
+                        "competition": r["strong"],
+                        "vital_site": r["vital_site"] or "",
+                        "checked_at": r["checked_at"],
+                    })
+            except Exception:
+                pass
+            rows.sort(key=lambda x: x.get("checked_at") or "", reverse=True)
+            self.send_json({"phrases_checked": len(rows), "history": rows[:100]})
+            return
+
         # --- фоновые задания (долгие агенты) ---
         if path == "/api/jobs":
             mark_stale_jobs()
@@ -504,6 +542,79 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 conn.commit()
 
             self.send_json({"status": status, "agent": agent, "log": log_output})
+            return
+
+        # 7.5. Проверка фразы: спрос (Вордстат, бесплатно) и конкуренция (Мутаген, платно)
+        if path == "/api/keyword/check":
+            phrase = (payload.get("phrase") or "").strip()
+            source = (payload.get("source") or "auto").strip().lower()
+            if not phrase:
+                self.send_json({"status": "error", "message": "Пустая фраза"}, 400)
+                return
+
+            result = {"status": "ok", "phrase": phrase, "wordstat": None, "mutagen": None, "cost": 0.0, "notes": []}
+
+            # Вордстат — всегда и бесплатно
+            try:
+                import wordstat as ws_mod
+                cached = None if payload.get("refresh") else ws_mod.get_cached(phrase)
+                if cached:
+                    result["wordstat"] = {
+                        "totalCount": cached["totalCount"],
+                        "results": cached["results"][:5],
+                        "associations": cached["associations"][:5],
+                        "cached": True,
+                        "checked_at": cached.get("checked_at"),
+                    }
+                else:
+                    data = ws_mod.top_requests(phrase, num_phrases=15)
+                    ws_mod.save_cache(phrase, data)
+                    result["wordstat"] = {
+                        "totalCount": int(data.get("totalCount") or 0),
+                        "results": [{"phrase": r.get("phrase"), "count": int(r.get("count") or 0)}
+                                    for r in (data.get("results") or [])[:5]],
+                        "associations": [{"phrase": r.get("phrase"), "count": int(r.get("count") or 0)}
+                                         for r in (data.get("associations") or [])[:5]],
+                        "cached": False,
+                    }
+            except Exception as ex:  # noqa: BLE001
+                result["notes"].append(f"Вордстат недоступен: {type(ex).__name__}: {str(ex)[:120]}")
+
+            # Мутаген — только по явному запросу (стоит денег)
+            if source in ("mutagen", "both"):
+                try:
+                    import mutagen as mg
+                    cached_m = None if payload.get("refresh") else mg.cached_metrics(phrase)
+                    if cached_m:
+                        result["mutagen"] = {
+                            "strong": cached_m["strong"],
+                            "wordstat": cached_m["wordstat"],
+                            "tails": cached_m["tails"],
+                            "vital_site": cached_m["vital_site"],
+                            "cached": True,
+                            "checked_at": cached_m["checked_at"],
+                        }
+                    else:
+                        balance_before = mg.get_balance()
+                        res = mg.check_keyword(phrase)
+                        balance_after = mg.get_balance()
+                        cost = max(0.0, balance_before - balance_after)
+                        mg.save_metrics(phrase, res)
+                        direct = res.get("direct") or {}
+                        result["mutagen"] = {
+                            "strong": res.get("strong"),
+                            "wordstat": res.get("wordstat"),
+                            "tails": res.get("tails"),
+                            "vital_site": res.get("vital_site") or "",
+                            "bids": {"spec": direct.get("spec"), "first": direct.get("first"), "garant": direct.get("garant")},
+                            "cached": False,
+                        }
+                        result["cost"] = round(cost, 4)
+                        result["balance"] = round(balance_after, 2)
+                except Exception as ex:  # noqa: BLE001
+                    result["notes"].append(f"Мутаген недоступен: {type(ex).__name__}: {str(ex)[:120]}")
+
+            self.send_json(result)
             return
 
         # 8. Импорт выгрузки Firecrawl (Markdown / JSON)

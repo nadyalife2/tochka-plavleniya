@@ -55,17 +55,15 @@ CREDENTIALS = Path(os.path.expanduser("~")) / ".dsh" / ".credentials.yaml"
 
 
 def _read_key() -> str:
-    """Читает ключ из credentials. В случае ошибки сообщает БЕЗ вывода значения."""
-    env_key = os.environ.get("MUTAGEN_API_KEY", "").strip()
-    if env_key:
-        return env_key
-    if not CREDENTIALS.exists():
-        raise SystemExit("❌ Нет ~/.dsh/.credentials.yaml — положите туда MUTAGEN_API_KEY.")
-    for line in CREDENTIALS.read_text(encoding="utf-8").splitlines():
-        m = re.match(r"^\s*MUTAGEN_API_KEY\s*:\s*(\S+)\s*$", line)
-        if m:
-            return m.group(1)
-    raise SystemExit("❌ В ~/.dsh/.credentials.yaml нет MUTAGEN_API_KEY.")
+    """Читает ключ через единый загрузчик (config/api-keys.local.yaml)."""
+    from keys import get_key
+    value = get_key("MUTAGEN_API_KEY")
+    if not value:
+        raise SystemExit(
+            "❌ Не найден MUTAGEN_API_KEY. Откройте config/api-keys.local.yaml "
+            "и впишите ключ Мутагена справа от MUTAGEN_API_KEY:"
+        )
+    return value
 
 
 def _call(method: str, params: dict | None = None, timeout: int = 90) -> dict:

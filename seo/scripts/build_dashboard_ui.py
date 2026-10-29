@@ -707,6 +707,7 @@ def generate_html() -> str:
     <button class="tab-btn" onclick="switchTab('export')">🚀 Готовые к выгрузке <span class="tab-badge" id="bCountExport" style="background:#A7F3D0;color:#064E3B;">0</span></button>
     <button class="tab-btn" onclick="switchTab('gaps')">💡 Темы из пробелов <span class="tab-badge" id="bCountProposed">0</span></button>
     <button class="tab-btn" onclick="switchTab('competitors')">🔎 Конкуренты и фишки <span class="tab-badge" id="bCountComps">0</span></button>
+    <button class="tab-btn" onclick="switchTab('analysis')">🔬 Анализ запросов <span class="tab-badge" id="bCountAnalysis">0</span></button>
     <button class="tab-btn" onclick="switchTab('agents')">🤖 Центр агентов</button>
     <button class="tab-btn" onclick="switchTab('backups')">💾 Бэкапы и архивы <span class="tab-badge" id="bCountBackups">0</span></button>
   </nav>
@@ -888,6 +889,42 @@ def generate_html() -> str:
           </tr>
         </thead>
         <tbody id="proposedCompetitorsBody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 4.5: KEYWORD ANALYSIS (Вордстат + Мутаген) -->
+  <section class="tab-view" id="view-analysis">
+    <div style="margin-bottom:12px;">
+      <h2 style="margin:0;font-size:17px;font-weight:800;">🔬 Анализ поисковых запросов</h2>
+      <div style="font-size:12px;color:var(--muted);">
+        Спрос — бесплатно через Яндекс AI Studio (Wordstat API). Конкуренция — Мутаген (0,30 ₽ за фразу).
+        Результаты кэшируются: повторная проверка денег не тратит.
+      </div>
+    </div>
+
+    <div style="background:var(--card);border:1.5px solid var(--border);padding:12px;margin-bottom:14px;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <input type="text" id="analysisPhrase" placeholder="Введите фразу (например: пайка проводов)" style="flex:1;min-width:260px;padding:7px 10px;border:1.5px solid var(--border);font-size:12px;">
+        <button class="btn btn--primary" onclick="checkPhrase('auto')">📊 Узнать спрос (бесплатно)</button>
+        <button class="btn btn--warning" onclick="checkPhrase('mutagen')">🔬 Проверить Мутагеном (0,30 ₽)</button>
+      </div>
+      <div id="analysisResult" style="margin-top:12px;display:none;"></div>
+    </div>
+
+    <div class="data-table-container">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Фраза</th>
+            <th>Источник</th>
+            <th>Спрос (широкая)</th>
+            <th>Конкуренция</th>
+            <th>Витальный сайт</th>
+            <th>Проверено</th>
+          </tr>
+        </thead>
+        <tbody id="analysisBody"></tbody>
       </table>
     </div>
   </section>
@@ -1133,6 +1170,9 @@ function switchTab(name) {
   if (btn) btn.classList.add('active');
   const view = document.getElementById('view-' + name);
   if (view) view.classList.add('active');
+  if (name === 'analysis') {
+    renderAnalysisHistory();
+  }
 }
 
 function filterByStep(stepCode) {
@@ -1186,6 +1226,115 @@ async function refreshData() {
   } catch (e) {}
   renderAll();
   showToast('✓ Интерфейс перерисован');
+}
+
+// ---------------------------------------------------------------------------
+// Анализ поисковых запросов: спрос (Вордстат, бесплатно) + конкуренция (Мутаген)
+// ---------------------------------------------------------------------------
+function checkTopicPhrase(topicId) {
+  const t = DB_DATA.topics.find(x => x.id === topicId);
+  if (!t) return;
+  closeInspector();
+  switchTab('analysis');
+  const input = document.getElementById('analysisPhrase');
+  if (input) input.value = t.title;
+  checkPhrase('auto');
+}
+
+async function checkPhrase(source) {
+  const input = document.getElementById('analysisPhrase');
+  const phrase = (input && input.value || '').trim();
+  if (!phrase) {
+    alert('Введите фразу для проверки');
+    return;
+  }
+  const box = document.getElementById('analysisResult');
+  box.style.display = 'block';
+  box.innerHTML = `<div style="padding:10px;background:var(--bg);border:1px solid var(--border);font-size:12px;">
+    ⏳ Проверяю «${esc(phrase)}»${source === 'mutagen' ? ' (Мутаген, 0,30 ₽)' : ' (Вордстат, бесплатно)'}...</div>`;
+
+  const res = await apiPost('/api/keyword/check', { phrase: phrase, source: source });
+  if (!res || res.status !== 'ok') {
+    box.innerHTML = `<div style="padding:10px;background:#FEE2E2;border:1px solid #B91C1C;font-size:12px;">
+      ❌ Не удалось проверить фразу.</div>`;
+    return;
+  }
+
+  const ws = res.wordstat || null;
+  const mg = res.mutagen || null;
+  let html = `<div style="border:1.5px solid var(--border);background:var(--card);padding:12px;">
+    <div style="font-size:13px;font-weight:800;margin-bottom:8px;">«${esc(res.phrase)}»</div>`;
+
+  if (ws) {
+    html += `<div style="margin-bottom:8px;">
+      <strong>Широкая частотность (Вордстат):</strong> ${(ws.totalCount || 0).toLocaleString('ru-RU')} показов/мес
+      ${ws.cached ? '<span style="color:var(--muted);font-size:11px;"> · из кэша, бесплатно</span>' : ''}
+    </div>`;
+    if (ws.results && ws.results.length) {
+      html += '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Топ похожих запросов:</div><ul style="margin:0 0 8px 16px;font-size:12px;">';
+      ws.results.slice(0, 5).forEach(r => {
+        html += `<li>${esc(r.phrase)} — <code>${(r.count || 0).toLocaleString('ru-RU')}</code></li>`;
+      });
+      html += '</ul>';
+    }
+  }
+
+  if (mg) {
+    const comp = mg.strong;
+    const color = comp <= 10 ? '#059669' : (comp <= 18 ? '#B45309' : '#B91C1C');
+    html += `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);">
+      <strong>Конкуренция (Мутаген):</strong> <span style="color:${color};font-weight:800;">${comp}/25</span>
+      · точный спрос в кавычках: <code>${(mg.wordstat || 0).toLocaleString('ru-RU')}</code>
+      · хвосты: <code>${(mg.tails || 0).toLocaleString('ru-RU')}</code>
+      ${mg.vital_site ? `<br><strong>Витальный сайт в топе:</strong> ${esc(mg.vital_site)}` : '<br>Витального сайта в топе нет — путь открыт'}
+      ${mg.cached ? '<span style="color:var(--muted);font-size:11px;"> · из кэша, деньги не потрачены</span>' : ''}
+    </div>`;
+    // Трактовка
+    let verdict = '';
+    if (comp <= 10 && (ws && ws.totalCount > 300)) verdict = '✅ Отличная цель: спрос есть, конкуренция низкая';
+    else if (comp <= 18) verdict = '⚠️ Рабочая цель: нужен сильный материал';
+    else verdict = '❌ Высокая конкуренция: только с серьёзным преимуществом';
+    html += `<div style="margin-top:8px;font-weight:700;">${verdict}</div>`;
+  }
+
+  if (res.cost) {
+    html += `<div style="margin-top:8px;font-size:11px;color:var(--muted);">Стоимость проверки: ${res.cost} ₽ · баланс: ${res.balance || '—'} ₽</div>`;
+  }
+  if (res.notes && res.notes.length) {
+    html += `<div style="margin-top:6px;font-size:11px;color:#B45309;">${res.notes.map(n => esc(n)).join('<br>')}</div>`;
+  }
+  html += '</div>';
+  box.innerHTML = html;
+
+  await renderAnalysisHistory();
+}
+
+async function renderAnalysisHistory() {
+  const tb = document.getElementById('analysisBody');
+  if (!tb) return;
+  try {
+    const res = await fetch('http://127.0.0.1:8765/api/keyword/history');
+    const data = await res.json();
+    const rows = data.history || [];
+    const badge = document.getElementById('bCountAnalysis');
+    if (badge) badge.innerText = rows.length;
+
+    if (!rows.length) {
+      tb.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted);">Проверок пока нет. Введите фразу выше.</td></tr>';
+      return;
+    }
+    tb.innerHTML = rows.map(r => `
+      <tr>
+        <td><strong>${esc(r.phrase)}</strong></td>
+        <td><span class="prio-pill ${r.source === 'mutagen' ? 'prio-pill--warm' : 'prio-pill--cold'}">${r.source === 'mutagen' ? 'Мутаген' : 'Вордстат'}</span></td>
+        <td style="font-family:var(--mono);">${r.demand != null ? Number(r.demand).toLocaleString('ru-RU') : '—'}</td>
+        <td style="font-family:var(--mono);">${r.competition != null ? r.competition + '/25' : '—'}</td>
+        <td style="font-size:11px;">${esc(r.vital_site || '—')}</td>
+        <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${(r.checked_at || '').replace('T', ' ').slice(0, 16)}</td>
+      </tr>`).join('');
+  } catch (e) {
+    tb.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);">История недоступна</td></tr>';
+  }
 }
 
 async function createBackup() {
@@ -1812,6 +1961,8 @@ function openInspector(topicId) {
   if (hasText) {
     btnRow.innerHTML += `<button class="btn btn--danger" onclick="rejectArticle(${t.id})">↺ Вернуть на доработку</button>`;
   }
+  // Проверка спроса и конкуренции по заголовку статьи
+  btnRow.innerHTML += `<button class="btn" onclick="checkTopicPhrase(${t.id})">🔬 Проверить запрос</button>`;
   btnRow.innerHTML += `<button class="btn" onclick="closeInspector()">Закрыть</button>`;
 
   document.getElementById('inspectorModal').classList.add('active');
@@ -1929,6 +2080,7 @@ function renderAll() {
   renderProposedTopics();
   renderCompetitors();
   renderBackups();
+  renderAnalysisHistory();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
