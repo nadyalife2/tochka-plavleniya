@@ -635,6 +635,8 @@ def generate_html() -> str:
       </div>
     </div>
     <div class="brand-bar__actions">
+      <a href="/api/export.html" target="_blank" class="btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Открыть сводную карточку базы в браузере (HTML)">🌐 База HTML ↗</a>
+      <a href="/api/export.json" download="tchp-existing-base.json" class="btn" style="text-decoration:none;" title="Скачать JSON-манифест базы для нейросети">⬇️ Манифест базы</a>
       <button class="btn btn--primary" onclick="createBackup()">💾 Создать бэкап БД</button>
       <button class="btn" onclick="refreshData()">🔄 Обновить данные</button>
     </div>
@@ -767,7 +769,12 @@ def generate_html() -> str:
         <h2 style="margin:0;font-size:17px;font-weight:800;">Статьи, готовые к выгрузке в WordPress</h2>
         <div style="font-size:12px;color:var(--muted);">Материалы, набравшие ≥80 баллов, проверенные рецензентом (Claude Opus) и утверждённые к публикации.</div>
       </div>
-      <button class="btn btn--primary" onclick="exportAllReady()">🚀 Выгрузить черновики в WordPress (delivery_cli.py)</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm" style="text-decoration:none;" title="Скачать JSON манифест базы для нейросети">⬇️ База JSON</a>
+        <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm" style="text-decoration:none;" title="Скачать Markdown манифест">⬇️ База MD</a>
+        <a href="/api/export.html" target="_blank" class="btn btn--sm" style="text-decoration:none;" title="Открыть базу в HTML в новой вкладке">🌐 База HTML ↗</a>
+        <button class="btn btn--primary" onclick="exportAllReady()">🚀 Выгрузить черновики в WordPress (delivery_cli.py)</button>
+      </div>
     </div>
 
     <div class="data-table-container">
@@ -834,27 +841,50 @@ def generate_html() -> str:
       </div>
     </div>
 
-    <!-- Блок ручного импорта выгрузки Firecrawl -->
+    <!-- Блок 1: Выгрузка текущей базы для нейросети (защита от дублей) -->
+    <div style="background:#FFFDE7;border:2px solid var(--border);padding:14px 16px;margin-bottom:16px;box-shadow:2px 2px 0px rgba(0,0,0,0.05);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <h3 style="margin:0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+            📦 Выгрузка текущей базы (для нейросети без дублей)
+          </h3>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+            Выгрузите манифест перед ручным сбором в Firecrawl или генерацией тем в нейросети, чтобы исключить дублирование статей, слагов, кластеров и URL.
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+          <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm btn--primary" style="text-decoration:none;" title="Скачать компактный JSON для отправки в нейросеть">⬇️ Скачать JSON</a>
+          <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm" style="text-decoration:none;" title="Скачать Markdown со сводными таблицами базы">⬇️ Скачать Markdown</a>
+          <a href="/api/export.html" target="_blank" class="btn btn--sm" style="text-decoration:none;" title="Открыть сводную карточку базы в браузере в отдельной вкладке">🌐 Открыть HTML ↗</a>
+          <button class="btn btn--sm" onclick="copyExistingBaseJson()" title="Скопировать JSON манифеста прямо в буфер обмена">📋 В буфер</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;font-size:11px;font-family:var(--mono);color:#444;flex-wrap:wrap;border-top:1px dashed #DDD;padding-top:8px;">
+        <span>Статей в бэклоге: <strong id="expStatTopics">0</strong> (<strong id="expStatWritten">0</strong> с текстом)</span>
+        <span>Кластеров: <strong id="expStatClusters">0</strong></span>
+        <span>Конкурентов: <strong id="expStatCompetitors">0</strong></span>
+        <span>URL в базе: <strong id="expStatUrls">0</strong></span>
+      </div>
+    </div>
+
+    <!-- Блок 2: Импорт выгрузки Firecrawl с дедупликацией -->
     <div style="background:var(--card);border:2px solid var(--border);padding:14px 16px;margin-bottom:20px;box-shadow:2px 2px 0px rgba(0,0,0,0.05);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <h3 style="margin:0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
-          📥 Импорт выгрузки Firecrawl (Markdown / JSON)
-        </h3>
-        <span style="font-size:11px;font-family:var(--mono);color:var(--muted);">Вставьте скопированный текст из Firecrawl</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div>
+          <h3 style="margin:0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+            📥 Импорт выгрузки Firecrawl (JSON или Markdown) с дедупликацией
+          </h3>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+            Вставьте содержимое <code>solder_seo_additional.json</code> или <code>solder_seo_additional.md</code> (или результат скрейпинга одной страницы). Дубликаты по доменам, URL, кластерам и слагам будут автоматически отфильтрованы.
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn--sm btn--primary" onclick="importFirecrawlData()">⚡ Разобрать и добавить с дедупликацией</button>
+          <button class="btn btn--sm" onclick="clearFirecrawlInput()">Очистить</button>
+        </div>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 220px 240px;gap:10px;margin-bottom:10px;">
-        <input type="text" id="fcDomain" placeholder="Домен сайта (например: masterpaiki.ru)..." style="padding:6px 10px;border:1px solid var(--border);font-size:12px;">
-        <select id="fcCluster" style="padding:6px 10px;border:1px solid var(--border);font-size:12px;">
-          <option value="Материалы / Припои">Материалы / Припои</option>
-          <option value="Инструменты / Паяльники">Инструменты / Паяльники</option>
-          <option value="Ошибки / Дефекты">Ошибки / Дефекты</option>
-          <option value="Типы компонентов / SMD">Типы компонентов / SMD</option>
-          <option value="Основы пайки / Начинающим">Основы пайки / Начинающим</option>
-        </select>
-        <button class="btn btn--primary" onclick="importFirecrawlData()">⚡ Разобрать и добавить сведения</button>
-      </div>
-      <textarea id="fcContent" placeholder="Вставьте сюда текст страницы из Firecrawl (Markdown страницы или JSON результат скрейпинга)..." rows="3" style="width:100%;padding:8px 10px;border:1px solid var(--border);font-family:var(--mono);font-size:12px;resize:vertical;"></textarea>
-      <div id="fcResult" style="display:none;margin-top:8px;padding:8px 12px;background:#F0FDF4;border:1px solid #86EFAC;font-size:12px;color:#166534;"></div>
+      <textarea id="fcContent" placeholder="Вставьте сюда JSON (solder_seo_additional.json) или Markdown (solder_seo_additional.md) выгрузку Firecrawl..." rows="5" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:11.5px;line-height:1.45;resize:vertical;"></textarea>
+      <div id="fcResult" style="display:none;margin-top:10px;padding:10px 14px;border:1.5px solid var(--border);font-size:12px;"></div>
     </div>
 
     <div class="data-table-container" style="margin-bottom:24px;">
@@ -1970,32 +2000,80 @@ async function exportAllReady() {
   runAgent('delivery-all');
 }
 
+function clearFirecrawlInput() {
+  document.getElementById('fcContent').value = '';
+  const resBox = document.getElementById('fcResult');
+  if (resBox) resBox.style.display = 'none';
+}
+
+async function copyExistingBaseJson() {
+  try {
+    const res = await apiGet('/api/export.json');
+    if (res) {
+      const text = JSON.stringify(res, null, 1);
+      await navigator.clipboard.writeText(text);
+      showToast('✓ JSON манифеста базы скопирован в буфер для нейросети!');
+    }
+  } catch (e) {
+    showToast('⚠️ Не удалось скопировать JSON');
+  }
+}
+
 async function importFirecrawlData() {
-  const content = document.getElementById('fcContent').value.trim();
-  const domain = document.getElementById('fcDomain').value.trim();
-  const cluster = document.getElementById('fcCluster').value;
+  const content = (document.getElementById('fcContent').value || '').trim();
   const resBox = document.getElementById('fcResult');
 
   if (!content) {
-    alert('Пожалуйста, вставьте текст выгрузки из Firecrawl!');
+    showToast('Вставьте текст выгрузки из Firecrawl (JSON или Markdown)');
     return;
   }
 
-  showToast('Разбор выгрузки Firecrawl...');
-  const res = await apiPost('/api/import/firecrawl', { content, domain, cluster });
+  showToast('Сверка с базой и импорт с дедупликацией...');
+  resBox.style.display = 'block';
+  resBox.style.background = '#FFFBEB';
+  resBox.style.borderColor = '#FCD34D';
+  resBox.style.color = '#92400E';
+  resBox.innerHTML = '⏳ Проверяем дубликаты по текущей базе (URL, домены, кластеры, слаги)...';
+
+  // 1. Попытка v1 пакетного импорта с дедупликацией
+  let res = await apiPost('/api/import/firecrawl/v1', { content });
+
+  // 2. Если это одиночная статья старого формата, пробуем legacy эндпоинт
+  if (!res || res.status !== 'ok') {
+    res = await apiPost('/api/import/firecrawl', { content });
+  }
+
   if (res && res.status === 'ok') {
-    resBox.style.display = 'block';
+    resBox.style.background = '#F0FDF4';
+    resBox.style.borderColor = '#86EFAC';
+    resBox.style.color = '#166534';
+    const a = res.added || {};
+    const d = res.duplicates || {};
+    const col = res.slug_collisions || [];
+    let collisionHtml = '';
+    if (col && col.length > 0) {
+      collisionHtml = `<div style="margin-top:8px;padding:6px 10px;background:#FEF2F2;border:1px solid #FCA5A5;color:#991B1B;font-size:11px;">
+        ⚠️ <strong>Обнаружены совпадения со слагами существующих статей:</strong><br>${col.map(s => '<code>' + esc(s) + '</code>').join(', ')}
+      </div>`;
+    }
+    const addedText = (res.added)
+      ? `• Добавлено уникальных: <strong>конкурентов ${a.competitors || 0}</strong>, <strong>страниц ${a.raw_articles || 0}</strong>, <strong>кластеров ${a.clusters || 0}</strong>, <strong>ключей ${a.keywords || 0}</strong><br>` +
+        `• Пропущено дубликатов: <strong>конкурентов ${d.competitors || 0}</strong>, <strong>страниц ${d.raw_articles || 0}</strong>, <strong>кластеров ${d.clusters || 0}</strong>, <strong>ключей ${d.keywords || 0}</strong>`
+      : `• Статей сохранено: <strong>${res.saved_articles || 0}</strong> (домен: ${esc(res.domain || '—')})`;
+
     resBox.innerHTML = `
-      <strong>✓ Успешно разобрано и добавлено в БД!</strong><br>
-      • Статей сохранено: <strong>${res.saved_articles}</strong><br>
-      • Обнаруженные фишки: <strong>${res.features.length ? res.features.join(', ') : 'базовый контент'}</strong><br>
-      • Извлечённые SEO-слова: <strong>${res.keywords.length ? res.keywords.join(', ') : '—'}</strong>
+      <div style="font-weight:800;font-size:13px;margin-bottom:6px;">✓ ${esc(res.message || 'Успешно импортировано и сведено с базой!')}</div>
+      <div style="font-size:12px;line-height:1.5;">${addedText}</div>
+      ${collisionHtml}
     `;
-    document.getElementById('fcContent').value = '';
-    showToast(`✓ Сведения по сайту ${res.domain} добавлены в базу!`);
+    showToast('✓ Выгрузка Firecrawl успешно сведена с базой без дублей!');
     await refreshData();
   } else {
-    alert('Ошибка при импорте выгрузки Firecrawl.');
+    resBox.style.background = '#FEF2F2';
+    resBox.style.borderColor = '#FCA5A5';
+    resBox.style.color = '#991B1B';
+    resBox.innerHTML = `<strong>⚠️ Ошибка при импорте:</strong> ${esc((res && res.message) || 'Не удалось разобрать данные Firecrawl')}`;
+    showToast('⚠️ Ошибка при импорте выгрузки Firecrawl');
   }
 }
 
@@ -2584,6 +2662,18 @@ function renderAll() {
   document.getElementById('stepFixCount').innerText = cntNeedsFix;
   document.getElementById('stepReviewCount').innerText = cntReview;
   document.getElementById('stepReadyCount').innerText = cntReady;
+
+  // Счётчики карточки экспорта базы
+  const elTopics = document.getElementById('expStatTopics');
+  if (elTopics) elTopics.innerText = (DB_DATA.topics || []).length;
+  const elWritten = document.getElementById('expStatWritten');
+  if (elWritten) elWritten.innerText = writtenCnt;
+  const elClusters = document.getElementById('expStatClusters');
+  if (elClusters) elClusters.innerText = (DB_DATA.clusters || []).length;
+  const elComps = document.getElementById('expStatCompetitors');
+  if (elComps) elComps.innerText = (DB_DATA.competitors || []).length;
+  const elUrls = document.getElementById('expStatUrls');
+  if (elUrls) elUrls.innerText = (DB_DATA.raw_articles || []).length;
 
   renderDecisionBanner();
   renderExportTab();

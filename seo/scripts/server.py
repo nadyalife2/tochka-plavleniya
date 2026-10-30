@@ -39,8 +39,9 @@ SCRIPTS = SEO / "scripts"
 DASHBOARD_DIR = SEO / "dashboard"
 sys.path.insert(0, str(SCRIPTS))
 
-from db import (DB_PATH, backup_database, get_connection, init_db, list_backups,
-                list_voices, migrate_schema_v3, migrate_schema_v4)
+from db import (DB_PATH, backup_database, build_export_manifest, export_manifest_html,
+                export_manifest_markdown, get_connection, init_db, list_backups,
+                list_voices, migrate_schema_v3, migrate_schema_v4, migrate_schema_v5)
 
 
 def slugify(title: str) -> str:
@@ -377,6 +378,79 @@ def fetch_all_data() -> dict:
     }
 
 
+def parse_firecrawl_markdown(md: str) -> dict:
+    """Извлекает конкурентов, кластеры, ключевые слова и страницы из отчёта Firecrawl Markdown."""
+    pkg = {"competitors": [], "raw_data": [], "clusters": [], "keywords": []}
+    if not md:
+        return pkg
+
+    # 1. Таблица конкурентов
+    comp_match = re.search(r"## Конкуренты\s*\n(.*?)(?=\n##|\Z)", md, re.S)
+    if comp_match:
+        for line in comp_match.group(1).splitlines():
+            line = line.strip()
+            if not line.startswith("|") or "Домен" in line or "|---" in line:
+                continue
+            parts = [p.strip() for p in line.split("|")[1:-1]]
+            if len(parts) >= 2 and "." in parts[0]:
+                pkg["competitors"].append({
+                    "domain": parts[0].lower(),
+                    "type": parts[1] if len(parts) > 1 else "competitor",
+                    "notes": f"Прочитано: {parts[2]}" if len(parts) > 2 else "",
+                })
+
+    # 2. Кластеры и ключевые слова (### C01. Название — P1)
+    cluster_blocks = re.findall(r"### (C\d+)\.\s*([^—\n]+)(?:—\s*([^\n]+))?\s*\n(.*?)(?=\n###|\n##|\Z)", md, re.S)
+    for cid, cname, cpriority, body in cluster_blocks:
+        cname = cname.strip()
+        h1_m = re.search(r"Предлагаемый H1:\s*(.+)", body)
+        slug_m = re.search(r"Slug:\s*`([^`]+)`", body)
+        key_m = re.search(r"Основной ключ:\s*(.+)", body)
+        sec_keys = [k.strip() for k in re.findall(r"^-\s+(.+)$", body, re.M) if k.strip()]
+
+        primary_k = key_m.group(1).strip() if key_m else cname.lower()
+        slug = slug_m.group(1).strip() if slug_m else ""
+        h1 = h1_m.group(1).strip() if h1_m else cname
+
+        pkg["clusters"].append({
+            "id": cid,
+            "name": cname,
+            "proposed_slug": slug,
+            "proposed_h1": h1,
+            "primary_keyword": primary_k,
+            "secondary_keywords": sec_keys,
+            "editorial_priority": (cpriority or "P2").strip(),
+        })
+
+        if primary_k:
+            pkg["keywords"].append({"keyword": primary_k, "cluster_id": cid})
+        for sk in sec_keys:
+            if sk:
+                pkg["keywords"].append({"keyword": sk, "cluster_id": cid})
+
+    # 3. Карточки прочитанных страниц (### P01. Title)
+    page_blocks = re.findall(r"### (P\d+)\.\s*([^\n]+)\s*\n(.*?)(?=\n###|\n##|\Z)", md, re.S)
+    for pid, ptitle, body in page_blocks:
+        url_m = re.search(r"URL:\s*(https?://[^\s\n]+)", body)
+        h1_m = re.search(r"H1(?: из Markdown)?:\s*([^\n]+)", body)
+        type_m = re.search(r"формат:\s*([^;\n]+)", body)
+        topic_m = re.search(r"тема:\s*([^\n]+)", body)
+        if url_m:
+            u = url_m.group(1).strip()
+            d = urlparse(u).netloc.replace("www.", "")
+            pkg["raw_data"].append({
+                "id": pid,
+                "url": u,
+                "domain": d,
+                "title": ptitle.strip(),
+                "h1": h1_m.group(1).strip() if h1_m else ptitle.strip(),
+                "content_type": type_m.group(1).strip() if type_m else "article",
+                "topic": topic_m.group(1).strip() if topic_m else "",
+            })
+
+    return pkg
+
+
 class DashboardHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         # Тихий логгер, чтобы не спамить в консоль
@@ -406,6 +480,32 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         if path == "/api/data":
             self.send_json(fetch_all_data())
+            return
+
+        # Экспорт «что уже есть»: JSON / Markdown / HTML для нейронки
+        if path in ("/api/export.json", "/api/export.md", "/api/export.html"):
+            try:
+                manifest = build_export_manifest()
+                if path == "/api/export.json":
+                    body = json.dumps(manifest, ensure_ascii=False, indent=1).encode("utf-8")
+                    ctype, filename = "application/json; charset=utf-8", "tchp-existing-base.json"
+                elif path == "/api/export.md":
+                    body = export_manifest_markdown(manifest).encode("utf-8")
+                    ctype, filename = "text/markdown; charset=utf-8", "tchp-existing-base.md"
+                else:
+                    body = export_manifest_html(manifest).encode("utf-8")
+                    ctype, filename = "text/html; charset=utf-8", "tchp-existing-base.html"
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": str(ex)}, 500)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(body)))
+            if path != "/api/export.html":
+                self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
             return
 
         if path == "/api/voices":
@@ -1097,7 +1197,139 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json(result)
             return
 
-        # 8. Импорт выгрузки Firecrawl (Markdown / JSON)
+        # 8. Импорт пакета Firecrawl schema 1.0 (JSON или Markdown) с дедупликацией по базе
+        if path == "/api/import/firecrawl/v1":
+            raw = payload.get("package") if payload.get("package") is not None else payload.get("content", payload)
+            pkg = None
+            if isinstance(raw, str):
+                raw_str = raw.strip()
+                if raw_str.startswith("{") or raw_str.startswith("["):
+                    try:
+                        pkg = json.loads(raw_str)
+                    except Exception:
+                        pass
+                if not isinstance(pkg, dict):
+                    pkg = parse_firecrawl_markdown(raw_str)
+            elif isinstance(raw, dict):
+                inner = raw.get("content") or raw.get("package")
+                if isinstance(inner, str) and not ("clusters" in raw or "competitors" in raw):
+                    raw_str = inner.strip()
+                    if raw_str.startswith("{") or raw_str.startswith("["):
+                        try:
+                            pkg = json.loads(raw_str)
+                        except Exception:
+                            pass
+                    if not isinstance(pkg, dict):
+                        pkg = parse_firecrawl_markdown(raw_str)
+                else:
+                    pkg = raw
+            else:
+                pkg = {}
+
+            if not isinstance(pkg, dict) or not any(k in pkg for k in ("competitors", "raw_data", "clusters", "keywords")):
+                self.send_json({
+                    "status": "error",
+                    "message": "Не удалось распознать структуру пакета Firecrawl (ожидался JSON с competitors/raw_data/clusters или Markdown-отчёт с таблицами).",
+                }, 400)
+                return
+
+            now = datetime.now().isoformat(timespec="seconds")
+            added = {"competitors": 0, "raw_articles": 0, "clusters": 0, "keywords": 0}
+            skipped = {"competitors": 0, "raw_articles": 0, "clusters": 0, "keywords": 0}
+            collisions = {"slugs": [], "titles": []}
+
+            with get_connection() as conn:
+                have_domains = {r[0] for r in conn.execute("SELECT domain FROM competitors").fetchall()}
+                have_urls = {r[0] for r in conn.execute("SELECT url FROM raw_articles").fetchall()}
+                have_clusters = {r[0] for r in conn.execute("SELECT name FROM clusters").fetchall()}
+                have_kw = {r[0] for r in conn.execute("SELECT keyword FROM keywords").fetchall()}
+                have_slugs = {r[0] for r in conn.execute("SELECT slug FROM topics").fetchall()}
+                have_titles = {r[0].strip().lower() for r in conn.execute("SELECT title FROM topics").fetchall()}
+
+                for comp in pkg.get("competitors", []) or []:
+                    domain = (comp.get("domain") or "").strip().lower()
+                    if not domain:
+                        continue
+                    if domain in have_domains:
+                        skipped["competitors"] += 1
+                        continue
+                    conn.execute(
+                        "INSERT OR IGNORE INTO competitors (domain, type, notes, updated_at) VALUES (?, ?, ?, ?)",
+                        (domain, comp.get("type") or "", (comp.get("notes") or "")[:500], now),
+                    )
+                    have_domains.add(domain)
+                    added["competitors"] += 1
+
+                for page in pkg.get("raw_data", []) or []:
+                    url = (page.get("url") or "").strip()
+                    if not url:
+                        continue
+                    if url in have_urls:
+                        skipped["raw_articles"] += 1
+                        continue
+                    conn.execute(
+                        "INSERT OR IGNORE INTO raw_articles (url, domain, title, h1, content_type, status, crawled_at) "
+                        "VALUES (?, ?, ?, ?, ?, 'собрано', ?)",
+                        (url, page.get("domain") or "", page.get("title") or "",
+                         page.get("h1") or "", page.get("content_type") or "", page.get("collected_at") or now),
+                    )
+                    have_urls.add(url)
+                    added["raw_articles"] += 1
+
+                for cl in pkg.get("clusters", []) or []:
+                    name = (cl.get("name") or "").strip()
+                    if not name:
+                        continue
+                    slug = (cl.get("proposed_slug") or "").strip()
+                    if slug and slug in have_slugs:
+                        collisions["slugs"].append(slug)
+                    if name in have_clusters:
+                        skipped["clusters"] += 1
+                    else:
+                        keywords = ", ".join(
+                            [cl.get("primary_keyword") or ""] + list(cl.get("secondary_keywords") or [])
+                        ).strip(", ")
+                        conn.execute(
+                            "INSERT OR IGNORE INTO clusters (name, description, keywords, type, priority, status) "
+                            "VALUES (?, ?, ?, ?, ?, ?)",
+                            (name, cl.get("suggested_differentiation") or "", keywords,
+                             cl.get("intent") or "", cl.get("editorial_priority") or "", cl.get("status") or ""),
+                        )
+                        have_clusters.add(name)
+                        added["clusters"] += 1
+
+                for kw in pkg.get("keywords", []) or []:
+                    keyword = (kw.get("keyword") or "").strip()
+                    if not keyword:
+                        continue
+                    if keyword in have_kw:
+                        skipped["keywords"] += 1
+                        continue
+                    conn.execute(
+                        "INSERT OR IGNORE INTO keywords (keyword, cluster_id, origin, status, source_page_ids, created_at) "
+                        "VALUES (?, ?, ?, ?, ?, ?)",
+                        (keyword, kw.get("cluster_id") or "", kw.get("origin") or "",
+                         kw.get("validation_status") or "not_checked",
+                         json.dumps(kw.get("source_page_ids") or [], ensure_ascii=False), now),
+                    )
+                    have_kw.add(keyword)
+                    added["keywords"] += 1
+
+                conn.commit()
+
+            self.send_json({
+                "status": "ok",
+                "added": added,
+                "duplicates": skipped,
+                "slug_collisions": collisions["slugs"][:20],
+                "message": (
+                    f"Добавлено: конкурентов {added['competitors']}, страниц {added['raw_articles']}, "
+                    f"кластеров {added['clusters']}, ключей {added['keywords']}. "
+                    f"Дублей пропущено: {sum(skipped.values())}."
+                ),
+            })
+            return
+
         if path == "/api/import/firecrawl":
             raw_text = payload.get("content", "").strip()
             source_domain = payload.get("domain", "").strip().lower()
@@ -1215,6 +1447,7 @@ def main():
     init_db()
     migrate_schema_v3()
     migrate_schema_v4()
+    migrate_schema_v5()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), DashboardHandler)
     print("=" * 60)
     print(f"СЕРВЕР SEO-КОНВЕЙЕРА ЗАПУЩЕН:")

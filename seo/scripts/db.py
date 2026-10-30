@@ -264,6 +264,191 @@ def migrate_schema_v3():
         conn.commit()
 
 
+def migrate_schema_v5() -> None:
+    """Миграция v5: таблица keyword-гипотез (для дедупликации выгрузок)."""
+    with get_connection() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS keywords (
+                keyword TEXT PRIMARY KEY,
+                cluster_id TEXT,
+                origin TEXT,
+                status TEXT DEFAULT 'not_checked',
+                source_page_ids TEXT,
+                created_at TEXT
+            )
+            """
+        )
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_keywords_cluster ON keywords (cluster_id);")
+        conn.commit()
+
+
+def _rows(conn, sql: str) -> list[dict]:
+    return [dict(r) for r in conn.execute(sql).fetchall()]
+
+
+def build_export_manifest() -> dict:
+    """Компактный манифест «что уже есть» — чтобы нейронка не делала дублей.
+
+    Ключи сортированы и стабильны: slugs, titles, clusters, keywords,
+    competitor_domains, collected_urls, proposed_titles.
+    """
+    with get_connection() as conn:
+        topics = _rows(conn, "SELECT id, title, slug, cluster, status, chars, score_total "
+                             "FROM topics ORDER BY id ASC")
+        clusters = _rows(conn, "SELECT name, keywords, type, priority, status "
+                               "FROM clusters ORDER BY priority_rank ASC, name ASC")
+        competitors = _rows(conn, "SELECT domain, type, niche FROM competitors ORDER BY domain ASC")
+        raw = _rows(conn, "SELECT url, domain, title FROM raw_articles ORDER BY crawled_at DESC")
+        try:
+            keywords = _rows(conn, "SELECT keyword, cluster_id FROM keywords ORDER BY keyword ASC")
+        except Exception:  # noqa: BLE001
+            keywords = []
+        proposed = _rows(conn, "SELECT title FROM topics_proposed "
+                               "WHERE status != 'отклонён' ORDER BY id ASC")
+
+    return {
+        "schema": "tchp-export-index/1.0",
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "counts": {
+            "topics": len(topics),
+            "written": sum(1 for t in topics if (t.get("chars") or 0) > 500),
+            "clusters": len(clusters),
+            "competitors": len(competitors),
+            "collected_urls": len(raw),
+            "keywords": len(keywords),
+            "proposed_titles": len(proposed),
+        },
+        "slugs": [t["slug"] for t in topics],
+        "titles": [t["title"] for t in topics],
+        "clusters": [
+            {"name": c["name"], "keywords": c["keywords"], "type": c["type"], "status": c["status"]}
+            for c in clusters
+        ],
+        "keywords": [{"keyword": k["keyword"], "cluster_id": k["cluster_id"]} for k in keywords],
+        "competitor_domains": [c["domain"] for c in competitors],
+        "collected_urls": [
+            {"url": r["url"], "domain": r["domain"], "title": r["title"]} for r in raw
+        ],
+        "proposed_titles": [p["title"] for p in proposed],
+        "topics": [
+            {"id": t["id"], "title": t["title"], "slug": t["slug"], "cluster": t["cluster"],
+             "status": t["status"], "chars": t["chars"], "score": t["score_total"]}
+            for t in topics
+        ],
+    }
+
+
+def export_manifest_markdown(manifest: dict) -> str:
+    """Тот же манифест, но markdown-таблицами — удобно вставлять в промпт."""
+    lines = [
+        "# Что уже есть в базе «Точка Плавления»",
+        "",
+        f"Сгенерировано: {manifest['generated_at']}",
+        "",
+        "## Счётчики",
+        "",
+        "| Сущность | Кол-во |",
+        "|---|---:|",
+    ]
+    for key, value in manifest["counts"].items():
+        lines.append(f"| {key} | {value} |")
+
+    lines += ["", "## Существующие статьи (slug — не повторять)", "", "| id | title | slug | cluster | status |", "|---:|---|---|---|---|"]
+    for t in manifest["topics"]:
+        lines.append(f"| {t['id']} | {t['title']} | `{t['slug']}` | {t['cluster']} | {t['status']} |")
+
+    lines += ["", "## Кластеры", "", "| Кластер | Ключевые слова |", "|---|---|"]
+    for c in manifest["clusters"]:
+        lines.append(f"| {c['name']} | {c['keywords'] or ''} |")
+
+    lines += ["", "## Домены конкурентов", "", ", ".join(manifest["competitor_domains"]) or "—"]
+
+    if manifest["keywords"]:
+        lines += ["", "## Keyword-гипотезы", "", ", ".join(k["keyword"] for k in manifest["keywords"])]
+
+    lines += ["", "## Уже собранные URL", "", "| URL | Домен |", "|---|---|"]
+    for u in manifest["collected_urls"]:
+        lines.append(f"| {u['url']} | {u['domain']} |")
+
+    if manifest["proposed_titles"]:
+        lines += ["", "## Предложенные темы (не отклонённые)", ""]
+        lines += [f"- {title}" for title in manifest["proposed_titles"]]
+
+    return "\n".join(lines) + "\n"
+
+
+def export_manifest_html(manifest: dict) -> str:
+    """SAFE: все значения экранируются — страница только читает данные."""
+    from html import escape
+
+    json_text = json.dumps(manifest, ensure_ascii=False, indent=1)
+
+    def table(headers: list[str], rows: list[list], numeric: set[int] | None = None) -> str:
+        numeric = numeric or set()
+        head = "".join(f"<th>{escape(h)}</th>" for h in headers)
+        body = []
+        for row in rows:
+            cells = []
+            for i, cell in enumerate(row):
+                style = ' style="text-align:right"' if i in numeric else ""
+                cells.append(f"<td{style}>{escape('' if cell is None else str(cell))}</td>")
+            body.append("<tr>" + "".join(cells) + "</tr>")
+        return f"<table><thead><tr>{head}</tr></thead><tbody>{''.join(body)}</tbody></table>"
+
+    cards = "".join(
+        f'<div class="card"><div class="num">{v}</div><div class="lbl">{escape(k)}</div></div>'
+        for k, v in manifest["counts"].items()
+    )
+    topics_table = table(
+        ["id", "title", "slug", "cluster", "status"],
+        [[t["id"], t["title"], t["slug"], t["cluster"], t["status"]] for t in manifest["topics"]],
+        numeric={0},
+    )
+    clusters_table = table(
+        ["Кластер", "Ключевые слова", "Тип"],
+        [[c["name"], c["keywords"], c["type"]] for c in manifest["clusters"]],
+    )
+    urls_table = table(
+        ["URL", "Домен", "Заголовок"],
+        [[u["url"], u["domain"], u["title"]] for u in manifest["collected_urls"]],
+    )
+    return f"""<!DOCTYPE html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>База «Точка Плавления» — что уже есть</title>
+<style>
+  body{{font-family:-apple-system,Segoe UI,Roboto,sans-serif;margin:0;padding:24px;background:#F6F8F7;color:#0F0E12}}
+  h1{{font-size:20px;margin:0 0 4px}} .sub{{color:#737373;font-size:12px;margin-bottom:18px}}
+  .cards{{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}}
+  .card{{background:#fff;border:1.5px solid #000;padding:10px 14px;min-width:110px}}
+  .num{{font-size:22px;font-weight:800}} .lbl{{font-size:11px;color:#737373}}
+  h2{{font-size:14px;margin:22px 0 8px}}
+  table{{border-collapse:collapse;width:100%;background:#fff;font-size:12px}}
+  th,td{{border:1px solid #E5E5E5;padding:5px 8px;text-align:left;vertical-align:top}}
+  th{{background:#FFC700}}
+  code{{font-family:Consolas,monospace}}
+  .btns{{margin:14px 0}}
+  button{{padding:7px 12px;border:1.5px solid #000;background:#FFC700;font-weight:700;cursor:pointer;margin-right:8px}}
+</style></head><body>
+<h1>Что уже есть в базе</h1>
+<div class="sub">Сгенерировано: {escape(manifest['generated_at'])} · схема {escape(manifest['schema'])}</div>
+<div class="btns">
+  <button onclick="navigator.clipboard.writeText(document.getElementById('json').textContent)">📋 Скопировать JSON</button>
+  <a href="/api/export.json"><button>⬇️ Скачать JSON</button></a>
+  <a href="/api/export.md"><button>⬇️ Скачать Markdown</button></a>
+</div>
+<div class="cards">{cards}</div>
+<h2>Статьи ({len(manifest['topics'])})</h2>{topics_table}
+<h2>Кластеры ({len(manifest['clusters'])})</h2>{clusters_table}
+<h2>Домены конкурентов ({len(manifest['competitor_domains'])})</h2>
+<p>{escape(', '.join(manifest['competitor_domains']) or '—')}</p>
+<h2>Собранные URL ({len(manifest['collected_urls'])})</h2>{urls_table}
+<h2>JSON для нейронки</h2>
+<pre id="json" style="background:#0F0E12;color:#E5E5E5;padding:14px;overflow:auto;font-size:11px;max-height:420px">{escape(json_text)}</pre>
+</body></html>"""
+
+
 DEFAULT_VOICES = (
     (
         "practico",
@@ -475,5 +660,6 @@ if __name__ == "__main__":
     migrate_schema_v2()
     migrate_schema_v3()
     migrate_schema_v4()
+    migrate_schema_v5()
     p = build_db_plan()
     print("✓ План собран из SQLite! Тем:", p["counts"]["topics"], "| Ссылок:", p["counts"]["links"])
