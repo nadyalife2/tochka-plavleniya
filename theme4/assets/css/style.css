@@ -520,8 +520,7 @@ body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background: rgba(0, 0, 0, 0.7);
     z-index: 1000;
     opacity: 0;
     transition: opacity 0.25s ease;
@@ -1000,8 +999,7 @@ body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15, 19, 28, 0.7);
-    backdrop-filter: blur(6px);
+    background: rgba(15, 19, 28, 0.85);
     z-index: 2000;
     align-items: flex-start;
     justify-content: center;
