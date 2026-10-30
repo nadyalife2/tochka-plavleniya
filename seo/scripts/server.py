@@ -42,7 +42,7 @@ sys.path.insert(0, str(SCRIPTS))
 from db import (DB_PATH, backup_database, build_export_manifest, export_manifest_html,
                 export_manifest_markdown, get_connection, init_db, list_backups,
                 list_voices, migrate_schema_v3, migrate_schema_v4, migrate_schema_v5,
-                migrate_schema_v6)
+                migrate_schema_v6, run_all_migrations)
 from keys import get_key
 
 # Гарантия бесплатности: строгий программный запрет платных внешних API-шлюзов
@@ -567,6 +567,7 @@ def build_llms_txt(full: bool = False) -> str:
     with get_connection() as conn:
         topics = conn.execute(
             "SELECT id, title, slug, cluster, status, chars, content_markdown FROM topics "
+            "WHERE chars >= 500 OR status IN ('published', 'ready', 'written') "
             "ORDER BY id ASC"
         ).fetchall()
         competitors = conn.execute("SELECT domain, type FROM competitors").fetchall()
@@ -610,15 +611,24 @@ def build_llms_txt(full: bool = False) -> str:
             lines.append("  ```")
 
     lines.append("")
-    lines.append("## Канонические сплавы и тепловые режимы")
-    lines.append("- ПОС-61: Тпл 183–190 °C, рабочая температура жала 260–295 °C (ГОСТ 21931-76)")
-    lines.append("- Sn63Pb37: Тпл 183 °C (эвтектика), рабочая температура жала 240–315 °C (IPC J-STD-006C)")
-    lines.append("- SAC305: Тпл 217–220 °C (бессвинцовый), рабочая температура жала 310–350 °C (IPC J-STD-006C)")
-    lines.append("- Sn42Bi58: Тпл 138 °C (низкотемпературный), рабочая температура жала 160–200 °C")
-    lines.append("- Сплав Розе: Тпл 94–96 °C (демонтаж термочувствительных компонентов, ТУ 6-09-4064-87)")
+    lines.append("## Канонические сплавы и тепловые режимы (из реестра материалов)")
+    import canonical_alloys as canonical
+    for k in ("pos61", "sn63pb37", "pos40", "sac305", "sn42bi58", "roze", "vuda"):
+        name = canonical.alloy_label(k)
+        melt = canonical.melt_range(k)
+        work = canonical.work_range(k)
+        melt_str = f"Тпл {melt[0]}–{melt[1]} °C" if melt else ""
+        work_str = f"уставка жала {work[0]}–{work[1]} °C" if work else ""
+        meta = canonical.REGISTRY_SOLDERS.get(k, {})
+        std = meta.get("standard") or ""
+        std_str = f" ({std})" if std else ""
+        parts = [p for p in (melt_str, work_str) if p]
+        desc = ", ".join(parts) + std_str
+        lines.append(f"- {name}: {desc}")
+
     lines.append("")
     lines.append("## Дополнительно")
-    lines.append(f"- Всего тем в базе: {len(topics)}")
+    lines.append(f"- Готовых и опубликованных статей: {len(topics)}")
     lines.append(f"- Кластеров: {len(clusters)}")
     lines.append(f"- Отслеживаемых конкурентов: {len(competitors)}")
     lines.append("- Полный манифест: https://tochka-plavleniya.ru/llms-full.txt")
@@ -2058,11 +2068,7 @@ def main():
     parser.add_argument("--port", type=int, default=8765, help="Порт сервера (по умолчанию 8765)")
     args = parser.parse_args()
 
-    init_db()
-    migrate_schema_v3()
-    migrate_schema_v4()
-    migrate_schema_v5()
-    migrate_schema_v6()
+    run_all_migrations()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), DashboardHandler)
     print("=" * 60)
     print(f"СЕРВЕР SEO-КОНВЕЙЕРА ЗАПУЩЕН:")

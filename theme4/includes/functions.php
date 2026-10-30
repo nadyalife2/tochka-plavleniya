@@ -158,16 +158,16 @@ if (!function_exists('render_article_schema')) {
                 "inLanguage" => "ru",
                 "datePublished" => $date_pub,
                 "dateModified" => $date_mod,
-                "author" => [
+                "author" => array_filter([
                     "@type" => "Person",
-                    "name" => $article['author'] ?? 'Инженер Лаборатории ТЧП',
-                    "jobTitle" => "Ведущий инженер-технолог пайки и монтажа РЭА",
+                    "name" => $article['author'] ?? 'Редакция «Точка Плавления»',
+                    "jobTitle" => !empty($article['author_job_title']) ? $article['author_job_title'] : null,
                     "worksFor" => [
                         "@type" => "Organization",
                         "name" => "Точка Плавления // ТЧП",
                         "url" => "https://tochka-plavleniya.ru/"
                     ]
-                ],
+                ]),
                 "publisher" => [
                     "@type" => "Organization",
                     "name" => "Точка Плавления",
@@ -300,7 +300,7 @@ if (!function_exists('render_rubric_schema')) {
         $rslug = $rubric['slug'] ?? 'materialy';
         $site_root_url = function_exists('home_url') ? home_url('/') : 'https://tochka-plavleniya.ru/';
         if ($rslug === 'all') {
-            $canonical_url = $site_root_url;
+            $canonical_url = $site_root_url . 'category/all/';
         } elseif (function_exists('get_category_by_slug') && ($cat = get_category_by_slug($rslug))) {
             $canonical_url = get_category_link($cat->term_id);
         } else {

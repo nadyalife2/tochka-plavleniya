@@ -10,6 +10,7 @@ import json
 import re
 import shutil
 import sqlite3
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 
@@ -20,13 +21,21 @@ DB_PATH = DATA / "seo.db"
 BACKUP_DIR = DATA / "_backup"
 
 
-def get_connection() -> sqlite3.Connection:
+@contextmanager
+def get_connection():
+    """Контекстный менеджер подключения к SQLite с гарантированным закрытием соединений."""
     DATA.mkdir(parents=True, exist_ok=True)
     conn = sqlite3.connect(str(DB_PATH), timeout=20.0)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL;")
     conn.execute("PRAGMA foreign_keys=ON;")
-    return conn
+    try:
+        yield conn
+    except Exception:
+        conn.rollback()
+        raise
+    finally:
+        conn.close()
 
 
 def init_db() -> None:
@@ -322,6 +331,23 @@ def migrate_schema_v7() -> None:
             if column not in cols:
                 conn.execute(f"ALTER TABLE topics ADD COLUMN {column} {decl};")
         conn.commit()
+
+
+def run_all_migrations() -> None:
+    """Последовательно выполняет все миграции схемы БД (от v2 до v7)."""
+    init_db()
+    for mig in (
+        migrate_schema_v2,
+        migrate_schema_v3,
+        migrate_schema_v4,
+        migrate_schema_v5,
+        migrate_schema_v6,
+        migrate_schema_v7,
+    ):
+        try:
+            mig()
+        except Exception:
+            pass
 
 
 def _rows(conn, sql: str) -> list[dict]:
