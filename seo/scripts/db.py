@@ -48,6 +48,12 @@ def init_db() -> None:
             chars INTEGER DEFAULT 0,
             score_total INTEGER,
             score_json TEXT,
+            is_critical INTEGER DEFAULT 0,
+            review_status TEXT,
+            review_model TEXT,
+            factcheck_status TEXT,
+            factcheck_model TEXT,
+            writer_mode TEXT,
             created_at TEXT,
             updated_at TEXT
         );
@@ -239,6 +245,25 @@ def migrate_schema_v2():
         conn.commit()
 
 
+def migrate_schema_v3():
+    """Миграция v3: флаг критичности, статусы рецензии/фактчека и режим автора."""
+    with get_connection() as conn:
+        cur = conn.cursor()
+        cols = [c[1] for c in cur.execute("PRAGMA table_info(topics)").fetchall()]
+        additions = {
+            "is_critical": "INTEGER DEFAULT 0",
+            "review_status": "TEXT",
+            "review_model": "TEXT",
+            "factcheck_status": "TEXT",
+            "factcheck_model": "TEXT",
+            "writer_mode": "TEXT",
+        }
+        for column, decl in additions.items():
+            if column not in cols:
+                conn.execute(f"ALTER TABLE topics ADD COLUMN {column} {decl};")
+        conn.commit()
+
+
 def build_db_plan() -> dict:
     """Собирает полный план проекта напрямую из SQLite seo.db.
     
@@ -382,5 +407,6 @@ def build_db_plan() -> dict:
 if __name__ == "__main__":
     init_db()
     migrate_schema_v2()
+    migrate_schema_v3()
     p = build_db_plan()
     print("✓ План собран из SQLite! Тем:", p["counts"]["topics"], "| Ссылок:", p["counts"]["links"])

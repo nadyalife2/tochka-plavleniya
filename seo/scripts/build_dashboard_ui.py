@@ -1147,6 +1147,24 @@ def generate_html() -> str:
       </div>
     </div>
 
+    <!-- Критичность и проверки (ОТК / фактчек) -->
+    <div style="margin-top:14px;padding:8px 12px;background:#FFF8E1;border:1.5px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800;cursor:pointer;">
+        <input type="checkbox" id="mCriticalCheck" onchange="toggleCritical()" style="width:16px;height:16px;">
+        Критичная статья (рецензия Opus)
+      </label>
+      <button class="btn btn--sm" onclick="runReviewerForCurrentTopic()">🧐 Рецензия (авто-модель)</button>
+      <button class="btn btn--sm" onclick="runFactcheckForCurrentTopic()">🔬 Фактчек (другая модель)</button>
+      <span id="mChecksStatus" style="font-size:11px;color:var(--muted);"></span>
+    </div>
+    <div id="mPasteBox" style="display:none;margin-top:10px;">
+      <textarea id="mPasteText" rows="7" placeholder="Вставьте готовый текст статьи — Sonnet приведёт его к голосу Practico и стандартам, сохранив ваши факты..." style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
+        <button class="btn btn--sm btn--primary" onclick="writePastedText('practico')">Адаптировать: Голос 1</button>
+        <button class="btn btn--sm btn--primary" onclick="writePastedText('practico2')">Адаптировать: Голос 2</button>
+      </div>
+    </div>
+
     <!-- Model Provider Selection Toolbar -->
     <div style="margin-top:16px;padding:8px 12px;background:#F5F5F5;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
       <div style="display:flex;align-items:center;gap:8px;">
@@ -1668,6 +1686,79 @@ async function writeArticleForCurrentTopic(voice) {
   }
 }
 
+// --- Критичность, рецензия и фактчек (Oxion AI) ---------------------------
+function togglePasteBox() {
+  const box = document.getElementById('mPasteBox');
+  if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+function updateChecksStatus(t) {
+  const el = document.getElementById('mChecksStatus');
+  if (!el) return;
+  const parts = [];
+  if (t && t.is_critical) parts.push('⚠️ критичная');
+  if (t && t.review_model) parts.push(`рецензия: ${t.review_model}`);
+  if (t && t.factcheck_model) parts.push(`фактчек: ${t.factcheck_model}`);
+  el.innerText = parts.join(' · ');
+}
+
+async function toggleCritical() {
+  if (!CURRENT_TOPIC_ID) return;
+  const el = document.getElementById('mCriticalCheck');
+  const critical = !!(el && el.checked);
+  await apiPost('/api/articles/critical', { id: CURRENT_TOPIC_ID, critical });
+  showToast(critical ? '⚠️ Критичная статья: рецензия пойдёт на Opus' : 'Обычная статья: рецензия на Gemini');
+  await refreshData();
+  openInspector(CURRENT_TOPIC_ID);
+}
+
+async function runReviewerForCurrentTopic() {
+  if (!CURRENT_TOPIC_ID) return;
+  const t = DB_DATA.topics.find(x => x.id === CURRENT_TOPIC_ID) || {};
+  const model = t.is_critical ? 'Claude Opus 4.6' : 'Gemini 3.7 Flash';
+  showToast(`Рецензия #${CURRENT_TOPIC_ID}: ${model}...`);
+  const c = document.getElementById('agentConsole');
+  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Агент 03 (рецензия)\nМодель: ${model}\nОжидание...`;
+  switchTab('agents');
+  const res = await apiPost('/api/agent/run', { agent: '03-reviewer', target_id: CURRENT_TOPIC_ID });
+  if (c && res) c.innerText = res.log || JSON.stringify(res);
+  showToast(res && res.status === 'succeeded' ? '✓ Рецензия готова' : '⚠️ Ошибка рецензии');
+  await refreshData();
+  if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+}
+
+async function runFactcheckForCurrentTopic() {
+  if (!CURRENT_TOPIC_ID) return;
+  showToast(`Фактчек #${CURRENT_TOPIC_ID}: DeepSeek V4 Pro...`);
+  const c = document.getElementById('agentConsole');
+  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Фактчек\nМодель: DeepSeek V4 Pro\nОжидание...`;
+  switchTab('agents');
+  const res = await apiPost('/api/agent/run', { agent: 'factcheck', target_id: CURRENT_TOPIC_ID });
+  if (c && res) c.innerText = res.log || JSON.stringify(res);
+  showToast(res && res.status === 'succeeded' ? '✓ Фактчек готов' : '⚠️ Ошибка фактчека');
+  await refreshData();
+  if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+}
+
+async function writePastedText(voice) {
+  if (!CURRENT_TOPIC_ID) return;
+  const ta = document.getElementById('mPasteText');
+  const text = ((ta && ta.value) || '').trim();
+  if (text.length < 200) { showToast('Вставьте текст статьи (≥ 200 знаков)'); return; }
+  if (!confirm('Заменить текущий текст статьи адаптированной версией Sonnet?')) return;
+  showToast('Sonnet адаптирует ваш текст под голос Practico...');
+  const c = document.getElementById('agentConsole');
+  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Адаптация готового текста\nГолос: ${voice}\nОжидание...`;
+  switchTab('agents');
+  const res = await apiPost('/api/agent/run', {
+    agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice: voice, mode: 'paste', pasted_text: text
+  });
+  if (c && res) c.innerText = res.log || JSON.stringify(res);
+  showToast(res && res.status === 'succeeded' ? '✓ Текст адаптирован' : '⚠️ Ошибка адаптации');
+  await refreshData();
+  if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+}
+
 function promptAgentTarget(agentName) {
   const tid = prompt(`Введите ID статьи для ${agentName}:`);
   if (!tid) return;
@@ -1975,6 +2066,7 @@ function renderKanban() {
           <div class="task-card__top">
             <span class="task-card__id">#${t.id}</span>
             <div class="task-card__badges">
+              ${t.is_critical ? '<span class="prio-pill" style="background:#FEE2E2;color:#B91C1C;">⚠ критично</span>' : ''}
               <span class="prio-pill ${pClass}">P${pScore}</span>
               ${seoBadge}
               ${scoreBadge}
@@ -2187,6 +2279,9 @@ function openInspector(topicId) {
 
   // Редактор текста статьи
   document.getElementById('mTextEditor').value = t.content_markdown || '';
+  const critEl = document.getElementById('mCriticalCheck');
+  if (critEl) critEl.checked = !!t.is_critical;
+  updateChecksStatus(t);
   document.getElementById('mDiskFilePath').innerText = `сами статьи/${t.id}-${t.slug}.md`;
   document.getElementById('mTextCharsBadge').innerText = (chars || 0) + ' зн.';
   switchModalTab('score');
@@ -2221,6 +2316,11 @@ function openInspector(topicId) {
   }
   // Проверка спроса и конкуренции по заголовку статьи
   btnRow.innerHTML += `<button class="btn" onclick="checkTopicPhrase(${t.id})">🔬 Проверить запрос</button>`;
+  if (hasText) {
+    btnRow.innerHTML += `<button class="btn" onclick="runReviewerForCurrentTopic()">🧐 Рецензия (ОТК)</button>`;
+    btnRow.innerHTML += `<button class="btn" onclick="runFactcheckForCurrentTopic()">🔬 Фактчек</button>`;
+  }
+  btnRow.innerHTML += `<button class="btn" onclick="togglePasteBox()">📋 Вставить готовый текст</button>`;
   btnRow.innerHTML += `<button class="btn" onclick="closeInspector()">Закрыть</button>`;
 
   document.getElementById('inspectorModal').classList.add('active');

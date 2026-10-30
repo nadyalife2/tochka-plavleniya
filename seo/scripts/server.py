@@ -19,6 +19,8 @@ import subprocess
 import sys
 import threading
 import time
+import urllib.error
+import urllib.request
 from datetime import datetime, timedelta
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -37,7 +39,7 @@ SCRIPTS = SEO / "scripts"
 DASHBOARD_DIR = SEO / "dashboard"
 sys.path.insert(0, str(SCRIPTS))
 
-from db import DB_PATH, backup_database, get_connection, init_db, list_backups
+from db import DB_PATH, backup_database, get_connection, init_db, list_backups, migrate_schema_v3
 
 
 def slugify(title: str) -> str:
@@ -63,6 +65,105 @@ def slugify(title: str) -> str:
 # Долгие агенты выполняются в фоновом потоке: обход сайтов не влезает в HTTP-таймаут.
 LONG_AGENTS = {"00-research", "bot-analyzer"}
 JOB_TIMEOUT_SECONDS = 600
+
+
+# --- Oxion AI: роли моделей и клиент с ротацией ключей ---------------------
+OXION_BASE_URL = "https://oxionai.com/v1"
+OXION_ROLE_MODELS = {
+    "writer": "claude-sonnet-5",
+    "reviewer_critical": "claude-opus-4.6",
+    "reviewer_default": "gemini-3.7-flash",
+    "factcheck": "deepseek-v4-pro-0813",
+}
+OXION_REF_NAMES = ("OXION_KEY_ACTIVE", "OXION_KEY_1", "OXION_KEY_2")
+
+REVIEW_SYSTEM_PROMPT = """Ты — рецензент (ОТК) проекта «Точка Плавления» о пайке.
+Проверь статью строго по редполитике:
+1. Answer First: суть в первых 30-50 словах, обращение на «Вы», без вымышленного опыта мастера.
+2. Факты и числа: каждая температура/режим/норма должна иметь обоснование; ищи подмены понятий (припой/флюс, уставка/температура шва, плавление/уставка).
+3. Структура: 4-8 H2, 1-2 сопоставительные таблицы, FAQ 4-6 пар в служебном блоке, источники 2-4.
+4. Объём: 5 500-7 000 знаков с пробелами.
+5. «ИИ-слоп»: «в современном мире», «важно отметить», «не просто X, а Y», самовопросы, тройки прилагательных, натянутые шутки.
+Верни: вердикт (ПРИНЯТО / ДОРАБОТКА), 3-8 конкретных замечаний с цитатами, список блокеров (если есть), и что править в первую очередь. Без переписывания статьи."""
+
+FACTCHECK_SYSTEM_PROMPT = """Ты — независимый фактчекер проекта «Точка Плавления» (пайка, электроника).
+Задача: проверить статью по фактам и числам, не переписывая её.
+1. Выпиши каждое техническое число (температура, мощность, время, состав, ГОСТ/IPC) и укажи, обосновано ли оно в тексте.
+2. Найди физические противоречия и опасные утверждения (сеть 220 В, токсичность флюсов, перегрев).
+3. Отметь утверждения, которые нельзя проверить по тексту (нет источника/расчёта).
+4. Дай таблицу: утверждение | статус (подтверждено / требует источника / ошибка) | комментарий.
+Вердикт: СТАТЬЯ ФАКТИЧЕСКИ НАДЁЖНА / ТРЕБУЕТ ПРАВОК."""
+
+
+def _read_oxion_keys() -> list[str]:
+    """Ключи Oxion: активный слот, затем два аккаунта (env -> ~/.dsh/.env)."""
+    keys: list[str] = []
+    seen: set[str] = set()
+
+    def add(value) -> None:
+        text = (value or "").strip().strip('"').strip("'")
+        if text.startswith("cc_") and text not in seen:
+            seen.add(text)
+            keys.append(text)
+
+    for ref in OXION_REF_NAMES:
+        add(os.environ.get(ref))
+    dotenv = Path.home() / ".dsh" / ".env"
+    if dotenv.exists():
+        try:
+            for line in dotenv.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                name, _, value = line.partition("=")
+                if name.strip() in OXION_REF_NAMES:
+                    add(value)
+        except Exception:  # noqa: BLE001
+            pass
+    return keys
+
+
+def oxion_chat(model: str, system_prompt: str, user_prompt: str,
+               max_tokens: int = 8000, temperature: float = 0.4) -> tuple[str, str]:
+    """Запрос к Oxion с авто-переключением ключей при 401/402/403/429."""
+    keys = _read_oxion_keys()
+    if not keys:
+        raise RuntimeError(
+            "Нет ключей Oxion. Впишите OXION_KEY_ACTIVE, OXION_KEY_1, OXION_KEY_2 "
+            "в ~/.dsh/.env и перезапустите сервер дашборда."
+        )
+    body = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+    }, ensure_ascii=False).encode("utf-8")
+    last_error = ""
+    for index, key in enumerate(keys):
+        request = urllib.request.Request(
+            OXION_BASE_URL + "/chat/completions",
+            data=body,
+            headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=300) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            content = ((data.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+            if content.strip():
+                label = model if index == 0 else f"{model} (ключ #{index + 1})"
+                return content, label
+            last_error = "пустой ответ модели"
+        except urllib.error.HTTPError as ex:
+            last_error = f"HTTP {ex.code}: {ex.read().decode('utf-8', 'replace')[:300]}"
+            if ex.code not in (401, 402, 403, 429):
+                break
+        except Exception as ex:  # noqa: BLE001
+            last_error = f"{type(ex).__name__}: {ex}"
+    raise RuntimeError(f"Oxion недоступен: {last_error}")
 
 
 def start_background_job(agent: str, cmd: list[str], target_id=None) -> int:
@@ -533,6 +634,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "id": tid, "new_status": "needs_fix"})
             return
 
+        # 5.5. Флаг критичной статьи: рецензия уходит на Opus, обычная — на Gemini
+        if path == "/api/articles/critical":
+            tid = payload.get("id")
+            flag = 1 if payload.get("critical") else 0
+            with get_connection() as conn:
+                conn.execute(
+                    "UPDATE topics SET is_critical = ?, updated_at = ? WHERE id = ?",
+                    (flag, datetime.now().isoformat(timespec="seconds"), tid),
+                )
+                conn.commit()
+            self.send_json({"status": "ok", "id": tid, "is_critical": flag})
+            return
+
         # 6.5. Сохранить отредактированный текст статьи
         if path == "/api/topics/update-text":
             tid = payload.get("id")
@@ -636,14 +750,99 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     voice = (payload.get("voice") or "practico").strip().lower()
                     if voice not in ("practico", "practico2"):
                         voice = "practico"
-                    provider = (payload.get("provider") or "auto").strip().lower()
-                    if provider not in ("auto", "claude", "deepseek", "yandex"):
-                        provider = "auto"
-                    cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
-                           "--id", str(target_id), "--voice", voice, "--provider", provider]
-                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
-                    log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
-                    status = "succeeded" if p.returncode == 0 else "failed"
+                    mode = (payload.get("mode") or "draft").strip().lower()
+                    if mode == "paste":
+                        pasted = (payload.get("pasted_text") or "").strip()
+                        if len(pasted) < 200:
+                            log_output = "Вставленный текст слишком короткий (нужно ≥ 200 знаков)."
+                            status = "failed"
+                        else:
+                            try:
+                                from writer_practico import PRACTICO2_SYSTEM_PROMPT, PRACTICO_SYSTEM_PROMPT
+                                system_prompt = (
+                                    PRACTICO2_SYSTEM_PROMPT if voice == "practico2"
+                                    else PRACTICO_SYSTEM_PROMPT
+                                )
+                            except Exception:  # noqa: BLE001
+                                system_prompt = (
+                                    "Ты — автор проекта «Точка Плавления» о пайке. Обращение на «Вы», "
+                                    "без вымышленного опыта мастера, Answer First, живая ирония без натянутых шуток."
+                                )
+                            instruction = (
+                                "Ниже готовый текст автора. Приведи его к стандартам проекта и голосу Practico: "
+                                "Answer First ≤ 40 слов, 4-8 разделов H2, 1-2 сопоставительные таблицы, "
+                                "FAQ 4-6 пар в блоке '### FAQ:', источники 2-4 в '## Источники:', "
+                                "объём 5 500-7 000 знаков с пробелами. Сохрани все факты и числа автора, "
+                                "не выдумывай новых. Верни только готовый markdown.\n\n"
+                            )
+                            answer, used = oxion_chat(
+                                OXION_ROLE_MODELS["writer"], system_prompt,
+                                instruction + pasted, max_tokens=12000, temperature=0.3,
+                            )
+                            chars = len(answer.strip())
+                            slug = f"article-{target_id}"
+                            with get_connection() as conn:
+                                row = conn.execute("SELECT slug FROM topics WHERE id = ?", (target_id,)).fetchone()
+                                slug = row["slug"] if row else slug
+                                conn.execute(
+                                    "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
+                                    "writer_mode = 'paste', next_action = ?, updated_at = ? WHERE id = ?",
+                                    (answer, chars, f"адаптировано Sonnet ({voice})",
+                                     datetime.now().isoformat(timespec="seconds"), target_id),
+                                )
+                                conn.commit()
+                            try:
+                                (ROOT / "сами статьи" / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
+                            except Exception:  # noqa: BLE001
+                                pass
+                            log_output = f"✅ Готовый текст адаптирован моделью {used} ({chars} зн.)\n\n{answer[:1500]}"
+                            status = "succeeded"
+                    else:
+                        provider = (payload.get("provider") or "auto").strip().lower()
+                        if provider not in ("auto", "claude", "deepseek", "yandex"):
+                            provider = "auto"
+                        cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
+                               "--id", str(target_id), "--voice", voice, "--provider", provider]
+                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
+                        log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
+                        status = "succeeded" if p.returncode == 0 else "failed"
+                elif agent in ("03-reviewer", "factcheck") and target_id:
+                    with get_connection() as conn:
+                        row = conn.execute(
+                            "SELECT title, content_markdown, is_critical FROM topics WHERE id = ?",
+                            (target_id,),
+                        ).fetchone()
+                    text = (row["content_markdown"] if row else "") or ""
+                    if len(text.strip()) < 200:
+                        log_output = f"У статьи #{target_id} нет текста для проверки."
+                        status = "failed"
+                    else:
+                        critical = bool(row["is_critical"]) if row else False
+                        if agent == "03-reviewer":
+                            model_key = "reviewer_critical" if critical else "reviewer_default"
+                            system_prompt = REVIEW_SYSTEM_PROMPT
+                            status_column, model_column = "review_status", "review_model"
+                            label = "рецензия"
+                        else:
+                            model_key = "factcheck"
+                            system_prompt = FACTCHECK_SYSTEM_PROMPT
+                            status_column, model_column = "factcheck_status", "factcheck_model"
+                            label = "фактчек"
+                        answer, used = oxion_chat(
+                            OXION_ROLE_MODELS[model_key], system_prompt,
+                            f"Статья #{target_id} «{row['title']}»:\n\n{text}",
+                            max_tokens=6000,
+                        )
+                        with get_connection() as conn:
+                            conn.execute(
+                                f"UPDATE topics SET {status_column} = 'done', {model_column} = ?, "
+                                "next_action = ?, updated_at = ? WHERE id = ?",
+                                (used, f"{label}: {used}",
+                                 datetime.now().isoformat(timespec="seconds"), target_id),
+                            )
+                            conn.commit()
+                        log_output = f"✅ {label.capitalize()} завершён моделью {used}\n\n{answer}"
+                        status = "succeeded"
                 else:
                     log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."
                     status = "not_implemented"
@@ -851,6 +1050,7 @@ def main():
     args = parser.parse_args()
 
     init_db()
+    migrate_schema_v3()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), DashboardHandler)
     print("=" * 60)
     print(f"СЕРВЕР SEO-КОНВЕЙЕРА ЗАПУЩЕН:")
