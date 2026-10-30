@@ -14,9 +14,9 @@
 
 | Инструмент | Что делает | Стоимость | Проверено |
 |---|---|---|---|
-| `seo/scripts/research_competitors.py` | Обходит `sitemap.xml`, `sitemap_index.xml`, `wp-sitemap.xml`, RSS/Atom и HTML-архив блога конкурента. Извлекает URL, `<h1>`, `<title>`, дату. Классифицирует тип статьи и кластер эвристиками. Пишет в лист `raw_data` мастера. | 0 ₽, 0 токенов | Да: `solderpoint.ru` → 25 статей за один прогон |
-| `seo/scripts/priority_matrix.py` | Считает интегральный приоритет каждой темы 0–100 по шести факторам (кластер, контентный пробел, покрытие конкурентами, хабность ссылок, широта ключей, готовность). Пишет в лист `priority_scores` и колонку `Оценка_приоритета_0_100`. | 0 ₽, 0 токенов | Да: 60 тем посчитаны |
-| `seo/scripts/excel_io.py` | Автобэкап мастера, `save_competitors`, `save_raw_data`, `save_priority_scores`. | 0 ₽, 0 токенов | Да |
+| `seo/scripts/research_competitors.py` | Обходит `sitemap.xml`, `sitemap_index.xml`, `wp-sitemap.xml`, RSS/Atom и HTML-архив блога конкурента. Извлекает URL, `<h1>`, `<title>`, дату. Классифицирует тип статьи и кластер эвристиками. Пишет в таблицу `raw_articles` базы `seo/data/seo.db`. | 0 ₽, 0 токенов | Да: `solderpoint.ru` → 25 статей за один прогон |
+| `seo/scripts/priority_matrix.py` | Считает интегральный приоритет каждой темы 0–100 по шести факторам (кластер, контентный пробел, покрытие конкурентами, хабность ссылок, широта ключей, готовность). Пишет в `topics.priority_score` и `topics.seo_priority_json`. | 0 ₽, 0 токенов | Да: все темы посчитаны |
+| `seo/scripts/db.py` | Подключение к SQLite (WAL, busy-таймаут), схема, автобэкап, `build_db_plan`. | 0 ₽, 0 токенов | Да |
 
 Порядок работы по умолчанию:
 
@@ -24,7 +24,7 @@
 python seo/scripts/research_competitors.py --limit 60
 python seo/scripts/priority_matrix.py --top 20
 python seo/scripts/build_worklist.py
-python seo/scripts/build_dashboard.py
+python seo/scripts/build_dashboard_ui.py
 ```
 
 Этого достаточно для 80 % задач SEO-разведки. Дальше — про то, чего скрипт не умеет.

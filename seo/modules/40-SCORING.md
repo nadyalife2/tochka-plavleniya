@@ -94,7 +94,7 @@
 
 ## 4. Как запустить оценку статьи
 
-В корне проекта выполните команду, передав путь к файлу статьи и её ID из мастер-таблицы:
+В корне проекта выполните команду, передав путь к файлу статьи и её ID из базы (`topics.id`):
 
 ```bash
 python seo/scripts/score_article.py --file "сами статьи/15-pripoj-dlya-pajki-vidy.md" --id 15
@@ -129,7 +129,7 @@ python seo/scripts/score_article.py --file "сами статьи/15-pripoj-dlya
 
 ## Связанные инструменты
 
-- `seo/scripts/score_article.py` — мастер-раннер скоринга.
+- `seo/scripts/score_article.py` — основной раннер скоринга.
 - `seo/out/scores/<ID>.md` — индивидуальный протокол аудита.
 - `seo/modules/50-VOICE.md` — руководство по исправлению стиля и голоса Practico.
 - `seo/modules/20-ONPAGE-SEO.md` — стандарты метаполей и микроразметки.

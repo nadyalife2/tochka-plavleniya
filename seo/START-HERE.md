@@ -27,10 +27,10 @@
 | **Оформляю структуру, H1/H2, сниппеты, FAQ** | [Модуль 20 (On-Page SEO)](modules/20-ONPAGE-SEO.md) | Answer First ≤40 слов |
 | **Нужно расставить ссылки на другие статьи** | [Модуль 30 (Interlink)](modules/30-INTERLINK.md) | `python seo/scripts/link_candidates.py --id <ID>` |
 | **Хочу проверить готовность статьи (0–100 баллов)** | [Модуль 40 (Scoring)](modules/40-SCORING.md) | `python seo/scripts/score_article.py --file <путь> --id <ID>` |
-| **Статья готова, хочу внести её в общую таблицу** | Скрипт `add_article.py` | `python seo/scripts/add_article.py --file <путь> --id <ID>` |
+| **Статья готова, хочу внести её в базу** | Скрипт `sync_all_texts_to_db.py` | `python seo/scripts/sync_all_texts_to_db.py` |
 | **Хочу, чтобы черновик заполнил ИИ по моим паттернам** | [Модуль 60 (AI Patterns)](modules/60-AI-PATTERNS.md) | контракт v1.1, боты |
 | **Хочу прогнать статью через Google Gems** | [Модуль 70 (Gems)](modules/70-GEMS.md) | 3 готовых Gem'а |
-| **Хочу увидеть общую картину (человечки, канбан)** | [Дашборд](dashboard/index.html) | `python seo/scripts/build_dashboard.py` |
+| **Хочу увидеть общую картину (человечки, канбан)** | [Дашборд](dashboard/index.html) | `python seo/scripts/server.py` → `http://127.0.0.1:8765` |
 
 ---
 
@@ -62,12 +62,11 @@
        │                → Вы смотрите отчёт скоринга: «Подходит» или «Что поправить»
        │                → при замечаниях — возврат автору на быструю правку
        ▼
-7. Фиксация в таблице   [Скрипт add_article.py - 0 ₽]
-       │                → python seo/scripts/add_article.py --file "сами статьи/<файл>" --id <ID>
-       │                → автобэкап мастера, запись текста в лист `statiy`, обновление статуса
+7. Фиксация в БД        [Скрипт sync_all_texts_to_db.py - 0 ₽]
+       │                → python seo/scripts/sync_all_texts_to_db.py
+       │                → автобэкап базы, запись текста в `topics.content_markdown`, обновление статуса
        ▼
-8. Визуализация и ОТК   [Дашборд dashboard/index.html + WordPress]
-                        → python seo/scripts/build_dashboard.py
+8. Визуализация и ОТК   [Дашборд: python seo/scripts/server.py → http://127.0.0.1:8765]
                         → подтверждение в дашборде и кнопка «🛡️ Подтвердить проверку (ОТК)» в WP
 ```
 
@@ -91,12 +90,13 @@ seo/
 ├── reference/                 ← быстрые справочники
 │   └── glossary.md            ← термины, сплавы, температуры, J-STD-004
 ├── scripts/                   ← консольные утилиты автоматизации
-│   ├── excel_io.py            ← чтение/запись master-Excel с автобэкапом
+│   ├── db.py                  ← SQLite-мастер: подключение, схема, автобэкап
+│   ├── excel_io.py            ← legacy-мост к Excel-архиву (импорт/обмен)
 │   ├── build_worklist.py      ← сборка очереди «что писать»
 │   ├── link_candidates.py     ← подбор связей для статьи
 │   ├── score_article.py       ← расчёт оценки 0–100 по 6 категориям
-│   ├── add_article.py         ← внесение текста в Excel
-│   └── build_dashboard.py     ← сборка HTML-дашборда с ролями
+│   ├── sync_all_texts_to_db.py← синхронизация markdown с базой
+│   └── server.py + build_dashboard_ui.py ← локальный дашборд (127.0.0.1:8765)
 ├── out/                       ← файлы для человека
 │   ├── WORKLIST.md            ← читаемый список задач
 │   ├── WORKLIST.csv           ← таблица задач для импорта
@@ -122,9 +122,9 @@ python seo/scripts/link_candidates.py --id 16 --write
 # Проверить качество статьи #15
 python seo/scripts/score_article.py --file "сами статьи/15-pripoj-dlya-pajki-vidy.md" --id 15
 
-# Добавить готовую статью в общую таблицу
-python seo/scripts/add_article.py --file "сами статьи/15-pripoj-dlya-pajki-vidy.md" --id 15
+# Внести готовую статью в базу (с резервной копией)
+python seo/scripts/sync_all_texts_to_db.py
 
-# Обновить визуальный дашборд
-python seo/scripts/build_dashboard.py
+# Открыть дашборд
+python seo/scripts/server.py
 ```
