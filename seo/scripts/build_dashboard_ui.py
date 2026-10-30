@@ -696,6 +696,9 @@ def generate_html() -> str:
     <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active" style="background:#FFC700;"></span> 02-Автор Practico (Claude Sonnet Antigravity)</span>
     <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active" style="background:#818CF8;"></span> 03-Рецензент (Claude Opus Antigravity)</span>
     <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active"></span> 04-Скорер (score_article.py)</span>
+    <span class="agent-badge" onclick="switchTab('analysis')" title="Баланс Мутагена для проверки конкуренции (0,30 ₽/фраза). Кликните для перехода в анализ" style="margin-left:auto;background:#ECFDF5;border-color:#10B981;color:#065F46;cursor:pointer;">
+      <span class="status-dot active" style="background:#10B981;"></span> Мутаген: <strong id="mutagenBalanceBadge">15.92 ₽</strong>
+    </span>
   </section>
 
   <!-- Decision / Action Required Banner -->
@@ -926,10 +929,61 @@ def generate_html() -> str:
   <!-- TAB 4.5: KEYWORD ANALYSIS (Вордстат + Мутаген) -->
   <section class="tab-view" id="view-analysis">
     <div style="margin-bottom:12px;">
-      <h2 style="margin:0;font-size:17px;font-weight:800;">🔬 Анализ поисковых запросов</h2>
+      <h2 style="margin:0;font-size:17px;font-weight:800;">🔬 Анализ поисковых запросов и конкуренции</h2>
       <div style="font-size:12px;color:var(--muted);">
-        Спрос — бесплатно через Яндекс AI Studio (Wordstat API). Конкуренция — Мутаген (0,30 ₽ за фразу).
+        Спрос — бесплатно через Яндекс AI Studio (Wordstat API). Конкуренция и хвосты — Мутаген (0,30 ₽ за фразу).
         Результаты кэшируются: повторная проверка денег не тратит.
+      </div>
+    </div>
+
+    <!-- Информационный блок: Баланс и Экономичные механики Мутагена -->
+    <div style="background:var(--card);border:1.5px solid var(--border);padding:14px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:13px;font-weight:800;">Баланс API Мутагена:</span>
+          <span id="analysisMutagenBalance" style="background:#D1FAE5;color:#065F46;padding:3px 10px;font-size:13px;font-weight:800;border:1px solid #10B981;">
+            15.92 ₽ (~53 проверок)
+          </span>
+          <button class="btn btn--xs" onclick="refreshMutagenBalance()" title="Обновить баланс с сервера">↻ Обновить</button>
+        </div>
+        <div style="font-size:11.5px;color:var(--muted);">
+          Тариф: 0,30 ₽ за фразу · Вордстат: 0 ₽ · Лимит на сайте mutagen.ru: 10–20 проверок/сутки бесплатно
+        </div>
+      </div>
+
+      <!-- Карточки механик экономии -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-bottom:12px;">
+        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
+          <div style="font-weight:800;color:#047857;margin-bottom:3px;">🎁 0 ₽ — Лимит на mutagen.ru</div>
+          <div style="color:var(--ink);line-height:1.4;">В веб-кабинете на сайте mutagen.ru ежедневно даётся 10–20 бесплатных проверок конкуренции в сутки. Можно тестировать темы без списания с API.</div>
+        </div>
+        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
+          <div style="font-weight:800;color:#1D4ED8;margin-bottom:3px;">🎯 «Золотые темы» (strong ≤ 5–7)</div>
+          <div style="color:var(--ink);line-height:1.4;">Слабая конкуренция: статьи занимают ТОП-3 Яндекса за 1–2 недели без покупных ссылок. Проверяйте узкие боли мастера, а не общие слова.</div>
+        </div>
+        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
+          <div style="font-weight:800;color:#B45309;margin-bottom:3px;"> хвосты (tails > 1 000)</div>
+          <div style="color:var(--ink);line-height:1.4;">Параметр tails показывает суммарный спрос по десяткам микро-запросов. Одна статья закрывает сразу весь кластер и собирает стабильный трафик.</div>
+        </div>
+        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
+          <div style="font-weight:800;color:#6B21A8;margin-bottom:3px;">🔎 Подсказки и FAQ (бесплатно)</div>
+          <div style="color:var(--ink);line-height:1.4;">Живые формулировки людей из подсказок Яндекса/Google («как паять», «почему не лудится»). Готовые подзаголовки H2 и вопросы для блока FAQ.</div>
+        </div>
+      </div>
+
+      <!-- Быстрые чипсы перспективных тем -->
+      <div>
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">
+          ⚡ Перспективные темы из бэклога для быстрой проверки:
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка алюминия припой')">#48 Пайка алюминия (припой)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка нержавейки кислотой')">#49 Пайка нержавейки (кислота)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('холодная пайка как исправить')">#26 Холодная пайка (исправление)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('ремонт наушников пайка проводов')">#36 Ремонт наушников (провода)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка smd 0402 0201')">#58 Пайка SMD 0402/0201</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('беспроводной паяльник какой выбрать')">#9 Беспроводной паяльник (выбор)</button>
+        </div>
       </div>
     </div>
 
@@ -1400,6 +1454,32 @@ async function refreshData() {
 // ---------------------------------------------------------------------------
 // Анализ поисковых запросов: спрос (Вордстат, бесплатно) + конкуренция (Мутаген)
 // ---------------------------------------------------------------------------
+function setAnalysisPhrase(phrase) {
+  const input = document.getElementById('analysisPhrase');
+  if (input) {
+    input.value = phrase;
+    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    input.focus();
+  }
+}
+
+async function refreshMutagenBalance() {
+  const el = document.getElementById('analysisMutagenBalance');
+  const badge = document.getElementById('mutagenBalanceBadge');
+  try {
+    const res = await apiGet('/api/mutagen/balance');
+    if (res && res.status === 'ok') {
+      const bal = Number(res.balance || 0).toFixed(2);
+      const checks = Math.floor(res.balance / 0.30);
+      const text = `${bal} ₽ (~${checks} проверок)`;
+      if (el) el.textContent = text;
+      if (badge) badge.textContent = `${bal} ₽`;
+    }
+  } catch (e) {
+    console.error('Ошибка загрузки баланса Мутагена:', e);
+  }
+}
+
 function checkTopicPhrase(topicId) {
   const t = DB_DATA.topics.find(x => x.id === topicId);
   if (!t) return;
@@ -1557,6 +1637,7 @@ async function checkPhraseValue(phrase, source, refresh) {
   box.innerHTML = html;
 
   await renderAnalysisHistory();
+  refreshMutagenBalance();
 }
 
 let ANALYSIS_ROWS = [];
@@ -2682,6 +2763,7 @@ function renderAll() {
   renderCompetitors();
   renderBackups();
   renderAnalysisHistory();
+  refreshMutagenBalance();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

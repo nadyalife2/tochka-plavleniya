@@ -524,6 +524,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "running", "topics_count": cnt, "time": datetime.now().isoformat()})
             return
 
+        if path == "/api/mutagen/balance":
+            try:
+                import mutagen as mg
+                bal = mg.get_balance()
+                self.send_json({"status": "ok", "balance": bal, "currency": "₽"})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:150]}"}, 500)
+            return
+
         if path == "/api/brief":
             qs = parse_qs(url.query)
             tid = (qs.get("id") or [""])[0].strip()
