@@ -27,16 +27,16 @@ Excel `semantic_core_FULL_v11.xlsx` больше не мастер. Он ост�
 |---|---|---|
 | `topics` | очередь статей + тексты + оценки | `id`, `title`, `slug`, `cluster`, `status`, `content_markdown`, `chars`, `score_total`, `seo_priority`, `review_status`, `factcheck_status`, `writer_mode` |
 | `clusters` | кластеры и ключевики | `name`, `priority_rank`, ключевые темы, конкуренты, пробел |
-| `links` | плановые и фактические связи | `source_id`, `target_id`, `anchor`, `link_type` |
+| `links` | плановые и фактические связи | `source_id`, `target_id`, `anchor`, `status` |
 | `competitors`, `competitors_proposed` | конкуренты и предложенные | `domain`, `niche`, `score`, `articles_count` |
-| `topics_proposed` | темы из контентных пробелов | заголовок, кластер, доказательство, статус |
-| `raw_articles` | выгрузка страниц конкурентов | `url`, `title`, `h1`, `cluster`, `content_type` |
-| `briefs` | брифы (ТЗ) | интент, боль, LSI, GEO, E-E-A-T |
+| `topics_proposed` | темы из контентных пробелов | `title`, `cluster`, `source`, `evidence`, `hits`, `priority_score`, `status` |
+| `raw_articles` | выгрузка страниц конкурентов | `url`, `domain`, `title`, `h1`, `content_type`, `cluster` |
+| `briefs` | брифы (ТЗ) | `topic_id`, `intent`, `reader_pain`, `geo_snippet`, `eeat_facts`, `lsi`, `faq_json` |
 | `keyword_metrics`, `keyword_metrics_history` | конкуренция по Мутагену | `keyword`, `strong`, `wordstat`, `tails`, `vital` |
 | `wordstat_metrics`, `wordstat_history` | спрос по Вордстату | `phrase`, `total_count`, `top_json` |
-| `voices` | авторские голоса Practico 1 / 2 | `name`, `system_prompt`, `is_active` |
-| `jobs`, `agent_runs` | очередь фоновых задач и журнал прогонов | `job_type`, `status`, `log` |
-| `backups` | журнал резервных копий | файл, размер, дата |
+| `voices` | авторские голоса Practico 1 / 2 | `id`, `name`, `system_prompt`, `model`, `is_active` |
+| `jobs`, `agent_runs` | очередь фоновых задач и журнал прогонов | `job_type`, `target_id`, `status`, `log` |
+| `backups` | журнал резервных копий | `filename`, `filepath`, `size_bytes`, `records_count` |
 
 Ещё не мигрированы в БД (единственные оставшиеся листы Excel): `wp_export` (поля публикации —
 в `topics` пока нет `wp_post_id`/`wp_url`/`wp_status`) и `image_generation` (промпты иллюстраций).
