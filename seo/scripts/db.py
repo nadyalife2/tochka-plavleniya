@@ -63,6 +63,17 @@ def init_db() -> None:
             updated_at TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS topic_versions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            topic_id INTEGER NOT NULL,
+            content_markdown TEXT NOT NULL,
+            chars INTEGER NOT NULL,
+            author TEXT,
+            created_at TEXT NOT NULL,
+            FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
+        );
+        CREATE INDEX IF NOT EXISTS idx_topic_versions_topic ON topic_versions(topic_id, created_at DESC);
+
         CREATE TABLE IF NOT EXISTS clusters (
             name TEXT PRIMARY KEY,
             description TEXT,

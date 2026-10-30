@@ -1,33 +1,35 @@
 {
   "article_id": "1",
-  "generated_at": "2026-10-29T22:16:22",
+  "generated_at": "2026-10-30T20:54:22",
   "file": null,
   "metrics": {
-    "chars": 8053,
+    "chars": 8789,
     "h1": [
       "Как паять паяльником: пошаговый гайд для начинающих"
     ],
-    "h2_count": 11,
-    "avg_sentence_words": 17.4,
-    "avg_paragraph_sentences": 2.0,
-    "faq": 5,
-    "internal_links": 3,
-    "sources": 5,
-    "temps": 12,
+    "h2_count": 8,
+    "avg_sentence_words": 12.1,
+    "avg_paragraph_sentences": 2.2,
+    "faq": 6,
+    "internal_links": 0,
+    "sources": 10,
+    "temps": 21,
     "alloys": true,
-    "answer_first_words": 37,
+    "answer_first_words": 28,
     "stop_phrases": [],
-    "bureaucratic": [],
+    "bureaucratic": [
+      "необходимо"
+    ],
     "ai_patterns": [],
     "dangerous": []
   },
   "blocks": {
     "intent": {
-      "points": 13,
+      "points": 15,
       "max": 20
     },
     "facts": {
-      "points": 25,
+      "points": 21,
       "max": 25
     },
     "voice": {
@@ -35,11 +37,11 @@
       "max": 15
     },
     "seo": {
-      "points": 18,
+      "points": 15,
       "max": 20
     },
     "links": {
-      "points": 10,
+      "points": 5,
       "max": 10
     },
     "ai": {
@@ -47,12 +49,12 @@
       "max": 10
     }
   },
-  "total": 91,
+  "total": 81,
   "verdict": "готово к ОТК",
   "issues": [
-    "H2: 11 (цель 4–8; для справочников допустимо до 10)",
-    "Объём: 8,053 знаков (цель 5 500–7 000)",
-    "Нет раздела «Источники/Стандарты»"
+    "Объём: 8,789 знаков (цель 5 500–7 000)",
+    "Внутренние ссылки: 0 (нужно 3–5)",
+    "Ссылки: 0 (цель 3–5)"
   ],
   "blockers": [],
   "manual": [

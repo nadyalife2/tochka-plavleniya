@@ -1,0 +1,64 @@
+{
+  "article_id": "25",
+  "generated_at": "2026-10-29T23:30:30",
+  "file": null,
+  "metrics": {
+    "chars": 2785,
+    "h1": [],
+    "h2_count": 1,
+    "avg_sentence_words": 8.5,
+    "avg_paragraph_sentences": 3.0,
+    "faq": 4,
+    "internal_links": 0,
+    "sources": 3,
+    "temps": 0,
+    "alloys": true,
+    "answer_first_words": 25,
+    "stop_phrases": [],
+    "bureaucratic": [],
+    "ai_patterns": [],
+    "dangerous": []
+  },
+  "blocks": {
+    "intent": {
+      "points": 10,
+      "max": 20
+    },
+    "facts": {
+      "points": 20,
+      "max": 25
+    },
+    "voice": {
+      "points": 15,
+      "max": 15
+    },
+    "seo": {
+      "points": 15,
+      "max": 20
+    },
+    "links": {
+      "points": 5,
+      "max": 10
+    },
+    "ai": {
+      "points": 8,
+      "max": 10
+    }
+  },
+  "total": 73,
+  "verdict": "черновик",
+  "issues": [
+    "H1: найдено 0 (нужен ровно один)",
+    "H2: 1 (цель 4–8; для справочников допустимо до 10)",
+    "Объём: 2,785 знаков (цель 5 500–7 000)",
+    "Температуры: 0 значений с °C (нужно ≥ 3 в паяльной теме)",
+    "Внутренние ссылки: 0 (нужно 3–5)",
+    "Ссылки: 0 (цель 3–5)"
+  ],
+  "blockers": [],
+  "manual": [
+    "проверить факты по первоисточникам",
+    "проверить уникальность (text.ru/Главред)",
+    "прочитать голосом вслух (голос Practico)"
+  ]
+}
