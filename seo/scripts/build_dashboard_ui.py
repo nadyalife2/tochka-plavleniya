@@ -485,6 +485,24 @@ def generate_html() -> str:
     line-height: 1.25;
   }
 
+  /* Drag & Drop карточек между колонками (нативный HTML5) */
+  .task-card[draggable="true"] { cursor: grab; }
+  .task-card[draggable="true"]:active { cursor: grabbing; }
+  .task-card.dragging { opacity: 0.4; border-style: dashed; }
+  .board-column.drag-over {
+    background: #FFF9E6;
+    outline: 2px dashed var(--accent);
+    outline-offset: -2px;
+  }
+  .kanban-hint {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--mono);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
   .prio-pill {
     font-family: var(--mono);
     font-size: 10px;
@@ -636,19 +654,77 @@ def generate_html() -> str:
   @keyframes sketch-spin {
     to { transform: rotate(360deg); }
   }
+
+  /* ===== ACCESSIBILITY & TOUCH TARGETS ===== */
+  :focus-visible {
+    outline: 2px solid var(--accent) !important;
+    outline-offset: 2px !important;
+  }
+  .btn, .tab-btn, button[onclick], .board-column, .task-card, [role="button"], .step-node {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  .btn--xs { min-height: 36px; min-width: 36px; }
+  .btn--sm { min-height: 40px; min-width: 40px; }
+  .tab-btn { min-height: 40px; min-width: 40px; }
+  .step-node { min-height: 56px; }
+
+  /* Kanban keyboard navigation */
+  .task-card[tabindex="0"]:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent), 0 0 0 4px var(--card);
+  }
+  .board-column[tabindex="0"]:focus-visible {
+    box-shadow: inset 0 0 0 2px var(--accent);
+  }
+
+  /* Skip link for keyboard users */
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 12px;
+    background: var(--accent);
+    color: #000;
+    padding: 8px 12px;
+    font-weight: 700;
+    z-index: 10000;
+    border: 1.5px solid var(--border);
+  }
+  .skip-link:focus {
+    top: 12px;
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    :root {
+      --border: #000;
+      --border-hairline: #000;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="app-container">
+  <!-- Skip link for keyboard navigation -->
+  <a href="#main-content" class="skip-link">Перейти к основному контенту</a>
 
-  <!-- Brand & Header -->
-  <header class="brand-bar">
-    <div class="brand-bar__left">
-      <h1>ТОЧКА ПЛАВЛЕНИЯ <span class="brand-bar__tag">SEO КОНВЕЙЕР v3.3</span></h1>
-      <div style="font-family:var(--mono);font-size:12px;background:var(--card);padding:3px 8px;border:1px solid var(--border);">
-        ● База SQLite: <strong id="statTopicsCount">__STAT_TOPICS__</strong> тем · <strong id="statWrittenCount">__STAT_WRITTEN__</strong> с текстом
+  <div class="app-container">
+
+    <!-- Brand & Header -->
+    <header class="brand-bar" role="banner">
+      <div class="brand-bar__left">
+        <h1>ТОЧКА ПЛАВЛЕНИЯ <span class="brand-bar__tag">SEO КОНВЕЙЕР v3.3</span></h1>
+        <div style="font-family:var(--mono);font-size:12px;background:var(--card);padding:3px 8px;border:1px solid var(--border);">
+          ● База SQLite: <strong id="statTopicsCount">__STAT_TOPICS__</strong> тем · <strong id="statWrittenCount">__STAT_WRITTEN__</strong> с текстом
+        </div>
       </div>
-    </div>
     <div class="brand-bar__actions">
       <a href="/api/export.html" target="_blank" class="btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Открыть сводную карточку базы в браузере (HTML)">🌐 База HTML ↗</a>
       <a href="/api/export.json" download="tchp-existing-base.json" class="btn" style="text-decoration:none;" title="Скачать JSON-манифест базы для нейросети">⬇️ Манифест базы</a>
@@ -721,8 +797,10 @@ def generate_html() -> str:
     <!-- Решения шеф-редактора генерируются JS -->
   </section>
 
+  <main id="main-content" role="main">
+
   <!-- Navigation Tabs -->
-  <nav class="tabs-nav">
+  <nav class="tabs-nav" aria-label="Разделы дашборда">
     <button class="tab-btn active" onclick="switchTab('kanban')">📋 Канбан статей <span class="tab-badge" id="bCountTopics">0</span></button>
     <button class="tab-btn" onclick="switchTab('export')">🚀 Готовые к выгрузке <span class="tab-badge" id="bCountExport" style="background:#A7F3D0;color:#064E3B;">0</span></button>
     <button class="tab-btn" onclick="switchTab('gaps')">💡 Темы из пробелов <span class="tab-badge" id="bCountProposed">0</span></button>
@@ -743,6 +821,7 @@ def generate_html() -> str:
         </label>
         <input type="text" id="kanbanSearch" placeholder="Поиск по названию или #ID..." oninput="filterKanban()" style="padding:4px 8px;border:1px solid var(--border);width:220px;font-size:12px;">
         <button class="btn btn--sm" id="btnResetFilter" onclick="resetStepFilter()" style="display:none;">Сбросить фильтр этапа ✕</button>
+        <span class="kanban-hint" title="Зажмите карточку и перетащите в другую колонку — статус обновится">↕ перетащить статус</span>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button class="btn btn--sm btn--primary" onclick="toggleNewTopicBox()">✍️ + Добавить тему из головы</button>
@@ -774,6 +853,18 @@ def generate_html() -> str:
       </div>
       <div>
         <input type="text" id="newTopicNotes" placeholder="Ваши мысли, ключевые тезисы или акценты статьи (необязательно)..." style="width:100%;padding:5px 10px;border:1px dashed var(--border);font-size:11px;background:var(--bg);">
+      </div>
+    </div>
+
+    <!-- Bulk Actions Toolbar -->
+    <div id="bulkToolbar" style="display:none;gap:8px;margin-bottom:12px;padding:10px 12px;background:#FFF8E1;border:1.5px solid #D97706;border-radius:8px;align-items:center;flex-wrap:wrap;justify-content:space-between;">
+      <span style="font-weight:700;font-size:12px;">Выбрано: <strong id="bulkCount" style="font-family:var(--mono);">0</strong></span>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn--xs btn--success" onclick="bulkAction('approve')">✓ Утвердить все</button>
+        <button class="btn btn--xs btn--primary" onclick="bulkAction('score')">⚡ Скоринг</button>
+        <button class="btn btn--xs" onclick="bulkAction('export_wp')">🚀 В WordPress</button>
+        <button class="btn btn--xs btn--danger" onclick="bulkAction('reject')">↺ На доработку</button>
+        <button class="btn btn--xs" onclick="clearBulkSelection()">✕ Сбросить</button>
       </div>
     </div>
 
@@ -1170,6 +1261,8 @@ def generate_html() -> str:
     </div>
   </section>
 
+</main>
+
 </div>
 
 <!-- Modal Inspector -->
@@ -1465,6 +1558,55 @@ let CURRENT_TOPIC_ID = null;
 let ACTIVE_STEP_FILTER = null;
 let CURRENT_AI_PROVIDER = 'auto';
 
+// Bulk selection state
+let BULK_SELECTED = new Set();
+
+function clearBulkSelection() {
+  BULK_SELECTED.clear();
+  document.querySelectorAll('.bulk-check input').forEach(cb => cb.checked = false);
+  updateBulkToolbar();
+}
+
+function toggleBulkSelection(checkbox) {
+  const id = parseInt(checkbox.value, 10);
+  if (checkbox.checked) BULK_SELECTED.add(id);
+  else BULK_SELECTED.delete(id);
+  updateBulkToolbar();
+}
+
+function updateBulkToolbar() {
+  const toolbar = document.getElementById('bulkToolbar');
+  const countEl = document.getElementById('bulkCount');
+  if (!toolbar || !countEl) return;
+  const count = BULK_SELECTED.size;
+  countEl.innerText = count;
+  toolbar.style.display = count > 0 ? 'flex' : 'none';
+}
+
+async function bulkAction(action) {
+  if (BULK_SELECTED.size === 0) return;
+  const ids = Array.from(BULK_SELECTED);
+  let success = 0, failed = 0;
+  
+  for (const id of ids) {
+    try {
+      let res;
+      if (action === 'approve') res = await apiPost('/api/articles/approve', { id });
+      else if (action === 'reject') res = await apiPost('/api/articles/reject', { id, reason: 'Массовая отправка на доработку' });
+      else if (action === 'score') res = await apiPost('/api/agent/run', { agent: '04-scorer', target_id: id });
+      else if (action === 'export_wp') res = await apiPost('/api/agent/run', { agent: 'delivery', target_id: id });
+      else continue;
+      
+      if (res && res.status === 'succeeded') success++;
+      else failed++;
+    } catch (e) { failed++; }
+  }
+  
+  showToast(`Массовое действие: ${success} успешно, ${failed} ошибок`);
+  clearBulkSelection();
+  await refreshData();
+}
+
 function setGlobalProvider(val) {
   CURRENT_AI_PROVIDER = val || 'auto';
   const mSel = document.getElementById('modalProviderSelect');
@@ -1519,6 +1661,10 @@ function getTopicColumn(t) {
   // Явный возврат на доработку редактором имеет приоритет над баллом
   if (t.status === 'needs_fix') return 'needs_fix';
   if (t.status === 'blocked') return 'needs_fix';
+  // Ручные переносы (drag-and-drop) — приоритет над расчётом по данным
+  if (t.status === 'review') return 'review';
+  if (t.status === 'work') return 'work';
+  if (t.status === 'backlog') return 'backlog';
   const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
   const hasContent = chars >= 200;
   if (hasContent) {
@@ -2597,6 +2743,10 @@ function renderKanban() {
 
     const colDiv = document.createElement('div');
     colDiv.className = 'board-column';
+    colDiv.dataset.status = col.code;
+    colDiv.setAttribute('tabindex', '0');
+    colDiv.setAttribute('role', 'region');
+    colDiv.setAttribute('aria-label', `Колонка: ${col.title}, ${count} задач`);
 
     let colCardsHtml = '';
     let count = 0;
@@ -2655,9 +2805,12 @@ function renderKanban() {
       }
 
       colCardsHtml += `
-        <article class="task-card" onclick="openInspector(${t.id})">
+        <article class="task-card" draggable="true" data-topic-id="${t.id}" tabindex="0" role="button" aria-label="Статья #${t.id}: ${esc(t.title)}. ${STATUS_RU[t.status] || t.status}. ${chars > 0 ? chars + ' знаков' : 'без текста'}" onclick="openInspector(${t.id})" onkeydown="handleTaskCardKeydown(event, ${t.id})">
           <div class="task-card__top">
-            <span class="task-card__id">#${t.id}</span>
+            <label class="bulk-check" style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+              <input type="checkbox" value="${t.id}" onchange="toggleBulkSelection(this)" style="width:18px;height:18px;flex-shrink:0;">
+            </label>
+            <span class="task-card__id" style="cursor:grab;" title="Перетащите в другую колонку">⠿ #${t.id}</span>
             <div class="task-card__badges">
               ${t.is_critical ? '<span class="prio-pill" style="background:#FEE2E2;color:#B91C1C;">⚠ критично</span>' : ''}
               <span class="prio-pill ${pClass}">P${pScore}</span>
@@ -2693,8 +2846,73 @@ function renderKanban() {
     `;
     board.appendChild(colDiv);
   });
+
+  initKanbanDnD();
 }
 
+// ===== Drag & Drop карточек между колонками (нативный HTML5, без CDN) =====
+let KANBAN_DRAG_ID = null;
+
+function initKanbanDnD() {
+  const board = document.getElementById('kanbanBoard');
+  if (!board || board.dataset.dndReady === '1') return;
+  board.dataset.dndReady = '1';
+
+  board.addEventListener('dragstart', (e) => {
+    const card = e.target && e.target.closest ? e.target.closest('.task-card') : null;
+    if (!card || card.getAttribute('draggable') !== 'true') return;
+    KANBAN_DRAG_ID = Number(card.dataset.topicId);
+    e.dataTransfer.setData('text/plain', String(KANBAN_DRAG_ID));
+    e.dataTransfer.effectAllowed = 'move';
+    card.classList.add('dragging');
+  });
+
+  board.addEventListener('dragend', () => {
+    board.querySelectorAll('.task-card.dragging').forEach(c => c.classList.remove('dragging'));
+    board.querySelectorAll('.board-column.drag-over').forEach(c => c.classList.remove('drag-over'));
+  });
+
+  board.addEventListener('dragover', (e) => {
+    const col = e.target && e.target.closest ? e.target.closest('.board-column') : null;
+    if (!col) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    col.classList.add('drag-over');
+  });
+
+  board.addEventListener('dragleave', (e) => {
+    const col = e.target && e.target.closest ? e.target.closest('.board-column') : null;
+    if (col && e.relatedTarget && !col.contains(e.relatedTarget)) col.classList.remove('drag-over');
+  });
+
+  board.addEventListener('drop', async (e) => {
+    const col = e.target && e.target.closest ? e.target.closest('.board-column') : null;
+    if (!col) return;
+    e.preventDefault();
+    col.classList.remove('drag-over');
+    const id = Number(e.dataTransfer.getData('text/plain') || KANBAN_DRAG_ID || 0);
+    const newStatus = col.dataset.status;
+    if (!id || !newStatus) return;
+    const topic = (DB_DATA.topics || []).find(x => x.id === id);
+    if (!topic) return;
+    const fromCol = getTopicColumn(topic);
+    if (fromCol === newStatus) return;
+    const RU = { backlog: 'Бэклог', work: 'В работе', needs_fix: 'Требует правок', review: 'На ревью', ready: 'Готово к выгрузке', published: 'В WordPress' };
+    const risky = ['ready', 'published'].includes(newStatus) || ['ready', 'published'].includes(fromCol);
+    if (risky && !confirm('Перенести статью #' + id + ' в колонку «' + (RU[newStatus] || newStatus) + '»?')) {
+      renderKanban();
+      return;
+    }
+    const res = await apiPost('/api/articles/status', { id: id, status: newStatus });
+    if (res && res.status === 'ok') {
+      showToast('✓ Статус статьи #' + id + ': ' + (RU[newStatus] || newStatus));
+      await refreshData();
+    } else {
+      showToast('⚠️ Не удалось изменить статус');
+      renderKanban();
+    }
+  });
+}
 function filterKanban() {
   renderKanban();
 }
@@ -2785,6 +3003,88 @@ function renderBackups() {
         <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${esc(b.filepath)}</td>
       </tr>
     `;
+  });
+}
+
+// ===== KEYBOARD NAVIGATION HANDLERS =====
+function handleTaskCardKeydown(event, topicId) {
+  if (event.key === 'Enter' || event.key === ' ') {
+    event.preventDefault();
+    openInspector(topicId);
+  } else if (event.key === 'ArrowRight') {
+    event.preventDefault();
+    // Move to next card in column
+    const cards = document.querySelectorAll('.task-card[tabindex="0"]');
+    const idx = Array.from(cards).findIndex(c => c.getAttribute('onclick')?.includes(topicId));
+    if (idx >= 0 && idx < cards.length - 1) cards[idx + 1].focus();
+  } else if (event.key === 'ArrowLeft') {
+    event.preventDefault();
+    // Move to previous card in column
+    const cards = document.querySelectorAll('.task-card[tabindex="0"]');
+    const idx = Array.from(cards).findIndex(c => c.getAttribute('onclick')?.includes(topicId));
+    if (idx > 0) cards[idx - 1].focus();
+  } else if (event.key === 'ArrowDown') {
+    event.preventDefault();
+    // Move to next column (handled by column focus)
+    const col = event.target.closest('.board-column');
+    if (col) {
+      const nextCol = col.nextElementSibling;
+      if (nextCol && nextCol.classList.contains('board-column')) {
+        const firstCard = nextCol.querySelector('.task-card[tabindex="0"]');
+        if (firstCard) firstCard.focus();
+      }
+    }
+  } else if (event.key === 'ArrowUp') {
+    event.preventDefault();
+    const col = event.target.closest('.board-column');
+    if (col) {
+      const prevCol = col.previousElementSibling;
+      if (prevCol && prevCol.classList.contains('board-column')) {
+        const firstCard = prevCol.querySelector('.task-card[tabindex="0"]');
+        if (firstCard) firstCard.focus();
+      }
+    }
+  } else if (event.key === 'Escape') {
+    // Close modal if open, or blur card
+    if (document.getElementById('inspectorModal').classList.contains('active')) {
+      closeInspector();
+    } else {
+      event.target.blur();
+    }
+  }
+}
+
+// Global keyboard shortcuts
+function initGlobalKeyboardShortcuts() {
+  document.addEventListener('keydown', e => {
+    // Cmd/Ctrl + K = Command Palette (future)
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      showToast('⌘K Command Palette — в разработке');
+    }
+    // Cmd/Ctrl + Enter = Save in text editor
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      const activeTab = document.querySelector('.tab-view[style*="block"]')?.id;
+      if (activeTab === 'view-text' || activeTab === 'modalPanelText') {
+        e.preventDefault();
+        saveEditedArticleText();
+      }
+    }
+    // Escape = Close modal
+    if (e.key === 'Escape') {
+      if (document.getElementById('inspectorModal').classList.contains('active')) {
+        closeInspector();
+      } else if (document.getElementById('mPasteBox')?.style.display !== 'none') {
+        togglePasteBox();
+      }
+    }
+    // Alt + 1..7 = Switch tabs
+    if (e.altKey && e.key >= '1' && e.key <= '7') {
+      e.preventDefault();
+      const tabs = ['kanban', 'export', 'gaps', 'competitors', 'analysis', 'agents', 'backups'];
+      const idx = parseInt(e.key, 10) - 1;
+      if (tabs[idx]) switchTab(tabs[idx]);
+    }
   });
 }
 
@@ -3247,6 +3547,7 @@ function renderAll() {
   renderBackups();
   renderAnalysisHistory();
   refreshMutagenBalance();
+  initGlobalKeyboardShortcuts();
 }
 
 document.addEventListener('DOMContentLoaded', () => {

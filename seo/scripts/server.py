@@ -1008,6 +1008,41 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "id": tid, "new_status": "needs_fix"})
             return
 
+        # 6.1. Изменение статуса статьи (drag-and-drop на канбан-доске)
+        if path == "/api/articles/status":
+            tid = self.require_id(payload)
+            if tid is None:
+                return
+            new_status = _scalar(payload.get("status", ""), "").strip().lower()
+            VALID_STATUSES = {
+                "backlog": "перенесено в бэклог",
+                "work": "перенесено в работу",
+                "needs_fix": "на доработке (требует правок)",
+                "review": "на ревью (ОТК)",
+                "ready": "утверждено к выгрузке",
+                "published": "опубликовано в WordPress",
+            }
+            if new_status not in VALID_STATUSES:
+                self.send_json({
+                    "status": "error",
+                    "message": f"Недопустимый статус: {new_status!r}. Допустимы: {list(VALID_STATUSES.keys())}",
+                }, 400)
+                return
+
+            action_desc = VALID_STATUSES[new_status]
+            now_str = datetime.now().isoformat(timespec="seconds")
+            with get_connection() as conn:
+                cur = conn.execute(
+                    "UPDATE topics SET status = ?, next_action = ?, updated_at = ? WHERE id = ?",
+                    (new_status, action_desc, now_str, tid),
+                )
+                conn.commit()
+
+            if not self.require_updated(cur.rowcount, f"Статья #{tid} не найдена"):
+                return
+            self.send_json({"status": "ok", "id": int(tid), "new_status": new_status, "next_action": action_desc})
+            return
+
         # 5.5. Флаг критичной статьи: рецензия уходит на Opus, обычная — на Gemini
         if path == "/api/articles/critical":
             tid = self.require_id(payload)
