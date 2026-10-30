@@ -43,6 +43,7 @@ from db import (DB_PATH, backup_database, build_export_manifest, export_manifest
                 export_manifest_markdown, get_connection, init_db, list_backups,
                 list_voices, migrate_schema_v3, migrate_schema_v4, migrate_schema_v5,
                 migrate_schema_v6)
+from keys import get_key
 
 # Гарантия бесплатности: строгий программный запрет платных внешних API-шлюзов
 ALLOW_PAID = False
@@ -275,17 +276,31 @@ def _topic_title(topic_id) -> str:
     return (row["title"] if row else "") or f"тема #{topic_id}"
 
 
-def _save_written_article(topic_id, text: str) -> None:
-    """Сохраняет готовый текст в topics и в файл «сами статьи/»."""
+def _save_written_article(topic_id, text: str, author: str = "ai-writer") -> None:
+    """Сохраняет готовый текст в topics, пишет историю в topic_versions и сохраняет файл в «сами статьи/»."""
     chars = len(text.strip())
     slug = f"article-{topic_id}"
+    now_str = datetime.now().isoformat(timespec="seconds")
     with get_connection() as conn:
-        row = conn.execute("SELECT slug FROM topics WHERE id = ?", (topic_id,)).fetchone()
-        slug = row["slug"] if row else slug
+        row = conn.execute("SELECT slug, content_markdown, chars FROM topics WHERE id = ?", (topic_id,)).fetchone()
+        if row:
+            slug = row["slug"] or slug
+            old_text = row["content_markdown"] or ""
+            old_chars = row["chars"] or len(old_text.strip())
+            if old_text and old_text.strip() != text.strip():
+                try:
+                    conn.execute(
+                        "INSERT INTO topic_versions (topic_id, content_markdown, chars, author, created_at) "
+                        "VALUES (?, ?, ?, ?, ?)",
+                        (topic_id, old_text, old_chars, author, now_str),
+                    )
+                except Exception:
+                    pass
         conn.execute(
             "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
+            "review_status = NULL, factcheck_status = NULL, "
             "writer_mode = 'draft', updated_at = ? WHERE id = ?",
-            (text, chars, datetime.now().isoformat(timespec="seconds"), topic_id),
+            (text, chars, now_str, topic_id),
         )
         conn.commit()
     try:
@@ -1164,9 +1179,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
             if tid is None:
                 return
             with get_connection() as conn:
+                row = conn.execute("SELECT content_markdown, chars, score_total, review_status FROM topics WHERE id = ?", (tid,)).fetchone()
+                if not row:
+                    self.send_json({"status": "error", "message": f"Статья #{tid} не найдена"}, 404)
+                    return
+                text = (row["content_markdown"] or "").strip()
+                if len(text) < 500:
+                    self.send_json({"status": "error", "message": f"Нельзя утвердить статью #{tid}: текст отсутствует или слишком короткий ({len(text)} < 500 зн.)."}, 400)
+                    return
                 cur = conn.execute(
                     "UPDATE topics SET status = 'ready', "
-                    "next_action = 'утверждено шеф-редактором к ОТК' WHERE id = ?", (tid,))
+                    "next_action = 'утверждено шеф-редактором к ОТК', updated_at = ? WHERE id = ?",
+                    (datetime.now().isoformat(timespec="seconds"), tid),
+                )
                 conn.commit()
             if not self.require_updated(cur.rowcount, f"Статья #{tid} не найдена"):
                 return
@@ -1183,8 +1208,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 # needs_fix — отдельный статус, чтобы статья ГАРАНТИРОВАННО
                 # попала в колонку «Требует правок», даже если балл был ≥ 80
                 cur = conn.execute(
-                    "UPDATE topics SET status = 'needs_fix', next_action = ? WHERE id = ?",
-                    (f"доработка: {reason}", tid),
+                    "UPDATE topics SET status = 'needs_fix', next_action = ?, updated_at = ? WHERE id = ?",
+                    (f"доработка: {reason}", datetime.now().isoformat(timespec="seconds"), tid),
                 )
                 conn.commit()
             if not self.require_updated(cur.rowcount, f"Статья #{tid} не найдена"):
@@ -1212,6 +1237,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     "message": f"Недопустимый статус: {new_status!r}. Допустимы: {list(VALID_STATUSES.keys())}",
                 }, 400)
                 return
+
+            if new_status == "published":
+                with get_connection() as conn:
+                    row = conn.execute("SELECT wp_post_id FROM topics WHERE id = ?", (tid,)).fetchone()
+                    if not row or not row["wp_post_id"]:
+                        self.send_json({
+                            "status": "error",
+                            "message": f"Статья #{tid} не может быть перемещена в «В WordPress» вручную: она ещё не отправлена в WordPress (отсутствует wp_post_id). Запустите доставку черновика через агента delivery.",
+                        }, 400)
+                        return
 
             action_desc = VALID_STATUSES[new_status]
             now_str = datetime.now().isoformat(timespec="seconds")
@@ -1304,16 +1339,34 @@ class DashboardHandler(BaseHTTPRequestHandler):
             chars = len(new_text.strip())
 
             with get_connection() as conn:
-                row = conn.execute("SELECT slug FROM topics WHERE id = ?", (tid,)).fetchone()
+                row = conn.execute("SELECT slug, content_markdown, chars FROM topics WHERE id = ?", (tid,)).fetchone()
                 if not row:
                     self.send_json({"status": "error", "message": f"Статья #{tid} не найдена"}, 404)
                     return
                 slug = row["slug"] or f"article-{tid}"
-                conn.execute("""
-                    UPDATE topics
-                    SET content_markdown = ?, chars = ?, updated_at = ?
-                    WHERE id = ?
-                """, (new_text, chars, now_str, tid))
+                old_text = row["content_markdown"] or ""
+                old_chars = row["chars"] or len(old_text.strip())
+                if old_text and old_text.strip() != new_text.strip():
+                    try:
+                        conn.execute(
+                            "INSERT INTO topic_versions (topic_id, content_markdown, chars, author, created_at) "
+                            "VALUES (?, ?, ?, ?, ?)",
+                            (tid, old_text, old_chars, "editor", now_str),
+                        )
+                    except Exception:
+                        pass
+                    # При изменении текста сбрасываем статус рецензии и фактчека как устаревшие
+                    conn.execute("""
+                        UPDATE topics
+                        SET content_markdown = ?, chars = ?, review_status = NULL, factcheck_status = NULL, updated_at = ?
+                        WHERE id = ?
+                    """, (new_text, chars, now_str, tid))
+                else:
+                    conn.execute("""
+                        UPDATE topics
+                        SET content_markdown = ?, chars = ?, updated_at = ?
+                        WHERE id = ?
+                    """, (new_text, chars, now_str, tid))
                 conn.commit()
 
             # Синхронизируем файл на диске в `сами статьи/`
@@ -1464,30 +1517,41 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         wp_url = get_key("WP_URL") or os.environ.get("WP_URL", "")
                         wp_user = get_key("WP_USER") or os.environ.get("WP_USER", "")
                         wp_pass = get_key("WP_PASS") or os.environ.get("WP_PASS", "")
-                        is_live = bool(payload.get("live")) and bool(wp_url and wp_pass)
+                        want_live = bool(payload.get("live"))
 
-                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path)]
-                        if is_live:
-                            cmd.extend(["--wp-url", wp_url, "--wp-user", wp_user, "--wp-pass", wp_pass])
+                        if want_live and not (wp_url and wp_pass):
+                            log_output = (
+                                f"❌ Ошибка конфигурации отправки статьи #{target_id} в WordPress:\n"
+                                "Для реальной доставки (live) необходимо указать WP_URL и WP_PASS "
+                                "в файле config/api-keys.local.yaml или в переменных окружения.\n"
+                                "Автоматическое переключение в тестовый режим запрещено во избежание дезинформации."
+                            )
+                            status = "failed"
                         else:
-                            cmd.append("--dry-run")
+                            is_live = want_live and bool(wp_url and wp_pass)
+                            cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path)]
+                            if is_live:
+                                cmd.extend(["--wp-url", wp_url, "--wp-user", wp_user, "--wp-pass", wp_pass])
+                            else:
+                                cmd.append("--dry-run")
 
-                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=45)
-                        mode_label = "Реальная отправка черновика в WordPress" if is_live else "Тестовая валидация (dry-run, схема v1.1)"
-                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\nРежим: {mode_label}\n\n" + p.stdout + "\n" + p.stderr
-                        status = "succeeded" if p.returncode == 0 else "failed"
+                            p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=45)
+                            mode_label = "Реальная отправка черновика в WordPress" if is_live else "Тестовая валидация (dry-run, схема v1.1)"
+                            log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\nРежим: {mode_label}\n\n" + p.stdout + "\n" + p.stderr
+                            status = "succeeded" if p.returncode == 0 else "failed"
 
-                        # Синхронизируем метаданные WP из журнала доставки в SQLite
-                        journal_file = ROOT / "delivery-journal.json"
-                        if journal_file.exists():
-                            try:
-                                j_data = json.loads(journal_file.read_text(encoding="utf-8"))
-                                entries = j_data.get("entries", {})
-                                # Ключ может быть content_id ("article-ID" или "ID")
-                                for k, entry in entries.items():
-                                    if str(target_id) in k or f"article-{target_id}" in k:
+                            # Синхронизируем точные метаданные WP из журнала доставки DeliveryJournal v2.0 в SQLite
+                            journal_file = ROOT / "delivery-journal.json"
+                            contract_cid = res.get("contract", {}).get("content_id", "")
+                            if journal_file.exists() and is_live and p.returncode == 0 and contract_cid:
+                                try:
+                                    j_data = json.loads(journal_file.read_text(encoding="utf-8"))
+                                    site_key = wp_url.rstrip("/").lower()
+                                    site_entries = j_data.get("sites", {}).get(site_key, {})
+                                    entry = site_entries.get(contract_cid)
+                                    if entry:
                                         p_id = entry.get("wp_post_id")
-                                        p_status = entry.get("status")
+                                        p_status = entry.get("status") or "draft"
                                         if p_id:
                                             with get_connection() as conn:
                                                 conn.execute(
@@ -1495,9 +1559,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                                     (p_id, p_status, datetime.now().isoformat(timespec="seconds"), target_id),
                                                 )
                                                 conn.commit()
-                                        break
-                            except Exception:
-                                pass
+                                except Exception:
+                                    pass
                 elif agent == "04-scorer" and target_id:
                     with get_connection() as conn:
                         row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (target_id,)).fetchone()
@@ -1595,30 +1658,19 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 log_output = f"👁️ Предпросмотр адаптации ({chars} зн.): {voice_name} · {used}\nТекст готов к проверке и утверждению."
                             status = "succeeded"
                     else:
-                        provider = (payload.get("provider") or "auto").strip().lower()
-                        if provider not in ("auto", "claude", "deepseek", "yandex"):
-                            provider = "auto"
-                        custom_voice = voice not in ("practico", "practico2")
-                        if custom_voice:
-                            instruction = (
-                                "Напиши статью по теме «" + _topic_title(target_id) + "» в этом голосе. "
-                                "Стандарты: Answer First ≤ 40 слов, 4-8 H2, 1-2 таблицы, FAQ 4-6 пар "
-                                "в блоке '### FAQ:', источники 2-4 в '## Источники:', объём 5 500-7 000 знаков. "
-                                "Верни только markdown."
-                            )
-                            answer, used = voice_generate(
-                                model_spec, system_prompt, instruction,
-                                max_tokens=12000, temperature=0.4,
-                            )
-                            _save_written_article(target_id, answer)
-                            log_output = f"✅ Статья написана: {voice_name} · {used} ({len(answer)} зн.)\n\n{answer[:1500]}"
-                            status = "succeeded"
-                        else:
-                            cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
-                                   "--id", str(target_id), "--voice", voice, "--provider", provider]
-                            p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
-                            log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
-                            status = "succeeded" if p.returncode == 0 else "failed"
+                        instruction = (
+                            "Напиши статью по теме «" + _topic_title(target_id) + "» в этом голосе. "
+                            "Стандарты: Answer First ≤ 40 слов, 4-8 H2, 1-2 таблицы, FAQ 4-6 пар "
+                            "в блоке '### FAQ:', источники 2-4 в '## Источники:', объём 5 500-7 000 знаков. "
+                            "Верни только markdown."
+                        )
+                        answer, used = voice_generate(
+                            model_spec, system_prompt, instruction,
+                            max_tokens=12000, temperature=0.35,
+                        )
+                        _save_written_article(target_id, answer, author=f"ai-{voice}")
+                        log_output = f"✅ Статья написана: {voice_name} · {used} ({len(answer)} зн.)\n\n{answer[:1500]}"
+                        status = "succeeded"
                 elif agent in ("03-reviewer", "factcheck") and target_id:
                     with get_connection() as conn:
                         row = conn.execute(
@@ -1646,15 +1698,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             f"Статья #{target_id} «{row['title']}»:\n\n{text}",
                             max_tokens=6000,
                         )
+                        # Парсим машинный вердикт модели (принято / доработка)
+                        verdict = "done"
+                        low_ans = answer.lower()
+                        if re.search(r"(?i)вердикт[:\s]*(?:принято|годен|одобрено|соответствует)", answer):
+                            verdict = "passed"
+                        elif re.search(r"(?i)вердикт[:\s]*(?:доработка|правки|требует правок|не годен|отклон|ошибк)", answer) or "блок" in low_ans:
+                            verdict = "needs_fix"
+
                         with get_connection() as conn:
                             conn.execute(
-                                f"UPDATE topics SET {status_column} = 'done', {model_column} = ?, "
+                                f"UPDATE topics SET {status_column} = ?, {model_column} = ?, "
                                 "next_action = ?, updated_at = ? WHERE id = ?",
-                                (used, f"{label}: {used}",
+                                (verdict, used, f"{label} ({verdict}): {used}",
                                  datetime.now().isoformat(timespec="seconds"), target_id),
                             )
                             conn.commit()
-                        log_output = f"✅ {label.capitalize()} завершён моделью {used}\n\n{answer}"
+                        log_output = f"✅ {label.capitalize()} завершён: вердикт «{verdict}» (модель {used})\n\n{answer}"
                         status = "succeeded"
                 else:
                     log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."
