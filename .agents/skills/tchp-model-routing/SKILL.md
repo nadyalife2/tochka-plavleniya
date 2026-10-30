@@ -48,9 +48,13 @@ Gemini. Нашёл блокер у Gemini → перевести в критич
 
 ## VPN и каналы
 
-- Oxion, DeepSeek, Yandex AI Studio — VPN не нужен.
-- Token Harbor, Kilo AI Gateway, OpenRouter — только с VPN.
-- Antigravity (Gemini 3.8) — обычно нужен VPN.
+⚠️ Oxion (Claude для статей, Gemini для рецензии) **не работает при включённом VPN** — таймаут.
+Token Harbor и Kilo наоборот **требуют VPN** (`403` без него). Одновременно не работают.
+
+- `· VPN вкл` — Token Harbor, Kilo, OpenRouter.
+- `· VPN выкл` — Oxion: Claude Sonnet 5, Gemini 3.7 Flash, GPT-5.6 Luna, DeepSeek V4 Pro/Flash.
+- `· VPN любой` — Yandex AI Studio (YandexGPT), DeepSeek-аккаунт, SourceCraft CLI.
+- Схема: статьи → VPN выкл; бесплатный резерв → VPN вкл.
 - OpenCode Zen / freetap — удалён из профиля.
 
 ## Как этот skill развивается
