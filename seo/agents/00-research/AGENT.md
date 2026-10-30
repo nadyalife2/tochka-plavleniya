@@ -11,12 +11,15 @@
 
 ## 1. Входные данные
 
+Единственный мастер — SQLite `seo/data/seo.db`. Excel-архив `semantic_core_FULL_v11.xlsx`
+для работы не читается.
+
 | Что | Где лежит |
 |---|---|
-| Список конкурентов | лист `competitors` мастера `semantic_core_FULL_v11.xlsx` |
-| Кластеры, пробелы, приоритеты | лист `clusters` |
-| План тем | лист `content_plan` |
-| Карта перелинковки | лист `interlinking_map` |
+| Список конкурентов | таблица `competitors` (+ `competitors_proposed`) в `seo/data/seo.db` |
+| Кластеры, пробелы, приоритеты | таблица `clusters` |
+| План тем | таблица `topics` |
+| Карта перелинковки | таблица `links` |
 
 ## 2. Что делает агент
 

@@ -119,7 +119,7 @@ def render_markdown(plan: dict) -> str:
 
     add("# WORKLIST — «Точка Плавления»")
     add("")
-    add(f"Собрано из `semantic_core_FULL_v11.xlsx` · {plan['generated_at']}")
+    add(f"Собрано из SQLite `seo/data/seo.db` · {plan['generated_at']}")
     add("")
     add(f"**Тем: {counts['topics']}** · кластеров: {counts['clusters']} · связей: {counts['links']} · "
         f"написано: {counts['written']} · брифов: {counts['with_brief']}")

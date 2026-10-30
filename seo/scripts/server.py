@@ -68,6 +68,37 @@ def slugify(title: str) -> str:
 LONG_AGENTS = {"00-research", "bot-analyzer"}
 JOB_TIMEOUT_SECONDS = 600
 
+# Агенты, которым нужен конкретный ID темы. Без него запуск бессмысленен.
+TARGET_REQUIRED_AGENTS = {"delivery", "04-scorer", "02-writer", "03-reviewer", "factcheck"}
+
+
+def _scalar(value, default=""):
+    """Возвращает первый элемент, если value — список/кортеж, иначе value как есть.
+    Удобно для полей формы, где одно имя может приходить несколько раз."""
+    if isinstance(value, (list, tuple)):
+        return value[0] if value else default
+    return value if value is not None else default
+
+
+def parse_row_id(value: object) -> int | None:
+    """Приводит id из JSON к положительному int. None — если значение не число.
+
+    Нужен, чтобы `{"id": "abc"}` давал 400, а не тихое «ok» при нуле
+    обновлённых строк (SQLite сравнивает INTEGER с 'abc' без ошибки).
+    """
+    if value is None or isinstance(value, bool):
+        return None
+    if isinstance(value, int):
+        return value if value > 0 else None
+    if isinstance(value, float):
+        return int(value) if value.is_integer() and value > 0 else None
+    if isinstance(value, str):
+        text = value.strip()
+        if text.isdigit():
+            number = int(text)
+            return number if number > 0 else None
+    return None
+
 
 # --- Oxion AI: роли моделей и клиент с ротацией ключей ---------------------
 OXION_BASE_URL = "https://oxionai.com/v1"
@@ -474,6 +505,44 @@ class DashboardHandler(BaseHTTPRequestHandler):
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
 
+    # --- валидация входных данных POST ------------------------------------
+    def require_id(self, payload: dict, field: str = "id") -> int | None:
+        """Числовой id или ответ 400. Возвращает None, если ответ уже отправлен."""
+        raw = payload.get(field)
+        row_id = parse_row_id(raw)
+        if row_id is None:
+            self.send_json({
+                "status": "error",
+                "message": f"Поле '{field}' должно быть положительным целым числом, получено: {raw!r}",
+            }, 400)
+        return row_id
+
+    def require_text(self, payload: dict, field: str, label: str,
+                     min_len: int = 1, max_len: int = 400_000) -> str | None:
+        """Строка в допустимых границах или ответ 400."""
+        raw = payload.get(field)
+        if not isinstance(raw, str):
+            self.send_json({"status": "error",
+                            "message": f"Поле '{field}' ({label}) должно быть строкой"}, 400)
+            return None
+        text = raw.strip()
+        if len(text) < min_len:
+            self.send_json({"status": "error",
+                            "message": f"{label}: нужно минимум {min_len} знаков"}, 400)
+            return None
+        if len(text) > max_len:
+            self.send_json({"status": "error",
+                            "message": f"{label}: максимум {max_len} знаков"}, 400)
+            return None
+        return text
+
+    def require_updated(self, rowcount: int, message: str) -> bool:
+        """Проверяет, что UPDATE действительно что-то изменил. Иначе 404."""
+        if rowcount == 0:
+            self.send_json({"status": "error", "message": message}, 404)
+            return False
+        return True
+
     def do_GET(self):
         url = urlparse(self.path)
         path = url.path
@@ -718,11 +787,11 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         # 1.5. Создание темы вручную (из головы)
         if path == "/api/topics/create":
-            title = payload.get("title", "").strip()
-            cluster = payload.get("cluster", "").strip() or "Материалы / Припои"
-            ctype = payload.get("type", "гайд").strip()
-            priority = payload.get("priority", "средний").strip()
-            notes = payload.get("notes", "").strip()
+            title = _scalar(payload.get("title", ""), "").strip()
+            cluster = _scalar(payload.get("cluster", ""), "").strip() or "Материалы / Припои"
+            ctype = _scalar(payload.get("type", ""), "").strip() or "гайд"
+            priority = _scalar(payload.get("priority", ""), "").strip() or "средний"
+            notes = _scalar(payload.get("notes", ""), "").strip()
 
             if not title:
                 self.send_json({"status": "error", "message": "Введите название темы"}, 400)
@@ -755,7 +824,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         # 2. Одобрить предложенную тему -> в topics
         if path == "/api/topics/approve":
-            pid = payload.get("id")
+            pid = self.require_id(payload)
+            if pid is None:
+                return
             with get_connection() as conn:
                 cur = conn.cursor()
                 row = cur.execute("SELECT * FROM topics_proposed WHERE id = ?", (pid,)).fetchone()
@@ -777,16 +848,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         # 3. Отклонить предложенную тему
         if path == "/api/topics/reject":
-            pid = payload.get("id")
+            pid = self.require_id(payload)
+            if pid is None:
+                return
             with get_connection() as conn:
-                conn.execute("UPDATE topics_proposed SET status = 'отклонён' WHERE id = ?", (pid,))
+                cur = conn.execute("UPDATE topics_proposed SET status = 'отклонён' WHERE id = ?", (pid,))
                 conn.commit()
-            self.send_json({"status": "ok"})
+            if not self.require_updated(cur.rowcount, f"Предложенная тема #{pid} не найдена"):
+                return
+            self.send_json({"status": "ok", "id": pid})
             return
 
         # 4. Одобрить конкурента -> в competitors
         if path == "/api/competitors/approve":
-            domain = payload.get("domain")
+            domain = self.require_text(payload, "domain", "домен конкурента", min_len=3, max_len=253)
+            if domain is None:
+                return
             with get_connection() as conn:
                 cur = conn.cursor()
                 row = cur.execute("SELECT * FROM competitors_proposed WHERE domain = ?", (domain,)).fetchone()
@@ -820,38 +897,52 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         # 5. Утвердить статью к публикации
         if path == "/api/articles/approve":
-            tid = payload.get("id")
+            tid = self.require_id(payload)
+            if tid is None:
+                return
             with get_connection() as conn:
-                conn.execute("UPDATE topics SET status = 'ready', next_action = 'утверждено шеф-редактором к ОТК' WHERE id = ?", (tid,))
+                cur = conn.execute(
+                    "UPDATE topics SET status = 'ready', "
+                    "next_action = 'утверждено шеф-редактором к ОТК' WHERE id = ?", (tid,))
                 conn.commit()
-            self.send_json({"status": "ok", "id": tid})
+            if not self.require_updated(cur.rowcount, f"Статья #{tid} не найдена"):
+                return
+            self.send_json({"status": "ok", "id": int(tid), "new_status": "ready"})
             return
 
         # 6. Вернуть статью на доработку
         if path == "/api/articles/reject":
-            tid = payload.get("id")
-            reason = payload.get("reason", "Замечания редактора")
+            tid = self.require_id(payload)
+            if tid is None:
+                return
+            reason = _scalar(payload.get("reason", "Замечания редактора"), "Замечания редактора").strip()[:500]
             with get_connection() as conn:
                 # needs_fix — отдельный статус, чтобы статья ГАРАНТИРОВАННО
                 # попала в колонку «Требует правок», даже если балл был ≥ 80
-                conn.execute(
+                cur = conn.execute(
                     "UPDATE topics SET status = 'needs_fix', next_action = ? WHERE id = ?",
                     (f"доработка: {reason}", tid),
                 )
                 conn.commit()
+            if not self.require_updated(cur.rowcount, f"Статья #{tid} не найдена"):
+                return
             self.send_json({"status": "ok", "id": tid, "new_status": "needs_fix"})
             return
 
         # 5.5. Флаг критичной статьи: рецензия уходит на Opus, обычная — на Gemini
         if path == "/api/articles/critical":
-            tid = payload.get("id")
+            tid = self.require_id(payload)
+            if tid is None:
+                return
             flag = 1 if payload.get("critical") else 0
             with get_connection() as conn:
-                conn.execute(
+                cur = conn.execute(
                     "UPDATE topics SET is_critical = ?, updated_at = ? WHERE id = ?",
                     (flag, datetime.now().isoformat(timespec="seconds"), tid),
                 )
                 conn.commit()
+            if not self.require_updated(cur.rowcount, f"Статья #{tid} не найдена"):
+                return
             self.send_json({"status": "ok", "id": tid, "is_critical": flag})
             return
 
@@ -864,7 +955,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/voices/save":
-            voice_id = re.sub(r"[^a-z0-9_-]+", "-", (payload.get("id") or "").strip().lower()).strip("-")
+            raw_id = self.require_text(payload, "id", "id голоса", min_len=1, max_len=60)
+            if raw_id is None:
+                return
+            voice_id = re.sub(r"[^a-z0-9_-]+", "-", raw_id.lower()).strip("-")
             name = (payload.get("name") or "").strip()
             prompt = (payload.get("system_prompt") or "").strip()
             model = (payload.get("model") or "oxion:claude-sonnet-5").strip()
@@ -887,23 +981,36 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/voices/delete":
-            voice_id = (payload.get("id") or "").strip()
+            voice_id = self.require_text(payload, "id", "id голоса", min_len=1, max_len=60)
+            if voice_id is None:
+                return
             with get_connection() as conn:
-                conn.execute("UPDATE voices SET is_active = 0 WHERE id = ?", (voice_id,))
+                cur = conn.execute("UPDATE voices SET is_active = 0 WHERE id = ?", (voice_id,))
                 conn.commit()
+            if not self.require_updated(cur.rowcount, f"Голос '{voice_id}' не найден"):
+                return
             self.send_json({"status": "ok", "id": voice_id})
             return
 
         # 6.5. Сохранить отредактированный текст статьи
         if path == "/api/topics/update-text":
-            tid = payload.get("id")
+            tid = self.require_id(payload)
+            if tid is None:
+                return
             new_text = payload.get("content_markdown", "")
+            if not isinstance(new_text, str):
+                self.send_json({"status": "error",
+                                "message": "Поле 'content_markdown' должно быть строкой"}, 400)
+                return
             now_str = datetime.now().isoformat(timespec="seconds")
             chars = len(new_text.strip())
 
             with get_connection() as conn:
                 row = conn.execute("SELECT slug FROM topics WHERE id = ?", (tid,)).fetchone()
-                slug = row["slug"] if row else f"article-{tid}"
+                if not row:
+                    self.send_json({"status": "error", "message": f"Статья #{tid} не найдена"}, 404)
+                    return
+                slug = row["slug"] or f"article-{tid}"
                 conn.execute("""
                     UPDATE topics
                     SET content_markdown = ?, chars = ?, updated_at = ?
@@ -923,8 +1030,26 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         # 7. Запуск субагента
         if path == "/api/agent/run":
-            agent = payload.get("agent")
-            target_id = payload.get("target_id")
+            agent = _scalar(payload.get("agent", ""), "").strip()
+            if not agent:
+                self.send_json({"status": "error", "message": "Не указан агент"}, 400)
+                return
+
+            raw_target = _scalar(payload.get("target_id"), "")
+            if raw_target in (None, ""):
+                target_id = None
+            else:
+                target_id = parse_row_id(raw_target)
+                if target_id is None:
+                    self.send_json({
+                        "status": "error",
+                        "message": f"Поле 'target_id' должно быть положительным целым числом, получено: {raw_target!r}",
+                    }, 400)
+                    return
+            if agent in TARGET_REQUIRED_AGENTS and target_id is None:
+                self.send_json({"status": "error",
+                                "message": f"Агенту '{agent}' нужен target_id — ID темы из базы"}, 400)
+                return
 
             # Долгие агенты (обход сайтов) выполняются в фоне: HTTP-запрос
             # не должен ждать десятки секунд и обрываться по таймауту.
@@ -1123,11 +1248,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 log_output = str(ex)
 
             # Сохраняем запуск в agent_runs
+            safe_agent = _scalar(agent, "unknown").strip() or "unknown"
             with get_connection() as conn:
                 conn.execute("""
                     INSERT INTO agent_runs (agent_name, action, target_id, status, log, created_at)
                     VALUES (?, ?, ?, ?, ?, ?)
-                """, (agent, "run", str(target_id or ""), status, log_output[:2000], datetime.now().isoformat(timespec="seconds")))
+                """, (safe_agent, "run", str(target_id or ""), status, log_output[:2000], datetime.now().isoformat(timespec="seconds")))
                 conn.commit()
 
             self.send_json({"status": status, "agent": agent, "log": log_output})

@@ -8,7 +8,7 @@
 
 ## 1. Входные данные
 - ID темы и название из `seo/out/WORKLIST.md`.
-- Данные кластера из `semantic_core_FULL_v11.xlsx` (лист `clusters`).
+- Данные кластера из таблицы `clusters` в `seo/data/seo.db` (мастер — SQLite, не Excel).
 - Карточка перелинковки, сгенерированная командой:
   ```bash
   python seo/scripts/link_candidates.py --id <ID> --write
