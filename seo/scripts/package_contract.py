@@ -185,8 +185,12 @@ def markdown_to_html(md: str) -> str:
     return "\n\n".join(out)
 
 
-def package_article(topic_id: int | str) -> dict:
-    """Собирает и строго валидирует пакет статьи без выдуманных данных."""
+def package_article(topic_id: int | str, passport_override: dict | None = None) -> dict:
+    """Собирает и строго валидирует пакет статьи без выдуманных данных.
+
+    При наличии сохранённого паспорта (passport_override или topic['passport_json'])
+    использует явные параметры инженера (сплав, температуры, сложность, инструменты).
+    """
     tid = int(topic_id) if str(topic_id).isdigit() else topic_id
 
     with get_connection() as conn:
@@ -206,7 +210,7 @@ def package_article(topic_id: int | str) -> dict:
             ],
         }
 
-    # 1. Извлекаем реальные элементы
+    # 1. Извлекаем реальные элементы из текста
     first_para = re.split(r"\n\s*\n", md_text.strip())[0] if md_text else ""
     first_para_clean = re.sub(r"^#+.*?\n", "", first_para).strip()
     excerpt = first_para_clean[:280] if len(first_para_clean) >= 20 else (topic["title"] + ": техническое руководство.")
@@ -216,6 +220,37 @@ def package_article(topic_id: int | str) -> dict:
     tools = parse_tools_from_text(md_text)
     faq = parse_faq_from_text(md_text)
     sources = parse_sources_from_text(md_text)
+    difficulty = "Практик"
+
+    # Если передан явный паспорт или сохранён в БД — используем настройки инженера
+    passport_data = {}
+    if passport_override and isinstance(passport_override, dict):
+        passport_data = passport_override
+    elif topic and "passport_json" in topic.keys() and topic["passport_json"]:
+        try:
+            passport_data = json.loads(topic["passport_json"])
+        except Exception:
+            passport_data = {}
+
+    if passport_data:
+        if passport_data.get("solder_alloy"):
+            alloy = passport_data["solder_alloy"]
+        if passport_data.get("temp_data"):
+            temp_data = passport_data["temp_data"]
+        elif passport_data.get("temp_range"):
+            t_obj = {
+                "kind": passport_data.get("temp_kind") or "station_setpoint",
+                "range": passport_data["temp_range"].strip(),
+            }
+            if passport_data.get("temp_peak"):
+                t_obj["peak"] = passport_data["temp_peak"].strip()
+            temp_data = t_obj
+        if passport_data.get("difficulty"):
+            difficulty = passport_data["difficulty"]
+        if passport_data.get("tools"):
+            tools = passport_data["tools"]
+        if passport_data.get("sources"):
+            sources = passport_data["sources"]
 
     # Если FAQ не был в markdown, пробуем взять из таблицы briefs
     if not faq and brief_row and brief_row["faq_json"]:
@@ -247,7 +282,7 @@ def package_article(topic_id: int | str) -> dict:
         "category_slug": cat_slug,
         "tags": [topic["cluster"], "пайка"],
         "reading_time": reading_time,
-        "difficulty": "Практик",
+        "difficulty": difficulty,
         "solder_alloy": alloy,
         "temp_data": temp_data,
         "tools": tools,

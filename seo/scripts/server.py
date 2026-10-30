@@ -41,7 +41,8 @@ sys.path.insert(0, str(SCRIPTS))
 
 from db import (DB_PATH, backup_database, build_export_manifest, export_manifest_html,
                 export_manifest_markdown, get_connection, init_db, list_backups,
-                list_voices, migrate_schema_v3, migrate_schema_v4, migrate_schema_v5)
+                list_voices, migrate_schema_v3, migrate_schema_v4, migrate_schema_v5,
+                migrate_schema_v6)
 
 
 def slugify(title: str) -> str:
@@ -599,7 +600,85 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 bal = mg.get_balance()
                 self.send_json({"status": "ok", "balance": bal, "currency": "₽"})
             except Exception as ex:  # noqa: BLE001
-                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:150]}"}, 500)
+                self.send_json({"status": "ok", "balance": 0.0, "currency": "₽", "unavailable": True})
+            return
+
+        # Паспорт статьи (канонический сплав, температуры, стандарт, v1.1)
+        if path == "/api/topics/passport":
+            qs = parse_qs(url.query)
+            tid_raw = (qs.get("id") or [""])[0].strip()
+            tid = parse_row_id(tid_raw)
+            if tid is None:
+                self.send_json({"status": "error", "message": "Укажите корректный числовой ?id="}, 400)
+                return
+            try:
+                from package_contract import package_article
+                import canonical_alloys as canonical
+
+                with get_connection() as conn:
+                    row = conn.execute(
+                        "SELECT id, title, slug, cluster, passport_json, content_markdown FROM topics WHERE id = ?",
+                        (tid,),
+                    ).fetchone()
+                if not row:
+                    self.send_json({"status": "error", "message": f"Тема #{tid} не найдена"}, 404)
+                    return
+
+                saved_passport = {}
+                if "passport_json" in row.keys() and row["passport_json"]:
+                    try:
+                        saved_passport = json.loads(row["passport_json"])
+                    except Exception:
+                        saved_passport = {}
+
+                pkg = package_article(tid, passport_override=saved_passport if saved_passport else None)
+                contract = pkg.get("contract") or {}
+
+                passport = {
+                    "topic_id": tid,
+                    "title": row["title"],
+                    "slug": row["slug"],
+                    "solder_alloy": saved_passport.get("solder_alloy") or contract.get("solder_alloy") or "universal",
+                    "temp_kind": (saved_passport.get("temp_kind") or (contract.get("temp_data") or {}).get("kind") or "station_setpoint"),
+                    "temp_range": (saved_passport.get("temp_range") or (contract.get("temp_data") or {}).get("range") or ""),
+                    "temp_peak": (saved_passport.get("temp_peak") or (contract.get("temp_data") or {}).get("peak") or ""),
+                    "difficulty": saved_passport.get("difficulty") or contract.get("difficulty") or "Практик",
+                    "standard": saved_passport.get("standard") or "",
+                    "tools": saved_passport.get("tools") or contract.get("tools") or [],
+                    "faq_count": pkg.get("faq_count", 0),
+                    "sources_count": pkg.get("sources_count", 0),
+                    "is_customized": bool(saved_passport),
+                }
+
+                alloys_catalog = []
+                for k in canonical.canonical_keys():
+                    data = canonical.REGISTRY_SOLDERS.get(k, {})
+                    w_min, w_max = data.get("t_work_min"), data.get("t_work_max")
+                    m_min, m_max = data.get("t_melt_min"), data.get("t_melt_max")
+                    work_str = f"{w_min} – {w_max} °C" if w_min and w_max else ""
+                    melt_str = f"{m_min} – {m_max} °C" if m_min and m_max else (f"{m_min} °C" if m_min else "")
+                    alloys_catalog.append({
+                        "id": k,
+                        "name": canonical.alloy_label(k),
+                        "standard": data.get("standard", ""),
+                        "type": data.get("type", ""),
+                        "work_range": work_str,
+                        "melt_range": melt_str,
+                    })
+
+                self.send_json({
+                    "status": "ok",
+                    "passport": passport,
+                    "validation": {
+                        "valid": pkg.get("valid", False),
+                        "errors": pkg.get("errors", []),
+                        "missing_warnings": pkg.get("missing_warnings", []),
+                        "notes": pkg.get("notes", []),
+                    },
+                    "alloys_catalog": alloys_catalog,
+                })
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:180]}"}, 500)
             return
 
         if path == "/api/brief":
@@ -1028,6 +1107,81 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "id": tid, "chars": chars})
             return
 
+        # 6.6. Сохранение технического паспорта статьи (v1.1)
+        if path == "/api/topics/passport":
+            tid = self.require_id(payload)
+            if tid is None:
+                return
+            solder_alloy = _scalar(payload.get("solder_alloy", ""), "").strip().lower() or "universal"
+            temp_kind = _scalar(payload.get("temp_kind", ""), "").strip() or "station_setpoint"
+            temp_range = _scalar(payload.get("temp_range", ""), "").strip()
+            temp_peak = _scalar(payload.get("temp_peak", ""), "").strip()
+            difficulty = _scalar(payload.get("difficulty", ""), "").strip() or "Практик"
+            standard = _scalar(payload.get("standard", ""), "").strip()
+            tools_raw = payload.get("tools")
+            tools_list = []
+            if isinstance(tools_raw, list):
+                for t in tools_raw:
+                    if isinstance(t, dict) and t.get("name"):
+                        tools_list.append({"name": str(t["name"]).strip(), "model": str(t.get("model", "")).strip(), "purpose": str(t.get("purpose", "Пайка")).strip()})
+                    elif isinstance(t, str) and t.strip():
+                        tools_list.append({"name": t.strip(), "model": "", "purpose": "Пайка"})
+            elif isinstance(tools_raw, str) and tools_raw.strip():
+                for t in tools_raw.split(","):
+                    if t.strip():
+                        tools_list.append({"name": t.strip(), "model": "", "purpose": "Пайка"})
+
+            sources_raw = payload.get("sources")
+            sources_list = []
+            if isinstance(sources_raw, list):
+                for s in sources_raw:
+                    if isinstance(s, dict) and s.get("title"):
+                        sources_list.append(s)
+                    elif isinstance(s, str) and s.strip():
+                        sources_list.append({"title": s.strip(), "standard": standard or "IPC/ГОСТ"})
+
+            passport_dict = {
+                "solder_alloy": solder_alloy,
+                "temp_kind": temp_kind,
+                "temp_range": temp_range,
+                "temp_peak": temp_peak,
+                "difficulty": difficulty,
+                "standard": standard,
+                "tools": tools_list,
+                "updated_at": datetime.now().isoformat(timespec="seconds"),
+            }
+            if sources_list:
+                passport_dict["sources"] = sources_list
+
+            passport_json_str = json.dumps(passport_dict, ensure_ascii=False)
+
+            with get_connection() as conn:
+                conn.execute(
+                    "UPDATE topics SET passport_json = ?, updated_at = ? WHERE id = ?",
+                    (passport_json_str, datetime.now().isoformat(timespec="seconds"), tid),
+                )
+                conn.commit()
+
+            # Сборка и валидация контракта v1.1
+            from package_contract import package_article
+            pkg = package_article(tid, passport_override=passport_dict)
+            contract_file_rel = f"seo/data/contract_{tid}.json"
+            if pkg.get("contract"):
+                contract_path = DATA / f"contract_{tid}.json"
+                contract_path.write_text(json.dumps(pkg["contract"], ensure_ascii=False, indent=2), encoding="utf-8")
+
+            self.send_json({
+                "status": "ok",
+                "id": tid,
+                "valid": pkg.get("valid", False),
+                "errors": pkg.get("errors", []),
+                "missing_warnings": pkg.get("missing_warnings", []),
+                "notes": pkg.get("notes", []),
+                "contract_file": contract_file_rel,
+                "passport": passport_dict,
+            })
+            return
+
         # 7. Запуск субагента
         if path == "/api/agent/run":
             agent = _scalar(payload.get("agent", ""), "").strip()
@@ -1072,6 +1226,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
             log_output = f"Запуск {agent}..."
             status = "completed"
+            extra_response = {}
 
             try:
                 if agent == "delivery" and target_id:
@@ -1085,10 +1240,45 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         contract_path = DATA / f"contract_{target_id}.json"
                         contract_path.write_text(json.dumps(res["contract"], ensure_ascii=False, indent=2), encoding="utf-8")
                         delivery_tool = ROOT / "tools" / "delivery_cli.py"
-                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path), "--dry-run"]
-                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
-                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\n" + p.stdout + "\n" + p.stderr
+
+                        # Проверяем наличие ключей WP в keys.py
+                        wp_url = get_key("WP_URL") or os.environ.get("WP_URL", "")
+                        wp_user = get_key("WP_USER") or os.environ.get("WP_USER", "")
+                        wp_pass = get_key("WP_PASS") or os.environ.get("WP_PASS", "")
+                        is_live = bool(payload.get("live")) and bool(wp_url and wp_pass)
+
+                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path)]
+                        if is_live:
+                            cmd.extend(["--wp-url", wp_url, "--wp-user", wp_user, "--wp-pass", wp_pass])
+                        else:
+                            cmd.append("--dry-run")
+
+                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=45)
+                        mode_label = "Реальная отправка черновика в WordPress" if is_live else "Тестовая валидация (dry-run, схема v1.1)"
+                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\nРежим: {mode_label}\n\n" + p.stdout + "\n" + p.stderr
                         status = "succeeded" if p.returncode == 0 else "failed"
+
+                        # Синхронизируем метаданные WP из журнала доставки в SQLite
+                        journal_file = ROOT / "delivery-journal.json"
+                        if journal_file.exists():
+                            try:
+                                j_data = json.loads(journal_file.read_text(encoding="utf-8"))
+                                entries = j_data.get("entries", {})
+                                # Ключ может быть content_id ("article-ID" или "ID")
+                                for k, entry in entries.items():
+                                    if str(target_id) in k or f"article-{target_id}" in k:
+                                        p_id = entry.get("wp_post_id")
+                                        p_status = entry.get("status")
+                                        if p_id:
+                                            with get_connection() as conn:
+                                                conn.execute(
+                                                    "UPDATE topics SET wp_post_id = ?, wp_status = ?, updated_at = ? WHERE id = ?",
+                                                    (p_id, p_status, datetime.now().isoformat(timespec="seconds"), target_id),
+                                                )
+                                                conn.commit()
+                                        break
+                            except Exception:
+                                pass
                 elif agent == "04-scorer" and target_id:
                     with get_connection() as conn:
                         row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (target_id,)).fetchone()
@@ -1162,21 +1352,28 @@ class DashboardHandler(BaseHTTPRequestHandler):
                             )
                             chars = len(answer.strip())
                             slug = f"article-{target_id}"
-                            with get_connection() as conn:
-                                row = conn.execute("SELECT slug FROM topics WHERE id = ?", (target_id,)).fetchone()
-                                slug = row["slug"] if row else slug
-                                conn.execute(
-                                    "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
-                                    "writer_mode = 'paste', next_action = ?, updated_at = ? WHERE id = ?",
-                                    (answer, chars, f"адаптировано: {voice_name} · {used}",
-                                     datetime.now().isoformat(timespec="seconds"), target_id),
-                                )
-                                conn.commit()
-                            try:
-                                (ROOT / "сами статьи" / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
-                            except Exception:  # noqa: BLE001
-                                pass
-                            log_output = f"✅ Готовый текст адаптирован: {voice_name} · {used} ({chars} зн.)\n\n{answer[:1500]}"
+                            preview_only = bool(payload.get("preview_only", False))
+                            extra_response["adapted_markdown"] = answer
+                            extra_response["chars"] = chars
+
+                            if not preview_only:
+                                with get_connection() as conn:
+                                    row = conn.execute("SELECT slug FROM topics WHERE id = ?", (target_id,)).fetchone()
+                                    slug = row["slug"] if row else slug
+                                    conn.execute(
+                                        "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
+                                        "writer_mode = 'paste', next_action = ?, updated_at = ? WHERE id = ?",
+                                        (answer, chars, f"адаптировано: {voice_name} · {used}",
+                                         datetime.now().isoformat(timespec="seconds"), target_id),
+                                    )
+                                    conn.commit()
+                                try:
+                                    (ROOT / "сами статьи" / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
+                                except Exception:  # noqa: BLE001
+                                    pass
+                                log_output = f"✅ Готовый текст адаптирован и сохранён: {voice_name} · {used} ({chars} зн.)\n\n{answer[:1500]}"
+                            else:
+                                log_output = f"👁️ Предпросмотр адаптации ({chars} зн.): {voice_name} · {used}\nТекст готов к проверке и утверждению."
                             status = "succeeded"
                     else:
                         provider = (payload.get("provider") or "auto").strip().lower()
@@ -1256,7 +1453,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 """, (safe_agent, "run", str(target_id or ""), status, log_output[:2000], datetime.now().isoformat(timespec="seconds")))
                 conn.commit()
 
-            self.send_json({"status": status, "agent": agent, "log": log_output})
+            resp_payload = {"status": status, "agent": agent, "log": log_output}
+            if extra_response:
+                resp_payload.update(extra_response)
+            self.send_json(resp_payload)
             return
 
         # 7.5. Проверка фразы: спрос (Вордстат, бесплатно) и конкуренция (Мутаген, платно)
@@ -1583,6 +1783,7 @@ def main():
     migrate_schema_v3()
     migrate_schema_v4()
     migrate_schema_v5()
+    migrate_schema_v6()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), DashboardHandler)
     print("=" * 60)
     print(f"СЕРВЕР SEO-КОНВЕЙЕРА ЗАПУЩЕН:")

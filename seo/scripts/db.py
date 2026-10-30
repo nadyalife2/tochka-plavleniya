@@ -54,6 +54,11 @@ def init_db() -> None:
             factcheck_status TEXT,
             factcheck_model TEXT,
             writer_mode TEXT,
+            passport_json TEXT,
+            wp_post_id INTEGER,
+            wp_url TEXT,
+            wp_status TEXT,
+            wp_published_at TEXT,
             created_at TEXT,
             updated_at TEXT
         );
@@ -280,6 +285,31 @@ def migrate_schema_v5() -> None:
             """
         )
         conn.execute("CREATE INDEX IF NOT EXISTS idx_keywords_cluster ON keywords (cluster_id);")
+        conn.commit()
+
+
+def migrate_schema_v6() -> None:
+    """Миграция v6: колонка passport_json в topics для технического паспорта статьи."""
+    with get_connection() as conn:
+        cols = [c[1] for c in conn.execute("PRAGMA table_info(topics)").fetchall()]
+        if "passport_json" not in cols:
+            conn.execute("ALTER TABLE topics ADD COLUMN passport_json TEXT;")
+            conn.commit()
+
+
+def migrate_schema_v7() -> None:
+    """Миграция v7: колонки публикации WordPress (wp_post_id, wp_url, wp_status, wp_published_at)."""
+    with get_connection() as conn:
+        cols = [c[1] for c in conn.execute("PRAGMA table_info(topics)").fetchall()]
+        additions = {
+            "wp_post_id": "INTEGER",
+            "wp_url": "TEXT",
+            "wp_status": "TEXT",
+            "wp_published_at": "TEXT",
+        }
+        for column, decl in additions.items():
+            if column not in cols:
+                conn.execute(f"ALTER TABLE topics ADD COLUMN {column} {decl};")
         conn.commit()
 
 
@@ -661,5 +691,7 @@ if __name__ == "__main__":
     migrate_schema_v3()
     migrate_schema_v4()
     migrate_schema_v5()
+    migrate_schema_v6()
+    migrate_schema_v7()
     p = build_db_plan()
     print("✓ План собран из SQLite! Тем:", p["counts"]["topics"], "| Ссылок:", p["counts"]["links"])

@@ -25,7 +25,7 @@ Excel `semantic_core_FULL_v11.xlsx` больше не мастер. Он ост�
 
 | Таблица | Роль | Ключевые колонки |
 |---|---|---|
-| `topics` | очередь статей + тексты + оценки | `id`, `title`, `slug`, `cluster`, `status`, `content_markdown`, `chars`, `score_total`, `seo_priority`, `review_status`, `factcheck_status`, `writer_mode` |
+| `topics` | очередь статей + тексты + оценки | `id`, `title`, `slug`, `cluster`, `status`, `content_markdown`, `chars`, `score_total`, `seo_priority`, `review_status`, `factcheck_status`, `writer_mode`, `wp_post_id`, `wp_url`, `wp_status`, `wp_published_at` |
 | `clusters` | кластеры и ключевики | `name`, `priority_rank`, ключевые темы, конкуренты, пробел |
 | `links` | плановые и фактические связи | `source_id`, `target_id`, `anchor`, `status` |
 | `competitors`, `competitors_proposed` | конкуренты и предложенные | `domain`, `niche`, `score`, `articles_count` |
@@ -38,9 +38,8 @@ Excel `semantic_core_FULL_v11.xlsx` больше не мастер. Он ост�
 | `jobs`, `agent_runs` | очередь фоновых задач и журнал прогонов | `job_type`, `target_id`, `status`, `log` |
 | `backups` | журнал резервных копий | `filename`, `filepath`, `size_bytes`, `records_count` |
 
-Ещё не мигрированы в БД (единственные оставшиеся листы Excel): `wp_export` (поля публикации —
-в `topics` пока нет `wp_post_id`/`wp_url`/`wp_status`) и `image_generation` (промпты иллюстраций).
-Это известный долг, а не действующее правило: новые поля добавляем в БД, а не в xlsx.
+Единственный оставшийся лист Excel: `image_generation` (промпты иллюстраций).
+Поля публикации (`wp_post_id`, `wp_url`, `wp_status`, `wp_published_at`) уже перенесены в таблицу `topics`.
 
 ## 2. Канонические статусы
 

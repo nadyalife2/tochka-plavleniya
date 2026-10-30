@@ -351,15 +351,17 @@ def generate_html() -> str:
   /* Kanban Ergonomic Board */
   .kanban-board {
     display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(215px, 1fr));
     gap: 8px;
     align-items: stretch;
+    overflow-x: auto;
+    padding-bottom: 8px;
   }
   @media(max-width: 1360px) {
-    .kanban-board { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .kanban-board { grid-template-columns: repeat(6, minmax(215px, 1fr)); overflow-x: auto; }
   }
   @media(max-width: 768px) {
-    .kanban-board { grid-template-columns: repeat(1, 1fr); }
+    .kanban-board { grid-template-columns: repeat(1, 1fr); overflow-x: visible; }
   }
 
   .board-column {
@@ -620,6 +622,19 @@ def generate_html() -> str:
     font-weight: 600;
     z-index: 9999;
     display: none;
+  }
+
+  .sketch-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3.5px solid #E5E7EB;
+    border-top-color: var(--accent);
+    border-right-color: var(--border);
+    border-radius: 50%;
+    animation: sketch-spin 0.8s linear infinite;
+  }
+  @keyframes sketch-spin {
+    to { transform: rotate(360deg); }
   }
 </style>
 </head>
@@ -1161,6 +1176,13 @@ def generate_html() -> str:
 <div class="modal-overlay" id="inspectorModal" onclick="closeInspector(event)">
   <div class="modal-content" onclick="event.stopPropagation()">
     <button class="modal-close" onclick="closeInspector()">✕</button>
+
+    <!-- Оверлей ожидания для агентов (спиннер) -->
+    <div id="mModalLoadingOverlay" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,0.92);z-index:99;align-items:center;justify-content:center;flex-direction:column;gap:12px;padding:24px;text-align:center;">
+      <div class="sketch-spinner"></div>
+      <strong id="mModalLoadingTitle" style="font-size:15px;color:var(--ink);">Запуск агента...</strong>
+      <div id="mModalLoadingDesc" style="font-size:12px;color:var(--muted);max-width:400px;line-height:1.4;">Идёт обработка нейросетью. Обычно это занимает от 15 до 60 секунд.</div>
+    </div>
     
     <div style="border-bottom:2px solid var(--border);padding-bottom:10px;margin-bottom:12px;">
       <div style="font-family:var(--mono);font-size:11px;color:var(--muted);display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
@@ -1173,11 +1195,12 @@ def generate_html() -> str:
       <h2 id="mTitle" style="margin:6px 0 0;font-size:17px;font-weight:800;line-height:1.3;">Название статьи</h2>
     </div>
 
-    <!-- Вкладки модального окна: Оценка vs Текст статьи vs Бриф для автора -->
-    <div style="display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:12px;">
-      <button class="tab-btn active" id="modalTabBtnScore" onclick="switchModalTab('score')">📊 Оценка и замечания (0-100)</button>
-      <button class="tab-btn" id="modalTabBtnText" onclick="switchModalTab('text')">📄 Текст статьи (Markdown) <span class="tab-badge" id="mTextCharsBadge">0 зн.</span></button>
-      <button class="tab-btn" id="modalTabBtnBrief" onclick="switchModalTab('brief')">📋 Бриф для автора (ТЗ)</button>
+    <!-- Вкладки модального окна: Оценка vs Текст статьи vs Бриф для автора vs Паспорт статьи -->
+    <div style="display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:12px;flex-wrap:wrap;">
+      <button class="tab-btn active" id="modalTabBtnScore" onclick="switchModalTab('score')">📊 Оценка (0-100)</button>
+      <button class="tab-btn" id="modalTabBtnText" onclick="switchModalTab('text')">📄 Текст статьи <span class="tab-badge" id="mTextCharsBadge">0 зн.</span></button>
+      <button class="tab-btn" id="modalTabBtnBrief" onclick="switchModalTab('brief')">📋 Бриф автора</button>
+      <button class="tab-btn" id="modalTabBtnPassport" onclick="switchModalTab('passport')">🛠️ Паспорт статьи (v1.1)</button>
     </div>
 
     <!-- Вкладка 1: Оценка и замечания -->
@@ -1207,13 +1230,31 @@ def generate_html() -> str:
 
     <!-- Вкладка 2: Полный текст статьи (Markdown) -->
     <div id="modalPanelText" style="display:none;">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
-        <span style="font-size:11px;color:var(--muted);font-family:var(--mono);">
-          Файл на диске: <strong id="mDiskFilePath" style="color:var(--ink);">сами статьи/...</strong>
-        </span>
-        <button class="btn btn--sm btn--primary" onclick="saveEditedArticleText()">💾 Сохранить изменения текста</button>
+      <!-- Блок уведомления об адаптации текста -->
+      <div id="mAdaptationNotice" style="display:none;background:#FEF3C7;border:1.5px solid #D97706;padding:10px 14px;margin-bottom:10px;border-radius:4px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:12px;font-weight:700;color:#92400E;">⚠️ ИИ адаптировал текст под стандарты Practico (<span id="mAdaptationChars">0</span> зн.). Проверьте текст ниже.</span>
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn--xs btn--success" onclick="acceptAdaptation()">✓ Принять в БД</button>
+            <button class="btn btn--xs" onclick="cancelAdaptation()">✕ Отменить</button>
+          </div>
+        </div>
       </div>
-      <textarea id="mTextEditor" rows="18" style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;background:#FAFAFA;resize:vertical;" placeholder="Текст статьи ещё не написан..."></textarea>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <span style="font-size:11px;color:var(--muted);font-family:var(--mono);">
+            Файл: <strong id="mDiskFilePath" style="color:var(--ink);">сами статьи/...</strong>
+          </span>
+          <span id="mTextLiveCounter" style="font-family:var(--mono);font-size:11.5px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:#FFF;">0 зн.</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <button class="btn btn--xs" id="mTextPreviewBtn" onclick="toggleMarkdownPreview()">👁️ Превью</button>
+          <button class="btn btn--sm btn--primary" onclick="saveEditedArticleText()">💾 Сохранить изменения текста</button>
+        </div>
+      </div>
+      <textarea id="mTextEditor" rows="18" oninput="updateLiveCharCounter()" style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;background:#FAFAFA;resize:vertical;" placeholder="Текст статьи ещё не написан..."></textarea>
+      <div id="mTextPreview" style="display:none;width:100%;min-height:300px;max-height:480px;overflow-y:auto;padding:14px;border:1.5px solid var(--border);background:#FFF;line-height:1.65;font-size:13px;"></div>
       <div style="margin-top:6px;font-size:11px;color:var(--muted);">
         💡 Вы можете читать, проверять или редактировать текст прямо здесь. Кнопка «Сохранить» синхронизирует и базу данных SQLite, и файл на диске.
       </div>
@@ -1229,6 +1270,118 @@ def generate_html() -> str:
       <div style="margin-top:8px;font-size:11px;color:var(--muted);">
         💡 Напишите статью своим голосом по этому ТЗ, вставьте текст во вкладку «📄 Текст статьи» и нажмите «Сохранить». Затем ИИ адаптирует разметку и стандарты, а вы утвердите правки.
       </div>
+    </div>
+
+    <!-- Вкладка 4: Паспорт статьи (v1.1) -->
+    <div id="modalPanelPassport" style="display:none;">
+      <div style="background:#FFFDE7;border:1.5px solid var(--border);padding:10px 12px;margin-bottom:12px;font-size:12px;">
+        <strong>📋 Технический паспорт статьи (для схемы v1.1 и WordPress)</strong><br>
+        <span style="color:var(--muted);font-size:11px;">
+          Параметры проверяются сборщиком контракта. Выберите канонический припой — система подставит рабочие температуры и стандарт из реестра.
+        </span>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <!-- Сплав -->
+        <div class="form-group">
+          <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;">Припой / Сплав (канонический реестр):</label>
+          <select id="mPassportAlloy" onchange="onAlloySelectChange(this.value)" style="width:100%;padding:6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;">
+            <option value="universal">— Не конкретизирован (универсальный) —</option>
+            <option value="pos61">ПОС-61 (Sn61Pb39, 183–190 °C)</option>
+            <option value="sn63pb37">Sn63Pb37 (эвтектика 183 °C)</option>
+            <option value="sac305">SAC305 (Sn96.5Ag3Cu0.5, 217–220 °C, бессвинец)</option>
+            <option value="pos40">ПОС-40 (Sn40Pb60, 183–238 °C)</option>
+            <option value="sac405">SAC405 (Sn95.5Ag4Cu0.5, 217–220 °C)</option>
+            <option value="sn42bi58">Sn42Bi58 (низкотемпературный, 138 °C)</option>
+            <option value="snbiago">SnBiAg (термочувствительные, 137–140 °C)</option>
+            <option value="roze">Сплав Розе (94–96 °C)</option>
+            <option value="vuda">Сплав Вуда (68–72 °C)</option>
+          </select>
+          <div style="margin-top:4px;">
+            <button class="btn btn--sm" type="button" onclick="applyAlloyPreset()">⚡ Нормы из реестра</button>
+          </div>
+        </div>
+
+        <!-- Сложность -->
+        <div class="form-group">
+          <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;">Сложность материала (difficulty):</label>
+          <select id="mPassportDifficulty" style="width:100%;padding:6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;">
+            <option value="Новичок">Новичок (базовые приёмы)</option>
+            <option value="Любитель">Любитель (домашняя мастерская)</option>
+            <option value="Практик" selected>Практик (ремонт и монтаж)</option>
+            <option value="Инженер">Инженер (нормы и стандарты)</option>
+            <option value="Эксперт">Эксперт (сертификация, спецсплавы)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Температурный режим -->
+      <div style="border:1.5px solid var(--border);background:#FAFAFA;padding:10px 12px;margin-bottom:12px;">
+        <strong style="font-size:12px;display:block;margin-bottom:6px;">🌡️ Температурный режим (temp_data):</strong>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:2px;">Тип параметра:</label>
+            <select id="mPassportTempKind" style="width:100%;padding:5px;border:1px solid var(--border);font-size:12px;background:#FFF;">
+              <option value="station_setpoint">Жало паяльника (уставка)</option>
+              <option value="joint_temperature">Зона пайки (паяный шов)</option>
+              <option value="reflow_profile">Термопрофиль стола/печи</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:2px;">Рабочий диапазон (range):</label>
+            <input type="text" id="mPassportTempRange" placeholder="напр. 260 – 295 °C" style="width:100%;padding:5px 8px;border:1px solid var(--border);font-size:12px;">
+          </div>
+          <div>
+            <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:2px;">Пиковая температура (peak):</label>
+            <input type="text" id="mPassportTempPeak" placeholder="напр. 320 °C" style="width:100%;padding:5px 8px;border:1px solid var(--border);font-size:12px;">
+          </div>
+        </div>
+      </div>
+
+      <!-- Стандарты и инструменты -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+        <div>
+          <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;">Нормативная база (стандарт):</label>
+          <input type="text" id="mPassportStandard" placeholder="напр. ГОСТ 21930-76 / IPC J-STD-006C" style="width:100%;padding:6px 8px;border:1.5px solid var(--border);font-size:12px;">
+          <div style="font-size:10.5px;color:var(--muted);margin-top:3px;">
+            Быстрый выбор:
+            <a href="javascript:void(0)" onclick="setStandardQuick('IPC-A-610G')" style="color:var(--ink);">IPC-A-610G</a> ·
+            <a href="javascript:void(0)" onclick="setStandardQuick('ГОСТ 21931-76')" style="color:var(--ink);">ГОСТ 21931-76</a> ·
+            <a href="javascript:void(0)" onclick="setStandardQuick('J-STD-004B')" style="color:var(--ink);">J-STD-004B</a>
+          </div>
+        </div>
+        <div>
+          <label style="font-weight:700;font-size:12px;display:block;margin-bottom:4px;">Инструменты (отметьте упомянутые):</label>
+          <div id="mPassportToolsBox" style="display:flex;flex-wrap:wrap;gap:8px;font-size:11.5px;">
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Паяльник" class="passport-tool-cb"> Паяльник</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Паяльная станция" class="passport-tool-cb"> Паяльная станция</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Термофен" class="passport-tool-cb"> Термофен</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Микроскоп" class="passport-tool-cb"> Микроскоп</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Оплётка" class="passport-tool-cb"> Оплётка</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Оловоотсос" class="passport-tool-cb"> Оловоотсос</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Термопинцет" class="passport-tool-cb"> Термопинцет</label>
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;"><input type="checkbox" value="Термостол" class="passport-tool-cb"> Термостол</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Статус обязательных компонентов контракта -->
+      <div style="display:flex;gap:12px;margin-bottom:12px;padding:8px 12px;background:#F5F5F5;border:1px solid var(--border);font-size:11.5px;font-family:var(--mono);flex-wrap:wrap;">
+        <span id="mPassportFaqStatus">FAQ в статье: <strong>...</strong> (мин. 4)</span>
+        <span>•</span>
+        <span id="mPassportSourcesStatus">Источники в статье: <strong>...</strong> (мин. 2)</span>
+        <span>•</span>
+        <span id="mPassportCustomStatus">Паспорт: <strong>расчётный</strong></span>
+      </div>
+
+      <!-- Действия -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+        <button class="btn btn--sm btn--primary" type="button" onclick="savePassport()">💾 Сохранить паспорт и сгенерировать контракт v1.1</button>
+        <button class="btn btn--sm" type="button" onclick="loadModalPassport()">🔄 Обновить из текста</button>
+      </div>
+
+      <!-- Результат валидации v1.1 -->
+      <div id="mPassportValidationResult" style="display:none;margin-top:10px;padding:10px 12px;border:1.5px solid var(--border);font-size:12px;"></div>
     </div>
 
     <!-- Критичность и проверки (ОТК / фактчек) -->
@@ -1293,7 +1446,11 @@ def generate_html() -> str:
     </div>
 
     <!-- Contextual Action Buttons in Modal -->
-    <div id="modalActionButtons" style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);flex-wrap:wrap;">
+    <div id="modalActionButtons" style="display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1.5px solid var(--border);flex-wrap:wrap;align-items:center;justify-content:space-between;">
+      <!-- Генерируются динамически в openInspector() -->
+    </div>
+    <!-- Secondary Quality & Content Toolbar in Modal -->
+    <div id="modalSecondaryToolbar" style="display:none;margin-top:8px;padding:8px 12px;background:#F0F2F1;border:1px solid var(--border);font-size:11.5px;gap:8px;align-items:center;flex-wrap:wrap;">
       <!-- Генерируются динамически в openInspector() -->
     </div>
   </div>
@@ -1562,8 +1719,15 @@ async function checkPhrase(source) {
   const input = document.getElementById('analysisPhrase');
   const phrase = (input && input.value || '').trim();
   if (!phrase) {
-    alert('Введите фразу для проверки');
+    showToast('Введите фразу для проверки');
     return;
+  }
+  if (source === 'mutagen' || source === 'both') {
+    const balEl = document.getElementById('analysisMutagenBalance');
+    const curBal = balEl ? balEl.textContent : '15.92 ₽';
+    if (!confirm(`Проверить фразу «${phrase}» в платном API Мутагена?\nЭто спишет 0.30 ₽ с баланса (${curBal}).\n\nПродолжить?`)) {
+      return;
+    }
   }
   return checkPhraseValue(phrase, source, false);
 }
@@ -1574,6 +1738,13 @@ function recheckPhraseByIndex(index, source) {
   if (!row) return;
   const input = document.getElementById('analysisPhrase');
   if (input) input.value = row.phrase;
+  if (source === 'mutagen' || source === 'both') {
+    const balEl = document.getElementById('analysisMutagenBalance');
+    const curBal = balEl ? balEl.textContent : '15.92 ₽';
+    if (!confirm(`Повторно проверить «${row.phrase}» в Мутагене?\nЭто спишет 0.30 ₽ с баланса (${curBal}).`)) {
+      return;
+    }
+  }
   checkPhraseValue(row.phrase, source, true);
 }
 
@@ -1776,13 +1947,19 @@ async function rejectArticle(topicId) {
 
 async function scoreCurrentArticle() {
   if (!CURRENT_TOPIC_ID) return;
-  showToast(`Запуск скоринга статьи #${CURRENT_TOPIC_ID}...`);
-  const res = await apiPost('/api/agent/run', { agent: '04-scorer', target_id: CURRENT_TOPIC_ID });
-  if (res && res.log) {
-    document.getElementById('agentConsole').innerText = res.log;
-    showToast('✓ Скоринг завершён!');
-    await refreshData();
-    openInspector(CURRENT_TOPIC_ID);
+  showModalLoading(`⚡ Скоринг статьи #${CURRENT_TOPIC_ID}`, 'Проверка 100-балльной рубрики: факты, температуры, ГОСТ/IPC, разметка и ссылки...');
+  try {
+    const res = await apiPost('/api/agent/run', { agent: '04-scorer', target_id: CURRENT_TOPIC_ID });
+    if (res && res.log) {
+      document.getElementById('agentConsole').innerText = res.log;
+      showToast('✓ Скоринг завершён!');
+      await refreshData();
+      openInspector(CURRENT_TOPIC_ID);
+    }
+  } catch (e) {
+    showToast('⚠️ Ошибка скоринга');
+  } finally {
+    hideModalLoading();
   }
 }
 
@@ -1854,28 +2031,32 @@ async function runReviewerForCurrentTopic() {
   if (!CURRENT_TOPIC_ID) return;
   const t = DB_DATA.topics.find(x => x.id === CURRENT_TOPIC_ID) || {};
   const model = t.is_critical ? 'Claude Opus 4.6' : 'Gemini 3.7 Flash';
-  showToast(`Рецензия #${CURRENT_TOPIC_ID}: ${model}...`);
-  const c = document.getElementById('agentConsole');
-  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Агент 03 (рецензия)\nМодель: ${model}\nОжидание...`;
-  switchTab('agents');
-  const res = await apiPost('/api/agent/run', { agent: '03-reviewer', target_id: CURRENT_TOPIC_ID });
-  if (c && res) c.innerText = res.log || JSON.stringify(res);
-  showToast(res && res.status === 'succeeded' ? '✓ Рецензия готова' : '⚠️ Ошибка рецензии');
-  await refreshData();
-  if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+  showModalLoading(`🧐 Рецензия статьи #${CURRENT_TOPIC_ID}`, `Модель ${model} проверяет факты, безопасность и стандарты...`);
+  try {
+    const res = await apiPost('/api/agent/run', { agent: '03-reviewer', target_id: CURRENT_TOPIC_ID });
+    showToast(res && res.status === 'succeeded' ? '✓ Рецензия готова' : '⚠️ Ошибка рецензии');
+    await refreshData();
+    if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+  } catch (e) {
+    showToast('⚠️ Ошибка соединения при рецензии');
+  } finally {
+    hideModalLoading();
+  }
 }
 
 async function runFactcheckForCurrentTopic() {
   if (!CURRENT_TOPIC_ID) return;
-  showToast(`Фактчек #${CURRENT_TOPIC_ID}: DeepSeek V4 Pro...`);
-  const c = document.getElementById('agentConsole');
-  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Фактчек\nМодель: DeepSeek V4 Pro\nОжидание...`;
-  switchTab('agents');
-  const res = await apiPost('/api/agent/run', { agent: 'factcheck', target_id: CURRENT_TOPIC_ID });
-  if (c && res) c.innerText = res.log || JSON.stringify(res);
-  showToast(res && res.status === 'succeeded' ? '✓ Фактчек готов' : '⚠️ Ошибка фактчека');
-  await refreshData();
-  if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+  showModalLoading(`🔬 Фактчек статьи #${CURRENT_TOPIC_ID}`, 'Модель DeepSeek V4 Pro сверяет числа, сплавы и ГОСТ...');
+  try {
+    const res = await apiPost('/api/agent/run', { agent: 'factcheck', target_id: CURRENT_TOPIC_ID });
+    showToast(res && res.status === 'succeeded' ? '✓ Фактчек готов' : '⚠️ Ошибка фактчека');
+    await refreshData();
+    if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+  } catch (e) {
+    showToast('⚠️ Ошибка соединения при фактчеке');
+  } finally {
+    hideModalLoading();
+  }
 }
 
 // --- Голоса автора: загрузка, редактирование, сохранение ------------------
@@ -1972,24 +2153,155 @@ async function writeWithSelectedVoice() {
   if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
 }
 
+let CURRENT_ORIGINAL_TEXT = '';
+
+function showModalLoading(title, desc) {
+  const o = document.getElementById('mModalLoadingOverlay');
+  if (!o) return;
+  document.getElementById('mModalLoadingTitle').innerText = title || 'Обработка...';
+  if (desc) document.getElementById('mModalLoadingDesc').innerText = desc;
+  o.style.display = 'flex';
+}
+
+function hideModalLoading() {
+  const o = document.getElementById('mModalLoadingOverlay');
+  if (o) o.style.display = 'none';
+}
+
+function updateLiveCharCounter() {
+  const ta = document.getElementById('mTextEditor');
+  const counter = document.getElementById('mTextLiveCounter');
+  const badge = document.getElementById('mTextCharsBadge');
+  if (!ta) return;
+  const len = (ta.value || '').length;
+  if (badge) badge.innerText = len.toLocaleString('ru-RU') + ' зн.';
+  if (!counter) return;
+  let color = '#D97706';
+  let label = 'коротко';
+  if (len >= 5500 && len <= 7000) {
+    color = '#059669';
+    label = 'норма (5 500-7 000)';
+  } else if (len > 7000) {
+    color = '#DC2626';
+    label = 'длинно (>7 000)';
+  } else if (len === 0) {
+    label = 'пусто';
+    color = 'var(--muted)';
+  }
+  counter.innerHTML = `<span style="color:${color};font-weight:700;">${len.toLocaleString('ru-RU')} зн.</span> <span style="font-size:10.5px;color:var(--muted);">(${label})</span>`;
+}
+
+function renderSimpleMarkdown(md) {
+  if (!md) return '<p style="color:var(--muted);font-style:italic;">Текст статьи пока отсутствует.</p>';
+  let text = md.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  text = text.replace(/^### (.*$)/gim, '<h3 style="font-size:14px;font-weight:700;margin:14px 0 6px;color:var(--ink);">$1</h3>');
+  text = text.replace(/^## (.*$)/gim, '<h2 style="font-size:16px;font-weight:800;border-bottom:1.5px solid #E5E7EB;padding-bottom:4px;margin:18px 0 8px;color:var(--ink);">$1</h2>');
+  text = text.replace(/^# (.*$)/gim, '<h1 style="font-size:20px;font-weight:800;margin:8px 0 12px;color:var(--ink);">$1</h1>');
+  text = text.replace(/^> (.*$)/gim, '<blockquote style="border-left:3.5px solid var(--accent);background:#FFFBEB;padding:8px 12px;margin:10px 0;font-size:12.5px;font-style:italic;line-height:1.5;">$1</blockquote>');
+  text = text.replace(/\\*\\*(.*?)\\*\\*/gim, '<strong>$1</strong>');
+  text = text.replace(/\\*(.*?)\\*/gim, '<em>$1</em>');
+  text = text.replace(/`([^`]+)`/gim, '<code style="background:#F3F4F6;padding:2px 5px;font-family:var(--mono);font-size:11.5px;border-radius:3px;">$1</code>');
+  
+  const lines = text.split(/\\r?\\n/);
+  let inTable = false;
+  let out = [];
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i].trim();
+    if (l.startsWith('|') && l.endsWith('|')) {
+      if (!inTable) {
+        inTable = true;
+        out.push('<div style="overflow-x:auto;margin:12px 0;"><table style="width:100%;border-collapse:collapse;font-size:11.5px;border:1px solid #D1D5DB;">');
+      }
+      if (l.includes('---')) continue;
+      const cells = l.split('|').slice(1, -1).map(c => c.trim());
+      out.push('<tr>' + cells.map(c => `<td style="border:1px solid #D1D5DB;padding:5px 8px;">${c}</td>`).join('') + '</tr>');
+    } else {
+      if (inTable) {
+        inTable = false;
+        out.push('</table></div>');
+      }
+      if (l.startsWith('- ') || l.startsWith('* ')) {
+        out.push(`<li style="margin-left:18px;font-size:12.5px;line-height:1.5;">${l.substring(2)}</li>`);
+      } else if (l === '') {
+        out.push('<br>');
+      } else if (!l.startsWith('<h') && !l.startsWith('<block')) {
+        out.push(`<p style="margin:5px 0;font-size:12.5px;line-height:1.6;">${l}</p>`);
+      } else {
+        out.push(l);
+      }
+    }
+  }
+  if (inTable) out.push('</table></div>');
+  return out.join('');
+}
+
+function toggleMarkdownPreview() {
+  const ta = document.getElementById('mTextEditor');
+  const prev = document.getElementById('mTextPreview');
+  const btn = document.getElementById('mTextPreviewBtn');
+  if (!ta || !prev || !btn) return;
+  if (prev.style.display === 'none') {
+    prev.innerHTML = renderSimpleMarkdown(ta.value);
+    prev.style.display = 'block';
+    ta.style.display = 'none';
+    btn.innerText = '✏️ Редактор';
+    btn.classList.add('btn--primary');
+  } else {
+    prev.style.display = 'none';
+    ta.style.display = 'block';
+    btn.innerText = '👁️ Превью';
+    btn.classList.remove('btn--primary');
+  }
+}
+
 async function writePastedText() {
   if (!CURRENT_TOPIC_ID) return;
   const ta = document.getElementById('mPasteText');
   const text = ((ta && ta.value) || '').trim();
   if (text.length < 200) { showToast('Вставьте текст статьи (≥ 200 знаков)'); return; }
   const { voice, model, name } = selectedVoicePayload();
-  if (!confirm(`Заменить текущий текст статьи версией, адаптированной голосом «${name}» (${model})?`)) return;
-  showToast(`Адаптация голосом «${name}» (${model})...`);
-  const c = document.getElementById('agentConsole');
-  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Адаптация готового текста\nГолос: ${name}\nМодель: ${model}\nОжидание...`;
-  switchTab('agents');
-  const res = await apiPost('/api/agent/run', {
-    agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice, model, mode: 'paste', pasted_text: text
-  });
-  if (c && res) c.innerText = res.log || JSON.stringify(res);
-  showToast(res && res.status === 'succeeded' ? '✓ Текст адаптирован' : '⚠️ Ошибка адаптации');
-  await refreshData();
-  if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+  showModalLoading(`Адаптация текста: ${name}`, `Модель ${model} сохраняет факты и адаптирует структуру под стандарты...`);
+  try {
+    const res = await apiPost('/api/agent/run', {
+      agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice, model, mode: 'paste', pasted_text: text, preview_only: true
+    });
+    if (res && res.status === 'succeeded' && res.adapted_markdown) {
+      CURRENT_ORIGINAL_TEXT = document.getElementById('mTextEditor').value;
+      document.getElementById('mTextEditor').value = res.adapted_markdown;
+      updateLiveCharCounter();
+      switchModalTab('text');
+      const notice = document.getElementById('mAdaptationNotice');
+      if (notice) {
+        document.getElementById('mAdaptationChars').innerText = (res.chars || res.adapted_markdown.length).toLocaleString('ru-RU');
+        notice.style.display = 'block';
+      }
+      showToast('✓ Текст адаптирован! Проверьте результат и нажмите «Принять в БД»');
+      togglePasteBox();
+    } else {
+      showToast('⚠️ Ошибка адаптации: ' + ((res && res.log) || 'неизвестная ошибка'));
+    }
+  } catch (e) {
+    showToast('⚠️ Сбой соединения при адаптации текста');
+  } finally {
+    hideModalLoading();
+  }
+}
+
+function cancelAdaptation() {
+  if (CURRENT_ORIGINAL_TEXT !== undefined) {
+    document.getElementById('mTextEditor').value = CURRENT_ORIGINAL_TEXT;
+    updateLiveCharCounter();
+  }
+  const notice = document.getElementById('mAdaptationNotice');
+  if (notice) notice.style.display = 'none';
+  showToast('Адаптация отменена, исходный текст восстановлен');
+}
+
+async function acceptAdaptation() {
+  await saveEditedArticleText();
+  const notice = document.getElementById('mAdaptationNotice');
+  if (notice) notice.style.display = 'none';
+  showToast('✓ Адаптированная версия принята и сохранена в SQLite!');
 }
 
 function promptAgentTarget(agentName) {
@@ -2560,50 +2872,70 @@ function openInspector(topicId) {
 
   // Редактор текста статьи
   document.getElementById('mTextEditor').value = t.content_markdown || '';
+  const prevBox = document.getElementById('mTextPreview');
+  if (prevBox) prevBox.style.display = 'none';
+  document.getElementById('mTextEditor').style.display = 'block';
+  const prevBtn = document.getElementById('mTextPreviewBtn');
+  if (prevBtn) { prevBtn.innerText = '👁️ Превью'; prevBtn.classList.remove('btn--primary'); }
+  const notice = document.getElementById('mAdaptationNotice');
+  if (notice) notice.style.display = 'none';
+  updateLiveCharCounter();
+
   const critEl = document.getElementById('mCriticalCheck');
   if (critEl) critEl.checked = !!t.is_critical;
   updateChecksStatus(t);
   loadVoices();
   document.getElementById('mDiskFilePath').innerText = `сами статьи/${t.id}-${t.slug}.md`;
-  document.getElementById('mTextCharsBadge').innerText = (chars || 0) + ' зн.';
   switchModalTab('score');
 
-  // Поправка #2: Контекстные кнопки действий с защитой от затирания
+  // Главные действия (Primary Actions)
   const mProv = document.getElementById('modalProviderSelect');
   if (mProv) mProv.value = CURRENT_AI_PROVIDER || 'auto';
   const btnRow = document.getElementById('modalActionButtons');
+  const toolRow = document.getElementById('modalSecondaryToolbar');
   btnRow.innerHTML = '';
+  if (toolRow) toolRow.innerHTML = '';
 
+  let leftBtns = '';
   if (hasText) {
     if (t.score_total !== null && t.score_total >= 80 && t.status !== 'ready') {
-      btnRow.innerHTML += `<button class="btn btn--success" onclick="approveArticle(${t.id})">✓ Утвердить к выгрузке (ОТК)</button>`;
+      leftBtns += `<button class="btn btn--success" onclick="approveArticle(${t.id})">✓ Утвердить к выгрузке (ОТК)</button>`;
+      leftBtns += `<button class="btn btn--danger" onclick="rejectArticle(${t.id})">↺ На доработку</button>`;
     } else if (t.status === 'ready') {
-      btnRow.innerHTML += `<button class="btn btn--primary" onclick="exportSingleArticle(${t.id})">📦 Проверить пакет v1.1</button>`;
+      leftBtns += `<button class="btn btn--primary" onclick="exportSingleArticle(${t.id})">🚀 Отправить черновик в WordPress</button>`;
+      leftBtns += `<button class="btn btn--danger" onclick="rejectArticle(${t.id})">↺ Вернуть в черновики</button>`;
     } else {
-      btnRow.innerHTML += `<button class="btn btn--primary" onclick="switchModalTab('text')">✏️ Править текст статьи</button>`;
-      btnRow.innerHTML += `<button class="btn" onclick="scoreCurrentArticle()">⚡ Пересчитать оценку (0-100)</button>`;
+      leftBtns += `<button class="btn btn--primary" onclick="switchModalTab('text')">✏️ Править текст статьи</button>`;
+      leftBtns += `<button class="btn" onclick="scoreCurrentArticle()">⚡ Оценить (0-100)</button>`;
+      leftBtns += `<button class="btn btn--danger" onclick="rejectArticle(${t.id})">↺ На доработку</button>`;
     }
-    // Кнопка переписать с нуля — второстепенная с подтверждением
-    btnRow.innerHTML += `<button class="btn btn--warning" onclick="confirmRewriteCurrentTopic('practico')">↻ Переписать (Practico 1)</button>`;
-    btnRow.innerHTML += `<button class="btn btn--warning" onclick="confirmRewriteCurrentTopic('practico2')">↻ Переписать (Practico 2)</button>`;
   } else {
-    btnRow.innerHTML += `<button class="btn btn--primary" onclick="writeArticleForCurrentTopic('practico')">✍️ Написать (Practico 1)</button>`;
-    btnRow.innerHTML += `<button class="btn btn--primary" style="background:#111;color:#FFC700;" onclick="writeArticleForCurrentTopic('practico2')">✍️ Написать (Practico 2)</button>`;
-    btnRow.innerHTML += `<button class="btn" onclick="switchModalTab('brief')">📋 Напишу сама (показать ТЗ)</button>`;
+    leftBtns += `<button class="btn btn--primary" onclick="writeArticleForCurrentTopic('practico')">✍️ Написать (Practico 1)</button>`;
+    leftBtns += `<button class="btn btn--primary" style="background:#111;color:#FFC700;" onclick="writeArticleForCurrentTopic('practico2')">✍️ Написать (Practico 2)</button>`;
+    leftBtns += `<button class="btn" onclick="switchModalTab('brief')">📋 Напишу сама (ТЗ)</button>`;
   }
 
-  if (hasText) {
-    btnRow.innerHTML += `<button class="btn btn--danger" onclick="rejectArticle(${t.id})">↺ Вернуть на доработку</button>`;
-    btnRow.innerHTML += `<button class="btn" onclick="switchModalTab('brief')">📋 Бриф темы</button>`;
+  btnRow.innerHTML = `<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">${leftBtns}</div>` +
+                     `<button class="btn" onclick="closeInspector()">✕ Закрыть</button>`;
+
+  // Вспомогательная панель (Инструменты качества и редактора)
+  if (toolRow) {
+    toolRow.style.display = 'flex';
+    let toolsHtml = '<strong style="color:var(--ink);font-size:11px;">Экспертиза:</strong>';
+    if (hasText) {
+      toolsHtml += `<button class="btn btn--xs" onclick="runReviewerForCurrentTopic()">🧐 Рецензия (ОТК)</button>`;
+      toolsHtml += `<button class="btn btn--xs" onclick="runFactcheckForCurrentTopic()">🔬 Фактчек</button>`;
+    }
+    toolsHtml += `<button class="btn btn--xs" onclick="checkTopicPhrase(${t.id})">🔬 Запрос темы</button>`;
+    toolsHtml += '<span style="color:#CBD5E1;margin:0 4px;">|</span>';
+    toolsHtml += '<strong style="color:var(--ink);font-size:11px;">Контент:</strong>';
+    toolsHtml += `<button class="btn btn--xs" onclick="switchModalTab('brief')">📋 ТЗ темы</button>`;
+    toolsHtml += `<button class="btn btn--xs" onclick="togglePasteBox()">📋 Вставить готовый текст</button>`;
+    if (hasText) {
+      toolsHtml += `<button class="btn btn--xs btn--warning" onclick="confirmRewriteCurrentTopic('practico')">↻ Переписать ИИ</button>`;
+    }
+    toolRow.innerHTML = toolsHtml;
   }
-  // Проверка спроса и конкуренции по заголовку статьи
-  btnRow.innerHTML += `<button class="btn" onclick="checkTopicPhrase(${t.id})">🔬 Проверить запрос</button>`;
-  if (hasText) {
-    btnRow.innerHTML += `<button class="btn" onclick="runReviewerForCurrentTopic()">🧐 Рецензия (ОТК)</button>`;
-    btnRow.innerHTML += `<button class="btn" onclick="runFactcheckForCurrentTopic()">🔬 Фактчек</button>`;
-  }
-  btnRow.innerHTML += `<button class="btn" onclick="togglePasteBox()">📋 Вставить готовый текст</button>`;
-  btnRow.innerHTML += `<button class="btn" onclick="closeInspector()">Закрыть</button>`;
 
   document.getElementById('inspectorModal').classList.add('active');
 }
@@ -2612,11 +2944,162 @@ function switchModalTab(tab) {
   document.getElementById('modalTabBtnScore').classList.toggle('active', tab === 'score');
   document.getElementById('modalTabBtnText').classList.toggle('active', tab === 'text');
   document.getElementById('modalTabBtnBrief').classList.toggle('active', tab === 'brief');
+  const btnPass = document.getElementById('modalTabBtnPassport');
+  if (btnPass) btnPass.classList.toggle('active', tab === 'passport');
+
   document.getElementById('modalPanelScore').style.display = tab === 'score' ? 'block' : 'none';
   document.getElementById('modalPanelText').style.display = tab === 'text' ? 'block' : 'none';
   document.getElementById('modalPanelBrief').style.display = tab === 'brief' ? 'block' : 'none';
+  const panPass = document.getElementById('modalPanelPassport');
+  if (panPass) panPass.style.display = tab === 'passport' ? 'block' : 'none';
+
   if (tab === 'brief') {
     loadModalBrief();
+  } else if (tab === 'passport') {
+    loadModalPassport();
+  }
+}
+
+let CURRENT_PASSPORT_CATALOG = [];
+
+function setStandardQuick(std) {
+  const el = document.getElementById('mPassportStandard');
+  if (el) el.value = std;
+}
+
+function onAlloySelectChange(alloyId) {
+  applyAlloyPreset();
+}
+
+function applyAlloyPreset() {
+  const alloyId = document.getElementById('mPassportAlloy').value;
+  const item = CURRENT_PASSPORT_CATALOG.find(x => x.id === alloyId);
+  if (!item) return;
+
+  if (item.work_range) {
+    document.getElementById('mPassportTempRange').value = item.work_range;
+  }
+  if (item.standard && !document.getElementById('mPassportStandard').value.trim()) {
+    document.getElementById('mPassportStandard').value = item.standard;
+  }
+  showToast(`Нормы применены: ${item.name}`);
+}
+
+async function loadModalPassport() {
+  if (!CURRENT_TOPIC_ID) return;
+  const resBox = document.getElementById('mPassportValidationResult');
+  if (resBox) resBox.style.display = 'none';
+
+  try {
+    const res = await apiGet('/api/topics/passport?id=' + CURRENT_TOPIC_ID);
+    if (!res || res.status !== 'ok') {
+      showToast('⚠️ Не удалось загрузить паспорт статьи');
+      return;
+    }
+    const p = res.passport || {};
+    const val = res.validation || {};
+    CURRENT_PASSPORT_CATALOG = res.alloys_catalog || [];
+
+    // 1. Сплав
+    const alloySel = document.getElementById('mPassportAlloy');
+    if (alloySel && p.solder_alloy) {
+      alloySel.value = p.solder_alloy;
+    }
+
+    // 2. Температуры
+    document.getElementById('mPassportTempKind').value = p.temp_kind || 'station_setpoint';
+    document.getElementById('mPassportTempRange').value = p.temp_range || '';
+    document.getElementById('mPassportTempPeak').value = p.temp_peak || '';
+
+    // 3. Сложность
+    document.getElementById('mPassportDifficulty').value = p.difficulty || 'Практик';
+
+    // 4. Стандарт
+    document.getElementById('mPassportStandard').value = p.standard || '';
+
+    // 5. Инструменты
+    const toolNames = new Set((p.tools || []).map(t => (t.name || t).toLowerCase()));
+    document.querySelectorAll('.passport-tool-cb').forEach(cb => {
+      cb.checked = toolNames.has(cb.value.toLowerCase());
+    });
+
+    // 6. Сводка
+    document.getElementById('mPassportFaqStatus').innerHTML = `FAQ в тексте: <strong>${p.faq_count}</strong> (мин. 4)`;
+    document.getElementById('mPassportSourcesStatus').innerHTML = `Источники в тексте: <strong>${p.sources_count}</strong> (мин. 2)`;
+    document.getElementById('mPassportCustomStatus').innerHTML = p.is_customized ? `<span style="color:#059669;font-weight:700;">сохранён вручную</span>` : `<span>расчётный из текста</span>`;
+
+    // 7. Валидация
+    renderPassportValidation(val);
+  } catch (e) {
+    showToast('Ошибка загрузки паспорта статьи');
+  }
+}
+
+function renderPassportValidation(val) {
+  const resBox = document.getElementById('mPassportValidationResult');
+  if (!resBox) return;
+  resBox.style.display = 'block';
+
+  if (val.valid) {
+    resBox.style.background = '#F0FDF4';
+    resBox.style.borderColor = '#86EFAC';
+    resBox.style.color = '#166534';
+    resBox.innerHTML = `
+      <strong>✓ ПАКЕТ СТАТЬИ 100% ВАЛИДЕН ПО СХЕМЕ v1.1</strong><br>
+      <div style="font-size:11.5px;margin-top:4px;">Все обязательные поля, канонический сплав, температурный коридор, FAQ (≥4) и источники (≥2) подтверждены. Статья готова к выгрузке в WordPress.</div>
+    `;
+  } else {
+    resBox.style.background = '#FFFBEB';
+    resBox.style.borderColor = '#FCD34D';
+    resBox.style.color = '#92400E';
+    const errs = (val.errors || []).concat(val.missing_warnings || []);
+    resBox.innerHTML = `
+      <strong>⚠️ Требуется внимание для схемы v1.1:</strong>
+      <ul style="margin:6px 0 0;padding-left:18px;font-size:11.5px;line-height:1.4;">
+        ${errs.map(e => `<li>${esc(e)}</li>`).join('')}
+      </ul>
+    `;
+  }
+}
+
+async function savePassport() {
+  if (!CURRENT_TOPIC_ID) return;
+
+  const solder_alloy = document.getElementById('mPassportAlloy').value;
+  const temp_kind = document.getElementById('mPassportTempKind').value;
+  const temp_range = document.getElementById('mPassportTempRange').value.trim();
+  const temp_peak = document.getElementById('mPassportTempPeak').value.trim();
+  const difficulty = document.getElementById('mPassportDifficulty').value;
+  const standard = document.getElementById('mPassportStandard').value.trim();
+
+  const selectedTools = [];
+  document.querySelectorAll('.passport-tool-cb:checked').forEach(cb => {
+    selectedTools.push({ name: cb.value, model: '', purpose: 'Пайка' });
+  });
+
+  showToast('Сохранение паспорта и валидация v1.1...');
+  const res = await apiPost('/api/topics/passport', {
+    id: CURRENT_TOPIC_ID,
+    solder_alloy,
+    temp_kind,
+    temp_range,
+    temp_peak,
+    difficulty,
+    standard,
+    tools: selectedTools,
+  });
+
+  if (res && res.status === 'ok') {
+    showToast('✓ Паспорт статьи сохранён!');
+    document.getElementById('mPassportCustomStatus').innerHTML = `<span style="color:#059669;font-weight:700;">сохранён вручную</span>`;
+    renderPassportValidation({
+      valid: res.valid,
+      errors: res.errors || [],
+      missing_warnings: res.missing_warnings || []
+    });
+    await refreshData();
+  } else {
+    showToast('⚠️ Ошибка при сохранении паспорта');
   }
 }
 
