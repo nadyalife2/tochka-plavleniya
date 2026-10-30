@@ -144,52 +144,148 @@ def detect_alloy(text: str, title: str = "") -> str:
 
 
 def detect_temp_data(text: str, alloy: str) -> dict | None:
-    """Температурные данные только из текста или из реестра. Без искусственных «пиков»."""
-    def plausible(low: int, high: int) -> int:
-        """Приоритет диапазонов, реально относящихся к пайке (а не к сплаву Розе в таблице)."""
-        if 170 <= low and high <= 400:
-            return 3
-        if 120 <= low and high <= 450:
-            return 2
-        return 0
+    """Извлекает типизированные температурные данные из текста или канонического реестра.
 
-    ranges = [
-        (int(lo), int(hi))
-        for lo, hi in re.findall(r"(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text)
-        if int(lo) < int(hi)
+    Строго разделяет:
+      - температуру плавления (солидус/ликвидус) -> joint_temperature / melting
+      - уставку жала паяльника / станции -> station_setpoint
+    """
+    # 1. Поиск явной уставки станции/паяльника по контекстным маркерам
+    setpoint_matches = []
+    for m in re.finditer(r"(?i)(?:уставк\w*|паяльник\w*|жал\w*|на станци\w*|режим\w*|паять при|температур\w*)\s*(?:жала|паяльника|станции|регулятора|составляет|равна|—|-|:)?\s*(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text):
+        lo, hi = int(m.group(1)), int(m.group(2))
+        if 230 <= lo < hi <= 400:
+            setpoint_matches.append((lo, hi))
+
+    if setpoint_matches:
+        lo, hi = setpoint_matches[0]
+        return {"kind": "station_setpoint", "range": f"{lo} – {hi} °C"}
+
+    # 2. Поиск общих диапазонов в тексте с фильтрацией плавления
+    melt_r = canonical.melt_range(alloy)
+    all_ranges = [
+        (int(m.group(1)), int(m.group(2)), m.start())
+        for m in re.finditer(r"(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text)
+        if int(m.group(1)) < int(m.group(2))
     ]
-    if ranges:
-        best = max(ranges, key=lambda r: (plausible(r[0], r[1]), -ranges.index(r)))
-        if plausible(*best) > 0:
-            return {"kind": "station_setpoint", "range": f"{best[0]} – {best[1]} °C"}
 
-    singles = [int(t) for t in re.findall(r"(\d{2,3})\s*°\s*[CС]", text)]
-    steering = [t for t in singles if 150 <= t <= 450]
-    if steering:
-        return {"kind": "station_setpoint", "range": f"{steering[0]} °C"}
+    for lo, hi, pos in all_ranges:
+        prefix = text[max(0, pos - 60):pos].lower()
+        is_melting = any(word in prefix for word in ("плавлен", "плавит", "солидус", "ликвидус", "тпл"))
+        if is_melting or (melt_r and (abs(lo - melt_r[0]) <= 5 and abs(hi - melt_r[1]) <= 5)):
+            continue  # Пропускаем температуру плавления
 
-    melt = canonical.melt_range(alloy)
-    if melt:
-        return {"kind": "joint_temperature", "range": f"{melt[0]} – {melt[1]} °C"}
+        if 240 <= lo and hi <= 380:
+            return {"kind": "station_setpoint", "range": f"{lo} – {hi} °C"}
+
+    # 3. Если уставка не названа явно в тексте, берём канонический рабочий коридор из реестра
+    work_r = canonical.work_range(alloy)
+    if work_r:
+        return {"kind": "station_setpoint", "range": f"{work_r[0]} – {work_r[1]} °C"}
+
+    # 4. В крайнем случае — температура плавления как joint_temperature
+    if melt_r:
+        return {"kind": "joint_temperature", "range": f"{melt_r[0]} – {melt_r[1]} °C"}
+
     return None
 
 
 def markdown_to_html(md: str) -> str:
-    """Простая конвертация Markdown структуры в HTML."""
-    html = md
-    # H3, H2, H1
-    html = re.sub(r"(?m)^###\s+(.+)$", r"<h3>\1</h3>", html)
-    html = re.sub(r"(?m)^##\s+(.+)$", r"<h2>\1</h2>", html)
-    html = re.sub(r"(?m)^#\s+(.+)$", r"<h1>\1</h1>", html)
-    # Paragraphs
-    paras = [p.strip() for p in re.split(r"\n\s*\n", html) if p.strip()]
-    out = []
-    for p in paras:
-        if p.startswith("<h") or p.startswith("<!--") or p.startswith("---"):
-            out.append(p)
+    """Полноценная конвертация Markdown структуры в чистый HTML для WordPress.
+
+    Поддерживает:
+      - Удаление YAML-frontmatter;
+      - Удаление служебного блока FAQ из тела статьи (он упаковывается отдельно);
+      - Таблицы Markdown (|---|) -> <div class="table-responsive"><table ...>;
+      - Ссылки [текст](url) -> <a href="url">текст</a>;
+      - Жирный (**текст**) и курсив (*текст*);
+      - Инлайн-код (`код`);
+      - Заголовки H1-H4;
+      - Маркированные и нумерованные списки (ul / ol);
+      - Абзацы (<p>...</p>).
+    """
+    if not md:
+        return ""
+
+    # 1. Срезаем YAML frontmatter (---\n...\n---)
+    text = re.sub(r"^---\s*\n[\s\S]+?\n---\s*\n*", "", md.strip())
+
+    # 2. Вырезаем служебный блок FAQ из тела статьи
+    text = re.sub(
+        r"(?im)^#{2,3}\s*[^a-zA-Zа-яА-Я0-9\n]*(?:FAQ|Частые вопросы|Часто задаваемые|Вопросы и ответы)[^\n]*\n[\s\S]+?(?=\n#{1,2}\s+[^\n]+|\Z)",
+        "",
+        text,
+    ).strip()
+
+    # 3. Конвертация таблиц Markdown (| ... |)
+    def convert_table(match: re.Match) -> str:
+        lines = [line.strip() for line in match.group(0).strip().splitlines() if line.strip()]
+        if len(lines) < 2:
+            return match.group(0)
+
+        headers = [c.strip() for c in lines[0].split("|")[1:-1]]
+        sep_cells = [c.strip() for c in lines[1].split("|")[1:-1]]
+        has_sep = len(sep_cells) == len(headers) and all(re.match(r"^:?-+:?$", c) for c in sep_cells)
+
+        rows = []
+        start_row = 2 if has_sep else 1
+        for line in lines[start_row:]:
+            cells = [c.strip() for c in line.split("|")[1:-1]]
+            if cells:
+                rows.append(cells)
+
+        out = ['<div class="table-responsive"><table class="article-table">']
+        if headers:
+            out.append('  <thead><tr>' + ''.join(f'<th>{h}</th>' for h in headers) + '</tr></thead>')
+        out.append('  <tbody>')
+        for r in rows:
+            out.append('    <tr>' + ''.join(f'<td>{c}</td>' for c in r) + '</tr>')
+        out.append('  </tbody>')
+        out.append('</table></div>')
+        return "\n".join(out)
+
+    table_pattern = re.compile(r'(?:^\|.+?\|$\n?)+', re.MULTILINE)
+    text = table_pattern.sub(convert_table, text)
+
+    # 4. Ссылки: [текст](url)
+    text = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', text)
+
+    # 5. Инлайн-код: `code`
+    text = re.sub(r'`([^`]+)`', r'<code>\1</code>', text)
+
+    # 6. Жирный шрифт и курсив
+    text = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', text)
+    text = re.sub(r'(?<!\*)\*([^*]+)\*(?!\*)', r'<em>\1</em>', text)
+
+    # 7. Заголовки H1-H4
+    text = re.sub(r'(?m)^####\s+(.+)$', r'<h4>\1</h4>', text)
+    text = re.sub(r'(?m)^###\s+(.+)$', r'<h3>\1</h3>', text)
+    text = re.sub(r'(?m)^##\s+(.+)$', r'<h2>\1</h2>', text)
+    text = re.sub(r'(?m)^#\s+(.+)$', r'<h1>\1</h1>', text)
+
+    # 8. Списки
+    def convert_ul(match: re.Match) -> str:
+        items = re.findall(r'(?m)^[-*]\s+(.+)$', match.group(0))
+        return '<ul>' + ''.join(f'<li>{it}</li>' for it in items) + '</ul>'
+    text = re.sub(r'(?:^[-*]\s+.+$\n?)+', convert_ul, text, flags=re.MULTILINE)
+
+    def convert_ol(match: re.Match) -> str:
+        items = re.findall(r'(?m)^\d+\.\s+(.+)$', match.group(0))
+        return '<ol>' + ''.join(f'<li>{it}</li>' for it in items) + '</ol>'
+    text = re.sub(r'(?:^\d+\.\s+.+$\n?)+', convert_ol, text, flags=re.MULTILINE)
+
+    # 9. Формирование абзацев
+    blocks = [b.strip() for b in re.split(r'\n\s*\n', text) if b.strip()]
+    final_blocks = []
+    for b in blocks:
+        if any(b.startswith(tag) for tag in ('<h', '<table', '<div', '<ul', '<ol', '<blockquote', '<!--', '<hr')):
+            final_blocks.append(b)
+        elif b == '---':
+            final_blocks.append('<hr />')
         else:
-            out.append(f"<p>{p}</p>")
-    return "\n\n".join(out)
+            final_blocks.append(f'<p>{b}</p>')
+
+    return "\n\n".join(final_blocks)
 
 
 def package_article(topic_id: int | str, passport_override: dict | None = None) -> dict:

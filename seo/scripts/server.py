@@ -44,6 +44,9 @@ from db import (DB_PATH, backup_database, build_export_manifest, export_manifest
                 list_voices, migrate_schema_v3, migrate_schema_v4, migrate_schema_v5,
                 migrate_schema_v6)
 
+# Гарантия бесплатности: строгий программный запрет платных внешних API-шлюзов
+ALLOW_PAID = False
+
 
 def slugify(title: str) -> str:
     table = {
@@ -613,12 +616,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
         # Тихий логгер, чтобы не спамить в консоль
         sys.stderr.write(f"[{datetime.now().strftime('%H:%M:%S')}] {args[0]} {args[1]}\n")
 
+    def _allowed_origin(self) -> str:
+        """Безопасный CORS: разрешает только локальные хосты (127.0.0.1 / localhost), блокирует внешние сайты."""
+        origin = self.headers.get("Origin", "")
+        if origin and (
+            origin.startswith("http://localhost:")
+            or origin.startswith("http://127.0.0.1:")
+            or origin in ("http://localhost", "http://127.0.0.1")
+        ):
+            return origin
+        return "http://127.0.0.1:8765"
+
     def send_json(self, data: dict, status: int = 200):
         body = json.dumps(data, ensure_ascii=False).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", self._allowed_origin())
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
@@ -626,7 +640,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
     def do_OPTIONS(self):
         self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Origin", self._allowed_origin())
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.end_headers()
@@ -1003,7 +1017,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         url = urlparse(self.path)
         path = url.path
+
+        # Безопасность API: Origin-проверка от CSRF/DNS-rebinding
+        origin = self.headers.get("Origin")
+        if origin and not (
+            origin.startswith("http://localhost:")
+            or origin.startswith("http://127.0.0.1:")
+            or origin in ("http://localhost", "http://127.0.0.1")
+        ):
+            self.send_json({"status": "error", "message": "Cross-origin requests from external origins forbidden"}, 403)
+            return
+
         length = int(self.headers.get("Content-Length", 0))
+        if length > 5 * 1024 * 1024:
+            self.send_json({"status": "error", "message": "Payload too large (max 5MB)"}, 413)
+            return
+
         body = self.rfile.read(length).decode("utf-8", "replace") if length > 0 else "{}"
         try:
             payload = json.loads(body)
