@@ -64,12 +64,19 @@ def parse_faq_from_text(text: str) -> list[dict]:
     faq_block_match = re.search(r"(?im)^#{2,3}\s*[^a-zA-Zа-яА-Я0-9\n]*(?:FAQ|Частые вопросы|Часто задаваемые|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
     if faq_block_match:
         block = faq_block_match.group(1).strip()
-        # 1. Формат q: "..." \n a: "..."
-        qa_pairs = re.findall(r'(?i)q:\s*["«](.+?)["»]\s*\n\s*a:\s*["«](.+?)["»]', block)
-        if qa_pairs:
-            for q, a in qa_pairs:
-                faq_items.append({"q": q.strip(), "a": a.strip()})
-        else:
+        # 1. Формат q: ... \n a: ... (разбиение по меткам q: и a:)
+        if re.search(r"(?im)^\s*(?:\d+[.)]\s*)?q:\s*", block):
+            raw_parts = re.split(r"(?im)^\s*(?:\d+[.)]\s*)?q:\s*", block)
+            for part in raw_parts:
+                if not part.strip():
+                    continue
+                if re.search(r"(?im)\n\s*a:\s*", part):
+                    m = re.split(r"(?im)\n\s*a:\s*", part, maxsplit=1)
+                    q = m[0].strip().strip('"«»')
+                    a = m[1].split("\n---")[0].strip().strip('"«»')
+                    if q and a:
+                        faq_items.append({"q": q, "a": a})
+        if not faq_items:
             # 2. Формат **Вопрос?** \n Ответ (до следующего вопроса или конца)
             pairs = re.findall(r'(?m)^\s*(?:\d+[.)]\s*)?\*\*([^*]+\?)\*\*\s*\n+([\s\S]+?)(?=\n\s*(?:\d+[.)]\s*)?\*\*[^*]+\?\*\*|\Z)', block)
             if pairs:
