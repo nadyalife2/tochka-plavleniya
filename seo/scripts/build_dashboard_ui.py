@@ -951,9 +951,9 @@ def generate_html() -> str:
         <span style="font-weight:800;font-size:13px;">🤖 Канал генерации статей:</span>
         <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;">
           <option value="auto">⚡ Авто-каскад (Claude → DeepSeek → Yandex)</option>
-          <option value="claude">🟣 Claude Sonnet (нужен VPN через Antigravity / OpenRouter)</option>
-          <option value="deepseek">🔵 DeepSeek Chat (без VPN, platform.deepseek.com)</option>
-          <option value="yandex">🟡 YandexGPT Pro 32k (без VPN, Yandex AI Studio)</option>
+          <option value="claude">🟣 Claude Sonnet — VPN ON</option>
+          <option value="deepseek">🔵 DeepSeek Chat — VPN не нужен</option>
+          <option value="yandex">🟡 YandexGPT Pro 32k — VPN не нужен</option>
         </select>
       </div>
       <div style="font-size:11px;color:var(--muted);">
@@ -1156,6 +1156,7 @@ def generate_html() -> str:
       <button class="btn btn--sm" onclick="runReviewerForCurrentTopic()">🧐 Рецензия (авто-модель)</button>
       <button class="btn btn--sm" onclick="runFactcheckForCurrentTopic()">🔬 Фактчек (другая модель)</button>
       <span id="mChecksStatus" style="font-size:11px;color:var(--muted);"></span>
+      <span style="font-size:10px;color:var(--muted);">рецензия/фактчек/адаптация: Oxion — VPN не нужен · Token Harbor free — только с VPN</span>
     </div>
     <div id="mPasteBox" style="display:none;margin-top:10px;">
       <textarea id="mPasteText" rows="7" placeholder="Вставьте готовый текст статьи — Sonnet приведёт его к голосу Practico и стандартам, сохранив ваши факты..." style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical;"></textarea>
@@ -1171,13 +1172,13 @@ def generate_html() -> str:
         <span style="font-size:12px;font-weight:800;color:var(--text);">🤖 Канал ИИ:</span>
         <select id="modalProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:5px 8px;border:1.5px solid var(--border);font-size:12px;font-weight:700;background:#FFF;cursor:pointer;">
           <option value="auto">⚡ Авто-каскад (Claude → DeepSeek → Yandex)</option>
-          <option value="claude">🟣 Claude Sonnet (нужен VPN через Antigravity / OpenRouter)</option>
-          <option value="deepseek">🔵 DeepSeek Chat (без VPN, ключ в api-keys.local.yaml)</option>
-          <option value="yandex">🟡 YandexGPT Pro 32k (без VPN, ключ AI Studio)</option>
+          <option value="claude">🟣 Claude Sonnet — VPN ON</option>
+          <option value="deepseek">🔵 DeepSeek Chat — VPN не нужен</option>
+          <option value="yandex">🟡 YandexGPT Pro 32k — VPN не нужен</option>
         </select>
       </div>
       <div style="font-size:11px;color:var(--muted);">
-        Claude даёт эталонный голос (с VPN). DeepSeek и Yandex работают из РФ.
+        Claude-шаг требует VPN, DeepSeek и Yandex работают из РФ. Рецензия/фактчек идут через <strong>Oxion — VPN не нужен</strong>; бесплатный резерв <strong>Token Harbor — только с VPN</strong>.
       </div>
     </div>
 
@@ -1205,9 +1206,9 @@ function setGlobalProvider(val) {
   if (aSel && aSel.value !== CURRENT_AI_PROVIDER) aSel.value = CURRENT_AI_PROVIDER;
   const pNames = {
     auto: '⚡ Авто (каскад Claude → DeepSeek → Yandex)',
-    claude: '🟣 Claude Sonnet (нужен VPN)',
-    deepseek: '🔵 DeepSeek Chat (без VPN)',
-    yandex: '🟡 YandexGPT Pro 32k (без VPN)'
+    claude: '🟣 Claude Sonnet — VPN ON',
+    deepseek: '🔵 DeepSeek Chat — VPN не нужен',
+    yandex: '🟡 YandexGPT Pro 32k — VPN не нужен'
   };
   showToast(`Канал генерации: ${pNames[CURRENT_AI_PROVIDER] || CURRENT_AI_PROVIDER}`);
 }
@@ -1667,9 +1668,9 @@ async function writeArticleForCurrentTopic(voice) {
   const provider = CURRENT_AI_PROVIDER || 'auto';
   const providerNames = {
     auto: 'Авто (Claude → DeepSeek → Yandex)',
-    claude: 'Claude Sonnet (с VPN)',
-    deepseek: 'DeepSeek Chat (без VPN)',
-    yandex: 'YandexGPT Pro 32k (без VPN)'
+    claude: 'Claude Sonnet — VPN ON',
+    deepseek: 'DeepSeek Chat — VPN не нужен',
+    yandex: 'YandexGPT Pro 32k — VPN не нужен'
   };
   const voiceLabel = v === 'practico2' ? 'Practico 2 — голос заказчика' : 'Practico 1 — инженер';
   closeInspector();
