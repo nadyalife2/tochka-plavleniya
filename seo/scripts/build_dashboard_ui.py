@@ -726,6 +726,7 @@ def generate_html() -> str:
         </div>
       </div>
     <div class="brand-bar__actions">
+      <a href="/llms.txt" target="_blank" class="btn" style="text-decoration:none;" title="Открыть AEO/LLM-манифест сайта для нейросетей (Perplexity, ChatGPT, Яндекс Нейро)">🤖 llms.txt ↗</a>
       <a href="/api/export.html" target="_blank" class="btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Открыть сводную карточку базы в браузере (HTML)">🌐 База HTML ↗</a>
       <a href="/api/export.json" download="tchp-existing-base.json" class="btn" style="text-decoration:none;" title="Скачать JSON-манифест базы для нейросети">⬇️ Манифест базы</a>
       <button class="btn btn--primary" onclick="createBackup()">💾 Создать бэкап БД</button>
@@ -1341,7 +1342,16 @@ def generate_html() -> str:
           </span>
           <span id="mTextLiveCounter" style="font-family:var(--mono);font-size:11.5px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:#FFF;">0 зн.</span>
         </div>
-        <div style="display:flex;gap:6px;align-items:center;">
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <select id="mTemplateSelect" style="padding:4px 6px;border:1.5px solid var(--border);font-size:11.5px;background:#FFF;" title="Выбрать инженерный шаблон статьи">
+            <option value="">— Инженерный шаблон ▾ —</option>
+            <option value="how-to">1. Пошаговая инструкция (How-to)</option>
+            <option value="comparison">2. Выбор и сравнение (Guide/Comparison)</option>
+            <option value="troubleshooting">3. Диагностика дефектов (Troubleshooting)</option>
+            <option value="reference">4. Инженерный справочник (Reference)</option>
+            <option value="safety">5. Безопасность и организация (Safety)</option>
+          </select>
+          <button class="btn btn--xs" type="button" onclick="applySelectedTemplate()">📝 Вставить шаблон</button>
           <button class="btn btn--xs" id="mTextPreviewBtn" onclick="toggleMarkdownPreview()">👁️ Превью</button>
           <button class="btn btn--sm btn--primary" onclick="saveEditedArticleText()">💾 Сохранить изменения текста</button>
         </div>
@@ -3426,6 +3436,37 @@ function copyBriefToClipboard() {
   navigator.clipboard.writeText(el.innerText)
     .then(() => showToast('✓ Бриф скопирован в буфер обмена!'))
     .catch(() => showToast('Выделите и скопируйте текст вручную'));
+}
+
+async function applySelectedTemplate() {
+  const sel = document.getElementById('mTemplateSelect');
+  const tmplId = sel ? sel.value : '';
+  if (!tmplId) {
+    showToast('Выберите тип инженерного шаблона');
+    return;
+  }
+  const editor = document.getElementById('mTextEditor');
+  if (!editor) return;
+
+  if (editor.value.trim().length > 200) {
+    if (!confirm('В редакторе уже есть текст статьи. Заменить его выбранным инженерным шаблоном?')) {
+      return;
+    }
+  }
+
+  showToast('Загрузка шаблона...');
+  try {
+    const res = await apiGet('/api/templates?id=' + tmplId);
+    if (res && res.status === 'ok' && res.content) {
+      editor.value = res.content;
+      updateLiveCharCounter();
+      showToast('✓ Шаблон успешно применён в редактор!');
+    } else {
+      showToast('⚠️ Не удалось загрузить шаблон');
+    }
+  } catch (e) {
+    showToast('Ошибка при загрузке шаблона');
+  }
 }
 
 async function saveEditedArticleText() {

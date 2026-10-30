@@ -483,6 +483,131 @@ def parse_firecrawl_markdown(md: str) -> dict:
     return pkg
 
 
+TEMPLATES_DIR = SEO / "templates"
+
+TEMPLATE_METADATA = [
+    {
+        "id": "how-to",
+        "name": "Пошаговая инструкция (How-to)",
+        "desc": "Алгоритм операции, подготовка, пошаговые шаги, контроль шва, откат при неуспехе",
+        "file": "how-to.md",
+    },
+    {
+        "id": "comparison",
+        "name": "Выбор и сравнение (Guide / Comparison)",
+        "desc": "Прямой вердикт для 80% задач, сопоставительная таблица параметров, ограничения",
+        "file": "comparison.md",
+    },
+    {
+        "id": "troubleshooting",
+        "name": "Диагностика дефектов (Troubleshooting)",
+        "desc": "Симптом → Физическая причина → Проверка → Исправление → Точка невозврата",
+        "file": "troubleshooting.md",
+    },
+    {
+        "id": "reference",
+        "name": "Инженерный справочник (Reference)",
+        "desc": "Солидус/ликвидус, допуски ГОСТ/IPC, сводные таблицы свойств и удельного сопротивления",
+        "file": "reference.md",
+    },
+    {
+        "id": "safety",
+        "name": "Безопасность и вентиляция (Safety)",
+        "desc": "Реальные риски, СИЗ, вентиляция, действия при ожогах и химии",
+        "file": "safety.md",
+    },
+]
+
+
+def list_article_templates() -> list[dict]:
+    """Возвращает список доступных канонических шаблонов."""
+    items = []
+    for meta in TEMPLATE_METADATA:
+        fpath = TEMPLATES_DIR / meta["file"]
+        items.append({
+            "id": meta["id"],
+            "name": meta["name"],
+            "desc": meta["desc"],
+            "exists": fpath.exists(),
+        })
+    return items
+
+
+def get_article_template(tmpl_id: str) -> str:
+    """Возвращает текст шаблона по его ID."""
+    meta = next((m for m in TEMPLATE_METADATA if m["id"] == tmpl_id), None)
+    if not meta:
+        return ""
+    fpath = TEMPLATES_DIR / meta["file"]
+    if fpath.exists():
+        return fpath.read_text(encoding="utf-8")
+    return ""
+
+
+def build_llms_txt(full: bool = False) -> str:
+    """Генерирует манифест llms.txt по стандарту llmstxt.org для цитирования в LLM/AEO."""
+    with get_connection() as conn:
+        topics = conn.execute(
+            "SELECT id, title, slug, cluster, status, chars, content_markdown FROM topics "
+            "ORDER BY id ASC"
+        ).fetchall()
+        competitors = conn.execute("SELECT domain, type FROM competitors").fetchall()
+        clusters = conn.execute("SELECT name FROM clusters").fetchall()
+
+    lines = [
+        "# Точка Плавления — База знаний и инженерный портал о пайке",
+        "",
+        "> Авторитетный русскоязычный портал о технологии пайки, радиомонтаже, материалах (припои, флюсы), оборудовании и стандартах IPC-A-610 / ГОСТ 21931-76.",
+        "",
+        "## О проекте",
+        "- Сайт: https://tochka-plavleniya.ru",
+        "- Стандарты: IPC-A-610G, ГОСТ 21930-76 / 21931-76, J-STD-004B, ГОСТ Р 56427-2015",
+        "- Канонические материалы: ПОС-61 (183–190 °C), SAC305 (217–220 °C), Sn63Pb37 (183 °C), Sn42Bi58 (138 °C), Сплав Розе (94 °C)",
+        "- Редакционная политика: Answer First, конкретные физические величины, отсутствие неподтверждённых утверждений",
+        "",
+        "## Статьи и технические руководства",
+    ]
+
+    for t in topics:
+        title = t["title"]
+        slug = t["slug"]
+        url = f"https://tochka-plavleniya.ru/{slug}/"
+        cluster = t["cluster"] or "Пайка"
+
+        lead = ""
+        md = t["content_markdown"] or ""
+        if md:
+            paras = [p.strip() for p in md.split("\n\n") if p.strip() and not p.strip().startswith("#")]
+            if paras:
+                lead = paras[0][:180].replace("\n", " ").strip()
+                if not lead.endswith("."):
+                    lead += "..."
+        if not lead:
+            lead = f"Техническое руководство и регламент по теме «{title}»."
+
+        lines.append(f"- [{title}]({url}): {lead} (Категория: {cluster})")
+        if full and md and len(md) > 200:
+            lines.append("  ```markdown")
+            lines.append("  " + md[:600].replace("\n", "\n  ").strip())
+            lines.append("  ```")
+
+    lines.append("")
+    lines.append("## Канонические сплавы и тепловые режимы")
+    lines.append("- ПОС-61: Тпл 183–190 °C, рабочая температура жала 260–295 °C (ГОСТ 21931-76)")
+    lines.append("- Sn63Pb37: Тпл 183 °C (эвтектика), рабочая температура жала 240–315 °C (IPC J-STD-006C)")
+    lines.append("- SAC305: Тпл 217–220 °C (бессвинцовый), рабочая температура жала 310–350 °C (IPC J-STD-006C)")
+    lines.append("- Sn42Bi58: Тпл 138 °C (низкотемпературный), рабочая температура жала 160–200 °C")
+    lines.append("- Сплав Розе: Тпл 94–96 °C (демонтаж термочувствительных компонентов, ТУ 6-09-4064-87)")
+    lines.append("")
+    lines.append("## Дополнительно")
+    lines.append(f"- Всего тем в базе: {len(topics)}")
+    lines.append(f"- Кластеров: {len(clusters)}")
+    lines.append(f"- Отслеживаемых конкурентов: {len(competitors)}")
+    lines.append("- Полный манифест: https://tochka-plavleniya.ru/llms-full.txt")
+
+    return "\n".join(lines)
+
+
 class DashboardHandler(BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         # Тихий логгер, чтобы не спамить в консоль
@@ -576,6 +701,36 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_header("Access-Control-Allow-Origin", "*")
             self.end_headers()
             self.wfile.write(body)
+            return
+
+        # AEO / LLM-манифест llms.txt (стандарт llmstxt.org)
+        if path in ("/llms.txt", "/api/aeo/llms.txt", "/llms-full.txt", "/api/aeo/llms-full.txt"):
+            is_full = "full" in path
+            try:
+                body = build_llms_txt(full=is_full).encode("utf-8")
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": str(ex)}, 500)
+                return
+            self.send_response(200)
+            self.send_header("Content-Type", "text/plain; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+
+        # Инженерные шаблоны статей (how-to, comparison, troubleshooting, reference, safety)
+        if path == "/api/templates":
+            qs = parse_qs(url.query)
+            tmpl_id = (qs.get("id") or [""])[0].strip()
+            if tmpl_id:
+                content = get_article_template(tmpl_id)
+                if not content:
+                    self.send_json({"status": "error", "message": f"Шаблон '{tmpl_id}' не найден"}, 404)
+                    return
+                self.send_json({"status": "ok", "id": tmpl_id, "content": content})
+            else:
+                self.send_json({"status": "ok", "templates": list_article_templates()})
             return
 
         if path == "/api/voices":
