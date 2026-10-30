@@ -264,6 +264,72 @@ def migrate_schema_v3():
         conn.commit()
 
 
+DEFAULT_VOICES = (
+    (
+        "practico",
+        "Голос 1 — Practico (инженер)",
+        "claude-sonnet-5",
+    ),
+    (
+        "practico2",
+        "Голос 2 — Practico 2 (заказчик)",
+        "claude-sonnet-5",
+    ),
+)
+
+
+def _default_voice_prompt(voice_id: str) -> str:
+    """Текст инструкции по умолчанию — из writer_practico (единый источник)."""
+    try:
+        from writer_practico import PRACTICO2_SYSTEM_PROMPT, PRACTICO_SYSTEM_PROMPT
+
+        return PRACTICO2_SYSTEM_PROMPT if voice_id == "practico2" else PRACTICO_SYSTEM_PROMPT
+    except Exception:  # noqa: BLE001
+        return ""
+
+
+def migrate_schema_v4() -> None:
+    """Миграция v4: таблица голосов автора (редактируемые инструкции + модель)."""
+    with get_connection() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS voices (
+                id TEXT PRIMARY KEY,
+                name TEXT NOT NULL,
+                system_prompt TEXT NOT NULL DEFAULT '',
+                model TEXT,
+                is_active INTEGER DEFAULT 1,
+                updated_at TEXT
+            )
+            """
+        )
+        conn.commit()
+        existing = {r[0] for r in conn.execute("SELECT id FROM voices").fetchall()}
+        now = datetime.now().isoformat(timespec="seconds")
+        for voice_id, name, model in DEFAULT_VOICES:
+            if voice_id in existing:
+                continue
+            prompt = _default_voice_prompt(voice_id)
+            if not prompt:
+                continue
+            conn.execute(
+                "INSERT INTO voices (id, name, system_prompt, model, is_active, updated_at) "
+                "VALUES (?, ?, ?, ?, 1, ?)",
+                (voice_id, name, prompt, model, now),
+            )
+        conn.commit()
+
+
+def list_voices() -> list[dict]:
+    """Активные голоса автора: id, name, system_prompt, model."""
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT id, name, system_prompt, model, is_active, updated_at "
+            "FROM voices WHERE is_active = 1 ORDER BY rowid ASC"
+        ).fetchall()
+    return [dict(r) for r in rows]
+
+
 def build_db_plan() -> dict:
     """Собирает полный план проекта напрямую из SQLite seo.db.
     
@@ -408,5 +474,6 @@ if __name__ == "__main__":
     init_db()
     migrate_schema_v2()
     migrate_schema_v3()
+    migrate_schema_v4()
     p = build_db_plan()
     print("✓ План собран из SQLite! Тем:", p["counts"]["topics"], "| Ссылок:", p["counts"]["links"])

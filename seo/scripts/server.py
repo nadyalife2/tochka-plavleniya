@@ -39,7 +39,8 @@ SCRIPTS = SEO / "scripts"
 DASHBOARD_DIR = SEO / "dashboard"
 sys.path.insert(0, str(SCRIPTS))
 
-from db import DB_PATH, backup_database, get_connection, init_db, list_backups, migrate_schema_v3
+from db import (DB_PATH, backup_database, get_connection, init_db, list_backups,
+                list_voices, migrate_schema_v3, migrate_schema_v4)
 
 
 def slugify(title: str) -> str:
@@ -164,6 +165,97 @@ def oxion_chat(model: str, system_prompt: str, user_prompt: str,
         except Exception as ex:  # noqa: BLE001
             last_error = f"{type(ex).__name__}: {ex}"
     raise RuntimeError(f"Oxion недоступен: {last_error}")
+
+
+def _env_value(name: str) -> str:
+    """Значение из env, иначе из ~/.dsh/.env."""
+    value = (os.environ.get(name) or "").strip()
+    if value:
+        return value.strip('"').strip("'")
+    dotenv = Path.home() / ".dsh" / ".env"
+    if dotenv.exists():
+        try:
+            for line in dotenv.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, _, raw = line.partition("=")
+                if key.strip() == name:
+                    return raw.strip().strip('"').strip("'")
+        except Exception:  # noqa: BLE001
+            pass
+    return ""
+
+
+def yandex_chat(system_prompt: str, user_prompt: str, max_tokens: int = 8000) -> tuple[str, str]:
+    """Yandex AI Studio (OpenAI-compatible), модель YandexGPT."""
+    key = _env_value("YANDEX_AI_API_KEY")
+    folder = _env_value("YANDEX_FOLDER_ID") or "b1gtjgvrfp1vcc24p18n"
+    if not key:
+        raise RuntimeError("Нет ключа YANDEX_AI_API_KEY в ~/.dsh/.env.")
+    model = f"gpt://{folder}/yandexgpt/latest"
+    body = json.dumps({
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+        "max_tokens": max_tokens,
+        "temperature": 0.4,
+    }, ensure_ascii=False).encode("utf-8")
+    request = urllib.request.Request(
+        "https://ai.api.cloud.yandex.net/v1/chat/completions",
+        data=body,
+        headers={"Authorization": "Bearer " + key, "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=300) as response:
+            data = json.loads(response.read().decode("utf-8"))
+    except urllib.error.HTTPError as ex:
+        raise RuntimeError(f"Yandex AI Studio HTTP {ex.code}: {ex.read().decode('utf-8', 'replace')[:300]}")
+    content = ((data.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+    if not content.strip():
+        raise RuntimeError("Yandex AI Studio вернул пустой ответ.")
+    return content, model
+
+
+VOICE_MODEL_PREFIX = ("oxion:", "yandex:")
+
+
+def voice_generate(model: str, system_prompt: str, user_prompt: str,
+                   max_tokens: int = 12000, temperature: float = 0.35) -> tuple[str, str]:
+    """Генерация выбранной моделью: `oxion:<id>` или `yandex:<id>`."""
+    spec = (model or "oxion:claude-sonnet-5").strip()
+    if spec.startswith("yandex:"):
+        return yandex_chat(system_prompt, user_prompt, max_tokens=max_tokens)
+    model_id = spec.split(":", 1)[1] if spec.startswith("oxion:") else spec
+    return oxion_chat(model_id, system_prompt, user_prompt, max_tokens=max_tokens, temperature=temperature)
+
+
+def _topic_title(topic_id) -> str:
+    with get_connection() as conn:
+        row = conn.execute("SELECT title FROM topics WHERE id = ?", (topic_id,)).fetchone()
+    return (row["title"] if row else "") or f"тема #{topic_id}"
+
+
+def _save_written_article(topic_id, text: str) -> None:
+    """Сохраняет готовый текст в topics и в файл «сами статьи/»."""
+    chars = len(text.strip())
+    slug = f"article-{topic_id}"
+    with get_connection() as conn:
+        row = conn.execute("SELECT slug FROM topics WHERE id = ?", (topic_id,)).fetchone()
+        slug = row["slug"] if row else slug
+        conn.execute(
+            "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
+            "writer_mode = 'draft', updated_at = ? WHERE id = ?",
+            (text, chars, datetime.now().isoformat(timespec="seconds"), topic_id),
+        )
+        conn.commit()
+    try:
+        (ROOT / "сами статьи" / f"{topic_id}-{slug}.md").write_text(text, encoding="utf-8")
+    except Exception:  # noqa: BLE001
+        pass
 
 
 def start_background_job(agent: str, cmd: list[str], target_id=None) -> int:
@@ -314,6 +406,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         if path == "/api/data":
             self.send_json(fetch_all_data())
+            return
+
+        if path == "/api/voices":
+            try:
+                self.send_json({"status": "ok", "voices": list_voices()})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": str(ex)}, 500)
             return
 
         if path == "/api/status":
@@ -493,7 +592,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
         url = urlparse(self.path)
         path = url.path
         length = int(self.headers.get("Content-Length", 0))
-        body = self.rfile.read(length).decode("utf-8") if length > 0 else "{}"
+        body = self.rfile.read(length).decode("utf-8", "replace") if length > 0 else "{}"
         try:
             payload = json.loads(body)
         except Exception:
@@ -647,6 +746,45 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "id": tid, "is_critical": flag})
             return
 
+        # 5.6. Голоса автора: список, сохранение, удаление
+        if path == "/api/voices":
+            try:
+                self.send_json({"status": "ok", "voices": list_voices()})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": str(ex)}, 500)
+            return
+
+        if path == "/api/voices/save":
+            voice_id = re.sub(r"[^a-z0-9_-]+", "-", (payload.get("id") or "").strip().lower()).strip("-")
+            name = (payload.get("name") or "").strip()
+            prompt = (payload.get("system_prompt") or "").strip()
+            model = (payload.get("model") or "oxion:claude-sonnet-5").strip()
+            if not voice_id or not name or len(prompt) < 50:
+                self.send_json({"status": "error",
+                                "message": "Нужны id, название и инструкция голоса (≥ 50 знаков)."}, 400)
+                return
+            now = datetime.now().isoformat(timespec="seconds")
+            with get_connection() as conn:
+                conn.execute(
+                    "INSERT INTO voices (id, name, system_prompt, model, is_active, updated_at) "
+                    "VALUES (?, ?, ?, ?, 1, ?) "
+                    "ON CONFLICT(id) DO UPDATE SET name = excluded.name, "
+                    "system_prompt = excluded.system_prompt, model = excluded.model, "
+                    "is_active = 1, updated_at = excluded.updated_at",
+                    (voice_id, name, prompt, model, now),
+                )
+                conn.commit()
+            self.send_json({"status": "ok", "id": voice_id, "updated_at": now})
+            return
+
+        if path == "/api/voices/delete":
+            voice_id = (payload.get("id") or "").strip()
+            with get_connection() as conn:
+                conn.execute("UPDATE voices SET is_active = 0 WHERE id = ?", (voice_id,))
+                conn.commit()
+            self.send_json({"status": "ok", "id": voice_id})
+            return
+
         # 6.5. Сохранить отредактированный текст статьи
         if path == "/api/topics/update-text":
             tid = payload.get("id")
@@ -747,37 +885,46 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
                         status = "failed"
                 elif agent == "02-writer" and target_id:
-                    voice = (payload.get("voice") or "practico").strip().lower()
-                    if voice not in ("practico", "practico2"):
-                        voice = "practico"
+                    voice = (payload.get("voice") or "practico").strip()
                     mode = (payload.get("mode") or "draft").strip().lower()
+                    voices = {v["id"]: v for v in list_voices()}
+                    voice_row = voices.get(voice)
+                    if voice_row is None:
+                        voice = "practico"
+                        voice_row = voices.get("practico")
+                    model_spec = (payload.get("model") or (voice_row or {}).get("model")
+                                  or "oxion:claude-sonnet-5").strip()
+                    system_prompt = ((voice_row or {}).get("system_prompt") or "").strip()
+                    if not system_prompt:
+                        try:
+                            from writer_practico import PRACTICO2_SYSTEM_PROMPT, PRACTICO_SYSTEM_PROMPT
+                            system_prompt = (
+                                PRACTICO2_SYSTEM_PROMPT if voice == "practico2"
+                                else PRACTICO_SYSTEM_PROMPT
+                            )
+                        except Exception:  # noqa: BLE001
+                            system_prompt = (
+                                "Ты — автор проекта «Точка Плавления» о пайке. Обращение на «Вы», "
+                                "без вымышленного опыта мастера, Answer First, живая ирония без натянутых шуток."
+                            )
+                    voice_name = (voice_row or {}).get("name") or voice
+
                     if mode == "paste":
                         pasted = (payload.get("pasted_text") or "").strip()
                         if len(pasted) < 200:
                             log_output = "Вставленный текст слишком короткий (нужно ≥ 200 знаков)."
                             status = "failed"
                         else:
-                            try:
-                                from writer_practico import PRACTICO2_SYSTEM_PROMPT, PRACTICO_SYSTEM_PROMPT
-                                system_prompt = (
-                                    PRACTICO2_SYSTEM_PROMPT if voice == "practico2"
-                                    else PRACTICO_SYSTEM_PROMPT
-                                )
-                            except Exception:  # noqa: BLE001
-                                system_prompt = (
-                                    "Ты — автор проекта «Точка Плавления» о пайке. Обращение на «Вы», "
-                                    "без вымышленного опыта мастера, Answer First, живая ирония без натянутых шуток."
-                                )
                             instruction = (
-                                "Ниже готовый текст автора. Приведи его к стандартам проекта и голосу Practico: "
+                                "Ниже готовый текст автора. Приведи его к стандартам проекта и голосу: "
                                 "Answer First ≤ 40 слов, 4-8 разделов H2, 1-2 сопоставительные таблицы, "
                                 "FAQ 4-6 пар в блоке '### FAQ:', источники 2-4 в '## Источники:', "
                                 "объём 5 500-7 000 знаков с пробелами. Сохрани все факты и числа автора, "
                                 "не выдумывай новых. Верни только готовый markdown.\n\n"
                             )
-                            answer, used = oxion_chat(
-                                OXION_ROLE_MODELS["writer"], system_prompt,
-                                instruction + pasted, max_tokens=12000, temperature=0.3,
+                            answer, used = voice_generate(
+                                model_spec, system_prompt, instruction + pasted,
+                                max_tokens=12000, temperature=0.3,
                             )
                             chars = len(answer.strip())
                             slug = f"article-{target_id}"
@@ -787,7 +934,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 conn.execute(
                                     "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
                                     "writer_mode = 'paste', next_action = ?, updated_at = ? WHERE id = ?",
-                                    (answer, chars, f"адаптировано Sonnet ({voice})",
+                                    (answer, chars, f"адаптировано: {voice_name} · {used}",
                                      datetime.now().isoformat(timespec="seconds"), target_id),
                                 )
                                 conn.commit()
@@ -795,17 +942,33 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                 (ROOT / "сами статьи" / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
                             except Exception:  # noqa: BLE001
                                 pass
-                            log_output = f"✅ Готовый текст адаптирован моделью {used} ({chars} зн.)\n\n{answer[:1500]}"
+                            log_output = f"✅ Готовый текст адаптирован: {voice_name} · {used} ({chars} зн.)\n\n{answer[:1500]}"
                             status = "succeeded"
                     else:
                         provider = (payload.get("provider") or "auto").strip().lower()
                         if provider not in ("auto", "claude", "deepseek", "yandex"):
                             provider = "auto"
-                        cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
-                               "--id", str(target_id), "--voice", voice, "--provider", provider]
-                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
-                        log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
-                        status = "succeeded" if p.returncode == 0 else "failed"
+                        custom_voice = voice not in ("practico", "practico2")
+                        if custom_voice:
+                            instruction = (
+                                "Напиши статью по теме «" + _topic_title(target_id) + "» в этом голосе. "
+                                "Стандарты: Answer First ≤ 40 слов, 4-8 H2, 1-2 таблицы, FAQ 4-6 пар "
+                                "в блоке '### FAQ:', источники 2-4 в '## Источники:', объём 5 500-7 000 знаков. "
+                                "Верни только markdown."
+                            )
+                            answer, used = voice_generate(
+                                model_spec, system_prompt, instruction,
+                                max_tokens=12000, temperature=0.4,
+                            )
+                            _save_written_article(target_id, answer)
+                            log_output = f"✅ Статья написана: {voice_name} · {used} ({len(answer)} зн.)\n\n{answer[:1500]}"
+                            status = "succeeded"
+                        else:
+                            cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
+                                   "--id", str(target_id), "--voice", voice, "--provider", provider]
+                            p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
+                            log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
+                            status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent in ("03-reviewer", "factcheck") and target_id:
                     with get_connection() as conn:
                         row = conn.execute(
@@ -1051,6 +1214,7 @@ def main():
 
     init_db()
     migrate_schema_v3()
+    migrate_schema_v4()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), DashboardHandler)
     print("=" * 60)
     print(f"СЕРВЕР SEO-КОНВЕЙЕРА ЗАПУЩЕН:")

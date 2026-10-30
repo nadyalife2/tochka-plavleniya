@@ -1159,11 +1159,37 @@ def generate_html() -> str:
       <span style="font-size:10px;color:var(--muted);">рецензия/фактчек/адаптация: Oxion — VPN не нужен · Token Harbor free — только с VPN</span>
     </div>
     <div id="mPasteBox" style="display:none;margin-top:10px;">
-      <textarea id="mPasteText" rows="7" placeholder="Вставьте готовый текст статьи — Sonnet приведёт его к голосу Practico и стандартам, сохранив ваши факты..." style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical;"></textarea>
+      <textarea id="mPasteText" rows="7" placeholder="Вставьте готовый текст статьи — выбранный голос приведёт его к стандартам, сохранив ваши факты..." style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical;"></textarea>
       <div style="display:flex;gap:8px;margin-top:6px;flex-wrap:wrap;">
-        <button class="btn btn--sm btn--primary" onclick="writePastedText('practico')">Адаптировать: Голос 1</button>
-        <button class="btn btn--sm btn--primary" onclick="writePastedText('practico2')">Адаптировать: Голос 2</button>
+        <button class="btn btn--sm btn--primary" onclick="writePastedText()">📋 Адаптировать выбранным голосом</button>
       </div>
+    </div>
+
+    <!-- Голоса автора: инструкции и модель -->
+    <div style="margin-top:14px;border:1.5px solid var(--border);background:#FAFAFA;padding:10px 12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+        <strong style="font-size:12px;">🎙 Голоса автора — можно править прямо здесь</strong>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <select id="mVoiceSelect" onchange="loadVoiceIntoEditor(this.value)" style="padding:4px 6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;"></select>
+          <select id="mVoiceModel" style="padding:4px 6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;">
+            <option value="oxion:claude-sonnet-5">Claude Sonnet 5 (Oxion)</option>
+            <option value="oxion:gemini-3.7-flash">Gemini 3.7 Flash (Oxion)</option>
+            <option value="oxion:gpt-5.6-luna">GPT-5.6 Luna (Oxion)</option>
+            <option value="oxion:deepseek-v4-pro-0813">DeepSeek V4 Pro (Oxion)</option>
+            <option value="oxion:deepseek-v4-flash-0731">DeepSeek V4 Flash (Oxion)</option>
+            <option value="yandex:yandexgpt">YandexGPT 5 Pro (без VPN)</option>
+          </select>
+        </div>
+      </div>
+      <input id="mVoiceName" placeholder="Название голоса" style="width:100%;padding:6px 8px;border:1.5px solid var(--border);font-size:12px;margin-bottom:6px;">
+      <textarea id="mVoicePrompt" rows="9" placeholder="Инструкция голоса (system prompt)..." style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:11.5px;line-height:1.5;background:#FFF;resize:vertical;"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+        <button class="btn btn--sm btn--primary" onclick="saveVoice()">💾 Сохранить голос</button>
+        <button class="btn btn--sm" onclick="startNewVoice()">+ Новый голос</button>
+        <button class="btn btn--sm" onclick="deleteVoice()">🗑 Удалить</button>
+        <button class="btn btn--sm btn--primary" onclick="writeWithSelectedVoice()">✍️ Написать этим голосом</button>
+      </div>
+      <div id="mVoiceStatus" style="font-size:11px;color:var(--muted);margin-top:6px;"></div>
     </div>
 
     <!-- Model Provider Selection Toolbar -->
@@ -1741,18 +1767,113 @@ async function runFactcheckForCurrentTopic() {
   if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
 }
 
-async function writePastedText(voice) {
+// --- Голоса автора: загрузка, редактирование, сохранение ------------------
+let VOICES = [];
+
+async function loadVoices(selectId) {
+  const data = await apiGet('/api/voices');
+  VOICES = (data && data.voices) || [];
+  const sel = document.getElementById('mVoiceSelect');
+  if (!sel) return;
+  sel.innerHTML = VOICES.map(v => `<option value="${esc(v.id)}">${esc(v.name)}</option>`).join('');
+  const id = selectId || (VOICES[0] && VOICES[0].id);
+  if (id) { sel.value = id; loadVoiceIntoEditor(id); }
+}
+
+function loadVoiceIntoEditor(id) {
+  const v = VOICES.find(x => x.id === id);
+  const st = document.getElementById('mVoiceStatus');
+  if (!v) { if (st) st.innerText = 'Голос не найден'; return; }
+  document.getElementById('mVoiceName').value = v.name || '';
+  document.getElementById('mVoicePrompt').value = v.system_prompt || '';
+  const modelSel = document.getElementById('mVoiceModel');
+  if (modelSel && v.model) {
+    const has = Array.from(modelSel.options).some(o => o.value === v.model);
+    if (!has) {
+      const opt = document.createElement('option');
+      opt.value = v.model; opt.textContent = v.model;
+      modelSel.appendChild(opt);
+    }
+    modelSel.value = v.model;
+  }
+  if (st) st.innerText = `Голос «${v.name}» · ${(v.system_prompt || '').length} знаков · ${v.model || ''}`;
+}
+
+function startNewVoice() {
+  document.getElementById('mVoiceName').value = '';
+  document.getElementById('mVoicePrompt').value = '';
+  document.getElementById('mVoiceStatus').innerText = 'Новый голос: задайте id (латиницей), название, инструкцию и модель';
+  document.getElementById('mVoiceName').focus();
+}
+
+async function saveVoice() {
+  if (!CURRENT_TOPIC_ID) return;
+  const name = (document.getElementById('mVoiceName').value || '').trim();
+  const prompt = (document.getElementById('mVoicePrompt').value || '').trim();
+  const model = document.getElementById('mVoiceModel').value || 'oxion:claude-sonnet-5';
+  if (!name) { showToast('Укажите название голоса'); return; }
+  if (prompt.length < 50) { showToast('Инструкция голоса слишком короткая (≥ 50 знаков)'); return; }
+  const existing = document.getElementById('mVoiceSelect').value;
+  const isNew = !VOICES.some(v => v.id === existing) || document.getElementById('mVoicePrompt').value.trim().length === 0;
+  const voiceId = (isNew ? name : (VOICES.find(v => v.id === existing) || {}).id)
+    .toLowerCase().replace(/[^a-z0-9_-]+/g, '-').replace(/^-+|-+$/g, '') || ('voice-' + Date.now());
+  const res = await apiPost('/api/voices/save', { id: voiceId, name, system_prompt: prompt, model });
+  if (res && res.status === 'ok') {
+    showToast(`✓ Голос «${name}» сохранён`);
+    await loadVoices(voiceId);
+  } else {
+    showToast('⚠️ ' + ((res && res.message) || 'Не удалось сохранить голос'));
+  }
+}
+
+async function deleteVoice() {
+  const id = document.getElementById('mVoiceSelect').value;
+  const v = VOICES.find(x => x.id === id);
+  if (!v) return;
+  if (!confirm(`Удалить голос «${v.name}»?`)) return;
+  await apiPost('/api/voices/delete', { id });
+  showToast('Голос удалён');
+  await loadVoices();
+}
+
+function selectedVoicePayload() {
+  const voice = document.getElementById('mVoiceSelect').value || 'practico';
+  const model = document.getElementById('mVoiceModel').value || 'oxion:claude-sonnet-5';
+  const name = (VOICES.find(v => v.id === voice) || {}).name || voice;
+  return { voice, model, name };
+}
+
+async function writeWithSelectedVoice() {
+  if (!CURRENT_TOPIC_ID) return;
+  const { voice, model, name } = selectedVoicePayload();
+  const t = DB_DATA.topics.find(x => x.id === CURRENT_TOPIC_ID);
+  if (t && (t.chars || 0) >= 200 && !confirm(`У статьи #${CURRENT_TOPIC_ID} уже есть текст. Переписать голосом «${name}»?`)) return;
+  showToast(`Пишем голосом «${name}» (${model})...`);
+  const c = document.getElementById('agentConsole');
+  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Написание статьи\nГолос: ${name}\nМодель: ${model}\nОжидание...`;
+  switchTab('agents');
+  const res = await apiPost('/api/agent/run', {
+    agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice, model, provider: CURRENT_AI_PROVIDER || 'auto'
+  });
+  if (c && res) c.innerText = res.log || JSON.stringify(res);
+  showToast(res && res.status === 'succeeded' ? `✓ Статья написана голосом «${name}»` : '⚠️ Ошибка написания');
+  await refreshData();
+  if (CURRENT_TOPIC_ID) openInspector(CURRENT_TOPIC_ID);
+}
+
+async function writePastedText() {
   if (!CURRENT_TOPIC_ID) return;
   const ta = document.getElementById('mPasteText');
   const text = ((ta && ta.value) || '').trim();
   if (text.length < 200) { showToast('Вставьте текст статьи (≥ 200 знаков)'); return; }
-  if (!confirm('Заменить текущий текст статьи адаптированной версией Sonnet?')) return;
-  showToast('Sonnet адаптирует ваш текст под голос Practico...');
+  const { voice, model, name } = selectedVoicePayload();
+  if (!confirm(`Заменить текущий текст статьи версией, адаптированной голосом «${name}» (${model})?`)) return;
+  showToast(`Адаптация голосом «${name}» (${model})...`);
   const c = document.getElementById('agentConsole');
-  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Адаптация готового текста\nГолос: ${voice}\nОжидание...`;
+  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Адаптация готового текста\nГолос: ${name}\nМодель: ${model}\nОжидание...`;
   switchTab('agents');
   const res = await apiPost('/api/agent/run', {
-    agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice: voice, mode: 'paste', pasted_text: text
+    agent: '02-writer', target_id: CURRENT_TOPIC_ID, voice, model, mode: 'paste', pasted_text: text
   });
   if (c && res) c.innerText = res.log || JSON.stringify(res);
   showToast(res && res.status === 'succeeded' ? '✓ Текст адаптирован' : '⚠️ Ошибка адаптации');
@@ -2283,6 +2404,7 @@ function openInspector(topicId) {
   const critEl = document.getElementById('mCriticalCheck');
   if (critEl) critEl.checked = !!t.is_critical;
   updateChecksStatus(t);
+  loadVoices();
   document.getElementById('mDiskFilePath').innerText = `сами статьи/${t.id}-${t.slug}.md`;
   document.getElementById('mTextCharsBadge').innerText = (chars || 0) + ' зн.';
   switchModalTab('score');
