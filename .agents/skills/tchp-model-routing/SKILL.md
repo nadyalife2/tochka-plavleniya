@@ -23,6 +23,7 @@ metadata:
 | Код/техно-аудит | `deepseek-v4-pro-0813` | не нужен |
 | Рутина, LSI, черновики | `deepseek-v4-flash-0731` | не нужен |
 | Бесплатный резерв | `deepseek-v4.1-flash:free` (Token Harbor) | **только с VPN** |
+| Бесплатный резерв №2 | `kilo-auto/free`, `nvidia/nemotron-3.5-lightning:free` (Kilo Gateway) | **только с VPN** |
 | YandexGPT 5 Pro (Yandex AI Studio) | `gpt://<folder>/yandexgpt/latest` | не нужен |
 
 Модели в селекторе DSH помечены суффиксами `· VPN ON` / `· VPN OFF`.
@@ -48,7 +49,7 @@ Gemini. Нашёл блокер у Gemini → перевести в критич
 ## VPN и каналы
 
 - Oxion, DeepSeek, Yandex AI Studio — VPN не нужен.
-- Token Harbor, OpenRouter — только с VPN.
+- Token Harbor, Kilo AI Gateway, OpenRouter — только с VPN.
 - Antigravity (Gemini 3.8) — обычно нужен VPN.
 - OpenCode Zen / freetap — удалён из профиля.
 
