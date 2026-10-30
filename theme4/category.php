@@ -126,9 +126,13 @@ if ($is_tag_view && $queried_tag) {
 } elseif ($queried_cat) {
     $canonical_url = get_category_link($queried_cat->term_id);
 } elseif ($current_slug === 'all') {
-    $canonical_url = ''; // архив без собственного URL: canonical не выводим (Rank Math / шаблон)
+    $canonical_url = $site_root . 'category/all/';
 } else {
     $canonical_url = $site_root . 'category/' . urlencode($current_slug) . '/';
+}
+
+if ($page_num > 1 && !empty($canonical_url)) {
+    $canonical_url .= (strpos($canonical_url, '?') !== false ? '&' : '?') . 'page=' . $page_num;
 }
 
 // Collect articles for this rubric
@@ -259,7 +263,9 @@ $paginated = paginate($grid_articles, 4, $page_num);
 // Prepare extra head elements: canonical link, schema.org, and custom styling
 ob_start();
 ?>
+  <?php if (!empty($canonical_url)): ?>
   <link rel="canonical" href="<?= e($canonical_url) ?>">
+  <?php endif; ?>
   <style>
     .font-hand { font-family: 'Caveat', cursive; }
     .washi-tape-badge {
