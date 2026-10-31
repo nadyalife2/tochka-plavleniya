@@ -33,7 +33,6 @@ SCRIPTS = ROOT / "seo" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
 from db import get_connection
-import canonical_alloys as canonical
 
 SCHEMA_PATH = ROOT / "schemas" / "article-contract-v1.1.schema.json"
 
@@ -51,7 +50,10 @@ CATEGORY_MAP = {
     "станции": "oborudovanie",
 }
 
-CANONICAL_ALLOYS = canonical.canonical_keys()
+CANONICAL_ALLOYS = [
+    "pos61", "sn63pb37", "pos40", "sac305", "sac405",
+    "sn42bi58", "snbiago", "roze", "vuda", "universal",
+]
 
 
 def load_schema() -> dict:
@@ -61,7 +63,7 @@ def load_schema() -> dict:
 def parse_faq_from_text(text: str) -> list[dict]:
     """Извлекает реальные вопросы-ответы из блока ## FAQ или ### FAQ: в тексте статьи."""
     faq_items = []
-    faq_block_match = re.search(r"(?im)^#{2,3}\s*[^a-zA-Zа-яА-Я0-9\n]*(?:FAQ|Частые вопросы|Часто задаваемые|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
+    faq_block_match = re.search(r"(?im)^#{2,3}\s*(?:FAQ|Частые вопросы|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
     if faq_block_match:
         block = faq_block_match.group(1).strip()
         # 1. Формат q: "..." \n a: "..."
@@ -81,13 +83,6 @@ def parse_faq_from_text(text: str) -> list[dict]:
                 pairs_num = re.findall(r'(?m)^\s*\d+[.)]\s*\*\*([^*]+)\*\*\s*\n+([^\n]+)', block)
                 for q, a in pairs_num:
                     faq_items.append({"q": q.strip(), "a": a.strip()})
-
-        # 4. Формат подзаголовков ### Вопрос? \n Ответ
-        if not faq_items:
-            pairs_h3 = re.findall(r'(?m)^#{3,4}\s+([^\n]+\?)\s*\n+([\s\S]+?)(?=\n#{3,4}\s+[^\n]+\?|\Z)', block)
-            for q, a in pairs_h3:
-                ans_clean = "\n".join([line.strip() for line in a.strip().splitlines() if not line.strip().startswith("#")])
-                faq_items.append({"q": q.strip(), "a": ans_clean[:500].strip()})
     return faq_items
 
 
@@ -112,58 +107,72 @@ def parse_sources_from_text(text: str) -> list[dict]:
 
 
 def parse_tools_from_text(text: str) -> list[dict]:
-    """Извлекает упомянутые инструменты и приводит названия к каноническим."""
-    # каноническое имя -> шаблон упоминания
-    CATALOG = [
-        ("Паяльная станция", r"паяльн\w*\s+станци"),
-        ("Паяльник", r"\bпаяльник\w*"),
-        ("Термофен", r"термофен\w*|\bфен\w*"),
-        ("Микроскоп", r"микроскоп\w*|\bлупа\b"),
-        ("Оловоотсос", r"оловоотсос\w*|помп\w*"),
-        ("Оплётка", r"оплётк\w*|оплетк\w*"),
-        ("Термопинцет", r"термопинцет\w*|пинцет\w*"),
-    ]
-    tools: list[dict] = []
-    for name, pattern in CATALOG:
-        if re.search(pattern, text, re.I):
-            tools.append({"name": name, "model": "", "purpose": "Пайка и демонтаж"})
-    return tools
+    """Извлекает упомянутые инструменты."""
+    tools = []
+    t_matches = re.findall(r"(?i)\b(паяльник[а-я]*|паяльная станция|фен|термофен|микроскоп|оловоотсос|оплетка|термопинцет)\s*([A-Za-z0-9\-]+)?", text)
+    seen = set()
+    for name, model in t_matches:
+        name_clean = name.capitalize()
+        if name_clean in seen:
+            continue
+        seen.add(name_clean)
+        tools.append({
+            "name": name_clean,
+            "model": model or "",
+            "purpose": "Пайка и демонтаж",
+        })
+    if not tools:
+        tools.append({"name": "Паяльник", "model": "", "purpose": "Монтаж"})
+    return tools[:5]
 
 
-def detect_alloy(text: str, title: str = "") -> str:
-    """Канонический сплав из реестра theme4/data/materials-registry.php."""
-    key, _ = canonical.detect_alloy(text, title)
-    return key
+def detect_alloy(text: str) -> str:
+    text_low = text.lower()
+    if "sac305" in text_low:
+        return "sac305"
+    if "sn63pb37" in text_low or "sn63" in text_low:
+        return "sn63pb37"
+    if "пос-61" in text_low or "pos61" in text_low:
+        return "pos61"
+    if "пос-40" in text_low or "pos40" in text_low:
+        return "pos40"
+    if "розе" in text_low or "roze" in text_low:
+        return "roze"
+    if "вуда" in text_low or "vuda" in text_low:
+        return "vuda"
+    if "sn42bi58" in text_low or "висмут" in text_low:
+        return "sn42bi58"
+    if "бессвинцов" in text_low:
+        return "sac305"
+    return "universal"
 
 
 def detect_temp_data(text: str, alloy: str) -> dict | None:
-    """Температурные данные только из текста или из реестра. Без искусственных «пиков»."""
-    def plausible(low: int, high: int) -> int:
-        """Приоритет диапазонов, реально относящихся к пайке (а не к сплаву Розе в таблице)."""
-        if 170 <= low and high <= 400:
-            return 3
-        if 120 <= low and high <= 450:
-            return 2
-        return 0
+    text_low = text.lower()
+    m_temp = re.findall(r"(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text)
+    if m_temp:
+        low, high = m_temp[0]
+        res = {
+            "kind": "station_setpoint",
+            "range": f"{low} – {high} °C",
+        }
+        # Пик добавляем ТОЛЬКО если он явно упомянут в тексте (не выдумываем +20)
+        m_peak = re.search(r"(?:пик(?:овая)?|макс(?:имальная)?|не более|предел)\s*(?:до\s*)?(\d{2,3})\s*°\s*[CС]", text_low)
+        if m_peak:
+            res["peak"] = f"{m_peak.group(1)} °C"
+        return res
 
-    ranges = [
-        (int(lo), int(hi))
-        for lo, hi in re.findall(r"(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text)
-        if int(lo) < int(hi)
-    ]
-    if ranges:
-        best = max(ranges, key=lambda r: (plausible(r[0], r[1]), -ranges.index(r)))
-        if plausible(*best) > 0:
-            return {"kind": "station_setpoint", "range": f"{best[0]} – {best[1]} °C"}
-
-    singles = [int(t) for t in re.findall(r"(\d{2,3})\s*°\s*[CС]", text)]
-    steering = [t for t in singles if 150 <= t <= 450]
-    if steering:
-        return {"kind": "station_setpoint", "range": f"{steering[0]} °C"}
-
-    melt = canonical.melt_range(alloy)
-    if melt:
-        return {"kind": "joint_temperature", "range": f"{melt[0]} – {melt[1]} °C"}
+    m_single = re.findall(r"(\d{2,3})\s*°\s*[CС]", text)
+    if m_single:
+        t = m_single[0]
+        return {
+            "kind": "joint_temperature",
+            "range": f"{t} °C",
+        }
+    if alloy in ("pos61", "sn63pb37"):
+        return {"kind": "joint_temperature", "range": "183 – 190 °C"}
+    if alloy == "sac305":
+        return {"kind": "joint_temperature", "range": "217 – 225 °C"}
     return None
 
 
@@ -211,7 +220,7 @@ def package_article(topic_id: int | str) -> dict:
     first_para_clean = re.sub(r"^#+.*?\n", "", first_para).strip()
     excerpt = first_para_clean[:280] if len(first_para_clean) >= 20 else (topic["title"] + ": техническое руководство.")
 
-    alloy = detect_alloy(md_text, topic["title"])
+    alloy = detect_alloy(md_text)
     temp_data = detect_temp_data(md_text, alloy)
     tools = parse_tools_from_text(md_text)
     faq = parse_faq_from_text(md_text)
@@ -249,7 +258,7 @@ def package_article(topic_id: int | str) -> dict:
         "reading_time": reading_time,
         "difficulty": "Практик",
         "solder_alloy": alloy,
-        "temp_data": temp_data,
+        "temp_data": temp_data or {"kind": "joint_temperature", "range": "183 – 190 °C"},
         "tools": tools,
         "content_html": markdown_to_html(md_text),
         "faq": faq,
@@ -276,19 +285,6 @@ def package_article(topic_id: int | str) -> dict:
         )
     if not temp_data:
         missing_data_warnings.append("В тексте не указаны температурные режимы (напр. '280 – 320 °C').")
-    if not tools:
-        missing_data_warnings.append(
-            "В тексте не найдено ни одного инструмента (паяльник, фен, станция, микроскоп). "
-            "Паспорт требует минимум один — добавьте упоминание в статье, выдумывать нельзя."
-        )
-
-    # Не блокирует выгрузку: `universal` — легальный ключ схемы (обзорные материалы)
-    notes = []
-    if alloy == canonical.UNIVERSAL:
-        notes.append(
-            "Сплав не определён однозначно (обзорная тема или сплав не назван) — в паспорт ушёл ключ universal. "
-            "Это допустимо по схеме v1.1; уточните сплав, только если материал про конкретную марку."
-        )
 
     is_valid = len(validation_errors) == 0 and len(missing_data_warnings) == 0
 
@@ -298,7 +294,6 @@ def package_article(topic_id: int | str) -> dict:
         "contract": contract_data,
         "errors": validation_errors,
         "missing_warnings": missing_data_warnings,
-        "notes": notes,
         "faq_count": len(faq),
         "sources_count": len(sources),
         "alloy": alloy,
@@ -329,8 +324,6 @@ def main():
             print(f"  ⚠️ {w}")
         for e in res.get("errors", []):
             print(f"  ❌ {e}")
-    for note in res.get("notes", []):
-        print(f"  ℹ️ {note}")
     print("=" * 60)
 
 

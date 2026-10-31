@@ -18,8 +18,7 @@ import re
 import subprocess
 import sys
 import threading
-import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -58,78 +57,6 @@ def slugify(title: str) -> str:
             out.append("-")
     slug = re.sub(r"-{2,}", "-", "".join(out)).strip("-")
     return slug[:70] or "article"
-
-
-# Долгие агенты выполняются в фоновом потоке: обход сайтов не влезает в HTTP-таймаут.
-LONG_AGENTS = {"00-research", "bot-analyzer"}
-JOB_TIMEOUT_SECONDS = 600
-
-
-def start_background_job(agent: str, cmd: list[str], target_id=None) -> int:
-    """Ставит задачу в таблицу jobs и запускает её в отдельном потоке."""
-    now_str = datetime.now().isoformat(timespec="seconds")
-    with get_connection() as conn:
-        cur = conn.execute(
-            "INSERT INTO jobs (job_type, target_id, params_json, status, created_at, updated_at) "
-            "VALUES (?, ?, ?, 'running', ?, ?)",
-            (agent, str(target_id or ""), json.dumps(cmd, ensure_ascii=False), now_str, now_str),
-        )
-        job_id = cur.lastrowid
-        conn.commit()
-
-    def worker() -> None:
-        status, return_code, output = "failed", None, ""
-        try:
-            proc = subprocess.run(
-                cmd, capture_output=True, text=True, encoding="utf-8",
-                timeout=JOB_TIMEOUT_SECONDS, cwd=str(ROOT),
-            )
-            output = (proc.stdout or "") + (("\n" + proc.stderr) if proc.stderr else "")
-            return_code = proc.returncode
-            status = "succeeded" if return_code == 0 else "failed"
-        except subprocess.TimeoutExpired:
-            output = f"Таймаут: задача выполнялась дольше {JOB_TIMEOUT_SECONDS} секунд."
-        except Exception as ex:  # noqa: BLE001
-            output = f"{type(ex).__name__}: {ex}"
-
-        ts = datetime.now().isoformat(timespec="seconds")
-        # Обновление статуса с повторами: SQLite может быть занят дашбордом.
-        for attempt in range(5):
-            try:
-                with get_connection() as conn:
-                    conn.execute(
-                        "UPDATE jobs SET status = ?, return_code = ?, log = ?, updated_at = ? WHERE id = ?",
-                        (status, return_code, output[:20000], ts, job_id),
-                    )
-                    conn.execute(
-                        "INSERT INTO agent_runs (agent_name, action, target_id, status, log, created_at) "
-                        "VALUES (?, 'background', ?, ?, ?, ?)",
-                        (agent, str(target_id or ""), status, output[:2000], ts),
-                    )
-                    conn.commit()
-                break
-            except Exception:
-                time.sleep(1 + attempt)
-
-    threading.Thread(target=worker, daemon=True).start()
-    return job_id
-
-
-def mark_stale_jobs() -> int:
-    """Помечает задачи, зависшие дольше таймаута: статус не должен висеть «running» вечно."""
-    cutoff = (datetime.now() - timedelta(seconds=JOB_TIMEOUT_SECONDS + 120)).isoformat(timespec="seconds")
-    try:
-        with get_connection() as conn:
-            cur = conn.execute(
-                "UPDATE jobs SET status = 'failed', log = COALESCE(log, '') || ?, updated_at = ? "
-                "WHERE status = 'running' AND updated_at < ?",
-                ("\nТаймаут: задача не завершилась за отведённое время (процесс мог зависнуть).",
-                 datetime.now().isoformat(timespec="seconds"), cutoff),
-            )
-            conn.commit()
-            return cur.rowcount or 0
-    except Exception:
-        return 0
 
 
 def fetch_all_data() -> dict:
@@ -210,168 +137,47 @@ class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         url = urlparse(self.path)
         path = url.path
+        qs = parse_qs(url.query)
 
         if path == "/api/data":
             self.send_json(fetch_all_data())
             return
 
         if path == "/api/status":
-            try:
-                with get_connection() as conn:
-                    cnt = conn.execute("SELECT COUNT(*) FROM topics").fetchone()[0]
-            except Exception:
-                cnt = 0
-            self.send_json({"status": "running", "topics_count": cnt, "time": datetime.now().isoformat()})
+            self.send_json({"status": "running", "time": datetime.now().isoformat()})
             return
 
-        if path == "/api/brief":
-            qs = parse_qs(url.query)
-            tid = (qs.get("id") or [""])[0].strip()
+        if path == "/api/standards":
+            std_file = SEO / "reference" / "standards_matrix.json"
+            if std_file.exists():
+                try:
+                    data = json.loads(std_file.read_text(encoding="utf-8"))
+                    self.send_json(data)
+                    return
+                except Exception as e:
+                    self.send_json({"error": str(e)}, 500)
+                    return
+            self.send_json({"error": "standards_matrix.json not found"}, 404)
+            return
+
+        if path == "/api/topics/links":
+            tid = qs.get("id", [""])[0]
             if not tid:
-                self.send_json({"status": "error", "message": "Укажите ?id="}, 400)
+                self.send_json({"error": "missing id"}, 400)
                 return
             try:
-                import generate_brief
-                brief_data = generate_brief.build_author_brief(tid)
-                self.send_json({"status": "ok", "brief": brief_data})
-            except Exception as ex:  # noqa: BLE001
-                self.send_json({"status": "error", "message": str(ex)}, 500)
-            return
-
-        if path == "/api/priority/top":
-            try:
-                with get_connection() as conn:
-                    rows = conn.execute(
-                        "SELECT id, title, seo_priority, seo_priority_json FROM topics "
-                        "WHERE seo_priority IS NOT NULL ORDER BY seo_priority DESC LIMIT 30"
-                    ).fetchall()
-                items = []
-                for r in rows:
-                    detail = {}
-                    try:
-                        detail = json.loads(r["seo_priority_json"] or "{}")
-                    except Exception:
-                        detail = {}
-                    items.append({"id": r["id"], "title": r["title"], "score": r["seo_priority"], "detail": detail})
-                self.send_json({"status": "ok", "items": items})
-            except Exception as ex:  # noqa: BLE001
-                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:150]}"}, 500)
-            return
-
-        if path == "/api/keywords/suggest":
-            # Подсказки фраз из SEO-данных конкурентов и хвостов Вордстата
-            qs = parse_qs(url.query)
-            try:
-                limit = int((qs.get("limit") or ["10"])[0])
-            except ValueError:
-                limit = 10
-            limit = max(1, min(50, limit))
-            contains = (qs.get("q") or [""])[0].strip()
-            try:
-                import keyword_suggestions
-                items = keyword_suggestions.collect(limit=limit, contains=contains)
-                self.send_json({"status": "ok", "count": len(items), "suggestions": items})
-            except Exception as ex:  # noqa: BLE001
-                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:120]}"}, 500)
-            return
-
-        if path == "/api/keyword/trend":
-            # История измерений по конкретной фразе (что менялось и когда)
-            phrase = (parse_qs(url.query).get("phrase") or [""])[0].strip()
-            if not phrase:
-                self.send_json({"status": "error", "message": "Укажите ?phrase="}, 400)
-                return
-            ws_hist, mg_hist = [], []
-            try:
-                with get_connection() as conn:
-                    for r in conn.execute(
-                        "SELECT total_count, checked_at FROM wordstat_history WHERE phrase = ? ORDER BY checked_at ASC",
-                        (phrase,),
-                    ).fetchall():
-                        ws_hist.append({"total_count": r["total_count"], "checked_at": r["checked_at"]})
-            except Exception:
-                pass
-            try:
-                with get_connection() as conn:
-                    for r in conn.execute(
-                        "SELECT strong, wordstat, tails, vital_site, checked_at FROM keyword_metrics_history "
-                        "WHERE keyword = ? ORDER BY checked_at ASC",
-                        (phrase,),
-                    ).fetchall():
-                        mg_hist.append({
-                            "strong": r["strong"],
-                            "wordstat": r["wordstat"],
-                            "tails": r["tails"],
-                            "vital_site": r["vital_site"] or "",
-                            "checked_at": r["checked_at"],
-                        })
-            except Exception:
-                pass
-            self.send_json({"status": "ok", "phrase": phrase, "wordstat_history": ws_hist, "mutagen_history": mg_hist})
-            return
-
-        if path == "/api/keyword/history":
-            # Единая история проверок: Вордстат (бесплатно) + Мутаген (платно)
-            rows = []
-            try:
-                with get_connection() as conn:
-                    ws_rows = conn.execute(
-                        "SELECT phrase, total_count, checked_at FROM wordstat_metrics ORDER BY checked_at DESC LIMIT 100"
-                    ).fetchall()
-                for r in ws_rows:
-                    rows.append({
-                        "phrase": r["phrase"],
-                        "source": "wordstat",
-                        "demand": r["total_count"],
-                        "competition": None,
-                        "checked_at": r["checked_at"],
-                    })
-            except Exception:
-                pass
-            try:
-                with get_connection() as conn:
-                    mg_rows = conn.execute(
-                        "SELECT keyword, strong, wordstat, vital_site, checked_at FROM keyword_metrics ORDER BY checked_at DESC LIMIT 100"
-                    ).fetchall()
-                for r in mg_rows:
-                    rows.append({
-                        "phrase": r["keyword"],
-                        "source": "mutagen",
-                        "demand": r["wordstat"],
-                        "competition": r["strong"],
-                        "vital_site": r["vital_site"] or "",
-                        "checked_at": r["checked_at"],
-                    })
-            except Exception:
-                pass
-            rows.sort(key=lambda x: x.get("checked_at") or "", reverse=True)
-            self.send_json({"phrases_checked": len(rows), "history": rows[:100]})
-            return
-
-        # --- фоновые задания (долгие агенты) ---
-        if path == "/api/jobs":
-            mark_stale_jobs()
-            with get_connection() as conn:
-                rows = conn.execute(
-                    "SELECT id, job_type, target_id, status, return_code, created_at, updated_at "
-                    "FROM jobs ORDER BY id DESC LIMIT 20"
-                ).fetchall()
-            self.send_json({"jobs": [dict(r) for r in rows]})
-            return
-
-        if path.startswith("/api/jobs/"):
-            mark_stale_jobs()
-            try:
-                job_id = int(path.rsplit("/", 1)[-1])
-            except ValueError:
-                self.send_json({"status": "error", "message": "bad job id"}, 400)
-                return
-            with get_connection() as conn:
-                row = conn.execute("SELECT * FROM jobs WHERE id = ?", (job_id,)).fetchone()
-            if not row:
-                self.send_json({"status": "error", "message": "job not found"}, 404)
-                return
-            self.send_json(dict(row))
+                from db import build_db_plan
+                import linkgraph
+                plan = build_db_plan()
+                out_links = linkgraph.outbound_candidates(plan, str(tid))
+                in_links = linkgraph.inbound_candidates(plan, str(tid))
+                self.send_json({
+                    "id": tid,
+                    "outbound": out_links,
+                    "inbound": in_links
+                })
+            except Exception as e:
+                self.send_json({"error": str(e)}, 500)
             return
 
         # Статика: index.html
@@ -494,21 +300,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "domain": domain})
             return
 
-        # 4.9. Пересчёт приоритета тем (спрос + конкуренция + интент + готовность)
-        if path == "/api/priority/recalc":
-            try:
-                import priority_v2
-                results = priority_v2.recalculate()
-                top = results[:10]
-                self.send_json({
-                    "status": "ok",
-                    "total": len(results),
-                    "top": [{"id": r["id"], "title": r["title"], "score": r["total"], "grade": r["grade"]} for r in top],
-                })
-            except Exception as ex:  # noqa: BLE001
-                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:150]}"}, 500)
-            return
-
         # 5. Утвердить статью к публикации
         if path == "/api/articles/approve":
             tid = payload.get("id")
@@ -523,14 +314,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
             tid = payload.get("id")
             reason = payload.get("reason", "Замечания редактора")
             with get_connection() as conn:
-                # needs_fix — отдельный статус, чтобы статья ГАРАНТИРОВАННО
-                # попала в колонку «Требует правок», даже если балл был ≥ 80
-                conn.execute(
-                    "UPDATE topics SET status = 'needs_fix', next_action = ? WHERE id = ?",
-                    (f"доработка: {reason}", tid),
-                )
+                conn.execute("UPDATE topics SET status = 'writing', next_action = ? WHERE id = ?", (f"доработка: {reason}", tid))
                 conn.commit()
-            self.send_json({"status": "ok", "id": tid, "new_status": "needs_fix"})
+            self.send_json({"status": "ok", "id": tid})
             return
 
         # 6.5. Сохранить отредактированный текст статьи
@@ -541,13 +327,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
             chars = len(new_text.strip())
 
             with get_connection() as conn:
-                row = conn.execute("SELECT slug FROM topics WHERE id = ?", (tid,)).fetchone()
+                row = conn.execute("SELECT slug, status FROM topics WHERE id = ?", (tid,)).fetchone()
                 slug = row["slug"] if row else f"article-{tid}"
+                curr_status = row["status"] if row else "writing"
+                new_status = "writing" if curr_status in ("ready", "scored") else curr_status
                 conn.execute("""
                     UPDATE topics
-                    SET content_markdown = ?, chars = ?, updated_at = ?
+                    SET content_markdown = ?, chars = ?, status = ?, score_total = NULL, score_json = NULL, updated_at = ?
                     WHERE id = ?
-                """, (new_text, chars, now_str, tid))
+                """, (new_text, chars, new_status, now_str, tid))
                 conn.commit()
 
             # Синхронизируем файл на диске в `сами статьи/`
@@ -557,7 +345,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             except Exception:
                 pass
 
-            self.send_json({"status": "ok", "id": tid, "chars": chars})
+            self.send_json({"status": "ok", "id": tid, "chars": chars, "status_code": new_status})
             return
 
         # 7. Запуск субагента
@@ -565,30 +353,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
             agent = payload.get("agent")
             target_id = payload.get("target_id")
 
-            # Долгие агенты (обход сайтов) выполняются в фоне: HTTP-запрос
-            # не должен ждать десятки секунд и обрываться по таймауту.
-            if agent in LONG_AGENTS:
-                if agent == "00-research":
-                    cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"),
-                           "--limit", "10", "--max-domains", "5", "--budget", "60"]
-                else:
-                    domain = payload.get("domain", "")
-                    cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
-                    cmd.extend(["--domain", domain] if domain else ["--all"])
-                job_id = start_background_job(agent, cmd, target_id)
-                self.send_json({
-                    "status": "queued",
-                    "agent": agent,
-                    "job_id": job_id,
-                    "log": f"Задача поставлена в очередь (job #{job_id}). Прогресс: /api/jobs/{job_id}",
-                })
-                return
-
             log_output = f"Запуск {agent}..."
             status = "completed"
 
             try:
-                if agent == "delivery" and target_id:
+                if agent == "00-research":
+                    cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"), "--limit", "20"]
+                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
+                    log_output = p.stdout + "\n" + p.stderr
+                    status = "succeeded" if p.returncode == 0 else "failed"
+                elif agent == "bot-analyzer":
+                    domain = payload.get("domain", "")
+                    cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
+                    if domain:
+                        cmd.extend(["--domain", domain])
+                    else:
+                        cmd.append("--all")
+                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
+                    log_output = p.stdout + "\n" + p.stderr
+                    status = "succeeded" if p.returncode == 0 else "failed"
+                elif agent == "delivery" and target_id:
+                    dry_run = payload.get("dry_run", True)
                     from package_contract import package_article
                     res = package_article(target_id)
                     if not res["valid"]:
@@ -599,10 +384,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         contract_path = DATA / f"contract_{target_id}.json"
                         contract_path.write_text(json.dumps(res["contract"], ensure_ascii=False, indent=2), encoding="utf-8")
                         delivery_tool = ROOT / "tools" / "delivery_cli.py"
-                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path), "--dry-run"]
+                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path)]
+                        if dry_run:
+                            cmd.append("--dry-run")
                         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
-                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\n" + p.stdout + "\n" + p.stderr
+                        mode_str = " (DRY-RUN / имитация)" if dry_run else " (БОЕВОЙ РЕЖИМ)"
+                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!{mode_str}\n" + p.stdout + "\n" + p.stderr
                         status = "succeeded" if p.returncode == 0 else "failed"
+                        if status == "succeeded" and not dry_run:
+                            with get_connection() as conn:
+                                conn.execute("UPDATE topics SET status = 'delivered', next_action = 'опубликовано в WP' WHERE id = ?", (target_id,))
+                                conn.commit()
                 elif agent == "04-scorer" and target_id:
                     with get_connection() as conn:
                         row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (target_id,)).fetchone()
@@ -633,15 +425,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
                         status = "failed"
                 elif agent == "02-writer" and target_id:
-                    voice = (payload.get("voice") or "practico").strip().lower()
-                    if voice not in ("practico", "practico2"):
-                        voice = "practico"
-                    provider = (payload.get("provider") or "auto").strip().lower()
-                    if provider not in ("auto", "claude", "deepseek", "yandex"):
-                        provider = "auto"
-                    cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"),
-                           "--id", str(target_id), "--voice", voice, "--provider", provider]
-                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=600)
+                    cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"), "--id", str(target_id)]
+                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=180)
                     log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
                     status = "succeeded" if p.returncode == 0 else "failed"
                 else:
@@ -660,79 +445,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 conn.commit()
 
             self.send_json({"status": status, "agent": agent, "log": log_output})
-            return
-
-        # 7.5. Проверка фразы: спрос (Вордстат, бесплатно) и конкуренция (Мутаген, платно)
-        if path == "/api/keyword/check":
-            phrase = (payload.get("phrase") or "").strip()
-            source = (payload.get("source") or "auto").strip().lower()
-            if not phrase:
-                self.send_json({"status": "error", "message": "Пустая фраза"}, 400)
-                return
-
-            result = {"status": "ok", "phrase": phrase, "wordstat": None, "mutagen": None, "cost": 0.0, "notes": []}
-
-            # Вордстат — всегда и бесплатно
-            try:
-                import wordstat as ws_mod
-                cached = None if payload.get("refresh") else ws_mod.get_cached(phrase)
-                if cached:
-                    result["wordstat"] = {
-                        "totalCount": cached["totalCount"],
-                        "results": cached["results"][:5],
-                        "associations": cached["associations"][:5],
-                        "cached": True,
-                        "checked_at": cached.get("checked_at"),
-                    }
-                else:
-                    data = ws_mod.top_requests(phrase, num_phrases=15)
-                    ws_mod.save_cache(phrase, data)
-                    result["wordstat"] = {
-                        "totalCount": int(data.get("totalCount") or 0),
-                        "results": [{"phrase": r.get("phrase"), "count": int(r.get("count") or 0)}
-                                    for r in (data.get("results") or [])[:5]],
-                        "associations": [{"phrase": r.get("phrase"), "count": int(r.get("count") or 0)}
-                                         for r in (data.get("associations") or [])[:5]],
-                        "cached": False,
-                    }
-            except Exception as ex:  # noqa: BLE001
-                result["notes"].append(f"Вордстат недоступен: {type(ex).__name__}: {str(ex)[:120]}")
-
-            # Мутаген — только по явному запросу (стоит денег)
-            if source in ("mutagen", "both"):
-                try:
-                    import mutagen as mg
-                    cached_m = None if payload.get("refresh") else mg.cached_metrics(phrase)
-                    if cached_m:
-                        result["mutagen"] = {
-                            "strong": cached_m["strong"],
-                            "wordstat": cached_m["wordstat"],
-                            "tails": cached_m["tails"],
-                            "vital_site": cached_m["vital_site"],
-                            "cached": True,
-                            "checked_at": cached_m["checked_at"],
-                        }
-                    else:
-                        balance_before = mg.get_balance()
-                        res = mg.check_keyword(phrase)
-                        balance_after = mg.get_balance()
-                        cost = max(0.0, balance_before - balance_after)
-                        mg.save_metrics(phrase, res)
-                        direct = res.get("direct") or {}
-                        result["mutagen"] = {
-                            "strong": res.get("strong"),
-                            "wordstat": res.get("wordstat"),
-                            "tails": res.get("tails"),
-                            "vital_site": res.get("vital_site") or "",
-                            "bids": {"spec": direct.get("spec"), "first": direct.get("first"), "garant": direct.get("garant")},
-                            "cached": False,
-                        }
-                        result["cost"] = round(cost, 4)
-                        result["balance"] = round(balance_after, 2)
-                except Exception as ex:  # noqa: BLE001
-                    result["notes"].append(f"Мутаген недоступен: {type(ex).__name__}: {str(ex)[:120]}")
-
-            self.send_json(result)
             return
 
         # 8. Импорт выгрузки Firecrawl (Markdown / JSON)
