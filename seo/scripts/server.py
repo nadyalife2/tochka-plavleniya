@@ -438,19 +438,67 @@ def parse_firecrawl_markdown(md: str) -> dict:
     if not md:
         return pkg
 
-    # 1. Таблица конкурентов
-    comp_match = re.search(r"## Конкуренты\s*\n(.*?)(?=\n##|\Z)", md, re.S)
-    if comp_match:
-        for line in comp_match.group(1).splitlines():
+    # 1. Таблицы конкурентов (поддерживает ## Конкуренты, ## Приоритетные конкуренты, ## Дополнительные конкуренты)
+    comp_sections = re.findall(r"##\s+[^#\n]*конкурент[^\n]*\n(.*?)(?=\n##|\Z)", md, re.I | re.S)
+    if not comp_sections and ("| Сайт |" in md or "| Домен |" in md or "| Домены |" in md):
+        comp_sections = [md]
+
+    seen_domains = set()
+    for sec in comp_sections:
+        for line in sec.splitlines():
             line = line.strip()
-            if not line.startswith("|") or "Домен" in line or "|---" in line:
+            if not line.startswith("|") or "|---" in line:
                 continue
             parts = [p.strip() for p in line.split("|")[1:-1]]
-            if len(parts) >= 2 and "." in parts[0]:
-                pkg["competitors"].append({
-                    "domain": parts[0].lower(),
-                    "type": parts[1] if len(parts) > 1 else "competitor",
-                    "notes": f"Прочитано: {parts[2]}" if len(parts) > 2 else "",
+            if not parts:
+                continue
+            first = parts[0]
+            if any(h in first.lower() for h in ("сайт", "домен", "domain", "url", "конкурент")):
+                continue
+
+            link_m = re.search(r"\[([^\]]+)\]\((https?://[^)]+)\)", first)
+            if link_m:
+                domain = link_m.group(1).replace("www.", "").strip().lower()
+                blog_url = link_m.group(2).strip()
+            elif first.startswith("http"):
+                blog_url = first
+                domain = urlparse(first).netloc.replace("www.", "").strip().lower()
+            else:
+                domain = first.replace("www.", "").strip().lower()
+                blog_url = ""
+
+            if "." not in domain or len(domain) < 4:
+                continue
+            if domain in seen_domains:
+                continue
+            seen_domains.add(domain)
+
+            ctype = parts[1] if len(parts) > 1 else "конкурент"
+            niche = parts[2] if len(parts) > 2 else ""
+            reason = parts[3] if len(parts) > 3 else ""
+            level = parts[4] if len(parts) > 4 else ""
+
+            level_clean = re.sub(r"[*_`]", "", level).strip()
+            score = 85 if "высок" in level_clean.lower() else (65 if "средн" in level_clean.lower() else (45 if "низк" in level_clean.lower() else 50))
+            notes = f"{reason} (Приоритет: {level_clean})" if level_clean else reason
+
+            pkg["competitors"].append({
+                "domain": domain,
+                "type": ctype,
+                "niche": niche,
+                "blog_url": blog_url,
+                "notes": notes.strip(),
+                "score": score,
+            })
+
+            if blog_url and blog_url.count("/") >= 3 and not blog_url.endswith(domain + "/"):
+                pkg["raw_data"].append({
+                    "url": blog_url,
+                    "domain": domain,
+                    "title": f"{niche} ({domain})" if niche else f"Статья {domain}",
+                    "h1": niche or f"Обзор {domain}",
+                    "content_type": ctype,
+                    "topic": niche,
                 })
 
     # 2. Кластеры и ключевые слова (### C01. Название — P1)
@@ -1956,12 +2004,25 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if not domain:
                         continue
                     if domain in have_domains:
+                        conn.execute("""
+                            UPDATE competitors SET
+                                niche = CASE WHEN length(coalesce(niche,'')) = 0 THEN ? ELSE niche END,
+                                type = CASE WHEN length(coalesce(type,'')) = 0 THEN ? ELSE type END,
+                                blog_url = CASE WHEN length(coalesce(blog_url,'')) = 0 THEN ? ELSE blog_url END,
+                                score = CASE WHEN score IS NULL OR score = 0 THEN ? ELSE score END,
+                                notes = CASE WHEN length(coalesce(notes,'')) = 0 THEN ? ELSE notes END,
+                                updated_at = ?
+                            WHERE domain = ?
+                        """, (comp.get("niche") or "", comp.get("type") or "", comp.get("blog_url") or "",
+                              comp.get("score") or 50, (comp.get("notes") or "")[:500], now, domain))
                         skipped["competitors"] += 1
                         continue
-                    conn.execute(
-                        "INSERT OR IGNORE INTO competitors (domain, type, notes, updated_at) VALUES (?, ?, ?, ?)",
-                        (domain, comp.get("type") or "", (comp.get("notes") or "")[:500], now),
-                    )
+
+                    conn.execute("""
+                        INSERT INTO competitors (domain, niche, type, blog_url, score, notes, updated_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?)
+                    """, (domain, comp.get("niche") or "", comp.get("type") or "", comp.get("blog_url") or "",
+                          comp.get("score") or 50, (comp.get("notes") or "")[:500], now))
                     have_domains.add(domain)
                     added["competitors"] += 1
 
