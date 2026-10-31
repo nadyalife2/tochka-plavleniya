@@ -21,7 +21,8 @@ try:
 except Exception:
     pass
 
-from excel_io import DATA, OUT, build_plan
+from db import build_db_plan as build_plan
+from excel_io import DATA, OUT
 
 SCORES = OUT / "scores"
 
@@ -50,7 +51,16 @@ def load_text(args) -> str:
         return Path(args.file).read_text(encoding="utf-8", errors="replace")
     if args.text:
         return args.text
-    raise SystemExit("Нужен --file или --text")
+    if args.id:
+        try:
+            from db import get_connection
+            with get_connection() as conn:
+                row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (args.id,)).fetchone()
+                if row and row["content_markdown"]:
+                    return row["content_markdown"]
+        except Exception:
+            pass
+    raise SystemExit("Нужен --file, --text или валидный --id с текстом в базе")
 
 
 def words(text: str) -> list[str]:
@@ -80,12 +90,21 @@ def strip_markdown(text: str) -> str:
 
 
 def internal_links(text: str) -> list[str]:
-    return re.findall(r"\]\((/(?:[a-z0-9\-]+)/?)\)", text) + re.findall(r"\]\((https?://[^)]+)\)", text)
+    # Внутренние относительные ссылки сайта: /slug/, /slug или ../slug/
+    return re.findall(r"\]\(((?:/|\.\./)(?:[a-z0-9\-]+)/?)\)", text)
 
 
 def count_faq(text: str) -> int:
+    try:
+        from package_contract import parse_faq_from_text
+        items = parse_faq_from_text(text)
+        if items:
+            return len(items)
+    except Exception:
+        pass
+
     if re.search(r"(?im)^#{2,3}\s*(faq|частые вопросы|вопросы и ответы)", text):
-        questions = re.findall(r"(?m)^\s*(?:\d+[.)]\s*)?\*\*[^*]+\?\*\*|\?\s*$", text)
+        questions = re.findall(r'(?m)^\s*(?:\d+[.)]\s*)?(?:\*\*[^*]+\?\*\*|q:\s*["«]?[^"\n\r]+\?|[^.\n\r]+\?\s*["»]?\s*$)', text)
         return len([q for q in questions if q])
     return len(re.findall(r"(?m)^\s*(?:[-*]|\d+[.)])\s+[^.\n]+\?", text))
 
@@ -95,7 +114,8 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
     h = headings(text)
     h1 = [t for lvl, t in h if lvl == 1]
     h2 = [t for lvl, t in h if lvl == 2]
-    chars = len(re.sub(r"\s+", "", plain))
+    # Объём текста: с пробелами (редакционный стандарт)
+    chars = len(plain.strip())
     paras = paragraphs(plain)
     sents = [s for p in paras for s in sentences(p)]
     avg_len = sum(len(words(s)) for s in sents) / max(1, len(sents))
@@ -108,7 +128,28 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
     stop_hits = [p for p in STOP_PHRASES if p in plain.lower()]
     bur_hits = [w for w in BUREAUCRATIC if re.search(rf"\b{w}", plain.lower())]
     ai_hits = [p for p in AI_PATTERNS if p in plain.lower()]
-    danger_hits = [p for p in DANGEROUS if p in plain.lower()]
+
+    # Проверка опасных советов: отрицание ищем ВБЛИЗИ фразы, а не в любом месте предложения.
+    # Иначе «Паяйте под напряжением, чтобы не тратить время» ошибочно считается предупреждением.
+    danger_hits = []
+    NEGATION_RE = re.compile(
+        r"\b(не|нельзя|запрещ\w*|исключ\w*|никогда|недопустим\w*|опасн\w*|внимани\w*|предостереж\w*|риск\w*)\b",
+        re.I,
+    )
+    for s in sents:
+        s_low = s.lower()
+        for p in DANGEROUS:
+            caught = False
+            for m in re.finditer(re.escape(p), s_low):
+                pre_words = re.findall(r"[\w\-]+", s_low[: m.start()])[-5:]
+                post_words = re.findall(r"[\w\-]+", s_low[m.end():])[:1]
+                window = " ".join(pre_words + post_words)
+                if not NEGATION_RE.search(window):
+                    danger_hits.append(f"«{s.strip()[:80]}»")
+                    caught = True
+                    break
+            if caught:
+                break
     first_para = paras[0] if paras else ""
     answer_words = len(words(first_para))
 
@@ -266,6 +307,18 @@ def main() -> int:
     slug = args.id or "article"
     (SCORES / f"{slug}.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
     (SCORES / f"{slug}.md").write_text(to_markdown(report), encoding="utf-8")
+
+    if args.id:
+        try:
+            from db import get_connection
+            with get_connection() as conn:
+                conn.execute(
+                    "UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
+                    (report["total"], json.dumps(report, ensure_ascii=False), args.id)
+                )
+                conn.commit()
+        except Exception:
+            pass
 
     print(f"#{args.id or '—'}: {report['total']}/100 — {report['verdict']}")
     print(f"    {SCORES / (slug + '.md')}")

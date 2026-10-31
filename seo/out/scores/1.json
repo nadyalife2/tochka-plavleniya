@@ -1,19 +1,19 @@
 {
   "article_id": "1",
-  "generated_at": "2026-10-28T15:16:19",
-  "file": "seo\\data\\article_1.md",
+  "generated_at": "2026-10-29T22:16:22",
+  "file": null,
   "metrics": {
-    "chars": 5941,
+    "chars": 8053,
     "h1": [
       "Как паять паяльником: пошаговый гайд для начинающих"
     ],
-    "h2_count": 10,
-    "avg_sentence_words": 17.0,
+    "h2_count": 11,
+    "avg_sentence_words": 17.4,
     "avg_paragraph_sentences": 2.0,
-    "faq": 3,
-    "internal_links": 2,
-    "sources": 0,
-    "temps": 10,
+    "faq": 5,
+    "internal_links": 3,
+    "sources": 5,
+    "temps": 12,
     "alloys": true,
     "answer_first_words": 37,
     "stop_phrases": [],
@@ -23,11 +23,11 @@
   },
   "blocks": {
     "intent": {
-      "points": 18,
+      "points": 13,
       "max": 20
     },
     "facts": {
-      "points": 17,
+      "points": 25,
       "max": 25
     },
     "voice": {
@@ -35,11 +35,11 @@
       "max": 15
     },
     "seo": {
-      "points": 13,
+      "points": 18,
       "max": 20
     },
     "links": {
-      "points": 8,
+      "points": 10,
       "max": 10
     },
     "ai": {
@@ -47,15 +47,12 @@
       "max": 10
     }
   },
-  "total": 81,
+  "total": 91,
   "verdict": "готово к ОТК",
   "issues": [
-    "H2: 10 (цель 4–8; для справочников допустимо до 10)",
-    "Источники: найдено 0 упоминаний ГОСТ/IPC/TDS (нужно 2–4)",
-    "FAQ: 3 вопросов (нужно 4–6)",
-    "Внутренние ссылки: 2 (нужно 3–5)",
-    "Нет раздела «Источники/Стандарты»",
-    "Ссылки: 2 (цель 3–5)"
+    "H2: 11 (цель 4–8; для справочников допустимо до 10)",
+    "Объём: 8,053 знаков (цель 5 500–7 000)",
+    "Нет раздела «Источники/Стандарты»"
   ],
   "blockers": [],
   "manual": [

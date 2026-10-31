@@ -69,7 +69,20 @@ def init_db() -> None:
             source_id INTEGER NOT NULL,
             target_id INTEGER NOT NULL,
             anchor TEXT,
-            status TEXT DEFAULT 'planned'
+            status TEXT DEFAULT 'planned',
+            UNIQUE(source_id, target_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS jobs (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            job_type TEXT NOT NULL,
+            target_id TEXT,
+            params_json TEXT,
+            status TEXT DEFAULT 'queued',
+            return_code INTEGER,
+            log TEXT,
+            created_at TEXT,
+            updated_at TEXT
         );
 
         CREATE TABLE IF NOT EXISTS competitors (
@@ -204,8 +217,170 @@ def list_backups() -> list[dict]:
         return [dict(r) for r in cur.fetchall()]
 
 
+def migrate_schema_v2():
+    """Миграция существующей БД: удаление дублей связей, уникальный индекс, колонки текста."""
+    with get_connection() as conn:
+        # 1. Удаляем возможные дубликаты связей
+        conn.execute("""
+            DELETE FROM links
+            WHERE id NOT IN (
+                SELECT MIN(id) FROM links GROUP BY source_id, target_id
+            )
+        """)
+        # 2. Создаем уникальный индекс
+        conn.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_links_pair ON links (source_id, target_id);")
+        # 3. Добавляем колонку content_markdown и content_hash в raw_articles, если их нет
+        cur = conn.cursor()
+        cols = [c[1] for c in cur.execute("PRAGMA table_info(raw_articles)").fetchall()]
+        if "content_markdown" not in cols:
+            conn.execute("ALTER TABLE raw_articles ADD COLUMN content_markdown TEXT;")
+        if "content_hash" not in cols:
+            conn.execute("ALTER TABLE raw_articles ADD COLUMN content_hash TEXT;")
+        conn.commit()
+
+
+def build_db_plan() -> dict:
+    """Собирает полный план проекта напрямую из SQLite seo.db.
+    
+    Полностью заменяет Excel build_plan(). Возвращает идентичную структуру данных:
+    - clusters: dict[name -> dict]
+    - topics: dict[id_str -> dict]
+    - links: list[dict]
+    - competitors: list[dict]
+    - raw_data: list[dict]
+    - proposed_topics: list[dict]
+    - proposed_competitors: list[dict]
+    - counts: dict
+    """
+    with get_connection() as conn:
+        clusters_rows = conn.execute("SELECT * FROM clusters ORDER BY priority_rank ASC, name ASC").fetchall()
+        topics_rows = conn.execute("SELECT * FROM topics ORDER BY priority_score DESC, id ASC").fetchall()
+        links_rows = conn.execute("SELECT * FROM links").fetchall()
+        competitors_rows = conn.execute("SELECT * FROM competitors ORDER BY score DESC").fetchall()
+        raw_rows = conn.execute("SELECT * FROM raw_articles ORDER BY crawled_at DESC").fetchall()
+        prop_topics_rows = conn.execute("SELECT * FROM topics_proposed ORDER BY priority_score DESC").fetchall()
+        prop_comps_rows = conn.execute("SELECT * FROM competitors_proposed ORDER BY hits DESC").fetchall()
+        briefs_rows = conn.execute("SELECT * FROM briefs").fetchall()
+
+    briefs_map = {str(b["topic_id"]): dict(b) for b in briefs_rows}
+    clusters = {c["name"]: dict(c) for c in clusters_rows}
+
+    topics = {}
+    for t in topics_rows:
+        tid = str(t["id"])
+        c_name = t["cluster"]
+        cluster_info = clusters.get(c_name, {})
+        has_text = bool(t["content_markdown"]) and (t["chars"] or 0) > 400
+        has_brief = tid in briefs_map
+
+        topics[tid] = {
+            "id": tid,
+            "title": t["title"],
+            "slug": t["slug"],
+            "cluster": c_name,
+            "cluster_priority": cluster_info.get("priority_rank", 2),
+            "keywords": cluster_info.get("keywords", ""),
+            "type": t["type"] or "гайд",
+            "priority": t["priority"] or "средний",
+            "priority_rank": 1 if (t["priority"] or "").lower() in ("высокий", "hot") else 2,
+            "status": t["status"] or "backlog",
+            "status_raw": t["status"] or "backlog",
+            "bot": t["bot"] or "",
+            "next_action": t["next_action"] or "",
+            "has_brief": has_brief,
+            "has_text": has_text,
+            "brief": briefs_map.get(tid),
+            "text": {"chars": t["chars"] or 0, "text": t["content_markdown"] or ""},
+            "outbound_planned": [],
+            "inbound_planned": [],
+            "score": t["score_total"],
+            "priority_score": t["priority_score"],
+        }
+
+    links = []
+    for l in links_rows:
+        sid = str(l["source_id"])
+        tid = str(l["target_id"])
+        link_dict = {
+            "source": sid,
+            "target": tid,
+            "anchor": l["anchor"] or "",
+            "status": l["status"] or "planned",
+        }
+        links.append(link_dict)
+        if sid in topics:
+            dst_t = topics.get(tid)
+            topics[sid]["outbound_planned"].append({
+                "id": tid,
+                "slug": dst_t["slug"] if dst_t else f"article-{tid}",
+                "anchor": l["anchor"] or "",
+                "written": dst_t["has_text"] if dst_t else False,
+            })
+        if tid in topics:
+            src_t = topics.get(sid)
+            topics[tid]["inbound_planned"].append({
+                "id": sid,
+                "slug": src_t["slug"] if src_t else f"article-{sid}",
+                "anchor": l["anchor"] or "",
+                "written": src_t["has_text"] if src_t else False,
+            })
+
+    competitors = [
+        {
+            "domain": c["domain"],
+            "niche": c["niche"],
+            "type": c["type"],
+            "blog": c["blog_url"],
+            "articles": c["articles_count"],
+            "features": c["features"],
+            "keywords": c["seo_keywords"],
+            "score": c["score"],
+            "notes": c["notes"],
+        }
+        for c in competitors_rows
+    ]
+
+    raw_data = [
+        {
+            "url": r["url"],
+            "source": r["domain"],
+            "title": r["title"],
+            "h1": r["h1"],
+            "date": r["date"],
+            "content_type": r["content_type"],
+            "cluster": r["cluster"],
+            "status": r["status"],
+        }
+        for r in raw_rows
+    ]
+
+    return {
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "master": "SQLite seo/data/seo.db",
+        "clusters": clusters,
+        "topics": topics,
+        "links": links,
+        "competitors": competitors,
+        "raw_data": raw_data,
+        "proposed_topics": [dict(r) for r in prop_topics_rows],
+        "proposed_competitors": [dict(r) for r in prop_comps_rows],
+        "duplicates": [],
+        "counts": {
+            "topics": len(topics),
+            "clusters": len(clusters),
+            "links": len(links),
+            "written": sum(1 for t in topics.values() if t["has_text"]),
+            "with_brief": sum(1 for t in topics.values() if t["has_brief"]),
+            "raw_data": len(raw_data),
+            "scored_priority": sum(1 for t in topics.values() if t["priority_score"] is not None),
+            "proposed_topics": len(prop_topics_rows),
+            "proposed_competitors": len(prop_comps_rows),
+        },
+    }
+
+
 if __name__ == "__main__":
     init_db()
-    print("OK: БД инициализирована в", DB_PATH)
-    bk = backup_database()
-    print("OK: Тестовый бэкап создан:", bk["filename"])
+    migrate_schema_v2()
+    p = build_db_plan()
+    print("✓ План собран из SQLite! Тем:", p["counts"]["topics"], "| Ссылок:", p["counts"]["links"])

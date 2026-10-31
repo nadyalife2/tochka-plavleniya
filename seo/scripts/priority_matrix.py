@@ -30,7 +30,8 @@ try:
 except Exception:
     pass
 
-from excel_io import build_plan, clean, save_priority_scores
+from db import build_db_plan as build_plan, get_connection
+from excel_io import clean, save_priority_scores
 
 # ---------------------------------------------------------------- веса ------
 
@@ -141,33 +142,15 @@ def score_readiness(topic: dict) -> int:
 
 
 def competitor_hits_from_raw(plan: dict) -> dict[str, int]:
-    """Считает, сколько собранных статей конкурентов попало в каждый кластер."""
+    """Считает, сколько собранных статей конкурентов попало в каждый кластер (из SQLite)."""
     hits: dict[str, int] = {}
-    # raw_data читается тем же мастером; берём через build_plan-совместимый путь
-    import openpyxl
-    from excel_io import MASTER, clean as cl
-
-    if not MASTER.exists():
-        return hits
-    wb = openpyxl.load_workbook(MASTER, read_only=True, data_only=True)
     try:
-        if "raw_data" not in wb.sheetnames:
-            return hits
-        ws = wb["raw_data"]
-        rows = ws.iter_rows(values_only=True)
-        header = [cl(h) for h in next(rows, [])]
-        idx = {name: i for i, name in enumerate(header) if name}
-        c_idx = idx.get("cluster")
-        if c_idx is None:
-            return hits
-        for row in rows:
-            if not row or c_idx >= len(row):
-                continue
-            cluster = cl(row[c_idx])
-            if cluster:
-                hits[cluster] = hits.get(cluster, 0) + 1
-    finally:
-        wb.close()
+        with get_connection() as conn:
+            rows = conn.execute("SELECT cluster, COUNT(*) FROM raw_articles WHERE cluster IS NOT NULL AND length(cluster) > 0 GROUP BY cluster").fetchall()
+            for c, cnt in rows:
+                hits[c] = cnt
+    except Exception:
+        pass
     return hits
 
 
@@ -241,24 +224,34 @@ def main() -> int:
         print("\n--dry-run: в Excel ничего не записано.")
         return 0
 
-    payload = [
-        {
-            "article_id": r["article_id"],
-            "score": r["score"],
-            "cluster_score": r["cluster_score"],
-            "gap_score": r["gap_score"],
-            "coverage_score": r["coverage_score"],
-            "links_score": r["links_score"],
-            "readiness_score": r["readiness_score"],
-            "keywords_score": r["keywords_score"],
-            "notes": f"кластер: {r['cluster']}",
-        }
-        for r in results
-    ]
-    res = save_priority_scores(payload, write_plan_column=True)
-    print(f"\nExcel: записано {res['written']} оценок в лист `{res['sheet']}` "
-          f"и колонку «Оценка_приоритета_0_100»")
-    print(f"Бэкап: {res['backup']}")
+    # 1. Сохраняем в SQLite БД (Единый первоисточник)
+    from db import get_connection
+    with get_connection() as conn:
+        for r in results:
+            conn.execute("UPDATE topics SET priority_score = ? WHERE id = ?", (r["score"], r["article_id"]))
+        conn.commit()
+    print(f"✓ Записано в SQLite seo.db: обновлено {len(results)} тем.")
+
+    # 2. Дополнительно обновляем Excel, если файл доступен
+    try:
+        payload = [
+            {
+                "article_id": r["article_id"],
+                "score": r["score"],
+                "cluster_score": r["cluster_score"],
+                "gap_score": r["gap_score"],
+                "coverage_score": r["coverage_score"],
+                "links_score": r["links_score"],
+                "readiness_score": r["readiness_score"],
+                "keywords_score": r["keywords_score"],
+                "notes": f"кластер: {r['cluster']}",
+            }
+            for r in results
+        ]
+        res = save_priority_scores(payload, write_plan_column=True)
+        print(f"Excel: записано {res['written']} оценок в лист `{res['sheet']}`")
+    except Exception as e:
+        print(f"(Синхронизация с Excel пропущена: {e})")
     return 0
 
 
