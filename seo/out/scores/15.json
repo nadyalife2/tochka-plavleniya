@@ -1,14 +1,14 @@
 {
   "article_id": "15",
-  "generated_at": "2026-10-29T22:16:25",
+  "generated_at": "2026-10-31T23:36:05",
   "file": null,
   "metrics": {
-    "chars": 9457,
+    "chars": 9760,
     "h1": [
       "Припой для пайки: виды и как выбрать правильный"
     ],
     "h2_count": 13,
-    "avg_sentence_words": 13.3,
+    "avg_sentence_words": 13.7,
     "avg_paragraph_sentences": 2.6,
     "faq": 6,
     "internal_links": 3,
@@ -51,7 +51,7 @@
   "verdict": "готово к ОТК",
   "issues": [
     "H2: 13 (цель 4–8; для справочников допустимо до 10)",
-    "Объём: 9,457 знаков (цель 5 500–7 000)"
+    "Объём: 9,760 знаков (цель 5 500–7 000)"
   ],
   "blockers": [],
   "manual": [
