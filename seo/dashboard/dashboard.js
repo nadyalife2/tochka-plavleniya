@@ -457,12 +457,67 @@ async function checkPhraseValue(phrase, source, refresh) {
       <strong>Широкая частотность (Вордстат):</strong> <strong style="font-family:var(--mono);">${(ws.totalCount || 0).toLocaleString('ru-RU')}</strong> показов/мес
       ${ws.cached ? '<span style="color:var(--muted);font-size:11px;"> · из кэша, бесплатно</span>' : ''}
     </div>`;
+
+    // 1. Похожие запросы (левая колонка Вордстата)
     if (ws.results && ws.results.length) {
-      html += '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Топ похожих запросов:</div><ul style="margin:0 0 8px 16px;font-size:12px;">';
+      html += '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">Топ похожих запросов (хвосты людей):</div><ul style="margin:0 0 8px 16px;font-size:12px;">';
       ws.results.slice(0, 5).forEach(r => {
         html += `<li>${esc(r.phrase)} — <code>${(r.count || 0).toLocaleString('ru-RU')}</code></li>`;
       });
       html += '</ul>';
+    }
+
+    // 2. Ассоциации (правая колонка Вордстата — что искали рядом)
+    if (ws.associations && ws.associations.length) {
+      html += `
+        <div style="margin:8px 0;padding:8px 10px;background:#F0FDF4;border:1px solid #86EFAC;border-radius:var(--radius-sm);">
+          <div style="font-size:11px;font-weight:700;color:#166534;margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+            <span>🔗 Искали рядом в той же сессии (Ассоциации для перелинковки):</span>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            ${ws.associations.map(a => `
+              <button class="btn btn--xs" type="button" onclick="setAnalysisPhrase('${esc(a.phrase)}')" title="Кликните, чтобы проверить этот смежный запрос" style="background:#FFFFFF;border-color:#86EFAC;color:#166534;">
+                ${esc(a.phrase)} <span style="color:#059669;font-weight:700;margin-left:4px;">${Number(a.count).toLocaleString('ru-RU')}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    // 3. Сезонность и помесячный тренд спроса
+    if (ws.trend && ws.trend.points && ws.trend.points.length) {
+      const t = ws.trend;
+      const dirColor = t.direction === 'up' ? '#059669' : (t.direction === 'down' ? '#B91C1C' : '#6B7280');
+      const dirIcon = t.direction === 'up' ? '📈' : (t.direction === 'down' ? '📉' : '➡️');
+      const dirLabel = t.direction === 'up' 
+        ? `Растущий спрос: +${t.change_pct}% за 6 мес (пик в ${t.peak_month}: ${Number(t.peak_count).toLocaleString('ru-RU')})`
+        : (t.direction === 'down' ? `Спад спроса: ${t.change_pct}% за 6 мес` : `Стабильный спрос (${t.change_pct}%)`);
+
+      const maxVal = Math.max(...t.points.map(p => p.count), 1);
+      const barsHtml = t.points.map(p => {
+        const h = Math.max(6, Math.round((p.count / maxVal) * 36));
+        const isPeak = p.month === t.peak_month;
+        return `
+          <div style="display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-family:var(--mono);" title="${p.month}: ${Number(p.count).toLocaleString('ru-RU')} показов">
+            <span style="color:${isPeak ? '#B45309' : 'var(--muted)'};font-weight:${isPeak ? '700' : '500'};">${p.count > 999 ? (p.count/1000).toFixed(0) + 'k' : p.count}</span>
+            <div style="width:26px;height:${h}px;background:${isPeak ? 'var(--accent)' : '#CBD5E1'};border:1px solid ${isPeak ? '#000' : '#94A3B8'};border-radius:2px 2px 0 0;"></div>
+            <span style="color:var(--muted);">${p.month.slice(5)}</span>
+          </div>
+        `;
+      }).join('');
+
+      html += `
+        <div style="margin:8px 0;padding:8px 12px;background:#F8FAFC;border:1px solid var(--border-hairline);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:11.5px;color:${dirColor};">${dirIcon} ${dirLabel}</span>
+            <span style="font-size:10px;color:var(--muted);">Яндекс Search API v2</span>
+          </div>
+          <div style="display:flex;align-items:flex-end;gap:12px;height:56px;padding-top:6px;border-top:1px dashed #E2E8F0;">
+            ${barsHtml}
+          </div>
+        </div>
+      `;
     }
   }
 

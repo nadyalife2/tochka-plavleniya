@@ -19,6 +19,11 @@ import json
 import sys
 from pathlib import Path
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "seo" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
@@ -73,6 +78,15 @@ def build_author_brief(topic_id: int | str) -> dict:
         try:
             items = json.loads(ws["top_json"])
             queries = [it["phrase"] for it in items[:8] if it.get("phrase")]
+        except Exception:
+            pass
+
+    # Ассоциации из Вордстата (смежные темы для перелинковки и LSI)
+    associations = []
+    if ws and ws["assoc_json"]:
+        try:
+            assoc_items = json.loads(ws["assoc_json"])
+            associations = [it["phrase"] for it in assoc_items[:5] if it.get("phrase")]
         except Exception:
             pass
 
@@ -137,8 +151,9 @@ def build_author_brief(topic_id: int | str) -> dict:
 - **Нормативная база (упомянуть в статье):**
 {chr(10).join(f'  • {s}' for s in standards)}
 
-## 4. Обязательные внутренние ссылки (вставить в естественный контекст)
+## 4. Обязательные внутренние ссылки и смежные темы (Вордстат Ассоциации)
 {chr(10).join(f"  • [{l['anchor']}]({l['url']}) — переход на статью #{l['id']} «{l['title']}»" for l in links_formatted) if links_formatted else '  • Ссылки на соседние материалы кластера'}
+{chr(10).join(f"  • Смежная тема для упоминания / перелинковки: «{a}»" for a in associations) if associations else ''}
 
 ## 5. Рекомендованный скелет структуры
 1. **Первый абзац (Answer First, до 40 слов):** прямой исчерпывающий ответ на главный вопрос темы с первой строчки.

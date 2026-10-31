@@ -1933,24 +1933,51 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 import wordstat as ws_mod
                 cached = None if payload.get("refresh") else ws_mod.get_cached(phrase)
                 if cached:
-                    result["wordstat"] = {
+                    ws_res = {
                         "totalCount": cached["totalCount"],
-                        "results": cached["results"][:5],
-                        "associations": cached["associations"][:5],
+                        "results": cached["results"][:6],
+                        "associations": cached["associations"][:6],
                         "cached": True,
                         "checked_at": cached.get("checked_at"),
                     }
                 else:
                     data = ws_mod.top_requests(phrase, num_phrases=15)
                     ws_mod.save_cache(phrase, data)
-                    result["wordstat"] = {
+                    ws_res = {
                         "totalCount": int(data.get("totalCount") or 0),
                         "results": [{"phrase": r.get("phrase"), "count": int(r.get("count") or 0)}
-                                    for r in (data.get("results") or [])[:5]],
+                                    for r in (data.get("results") or [])[:6]],
                         "associations": [{"phrase": r.get("phrase"), "count": int(r.get("count") or 0)}
-                                         for r in (data.get("associations") or [])[:5]],
+                                         for r in (data.get("associations") or [])[:6]],
                         "cached": False,
                     }
+
+                # Запрашиваем помесячную динамику и рассчитываем тренд (бесплатно)
+                try:
+                    dyn_raw = ws_mod.dynamics(phrase, period="PERIOD_MONTHLY", months_back=6)
+                    raw_points = dyn_raw.get("results") or []
+                    points = []
+                    for pt in raw_points:
+                        dt = (pt.get("date") or "")[:7]
+                        cnt = int(pt.get("count") or 0)
+                        if dt:
+                            points.append({"month": dt, "count": cnt})
+                    if len(points) >= 2:
+                        first_cnt = points[0]["count"]
+                        last_cnt = points[-1]["count"]
+                        diff_pct = round(((last_cnt - first_cnt) / max(1, first_cnt)) * 100, 1)
+                        peak = max(points, key=lambda x: x["count"])
+                        ws_res["trend"] = {
+                            "points": points,
+                            "change_pct": diff_pct,
+                            "direction": "up" if diff_pct > 5 else ("down" if diff_pct < -5 else "stable"),
+                            "peak_month": peak["month"],
+                            "peak_count": peak["count"],
+                        }
+                except Exception:
+                    pass
+
+                result["wordstat"] = ws_res
             except Exception as ex:  # noqa: BLE001
                 result["notes"].append(f"Вордстат недоступен: {type(ex).__name__}: {str(ex)[:120]}")
 
