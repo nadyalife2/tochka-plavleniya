@@ -384,6 +384,12 @@ def _keyword_context(title: str) -> str:
             tops = []
         if tops:
             parts.append("- Реальные запросы людей (использовать в подзаголовках и FAQ): " + "; ".join(tops))
+        try:
+            assocs = [it.get("phrase") for it in (json.loads(ws.get("assoc_json") or "[]"))[:6] if it.get("phrase")]
+        except Exception:
+            assocs = []
+        if assocs:
+            parts.append("- Смежные темы для контекста и перелинковки (Вордстат Ассоциации): " + "; ".join(assocs))
     return "\n".join(parts)
 
 
@@ -397,6 +403,12 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico", provid
     with get_connection() as conn:
         topic = conn.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
         brief_row = conn.execute("SELECT * FROM briefs WHERE topic_id = ?", (tid,)).fetchone()
+        link_rows = conn.execute("""
+            SELECT l.anchor, t2.title, t2.slug
+            FROM links l
+            JOIN topics t2 ON l.target_id = t2.id
+            WHERE l.source_id = ?
+        """, (tid,)).fetchall()
 
     if not topic:
         raise SystemExit(f"Тема #{tid} не найдена в базе данных.")
@@ -418,6 +430,12 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico", provid
 - Боль читателя: {brief_row['reader_pain']}
 - LSI-ключи: {brief_row['lsi']}
 """
+
+    if link_rows:
+        user_prompt += "\nОБЯЗАТЕЛЬНЫЕ ВНУТРЕННИЕ ССЫЛКИ ДЛЯ ПЕРЕЛИНКОВКИ (встрой естественно в текст статьи в виде [анкор](/slug)):\n"
+        for lr in link_rows[:5]:
+            anchor = lr["anchor"] or lr["title"]
+            user_prompt += f"- [{anchor}](/{lr['slug']}) — статья «{lr['title']}»\n"
 
     kw_ctx = _keyword_context(topic["title"])
     if kw_ctx:
