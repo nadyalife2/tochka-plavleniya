@@ -100,6 +100,7 @@ def describe() -> str:
     names = sorted(set(keys) | {
         "MUTAGEN_API_KEY", "YANDEX_AI_API_KEY", "YANDEX_FOLDER_ID",
         "OPENROUTER_API_KEY", "DASHSCOPE_API_KEY", "PERPLEXITY_API_KEY", "DEEPSEEK_API_KEY",
+        "TOKEN_HARBOR_API_KEY", "TOKEN_HARBOR_API_KEY_2",
     })
     lines = [f"Файл ключей: {LOCAL_KEYS}", f"Существует: {LOCAL_KEYS.exists()}", ""]
     for n in names:

@@ -43,7 +43,7 @@ ALLOY_MARKERS: dict[str, list[str]] = {
     "pos40": ["пос-40", "пос40", "пос 40", "pos40", "sn40pb60", "40/60"],
     "sac305": ["sac305", "sac 305", "sn96.5ag3cu0.5"],
     "sac405": ["sac405", "sac 405", "sn95.5ag4cu0.5"],
-    "sn42bi58": ["sn42bi58", "sn42/bi58", "58bi", "висмутовый припой"],
+    "sn42bi58": ["sn42bi58", "sn42/bi58", "sn42", "sn-42", "sn42-bi58", "58bi", "висмутовый припой"],
     "snbiago": ["snbiago", "sn42bi57", "bi57"],
     "roze": ["сплав розе", "розе", "roze"],
     "vuda": ["сплав вуда", "вуда", "vuda", "wood"],
@@ -103,7 +103,15 @@ def canonical_keys() -> list[str]:
 def normalize_key(value: str) -> str:
     """Нормализует устаревшие алиасы к каноническим ключам."""
     raw = (value or "").strip().lower()
-    aliases = {"wood": "vuda", "rose": "roze", "pos-61": "pos61", "пос-61": "pos61"}
+    aliases = {
+        "wood": "vuda",
+        "rose": "roze",
+        "pos-61": "pos61",
+        "пос-61": "pos61",
+        "sn42": "sn42bi58",
+        "sn-42": "sn42bi58",
+        "sn42-bi58": "sn42bi58",
+    }
     raw = aliases.get(raw, raw)
     return raw if raw in CANONICAL_KEYS else ""
 

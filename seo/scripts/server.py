@@ -875,6 +875,40 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:180]}"}, 500)
             return
 
+        if path == "/api/standards":
+            std_file = SEO / "reference" / "standards_matrix.json"
+            if std_file.exists():
+                try:
+                    data = json.loads(std_file.read_text(encoding="utf-8"))
+                    self.send_json(data)
+                    return
+                except Exception as e:
+                    self.send_json({"error": str(e)}, 500)
+                    return
+            self.send_json({"error": "standards_matrix.json not found"}, 404)
+            return
+
+        if path == "/api/topics/links":
+            qs = parse_qs(url.query)
+            tid = qs.get("id", [""])[0]
+            if not tid:
+                self.send_json({"error": "missing id"}, 400)
+                return
+            try:
+                from db import build_db_plan
+                import linkgraph
+                plan = build_db_plan()
+                out_links = linkgraph.outbound_candidates(plan, str(tid))
+                in_links = linkgraph.inbound_candidates(plan, str(tid))
+                self.send_json({
+                    "id": tid,
+                    "outbound": out_links,
+                    "inbound": in_links
+                })
+            except Exception as e:
+                self.send_json({"error": str(e)}, 500)
+            return
+
         if path == "/api/brief":
             qs = parse_qs(url.query)
             tid = (qs.get("id") or [""])[0].strip()

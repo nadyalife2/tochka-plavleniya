@@ -567,6 +567,73 @@
     overflow-y: auto;
     padding: 20px 24px;
     position: relative;
+    transition: max-width 0.2s ease;
+  }
+  .modal-content.workbench-expanded {
+    max-width: 1440px;
+    width: 96vw;
+  }
+  .split-workbench-grid {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    gap: 16px;
+    align-items: start;
+  }
+  @media(max-width: 1080px) {
+    .split-workbench-grid { grid-template-columns: 1fr; }
+  }
+  .practico-toolbar {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    padding: 6px 10px;
+    background: #F8FAFC;
+    border: 1px solid var(--border-hairline);
+    margin-bottom: 8px;
+    align-items: center;
+  }
+  .practico-btn {
+    background: #FFFFFF;
+    border: 1px solid var(--border);
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.1s;
+    color: var(--ink);
+  }
+  .practico-btn:hover {
+    background: var(--accent);
+    color: #000;
+  }
+  .serp-box {
+    background: #FFFFFF;
+    border: 1px solid #CBD5E1;
+    padding: 10px 12px;
+    font-family: var(--font);
+    margin-bottom: 10px;
+  }
+  .serp-url {
+    font-size: 11px;
+    color: #166534;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .serp-title {
+    font-size: 15px;
+    color: #1D4ED8;
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 3px 0;
+  }
+  .serp-snippet {
+    font-size: 12px;
+    color: #475569;
+    line-height: 1.4;
   }
   .modal-close {
     position: absolute;
@@ -1303,6 +1370,7 @@
           <span id="mTextLiveCounter" style="font-family:var(--mono);font-size:11.5px;padding:2px 8px;border:1px solid var(--border);border-radius:4px;background:#FFF;">0 зн.</span>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+          <button class="btn btn--xs btn--primary" id="mBtnToggleSplit" type="button" onclick="toggleSplitWorkbench()">🗖 Сплит-Верстак</button>
           <select id="mTemplateSelect" style="padding:4px 6px;border:1.5px solid var(--border);font-size:11.5px;background:#FFF;" title="Выбрать инженерный шаблон статьи">
             <option value="">— Инженерный шаблон ▾ —</option>
             <option value="how-to">1. Пошаговая инструкция (How-to)</option>
@@ -1316,8 +1384,61 @@
           <button class="btn btn--sm btn--primary" onclick="saveEditedArticleText()">💾 Сохранить изменения текста</button>
         </div>
       </div>
-      <textarea id="mTextEditor" rows="18" oninput="updateLiveCharCounter()" style="width:100%;padding:10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12px;line-height:1.5;background:#FAFAFA;resize:vertical;" placeholder="Текст статьи ещё не написан..."></textarea>
-      <div id="mTextPreview" style="display:none;width:100%;min-height:300px;max-height:480px;overflow-y:auto;padding:14px;border:1.5px solid var(--border);background:#FFF;line-height:1.65;font-size:13px;"></div>
+
+      <!-- Панель быстрых вставок Practico -->
+      <div class="practico-toolbar">
+        <span style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-right:2px;">Вставки Practico:</span>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('master_secret')">💡 Секрет мастера</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('temp_table')">🌡️ Таблица T°</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('faq_block')">❓ FAQ (4 вопроса)</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('passport_card')">📋 Паспорт процесса</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('safety_lead')">⚠️ ТБ: свинец / вытяжка</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('sources_block')">📚 Источники ГОСТ</button>
+      </div>
+
+      <!-- Сетка Сплит-Верстака (Редактор + Живой ассистент ГОСТ/SEO) -->
+      <div id="mWorkbenchGrid" class="split-workbench-grid">
+        <div style="min-width:0;">
+          <textarea id="mTextEditor" rows="18" oninput="updateLiveCharCounter(); updateWorkbenchLiveAssistant();" style="width:100%;min-height:480px;padding:12px;border:1.5px solid var(--border);font-family:var(--mono);font-size:12.5px;line-height:1.55;background:#FAFAFA;resize:vertical;" placeholder="Текст статьи ещё не написан..."></textarea>
+          <div id="mTextPreview" style="display:none;width:100%;min-height:300px;max-height:520px;overflow-y:auto;padding:14px;border:1.5px solid var(--border);background:#FFF;line-height:1.65;font-size:13px;"></div>
+        </div>
+
+        <!-- Правая колонка ассистента Сплит-Верстака -->
+        <div id="mWorkbenchSidebar" style="display:none;background:var(--card);border:1.5px solid var(--border);padding:12px;max-height:560px;overflow-y:auto;">
+          <div style="display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:10px;">
+            <button class="tab-btn active" id="wbTabGost" type="button" onclick="switchWbTab('gost')" style="font-size:11px;padding:4px 8px;">🛡️ ГОСТ/Физика</button>
+            <button class="tab-btn" id="wbTabSerp" type="button" onclick="switchWbTab('serp')" style="font-size:11px;padding:4px 8px;">🔗 SERP & Ссылки</button>
+          </div>
+
+          <!-- Секция ГОСТ и стандарты -->
+          <div id="wbPanelGost">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Сверка с базой стандартов:</div>
+            <div id="wbGostBadges" style="margin-bottom:10px;font-size:11.5px;">
+              <div style="padding:6px 8px;background:#F9FAFB;border:1px solid var(--border-hairline);color:var(--muted);">
+                Начните ввод текста со сплавом (ПОС-61, SAC305, Розе) — ассистент подтянет допуски ГОСТ и предупреждения.
+              </div>
+            </div>
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Справка по сплавам (клик для вставки):</div>
+            <div id="wbQuickAlloys" style="display:flex;flex-direction:column;gap:5px;"></div>
+          </div>
+
+          <!-- Секция SERP и Перелинковка -->
+          <div id="wbPanelSerp" style="display:none;">
+            <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Сниппет в поиске Яндекса:</div>
+            <div class="serp-box">
+              <div class="serp-url" id="wbSerpUrl">https://tochka-plavleniya.ru/slug</div>
+              <div class="serp-title" id="wbSerpTitle">Заголовок статьи — Точка Плавления</div>
+              <div class="serp-snippet" id="wbSerpSnippet">Первый абзац статьи появится здесь...</div>
+            </div>
+
+            <div style="border-top:1px dashed var(--border-hairline);padding-top:8px;margin-top:8px;">
+              <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:6px;">Рекомендованная перелинковка (клик — вставка):</div>
+              <div id="wbTopicLinksList" style="font-size:11.5px;display:flex;flex-direction:column;gap:5px;">Загрузка связей...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div style="margin-top:6px;font-size:11px;color:var(--muted);">
         💡 Вы можете читать, проверять или редактировать текст прямо здесь. Кнопка «Сохранить» синхронизирует и базу данных SQLite, и файл на диске.
       </div>
@@ -3566,6 +3687,199 @@ function renderAll() {
   renderAnalysisHistory();
   refreshMutagenBalance();
   initGlobalKeyboardShortcuts();
+}
+
+// ==========================================
+// СПЛИТ-ВЕРСТАК & ВСТАВКИ PRACTICO
+// ==========================================
+let STANDARDS_CACHE = null;
+
+async function loadStandardsCatalog() {
+  if (STANDARDS_CACHE) return STANDARDS_CACHE;
+  try {
+    const res = await fetch('http://127.0.0.1:8765/api/standards');
+    if (res.ok) {
+      STANDARDS_CACHE = await res.json();
+    }
+  } catch (e) {}
+  return STANDARDS_CACHE;
+}
+
+function toggleSplitWorkbench() {
+  const modal = document.querySelector('#inspectorModal .modal-content');
+  const sidebar = document.getElementById('mWorkbenchSidebar');
+  const btn = document.getElementById('mBtnToggleSplit');
+  if (!modal || !sidebar) return;
+
+  const isExpanded = modal.classList.toggle('workbench-expanded');
+  sidebar.style.display = isExpanded ? 'block' : 'none';
+  if (btn) btn.innerText = isExpanded ? '🗗 Обычный вид' : '🗖 Сплит-Верстак';
+
+  if (isExpanded) {
+    updateWorkbenchLiveAssistant();
+    if (CURRENT_TOPIC_ID) {
+      loadWorkbenchLinks(CURRENT_TOPIC_ID);
+    }
+  }
+}
+
+function switchWbTab(tab) {
+  const btnGost = document.getElementById('wbTabGost');
+  const btnSerp = document.getElementById('wbTabSerp');
+  const panelGost = document.getElementById('wbPanelGost');
+  const panelSerp = document.getElementById('wbPanelSerp');
+
+  if (tab === 'gost') {
+    btnGost.classList.add('active');
+    btnSerp.classList.remove('active');
+    panelGost.style.display = 'block';
+    panelSerp.style.display = 'none';
+  } else {
+    btnGost.classList.remove('active');
+    btnSerp.classList.add('active');
+    panelGost.style.display = 'none';
+    panelSerp.style.display = 'block';
+  }
+}
+
+function insertPracticoBlock(type) {
+  const editor = document.getElementById('mTextEditor');
+  if (!editor) return;
+  let snippet = '';
+  switch (type) {
+    case 'master_secret':
+      snippet = '\n\n> 💡 **Секрет мастера (Practico):** Сухое жало передает тепло медленно. Крошечная капля припоя на кончике жала образует «тепловой мостик», увеличивая площадь контакта в 3–4 раза.\n\n';
+      break;
+    case 'temp_table':
+      snippet = '\n\n## Температурные режимы пайки\n\n| Сплав / Операция | Ликвидус (°C) | Уставка жала (°C) | Макс. время контакта |\n|---|---|---|---|\n| ПОС-61 (Sn61Pb39) | 190 | 270 – 300 | 2–3 сек |\n| Sn63Pb37 | 183 | 260 – 290 | 2–3 сек |\n| SAC305 (Sn96.5Ag3Cu0.5) | 220 | 310 – 340 | 2–3 сек |\n| Сплав Розе (демонтаж) | 94 | 160 – 200 | 3–5 сек |\n\n';
+      break;
+    case 'faq_block':
+      snippet = '\n\n## FAQ: Часто задаваемые вопросы\n\n1. **Вопрос?**\nОтвет.\n\n2. **Вопрос?**\nОтвет.\n\n3. **Вопрос?**\nОтвет.\n\n4. **Вопрос?**\nОтвет.\n\n';
+      break;
+    case 'passport_card':
+      snippet = '\n\n## Паспорт технологического процесса\n\n* **Припой:** ПОС-61 (ГОСТ 21930-76 / ГОСТ 21931-76)\n* **Флюс:** нейтральный канифольный ROL0 (IPC J-STD-004)\n* **Температура жала:** 270–300 °C\n* **Инструмент:** паяльная станция с картриджем T12 / C245\n\n';
+      break;
+    case 'safety_lead':
+      snippet = '\n\n## ⚠️ Безопасность и гигиена\n\n* **Вентиляция:** пары канифоли содержат абиетиновую кислоту. Работайте с местным дымоуловителем.\n* **Свинец:** не испаряется при пайке, но оседает пылью на коже. Обязательно мойте руки теплой водой с мылом.\n* **Защита глаз:** капли вскипающего флюса разлетаются до 50 см — защитные очки обязательны.\n\n';
+      break;
+    case 'sources_block':
+      snippet = '\n\n## Нормативная база и стандарты\n\n* **ГОСТ 21930-76** — Припои оловянно-свинцовые в чушках. Технические условия.\n* **ГОСТ 21931-76** — Припои оловянно-свинцовые в виде проволоки и трубок с флюсом.\n* **IPC-A-610G** — Критерии качества электронных сборок (Acceptability of Electronic Assemblies).\n* **IPC J-STD-004B** — Требования к паяльным флюсам (Requirements for Soldering Fluxes).\n\n';
+      break;
+  }
+
+  const pos = editor.selectionStart || editor.value.length;
+  const before = editor.value.substring(0, pos);
+  const after = editor.value.substring(pos);
+  editor.value = before + snippet + after;
+  editor.focus();
+  editor.selectionStart = editor.selectionEnd = pos + snippet.length;
+  updateLiveCharCounter();
+  updateWorkbenchLiveAssistant();
+  showToast('✓ Блок вставлен в редактор');
+}
+
+async function updateWorkbenchLiveAssistant() {
+  const text = (document.getElementById('mTextEditor') || {}).value || '';
+  const textLow = text.toLowerCase();
+
+  // 1. SERP превью
+  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_TOPIC_ID) || {};
+  const serpUrl = document.getElementById('wbSerpUrl');
+  const serpTitle = document.getElementById('wbSerpTitle');
+  const serpSnippet = document.getElementById('wbSerpSnippet');
+
+  if (serpUrl) serpUrl.innerText = `https://tochka-plavleniya.ru/${t.slug || 'article'}/`;
+  if (serpTitle) serpTitle.innerText = `${t.title || 'Статья'} — Точка Плавления`;
+  if (serpSnippet) {
+    const lines = text.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('#') && !l.startsWith('---'));
+    serpSnippet.innerText = lines[0] ? lines[0].substring(0, 160) + '...' : 'Инженерный ответ на интент мастера появится здесь...';
+  }
+
+  // 2. ГОСТ база и сплавы
+  const std = await loadStandardsCatalog();
+  const badgesBox = document.getElementById('wbGostBadges');
+  const quickBox = document.getElementById('wbQuickAlloys');
+
+  if (std && std.alloys) {
+    if (badgesBox) {
+      let matched = [];
+      for (const [key, al] of Object.entries(std.alloys)) {
+        if (textLow.includes(key) || textLow.includes(al.name.toLowerCase()) || (key === 'pos61' && textLow.includes('пос-61'))) {
+          matched.push(al);
+        }
+      }
+      if (matched.length > 0) {
+        badgesBox.innerHTML = matched.map(m => `
+          <div style="padding:6px 8px;background:#F0FDF4;border:1px solid #86EFAC;margin-bottom:6px;">
+            <div style="font-weight:700;color:#166534;">✓ ${m.name} (${m.std})</div>
+            <div style="font-size:11px;color:#374151;">Ликвидус: <strong>${m.t_liquidus} °C</strong> | Уставка жала: <strong>${m.t_iron_min || 260}–${m.t_iron_max || 300} °C</strong></div>
+            ${(m.warnings || []).map(w => `<div style="font-size:10.5px;color:#B91C1C;margin-top:2px;">⚠️ ${w}</div>`).join('')}
+          </div>
+        `).join('');
+      } else {
+        badgesBox.innerHTML = `
+          <div style="padding:6px 8px;background:#F9FAFB;border:1px solid var(--border-hairline);color:var(--muted);font-size:11px;">
+            Сплав пока не упомянут. Напишите «ПОС-61», «SAC305», «Sn63Pb37» или кликните ниже.
+          </div>`;
+      }
+    }
+
+    if (quickBox && quickBox.children.length === 0) {
+      quickBox.innerHTML = Object.entries(std.alloys).slice(0, 5).map(([k, al]) => `
+        <button class="btn btn--xs" type="button" style="text-align:left;justify-content:flex-start;" onclick="insertAlloyMention('${al.name}', '${al.t_iron_min || 270}–${al.t_iron_max || 300} °C')">
+          ➕ ${al.name} (ликвидус ${al.t_liquidus} °C)
+        </button>
+      `).join('');
+    }
+  }
+}
+
+function insertAlloyMention(name, tempRange) {
+  const editor = document.getElementById('mTextEditor');
+  if (!editor) return;
+  const str = ` припоем ${name} при рабочей температуре жала ${tempRange} `;
+  const pos = editor.selectionStart || editor.value.length;
+  editor.value = editor.value.substring(0, pos) + str + editor.value.substring(pos);
+  editor.focus();
+  updateLiveCharCounter();
+  updateWorkbenchLiveAssistant();
+}
+
+async function loadWorkbenchLinks(topicId) {
+  const box = document.getElementById('wbTopicLinksList');
+  if (!box) return;
+  box.innerHTML = 'Загрузка связей...';
+  try {
+    const res = await fetch(`http://127.0.0.1:8765/api/topics/links?id=${topicId}`);
+    if (res.ok) {
+      const data = await res.json();
+      const outb = data.outbound || [];
+      if (outb.length === 0) {
+        box.innerHTML = '<span style="color:var(--muted);">Нет плановых связей для этого кластера</span>';
+        return;
+      }
+      box.innerHTML = outb.map(l => `
+        <button class="btn btn--xs" type="button" style="text-align:left;justify-content:flex-start;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" onclick="insertLinkToEditor('${l.title}', '/${l.slug}/')" title="Вставить ссылку в текст: [${l.anchor || l.title}](/${l.slug}/)">
+          🔗 [${l.anchor || l.title}] → /${l.slug}/
+        </button>
+      `).join('');
+    } else {
+      box.innerHTML = '<span style="color:var(--muted);">Связи формируются автоматически</span>';
+    }
+  } catch (e) {
+    box.innerHTML = '<span style="color:var(--muted);">Связи формируются автоматически</span>';
+  }
+}
+
+function insertLinkToEditor(title, url) {
+  const editor = document.getElementById('mTextEditor');
+  if (!editor) return;
+  const mdLink = ` [${title}](${url}) `;
+  const pos = editor.selectionStart || editor.value.length;
+  editor.value = editor.value.substring(0, pos) + mdLink + editor.value.substring(pos);
+  editor.focus();
+  updateLiveCharCounter();
+  showToast('✓ Ссылка вставлена в текст');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
