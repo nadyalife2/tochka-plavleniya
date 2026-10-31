@@ -135,6 +135,8 @@ function switchTab(name) {
   if (name === 'analysis') {
     renderAnalysisHistory();
     loadKeywordSuggestions();
+  } else if (name === 'competitors') {
+    updatePromptPreviewText();
   }
 }
 
@@ -1174,6 +1176,129 @@ function clearFirecrawlInput() {
   document.getElementById('fcContent').value = '';
   const resBox = document.getElementById('fcResult');
   if (resBox) resBox.style.display = 'none';
+}
+
+let CURRENT_FC_PROMPT_MODE = 'new_competitors';
+
+function setFcPromptMode(mode) {
+  CURRENT_FC_PROMPT_MODE = mode;
+  const btnNew = document.getElementById('btnFcModeNew');
+  const btnGaps = document.getElementById('btnFcModeGaps');
+  if (btnNew) btnNew.classList.toggle('active', mode === 'new_competitors');
+  if (btnGaps) btnGaps.classList.toggle('active', mode === 'existing_gaps');
+  updatePromptPreviewText();
+}
+
+function generateFirecrawlPromptText() {
+  const focusInput = document.getElementById('fcPromptFocus');
+  const focus = (focusInput && focusInput.value || 'Пайка BGA/SMD, выбор оборудования, флюсы').trim();
+  const depth = (document.getElementById('fcPromptDepth') || {}).value || 'deep';
+  const format = (document.getElementById('fcPromptFormat') || {}).value || 'markdown';
+  const optGaps = document.getElementById('fcOptGaps') ? document.getElementById('fcOptGaps').checked : true;
+  const optStruct = document.getElementById('fcOptStructure') ? document.getElementById('fcOptStructure').checked : true;
+  const optFaq = document.getElementById('fcOptFaq') ? document.getElementById('fcOptFaq').checked : true;
+  const optModels = document.getElementById('fcOptModels') ? document.getElementById('fcOptModels').checked : true;
+
+  const existingDomains = (DB_DATA.competitors || []).map(c => c.domain).filter(Boolean);
+  const existingTopics = (DB_DATA.topics || []).map(t => t.title).filter(Boolean);
+
+  let prompt = '';
+
+  if (CURRENT_FC_PROMPT_MODE === 'new_competitors') {
+    prompt += `# ЗАДАНИЕ ДЛЯ FIRECRAWL / AI-ИССЛЕДОВАНИЯ: ПОИСК НОВЫХ КОНКУРЕНТОВ\n\n`;
+    prompt += `Ты — старший инженерный аналитик и SEO-разведчик проекта «Точка Плавления» (tochka-plavleniya.ru).\n`;
+    prompt += `Наша цель: Найти НОВЫХ профильных конкурентов в русскоязычном интернете по теме: «${focus}».\n\n`;
+    prompt += `## СТРОГИЙ ЧЁРНЫЙ СПИСОК (ЭТИ САЙТЫ УЖЕ ЕСТЬ В БАЗЕ — ИСКЛЮЧИТЬ!):\n`;
+    prompt += `Не включай в отчёт следующие ${existingDomains.length} доменов:\n`;
+    prompt += existingDomains.join(', ') + '\n\n';
+    prompt += `## ИСКЛЮЧИТЬ СУЩЕСТВУЮЩИЕ ${existingTopics.length} ТЕМ НАШЕГО БЛОГА (БЕЗ ДУБЛИКАТОВ):\n`;
+    prompt += existingTopics.slice(0, 40).map(t => `• ${t}`).join('\n') + '\n\n';
+    prompt += `## ВОЗМОЖНОСТИ И ГЛУБИНА СБОРА FIRECRAWL (${depth.toUpperCase()}):\n`;
+    prompt += `1. Используй Search/Map для выявления активных блогов и порталов по пайке и ремонту электроники.\n`;
+    if (depth === 'deep' || depth === 'crawl') {
+      prompt += `2. Проведи Scrape ключевых статей конкурента, извлекая полные метаданные:\n`;
+      if (optStruct) prompt += `   - Точный H1, логику разделов H2–H3, наличие таблиц режимов и шагов.\n`;
+      if (optFaq) prompt += `   - Вопросы читателей (FAQ), реальные боли новичков.\n`;
+      if (optModels) prompt += `   - Упомянутые модели станций, припои (ПОС/SAC), флюсы и инструмент.\n`;
+      if (optGaps) prompt += `   - Чего в статье НЕ ХВАТАЕТ (Content Gaps): где не назван ГОСТ, где завышена температура, где пропущена техника безопасности.\n`;
+    }
+  } else {
+    prompt += `# ЗАДАНИЕ ДЛЯ FIRECRAWL / AI-ИССЛЕДОВАНИЯ: АНАЛИЗ ТЕКУЩИХ КОНКУРЕНТОВ НА НОВЫЕ ТЕМЫ (CONTENT GAPS)\n\n`;
+    prompt += `Ты — ведущий контент-стратег проекта «Точка Плавления» (tochka-plavleniya.ru).\n`;
+    prompt += `Наша цель: Проанализировать блоги наших существующих конкурентов по теме «${focus}» и найти НОВЫЕ ТЕМЫ и ПРОБЕЛЫ (Content Gaps), которых ЕЩЁ НЕТ в нашей базе из ${existingTopics.length} статей.\n\n`;
+    prompt += `## СПИСОК КОНКУРЕНТОВ ДЛЯ ОБХОДА (FIRECRAWL MAP / CRAWL):\n`;
+    prompt += existingDomains.slice(0, 25).map(d => `• https://${d}`).join('\n') + '\n\n';
+    prompt += `## НАШИ УЖЕ НАПИСАННЫЕ И ЗАПЛАНИРОВАННЫЕ ТЕМЫ (НЕ ПРЕДЛАГАТЬ ДУБЛИ!):\n`;
+    prompt += existingTopics.slice(0, 45).map(t => `• ${t}`).join('\n') + '\n\n';
+    prompt += `## ЧТО ИЗВЛЕЧЬ И ПРЕДЛОЖИТЬ ДЛЯ «ТОЧКИ ПЛАВЛЕНИЯ»:\n`;
+    prompt += `1. Найти у конкурентов темы со стабильным интересом, которые мы упустили.\n`;
+    if (optGaps) prompt += `2. Выявить Content Gaps: где статьи конкурентов устарели, грешат мифами (пайка плат кислотой, конические жала-иглы) или не дают четких технологических шагов.\n`;
+    if (optFaq) prompt += `3. Собрать популярные вопросы из комментариев и FAQ конкурентов.\n`;
+    prompt += `4. Сформулировать новые сильные темы с рабочими H1 и обоснованием приоритета.\n\n`;
+  }
+
+  prompt += `## ТРЕБУЕМЫЙ ФОРМАТ ВЫДАЧИ ДЛЯ ИМПОРТА В ДАШБОРД ТЧП:\n`;
+  if (format === 'markdown') {
+    prompt += `Отдай результат строго в Markdown с таблицами следующего вида:\n\n`;
+    prompt += `## Приоритетные конкуренты\n\n`;
+    prompt += `| Сайт | Тип | Ниша | Почему конкурент | Уровень |\n`;
+    prompt += `|---|---|---|---|---|\n`;
+    prompt += `| [domain.ru](https://domain.ru/statya) | Тип сайта | Ниша | Почему важен и какие темы освещает | **Высокий** |\n\n`;
+    prompt += `## Предлагаемые новые темы и пробелы\n\n`;
+    prompt += `### C01. Название темы — P85\n`;
+    prompt += `Предлагаемый H1: Как правильно...\n`;
+    prompt += `Slug: \`novaya-tema-slug\`\n`;
+    prompt += `Основной ключ: поисковый запрос\n`;
+    prompt += `- lsi ключ 1\n`;
+    prompt += `- lsi ключ 2\n\n`;
+    prompt += `Пробел у конкурентов: в статьях нет физики смачивания и температурного режима.\n`;
+  } else {
+    prompt += `Отдай валидный JSON со структурой:\n`;
+    prompt += `{\n  "competitors": [{ "domain": "site.ru", "type": "...", "niche": "...", "blog_url": "https://site.ru/page", "score": 85, "notes": "..." }],\n`;
+    prompt += `  "raw_data": [{ "url": "https://site.ru/page", "domain": "site.ru", "title": "...", "h1": "...", "topic": "..." }],\n`;
+    prompt += `  "clusters": [{ "cid": "C01", "name": "...", "h1": "...", "slug": "...", "primary_key": "...", "secondary_keys": ["..."] }]\n}\n`;
+  }
+
+  return prompt;
+}
+
+function updatePromptPreviewText() {
+  const preview = document.getElementById('fcPromptPreviewText');
+  if (preview) {
+    preview.value = generateFirecrawlPromptText();
+  }
+}
+
+function togglePromptPreview() {
+  const box = document.getElementById('fcPromptPreview');
+  if (!box) return;
+  const isHidden = box.style.display === 'none';
+  box.style.display = isHidden ? 'block' : 'none';
+  if (isHidden) {
+    updatePromptPreviewText();
+  }
+}
+
+async function copyGeneratedFirecrawlPrompt() {
+  const text = generateFirecrawlPromptText();
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('✓ Готовый промпт для Firecrawl скопирован в буфер обмена!', 'success');
+    const btn = document.getElementById('btnCopyPrompt');
+    if (btn) {
+      const oldText = btn.innerText;
+      btn.innerText = '✓ СКОПИРОВАНО В БУФЕР!';
+      btn.style.background = '#059669';
+      btn.style.color = '#FFFFFF';
+      setTimeout(() => {
+        btn.innerText = oldText;
+        btn.style.background = '';
+        btn.style.color = '';
+      }, 1800);
+    }
+  } catch (err) {
+    showToast('⚠️ Не удалось скопировать промпт в буфер', 'error');
+  }
 }
 
 async function copyExistingBaseJson() {

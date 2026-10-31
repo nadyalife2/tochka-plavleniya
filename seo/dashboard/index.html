@@ -254,29 +254,81 @@
       </div>
     </div>
 
-    <!-- Блок 1: Выгрузка текущей базы для нейросети (защита от дублей) -->
-    <div style="background:#FFFDE7;border:2px solid var(--border);padding:14px 16px;margin-bottom:16px;box-shadow:2px 2px 0px rgba(0,0,0,0.05);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+    <!-- Блок 1: Выгрузка текущей базы и Генератор промптов Firecrawl -->
+    <div class="fc-prompt-builder">
+      <!-- 1.1 Верхняя плашка: Экспорт базы -->
+      <div class="fc-export-bar">
         <div>
-          <h3 style="margin:0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
-            📦 Выгрузка текущей базы (для нейросети без дублей)
+          <h3 class="fc-title">
+            📦 Текущая база знаний (для исключения дублей в Firecrawl / AI)
           </h3>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">
-            Выгрузите манифест перед ручным сбором в Firecrawl или генерацией тем в нейросети, чтобы исключить дублирование статей, слагов, кластеров и URL.
+          <div class="fc-desc">
+            Содержит <strong id="expStatCompetitors">0</strong> конкурентов, <strong id="expStatTopics">0</strong> тем (<strong id="expStatWritten">0</strong> с текстом), <strong id="expStatClusters">0</strong> кластеров и <strong id="expStatUrls">0</strong> URL. Используется как чёрный список при поиске нового контента.
           </div>
         </div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-          <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm btn--primary" style="text-decoration:none;" title="Скачать компактный JSON для отправки в нейросеть">⬇️ Скачать JSON</a>
-          <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm" style="text-decoration:none;" title="Скачать Markdown со сводными таблицами базы">⬇️ Скачать Markdown</a>
-          <a href="/api/export.html" target="_blank" class="btn btn--sm" style="text-decoration:none;" title="Открыть сводную карточку базы в браузере в отдельной вкладке">🌐 Открыть HTML ↗</a>
-          <button class="btn btn--sm" onclick="copyExistingBaseJson()" title="Скопировать JSON манифеста прямо в буфер обмена">📋 В буфер</button>
+        <div class="fc-export-actions">
+          <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm">[СКАЧАТЬ JSON]</a>
+          <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm">[СКАЧАТЬ MD]</a>
+          <a href="/api/export.html" target="_blank" class="btn btn--sm">[ОТКРЫТЬ HTML ↗]</a>
+          <button class="btn btn--sm btn--primary" onclick="copyExistingBaseJson()">📋 [В БУФЕР: ВСЯ БАЗА]</button>
         </div>
       </div>
-      <div style="display:flex;gap:14px;font-size:11px;font-family:var(--mono);color:#444;flex-wrap:wrap;border-top:1px dashed #DDD;padding-top:8px;">
-        <span>Статей в бэклоге: <strong id="expStatTopics">0</strong> (<strong id="expStatWritten">0</strong> с текстом)</span>
-        <span>Кластеров: <strong id="expStatClusters">0</strong></span>
-        <span>Конкурентов: <strong id="expStatCompetitors">0</strong></span>
-        <span>URL в базе: <strong id="expStatUrls">0</strong></span>
+
+      <!-- 1.2 Выбор режима промпта (Две главные кнопки) -->
+      <div class="fc-mode-switch">
+        <button class="btn btn--sm fc-mode-btn active" id="btnFcModeNew" type="button" onclick="setFcPromptMode('new_competitors')">
+          🔍 1. Промпт: Поиск НОВЫХ конкурентов (Search & Discovery)
+        </button>
+        <button class="btn btn--sm fc-mode-btn" id="btnFcModeGaps" type="button" onclick="setFcPromptMode('existing_gaps')">
+          📊 2. Промпт: Анализ ТЕКУЩИХ конкурентов на новые темы (Content Gaps)
+        </button>
+      </div>
+
+      <!-- 1.3 Интерактивная форма полей для настройки задачи -->
+      <div class="fc-form-grid">
+        <div class="fc-form-field">
+          <label for="fcPromptFocus">Тематический фокус / Ниша сбора:</label>
+          <input type="text" id="fcPromptFocus" oninput="updatePromptPreviewText()" value="Пайка BGA/SMD, выбор оборудования, флюсы, температурные профили, дефекты" placeholder="Например: Пайка медных труб, BGA реболлинг, бессвинцовые сплавы...">
+        </div>
+        <div class="fc-form-field">
+          <label for="fcPromptDepth">Глубина сбора Firecrawl:</label>
+          <select id="fcPromptDepth" onchange="updatePromptPreviewText()">
+            <option value="deep">Scrape + Extract (текст, H1-H3, таблицы, FAQ, коммерция)</option>
+            <option value="map">Map + Search (только разделы блогов и URL)</option>
+            <option value="crawl">Crawl (обход блогов конкурентов на глубину 2 уровней)</option>
+          </select>
+        </div>
+        <div class="fc-form-field">
+          <label for="fcPromptFormat">Формат выгрузки для импорта в ТЧП:</label>
+          <select id="fcPromptFormat" onchange="updatePromptPreviewText()">
+            <option value="markdown">Markdown с таблицами (## Приоритетные конкуренты, ## Темы, URL)</option>
+            <option value="json">Структурированный JSON Schema 1.0 (competitors, pages, gaps)</option>
+          </select>
+        </div>
+        <div class="fc-form-field fc-form-field--full">
+          <label>Что Firecrawl и AI обязаны извлечь со страниц конкурентов:</label>
+          <div class="fc-checkbox-group">
+            <label><input type="checkbox" id="fcOptGaps" checked onchange="updatePromptPreviewText()"> Пробелы (Content Gaps: чего нет у конкурента)</label>
+            <label><input type="checkbox" id="fcOptStructure" checked onchange="updatePromptPreviewText()"> Структура статьи (H1, H2, H3, таблицы)</label>
+            <label><input type="checkbox" id="fcOptFaq" checked onchange="updatePromptPreviewText()"> Вопросы читателей (FAQ / боли новичков)</label>
+            <label><input type="checkbox" id="fcOptModels" checked onchange="updatePromptPreviewText()"> Оборудование и материалы (станция, припой, флюс)</label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1.4 Кнопка мгновенного копирования готового промпта в буфер -->
+      <div class="fc-prompt-actions">
+        <button class="btn btn--primary" id="btnCopyPrompt" type="button" onclick="copyGeneratedFirecrawlPrompt()">
+          📋 СКОПИРОВАТЬ ГОТОВЫЙ ПРОМПТ В БУФЕР
+        </button>
+        <button class="btn btn--sm" type="button" onclick="togglePromptPreview()">
+          [Показать / Скрыть текст промпта]
+        </button>
+      </div>
+
+      <!-- Окно предпросмотра промпта (свёрнуто по умолчанию) -->
+      <div id="fcPromptPreview" style="display:none;" class="fc-prompt-preview">
+        <textarea id="fcPromptPreviewText" readonly rows="8"></textarea>
       </div>
     </div>
 
