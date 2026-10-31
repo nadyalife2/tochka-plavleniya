@@ -1064,39 +1064,80 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
 
         if path == "/api/keyword/history":
-            # Единая история проверок: Вордстат (бесплатно) + Мутаген (платно)
-            rows = []
-            try:
-                with get_connection() as conn:
+            # Сводная таблица ключевых фраз: объединяем Вордстат (широкий спрос) и Мутаген (конкуренция, точный спрос, хвосты, ставки Директа)
+            merged = {}
+            with get_connection() as conn:
+                # 1. Загружаем данные Вордстата
+                try:
                     ws_rows = conn.execute(
-                        "SELECT phrase, total_count, checked_at FROM wordstat_metrics ORDER BY checked_at DESC LIMIT 100"
+                        "SELECT phrase, total_count, checked_at FROM wordstat_metrics ORDER BY checked_at DESC LIMIT 200"
                     ).fetchall()
-                for r in ws_rows:
-                    rows.append({
-                        "phrase": r["phrase"],
-                        "source": "wordstat",
-                        "demand": r["total_count"],
-                        "competition": None,
-                        "checked_at": r["checked_at"],
-                    })
-            except Exception:
-                pass
-            try:
-                with get_connection() as conn:
+                    for r in ws_rows:
+                        p = (r["phrase"] or "").strip()
+                        if not p:
+                            continue
+                        p_norm = p.lower()
+                        if p_norm not in merged:
+                            merged[p_norm] = {
+                                "phrase": p,
+                                "demand_broad": r["total_count"],
+                                "demand_exact": None,
+                                "tails": None,
+                                "competition": None,
+                                "bid_spec": None,
+                                "bid_first": None,
+                                "vital_site": "",
+                                "checked_at": r["checked_at"],
+                                "has_wordstat": True,
+                                "has_mutagen": False,
+                            }
+                        else:
+                            merged[p_norm]["demand_broad"] = r["total_count"]
+                            merged[p_norm]["has_wordstat"] = True
+                            if (r["checked_at"] or "") > (merged[p_norm].get("checked_at") or ""):
+                                merged[p_norm]["checked_at"] = r["checked_at"]
+                except Exception:
+                    pass
+
+                # 2. Загружаем данные Мутагена и объединяем с той же фразой
+                try:
                     mg_rows = conn.execute(
-                        "SELECT keyword, strong, wordstat, vital_site, checked_at FROM keyword_metrics ORDER BY checked_at DESC LIMIT 100"
+                        "SELECT keyword, strong, wordstat, tails, bid_spec, bid_first, vital_site, checked_at FROM keyword_metrics ORDER BY checked_at DESC LIMIT 200"
                     ).fetchall()
-                for r in mg_rows:
-                    rows.append({
-                        "phrase": r["keyword"],
-                        "source": "mutagen",
-                        "demand": r["wordstat"],
-                        "competition": r["strong"],
-                        "vital_site": r["vital_site"] or "",
-                        "checked_at": r["checked_at"],
-                    })
-            except Exception:
-                pass
+                    for r in mg_rows:
+                        p = (r["keyword"] or "").strip()
+                        if not p:
+                            continue
+                        p_norm = p.lower()
+                        if p_norm not in merged:
+                            merged[p_norm] = {
+                                "phrase": p,
+                                "demand_broad": None,
+                                "demand_exact": r["wordstat"],
+                                "tails": r["tails"],
+                                "competition": r["strong"],
+                                "bid_spec": r["bid_spec"],
+                                "bid_first": r["bid_first"],
+                                "vital_site": r["vital_site"] or "",
+                                "checked_at": r["checked_at"],
+                                "has_wordstat": False,
+                                "has_mutagen": True,
+                            }
+                        else:
+                            merged[p_norm]["demand_exact"] = r["wordstat"]
+                            merged[p_norm]["tails"] = r["tails"]
+                            merged[p_norm]["competition"] = r["strong"]
+                            merged[p_norm]["bid_spec"] = r["bid_spec"]
+                            merged[p_norm]["bid_first"] = r["bid_first"]
+                            if r["vital_site"]:
+                                merged[p_norm]["vital_site"] = r["vital_site"]
+                            merged[p_norm]["has_mutagen"] = True
+                            if (r["checked_at"] or "") > (merged[p_norm].get("checked_at") or ""):
+                                merged[p_norm]["checked_at"] = r["checked_at"]
+                except Exception:
+                    pass
+
+            rows = list(merged.values())
             rows.sort(key=lambda x: x.get("checked_at") or "", reverse=True)
             self.send_json({"phrases_checked": len(rows), "history": rows[:100]})
             return

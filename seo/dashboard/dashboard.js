@@ -518,25 +518,59 @@ async function renderAnalysisHistory() {
     if (badge) badge.innerText = rows.length;
 
     if (!rows.length) {
-      tb.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--muted);">Проверок пока нет. Введите фразу выше.</td></tr>';
+      tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--muted);">Проверок пока нет. Введите фразу выше.</td></tr>';
       return;
     }
-    tb.innerHTML = rows.map((r, i) => `
-      <tr>
-        <td><strong>${esc(r.phrase)}</strong></td>
-        <td><span class="prio-pill ${r.source === 'mutagen' ? 'prio-pill--warm' : 'prio-pill--cold'}">${r.source === 'mutagen' ? 'Мутаген' : 'Вордстат'}</span></td>
-        <td style="font-family:var(--mono);">${r.demand != null ? Number(r.demand).toLocaleString('ru-RU') : '—'}</td>
-        <td style="font-family:var(--mono);">${r.competition != null ? r.competition + '/25' : '—'}</td>
-        <td style="font-size:11px;">${esc(r.vital_site || '—')}</td>
-        <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${(r.checked_at || '').replace('T', ' ').slice(0, 16)}</td>
-        <td style="white-space:nowrap;">
-          <button class="btn btn--xs" title="Перепроверить в Вордстате (бесплатно)" onclick="recheckPhraseByIndex(${i}, 'auto')">↻ Вордстат</button>
-          <button class="btn btn--xs btn--warning" title="Перепроверить в Мутагене (0,30 ₽)" onclick="recheckPhraseByIndex(${i}, 'mutagen')">↻ Мутаген</button>
-          <button class="btn btn--xs" title="Показать историю измерений" onclick="showPhraseTrend(${i})">📈 История</button>
-        </td>
-      </tr>`).join('');
+    tb.innerHTML = rows.map((r, i) => {
+      const comp = r.competition;
+      const hasComp = comp != null;
+      const compClass = hasComp ? (comp <= 10 ? 'score-pill--high' : (comp <= 18 ? 'score-pill--mid' : 'score-pill--low')) : '';
+      const compHtml = hasComp 
+        ? `<span class="score-pill ${compClass}">${comp}/25</span>` 
+        : '<span style="color:var(--muted);">—</span>';
+
+      const broadDemand = r.demand_broad != null 
+        ? `<strong style="font-family:var(--mono);">${Number(r.demand_broad).toLocaleString('ru-RU')}</strong>` 
+        : '<span style="color:var(--muted);">—</span>';
+
+      const exactDemand = r.demand_exact != null 
+        ? `<code style="font-size:11px;">${Number(r.demand_exact).toLocaleString('ru-RU')}</code>` 
+        : '<span style="color:var(--muted);">—</span>';
+
+      const tails = r.tails != null 
+        ? `<span style="font-family:var(--mono);font-size:11px;">${Number(r.tails).toLocaleString('ru-RU')}</span>` 
+        : '<span style="color:var(--muted);">—</span>';
+
+      const bids = (r.bid_spec != null || r.bid_first != null)
+        ? `<span style="font-family:var(--mono);font-size:10.5px;color:#047857;" title="Ставки клика: спецразмещение / 1-е место">${r.bid_spec || 0} ₽ / ${r.bid_first || 0} ₽</span>`
+        : '<span style="color:var(--muted);font-size:11px;">—</span>';
+
+      return `
+        <tr>
+          <td>
+            <strong>${esc(r.phrase)}</strong>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;">
+              ${r.has_wordstat ? '<span style="color:#059669;">● Вордстат</span>' : ''}
+              ${r.has_mutagen ? '<span style="color:#D97706;margin-left:4px;">● Мутаген</span>' : ''}
+            </div>
+          </td>
+          <td>${broadDemand}</td>
+          <td>${exactDemand}</td>
+          <td>${tails}</td>
+          <td>${compHtml}</td>
+          <td>${bids}</td>
+          <td style="font-size:11px;">${esc(r.vital_site || '—')}</td>
+          <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${(r.checked_at || '').replace('T', ' ').slice(0, 16)}</td>
+          <td style="white-space:nowrap;">
+            <button class="btn btn--xs" title="Перепроверить в Вордстате (бесплатно)" onclick="recheckPhraseByIndex(${i}, 'auto')">↻ Вордстат</button>
+            <button class="btn btn--xs btn--warning" title="Перепроверить в Мутагене (0,30 ₽)" onclick="recheckPhraseByIndex(${i}, 'mutagen')">↻ Мутаген</button>
+            <button class="btn btn--xs" title="Показать историю измерений" onclick="showPhraseTrend(${i})">📈 История</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
   } catch (e) {
-    tb.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);">История недоступна</td></tr>';
+    tb.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--muted);">История недоступна</td></tr>';
   }
 }
 
