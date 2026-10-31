@@ -57,8 +57,9 @@ help the reader scan. Let paragraph and sentence length follow the material.
 
 ## 3 · Punctuation cadence
 
-- Repeated em dashes within a sentence. Check whether the interruptions make it
-  harder to follow. The checker uses 220-character windows.
+- Repeated em dashes within a sentence: two in one 220-character window is a
+  match. Check whether the interruptions make it harder to follow, and remember
+  that some languages use the em dash as ordinary punctuation.
 - Stacked hyphenated compounds. The checker flags four within one sentence window.
 - Semicolon density. The checker uses a threshold that scales with text length.
 

@@ -75,7 +75,9 @@ and conditions where the claim appears so the reader can interpret it correctly.
 
 Read the edit aloud or as a complete page. Keep the author's level of formality and
 allow sentence length to follow the content. Lists can have three items when there
-are three useful items. An em dash can be appropriate punctuation.
+are three useful items. An em dash can be appropriate punctuation: the checker
+still counts two in one 220-character window as a match, so keep the punctuation
+the reader needs and explain the finding rather than deleting it.
 
 Avoid imposing a quota of fragments or contractions. Do not invent an opinion or
 deliberate error to make the writing seem personal. For instructions, prioritize

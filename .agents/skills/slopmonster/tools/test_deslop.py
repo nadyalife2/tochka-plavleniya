@@ -9,6 +9,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import time
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -238,6 +239,78 @@ check('README safe tricolon example stays clean',
       'rhythm' not in groups('Inspection, repair and replacement for homes and commercial buildings.'))
 check('README tricolon example still fires',
       'rhythm' in groups('Trusted, reliable and built to last.'))
+
+# ── CLI contract: usage errors answer, they do not traceback ────────────────
+# A flag without an input reached `args[0]` and died with IndexError. This file's
+# own comment promises the tool never shows a traceback, so these are the cases
+# that promise is made of.
+
+
+def _cli(*args):
+    return subprocess.run([sys.executable, f'{here}/deslop.py', *args],
+                          capture_output=True, text=True, encoding='utf-8',
+                          errors='replace')
+
+
+r = _cli('-h')
+check('--help exits 0', r.returncode == 0, f'exit {r.returncode}')
+check('--help prints the scoring note', 'Scoring is out of 5' in r.stdout, r.stdout[:80])
+
+for args, label in ((['--allow-proof'], 'flag with no input'),
+                    (['--view', 'x.html'], '--view with no id'),
+                    (['--nope', 'x.html'], 'unknown option'),
+                    (['--view', 'x', '--text', 'copy'], '--view in --text mode')):
+    r = _cli(*args)
+    check(f'{label} exits 2', r.returncode == 2, f'exit {r.returncode}')
+    check(f'{label} has no traceback', 'Traceback' not in r.stderr, r.stderr[-120:])
+
+# ── every input path normalises typography ─────────────────────────────────
+# --text used to skip normalise(): the same copy scored 5/5 through --text and
+# 4/5 from a file. A smart apostrophe is the observable difference.
+r = _cli('--text', 'Whether you\u2019re a beginner or a pro, this works.')
+check('--text normalises smart apostrophes', 'AI constructions' in r.stdout, r.stdout[:120])
+
+# ── --view scores one element, not the rest of the page ────────────────────
+_view = os.path.join(_dir, 'views.html')
+with open(_view, 'w', encoding='utf-8') as fh:
+    fh.write('<div id="view-a"><p>We ship on time.</p></div>'
+             '<div class="blog"><p>We delve into a seamless tapestry.</p></div>')
+r = _cli(_view, '--view', 'view-a')
+check('--view does not leak into a neighbour', 'score 5/5' in r.stdout, r.stdout[:160])
+r = _cli(_view, '--view', 'missing')
+check('--view with an unknown id exits 2', r.returncode == 2, f'exit {r.returncode}')
+check('--view with an unknown id explains itself', 'no element with id' in r.stderr,
+      r.stderr[:120])
+
+# ── extension matching ignores case; a comparison is not a tag ─────────────
+_upper = os.path.join(_dir, 'UPPER.MD')
+with open(_upper, 'w', encoding='utf-8') as fh:
+    fh.write('# Title\n\nWe leverage a seamless journey here.\n')
+r = _cli(_upper)
+check('.MD is read as Markdown', r.returncode == 1, f'exit {r.returncode}')
+check('.MD scores the copy', 'score 4/5' in r.stdout, r.stdout[:120])
+
+check('a comparison is not a tag', '5 < 10' in visible_text('<p>5 < 10 of them.</p>'),
+      repr(visible_text('<p>5 < 10 of them.</p>')))
+
+# ── a truncated fence hides nothing ───────────────────────────────────────
+md = markdown_prose('Intro.\n```\nleverage seamless unlock\n')
+check('unterminated fence is not copy', 'vocab' not in groups(md), repr(md))
+
+# ── --markdown forces Markdown handling for --text ────────────────────────
+r = _cli('--text', 'Use `delve` here.')
+check('inline code is scored without --markdown', r.returncode == 1, f'exit {r.returncode}')
+r = _cli('--markdown', '--text', 'Use `delve` here.')
+check('--markdown hides inline code', r.returncode == 0, f'exit {r.returncode}')
+
+# ── blank-line files are linear, not quadratic ────────────────────────────
+# `\s` in the line-anchored Markdown patterns matched newlines, so each `^`
+# scanned the whole remainder: 50 KB of blank lines took 9.6 s, 100 KB took 38 s.
+# This assertion is the guard against that coming back.
+_start = time.monotonic()
+markdown_prose('\n' * 10000)
+_secs = time.monotonic() - _start
+check('blank lines scan linearly', _secs < 1.0, f'{_secs:.2f}s')
 
 if fails:
     print(f'{len(fails)} FAILED\n')

@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Hunt AI tells in the visible copy of a built page. Regex, no opinions, exits red.
 
-    python3 deslop.py index.html
-    python3 deslop.py index.html --view view-site     # score one tab only
-    python3 deslop.py --text "some copy to check"
+    python deslop.py index.html
+    python deslop.py index.html --view view-site     # score one element only
+    python deslop.py --text "some copy to check"
+    python deslop.py draft.md --markdown --allow-proof
 
-This reads only what a visitor can SEE: it strips <script>, <style>, and every HTML
-tag, so it scores the words on the page rather than the markup around them.
+This reads only what a visitor can SEE: it strips <script>, <style>, comments and
+every HTML tag, so it scores the words on the page rather than the markup around
+them. A bare `<` that belongs to the copy ("5 < 10") survives.
 
-Scoring is out of 5. Below 5 exits non-zero. That is deliberate — "mostly clean"
-copy is how a page ends up sounding like every other AI page on the internet.
+Scoring is out of 5. Below 5 exits 1, a usage error exits 2. That is deliberate —
+"mostly clean" copy is how a page ends up sounding like every other AI page on the
+internet.
 """
 import html as _html   # aliased: `visible_text` takes a parameter named `html`
 import re
@@ -37,6 +40,10 @@ VOCAB = [
 # Words with an ordinary literal sense — "we craft furniture", "harness the
 # horse", "the landscape of the valley". Matched exactly, never by root, so the
 # innocent use survives and only the marketing inflection is caught.
+#
+# Root-matched entries above can still fire on a literal or technical sense:
+# `foster` catches "foster children", and `elevate` catches "elevation" in survey
+# notes. Like every finding here, those get read in context before an edit.
 VOCAB_EXACT = [
     'crafted', 'curated', 'harnessing', 'harness the power', 'journey', 'realm', 'landscape',
     'navigate the', 'in the world of', "in today's", 'ever-evolving', 'fast-paced',
@@ -142,11 +149,91 @@ def normalise(t):
     return re.sub(r'\s+', ' ', t).strip()
 
 
+def _strip_block(html, tag):
+    """Drop `<tag ...>...</tag>` in one linear pass.
+
+    `<(script|style).*?</\\1>` is quadratic on a document full of unclosed
+    openers: every start scans to the end of the file before it fails. A 320 KB
+    page of truncated `<script` tags took 59 s. find() does not. An opener with
+    no closer drops the rest of the document, which is what a truncated page is.
+    """
+    low = html.lower()
+    open_at, close_at = f'<{tag}', f'</{tag}'
+    out, i = [], 0
+    while True:
+        start = low.find(open_at, i)
+        if start < 0:
+            out.append(html[i:])
+            return ''.join(out)
+        after_name = low[start + len(open_at):start + len(open_at) + 1]
+        if after_name and after_name not in ' \t\r\n/>':
+            out.append(html[i:start + len(open_at)])   # `<scripture>` is not a tag
+            i = start + len(open_at)
+            continue
+        out.append(html[i:start])
+        end = low.find(close_at, start)
+        if end < 0:
+            return ''.join(out)
+        gt = low.find('>', end)
+        i = len(html) if gt < 0 else gt + 1
+
+
+def _strip_comments(html):
+    """Drop `<!-- ... -->`, linearly, for the same reason as `_strip_block`."""
+    out, i = [], 0
+    while True:
+        start = html.find('<!--', i)
+        if start < 0:
+            out.append(html[i:])
+            return ''.join(out)
+        out.append(html[i:start])
+        end = html.find('-->', start)
+        if end < 0:
+            return ''.join(out)
+        i = end + 3
+
+
+def _strip_tags(html):
+    """Remove real tags, keeping a bare `<` that belongs to the copy.
+
+    `re.sub(r'<[^>]+>', ' ')` treated every `<` as a tag, so "5 < 10" lost the
+    text between the comparison and the next `>`. Only `<` followed by an
+    optional slash and a letter is a tag; `<!` and `<?` are declarations.
+    """
+    out, i, n = [], 0, len(html)
+    while i < n:
+        lt = html.find('<', i)
+        if lt < 0:
+            out.append(html[i:])
+            break
+        out.append(html[i:lt])
+        j = lt + 1
+        if j < n and html[j] in '!?':                 # doctype, comment, PI
+            gt = html.find('>', j)
+            if gt < 0:
+                break
+            out.append(' ')
+            i = gt + 1
+            continue
+        if j < n and html[j] == '/':
+            j += 1
+        if j < n and html[j].isalpha():
+            gt = html.find('>', j)
+            if gt < 0:
+                break                                 # truncated tag: drop it
+            out.append(' ')
+            i = gt + 1
+            continue
+        out.append('<')                               # a comparison, not a tag
+        i = lt + 1
+    return ''.join(out)
+
+
 def visible_text(html):
-    """What a visitor actually reads. Script/style stripped, tags removed."""
-    t = re.sub(r'<(script|style)\b.*?</\1>', ' ', html, flags=re.S | re.I)
-    t = re.sub(r'<!--.*?-->', ' ', t, flags=re.S)
-    t = re.sub(r'<[^>]+>', ' ', t)
+    """What a visitor actually reads. Script/style, comments and tags removed."""
+    for tag in ('script', 'style'):
+        html = _strip_block(html, tag)
+    t = _strip_tags(_strip_comments(html))
     # Decode every entity, not a hand-written six. Numeric entities used to leak
     # through as literal text: each `&#x27;` donated a phantom semicolon to the
     # punctuation rule, and every apostrophe-encoded page went blind to the
@@ -167,8 +254,18 @@ def read_utf8(path):
 
     A gate that passes because it cannot read is worse than no gate at all.
     Reported by @Azrael259 in #3, who hit it on Windows.
+
+    Bytes are decoded strictly first. A file that is not UTF-8 (cp1252 markup, a
+    truncated download) is announced on stderr and decoded with replacements,
+    rather than scored as silent mojibake.
     """
-    return open(path, encoding='utf-8', errors='replace').read()
+    data = open(path, 'rb').read()
+    try:
+        return data.decode('utf-8')
+    except UnicodeDecodeError as e:
+        print(f'deslop: {path} is not valid UTF-8 at byte {e.start}; '
+              'decoding with replacements', file=sys.stderr)
+        return data.decode('utf-8', errors='replace')
 
 
 def markdown_prose(md):
@@ -187,7 +284,12 @@ def markdown_prose(md):
     else is scored exactly as before: this strips markup, it does not soften a
     single rule.
     """
+    # Fences first: paired, then unterminated. A truncated ``` used to expose the
+    # very specimen the fence was hiding, and the coder did not get told.
     md = re.sub(r'```.*?```', ' ', md, flags=re.S)
+    md = re.sub(r'~~~.*?~~~', ' ', md, flags=re.S)
+    md = re.sub(r'```.*$', ' ', md, flags=re.S)
+    md = re.sub(r'~~~.*$', ' ', md, flags=re.S)
     md = re.sub(r'!\[[^\]]*\]\([^)]*\)', ' . ', md)
     md = re.sub(r'\[([^\]]*)\]\([^)]*\)', r'\1', md)
     # Stand-ins, not deletions. Removing `[needs number]` outright welds
@@ -198,12 +300,17 @@ def markdown_prose(md):
     md = re.sub(r'~~.*?~~', ' it ', md, flags=re.S)
     # Headings, table cells and rows are separate copy, not one long sentence.
     # Joined, two em-dashes from two table rows read as one machine cadence.
-    md = re.sub(r'^\s{0,3}#{1,6}\s*(.*)$', r' . \1 . ', md, flags=re.M)
+    #
+    # Every anchored pattern below says `[ \t]`, never `\s`. `\s` matches the
+    # newline, so on a file of blank lines each `^` scanned the whole remainder
+    # and failed: 50 KB of blank lines took 9.6 s and 100 KB about 38 s, growing
+    # quadratically. Runs of whitespace are collapsed afterwards anyway.
+    md = re.sub(r'^[ \t]{0,3}#{1,6}[ \t]*(.*)$', r' . \1 . ', md, flags=re.M)
     md = re.sub(r'\|', ' . ', md)
     # A bullet is its own line of copy. Left joined, two list items donate one
     # em-dash each and read as a single machine cadence that nobody wrote.
-    md = re.sub(r'^\s*(?:[-*+]|\d+\.)\s+', ' . ', md, flags=re.M)
-    md = re.sub(r'^\s*>\s?', ' . ', md, flags=re.M)
+    md = re.sub(r'^[ \t]*(?:[-*+]|\d+\.)[ \t]+', ' . ', md, flags=re.M)
+    md = re.sub(r'^[ \t]*>[ \t]?', ' . ', md, flags=re.M)
     md = re.sub(r'[*_>]', ' ', md)
     return normalise(md)
 
@@ -310,6 +417,117 @@ def report(hits, label='', allow_proof=False):
     return score
 
 
+# ── command line ────────────────────────────────────────────────────────────
+
+USAGE = """usage: deslop.py <file.md|file.html> [--view <id>] [--allow-proof]
+       deslop.py --text "<copy>" [--markdown] [--allow-proof]
+       deslop.py -h
+
+Scores visible copy out of 5. Exit 0 at 5/5, 1 below 5/5 or an unreadable input,
+2 for a usage error."""
+
+
+def usage(message):
+    print(f'deslop: {message}', file=sys.stderr)
+    print(USAGE, file=sys.stderr)
+    sys.exit(2)
+
+
+_TAG = re.compile(r'<(/?)([a-zA-Z][\w:-]*)((?:"[^"]*"|\'[^\']*\'|[^>])*)>', re.S)
+
+# Elements that never have a closing tag, so they must not open a nesting level.
+VOID = {'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link',
+        'meta', 'param', 'source', 'track', 'wbr'}
+
+
+def view_element(html, vid):
+    """The element whose opening tag carries `id="vid"`, closing tag included.
+
+    Slicing from `id="vid"` to the next `id="view-` left the rest of the opening
+    tag in the copy and, when later blocks used another naming scheme, swept
+    them in too: a clean tab scored 4/5 on a neighbour's slop. This walks the
+    tags and counts nesting of the same element name instead.
+    """
+    id_re = re.compile(r'(?<![\w-])id\s*=\s*(["\'])' + re.escape(vid) + r'\1', re.I)
+    for m in _TAG.finditer(html):
+        if m.group(1) or not id_re.search(m.group(3)):
+            continue
+        name = m.group(2).lower()
+        if name in VOID or m.group(3).rstrip().endswith('/'):
+            return html[m.start():m.end()]
+        depth = 1
+        for m2 in _TAG.finditer(html, m.end()):
+            if m2.group(2).lower() != name:
+                continue
+            if m2.group(1):
+                depth -= 1
+                if depth == 0:
+                    return html[m.start():m2.end()]
+            elif not m2.group(3).rstrip().endswith('/'):
+                depth += 1
+        return html[m.start():]        # unclosed element: to the end of the file
+    return None
+
+
+def parse_args(argv):
+    """Flags and input, POSIX-style: options first, `--text` takes the rest."""
+    allow_proof = as_md = False
+    view = text = path = None
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a in ('-h', '--help'):
+            print(__doc__.strip())
+            sys.exit(0)
+        elif a == '--allow-proof':
+            allow_proof = True
+        elif a == '--markdown':
+            as_md = True
+        elif a == '--view':
+            if i + 1 >= len(argv):
+                usage('--view needs an element id')
+            view = argv[i + 1]
+            i += 1
+        elif a == '--text':
+            payload = argv[i + 1:]
+            # Options come before the input. A lone flag after --text is almost
+            # always a misplaced option rather than copy, so say so instead of
+            # scoring it and shifting the word count.
+            stray = [p for p in payload
+                     if p in ('--allow-proof', '--markdown', '--view')]
+            if stray:
+                print(f'deslop: note - {", ".join(stray)} after --text is scored '
+                      'as copy; put options before --text', file=sys.stderr)
+            text = ' '.join(payload)
+            break
+        elif a.startswith('-') and a != '-':
+            usage(f'unknown option {a}')
+        elif path is None:
+            path = a
+        else:
+            usage(f'unexpected extra argument {a}')
+        i += 1
+    return allow_proof, as_md, view, text, path
+
+
+def read_input(path, as_md, view):
+    """The copy to score, read from a file."""
+    try:
+        if as_md or path.lower().endswith('.md'):
+            if view:
+                usage('--view applies to HTML files, not Markdown')
+            return markdown_prose(read_utf8(path))
+        html = read_utf8(path)
+    except (FileNotFoundError, IsADirectoryError, PermissionError) as e:
+        sys.exit(f'deslop: cannot read {path}: {e.strerror}')
+    if view:
+        element = view_element(html, view)
+        if element is None:
+            usage(f'no element with id "{view}"')
+        html = element
+    return visible_text(html)
+
+
 if __name__ == '__main__':
     # Reading UTF-8 correctly means real non-ASCII now reaches print(), and a
     # Windows console is cp1252: one CJK character or emoji inside a flagged
@@ -321,39 +539,19 @@ if __name__ == '__main__':
     except (AttributeError, ValueError):      # already-wrapped or exotic stream
         pass
 
-    args = sys.argv[1:]
-    if not args:
-        sys.exit(__doc__)
+    allow_proof, as_md, view, text, path = parse_args(sys.argv[1:])
 
-    allow_proof = '--allow-proof' in args
-    args = [a for a in args if a != '--allow-proof']
-
-    as_md = '--markdown' in args
-    args = [a for a in args if a != '--markdown']
-
-    if args[0] == '--text':
-        text = ' '.join(args[1:])
-        if as_md:
-            text = markdown_prose(text)
-    elif args[0].endswith('.md') or as_md:
-        try:
-            text = markdown_prose(read_utf8(args[0]))
-        except (FileNotFoundError, IsADirectoryError, PermissionError) as e:
-            sys.exit(f'deslop: cannot read {args[0]}: {e.strerror}')
+    if text is None and path is None:
+        usage('nothing to score - pass a file, or --text "copy"')
+    if text is not None:
+        if view:
+            usage('--view applies to HTML files, not --text')
+        # --text used to skip normalise(): a smart apostrophe or a non-breaking
+        # hyphen scored 5/5 here and 4/5 from a file. Every input path runs
+        # through it now, which is what the comment above promises.
+        text = markdown_prose(text) if as_md else normalise(text)
     else:
-        try:
-            html = read_utf8(args[0])
-        except (FileNotFoundError, IsADirectoryError, PermissionError) as e:
-            sys.exit(f'deslop: cannot read {args[0]}: {e.strerror}')
-        if '--view' in args:
-            # score one element only: slice from its id= to the next id="view-…"
-            vid = args[args.index('--view') + 1]
-            start = html.find(f'id="{vid}"')
-            if start < 0:
-                sys.exit(f'no element with id "{vid}"')
-            nxt = html.find('id="view-', start + 1)
-            html = html[start:nxt if nxt > 0 else len(html)]
-        text = visible_text(html)
+        text = read_input(path, as_md, view)
 
     # Nothing to score is a failure, not a pass. A cleanse that times out leaves a
     # zero-byte file, and a gate that stamps an empty file CLEAN reports slop as

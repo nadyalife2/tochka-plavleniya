@@ -2,17 +2,18 @@
 
 A real, unedited run of the full pipeline (29 Aug 2026) on seven verbatim sentences from
 the homepage of a large AI marketing SaaS. The draft was written by their team or their
-tools. We only ran the loop on it. This is the receipt the README numbers come from.
+tools. We only ran the loop on it. This is the receipt behind the score above.
 
-## Step 1 — Lint the original
+## Step 1 — Lint the original (SKILL.md step 1)
 
 ```
-$ python3 tools/deslop.py --text "…seven sentences from the live page…"
+$ python tools/deslop.py --text "…seven sentences from the live page…"
 112 words of visible copy
 
   AI vocabulary:
     · unlock  (1)
     · empower  (1)
+    · intuitive  (1)
   rule-of-three rhythm:
     · rule-of-three list  (contacts, leads, and opportunities)
     · rule-of-three list  (briefs, insights, and channel)
@@ -21,6 +22,8 @@ $ python3 tools/deslop.py --text "…seven sentences from the live page…"
 
   score 3/5  needs a cleanse
 ```
+
+Rules change: `intuitive` joined the vocabulary list after this run, so the recorded hit list now shows three words where the run showed two. The score did not move, because a category costs one point however many words it catches.
 
 These seven sentences are the scored sample. The full homepage fetch, which includes nav
 and menu strings, scored 2/5. Only the 3/5 above is reproducible from the text in this
@@ -44,10 +47,14 @@ expert guidance built for marketers.
 Quoted verbatim for criticism, and fenced because it is input to the tool rather than
 copy this repo is shipping.
 
-## Step 3 — The cleanse (GPT-5.6 via the codex CLI, one call, 40s)
+The editorial review in SKILL.md step 2 ran between these two steps and is not reproduced here, because only the machine steps left output.
+
+## Step 3 — The cleanse (SKILL.md step 3: GPT-5.6 via the codex CLI, one call, 40 s)
 
 ```
-$ tools/cleanse.sh original.txt > cleansed.txt
+$ DESLOP_WRITER=gpt tools/cleanse.sh original.txt > cleansed.txt
+# The recorded run predates the explicit selector. Today the family that
+# wrote the draft has to be named, and the script rejects an unknown value.
 ```
 
 > Jasper brings advanced language models and context-aware intelligence into agents that
@@ -68,10 +75,10 @@ What the model reported changing. It replaced `unlock`, `transform` and `empower
 direct verbs. It broke the stacked three-part lists into uneven sentences. It removed both
 em dashes. It cut "rich product experience". It kept the rough "And" opening.
 
-## Step 4 — Re-lint
+## Step 4 — Re-lint (SKILL.md step 4)
 
 ```
-$ python3 tools/deslop.py --text "$(cat cleansed.txt)"
+$ python tools/deslop.py --text "$(cat cleansed.txt)"
 119 words of visible copy
 
   score 5/5  CLEAN

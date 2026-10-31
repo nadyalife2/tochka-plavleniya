@@ -1,5 +1,5 @@
 Edit the draft below for its intended reader and purpose. Infer the format and
-audience from the supplied context. Preserve the author's position and level of
+audience from the draft itself, and from any brief placed above it. Preserve the author's position and level of
 formality. A README needs a clear explanation and usable instructions. A sales
 page or script may need a different opening.
 
