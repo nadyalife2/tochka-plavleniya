@@ -33,9 +33,10 @@ try:
 except Exception:
     pass
 
-# Служебные обрывки, которые не являются поисковыми фразами
+# Служебные обрывки и нерелевантные омонимы, которые не относятся к пайке
 JUNK = re.compile(
     r"(web:\d+|https?://|\bчитать далее\b|\bподробнее\b|^\d+$|^[^а-яёa-z]+$"
+    r"|\bсух\w*\s+па[её]к|\bпа[её]к\b|\bпайк\b|\bкриста\b|\bпалас\b"
     r"|^общая электроника$|^электроника$|^прочее$|^без типа$)",
     re.I,
 )
@@ -125,39 +126,62 @@ def collect(limit: int = 10, contains: str = "") -> list[dict]:
         except Exception:
             pass
 
-        # 4. SEO-ключи конкурентов — то, по чему они реально ранжируются
+        # 4. Темы нашего контент-плана (topics и topics_proposed)
         try:
             for r in conn.execute(
-                "SELECT domain, seo_keywords FROM competitors WHERE seo_keywords IS NOT NULL AND seo_keywords != '' "
-                "ORDER BY score DESC LIMIT 30"
+                "SELECT id, title, cluster FROM topics WHERE title IS NOT NULL ORDER BY id ASC"
             ).fetchall():
-                for kw in re.split(r"[,;/]", r["seo_keywords"]):
-                    add(kw.strip(), f"SEO конкурента ({r['domain']})", "competitor", None, None, weight=60)
+                add(r["title"], f"тема #{r['id']}", "topic", None, None, weight=65)
+            for r in conn.execute(
+                "SELECT id, title, cluster FROM topics_proposed WHERE title IS NOT NULL ORDER BY id ASC"
+            ).fetchall():
+                add(r["title"], f"пробел #{r['id']}", "topic", None, None, weight=55)
         except Exception:
             pass
 
-        # 5. Заголовки статей конкурентов
+        # 5. SEO-ключи и ниши конкурентов (из всех 46 сайтов)
+        try:
+            for r in conn.execute(
+                "SELECT domain, niche, seo_keywords FROM competitors WHERE "
+                "(seo_keywords IS NOT NULL AND seo_keywords != '') OR (niche IS NOT NULL AND niche != '') "
+                "ORDER BY score DESC"
+            ).fetchall():
+                if r["seo_keywords"]:
+                    for kw in re.split(r"[,;/]", r["seo_keywords"]):
+                        if len(kw.strip()) > 3:
+                            add(kw.strip(), f"SEO ({r['domain']})", "competitor", None, None, weight=60)
+                if r["niche"]:
+                    for kw in re.split(r"[,;/]", r["niche"]):
+                        kw_c = kw.strip()
+                        if len(kw_c) > 3 and not any(skip in kw_c.lower() for skip in ("магазин", "журнал", "портал", "производитель")):
+                            add(kw_c, f"ниша ({r['domain']})", "competitor", None, None, weight=50)
+        except Exception:
+            pass
+
+        # 6. Заголовки статей конкурентов
         try:
             for r in conn.execute(
                 "SELECT domain, title FROM raw_articles WHERE title IS NOT NULL ORDER BY id DESC LIMIT 200"
             ).fetchall():
-                add(r["title"], f"статья ({r['domain']})", "competitor", None, None, weight=40)
+                # Чистим от повторов и названий доменов в скобках
+                t_clean = re.sub(r"\s*\([^)]*\)", "", r["title"]).strip()
+                if len(t_clean) > 5:
+                    add(t_clean, f"статья ({r['domain']})", "competitor", None, None, weight=40)
         except Exception:
             pass
 
-    # Сбалансированная выдача: конкурентные и хвостовые фразы не должны
-    # вытесняться уже измеренными — иначе список теряет смысл.
-    groups: dict[str, list[dict]] = {"measured": [], "competitor": [], "tail": []}
+    # Сбалансированная выдача по 4 группам
+    groups: dict[str, list[dict]] = {"measured": [], "topic": [], "competitor": [], "tail": []}
     for item in seen.values():
         groups.setdefault(item["group"], []).append(item)
     for g in groups.values():
         g.sort(key=lambda x: (-x["weight"], -(x.get("demand") or 0)))
 
-    quota = {"measured": max(2, limit // 3), "competitor": max(3, limit // 3), "tail": max(2, limit // 3)}
+    quota = {"measured": max(2, limit // 4), "topic": max(2, limit // 4), "competitor": max(2, limit // 4), "tail": max(2, limit // 4)}
     picked: list[dict] = []
     while len(picked) < limit:
         progressed = False
-        for name in ("competitor", "measured", "tail"):
+        for name in ("measured", "topic", "competitor", "tail"):
             if len(picked) >= limit:
                 break
             taken = sum(1 for p in picked if p["group"] == name)
@@ -167,7 +191,6 @@ def collect(limit: int = 10, contains: str = "") -> list[dict]:
                 picked.append(groups[name].pop(0))
                 progressed = True
         if not progressed:
-            # квоты исчерпаны — добираем из любых оставшихся
             rest = [it for g in groups.values() for it in g]
             rest.sort(key=lambda x: (-x["weight"], -(x.get("demand") or 0)))
             picked.extend(rest[: limit - len(picked)])
