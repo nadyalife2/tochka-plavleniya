@@ -1182,18 +1182,43 @@ async function importFirecrawlData() {
   }
 }
 
+let DECISION_DETAILS_EXPANDED = false;
+
+function toggleDecisionDetails() {
+  DECISION_DETAILS_EXPANDED = !DECISION_DETAILS_EXPANDED;
+  renderDecisionBanner();
+}
+
+function toggleToolsMenu(e) {
+  if (e) e.stopPropagation();
+  const m = document.getElementById('toolsDropdownMenu');
+  if (m) m.classList.toggle('active');
+}
+document.addEventListener('click', () => {
+  const m = document.getElementById('toolsDropdownMenu');
+  if (m) m.classList.remove('active');
+});
+
 // Render Decision Alert Banner
 function renderDecisionBanner() {
   const banner = document.getElementById('decisionBanner');
+  if (!banner) return;
   
   // 1. Статьи требующие правок (score < 80 and chars > 500)
-  const needsFix = DB_DATA.topics.filter(t => (t.chars || 0) > 500 && (t.score_total === null || t.score_total < 80) && t.status !== 'ready' && t.status !== 'published');
+  const needsFix = (DB_DATA.topics || []).filter(t => (t.chars || 0) > 500 && (t.score_total === null || t.score_total < 80) && t.status !== 'ready' && t.status !== 'published');
   
   // 2. Статьи ожидающие утверждения шеф-редактором (score >= 80 and status != ready and status != published)
-  const readyForApproval = DB_DATA.topics.filter(t => (t.score_total || 0) >= 80 && t.status !== 'ready' && t.status !== 'published');
+  const readyForApproval = (DB_DATA.topics || []).filter(t => (t.score_total || 0) >= 80 && t.status !== 'ready' && t.status !== 'published');
   
   // 3. Предложенные темы ожидающие решения
   const proposedWaiting = (DB_DATA.topics_proposed || []).filter(t => t.status === 'предложен');
+
+  const totalActions = needsFix.length + readyForApproval.length + proposedWaiting.length;
+  if (totalActions === 0) {
+    banner.style.display = 'none';
+    return;
+  }
+  banner.style.display = 'block';
 
   let fixHtml = needsFix.map(t => `
     <li>
@@ -1219,35 +1244,52 @@ function renderDecisionBanner() {
   `).join('');
 
   banner.innerHTML = `
-    <div class="decision-col">
-      <div class="decision-col__title" style="color:#B91C1C;">
-        ⚠️ Требуются правки автора (${needsFix.length})
+    <div class="decision-summary-bar" onclick="toggleDecisionDetails()">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:13px;">⚡</span>
+        <span>Внимание шеф-редактора: 
+          ${needsFix.length > 0 ? `<strong style="color:#B91C1C;">${needsFix.length} на правки</strong> · ` : ''}
+          ${readyForApproval.length > 0 ? `<strong style="color:#059669;">${readyForApproval.length} на приёмку</strong> · ` : ''}
+          <strong>${proposedWaiting.length} тем на одобрение</strong>
+        </span>
       </div>
-      <ul class="decision-col__list">
-        ${fixHtml || '<li style="color:var(--muted);">Нет замечаний, все черновики в норме</li>'}
-      </ul>
+      <button class="btn btn--xs" type="button" style="background:#FFF;" onclick="event.stopPropagation(); toggleDecisionDetails();">
+        ${DECISION_DETAILS_EXPANDED ? '▲ Скрыть детали' : '▼ Показать задачи (' + totalActions + ')'}
+      </button>
     </div>
+    ${DECISION_DETAILS_EXPANDED ? `
+    <div class="decision-grid">
+      <div class="decision-col">
+        <div class="decision-col__title" style="color:#B91C1C;">
+          [ПРАВКИ АВТОРА] (${needsFix.length})
+        </div>
+        <ul class="decision-col__list">
+          ${fixHtml || '<li style="color:var(--muted);">Нет замечаний, черновики в норме</li>'}
+        </ul>
+      </div>
 
-    <div class="decision-col">
-      <div class="decision-col__title" style="color:#059669;">
-        🛡️ Готово к Вашему утверждению (${readyForApproval.length})
+      <div class="decision-col">
+        <div class="decision-col__title" style="color:#059669;">
+          [ОТК И УТВЕРЖДЕНИЕ] (${readyForApproval.length})
+        </div>
+        <ul class="decision-col__list">
+          ${approveHtml || '<li style="color:var(--muted);">Нет статей на приёмку</li>'}
+        </ul>
       </div>
-      <ul class="decision-col__list">
-        ${approveHtml || '<li style="color:var(--muted);">Нет новых статей на приёмку</li>'}
-      </ul>
-    </div>
 
-    <div class="decision-col">
-      <div class="decision-col__title" style="color:#D97706;">
-        💡 Темы из пробелов на одобрение (${proposedWaiting.length})
-      </div>
-      <ul class="decision-col__list">
-        ${propHtml || '<li style="color:var(--muted);">Все предложенные темы обработаны</li>'}
-      </ul>
-      <div style="margin-top:6px;font-size:11px;">
-        <a href="javascript:void(0)" onclick="switchTab('gaps')">Перейти к списку тем (${proposedWaiting.length}) →</a>
+      <div class="decision-col">
+        <div class="decision-col__title" style="color:#D97706;">
+          [ИДЕИ ТЕМ] (${proposedWaiting.length})
+        </div>
+        <ul class="decision-col__list">
+          ${propHtml || '<li style="color:var(--muted);">Все темы обработаны</li>'}
+        </ul>
+        <div style="margin-top:6px;font-size:11px;">
+          <a href="javascript:void(0)" onclick="switchTab('gaps')">Открыть темы (${proposedWaiting.length}) →</a>
+        </div>
       </div>
     </div>
+    ` : ''}
   `;
 }
 

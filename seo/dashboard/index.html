@@ -15,83 +15,88 @@
     <!-- Brand & Header -->
     <header class="brand-bar" role="banner">
       <div class="brand-bar__left">
-        <h1>ТОЧКА ПЛАВЛЕНИЯ <span class="brand-bar__tag">SEO КОНВЕЙЕР v3.3</span></h1>
-        <div style="font-family:var(--mono);font-size:12px;background:var(--card);padding:3px 8px;border:1px solid var(--border);">
-          ● База SQLite: <strong id="statTopicsCount">63</strong> тем · <strong id="statWrittenCount">10</strong> с текстом
+        <h1>ТОЧКА ПЛАВЛЕНИЯ <span class="brand-bar__tag">v3.3</span></h1>
+        <div class="status-chip" title="Состояние базы данных SQLite">
+          <span class="status-dot active"></span> SQLite: <strong id="statTopicsCount">63</strong> тем · <strong id="statWrittenCount">10</strong> с текстом
         </div>
       </div>
-    <div class="brand-bar__actions">
-      <a href="/llms.txt" target="_blank" class="btn" style="text-decoration:none;" title="Открыть AEO/LLM-манифест сайта для нейросетей (Perplexity, ChatGPT, Яндекс Нейро)">[LLMS.TXT ↗]</a>
-      <a href="/api/export.html" target="_blank" class="btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px;" title="Открыть сводную карточку базы в браузере (HTML)">[БАЗА HTML ↗]</a>
-      <a href="/api/export.json" download="tchp-existing-base.json" class="btn" style="text-decoration:none;" title="Скачать JSON-манифест базы для нейросети">[МАНИФЕСТ JSON]</a>
-      <button class="btn btn--primary" onclick="createBackup()">[СОЗДАТЬ БЭКАП]</button>
-      <button class="btn" onclick="refreshData()">[ОБНОВИТЬ ДАННЫЕ]</button>
-    </div>
-  </header>
 
-  <!-- Interactive Pipeline Stepper -->
-  <nav class="pipeline-stepper" aria-label="Этапы конвейера публикаций">
-    <div class="step-node" onclick="switchTab('gaps')" title="Пробелы ключевых слов у конкурентов">
-      <span class="step-node__num">01</span>
-      <div class="step-node__info">
-        <span class="step-node__title">Разведка пробелов</span>
-        <span class="step-node__meta"><strong id="stepGapsCount">0</strong> предложений</span>
+      <!-- Статус конвейера и агентов по центру (в один клик) -->
+      <div class="brand-bar__center">
+        <span class="agent-chip" onclick="switchTab('agents')" title="5 субагентов онлайн. Кликните для перехода в Центр агентов">
+          <span class="status-dot active"></span> 5 Агентов онлайн
+        </span>
+        <span class="mutagen-chip" onclick="switchTab('analysis')" title="Баланс Мутагена (0,30 ₽/фраза). Кликните для анализа спроса">
+          Мутаген: <strong id="mutagenBalanceBadge">15.92 ₽</strong>
+        </span>
       </div>
-    </div>
-    <div class="step-node" onclick="filterByStep('backlog')" title="Темы в очереди (без черновика)">
-      <span class="step-node__num">02</span>
-      <div class="step-node__info">
-        <span class="step-node__title">Бэклог тем</span>
-        <span class="step-node__meta"><strong id="stepBacklogCount">0</strong> в очереди</span>
-      </div>
-    </div>
-    <div class="step-node" onclick="filterByStep('work')" title="Темы в процессе сбора брифа">
-      <span class="step-node__num">03</span>
-      <div class="step-node__info">
-        <span class="step-node__title">В работе (Бриф)</span>
-        <span class="step-node__meta"><strong id="stepWorkCount">0</strong> готовятся</span>
-      </div>
-    </div>
-    <div class="step-node" onclick="filterByStep('needs_fix')" title="Черновики, набравшие менее 80 баллов">
-      <span class="step-node__num">04</span>
-      <div class="step-node__info">
-        <span class="step-node__title">Требуют правок</span>
-        <span class="step-node__meta"><strong id="stepFixCount" style="color:#B91C1C;">0</strong> черновиков</span>
-      </div>
-    </div>
-    <div class="step-node" onclick="filterByStep('review')" title="Статьи с баллом ≥80, ожидающие приёмки">
-      <span class="step-node__num">05</span>
-      <div class="step-node__info">
-        <span class="step-node__title">На ревью (ОТК)</span>
-        <span class="step-node__meta"><strong id="stepReviewCount" style="color:#059669;">0</strong> готовы к ОТК</span>
-      </div>
-    </div>
-    <div class="step-node" onclick="switchTab('export')" title="Утверждённые статьи для экспорта в WordPress">
-      <span class="step-node__num">06</span>
-      <div class="step-node__info">
-        <span class="step-node__title">Готово к WP</span>
-        <span class="step-node__meta"><strong id="stepReadyCount">0</strong> к доставке</span>
-      </div>
-    </div>
-  </nav>
 
-  <!-- Live Agents Status Bar -->
-  <section class="agents-status-strip">
-    <span style="font-weight:700;font-size:11px;text-transform:uppercase;">Субагенты конвейера:</span>
-    <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active"></span> 00-Разведчик (Perplexity Sonar)</span>
-    <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active"></span> 01-Исследователь (OpenCode Zen)</span>
-    <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active" style="background:#FFC700;"></span> 02-Автор Practico (Claude Sonnet Antigravity)</span>
-    <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active" style="background:#0F4C81;"></span> 03-Рецензент (Claude Opus Antigravity)</span>
-    <span class="agent-badge" onclick="switchTab('agents')"><span class="status-dot active"></span> 04-Скорер (score_article.py)</span>
-    <span class="agent-badge" onclick="switchTab('analysis')" title="Баланс Мутагена для проверки конкуренции (0,30 ₽/фраза). Кликните для перехода в анализ" style="margin-left:auto;background:#ECFDF5;border-color:#10B981;color:#065F46;cursor:pointer;">
-      <span class="status-dot active" style="background:#10B981;"></span> Мутаген: <strong id="mutagenBalanceBadge">15.92 ₽</strong>
-    </span>
-  </section>
+      <!-- Главные целевые действия справа -->
+      <div class="brand-bar__actions">
+        <button class="btn btn--sm btn--primary" onclick="toggleNewTopicBox()">+ [НОВАЯ ТЕМА]</button>
+        <button class="btn btn--sm" onclick="refreshData()" title="Обновить данные из SQLite">[ОБНОВИТЬ]</button>
+        
+        <!-- Меню инструментов и экспорта (выпадающий список) -->
+        <div class="dropdown-tools">
+          <button class="btn btn--sm dropdown-toggle" type="button" onclick="toggleToolsMenu(event)" title="Экспорт и резервное копирование">
+            [ЭКСПОРТ & БЭКАП ▾]
+          </button>
+          <div class="dropdown-menu" id="toolsDropdownMenu">
+            <button class="dropdown-item" onclick="createBackup()">[СОЗДАТЬ БЭКАП SQLite]</button>
+            <a href="/api/export.html" target="_blank" class="dropdown-item">[ОТКРЫТЬ БАЗУ HTML ↗]</a>
+            <a href="/api/export.json" download="tchp-existing-base.json" class="dropdown-item">[СКАЧАТЬ МАНИФЕСТ JSON]</a>
+            <a href="/llms.txt" target="_blank" class="dropdown-item">[ОТКРЫТЬ LLMS.TXT ↗]</a>
+          </div>
+        </div>
+      </div>
+    </header>
 
-  <!-- Decision / Action Required Banner -->
-  <section class="decision-banner" id="decisionBanner">
-    <!-- Решения шеф-редактора генерируются JS -->
-  </section>
+    <!-- Компактная воронка конвейера (Pipeline Funnel Bar) -->
+    <nav class="pipeline-stepper" aria-label="Этапы конвейера публикаций">
+      <div class="step-node" onclick="switchTab('gaps')" title="Пробелы ключевых слов у конкурентов">
+        <span class="step-node__num">01</span>
+        <span class="step-node__title">Разведка</span>
+        <span class="step-node__badge" id="stepGapsCount">0</span>
+      </div>
+      <span class="step-sep">→</span>
+      <div class="step-node" onclick="filterByStep('backlog')" title="Темы в очереди (без черновика)">
+        <span class="step-node__num">02</span>
+        <span class="step-node__title">Бэклог</span>
+        <span class="step-node__badge" id="stepBacklogCount">0</span>
+      </div>
+      <span class="step-sep">→</span>
+      <div class="step-node" onclick="filterByStep('work')" title="Темы в процессе сбора брифа">
+        <span class="step-node__num">03</span>
+        <span class="step-node__title">В работе</span>
+        <span class="step-node__badge" id="stepWorkCount">0</span>
+      </div>
+      <span class="step-sep">→</span>
+      <div class="step-node" onclick="filterByStep('needs_fix')" title="Черновики, набравшие менее 80 баллов">
+        <span class="step-node__num">04</span>
+        <span class="step-node__title">Правки</span>
+        <span class="step-node__badge step-node__badge--danger" id="stepFixCount">0</span>
+      </div>
+      <span class="step-sep">→</span>
+      <div class="step-node" onclick="filterByStep('review')" title="Статьи с баллом ≥80, ожидающие приёмки">
+        <span class="step-node__num">05</span>
+        <span class="step-node__title">ОТК</span>
+        <span class="step-node__badge step-node__badge--success" id="stepReviewCount">0</span>
+      </div>
+      <span class="step-sep">→</span>
+      <div class="step-node" onclick="switchTab('export')" title="Утверждённые статьи для экспорта в WordPress">
+        <span class="step-node__num">06</span>
+        <span class="step-node__title">К выгрузке</span>
+        <span class="step-node__badge" id="stepReadyCount">0</span>
+      </div>
+    </nav>
+
+    <!-- Скрытая разметка для совместимости со старыми селекторами агентов -->
+    <section class="agents-status-strip" style="display:none;"></section>
+
+    <!-- Умный сворачиваемый баннер задач шеф-редактора -->
+    <section class="decision-banner" id="decisionBanner">
+      <!-- Генерируется JS -->
+    </section>
 
   <main id="main-content" role="main">
 
@@ -108,19 +113,18 @@
 
   <!-- TAB 1: KANBAN -->
   <section class="tab-view active" id="view-kanban">
-    <div style="background:#EAEAEA;border:1.5px solid var(--border);border-radius:var(--radius-sm);padding:8px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-        <label style="font-size:12px;font-weight:700;">Кластер:
-          <select id="clusterSelect" onchange="filterKanban()" style="padding:4px 8px;border:1px solid var(--border);font-size:12px;border-radius:var(--radius-sm);">
+    <div style="background:#FAFAFA;border:1px solid var(--border-hairline);border-radius:var(--radius-sm);padding:6px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <input type="text" id="kanbanSearch" placeholder="Поиск по названию или #ID..." oninput="filterKanban()" style="padding:5px 9px;border:1px solid var(--border-hairline);background:#FFF;width:240px;font-size:12px;border-radius:var(--radius-sm);">
+        <label style="font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px;">Кластер:
+          <select id="clusterSelect" onchange="filterKanban()" style="padding:4px 8px;border:1px solid var(--border-hairline);background:#FFF;font-size:11.5px;border-radius:var(--radius-sm);">
             <option value="">Все кластеры</option>
           </select>
         </label>
-        <input type="text" id="kanbanSearch" placeholder="Поиск по названию или #ID..." oninput="filterKanban()" style="padding:4px 8px;border:1px solid var(--border);width:220px;font-size:12px;border-radius:var(--radius-sm);">
-        <button class="btn btn--sm" id="btnResetFilter" onclick="resetStepFilter()" style="display:none;">Сбросить фильтр этапа ✕</button>
-        <span class="kanban-hint" title="Зажмите карточку и перетащите в другую колонку — статус обновится">↕ перетащить статус</span>
+        <button class="btn btn--xs" id="btnResetFilter" onclick="resetStepFilter()" style="display:none;">Сбросить фильтр этапа ✕</button>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <button class="btn btn--sm btn--primary" onclick="toggleNewTopicBox()">+ [НОВАЯ ТЕМА]</button>
+      <div style="display:flex;gap:6px;align-items:center;">
+        <span class="kanban-hint" title="Зажмите карточку и перетащите в другую колонку — статус обновится" style="font-size:11px;color:var(--muted);font-family:var(--mono);">⠿ перетаскивание меняет статус</span>
       </div>
     </div>
 
