@@ -584,12 +584,14 @@ async function renderAnalysisHistory() {
         ? `<span class="score-pill ${compClass}">${comp}/25</span>` 
         : '<span style="color:var(--muted);">—</span>';
 
-      const broadDemand = r.demand_broad != null 
-        ? `<strong style="font-family:var(--mono);">${Number(r.demand_broad).toLocaleString('ru-RU')}</strong>` 
+      const rawBroad = r.demand_broad != null ? r.demand_broad : (r.source === 'wordstat' ? r.demand : null);
+      const broadDemand = rawBroad != null 
+        ? `<strong style="font-family:var(--mono);">${Number(rawBroad).toLocaleString('ru-RU')}</strong>` 
         : '<span style="color:var(--muted);">—</span>';
 
-      const exactDemand = r.demand_exact != null 
-        ? `<code style="font-size:11px;">${Number(r.demand_exact).toLocaleString('ru-RU')}</code>` 
+      const rawExact = r.demand_exact != null ? r.demand_exact : (r.source === 'mutagen' ? r.demand : null);
+      const exactDemand = rawExact != null 
+        ? `<code style="font-size:11px;">${Number(rawExact).toLocaleString('ru-RU')}</code>` 
         : '<span style="color:var(--muted);">—</span>';
 
       const tails = r.tails != null 
