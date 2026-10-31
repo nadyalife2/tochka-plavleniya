@@ -418,19 +418,26 @@ async function checkPhraseValue(phrase, source, refresh) {
 
   if (mg) {
     const comp = mg.strong;
-    const color = comp <= 10 ? '#059669' : (comp <= 18 ? '#B45309' : '#B91C1C');
+    const hasComp = (comp !== null && comp !== undefined && comp !== '');
+    const color = hasComp ? (comp <= 10 ? '#059669' : (comp <= 18 ? '#B45309' : '#B91C1C')) : '#6B7280';
     html += `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);">
-      <strong>Конкуренция (Мутаген):</strong> <span style="color:${color};font-weight:800;">${comp}/25</span>
-      · точный спрос в кавычках: <code>${(mg.wordstat || 0).toLocaleString('ru-RU')}</code>
-      · хвосты: <code>${(mg.tails || 0).toLocaleString('ru-RU')}</code>
+      <strong>Конкуренция (Мутаген):</strong> <span style="color:${color};font-weight:800;">${hasComp ? comp + '/25' : '— / 25'}</span>
+      · точный спрос в кавычках: <code>${mg.wordstat != null ? (mg.wordstat).toLocaleString('ru-RU') : '—'}</code>
+      · хвосты: <code>${mg.tails != null ? (mg.tails).toLocaleString('ru-RU') : '—'}</code>
       ${mg.vital_site ? `<br><strong>Витальный сайт в топе:</strong> ${esc(mg.vital_site)}` : '<br>Витального сайта в топе нет — путь открыт'}
-      ${mg.cached ? '<span style="color:var(--muted);font-size:11px;"> · из кэша, деньги не потрачены</span>' : ''}
+      ${mg.cached ? '<span style="color:var(--muted);font-size:11px;"> · из кэша, бесплатно</span>' : ''}
     </div>`;
     // Трактовка
     let verdict = '';
-    if (comp <= 10 && (ws && ws.totalCount > 300)) verdict = '✅ Отличная цель: спрос есть, конкуренция низкая';
-    else if (comp <= 18) verdict = '⚠️ Рабочая цель: нужен сильный материал';
-    else verdict = '❌ Высокая конкуренция: только с серьёзным преимуществом';
+    if (!hasComp) {
+      verdict = '⏳ Конкуренция ещё вычисляется сервисом';
+    } else if (comp <= 10 && (ws && ws.totalCount > 300)) {
+      verdict = '✅ Отличная цель: спрос есть, конкуренция низкая (≤10/25)';
+    } else if (comp <= 18) {
+      verdict = '⚠️ Рабочая цель: средняя конкуренция (11–18/25), нужен глубокий материал';
+    } else {
+      verdict = '❌ Высокая конкуренция (>18/25): пробиться в топ сложно';
+    }
     html += `<div style="margin-top:8px;font-weight:700;">${verdict}</div>`;
   }
 

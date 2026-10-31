@@ -111,15 +111,22 @@ def check_key_get(task_id) -> dict:
 def check_keyword(keyword: str, poll_timeout: int = 90) -> dict:
     """Ставит фразу на проверку конкуренции и ждёт готовый результат."""
     task = check_key_new(keyword)
-    if task.get("status") == "completed":
-        return task
     task_id = task.get("task_id")
-    if not task_id:
+    if not task_id and not task.get("strong"):
         raise RuntimeError(f"не удалось создать задание: {task}")
+
+    # Если сервис мгновенно вернул completed из своего кеша
+    if task.get("status") == "completed":
+        if "strong" in task and task.get("strong") is not None:
+            return task
+        if task_id:
+            res = check_key_get(task_id)
+            if res.get("status") == "completed" and res.get("strong") is not None:
+                return res
 
     started = time.monotonic()
     while time.monotonic() - started < poll_timeout:
-        time.sleep(3)
+        time.sleep(2)
         res = check_key_get(task_id)
         if res.get("status") == "completed":
             return res
@@ -230,7 +237,7 @@ def cached_metrics(keyword: str) -> dict | None:
         row = conn.execute(
             "SELECT * FROM keyword_metrics WHERE keyword = ?", (keyword,)
         ).fetchone()
-    if not row:
+    if not row or row["strong"] is None:
         return None
     try:
         checked = datetime.fromisoformat(row["checked_at"])
