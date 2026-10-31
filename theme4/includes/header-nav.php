@@ -46,6 +46,7 @@ $praktika_link = tchp_get_category_url(
 );
 
 $nav_items = [
+    ['href' => $site_root,                     'label' => 'Главная',      'page' => 'index'],
     ['href' => $site_root . '#articles',       'label' => 'Статьи',       'page' => 'articles'],
     ['href' => $site_root . 'interactive.php', 'label' => 'Калькуляторы', 'page' => 'interactive'],
     ['href' => $praktika_link,                 'label' => 'Практика',     'page' => 'praktika'],

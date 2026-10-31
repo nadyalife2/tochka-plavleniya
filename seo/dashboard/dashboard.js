@@ -157,6 +157,16 @@ function resetStepFilter() {
   renderKanban();
 }
 
+function goHome() {
+  resetStepFilter();
+  const sInput = document.getElementById('kanbanSearch');
+  if (sInput) sInput.value = '';
+  const cSel = document.getElementById('clusterSelect');
+  if (cSel) cSel.value = '';
+  switchTab('kanban');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 const API_BASE = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.startsWith('http'))
   ? window.location.origin
   : 'http://127.0.0.1:8765';

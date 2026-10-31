@@ -53,8 +53,11 @@
     padding: 10px 16px 60px;
   }
 
-  /* Top Bar */
+  /* Top Bar — Sticky so it never scrolls away */
   .brand-bar {
+    position: sticky;
+    top: 0;
+    z-index: 500;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -65,7 +68,19 @@
     margin-bottom: 8px;
     flex-wrap: wrap;
     gap: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  .brand-bar__logo {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .brand-bar__logo:hover {
+    opacity: 0.85;
   }
   .brand-bar__left {
     display: flex;
@@ -472,7 +487,7 @@
     scrollbar-width: thin;
   }
 
-  /* Cards (Emil Kowalski Tactile Polish) */
+  /* Cards (Emil Kowalski Tactile Polish — flex-shrink: 0 ensures cards NEVER compress) */
   .task-card {
     background: var(--card);
     border: 1.5px solid var(--border);
@@ -484,6 +499,10 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    flex-shrink: 0 !important;
+    min-height: 105px !important;
+    height: auto !important;
+    box-sizing: border-box;
   }
   .task-card:hover {
     background: #FFFFFF;
@@ -511,12 +530,14 @@
     align-items: center;
   }
   .task-card__title {
-    margin: 0;
+    margin: 2px 0 0;
     font-size: 13px;
     font-weight: 700;
     color: var(--ink);
-    line-height: 1.35;
+    line-height: 1.4;
     word-break: break-word;
+    min-height: 34px;
+    overflow: visible;
   }
   .task-card__footer {
     display: flex;
@@ -836,14 +857,13 @@
     outline: 2px solid var(--accent) !important;
     outline-offset: 2px !important;
   }
-  .btn, .tab-btn, button[onclick], .board-column, .task-card, [role="button"], .step-node {
-    min-height: 44px;
-    min-width: 44px;
+  .btn, .tab-btn, button[onclick], [role="button"]:not(.task-card) {
+    min-height: 38px;
+    min-width: 38px;
   }
-  .btn--xs { min-height: 36px; min-width: 36px; }
-  .btn--sm { min-height: 40px; min-width: 40px; }
-  .tab-btn { min-height: 40px; min-width: 40px; }
-  .step-node { min-height: 56px; }
+  .btn--xs { min-height: 28px; min-width: 28px; }
+  .btn--sm { min-height: 32px; min-width: 32px; }
+  .tab-btn { min-height: 34px; min-width: 34px; }
 
   /* Kanban keyboard navigation */
   .task-card[tabindex="0"]:focus-visible {

@@ -15,10 +15,14 @@
     <!-- Brand & Header -->
     <header class="brand-bar" role="banner">
       <div class="brand-bar__left">
-        <h1>ТОЧКА ПЛАВЛЕНИЯ <span class="brand-bar__tag">v3.3</span></h1>
+        <a href="javascript:void(0)" onclick="goHome()" class="brand-bar__logo" title="На главную дашборда (сбросить фильтры)">
+          <h1>ТОЧКА ПЛАВЛЕНИЯ <span class="brand-bar__tag">v3.3</span></h1>
+        </a>
         <div class="status-chip" title="Состояние базы данных SQLite">
           <span class="status-dot active"></span> SQLite: <strong id="statTopicsCount">63</strong> тем · <strong id="statWrittenCount">10</strong> с текстом
         </div>
+        <button class="btn btn--xs" type="button" onclick="goHome()" title="Сбросить фильтры и вернуться на главную канбан-доску">⌂ ГЛАВНАЯ</button>
+        <a href="http://127.0.0.1:8082/" target="_blank" class="btn btn--xs" title="Открыть сайт tochka-plavleniya.ru в новой вкладке">САЙТ ↗</a>
       </div>
 
       <!-- Статус конвейера и агентов по центру (в один клик) -->
@@ -102,7 +106,7 @@
 
   <!-- Navigation Tabs -->
   <nav class="tabs-nav" aria-label="Разделы дашборда">
-    <button class="tab-btn active" onclick="switchTab('kanban')">[КАНБАН] Статьи <span class="tab-badge" id="bCountTopics">0</span></button>
+    <button class="tab-btn active" id="tabBtnKanban" onclick="goHome()">⌂ [ГЛАВНАЯ] Статьи <span class="tab-badge" id="bCountTopics">0</span></button>
     <button class="tab-btn" onclick="switchTab('export')">[ЭКСПОРТ] Готовые к WP <span class="tab-badge" id="bCountExport" style="background:#A7F3D0;color:#064E3B;">0</span></button>
     <button class="tab-btn" onclick="switchTab('gaps')">[ПРОБЕЛЫ] Идеи тем <span class="tab-badge" id="bCountProposed">0</span></button>
     <button class="tab-btn" onclick="switchTab('competitors')">[АНАЛИЗ] Конкуренты <span class="tab-badge" id="bCountComps">0</span></button>
