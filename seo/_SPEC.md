@@ -4,29 +4,46 @@
 
 ## 1. Источник истины
 
-Единственный мастер-файл: `D:\сайт для пайки\semantic_core_FULL_v11.xlsx`.
+Единственный мастер — **SQLite-база `seo/data/seo.db`**.
 
-Всё остальное — производные. Скрипты **читают** мастер и пишут в `seo/data/*.json` (кэш),
-`seo/out/*` (рабочие файлы). Запись в Excel разрешена только через `seo/scripts/add_article.py`
-(с автобэкапом) и только в листы `statiy`, `content_plan`, `briefs_ТЗ`.
+Excel `semantic_core_FULL_v11.xlsx` больше не мастер. Он остаётся в репозитории как архив
+исходного семантического ядра и используется только для двух операций: разового импорта
+(`migrate_excel_to_db.py`) и ручного экспорта-обмена по просьбе человека. Скрипты конвейера
+читают и пишут только БД (`db.py` → `get_connection()`).
 
-Листы мастера и их роль:
+Производные (можно удалить и пересобрать): `seo/data/plan.json`, `seo/out/*`,
+`сами статьи/*.md`, `seo/dashboard/index.html`.
 
-| Лист | Роль | Колонки |
+Правила доступа:
+
+- запись в БД — через `db.py` и UI (`server.py`); прямые `UPDATE` из скриптов допустимы только в своих таблицах;
+- **секреты в БД не хранятся**: API-ключи и пароли живут в `config/api-keys.local.yaml` (файл в `.gitignore`)
+  и читаются через `keys.py`. `seo/data/seo.db` тоже версионируется, поэтому секретам там места нет;
+- `semantic_core_FULL_v11.xlsx` в git не редактируем: расхождения с БД считаются ошибкой, а не «второй правдой».
+
+Таблицы БД и их роль:
+
+| Таблица | Роль | Ключевые колонки |
 |---|---|---|
-| `content_plan` | очередь статей | `article_id`, `рабочий заголовок`, `кластер`, `slug`, `тип статьи`, `приоритет`, `статус`, `перелинковка`, `Ответственный_бот`, `Следующее_действие` |
-| `clusters` | кластеры и ключевики | `кластер`, `описание`, `ключевые темы`, `кол-во тем`, `тип статьи`, `приоритет`, `конкуренты`, `пробел`, `статус` |
-| `competitors` | конкуренты | `домен`, `ниша`, `тип`, `раздел блога`, `кол-во статей`, `заметки` |
-| `interlinking_map` | плановые связи | `ID_источника`, `slug_источника`, `ID_цели`, `slug_цели`, `анкорный_текст`, `тип_связи` |
-| `statiy` | написанные тексты | `ID_темы`, `Заголовок`, `Slug`, `Кластер`, `Текст_статьи`, `Кол-во_символов`, `Статус` |
-| `briefs_ТЗ` | брифы | 21 колонка (интент, боль, LSI, GEO, E-E-A-T, оценка пользы) |
-| `raw_data` | выгрузка конкурентов | `url`, `title`, `h1`, `cluster`, `content_type`, `priority` |
-| `wp_export` | параметры публикации | метаданные + GEO-поля |
-| `image_generation` | промпты иллюстраций | `ID_темы`, `Роль`, `Промпт`, `Alt`, `Имя файла` |
+| `topics` | очередь статей + тексты + оценки | `id`, `title`, `slug`, `cluster`, `status`, `content_markdown`, `chars`, `score_total`, `seo_priority`, `review_status`, `factcheck_status`, `writer_mode`, `wp_post_id`, `wp_url`, `wp_status`, `wp_published_at` |
+| `clusters` | кластеры и ключевики | `name`, `priority_rank`, ключевые темы, конкуренты, пробел |
+| `links` | плановые и фактические связи | `source_id`, `target_id`, `anchor`, `status` |
+| `competitors`, `competitors_proposed` | конкуренты и предложенные | `domain`, `niche`, `score`, `articles_count` |
+| `topics_proposed` | темы из контентных пробелов | `title`, `cluster`, `source`, `evidence`, `hits`, `priority_score`, `status` |
+| `raw_articles` | выгрузка страниц конкурентов | `url`, `domain`, `title`, `h1`, `content_type`, `cluster` |
+| `briefs` | брифы (ТЗ) | `topic_id`, `intent`, `reader_pain`, `geo_snippet`, `eeat_facts`, `lsi`, `faq_json` |
+| `keyword_metrics`, `keyword_metrics_history` | конкуренция по Мутагену | `keyword`, `strong`, `wordstat`, `tails`, `vital` |
+| `wordstat_metrics`, `wordstat_history` | спрос по Вордстату | `phrase`, `total_count`, `top_json` |
+| `voices` | авторские голоса Practico 1 / 2 | `id`, `name`, `system_prompt`, `model`, `is_active` |
+| `jobs`, `agent_runs` | очередь фоновых задач и журнал прогонов | `job_type`, `target_id`, `status`, `log` |
+| `backups` | журнал резервных копий | `filename`, `filepath`, `size_bytes`, `records_count` |
+
+Единственный оставшийся лист Excel: `image_generation` (промпты иллюстраций).
+Поля публикации (`wp_post_id`, `wp_url`, `wp_status`, `wp_published_at`) уже перенесены в таблицу `topics`.
 
 ## 2. Канонические статусы
 
-Единый словарь. В Excel допустимы только эти значения (маппинг старых — в `reference/statuses.md`).
+Единый словарь. В БД и в UI допустимы только эти значения (маппинг старых — в `reference/statuses.md`).
 
 | Код | Русский | Значение |
 |---|---|---|
@@ -35,6 +52,7 @@
 | `brief_ready` | ТЗ готово | бриф есть, можно писать |
 | `writing` | Пишется | черновик в работе |
 | `written` | Написано | текст есть, не проверен |
+| `needs_fix` | Требует правок | возвращено редактором, обязательные замечания в `next_action` |
 | `review` | На ревью | фактчек/голос/SEO проверяются |
 | `scored` | Оценено | есть `score` ≥ порога |
 | `ready` | Готово к публикации | все гейты пройдены |
@@ -77,32 +95,60 @@
 
 ## 5. Скрипты
 
+Все скрипты работают из корня репозитория и читают БД, а не Excel.
+
+Ядро данных и UI:
+
 | Скрипт | Что делает | Вход → Выход |
 |---|---|---|
-| `excel_io.py` | библиотека: чтение листов, нормализация ID, бэкап, сохранение | xlsx ↔ dict |
-| `build_worklist.py` | очередь «что писать», сводка, перелинковка | мастер → `WORKLIST.md/.csv`, `data/plan.json` |
+| `db.py` | подключение к БД (WAL, `busy_timeout`), схема, авто-бэкап, `build_db_plan` | `seo.db` ↔ dict |
+| `server.py` | локальный HTTP-сервер дашборда (`127.0.0.1:8765`), REST-API, очередь фоновых задач | БД + `o*/` → JSON для UI |
+| `build_dashboard_ui.py` | сборка `seo/dashboard/index.html` (канбан, инспектор, вкладки) | БД → один HTML-файл |
+| `migrate_excel_to_db.py` | разовая миграция xlsx → SQLite | `semantic_core_FULL_v11.xlsx` → `seo.db` |
+| `excel_io.py` | legacy-мост: константы статусов и путей, чтение/запись xlsx для обмена | xlsx ↔ dict |
+
+Конвейер:
+
+| Скрипт | Что делает | Вход → Выход |
+|---|---|---|
+| `build_worklist.py` | очередь «что писать», сводка, перелинковка | БД → `WORKLIST.md/.csv`, `data/plan.json` |
+| `generate_brief.py` | ТЗ для автора: паспорт, спрос, реальные запросы, стандарты, ссылки, скелет | `--id` → бриф (JSON/текст) |
 | `link_candidates.py` | кандидаты связей для статьи | `--id` → `out/links-<id>.md` |
-| `score_article.py` | оценка 0–100 | `--file` `--id` → `out/scores/*` |
-| `add_article.py` | внести текст в `statiy` + статус | `--file` `--id` |
-| `build_dashboard.py` | HTML-визуализация «человечки» | `plan.json` → `dashboard/index.html` |
+| `priority_v2.py` | приоритет темы 0–100 (спрос, конкуренция, интент, готовность) | БД → `seo_priority` |
+| `competition_score.py` | бесплатная локальная оценка конкуренции 0–100 | БД → балл |
+| `wordstat.py` | частотность Вордстат (Yandex AI Studio, бесплатно) | `--check`/`--batch` → `wordstat_metrics` |
+| `mutagen.py` | конкуренция, хвосты, ставки Директа (0,30 ₽/фраза) | `--check`/`--batch` → `keyword_metrics` |
+| `score_article.py` | оценка 0–100 по 6 блокам | `--file`/`--id` → `out/scores/*` |
+| `canonical_alloys.py` | канонические ID сплавов и сверка с реестром | `--json`/`--check` |
+| `package_contract.py` | упаковка статьи по схеме v1.1 + паспорт | `--id` → контракт + валидация |
+| `writer_practico.py` | генерация статьи голосами Practico 1/2 | `--id --voice --provider` → файл + БД |
+| `sync_all_texts_to_db.py` | синхронизация markdown с БД | `сами статьи/*.md` → `topics` |
+| `topics_from_gaps.py` | темы из пробелов конкурентов | БД → `topics_proposed` |
+| `research_competitors.py`, `discover_competitors.py`, `bot_competitor_analyzer.py` | сбор и разбор конкурентов | сайты → `competitors*`, `raw_articles` |
+| `run_pipeline.py` | сквозной прогон темы по этапам | `--id` → лог этапов |
 
 Запуск: `python seo/scripts/build_worklist.py` (работает из корня репозитория).
 
 ## 6. Правила для агентов
 
-1. Мастер — Excel; не создавать «вторую правду» в CSV/Markdown.
-2. Любая правка Excel — только через `add_article.py` (он делает `.bak`).
-3. Статусы — только из словаря §2.
-4. Ссылки — только на существующие/опубликованные страницы; иначе «отложенная связь».
-5. Числа (температуры, сплавы) — только из `theme4/data/materials-registry.php` и стандартов.
-6. Голос — `modules/50-VOICE.md`; споры решает человек.
-7. Никаких коммитов в `main`; только ветка `feat/seo-pipeline` + PR.
+1. Мастер — SQLite `seo/data/seo.db`; не создавать «вторую правду» в CSV/Markdown/Excel.
+   Excel — только импорт-экспорт по просьбе человека, правки в нём не накапливаются.
+2. Любая правка данных конвейера — через БД (UI `server.py` или скрипты на `db.get_connection()`)
+   с резервной копией. Ручные `UPDATE` в обход `db.py` запрещены.
+3. Секреты (API-ключи, пароли приложений WordPress, OAuth-токены) — только в
+   `config/api-keys.local.yaml` (вне git) через `keys.py`. В `seo.db` и в git их не писать.
+4. Статусы — только из словаря §2.
+5. Ссылки — только на существующие/опубликованные страницы; иначе «отложенная связь».
+6. Числа (температуры, сплавы) — только из `theme4/data/materials-registry.php` и стандартов.
+7. Голос — `modules/50-VOICE.md`; споры решает человек.
+8. Никаких коммитов в `main`; только ветка `feat/*` или `fix/*` + PR.
 
 ## 7. Экономия токенов
 
-- Не читать Excel целиком: `build_worklist.py` отдаёт готовые `WORKLIST.md`/`WORKLIST.csv`.
+- Не читать БД и Excel целиком: `build_worklist.py` отдаёт готовые `WORKLIST.md`/`WORKLIST.csv`,
+  `generate_brief.py --id` — готовое ТЗ по одной теме.
 - Один модуль за раз, только по маршруту `START-HERE.md`.
-- Модели: бесплатные (`dsh-freetap`, OpenCode Zen) — черновики и рутина; Google Antigravity (Pro)
-  и DeepSeek — финальные проверки и тексты.
+- Модели: бесплатные (`dsh-freetap`, OpenCode Zen) — черновики и рутина; Google Antigravity (Pro),
+  Oxion (Claude/Gemini) и DeepSeek — финальные проверки и тексты. Правила — `MODEL-ROUTING.md`.
 - MCP: только `firecrawl`, `yandex-webmaster`, `yandex-metrika`, `playwright` (см. `mcp.recommended.json`).
 - Wordstat — CLI (`scripts/wordstat.py`), не MCP: схемы инструментов не висят в контексте.

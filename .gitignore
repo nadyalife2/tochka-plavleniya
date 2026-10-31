@@ -33,6 +33,7 @@ __pycache__/
 *.pyc
 delivery-journal*.json*
 _archive/
+docs/archive/test.txt
 _tmp/
 .tmp/
 theme4-fixed/
@@ -44,3 +45,9 @@ seo/data/_backup/
 seo/data/tmp/
 *.db-wal
 *.db-shm
+
+# --- Секреты проекта: единый файл ключей (правит владелец, в git не попадает) ---
+config/api-keys.local.yaml
+config/*.local.yaml
+config/*.key
+api-keys*.yaml

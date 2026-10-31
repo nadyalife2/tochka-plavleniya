@@ -158,16 +158,16 @@ if (!function_exists('render_article_schema')) {
                 "inLanguage" => "ru",
                 "datePublished" => $date_pub,
                 "dateModified" => $date_mod,
-                "author" => [
+                "author" => array_filter([
                     "@type" => "Person",
-                    "name" => $article['author'] ?? 'Инженер Лаборатории ТЧП',
-                    "jobTitle" => "Ведущий инженер-технолог пайки и монтажа РЭА",
+                    "name" => $article['author'] ?? 'Редакция «Точка Плавления»',
+                    "jobTitle" => !empty($article['author_job_title']) ? $article['author_job_title'] : null,
                     "worksFor" => [
                         "@type" => "Organization",
                         "name" => "Точка Плавления // ТЧП",
                         "url" => "https://tochka-plavleniya.ru/"
                     ]
-                ],
+                ]),
                 "publisher" => [
                     "@type" => "Organization",
                     "name" => "Точка Плавления",
@@ -216,6 +216,21 @@ if (!function_exists('render_article_schema')) {
             $graph[] = [
                 "@type" => "FAQPage",
                 "mainEntity" => $faqItems
+            ];
+        }
+
+        if ($slug === 'temperaturnye-profili') {
+            $graph[] = [
+                "@type" => "HowTo",
+                "@id" => $url . "#howto",
+                "name" => "Настройка 4 фаз термопрофиля пайки BGA и SMD компонентов",
+                "description" => "Пошаговый инженерный регламент пайки без коробления текстолита и деламинации.",
+                "step" => [
+                    ["@type" => "HowToStep", "name" => "Preheat (Преднагрев)", "text" => "Плавный подъем температуры со скоростью 1–3 °C/с до 150 °C для предотвращения термоудара."],
+                    ["@type" => "HowToStep", "name" => "Soak (Активация флюса)", "text" => "Выдержка 60–120 секунд при 150–200 °C для выпаривания растворителей флюса и выравнивания градиента."],
+                    ["@type" => "HowToStep", "name" => "Reflow (Плавление припоя)", "text" => "Пиковый нагрев до 235–245 °C с выдержкой Time Above Liquidus (TAL) 30–60 секунд."],
+                    ["@type" => "HowToStep", "name" => "Cooling (Контролируемое охлаждение)", "text" => "Снижение температуры со скоростью 2–4 °C/с для формирования мелкозернистой структуры галтели."]
+                ]
             ];
         }
 
@@ -285,7 +300,7 @@ if (!function_exists('render_rubric_schema')) {
         $rslug = $rubric['slug'] ?? 'materialy';
         $site_root_url = function_exists('home_url') ? home_url('/') : 'https://tochka-plavleniya.ru/';
         if ($rslug === 'all') {
-            $canonical_url = $site_root_url;
+            $canonical_url = $site_root_url . 'category/all/';
         } elseif (function_exists('get_category_by_slug') && ($cat = get_category_by_slug($rslug))) {
             $canonical_url = get_category_link($cat->term_id);
         } else {

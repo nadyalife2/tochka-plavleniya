@@ -1,0 +1,246 @@
+{
+  "version": "1.0",
+  "category": "solder_alloys",
+  "updated_at": "2026-10-31",
+  "standards": [
+    "ГОСТ 21930-76 (Припои оловянно-свинцовые в чушках)",
+    "ГОСТ 21931-76 (Припои оловянно-свинцовые в виде проволоки и трубок)",
+    "IPC J-STD-006C (Requirements for Electronic Grade Solder Alloys)",
+    "ASTM B32 (Standard Specification for Solder Metal)"
+  ],
+  "items": {
+    "pos61": {
+      "id": "pos61",
+      "name": "ПОС-61",
+      "standard": "ГОСТ 21930-76, ГОСТ 21931-76",
+      "type": "leaded",
+      "composition": {
+        "sn_nominal": 61.0,
+        "sn_range": "59.0 – 61.0%",
+        "pb_nominal": 39.0,
+        "pb_range": "39.0 – 41.0%",
+        "antimony_max": 0.05,
+        "copper_max": 0.05,
+        "bismuth_max": 0.1
+      },
+      "temperatures": {
+        "t_solidus": 183,
+        "t_liquidus": 190,
+        "crystal_interval": 7,
+        "is_eutectic": false,
+        "t_iron_min": 260,
+        "t_iron_max": 290,
+        "t_iron_heavy_polygon": 320
+      },
+      "physical_properties": {
+        "density_g_cm3": 8.5,
+        "electrical_resistivity_ohm_mm2_m": 0.139,
+        "tensile_strength_mpa": 43,
+        "relative_elongation_pct": 36
+      },
+      "applications": [
+        "Монтаж и ремонт бытовой и промышленной электроники (THT и SMD)",
+        "Пайка медных проводов, кабелей, печатных плат и чувствительных компонентов",
+        "Лужение печатных плат и выводов элементов"
+      ],
+      "warnings": [
+        "Не эвтектика: имеет интервал кристаллизации 7 °C (между 190 и 183 °C расплав находится в кашеобразном состоянии).",
+        "Категорически запрещено сдвигать или вибрировать спаиваемые детали до полного охлаждения ниже 183 °C во избежание образования кристаллизационных микротрещин («холодная пайка»)."
+      ]
+    },
+    "sn63pb37": {
+      "id": "sn63pb37",
+      "name": "Sn63Pb37",
+      "standard": "IPC J-STD-006C / ASTM B32",
+      "type": "leaded_eutectic",
+      "composition": {
+        "sn_nominal": 63.0,
+        "sn_range": "62.5 – 63.5%",
+        "pb_nominal": 37.0,
+        "pb_range": "36.5 – 37.5%"
+      },
+      "temperatures": {
+        "t_solidus": 183,
+        "t_liquidus": 183,
+        "crystal_interval": 0,
+        "is_eutectic": true,
+        "t_iron_min": 250,
+        "t_iron_max": 285
+      },
+      "physical_properties": {
+        "density_g_cm3": 8.4,
+        "electrical_resistivity_ohm_mm2_m": 0.145,
+        "tensile_strength_mpa": 45
+      },
+      "applications": [
+        "Прецизионный монтаж электроники аэрокосмического и медицинского назначения",
+        "Монтаж компонентов с мелким шагом выводов (QFP, SOIC, 0402)"
+      ],
+      "warnings": [
+        "Истинная эвтектика: мгновенный фазовый переход из жидкости в твёрдое тело ровно при 183 °C без кашеобразной фазы."
+      ]
+    },
+    "pos40": {
+      "id": "pos40",
+      "name": "ПОС-40",
+      "standard": "ГОСТ 21930-76, ГОСТ 21931-76",
+      "type": "leaded",
+      "composition": {
+        "sn_nominal": 40.0,
+        "sn_range": "39.0 – 41.0%",
+        "pb_nominal": 60.0,
+        "pb_range": "59.0 – 61.0%"
+      },
+      "temperatures": {
+        "t_solidus": 183,
+        "t_liquidus": 238,
+        "crystal_interval": 55,
+        "is_eutectic": false,
+        "t_iron_min": 300,
+        "t_iron_max": 330
+      },
+      "physical_properties": {
+        "density_g_cm3": 9.3,
+        "electrical_resistivity_ohm_mm2_m": 0.159,
+        "tensile_strength_mpa": 38
+      },
+      "applications": [
+        "Пайка и лужение массивных силовых проводов, клемм, кабельных наконечников",
+        "Пайка латунных и медных радиаторов, теплообменников"
+      ],
+      "warnings": [
+        "Огромный интервал кристаллизации 55 °C (183–238 °C).",
+        "Категорически запрещён для тонких печатных плат и микросхем: длительное застывание провоцирует перегрев текстолита и отслоение дорожек."
+      ]
+    },
+    "sac305": {
+      "id": "sac305",
+      "name": "SAC305 (Sn96.5Ag3.0Cu0.5)",
+      "standard": "IPC J-STD-006C, RoHS 2011/65/EU",
+      "type": "lead_free",
+      "composition": {
+        "sn_nominal": 96.5,
+        "ag_nominal": 3.0,
+        "cu_nominal": 0.5
+      },
+      "temperatures": {
+        "t_solidus": 217,
+        "t_liquidus": 220,
+        "crystal_interval": 3,
+        "is_eutectic": false,
+        "t_iron_min": 300,
+        "t_iron_max": 335,
+        "t_reflow_peak": 245
+      },
+      "physical_properties": {
+        "density_g_cm3": 7.37,
+        "electrical_resistivity_ohm_mm2_m": 0.132,
+        "tensile_strength_mpa": 48
+      },
+      "applications": [
+        "Мировой бессвинцовый промышленный стандарт для поверхностного монтажа (SMD/BGA)",
+        "Ремонт современных заводских материнских плат, смартфонов, ноутбуков"
+      ],
+      "warnings": [
+        "Температура плавления на 34 °C выше ПОС-61.",
+        "Требует термостабильного флюса и бережного обращения с текстолитом.",
+        "Не перегревать жало выше 350 °C во избежание ускоренного выщелачивания медной металлизации дорожек."
+      ]
+    },
+    "sn42bi58": {
+      "id": "sn42bi58",
+      "name": "Sn42Bi58 (Олово-Висмут)",
+      "standard": "IPC J-STD-006C",
+      "type": "lead_free_low_melt",
+      "composition": {
+        "sn_nominal": 42.0,
+        "bi_nominal": 58.0
+      },
+      "temperatures": {
+        "t_solidus": 138,
+        "t_liquidus": 138,
+        "crystal_interval": 0,
+        "is_eutectic": true,
+        "t_iron_min": 170,
+        "t_iron_max": 210,
+        "t_reflow_peak": 165
+      },
+      "physical_properties": {
+        "density_g_cm3": 8.72,
+        "tensile_strength_mpa": 55,
+        "relative_elongation_pct": 5
+      },
+      "applications": [
+        "Пайка термочувствительных светодиодов (LED), гибких полиимидных шлейфов, пластиковых разъёмов",
+        "Двухступенчатая пайка узлов без риска расплавить соседние компоненты"
+      ],
+      "warnings": [
+        "Сплав обладает повышенной хрупкостью: не применять в узлах, подверженных вибрации или ударным нагрузкам.",
+        "КАТЕГОРИЧЕСКИЙ ЗАПРЕТ: не смешивать со свинцовыми припоями! В присутствии даже 0.5% свинца образуется тройная фаза Sn-Pb-Bi с температурой плавления 96 °C, вызывающая разрушение шва при обычном нагреве процессора."
+      ]
+    },
+    "roze": {
+      "id": "roze",
+      "name": "Сплав Розе",
+      "standard": "ТУ 6-09-4064-87",
+      "type": "demount_only",
+      "composition": {
+        "bi_nominal": 50.0,
+        "pb_nominal": 25.0,
+        "sn_nominal": 25.0
+      },
+      "temperatures": {
+        "t_solidus": 94,
+        "t_liquidus": 94,
+        "crystal_interval": 0,
+        "is_eutectic": true,
+        "t_iron_min": 150,
+        "t_iron_max": 200
+      },
+      "physical_properties": {
+        "density_g_cm3": 9.72,
+        "tensile_strength_mpa": 20
+      },
+      "applications": [
+        "Безопасный демонтаж многовыводных микросхем, разъемов и термочувствительных чипов без перегрева текстолита",
+        "Химико-термическое лужение дорожек печатных плат в кипящей воде с лимонной кислотой"
+      ],
+      "warnings": [
+        "ИСКЛЮЧИТЕЛЬНО ДЕМОНТАЖНЫЙ СПЛАВ: категорически запрещено оставлять в рабочих силовых и сигнальных соединениях!",
+        "Сплав крайне хрупок и разрушается от естественной вибрации техники.",
+        "После выпайки детали остатки сплава Розе обязаны быть полностью вычищены медной оплеткой с нейтральным флюсом перед монтажом на ПОС-61 или SAC305."
+      ]
+    },
+    "vuda": {
+      "id": "vuda",
+      "name": "Сплав Вуда",
+      "standard": "ТУ 6-09-4065-88",
+      "type": "toxic_demount",
+      "composition": {
+        "bi_nominal": 50.0,
+        "pb_nominal": 25.0,
+        "sn_nominal": 12.5,
+        "cd_nominal": 12.5
+      },
+      "temperatures": {
+        "t_solidus": 68.5,
+        "t_liquidus": 68.5,
+        "crystal_interval": 0,
+        "is_eutectic": true,
+        "t_iron_min": 110,
+        "t_iron_max": 150
+      },
+      "physical_properties": {
+        "density_g_cm3": 9.7
+      },
+      "applications": [
+        "Низкотемпературный демонтаж особо хрупких стеклянных и пластиковых корпусов"
+      ],
+      "warnings": [
+        "ОПАСНО ДЛЯ ЖИЗНИ И ЗДОРОВЬЯ: содержит 12.5% высокотоксичного кадмия (Cd)!",
+        "Пары кадмия поражают почки, печень и дыхательную систему, накапливаются в организме.",
+        "Рекомендуется полностью заменить на безопасный сплав Розе или висмутовые бессвинцовые сплавы."
+      ]
+    }
+  }
+}

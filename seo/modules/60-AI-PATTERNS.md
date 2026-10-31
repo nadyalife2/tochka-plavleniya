@@ -14,8 +14,8 @@
 
 | | Что | Где лежит |
 |---|---|---|
-| Вход | статья в голосе Practico | файл или лист `statiy`, колонка `Текст_статьи` |
-| Вход | паспорт факта: сплав, температуры, стандарт | бриф в `briefs_ТЗ`, [реестр сплавов](../../theme4/data/materials-registry.php) |
+| Вход | статья в голосе Practico | файл или `topics.content_markdown` в `seo/data/seo.db` |
+| Вход | паспорт факта: сплав, температуры, стандарт | бриф в таблице `briefs`, [реестр сплавов](../../theme4/data/materials-registry.php) |
 | Вход | схема контракта | [article-contract-v1.1.schema.json](../../schemas/article-contract-v1.1.schema.json) |
 | Выход | `package.json` для доставки | рабочий каталог `seo/out/` |
 | Выход | отчёт оценки 0–100 | `seo/out/scores/<id>.json` и `.md` |
@@ -208,8 +208,8 @@ python seo/scripts/score_article.py --file "сами статьи/17-bessvincovy
 python tools/delivery_cli.py send-draft --file seo/out/package.json \
   --wp-url "https://tochka-plavleniya.ru" --wp-user "automation_bot" --wp-pass "xxxx xxxx xxxx xxxx"
 
-# 4. Внести принятый текст в мастер (делает .bak)
-python seo/scripts/add_article.py --file "сами статьи/17-bessvincovyj-pripoj.md" --id 17
+# 4. Внести принятый текст в БД (с резервной копией)
+python seo/scripts/sync_all_texts_to_db.py
 ```
 
 ## Связанные файлы

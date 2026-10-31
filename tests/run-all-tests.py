@@ -142,10 +142,11 @@ def run_php_unit_tests():
     print("  [PASS] Business Logic & Contract Unit Tests completed with 100% success rate.")
 
 def run_python_unit_tests():
-    print("\n[STEP 4/7] Running Python Delivery CLI & Contract Unit Tests...")
+    print("\n[STEP 4/7] Running Python Delivery CLI, Contract & API Validation Unit Tests...")
     test_scripts = [
         ROOT_DIR / "tests" / "test_delivery_cli_unit.py",
         ROOT_DIR / "tests" / "test_article_generator.py",
+        ROOT_DIR / "tests" / "test_server_validation.py",
     ]
     for script in test_scripts:
         res = subprocess.run([sys.executable, "-m", "unittest", str(script)], capture_output=True, text=True, encoding="utf-8")
@@ -153,7 +154,7 @@ def run_python_unit_tests():
         if res.returncode != 0:
             print(res.stderr, file=sys.stderr)
             sys.exit(res.returncode)
-    print("  [PASS] Python Delivery CLI & Generator Unit Tests passed.")
+    print("  [PASS] Python Delivery CLI, Generator & API Validation Unit Tests passed.")
 
 def run_docs_link_check():
     print("\n[STEP 5/7] Checking relative Markdown links...")
@@ -164,6 +165,26 @@ def run_docs_link_check():
         print(res.stderr, file=sys.stderr)
         sys.exit(res.returncode)
     print("  [PASS] Documentation links are consistent.")
+
+def run_seo_pipeline_tests():
+    """Smoke-тесты SEO-контура: канонические сплавы, паспорт статьи, скорер, SQLite-план."""
+    print("\n[STEP 5.5/7] Running SEO pipeline smoke tests (seo/ contour)...")
+    seo_test = ROOT_DIR / "tests" / "test_seo_pipeline.py"
+    if not seo_test.exists():
+        print("  [SKIP] tests/test_seo_pipeline.py not found.")
+        return
+    res = subprocess.run(
+        [sys.executable, str(seo_test)],
+        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        cwd=str(ROOT_DIR),
+    )
+    if res.returncode != 0:
+        print(res.stdout[-4000:], file=sys.stderr)
+        print(res.stderr[-2000:], file=sys.stderr)
+        sys.exit(res.returncode)
+    tail = [line for line in (res.stdout + "\n" + res.stderr).strip().splitlines() if line.startswith(("Ran ", "OK"))]
+    print("  " + " | ".join(tail) if tail else "  ran")
+    print("  [PASS] SEO pipeline smoke tests passed (canonical alloys, contract, scorer, SQLite plan).")
 
 def verify_distribution_archives():
     print("\n[STEP 7/7] Verifying Distribution Packages Composition & Byte Parity...")
@@ -241,6 +262,7 @@ if __name__ == "__main__":
     run_php_unit_tests()
     run_python_unit_tests()
     run_docs_link_check()
+    run_seo_pipeline_tests()
 
     if not args.verify_only:
         build_distribution_archives()

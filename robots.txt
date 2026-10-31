@@ -38,3 +38,4 @@ Allow: /
 
 # Sitemap
 Sitemap: https://tochka-plavleniya.ru/sitemap.xml
+Sitemap: https://tochka-plavleniya.ru/wp-sitemap.xml
