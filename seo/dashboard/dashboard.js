@@ -2,6 +2,7 @@ let DB_DATA = { status: "ok", topics: [], topics_proposed: [], competitors: [], 
 let CURRENT_TOPIC_ID = null;
 let ACTIVE_STEP_FILTER = null;
 let CURRENT_AI_PROVIDER = 'auto';
+let lastFocusedElementBeforeModal = null;
 
 // Bulk selection state
 let BULK_SELECTED = new Set();
@@ -156,47 +157,77 @@ function resetStepFilter() {
   renderKanban();
 }
 
-function showToast(msg) {
+const API_BASE = (typeof window !== 'undefined' && window.location && window.location.origin && window.location.origin.startsWith('http'))
+  ? window.location.origin
+  : 'http://127.0.0.1:8765';
+
+let toastTimeout = null;
+function showToast(msg, type = 'info', actionText = '', onAction = null) {
   const t = document.getElementById('toast');
-  t.innerText = msg;
-  t.style.display = 'block';
-  setTimeout(() => { t.style.display = 'none'; }, 3500);
+  if (!t) return;
+  t.innerHTML = '';
+  t.className = 'toast' + (type ? ` toast--${type}` : '');
+  
+  const span = document.createElement('span');
+  span.innerText = msg;
+  t.appendChild(span);
+
+  if (actionText && typeof onAction === 'function') {
+    const actBtn = document.createElement('button');
+    actBtn.type = 'button';
+    actBtn.className = 'toast__action-btn';
+    actBtn.innerText = actionText;
+    actBtn.onclick = (e) => {
+      e.stopPropagation();
+      onAction();
+      t.style.display = 'none';
+      if (toastTimeout) clearTimeout(toastTimeout);
+    };
+    t.appendChild(actBtn);
+  }
+
+  t.style.display = 'inline-flex';
+  t.style.alignItems = 'center';
+  if (toastTimeout) clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(() => { t.style.display = 'none'; }, actionText ? 6000 : 3500);
 }
 
 async function apiPost(route, payload) {
   try {
-    const res = await fetch('http://127.0.0.1:8765' + route, {
+    const res = await fetch(API_BASE + route, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload || {})
     });
     return await res.json();
   } catch (e) {
+    showToast('Ошибка сети: ' + (e.message || 'нет связи с сервером'), 'error');
     return null;
   }
 }
 
 async function apiGet(route) {
   try {
-    const res = await fetch('http://127.0.0.1:8765' + route);
+    const res = await fetch(API_BASE + route);
     return await res.json();
   } catch (e) {
+    showToast('Ошибка сети: ' + (e.message || 'нет связи с сервером'), 'error');
     return null;
   }
 }
 
 async function refreshData() {
   try {
-    const res = await fetch('http://127.0.0.1:8765/api/data');
+    const res = await fetch(API_BASE + '/api/data');
     if (res.ok) {
       DB_DATA = await res.json();
       renderAll();
-      showToast('✓ Данные обновлены из SQLite БД');
+      showToast('✓ Данные обновлены из SQLite БД', 'success');
       return;
     }
   } catch (e) {}
   renderAll();
-  showToast('✓ Интерфейс перерисован');
+  showToast('✓ Интерфейс перерисован', 'info');
 }
 
 // ---------------------------------------------------------------------------
@@ -412,7 +443,7 @@ async function renderAnalysisHistory() {
   const tb = document.getElementById('analysisBody');
   if (!tb) return;
   try {
-    const res = await fetch('http://127.0.0.1:8765/api/keyword/history');
+    const res = await fetch(API_BASE + '/api/keyword/history');
     const data = await res.json();
     const rows = data.history || [];
     ANALYSIS_ROWS = rows;
@@ -1035,7 +1066,7 @@ async function pollJob(jobId, agentName) {
     await new Promise(r => setTimeout(r, 2000));
     let job = null;
     try {
-      const r = await fetch(`http://127.0.0.1:8765/api/jobs/${jobId}`);
+      const r = await fetch(`${API_BASE}/api/jobs/${jobId}`);
       if (r.ok) job = await r.json();
     } catch (e) { /* сервер занят — пробуем снова */ }
     if (!job || job.status === 'running') {
@@ -1440,10 +1471,16 @@ function initKanbanDnD() {
     }
     const res = await apiPost('/api/articles/status', { id: id, status: newStatus });
     if (res && res.status === 'ok') {
-      showToast('✓ Статус статьи #' + id + ': ' + (RU[newStatus] || newStatus));
+      showToast('✓ Статус статьи #' + id + ': ' + (RU[newStatus] || newStatus), 'success', '↩ Отменить', async () => {
+        const revertRes = await apiPost('/api/articles/status', { id: id, status: fromCol });
+        if (revertRes && revertRes.status === 'ok') {
+          showToast('✓ Возвращён статус: ' + (RU[fromCol] || fromCol), 'info');
+          await refreshData();
+        }
+      });
       await refreshData();
     } else {
-      showToast('⚠️ Не удалось изменить статус');
+      showToast('⚠️ Не удалось изменить статус', 'error');
       renderKanban();
     }
   });
@@ -1791,7 +1828,13 @@ function openInspector(topicId) {
     toolRow.innerHTML = toolsHtml;
   }
 
-  document.getElementById('inspectorModal').classList.add('active');
+  lastFocusedElementBeforeModal = document.activeElement;
+  const modalEl = document.getElementById('inspectorModal');
+  modalEl.classList.add('active');
+  setTimeout(() => {
+    const closeBtn = modalEl.querySelector('.modal-close');
+    if (closeBtn) closeBtn.focus();
+  }, 40);
 }
 
 function switchModalTab(tab) {
@@ -2027,13 +2070,17 @@ async function saveEditedArticleText() {
     document.getElementById('mTextCharsBadge').innerText = res.chars + ' зн.';
     await refreshData();
   } else {
-    alert('Ошибка при сохранении текста.');
+    showToast('Ошибка при сохранении текста.', 'error');
   }
 }
 
 function closeInspector(e) {
   if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
-  document.getElementById('inspectorModal').classList.remove('active');
+  const modalEl = document.getElementById('inspectorModal');
+  if (modalEl) modalEl.classList.remove('active');
+  if (lastFocusedElementBeforeModal && typeof lastFocusedElementBeforeModal.focus === 'function') {
+    try { lastFocusedElementBeforeModal.focus(); } catch (err) {}
+  }
 }
 
 function toggleNewTopicBox() {
@@ -2052,20 +2099,20 @@ async function createNewTopicFromInput() {
   const notes = document.getElementById('newTopicNotes').value.trim();
 
   if (!title) {
-    alert('Пожалуйста, введите название темы!');
+    showToast('Пожалуйста, введите название темы!', 'warning');
     return;
   }
 
   showToast('Добавление темы в бэклог...');
   const res = await apiPost('/api/topics/create', { title, cluster, type, priority, notes });
   if (res && res.status === 'ok') {
-    showToast(`✓ Тема #${res.id} добавлена в бэклог!`);
+    showToast(`✓ Тема #${res.id} добавлена в бэклог!`, 'success');
     document.getElementById('newTopicTitle').value = '';
     document.getElementById('newTopicNotes').value = '';
     document.getElementById('newTopicBox').style.display = 'none';
     await refreshData();
   } else {
-    alert('Ошибка при добавлении темы.');
+    showToast('Ошибка при добавлении темы.', 'error');
   }
 }
 
@@ -2146,7 +2193,7 @@ let STANDARDS_CACHE = null;
 async function loadStandardsCatalog() {
   if (STANDARDS_CACHE) return STANDARDS_CACHE;
   try {
-    const res = await fetch('http://127.0.0.1:8765/api/standards');
+    const res = await fetch(API_BASE + '/api/standards');
     if (res.ok) {
       STANDARDS_CACHE = await res.json();
     }
@@ -2321,7 +2368,7 @@ async function loadWorkbenchLinks(topicId) {
   if (!box) return;
   box.innerHTML = 'Загрузка связей...';
   try {
-    const res = await fetch(`http://127.0.0.1:8765/api/topics/links?id=${topicId}`);
+    const res = await fetch(`${API_BASE}/api/topics/links?id=${topicId}`);
     if (res.ok) {
       const data = await res.json();
       const outb = data.outbound || [];
@@ -2355,12 +2402,33 @@ function insertLinkToEditor(title, url) {
 
 document.addEventListener('DOMContentLoaded', () => {
   renderAll();
-  fetch('http://127.0.0.1:8765/api/status')
+  fetch(API_BASE + '/api/status')
     .then(r => r.json())
     .then(() => refreshData())
     .catch(() => {});
 });
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') closeInspector();
+  if (e.key === 'Escape') {
+    closeInspector();
+    return;
+  }
+  if (e.key === 'Tab') {
+    const modalEl = document.getElementById('inspectorModal');
+    if (modalEl && modalEl.classList.contains('active')) {
+      const focusable = modalEl.querySelectorAll('button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      const visible = Array.from(focusable).filter(el => el.offsetParent !== null);
+      if (visible.length > 0) {
+        const first = visible[0];
+        const last = visible[visible.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    }
+  }
 });
