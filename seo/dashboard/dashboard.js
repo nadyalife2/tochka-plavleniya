@@ -387,24 +387,72 @@ function recheckPhraseByIndex(index, source) {
 async function checkPhraseValue(phrase, source, refresh) {
   const box = document.getElementById('analysisResult');
   box.style.display = 'block';
-  box.innerHTML = `<div style="padding:10px;background:var(--bg);border:1px solid var(--border);font-size:12px;">
-    ⏳ ${refresh ? 'Перепроверяю' : 'Проверяю'} «${esc(phrase)}»${source === 'mutagen' ? ' (Мутаген, 0,30 ₽)' : ' (Вордстат, бесплатно)'}...</div>`;
 
-  const res = await apiPost('/api/keyword/check', { phrase: phrase, source: source, refresh: refresh });
+  // Блокируем кнопки на время запроса
+  const allBtns = document.querySelectorAll('#view-analysis button');
+  allBtns.forEach(b => { b.disabled = true; b.style.opacity = '0.6'; });
+
+  const startTime = Date.now();
+  function renderLoading() {
+    const elapsed = Math.floor((Date.now() - startTime) / 1000);
+    let stepTitle = 'Связываюсь с сервером...';
+    if (source === 'mutagen') {
+      if (elapsed < 3) stepTitle = 'Постановка задачи в API Мутагена...';
+      else if (elapsed < 8) stepTitle = 'Мутаген анализирует ТОП-10 Яндекса и хвосты...';
+      else stepTitle = 'Расчёт силы конкуренции и ставок Директа...';
+    } else {
+      stepTitle = 'Сбор частотности из Яндекс Вордстат...';
+    }
+
+    box.innerHTML = `
+      <div class="loading-card">
+        <div class="loading-card__spinner"></div>
+        <div style="flex:1;">
+          <div class="loading-card__title">
+            <span>${source === 'mutagen' ? 'Мутаген (проверка конкуренции)' : 'Вордстат (сбор спроса)'}: «${esc(phrase)}»</span>
+            <span class="loading-card__timer">${elapsed} сек</span>
+          </div>
+          <div class="loading-card__step">
+            <span class="loading-card__step-dot"></span>
+            <span>${stepTitle}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  renderLoading();
+  const loadingInterval = setInterval(renderLoading, 500);
+
+  let res = null;
+  try {
+    res = await apiPost('/api/keyword/check', { phrase: phrase, source: source, refresh: refresh });
+  } catch (err) {
+    res = null;
+  } finally {
+    clearInterval(loadingInterval);
+    allBtns.forEach(b => { b.disabled = false; b.style.opacity = ''; });
+  }
+
   if (!res || res.status !== 'ok') {
-    box.innerHTML = `<div style="padding:10px;background:#FEE2E2;border:1px solid #B91C1C;font-size:12px;">
-      ❌ Не удалось проверить фразу.</div>`;
+    box.innerHTML = `<div style="padding:12px;background:#FEE2E2;border:1.5px solid #B91C1C;border-radius:var(--radius-sm);font-size:12px;color:#7F1D1D;">
+      <strong>❌ Не удалось проверить фразу.</strong><br>
+      ${(res && res.notes && res.notes.join('<br>')) || 'Сервис не ответил или вернул ошибку сети. Проверьте баланс или повторите через минуту.'}
+    </div>`;
     return;
   }
 
   const ws = res.wordstat || null;
   const mg = res.mutagen || null;
-  let html = `<div style="border:1.5px solid var(--border);background:var(--card);padding:12px;">
-    <div style="font-size:13px;font-weight:800;margin-bottom:8px;">«${esc(res.phrase)}»</div>`;
+  let html = `<div style="border:1.5px solid var(--border);border-radius:var(--radius-md);background:var(--card);padding:14px;box-shadow:0 2px 6px rgba(0,0,0,0.03);">
+    <div style="font-size:14px;font-weight:800;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;">
+      <span>«${esc(res.phrase)}»</span>
+      <span style="font-size:11px;font-family:var(--mono);color:var(--muted);">${source === 'mutagen' ? 'Проверка: Мутаген (0,30 ₽)' : 'Проверка: Вордстат (бесплатно)'}</span>
+    </div>`;
 
   if (ws) {
     html += `<div style="margin-bottom:8px;">
-      <strong>Широкая частотность (Вордстат):</strong> ${(ws.totalCount || 0).toLocaleString('ru-RU')} показов/мес
+      <strong>Широкая частотность (Вордстат):</strong> <strong style="font-family:var(--mono);">${(ws.totalCount || 0).toLocaleString('ru-RU')}</strong> показов/мес
       ${ws.cached ? '<span style="color:var(--muted);font-size:11px;"> · из кэша, бесплатно</span>' : ''}
     </div>`;
     if (ws.results && ws.results.length) {
@@ -420,10 +468,10 @@ async function checkPhraseValue(phrase, source, refresh) {
     const comp = mg.strong;
     const hasComp = (comp !== null && comp !== undefined && comp !== '');
     const color = hasComp ? (comp <= 10 ? '#059669' : (comp <= 18 ? '#B45309' : '#B91C1C')) : '#6B7280';
-    html += `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);">
-      <strong>Конкуренция (Мутаген):</strong> <span style="color:${color};font-weight:800;">${hasComp ? comp + '/25' : '— / 25'}</span>
-      · точный спрос в кавычках: <code>${mg.wordstat != null ? (mg.wordstat).toLocaleString('ru-RU') : '—'}</code>
-      · хвосты: <code>${mg.tails != null ? (mg.tails).toLocaleString('ru-RU') : '—'}</code>
+    html += `<div style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--border-hairline);">
+      <strong>Конкуренция (Мутаген):</strong> <span style="color:${color};font-weight:800;font-size:13px;">${hasComp ? comp + '/25' : '— / 25'}</span>
+      · точный спрос в кавычках: <code style="font-size:12px;">${mg.wordstat != null ? (mg.wordstat).toLocaleString('ru-RU') : '—'}</code>
+      · хвосты: <code style="font-size:12px;">${mg.tails != null ? (mg.tails).toLocaleString('ru-RU') : '—'}</code>
       ${mg.vital_site ? `<br><strong>Витальный сайт в топе:</strong> ${esc(mg.vital_site)}` : '<br>Витального сайта в топе нет — путь открыт'}
       ${mg.cached ? '<span style="color:var(--muted);font-size:11px;"> · из кэша, бесплатно</span>' : ''}
     </div>`;
@@ -438,7 +486,7 @@ async function checkPhraseValue(phrase, source, refresh) {
     } else {
       verdict = '❌ Высокая конкуренция (>18/25): пробиться в топ сложно';
     }
-    html += `<div style="margin-top:8px;font-weight:700;">${verdict}</div>`;
+    html += `<div style="margin-top:10px;font-weight:700;padding:6px 10px;background:#F8FAFC;border:1px solid var(--border-hairline);border-radius:var(--radius-sm);">${verdict}</div>`;
   }
 
   if (res.cost) {
