@@ -207,15 +207,26 @@ add_action('init', function () {
 
     register_post_meta('post', 'tchp_schema_version', [
         'type'              => 'string',
-        'description'       => 'Версия схемы контракта статьи',
+        'description'       => 'Версия схемы контракта статьи (1.0 или 1.1)',
         'single'            => true,
         'show_in_rest'      => [
             'schema' => [
                 'type' => 'string',
-                'enum' => ['1.0'],
+                'enum' => ['1.0', '1.1'],
             ],
         ],
         'auth_callback'     => $auth_edit_post,
+        'validate_callback' => function ($val) {
+            $allowed = ['1.0', '1.1'];
+            if (!in_array($val, $allowed, true)) {
+                return new WP_Error(
+                    'rest_invalid_param',
+                    sprintf('Недопустимая версия схемы "%s". Допустимые: %s', esc_html($val), implode(', ', $allowed)),
+                    ['status' => 400]
+                );
+            }
+            return true;
+        },
         'sanitize_callback' => 'sanitize_text_field',
     ]);
 
@@ -247,17 +258,17 @@ add_action('init', function () {
 
     register_post_meta('post', 'tchp_difficulty', [
         'type'              => 'string',
-        'description'       => 'Уровень сложности (Базовый, Инженер, Эксперт)',
+        'description'       => 'Уровень сложности (Базовый, Инженер, Эксперт, Практик)',
         'single'            => true,
         'show_in_rest'      => [
             'schema' => [
                 'type' => 'string',
-                'enum' => ['Базовый', 'Инженер', 'Эксперт'],
+                'enum' => ['Базовый', 'Инженер', 'Эксперт', 'Практик'],
             ],
         ],
         'auth_callback'     => $auth_edit_post,
         'validate_callback' => function ($val) {
-            $allowed = ['Базовый', 'Инженер', 'Эксперт'];
+            $allowed = ['Базовый', 'Инженер', 'Эксперт', 'Практик'];
             if (!in_array($val, $allowed, true)) {
                 return new WP_Error(
                     'rest_invalid_param',
@@ -1068,6 +1079,7 @@ function tchp_render_article_spec_box($post) {
         <label for="tchp_difficulty">Уровень сложности:</label>
         <select name="tchp_difficulty" id="tchp_difficulty">
           <option value="Базовый" <?= selected($diff, 'Базовый', false) ?>>Базовый</option>
+          <option value="Практик" <?= selected($diff, 'Практик', false) ?>>Практик</option>
           <option value="Инженер" <?= selected($diff, 'Инженер', false) ?>>Инженер</option>
           <option value="Эксперт" <?= selected($diff, 'Эксперт', false) ?>>Эксперт</option>
         </select>

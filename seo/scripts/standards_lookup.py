@@ -65,6 +65,7 @@ def lookup_flux(query: str, fluxes: dict) -> dict | None:
 def format_alloy_card(item: dict) -> str:
     temps = item.get("temperatures", {})
     comp = item.get("composition", {})
+    props = item.get("physical_properties", {})
     interval = temps.get("crystal_interval", 0)
     eutectic_str = "ДА (0 °C)" if temps.get("is_eutectic") else f"НЕТ (интервал {interval} °C)"
     lines = [
@@ -77,6 +78,17 @@ def format_alloy_card(item: dict) -> str:
     ]
     if temps.get("t_reflow_peak"):
         lines.append(f"• Пик термопрофиля фена/печи: {temps.get('t_reflow_peak')} °C")
+    prop_parts = []
+    if props.get("density_g_cm3"):
+        prop_parts.append(f"плотность {props['density_g_cm3']} г/см³")
+    if props.get("electrical_resistivity_ohm_mm2_m"):
+        prop_parts.append(f"уд. сопр. {props['electrical_resistivity_ohm_mm2_m']} Ом·мм²/м")
+    if props.get("tensile_strength_mpa"):
+        prop_parts.append(f"прочность на разрыв {props['tensile_strength_mpa']} МПа")
+    if props.get("relative_elongation_pct"):
+        prop_parts.append(f"удлинение {props['relative_elongation_pct']}%")
+    if prop_parts:
+        lines.append(f"• Физ. свойства: {', '.join(prop_parts)}")
     warns = item.get("warnings", [])
     if warns:
         lines.append("• КРИТИЧЕСКИЕ ОГРАНИЧЕНИЯ:")
@@ -102,41 +114,74 @@ def format_flux_card(item: dict) -> str:
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Использование: python seo/scripts/standards_lookup.py <марка_сплава | код_флюса | тема>")
-        print("Примеры: pos61, sac305, sn42bi58, roze, ROL0, ROL1, safety, quality")
+    as_json = "--json" in sys.argv
+    clean_argv = [a for a in sys.argv[1:] if a != "--json"]
+
+    if not clean_argv:
+        if as_json:
+            print(json.dumps({"error": "missing_query", "usage": "python seo/scripts/standards_lookup.py <query> [--json]"}, ensure_ascii=False, indent=2))
+        else:
+            print("Использование: python seo/scripts/standards_lookup.py <марка_сплава | код_флюса | тема> [--json]")
+            print("Примеры: pos61, sac305, sn42bi58, roze, ROL0, ROL1, safety, quality")
         sys.exit(1)
 
-    query = sys.argv[1].strip()
+    query = clean_argv[0].strip()
 
     if query.lower() in ("safety", "тб", "безопасность", "пдк"):
         fpath = STANDARDS_DIR / "safety.md"
         if fpath.exists():
-            print(fpath.read_text(encoding="utf-8")[:1800])
+            text = fpath.read_text(encoding="utf-8")
+            if as_json:
+                print(json.dumps({"status": "ok", "type": "safety", "standard": "ГОСТ 12.3.040-86", "content": text}, ensure_ascii=False, indent=2))
+            else:
+                print(text.strip())
         return
 
-    if query.lower() in ("quality", "дефекты", "отк", "брак", "ipc-610"):
+    if query.lower() in ("quality", "дефекты", "отк", "брак", "ipc-610", "холодная пайка"):
         fpath = STANDARDS_DIR / "quality_defects.md"
         if fpath.exists():
-            print(fpath.read_text(encoding="utf-8")[:1800])
+            text = fpath.read_text(encoding="utf-8")
+            if as_json:
+                print(json.dumps({"status": "ok", "type": "quality", "standard": "IPC-A-610G / ГОСТ Р 56427-2015", "content": text}, ensure_ascii=False, indent=2))
+            else:
+                print(text.strip())
         return
 
     alloys = load_alloys()
     alloy_match = lookup_alloy(query, alloys)
     if alloy_match:
-        print(format_alloy_card(alloy_match))
+        if as_json:
+            print(json.dumps({"status": "ok", "type": "alloy", "item": alloy_match}, ensure_ascii=False, indent=2))
+        else:
+            print(format_alloy_card(alloy_match))
         return
 
     fluxes = load_fluxes()
     flux_match = lookup_flux(query, fluxes)
     if flux_match:
-        print(format_flux_card(flux_match))
+        if as_json:
+            print(json.dumps({"status": "ok", "type": "flux", "item": flux_match}, ensure_ascii=False, indent=2))
+        else:
+            print(format_flux_card(flux_match))
         return
+
+    if as_json:
+        print(json.dumps({
+            "status": "not_found",
+            "query": query,
+            "available": {
+                "alloys": list(alloys.keys()),
+                "fluxes": ["ROL0", "ROL1", "ROM1", "REL0", "ORH1"],
+                "topics": ["safety", "quality"]
+            }
+        }, ensure_ascii=False, indent=2))
+        sys.exit(1)
 
     print(f"По запросу «{query}» точных стандартов не найдено. Доступные ключи:")
     print("  Сплавы: " + ", ".join(alloys.keys()))
     print("  Флюсы: ROL0, ROL1, ROM1, REL0, ORH1")
     print("  Справочники: safety, quality")
+    sys.exit(1)
 
 
 if __name__ == "__main__":

@@ -14,6 +14,11 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "seo" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
@@ -25,8 +30,10 @@ def sync_texts():
     backup_database()
     loaded = {}
 
-    # 1. Из папки 'сами статьи'
-    articles_dir = ROOT / "сами статьи"
+    # 1. Из папки 'articles' (или устаревшей 'сами статьи')
+    articles_dir = ROOT / "articles"
+    if not articles_dir.exists():
+        articles_dir = ROOT / "сами статьи"
     if articles_dir.exists():
         for mf in articles_dir.glob("*.md"):
             m = re.match(r"^(\d+)-", mf.name)
@@ -34,7 +41,7 @@ def sync_texts():
                 tid = int(m.group(1))
                 text = mf.read_text(encoding="utf-8", errors="replace")
                 if len(text) > 100:
-                    loaded[tid] = (text, f"сами статьи/{mf.name}")
+                    loaded[tid] = (text, f"{articles_dir.name}/{mf.name}")
 
     # 2. Из папки 'seo/data/article_*.md'
     seo_data = ROOT / "seo" / "data"
@@ -47,7 +54,7 @@ def sync_texts():
                 if len(text) > 100 and tid not in loaded:
                     loaded[tid] = (text, f"seo/data/{mf.name}")
 
-    # Копируем тексты из seo/data в 'сами статьи' для единообразия
+    # Копируем тексты в 'articles' для единообразия
     articles_dir.mkdir(parents=True, exist_ok=True)
     slug_map = {
         1: "kak-payat-payalnikom-poshagovyj-gajd-dlya-nachinayushchih",
@@ -62,8 +69,8 @@ def sync_texts():
         dst = articles_dir / f"{tid}-{slug}.md"
         if src.exists() and not dst.exists():
             dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
-            print(f"  • Создан файл: сами статьи/{dst.name}")
-            loaded[tid] = (dst.read_text(encoding="utf-8"), f"сами статьи/{dst.name}")
+            print(f"  • Создан файл: articles/{dst.name}")
+            loaded[tid] = (dst.read_text(encoding="utf-8"), f"articles/{dst.name}")
 
     now_str = datetime.now().isoformat(timespec="seconds")
     updated_count = 0

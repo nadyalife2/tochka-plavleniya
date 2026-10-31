@@ -265,26 +265,26 @@ include __DIR__ . '/includes/header.php';
               <span class="flex items-center gap-1 text-emerald-600 dark:text-emerald-500 font-bold" title="Регламент соответствует стандарту IPC J-STD"><?= tp_icon('shield-check', 'w-3.5 h-3.5') ?>Проверено</span>
             </div>
 
-            <!-- Adafruit / SparkFun Quick-Spec Passport Bar -->
+            <!-- Quick-Spec Passport Bar (динамический вывод параметров материала) -->
             <div class="quick-spec-passport">
               <div class="passport-col">
                 <span class="passport-label">ТЕМПЕРАТУРА ЖАЛА</span>
                 <div class="te-display">
                   <span class="te-ghost">888 °C</span>
-                  <span class="te-active">275 °C</span>
+                  <span class="te-active"><?= esc_html($article['temp_iron'] ?? '275 °C') ?></span>
                 </div>
               </div>
               <div class="passport-col">
                 <span class="passport-label">СПЛАВ ПРИПОЯ</span>
-                <span class="passport-value text-accent">ПОС-61 / SAC305</span>
+                <span class="passport-value text-accent"><?= esc_html($article['solder'] ?? 'ПОС-61 / SAC305') ?></span>
               </div>
               <div class="passport-col">
                 <span class="passport-label">ВРЕМЯ КОНТАКТА (TAL)</span>
-                <span class="passport-value">&lt; 2.5 сек</span>
+                <span class="passport-value"><?= esc_html($article['tal'] ?? '< 2.5 сек') ?></span>
               </div>
               <div class="passport-col">
                 <span class="passport-label">КЛАСС ОТМЫВКИ</span>
-                <span class="passport-value text-emerald-600 dark:text-emerald-400">ROL0 / No-Clean</span>
+                <span class="passport-value text-emerald-600 dark:text-emerald-400"><?= esc_html($article['flux_class'] ?? 'ROL0 / No-Clean') ?></span>
               </div>
             </div>
 

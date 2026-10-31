@@ -147,8 +147,24 @@ if (!function_exists('render_article_schema')) {
         } else {
             $url = "https://tochka-plavleniya.ru/" . urlencode($slug) . "/";
         }
-        $date_pub = !empty($article['date']) ? $article['date'] : '2026-08-20';
+        $date_pub = !empty($article['date']) ? $article['date'] : gmdate('Y-m-d');
         $date_mod = !empty($article['date_modified']) ? $article['date_modified'] : $date_pub;
+        $author_name = $article['author'] ?? 'Редакция «Точка Плавления»';
+        $is_org = str_contains($author_name, 'Редакция') || empty($article['author']);
+        $author_schema = [
+            "@type" => $is_org ? "Organization" : "Person",
+            "name"  => $author_name,
+        ];
+        if (!$is_org) {
+            if (!empty($article['author_job_title'])) {
+                $author_schema["jobTitle"] = $article['author_job_title'];
+            }
+            $author_schema["worksFor"] = [
+                "@type" => "Organization",
+                "name"  => "Точка Плавления // ТЧП",
+                "url"   => "https://tochka-plavleniya.ru/"
+            ];
+        }
         $graph = [
             [
                 "@type" => "TechArticle",
@@ -158,16 +174,7 @@ if (!function_exists('render_article_schema')) {
                 "inLanguage" => "ru",
                 "datePublished" => $date_pub,
                 "dateModified" => $date_mod,
-                "author" => array_filter([
-                    "@type" => "Person",
-                    "name" => $article['author'] ?? 'Редакция «Точка Плавления»',
-                    "jobTitle" => !empty($article['author_job_title']) ? $article['author_job_title'] : null,
-                    "worksFor" => [
-                        "@type" => "Organization",
-                        "name" => "Точка Плавления // ТЧП",
-                        "url" => "https://tochka-plavleniya.ru/"
-                    ]
-                ]),
+                "author" => $author_schema,
                 "publisher" => [
                     "@type" => "Organization",
                     "name" => "Точка Плавления",
@@ -473,15 +480,30 @@ if (!function_exists('tchp_get_express_workbench_matrix')) {
                 'pth'    => ['range' => '210 – 235', 'liq' => '138 °C', 'delta' => '+72...97 °C', 'max' => 235],
                 'copper' => ['range' => '220 – 245', 'liq' => '138 °C', 'delta' => '+82...107 °C', 'max' => 245],
             ],
+            'sac405' => [
+                'smd'    => ['range' => '310 – 335', 'liq' => '217–220 °C', 'delta' => 'по реестру материалов', 'max' => 335],
+                'pth'    => ['range' => '320 – 350', 'liq' => '217–220 °C', 'delta' => 'по реестру материалов', 'max' => 350],
+                'copper' => ['range' => '340 – 370', 'liq' => '217–220 °C', 'delta' => 'по реестру материалов', 'max' => 370],
+            ],
+            'snbiago' => [
+                'smd'    => ['range' => '190 – 215', 'liq' => '137–140 °C', 'delta' => 'по реестру материалов', 'max' => 215],
+                'pth'    => ['range' => '200 – 225', 'liq' => '137–140 °C', 'delta' => 'по реестру материалов', 'max' => 225],
+                'copper' => ['range' => '215 – 240', 'liq' => '137–140 °C', 'delta' => 'по реестру материалов', 'max' => 240],
+            ],
             'roze' => [
-                'smd'    => ['range' => '140 – 170', 'liq' => '94 °C', 'delta' => '+46...76 °C', 'max' => 170],
-                'pth'    => ['range' => '150 – 180', 'liq' => '94 °C', 'delta' => '+56...86 °C', 'max' => 180],
-                'copper' => ['range' => '160 – 190', 'liq' => '94 °C', 'delta' => '+66...96 °C', 'max' => 190],
+                'smd'    => ['range' => '120 – 140', 'liq' => '94–96 °C', 'delta' => 'по реестру материалов', 'max' => 140],
+                'pth'    => ['range' => '130 – 150', 'liq' => '94–96 °C', 'delta' => 'по реестру материалов', 'max' => 150],
+                'copper' => ['range' => '140 – 155', 'liq' => '94–96 °C', 'delta' => 'по реестру материалов', 'max' => 155],
+            ],
+            'vuda' => [
+                'smd'    => ['range' => '110 – 135', 'liq' => '68–72 °C', 'delta' => 'по реестру материалов', 'max' => 135],
+                'pth'    => ['range' => '120 – 145', 'liq' => '68–72 °C', 'delta' => 'по реестру материалов', 'max' => 145],
+                'copper' => ['range' => '130 – 155', 'liq' => '68–72 °C', 'delta' => 'по реестру материалов', 'max' => 155],
             ],
             'wood' => [
-                'smd'    => ['range' => '110 – 135', 'liq' => '72 °C', 'delta' => '+40...65 °C', 'max' => 135],
-                'pth'    => ['range' => '120 – 145', 'liq' => '72 °C', 'delta' => '+50...75 °C', 'max' => 145],
-                'copper' => ['range' => '130 – 155', 'liq' => '72 °C', 'delta' => '+60...85 °C', 'max' => 155],
+                'smd'    => ['range' => '110 – 135', 'liq' => '68–72 °C', 'delta' => 'по реестру материалов', 'max' => 135],
+                'pth'    => ['range' => '120 – 145', 'liq' => '68–72 °C', 'delta' => 'по реестру материалов', 'max' => 145],
+                'copper' => ['range' => '130 – 155', 'liq' => '68–72 °C', 'delta' => 'по реестру материалов', 'max' => 155],
             ],
         ];
 
@@ -492,12 +514,14 @@ if (!function_exists('tchp_get_express_workbench_matrix')) {
             }
             $t_min = $s['t_melt_min'] ?? 183;
             $t_max = $s['t_melt_max'] ?? 190;
+            $w_min = $s['t_work_min'] ?? ($t_max + 50);
+            $w_max = $s['t_work_max'] ?? ($t_max + 100);
             $liq_str = ($t_min === $t_max) ? "{$t_max} °C" : "{$t_min}–{$t_max} °C";
 
             $matrix[$id] = [
-                'smd'    => ['range' => ($t_max + 75) . ' – ' . ($t_max + 105), 'liq' => $liq_str, 'delta' => '+75...105 °C', 'max' => $t_max + 105],
-                'pth'    => ['range' => ($t_max + 95) . ' – ' . ($t_max + 130), 'liq' => $liq_str, 'delta' => '+95...130 °C', 'max' => $t_max + 130],
-                'copper' => ['range' => ($t_max + 115) . ' – ' . ($t_max + 150), 'liq' => $liq_str, 'delta' => '+115...150 °C', 'max' => $t_max + 150],
+                'smd'    => ['range' => "{$w_min} – " . min($w_max, $w_min + 35), 'liq' => $liq_str, 'delta' => 'по реестру материалов', 'max' => min($w_max, $w_min + 35)],
+                'pth'    => ['range' => ($w_min + 15) . " – {$w_max}", 'liq' => $liq_str, 'delta' => 'по реестру материалов', 'max' => $w_max],
+                'copper' => ['range' => ($w_min + 30) . " – " . ($w_max + 20), 'liq' => $liq_str, 'delta' => 'массивные полигоны', 'max' => $w_max + 20],
             ];
         }
 

@@ -28,9 +28,9 @@
         "t_liquidus": 190,
         "crystal_interval": 7,
         "is_eutectic": false,
-        "t_iron_min": 260,
-        "t_iron_max": 290,
-        "t_iron_heavy_polygon": 320
+        "t_iron_min": 240,
+        "t_iron_max": 320,
+        "t_iron_heavy_polygon": 340
       },
       "physical_properties": {
         "density_g_cm3": 8.5,
@@ -128,8 +128,8 @@
         "t_liquidus": 220,
         "crystal_interval": 3,
         "is_eutectic": false,
-        "t_iron_min": 300,
-        "t_iron_max": 335,
+        "t_iron_min": 260,
+        "t_iron_max": 340,
         "t_reflow_peak": 245
       },
       "physical_properties": {
@@ -161,8 +161,8 @@
         "t_liquidus": 138,
         "crystal_interval": 0,
         "is_eutectic": true,
-        "t_iron_min": 170,
-        "t_iron_max": 210,
+        "t_iron_min": 160,
+        "t_iron_max": 200,
         "t_reflow_peak": 165
       },
       "physical_properties": {
@@ -179,6 +179,63 @@
         "КАТЕГОРИЧЕСКИЙ ЗАПРЕТ: не смешивать со свинцовыми припоями! В присутствии даже 0.5% свинца образуется тройная фаза Sn-Pb-Bi с температурой плавления 96 °C, вызывающая разрушение шва при обычном нагреве процессора."
       ]
     },
+    "sac405": {
+      "id": "sac405",
+      "name": "SAC405",
+      "standard": "IPC J-STD-006C (Sn95.5Ag4.0Cu0.5)",
+      "type": "lead_free",
+      "composition": {
+        "sn_nominal": 95.5,
+        "ag_nominal": 4.0,
+        "cu_nominal": 0.5
+      },
+      "temperatures": {
+        "t_solidus": 217,
+        "t_liquidus": 220,
+        "crystal_interval": 3,
+        "is_eutectic": false,
+        "t_iron_min": 265,
+        "t_iron_max": 345
+      },
+      "physical_properties": {
+        "density_g_cm3": 7.44,
+        "tensile_strength_mpa": 48
+      },
+      "applications": [
+        "Бессвинцовая пайка ответственных узлов с улучшенным смачиванием"
+      ],
+      "warnings": [
+        "Повышенное содержание серебра (4%) улучшает растекаемость, но увеличивает стоимость припоя."
+      ]
+    },
+    "snbiago": {
+      "id": "snbiago",
+      "name": "Sn42Bi57.6Ag0.4",
+      "standard": "Chip Quik SMDLTLFP / TDS",
+      "type": "low_temp_lead_free",
+      "composition": {
+        "sn_nominal": 42.0,
+        "bi_nominal": 57.6,
+        "ag_nominal": 0.4
+      },
+      "temperatures": {
+        "t_solidus": 137,
+        "t_liquidus": 140,
+        "crystal_interval": 3,
+        "is_eutectic": false,
+        "t_iron_min": 165,
+        "t_iron_max": 205
+      },
+      "physical_properties": {
+        "density_g_cm3": 8.56
+      },
+      "applications": [
+        "Монтаж термочувствительных компонентов, LED-модулей, гибких шлейфов"
+      ],
+      "warnings": [
+        "Хрупкость снижена добавкой 0.4% серебра, но остается выше, чем у Sn-Pb и SAC сплавов."
+      ]
+    },
     "roze": {
       "id": "roze",
       "name": "Сплав Розе",
@@ -186,16 +243,16 @@
       "type": "demount_only",
       "composition": {
         "bi_nominal": 50.0,
-        "pb_nominal": 25.0,
-        "sn_nominal": 25.0
+        "pb_nominal": 32.0,
+        "sn_nominal": 18.0
       },
       "temperatures": {
         "t_solidus": 94,
-        "t_liquidus": 94,
-        "crystal_interval": 0,
-        "is_eutectic": true,
-        "t_iron_min": 150,
-        "t_iron_max": 200
+        "t_liquidus": 96,
+        "crystal_interval": 2,
+        "is_eutectic": false,
+        "t_iron_min": 120,
+        "t_iron_max": 150
       },
       "physical_properties": {
         "density_g_cm3": 9.72,

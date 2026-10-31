@@ -43,6 +43,8 @@ tchp-content-fixed/
 # SEO database temporary files and backups
 seo/data/_backup/
 seo/data/tmp/
+seo/data/suggestions_*.json
+articles/
 *.db-wal
 *.db-shm
 

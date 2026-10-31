@@ -112,7 +112,7 @@ class TestPackageContract(unittest.TestCase):
     def test_tools_not_defaulted(self):
         """Инструменты берутся только из текста."""
         catalog = {"Паяльная станция", "Паяльник", "Термофен", "Микроскоп",
-                   "Оловоотсос", "Оплётка", "Термопинцет"}
+                   "Оловоотсос", "Оплётка", "Термопинцет", "Пинцет"}
         for tid in (1, 3, 15, 16, 17, 52):
             res = self.pc.package_article(tid)
             contract = res.get("contract") or {}

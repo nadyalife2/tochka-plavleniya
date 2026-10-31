@@ -117,7 +117,7 @@ OXION_REF_NAMES = ("OXION_KEY_ACTIVE", "OXION_KEY_1", "OXION_KEY_2")
 
 REVIEW_SYSTEM_PROMPT = """Ты — рецензент (ОТК) проекта «Точка Плавления» о пайке.
 Проверь статью строго по редполитике:
-1. Answer First: суть в первых 30-50 словах, обращение на «Вы», без вымышленного опыта мастера.
+1. Answer First: суть в первых ≤40 словах, обращение на «Вы», без вымышленного опыта мастера.
 2. Факты и числа: каждая температура/режим/норма должна иметь обоснование; ищи подмены понятий (припой/флюс, уставка/температура шва, плавление/уставка).
 3. Структура: 4-8 H2, 1-2 сопоставительные таблицы, FAQ 4-6 пар в служебном блоке, источники 2-4.
 4. Объём: 5 500-7 000 знаков с пробелами.
@@ -227,9 +227,11 @@ def _env_value(name: str) -> str:
 def yandex_chat(system_prompt: str, user_prompt: str, max_tokens: int = 8000) -> tuple[str, str]:
     """Yandex AI Studio (OpenAI-compatible), модель YandexGPT."""
     key = _env_value("YANDEX_AI_API_KEY")
-    folder = _env_value("YANDEX_FOLDER_ID") or "b1gtjgvrfp1vcc24p18n"
+    folder = _env_value("YANDEX_FOLDER_ID")
     if not key:
         raise RuntimeError("Нет ключа YANDEX_AI_API_KEY в ~/.dsh/.env.")
+    if not folder:
+        raise RuntimeError("Нет переменной YANDEX_FOLDER_ID в ~/.dsh/.env.")
     model = f"gpt://{folder}/yandexgpt/latest"
     body = json.dumps({
         "model": model,
@@ -277,7 +279,7 @@ def _topic_title(topic_id) -> str:
 
 
 def _save_written_article(topic_id, text: str, author: str = "ai-writer") -> None:
-    """Сохраняет готовый текст в topics, пишет историю в topic_versions и сохраняет файл в «сами статьи/»."""
+    """Сохраняет готовый текст в topics, пишет историю в topic_versions и сохраняет файл в «articles/»."""
     chars = len(text.strip())
     slug = f"article-{topic_id}"
     now_str = datetime.now().isoformat(timespec="seconds")
@@ -304,7 +306,9 @@ def _save_written_article(topic_id, text: str, author: str = "ai-writer") -> Non
         )
         conn.commit()
     try:
-        (ROOT / "сами статьи" / f"{topic_id}-{slug}.md").write_text(text, encoding="utf-8")
+        art_dir = ROOT / "articles"
+        art_dir.mkdir(parents=True, exist_ok=True)
+        (art_dir / f"{topic_id}-{slug}.md").write_text(text, encoding="utf-8")
     except Exception:  # noqa: BLE001
         pass
 
@@ -566,8 +570,8 @@ def build_llms_txt(full: bool = False) -> str:
     """Генерирует манифест llms.txt по стандарту llmstxt.org для цитирования в LLM/AEO."""
     with get_connection() as conn:
         topics = conn.execute(
-            "SELECT id, title, slug, cluster, status, chars, content_markdown FROM topics "
-            "WHERE chars >= 500 OR status IN ('published', 'ready', 'written') "
+            "SELECT id, title, slug, cluster, status, chars, content_markdown, wp_url FROM topics "
+            "WHERE status = 'published' OR (wp_url IS NOT NULL AND trim(wp_url) != '') "
             "ORDER BY id ASC"
         ).fetchall()
         competitors = conn.execute("SELECT domain, type FROM competitors").fetchall()
@@ -960,6 +964,22 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:120]}"}, 500)
             return
 
+        if path == "/api/semantics/google":
+            # Автономный сбор подсказок Google Suggest и интентов AEO
+            qs = parse_qs(url.query)
+            query = (qs.get("q") or qs.get("seed") or [""])[0].strip()
+            if not query:
+                self.send_json({"status": "error", "message": "Параметр 'q' (seed query) обязателен"}, 400)
+                return
+            try:
+                import google_semantics
+                cluster = google_semantics.collect_aeo_cluster(query)
+                google_semantics.save_to_sqlite(ROOT / "seo" / "data" / "seo.db", cluster)
+                self.send_json({"status": "ok", "data": cluster})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": f"{type(ex).__name__}: {str(ex)[:150]}"}, 500)
+            return
+
         if path == "/api/keyword/trend":
             # История измерений по конкретной фразе (что менялось и когда)
             phrase = (parse_qs(url.query).get("phrase") or [""])[0].strip()
@@ -1059,17 +1079,40 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json(dict(row))
             return
 
-        # Статика: index.html
+        # Статика дашборда: index.html, dashboard.css, dashboard.js и сопутствующие файлы
+        static_file = None
         if path in ("/", "/index.html"):
-            index_path = DASHBOARD_DIR / "index.html"
-            if index_path.exists():
-                content = index_path.read_bytes()
-                self.send_response(200)
-                self.send_header("Content-Type", "text/html; charset=utf-8")
-                self.send_header("Content-Length", str(len(content)))
-                self.end_headers()
-                self.wfile.write(content)
-                return
+            static_file = DASHBOARD_DIR / "index.html"
+        elif path.startswith("/"):
+            try:
+                candidate = (DASHBOARD_DIR / path.lstrip("/")).resolve()
+                if candidate.is_file() and str(candidate).startswith(str(DASHBOARD_DIR.resolve())):
+                    static_file = candidate
+            except Exception:
+                static_file = None
+
+        if static_file and static_file.exists():
+            content = static_file.read_bytes()
+            suffix = static_file.suffix.lower()
+            mime_map = {
+                ".html": "text/html; charset=utf-8",
+                ".css": "text/css; charset=utf-8",
+                ".js": "application/javascript; charset=utf-8",
+                ".json": "application/json; charset=utf-8",
+                ".png": "image/png",
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".svg": "image/svg+xml",
+                ".ico": "image/x-icon",
+            }
+            ctype = mime_map.get(suffix, "application/octet-stream")
+            self.send_response(200)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(content)))
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(content)
+            return
 
         self.send_error(404, "File Not Found")
 
@@ -1413,8 +1456,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     """, (new_text, chars, now_str, tid))
                 conn.commit()
 
-            # Синхронизируем файл на диске в `сами статьи/`
-            art_file = ROOT / "сами статьи" / f"{tid}-{slug}.md"
+            # Синхронизируем файл на диске в `articles/`
+            art_dir = ROOT / "articles"
+            art_dir.mkdir(parents=True, exist_ok=True)
+            art_file = art_dir / f"{tid}-{slug}.md"
             try:
                 art_file.write_text(new_text, encoding="utf-8")
             except Exception:
@@ -1694,7 +1739,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                     )
                                     conn.commit()
                                 try:
-                                    (ROOT / "сами статьи" / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
+                                    art_dir = ROOT / "articles"
+                                    art_dir.mkdir(parents=True, exist_ok=True)
+                                    (art_dir / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
                                 except Exception:  # noqa: BLE001
                                     pass
                                 log_output = f"✅ Готовый текст адаптирован и сохранён: {voice_name} · {used} ({chars} зн.)\n\n{answer[:1500]}"

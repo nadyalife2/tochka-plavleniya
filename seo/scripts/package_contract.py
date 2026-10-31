@@ -120,20 +120,40 @@ def parse_sources_from_text(text: str) -> list[dict]:
 
 def parse_tools_from_text(text: str) -> list[dict]:
     """Извлекает упомянутые инструменты и приводит названия к каноническим."""
-    # каноническое имя -> шаблон упоминания
     CATALOG = [
-        ("Паяльная станция", r"паяльн\w*\s+станци"),
+        ("Паяльная станция", r"\bпаяльн\w*\s+станци\w*"),
         ("Паяльник", r"\bпаяльник\w*"),
-        ("Термофен", r"термофен\w*|\bфен\w*"),
-        ("Микроскоп", r"микроскоп\w*|\bлупа\b"),
-        ("Оловоотсос", r"оловоотсос\w*|помп\w*"),
-        ("Оплётка", r"оплётк\w*|оплетк\w*"),
-        ("Термопинцет", r"термопинцет\w*|пинцет\w*"),
+        ("Термофен", r"\bтермофен\w*|\bпаяльн\w*\s+фен\w*"),
+        ("Микроскоп", r"\bмикроскоп\w*"),
+        ("Оловоотсос", r"\bоловоотсос\w*|\bвакуумн\w*\s+отсос\w*"),
+        ("Оплётка", r"\bоплётк\w*|\bоплетк\w*"),
+        ("Термопинцет", r"\bтермопинцет\w*"),
+        ("Пинцет", r"\bпинцет\w*"),
     ]
     tools: list[dict] = []
+    seen = set()
     for name, pattern in CATALOG:
-        if re.search(pattern, text, re.I):
-            tools.append({"name": name, "model": "", "purpose": "Пайка и демонтаж"})
+        # Проверяем каждое совпадение: не стоит ли оно в контексте отрицания
+        has_positive_match = False
+        for m in re.finditer(pattern, text, re.I):
+            start = m.start()
+            end = m.end()
+            prefix = text[max(0, start - 35):start].lower()
+            suffix = text[end:min(len(text), end + 30)].lower()
+            # Проверка отрицаний ("без паяльника", "не нужен", "не требуется")
+            if any(neg in prefix for neg in ("без ", "не нуж", "не требу", "не применя", "запрещ", "отказ")):
+                continue
+            if any(neg in suffix for neg in ("не нуж", "не требу", "не обязатель")):
+                continue
+            has_positive_match = True
+            break
+
+        if has_positive_match:
+            # Если уже есть Термопинцет, обычный Пинцет дублировать не нужно
+            if name == "Пинцет" and "Термопинцет" in seen:
+                continue
+            seen.add(name)
+            tools.append({"name": name, "model": "", "purpose": "Пайка и монтаж"})
     return tools
 
 
@@ -144,11 +164,11 @@ def detect_alloy(text: str, title: str = "") -> str:
 
 
 def detect_temp_data(text: str, alloy: str) -> dict | None:
-    """Извлекает типизированные температурные данные из текста или канонического реестра.
+    """Извлекает типизированные температурные данные исключительно из текста статьи.
 
     Строго разделяет:
-      - температуру плавления (солидус/ликвидус) -> joint_temperature / melting
       - уставку жала паяльника / станции -> station_setpoint
+    Выдумывание отсутствующих в тексте температур или подмена плавления на температуру шва запрещены!
     """
     # 1. Поиск явной уставки станции/паяльника по контекстным маркерам
     setpoint_matches = []
@@ -178,16 +198,49 @@ def detect_temp_data(text: str, alloy: str) -> dict | None:
         if 240 <= lo and hi <= 380:
             return {"kind": "station_setpoint", "range": f"{lo} – {hi} °C"}
 
-    # 3. Если уставка не названа явно в тексте, берём канонический рабочий коридор из реестра
-    work_r = canonical.work_range(alloy)
-    if work_r:
-        return {"kind": "station_setpoint", "range": f"{work_r[0]} – {work_r[1]} °C"}
-
-    # 4. В крайнем случае — температура плавления как joint_temperature
-    if melt_r:
-        return {"kind": "joint_temperature", "range": f"{melt_r[0]} – {melt_r[1]} °C"}
-
+    # Если уставка не названа явно в тексте — возвращаем None (выдумывать запрещено!)
     return None
+
+
+def check_temperature_proximity_inversions(text: str, alloy: str) -> list[str]:
+    """Проверяет локальный контекст температур на предмет физической инверсии (Windowed Proximity).
+
+    Ловит грубые галлюцинации LLM, когда температура жала путается с точкой плавления:
+      - «плавится при 280 °C» для ПОС-61 (инверсия: ликвидус 190 °C);
+      - «уставка жала 180 °C» для ПОС-61 (инверсия: замерзание шва).
+    """
+    if alloy == canonical.UNIVERSAL:
+        return []
+    melt_r = canonical.melt_range(alloy)
+    work_r = canonical.work_range(alloy)
+    if not melt_r or not work_r:
+        return []
+
+    inversions = []
+    for m in re.finditer(r"(\d{2,3})\s*°\s*[CС]", text):
+        val = int(m.group(1))
+        pos = m.start()
+        prefix = text[max(0, pos - 45):pos].lower()
+        suffix = text[m.end():min(len(text), m.end() + 45)].lower()
+        window = prefix + " " + suffix
+
+        # 1. Инверсия плавления: число рабочей уставки названо температурой плавления
+        if re.search(r"\b(?:плавит\w*|ликвидус\w*|солидус\w*)\b", prefix):
+            if not re.search(r"\b(?:уставк|жал|паяльник|разниц|выше|дельт)\b", window):
+                if val >= work_r[0] and val > (melt_r[1] + 30):
+                    inversions.append(
+                        f"Физическая инверсия: число {val} °C (уровень уставки жала) названо температурой плавления для {canonical.alloy_label(alloy)}."
+                    )
+
+        # 2. Инверсия уставки: число плавления названо уставкой жала
+        if re.search(r"\b(?:уставк\w*|на жал\w*|режим\s+пайк\w*)\b", prefix):
+            if not re.search(r"\b(?:подогрев|стол|предпрогрев|разниц|выше|плавлен|ликвидус|солидус)\b", window):
+                if val <= (melt_r[0] - 10) and val >= 90:
+                    inversions.append(
+                        f"Физическая инверсия: уставка жала указана как {val} °C (ниже солидуса {melt_r[0]} °C) для {canonical.alloy_label(alloy)}."
+                    )
+
+    return inversions
 
 
 def markdown_to_html(md: str) -> str:
@@ -313,9 +366,12 @@ def package_article(topic_id: int | str, passport_override: dict | None = None) 
             ],
         }
 
-    # 1. Извлекаем реальные элементы из текста
-    first_para = re.split(r"\n\s*\n", md_text.strip())[0] if md_text else ""
-    first_para_clean = re.sub(r"^#+.*?\n", "", first_para).strip()
+    # 1. Извлекаем реальные элементы из текста (с предварительной очисткой frontmatter)
+    clean_body = re.sub(r"^---\s*\n[\s\S]+?\n---\s*\n*", "", md_text.strip())
+    clean_body = re.sub(r"^#\s+[^\n]+\n*", "", clean_body).strip()
+    paras = [p.strip() for p in re.split(r"\n\s*\n", clean_body) if p.strip() and not p.strip().startswith("#")]
+    first_para = paras[0] if paras else ""
+    first_para_clean = re.sub(r"[*_`]", "", first_para).strip()
     excerpt = first_para_clean[:280] if len(first_para_clean) >= 20 else (topic["title"] + ": техническое руководство.")
 
     alloy = detect_alloy(md_text, topic["title"])
@@ -414,6 +470,28 @@ def package_article(topic_id: int | str, passport_override: dict | None = None) 
         )
     if not temp_data:
         missing_data_warnings.append("В тексте не указаны температурные режимы (напр. '280 – 320 °C').")
+    elif alloy != canonical.UNIVERSAL:
+        rng = temp_data.get("range", "")
+        m_rng = re.search(r"(\d+)\s*[–—\-]\s*(\d+)", rng)
+        if m_rng:
+            lo, hi = int(m_rng.group(1)), int(m_rng.group(2))
+            melt_r = canonical.melt_range(alloy)
+            work_r = canonical.work_range(alloy)
+            if melt_r and hi < melt_r[0]:
+                missing_data_warnings.append(
+                    f"Физическая аномалия: верхняя температура {hi} °C ниже температуры солидуса ({melt_r[0]} °C) для {canonical.alloy_label(alloy)}."
+                )
+            elif work_r and temp_data.get("kind") == "station_setpoint":
+                if lo < (work_r[0] - 30) or hi > (work_r[1] + 45):
+                    missing_data_warnings.append(
+                        f"Уставка жала ({lo}–{hi} °C) выходит за технологический коридор для {canonical.alloy_label(alloy)} ({work_r[0]}–{work_r[1]} °C по реестру)."
+                    )
+
+    # Проверка физической инверсии температур по локальному контексту (Windowed Proximity)
+    inversion_warnings = check_temperature_proximity_inversions(md_text, alloy)
+    for inv in inversion_warnings:
+        missing_data_warnings.append(inv)
+
     if not tools:
         missing_data_warnings.append(
             "В тексте не найдено ни одного инструмента (паяльник, фен, станция, микроскоп). "
