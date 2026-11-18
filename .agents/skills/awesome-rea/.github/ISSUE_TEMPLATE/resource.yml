@@ -1,0 +1,101 @@
+name: Suggest a resource
+description: Suggest a tool, project, reconstruction case, integration, or collection.
+title: "Resource: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Issues are public. Remove tokens, cookies, account identifiers, local filesystem paths and private captures from anything you paste, including logs and screenshots. See the [contribution guide](https://github.com/reacher-z/Awesome-REA/blob/main/CONTRIBUTING.md#review-and-publication), and report security problems privately under the [security policy](https://github.com/reacher-z/Awesome-REA/security/policy).
+  - type: input
+    id: url
+    attributes:
+      label: Canonical URL
+      description: Link to the original maintainer's repository or documentation.
+    validations:
+      required: true
+  - type: checkboxes
+    id: duplicate_check
+    attributes:
+      label: Duplicate check
+      description: Search the [website](https://awesomerea.org/) or README, and open issues and pull requests, for the resource's name and URL.
+      options:
+        - label: I searched the catalog and open issues and pull requests for this resource.
+          required: true
+  - type: input
+    id: existing_id
+    attributes:
+      label: Existing catalog ID (optional)
+      description: If the resource is already listed, give the ID from its entry page address (/resources/<id>/) and describe the update below instead of requesting a second entry.
+      placeholder: e.g. r2frida
+    validations:
+      required: false
+  - type: textarea
+    id: use
+    attributes:
+      label: What task does it help with?
+      description: Explain what a reader can do, and what makes it worth including.
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Resource type
+      options:
+        - Tool
+        - Project
+        - Case study
+        - Integration
+        - Collection
+        - Documentation
+        - Learning resource
+        - Research
+    validations:
+      required: true
+  - type: dropdown
+    id: targets
+    attributes:
+      label: Target areas
+      multiple: true
+      options:
+        - Website
+        - Game
+        - App
+        - Binary
+        - Firmware
+        - Protocol
+    validations:
+      required: true
+  - type: dropdown
+    id: relation
+    attributes:
+      label: Relationship to REA
+      description: How the resource itself relates to REA, as its own documentation establishes. Your personal connection is asked separately below.
+      options:
+        - Official REA resource
+        - Community REA resource
+        - Independent agent integration
+        - Independent reconstruction or case study
+        - Foundation tool
+        - Learning resource
+    validations:
+      required: true
+  - type: dropdown
+    id: affiliation
+    attributes:
+      label: Your connection to the resource
+      description: This is about you, not the resource. Disclosure helps reviewers and does not imply endorsement, official REA status or runtime verification. No real name, employer or account details are needed.
+      options:
+        - None
+        - I maintain or co-maintain it
+        - I have contributed to it
+        - Other connection, described in the evidence field
+        - Prefer not to say
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence and requirements
+      description: Include upstream evidence, version or platform requirements, license, and what you personally tested.
+    validations:
+      required: true
