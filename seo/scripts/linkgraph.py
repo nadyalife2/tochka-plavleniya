@@ -1,7 +1,19 @@
 """Рекомендации по перелинковке на основе плана и карты связей."""
 from __future__ import annotations
 
-from excel_io import STATUSES
+STATUSES = {
+    "backlog": "Не начато",
+    "brief": "ТЗ готовится",
+    "brief_ready": "ТЗ готово",
+    "writing": "Пишется",
+    "written": "Написано",
+    "review": "На ревью",
+    "scored": "Оценено",
+    "ready": "Готово к публикации",
+    "delivered": "В WordPress",
+    "published": "Опубликовано",
+    "blocked": "Блокер",
+}
 
 
 def _topic(plan: dict, article_id: str) -> dict | None:

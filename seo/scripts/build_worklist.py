@@ -13,7 +13,8 @@ import csv
 import json
 import sys
 
-from excel_io import DATA, OUT, STATUSES, build_plan
+from db import build_db_plan as build_plan
+from excel_io import DATA, OUT, STATUSES
 from linkgraph import hubs, inbound_candidates, outbound_candidates
 
 try:

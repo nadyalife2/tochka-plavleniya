@@ -14,6 +14,7 @@ import argparse
 import json
 import mimetypes
 import os
+import re
 import subprocess
 import sys
 import threading
@@ -30,11 +31,32 @@ except Exception:
 
 ROOT = Path(__file__).resolve().parents[2]
 SEO = ROOT / "seo"
+DATA = SEO / "data"
 SCRIPTS = SEO / "scripts"
 DASHBOARD_DIR = SEO / "dashboard"
 sys.path.insert(0, str(SCRIPTS))
 
 from db import DB_PATH, backup_database, get_connection, init_db, list_backups
+
+
+def slugify(title: str) -> str:
+    table = {
+        "а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "е": "e", "ё": "e",
+        "ж": "zh", "з": "z", "и": "i", "й": "y", "к": "k", "л": "l", "м": "m",
+        "н": "n", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t", "у": "u",
+        "ф": "f", "х": "h", "ц": "c", "ч": "ch", "ш": "sh", "щ": "sch", "ъ": "",
+        "ы": "y", "ь": "", "э": "e", "ю": "yu", "я": "ya",
+    }
+    out = []
+    for char in (title or "").lower():
+        if char in table:
+            out.append(table[char])
+        elif char.isalnum():
+            out.append(char)
+        else:
+            out.append("-")
+    slug = re.sub(r"-{2,}", "-", "".join(out)).strip("-")
+    return slug[:70] or "article"
 
 
 def fetch_all_data() -> dict:
@@ -115,6 +137,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         url = urlparse(self.path)
         path = url.path
+        qs = parse_qs(url.query)
 
         if path == "/api/data":
             self.send_json(fetch_all_data())
@@ -122,6 +145,39 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         if path == "/api/status":
             self.send_json({"status": "running", "time": datetime.now().isoformat()})
+            return
+
+        if path == "/api/standards":
+            std_file = SEO / "reference" / "standards_matrix.json"
+            if std_file.exists():
+                try:
+                    data = json.loads(std_file.read_text(encoding="utf-8"))
+                    self.send_json(data)
+                    return
+                except Exception as e:
+                    self.send_json({"error": str(e)}, 500)
+                    return
+            self.send_json({"error": "standards_matrix.json not found"}, 404)
+            return
+
+        if path == "/api/topics/links":
+            tid = qs.get("id", [""])[0]
+            if not tid:
+                self.send_json({"error": "missing id"}, 400)
+                return
+            try:
+                from db import build_db_plan
+                import linkgraph
+                plan = build_db_plan()
+                out_links = linkgraph.outbound_candidates(plan, str(tid))
+                in_links = linkgraph.inbound_candidates(plan, str(tid))
+                self.send_json({
+                    "id": tid,
+                    "outbound": out_links,
+                    "inbound": in_links
+                })
+            except Exception as e:
+                self.send_json({"error": str(e)}, 500)
             return
 
         # Статика: index.html
@@ -155,6 +211,43 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "ok", "backup": res})
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        # 1.5. Создание темы вручную (из головы)
+        if path == "/api/topics/create":
+            title = payload.get("title", "").strip()
+            cluster = payload.get("cluster", "").strip() or "Материалы / Припои"
+            ctype = payload.get("type", "гайд").strip()
+            priority = payload.get("priority", "средний").strip()
+            notes = payload.get("notes", "").strip()
+
+            if not title:
+                self.send_json({"status": "error", "message": "Введите название темы"}, 400)
+                return
+
+            with get_connection() as conn:
+                cur = conn.cursor()
+                max_id = cur.execute("SELECT MAX(id) FROM topics").fetchone()[0] or 0
+                next_id = max_id + 1
+                slug = slugify(title) + f"-{next_id}"
+                priority_score = 85 if priority.lower() in ("высокий", "hot") else 60
+                now_str = datetime.now().isoformat(timespec="seconds")
+
+                cur.execute("""
+                    INSERT INTO topics
+                    (id, title, slug, cluster, type, priority, priority_score, status, next_action, created_at, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'backlog', ?, ?, ?)
+                """, (next_id, title, slug, cluster, ctype, priority, priority_score, f"добавлено вручную: {notes}" if notes else "добавлено вручную", now_str, now_str))
+                conn.commit()
+
+            self.send_json({
+                "status": "ok",
+                "id": next_id,
+                "title": title,
+                "slug": slug,
+                "cluster": cluster,
+                "priority_score": priority_score,
+            })
             return
 
         # 2. Одобрить предложенную тему -> в topics
@@ -226,6 +319,35 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "id": tid})
             return
 
+        # 6.5. Сохранить отредактированный текст статьи
+        if path == "/api/topics/update-text":
+            tid = payload.get("id")
+            new_text = payload.get("content_markdown", "")
+            now_str = datetime.now().isoformat(timespec="seconds")
+            chars = len(new_text.strip())
+
+            with get_connection() as conn:
+                row = conn.execute("SELECT slug, status FROM topics WHERE id = ?", (tid,)).fetchone()
+                slug = row["slug"] if row else f"article-{tid}"
+                curr_status = row["status"] if row else "writing"
+                new_status = "writing" if curr_status in ("ready", "scored") else curr_status
+                conn.execute("""
+                    UPDATE topics
+                    SET content_markdown = ?, chars = ?, status = ?, score_total = NULL, score_json = NULL, updated_at = ?
+                    WHERE id = ?
+                """, (new_text, chars, new_status, now_str, tid))
+                conn.commit()
+
+            # Синхронизируем файл на диске в `сами статьи/`
+            art_file = ROOT / "сами статьи" / f"{tid}-{slug}.md"
+            try:
+                art_file.write_text(new_text, encoding="utf-8")
+            except Exception:
+                pass
+
+            self.send_json({"status": "ok", "id": tid, "chars": chars, "status_code": new_status})
+            return
+
         # 7. Запуск субагента
         if path == "/api/agent/run":
             agent = payload.get("agent")
@@ -239,6 +361,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"), "--limit", "20"]
                     p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
                     log_output = p.stdout + "\n" + p.stderr
+                    status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent == "bot-analyzer":
                     domain = payload.get("domain", "")
                     cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
@@ -248,14 +371,30 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         cmd.append("--all")
                     p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
                     log_output = p.stdout + "\n" + p.stderr
+                    status = "succeeded" if p.returncode == 0 else "failed"
                 elif agent == "delivery" and target_id:
-                    delivery_tool = ROOT / "tools" / "delivery_cli.py"
-                    if delivery_tool.exists():
-                        cmd = [sys.executable, str(delivery_tool), "--article-id", str(target_id)]
-                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=60)
-                        log_output = p.stdout + "\n" + p.stderr
+                    dry_run = payload.get("dry_run", True)
+                    from package_contract import package_article
+                    res = package_article(target_id)
+                    if not res["valid"]:
+                        errors_str = "\n".join([f"  • {e}" for e in (res.get("missing_warnings", []) + res.get("errors", []))])
+                        log_output = f"❌ Статья #{target_id} не готова к доставке в WordPress (нарушение схемы v1.1):\n{errors_str}\n\nУстраните замечания перед отправкой черновика."
+                        status = "failed"
                     else:
-                        log_output = f"Черновик статьи #{target_id} упакован по схеме v1.1. Готов к отправке в WordPress."
+                        contract_path = DATA / f"contract_{target_id}.json"
+                        contract_path.write_text(json.dumps(res["contract"], ensure_ascii=False, indent=2), encoding="utf-8")
+                        delivery_tool = ROOT / "tools" / "delivery_cli.py"
+                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path)]
+                        if dry_run:
+                            cmd.append("--dry-run")
+                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
+                        mode_str = " (DRY-RUN / имитация)" if dry_run else " (БОЕВОЙ РЕЖИМ)"
+                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!{mode_str}\n" + p.stdout + "\n" + p.stderr
+                        status = "succeeded" if p.returncode == 0 else "failed"
+                        if status == "succeeded" and not dry_run:
+                            with get_connection() as conn:
+                                conn.execute("UPDATE topics SET status = 'delivered', next_action = 'опубликовано в WP' WHERE id = ?", (target_id,))
+                                conn.commit()
                 elif agent == "04-scorer" and target_id:
                     with get_connection() as conn:
                         row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (target_id,)).fetchone()
@@ -265,7 +404,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         tmp_file.write_text(content, encoding="utf-8")
                         cmd = [sys.executable, str(SCRIPTS / "score_article.py"), "--file", str(tmp_file), "--id", str(target_id)]
                         p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
-                        log_output = p.stdout + "\n" + p.stderr
+                        log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
+                        # Коды скорера: 0 (passed >=80), 2 (needs_revision 60-79), 3 (low <60), 4 (blocker).
+                        # Все они являются успешным завершением аналитической проверки, а не падением сервера!
+                        status = "succeeded" if p.returncode in (0, 2, 3, 4) else "failed"
+                        if tmp_file.exists():
+                            try:
+                                tmp_file.unlink()
+                            except Exception:
+                                pass
                         # Обновляем скор в БД
                         score_json_file = SEO / "out" / "scores" / f"{target_id}.json"
                         if score_json_file.exists():
@@ -275,12 +422,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                              (s_data.get("total"), json.dumps(s_data, ensure_ascii=False), target_id))
                                 conn.commit()
                     else:
-                        log_output = f"У темы #{target_id} нет текста для оценки."
-                        status = "error"
+                        log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
+                        status = "failed"
+                elif agent == "02-writer" and target_id:
+                    cmd = [sys.executable, str(SCRIPTS / "writer_practico.py"), "--id", str(target_id)]
+                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=180)
+                    log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
+                    status = "succeeded" if p.returncode == 0 else "failed"
                 else:
-                    log_output = f"Агент {agent} инициирован. Задача передана в очередь."
+                    log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."
+                    status = "not_implemented"
             except Exception as ex:
-                status = "error"
+                status = "failed"
                 log_output = str(ex)
 
             # Сохраняем запуск в agent_runs
@@ -292,6 +445,113 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 conn.commit()
 
             self.send_json({"status": status, "agent": agent, "log": log_output})
+            return
+
+        # 8. Импорт выгрузки Firecrawl (Markdown / JSON)
+        if path == "/api/import/firecrawl":
+            raw_text = payload.get("content", "").strip()
+            source_domain = payload.get("domain", "").strip().lower()
+            default_cluster = payload.get("cluster", "").strip() or "Материалы / Припои"
+
+            if not raw_text:
+                self.send_json({"status": "error", "message": "Вставьте текст выгрузки Firecrawl"}, 400)
+                return
+
+            articles_to_save = []
+            parsed_json = None
+            try:
+                parsed_json = json.loads(raw_text)
+            except Exception:
+                pass
+
+            if isinstance(parsed_json, dict):
+                data_obj = parsed_json.get("data", parsed_json)
+                items = data_obj if isinstance(data_obj, list) else [data_obj]
+                for item in items:
+                    meta = item.get("metadata", {})
+                    url = meta.get("sourceURL") or meta.get("url") or item.get("url") or ""
+                    title = meta.get("title") or item.get("title") or ""
+                    md = item.get("markdown") or item.get("content") or ""
+                    if not title and md:
+                        m_h1 = re.search(r"^#\s+(.+)$", md, re.M)
+                        title = m_h1.group(1).strip() if m_h1 else "Статья Firecrawl"
+                    d = source_domain or (urlparse(url).netloc.replace("www.", "") if url else "firecrawl-import")
+                    articles_to_save.append({
+                        "url": url or f"https://{d}/{slugify(title)}",
+                        "domain": d,
+                        "title": title,
+                        "content": md,
+                    })
+            else:
+                m_h1 = re.search(r"^#\s+(.+)$", raw_text, re.M)
+                title = m_h1.group(1).strip() if m_h1 else "Импортированная статья Firecrawl"
+                d = source_domain or "firecrawl-import"
+                articles_to_save.append({
+                    "url": f"https://{d}/{slugify(title)}",
+                    "domain": d,
+                    "title": title,
+                    "content": raw_text,
+                })
+
+            from bot_competitor_analyzer import FEATURE_PATTERNS, SOLDERING_KEYWORDS
+
+            features_found = []
+            keywords_found = []
+            saved_count = 0
+
+            with get_connection() as conn:
+                for art in articles_to_save:
+                    text_blob = f"{art['title']} {art['content']}".lower()
+
+                    for kw in SOLDERING_KEYWORDS:
+                        if re.search(rf"\b{re.escape(kw)}", text_blob) and kw not in keywords_found:
+                            keywords_found.append(kw)
+
+                    for f_name, pattern, desc in FEATURE_PATTERNS:
+                        if re.search(pattern, art["content"], flags=re.I) and f_name not in features_found:
+                            features_found.append(f_name)
+                            conn.execute("""
+                                INSERT INTO competitor_features
+                                (domain, feature_type, title, description, example_url, seo_value, found_at)
+                                VALUES (?, ?, ?, ?, ?, ?, ?)
+                            """, (art["domain"], f_name, f_name.capitalize(), desc, art["url"], "Из выгрузки Firecrawl", datetime.now().strftime("%Y-%m-%d %H:%M")))
+
+                    conn.execute("""
+                        INSERT OR REPLACE INTO raw_articles
+                        (url, domain, title, h1, date, content_type, cluster, status, crawled_at)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, 'импортировано из Firecrawl', ?)
+                    """, (
+                        art["url"], art["domain"], art["title"], art["title"],
+                        datetime.now().strftime("%Y-%m-%d"),
+                        "импорт / гайд", default_cluster, datetime.now().strftime("%Y-%m-%d %H:%M"),
+                    ))
+
+                    if art["domain"] and art["domain"] != "firecrawl-import":
+                        conn.execute("""
+                            INSERT INTO competitors (domain, niche, type, blog_url, articles_count, features, seo_keywords, score, notes, updated_at)
+                            VALUES (?, 'электроника и пайка', 'Конкурент (Firecrawl)', ?, 1, ?, ?, 70, 'Импортировано из выгрузки Firecrawl', ?)
+                            ON CONFLICT(domain) DO UPDATE SET
+                                articles_count = articles_count + 1,
+                                features = CASE WHEN length(features) > 0 THEN features || ', ' || ? ELSE ? END,
+                                seo_keywords = CASE WHEN length(seo_keywords) > 0 THEN seo_keywords || ', ' || ? ELSE ? END,
+                                updated_at = ?
+                        """, (
+                            art["domain"], art["url"],
+                            ", ".join(features_found), ", ".join(keywords_found[:8]), datetime.now().strftime("%Y-%m-%d %H:%M"),
+                            ", ".join(features_found), ", ".join(features_found),
+                            ", ".join(keywords_found[:6]), ", ".join(keywords_found[:6]),
+                            datetime.now().strftime("%Y-%m-%d %H:%M"),
+                        ))
+                    saved_count += 1
+                conn.commit()
+
+            self.send_json({
+                "status": "ok",
+                "saved_articles": saved_count,
+                "domain": source_domain or "разные",
+                "features": features_found,
+                "keywords": keywords_found[:12],
+            })
             return
 
         self.send_error(404, "Unknown API route")

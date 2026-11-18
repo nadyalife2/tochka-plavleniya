@@ -17,7 +17,9 @@ try:
 except Exception:
     pass
 
-from excel_io import STATUSES, build_plan, save_article
+from datetime import datetime
+from db import get_connection, backup_database
+from excel_io import STATUSES
 
 try:
     from score_article import blocks as score_blocks
@@ -27,9 +29,9 @@ except Exception:  # pragma: no cover
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Добавить статью в мастер-таблицу")
+    parser = argparse.ArgumentParser(description="Добавить готовую статью в базу SQLite")
     parser.add_argument("--file", required=True, help="путь к Markdown-файлу статьи")
-    parser.add_argument("--id", required=True, help="ID темы (content_plan)")
+    parser.add_argument("--id", required=True, help="ID темы")
     parser.add_argument("--status", default="written", choices=list(STATUSES))
     parser.add_argument("--title", default="")
     parser.add_argument("--slug", default="")
@@ -44,27 +46,52 @@ def main() -> int:
     if len(text) < 1000:
         print(f"ВНИМАНИЕ: текст короче 1000 знаков ({len(text)}), проверьте файл")
 
-    plan = build_plan()
-    topic = plan["topics"].get(str(args.id))
-    title = args.title or (topic["title"] if topic else "")
-    slug = args.slug or (topic["slug"] if topic else "")
-    cluster = args.cluster or (topic["cluster"] if topic else "")
+    tid = int(args.id) if str(args.id).isdigit() else args.id
+    now_str = datetime.now().isoformat(timespec="seconds")
 
-    try:
-        result = save_article(args.id, text, title, slug, cluster, args.status)
-    except PermissionError:
-        raise SystemExit("Excel открыт — закройте semantic_core_FULL_v11.xlsx и повторите.")
+    # 1. Авто-бэкап базы данных ДО изменений (точка восстановления)
+    bk = backup_database()
+    print(f"✓ Точка восстановления БД создана: {bk['filename']}")
 
-    print(f"Записано: ID {result['article_id']}, статус «{STATUSES.get(result['status'])}», "
-          f"{result['chars']} знаков, строка {result['row']}")
-    print(f"Бэкап: {result['backup']}")
+    # 2. Сохраняем в SQLite БД (Единый первоисточник)
+    with get_connection() as conn:
+        row = conn.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
+        if not row:
+            # Если темы ещё нет, создаём её
+            title = args.title or f"Статья #{tid}"
+            slug = args.slug or f"article-{tid}"
+            cluster = args.cluster or "Материалы"
+            conn.execute("""
+                INSERT INTO topics
+                (id, title, slug, cluster, status, content_markdown, chars, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (tid, title, slug, cluster, args.status, text, len(text), now_str, now_str))
+        else:
+            title = args.title or row["title"]
+            slug = args.slug or row["slug"]
+            cluster = args.cluster or row["cluster"]
+            conn.execute("""
+                UPDATE topics
+                SET content_markdown = ?, chars = ?, status = ?,
+                    title = ?, slug = ?, cluster = ?, updated_at = ?
+                WHERE id = ?
+            """, (text, len(text), args.status, title, slug, cluster, now_str, tid))
+        conn.commit()
+
+    print(f"✓ Записано в SQLite (seo.db): ID #{tid}, статус «{STATUSES.get(args.status, args.status)}», {len(text)} знаков.")
 
     if not args.no_score and score_blocks:
-        report = score_blocks(text, plan, args.id)
+        report = score_blocks(text, None, str(args.id))
         out = Path(__file__).resolve().parents[1] / "out" / "scores"
         out.mkdir(parents=True, exist_ok=True)
         (out / f"{args.id}.md").write_text(to_markdown(report), encoding="utf-8")
-        print(f"Оценка: {report['total']}/100 — {report['verdict']} (см. seo/out/scores/{args.id}.md)")
+        # Сохраняем балл в БД
+        with get_connection() as conn:
+            import json
+            conn.execute("UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
+                         (report["total"], json.dumps(report, ensure_ascii=False), tid))
+            conn.commit()
+        print(f"✓ Оценка: {report['total']}/100 — {report['verdict']} (сохранено в seo/out/scores/{args.id}.md и seo.db)")
     return 0
 
 

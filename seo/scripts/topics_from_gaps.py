@@ -39,14 +39,8 @@ try:
 except Exception:
     pass
 
-from excel_io import (
-    DATA,
-    MASTER,
-    approved_proposals,
-    build_plan,
-    clean,
-    save_topic_proposals,
-)
+from db import build_db_plan as build_plan, get_connection
+from excel_io import DATA, clean, save_topic_proposals
 
 # Минимум статей конкурентов в кластере, чтобы считать его пробелом
 MIN_COMPETITOR_ARTICLES = 1
@@ -307,80 +301,59 @@ def main() -> int:
         print("\nПробелов не найдено: план уже покрывает то, что есть у конкурентов.")
         return 0
 
-    res = save_topic_proposals(proposals)
-    print(f"\nExcel `topics_proposed`: создано {res['created']}, обновлено {res['updated']}")
-    print(f"Бэкап: {res['backup']}")
-    print("\nДальше: откройте мастер, поставьте статус «принят» у нужных тем,")
-    print("затем: python seo/scripts/topics_from_gaps.py --promote")
+    # Сохраняем предложения в SQLite БД (Единый первоисточник)
+    with get_connection() as conn:
+        for p in proposals:
+            conn.execute("""
+                INSERT OR REPLACE INTO topics_proposed
+                (id, title, cluster, type, source, evidence, hits, priority_score, status, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'предложен', ?)
+            """, (p["предложение_id"], p["рабочий заголовок"], p["кластер"], p["тип статьи"],
+                  p["источник"], p["доказательство"], p["частота_в_выдаче"], p["оценка_приоритета"],
+                  datetime.now().strftime("%Y-%m-%d %H:%M")))
+        conn.commit()
+
+    print(f"\n✓ Записано в SQLite (topics_proposed): {len(proposals)} предложений.")
+    print("Дальше: одобрите подходящие темы в дашборде (кнопка «✓ Одобрить») либо запустите:")
+    print("python seo/scripts/topics_from_gaps.py --promote")
     return 0
 
 
 def promote() -> int:
-    """Вносит принятые темы в content_plan и clusters, считая новые ID."""
-    import openpyxl
-    from datetime import datetime as dt
+    """Вносит принятые темы в SQLite topics, рассчитывая новые ID."""
+    with get_connection() as conn:
+        cur = conn.cursor()
+        accepted = cur.execute("SELECT * FROM topics_proposed WHERE status IN ('принят', 'принято')").fetchall()
+        if not accepted:
+            print("В таблице `topics_proposed` нет записей со статусом «принят».")
+            print("Одобрите темы в дашборде (кнопка «✓ Одобрить») или установите статус в БД.")
+            return 1
 
-    accepted = approved_proposals("topics")
-    if not accepted:
-        print("В листе `topics_proposed` нет строк со статусом «принят».")
-        print("Поставьте статус «принят» у нужных тем и повторите.")
-        return 1
-
-    wb = openpyxl.load_workbook(MASTER)
-    added = 0
-    try:
-        ws = wb["content_plan"]
-        headers = {clean(c.value): c.column for c in ws[1] if clean(c.value)}
-        id_col = headers.get("article_id", 1)
-        ids = []
-        for row in range(2, ws.max_row + 1):
-            value = clean(ws.cell(row=row, column=id_col).value)
-            if value.isdigit():
-                ids.append(int(value))
-        next_id = (max(ids) if ids else 0) + 1
-        next_row = ws.max_row + 1
-
-        existing_slugs = set()
-        slug_col = headers.get("slug")
-        if slug_col:
-            for row in range(2, ws.max_row + 1):
-                existing_slugs.add(clean(ws.cell(row=row, column=slug_col).value).lower())
+        max_id = cur.execute("SELECT MAX(id) FROM topics").fetchone()[0] or 0
+        next_id = max_id + 1
+        added = 0
 
         for rec in accepted:
-            title = clean(rec.get("рабочий заголовок"))
-            if not title:
-                continue
-            slug = slugify(title)
-            base_slug, n = slug, 2
-            while slug.lower() in existing_slugs:
-                slug = f"{base_slug}-{n}"
-                n += 1
-            existing_slugs.add(slug.lower())
+            title = rec["title"]
+            slug = slugify(title) + f"-{next_id}"
+            p_score = rec["priority_score"] or 60
+            priority = "высокий" if p_score >= 80 else "средний"
+            now_str = datetime.now().isoformat(timespec="seconds")
 
-            values = {
-                "article_id": next_id,
-                "рабочий заголовок": title,
-                "кластер": clean(rec.get("кластер")),
-                "slug": slug,
-                "тип статьи": clean(rec.get("тип статьи")),
-                "приоритет": "высокий" if int(clean(rec.get("оценка_приоритета")) or 0) >= 85 else "средний",
-                "статус": "Не начато",
-                "Следующее_действие": f"из topics_proposed ({clean(rec.get('предложение_id'))})",
-            }
-            for name, value in values.items():
-                col = headers.get(name)
-                if col:
-                    ws.cell(row=next_row, column=col, value=value)
-            next_row += 1
+            cur.execute("""
+                INSERT INTO topics
+                (id, title, slug, cluster, type, priority, priority_score, status, next_action, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'backlog', ?, ?, ?)
+            """, (next_id, title, slug, rec["cluster"], rec["type"] or "гайд", priority, p_score,
+                  f"одобрено из topics_proposed ({rec['id']})", now_str, now_str))
+            
+            cur.execute("UPDATE topics_proposed SET status = 'в работе' WHERE id = ?", (rec["id"],))
             next_id += 1
             added += 1
 
-        wb.save(MASTER)
-    finally:
-        wb.close()
+        conn.commit()
 
-    print(f"В `content_plan` добавлено тем: {added}")
-    print("Теперь: python seo/scripts/build_worklist.py && python seo/scripts/build_dashboard.py")
+    print(f"✓ В SQLite (topics) перенесено тем: {added}")
     return 0
 
 

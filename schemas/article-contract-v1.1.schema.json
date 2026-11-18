@@ -14,8 +14,6 @@
     "tags",
     "reading_time",
     "difficulty",
-    "solder_alloy",
-    "temp_data",
     "tools",
     "content_html",
     "faq",
@@ -84,6 +82,7 @@
     "solder_alloy": {
       "type": "string",
       "enum": [
+        "none",
         "pos61",
         "sn63pb37",
         "pos40",
@@ -98,7 +97,7 @@
       "description": "Канонический ключ сплава из реестра materials-registry.php"
     },
     "temp_data": {
-      "type": "object",
+      "type": ["object", "null"],
       "required": ["kind", "range"],
       "properties": {
         "kind": {

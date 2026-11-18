@@ -23,56 +23,75 @@ except Exception:
 ROOT = Path(__file__).resolve().parents[2]
 
 
-def get_api_key() -> str:
-    # 1. Сначала из переменной окружения
+def get_credentials() -> tuple[str, str]:
+    """Возвращает (провайдер, ключ): ('perplexity', 'pplx-...') или ('openrouter', 'sk-or-...')"""
     import os
-    if os.environ.get("OPENROUTER_API_KEY"):
-        return os.environ["OPENROUTER_API_KEY"]
     if os.environ.get("PERPLEXITY_API_KEY"):
-        return os.environ["PERPLEXITY_API_KEY"]
+        return "perplexity", os.environ["PERPLEXITY_API_KEY"]
+    if os.environ.get("OPENROUTER_API_KEY"):
+        return "openrouter", os.environ["OPENROUTER_API_KEY"]
 
-    # 2. Из credentials DSH
     cred_path = Path.home() / ".dsh" / ".credentials.yaml"
     if cred_path.exists():
         try:
             import yaml
             data = yaml.safe_load(cred_path.read_text(encoding="utf-8"))
             refs = data.get("refs", {})
-            if refs.get("OPENROUTER_API_KEY"):
-                return refs["OPENROUTER_API_KEY"]
             if refs.get("PERPLEXITY_API_KEY"):
-                return refs["PERPLEXITY_API_KEY"]
+                return "perplexity", refs["PERPLEXITY_API_KEY"]
+            if refs.get("OPENROUTER_API_KEY"):
+                return "openrouter", refs["OPENROUTER_API_KEY"]
         except Exception:
             pass
-    return ""
+    return "", ""
 
 
 def ask_perplexity(
     prompt: str,
-    model: str = "perplexity/sonar",
+    model: str = "sonar",
     system_prompt: str = "Ты — инженерный ассистент по пайке и электронике. Отвечай кратко, чётко, со ссылками на источники.",
 ) -> str:
-    api_key = get_api_key()
+    provider, api_key = get_credentials()
     if not api_key:
-        raise RuntimeError("OPENROUTER_API_KEY не найден в ~/.dsh/.credentials.yaml или переменных окружения.")
+        raise RuntimeError("Ключ не найден. Добавьте PERPLEXITY_API_KEY (pplx-...) или OPENROUTER_API_KEY в ~/.dsh/.credentials.yaml.")
 
-    payload = {
-        "model": model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": prompt},
-        ],
-    }
-
-    req = urllib.request.Request(
-        "https://openrouter.ai/api/v1/chat/completions",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
+    # Если ключ прямой от Perplexity Pro (pplx-...)
+    if provider == "perplexity" or api_key.startswith("pplx-"):
+        url = "https://api.perplexity.ai/chat/completions"
+        model_name = model.replace("perplexity/", "")
+        payload = {
+            "model": model_name,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+        }
+        headers = {
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+        }
+    else:
+        # Fallback на OpenRouter
+        url = "https://openrouter.ai/api/v1/chat/completions"
+        model_name = model if model.startswith("perplexity/") else f"perplexity/{model}"
+        payload = {
+            "model": model_name,
+            "messages": [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt},
+            ],
+        }
+        headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json",
             "HTTP-Referer": "https://tochka-plavleniya.ru",
             "X-Title": "Tochka Plavleniya SEO",
-        },
+        }
+
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode("utf-8"),
+        headers=headers,
     )
 
     with urllib.request.urlopen(req, timeout=40) as resp:

@@ -87,4 +87,4 @@ graph TD
 | **Разрешённые ID сплавов** | Список канонических слагов и нормализация (`tchp_get_canonical_alloys`) | [`wp-content/plugins/tchp-content/tchp-content.php`](../wp-content/plugins/tchp-content/tchp-content.php) |
 | **Редакционная верификация** | Метаполя ОТК и серверный расчёт отпечатка SHA-256 | [`wp-content/plugins/tchp-content/tchp-content.php`](../wp-content/plugins/tchp-content/tchp-content.php) |
 | **Дизайн-токены и стиль** | Палитра (`#f6f6f6`, `#FFC700`, `#121212`), шрифты, сетка, радиусы | [`theme4/assets/css/tokens.css`](../theme4/assets/css/tokens.css) и [`DESIGN.md`](../DESIGN.md) |
-| **Семантическое ядро** | Темы, кластеры, поисковые интенты | [`semantic_core.xlsx`](../semantic_core.xlsx) |
+| **Семантическое ядро** | Темы, кластеры, поисковые интенты | рабочая база [`seo/data/seo.db`](../seo/data/seo.db); исходный импорт — [`semantic_core_FULL_v11.xlsx`](../semantic_core_FULL_v11.xlsx) |

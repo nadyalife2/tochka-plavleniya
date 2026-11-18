@@ -13,7 +13,8 @@ try:
 except Exception:
     pass
 
-from excel_io import OUT, STATUSES, build_plan
+from db import build_db_plan as build_plan
+from excel_io import OUT, STATUSES
 from linkgraph import hubs, inbound_candidates, outbound_candidates
 
 

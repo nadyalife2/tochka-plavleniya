@@ -42,14 +42,8 @@ except Exception:
 
 from bs4 import BeautifulSoup
 
-from excel_io import (
-    DATA,
-    approved_proposals,
-    build_plan,
-    clean,
-    save_competitor_proposals,
-    save_competitors,
-)
+from db import build_db_plan as build_plan, get_connection
+from excel_io import DATA, clean, save_competitors
 
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
@@ -233,27 +227,25 @@ def main() -> int:
     args = ap.parse_args()
 
     if args.promote:
-        accepted = approved_proposals("competitors")
-        if not accepted:
-            print("В листе `competitors_proposed` нет строк со статусом «принят».")
-            print("Откройте мастер, поставьте статус «принят» у нужных доменов и повторите.")
-            return 1
-        records = [
-            {
-                "домен": clean(r.get("домен")),
-                "ниша": clean(r.get("ниша")) or "найдено автоматически",
-                "тип": clean(r.get("тип")) or "Косвенный конкурент",
-                "раздел блога": clean(r.get("пример_url")),
-                "кол-во статей (собрано)": 0,
-                "заметки": f"принят из competitors_proposed: {clean(r.get('источник_находки'))}",
-            }
-            for r in accepted
-            if clean(r.get("домен"))
-        ]
-        res = save_competitors(records)
-        print(f"Перенесено в `competitors`: {res['created']} новых, {res['updated']} обновлено")
-        print(f"Бэкап: {res['backup']}")
-        return 0
+        with get_connection() as conn:
+            cur = conn.cursor()
+            accepted = cur.execute("SELECT * FROM competitors_proposed WHERE status IN ('принят', 'принято')").fetchall()
+            if not accepted:
+                print("В таблице `competitors_proposed` нет записей со статусом «принят».")
+                return 1
+            for r in accepted:
+                conn.execute("""
+                    INSERT OR REPLACE INTO competitors
+                    (domain, niche, type, blog_url, articles_count, notes, updated_at)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                """, (r["domain"], r["niche"] or "электроника", r["type"] or "Конкурент",
+                      r["example_url"], r["articles_count"] or 0,
+                      f"принят из competitors_proposed",
+                      datetime.now().strftime("%Y-%m-%d %H:%M")))
+                conn.execute("UPDATE competitors_proposed SET status = 'в работе' WHERE domain = ?", (r["domain"],))
+            conn.commit()
+            print(f"✓ В SQLite (competitors) перенесено {len(accepted)} сайтов.")
+            return 0
 
     socket.setdefaulttimeout(30)
     plan = build_plan()
@@ -364,24 +356,29 @@ def main() -> int:
     if not proposals:
         return 0
 
-    res = save_competitor_proposals(proposals)
-    print(f"Excel `competitors_proposed`: создано {res['created']}, "
-          f"обновлено {res['updated']}")
-    print(f"Бэкап: {res['backup']}")
-    print("\nДальше: откройте мастер, поставьте статус «принят» у нужных доменов,")
-    print("затем: python seo/scripts/discover_competitors.py --promote")
+    with get_connection() as conn:
+        for p in proposals:
+            conn.execute("""
+                INSERT OR REPLACE INTO competitors_proposed
+                (domain, niche, type, source, queries, hits, articles_count, example_url, status, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'предложен', ?)
+            """, (p["домен"], p["ниша"], p["тип"], p["источник_находки"], p["запросы"],
+                  p["сколько_раз_в_выдаче"], p["найдено_статей"], p["пример_url"],
+                  datetime.now().strftime("%Y-%m-%d %H:%M")))
+        conn.commit()
+
+    print(f"\n✓ Записано в SQLite (competitors_proposed): {len(proposals)} кандидатов.")
+    print("Дальше: одобрите подходящие сайты в дашборде (кнопка «✓ Добавить») либо запустите:")
+    print("python seo/scripts/discover_competitors.py --promote")
     return 0
 
 
 def _read_proposed() -> list[dict]:
-    """Читает уже предложенные домены, чтобы не дублировать их каждый прогон."""
+    """Читает уже предложенные домены из SQLite, чтобы не дублировать их каждый прогон."""
     try:
-        from excel_io import PROPOSED_COMPETITORS_SHEET, load_master, read_sheet
-        wb = load_master()
-        try:
-            return read_sheet(wb, PROPOSED_COMPETITORS_SHEET)
-        finally:
-            wb.close()
+        with get_connection() as conn:
+            rows = conn.execute("SELECT * FROM competitors_proposed").fetchall()
+            return [{"домен": r["domain"]} for r in rows]
     except Exception:
         return []
 

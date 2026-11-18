@@ -53,9 +53,7 @@ $tchp_head_escape = static function ($value) {
   </script>
   <?php
     $tchp_tokens_path = dirname(__DIR__) . '/assets/css/tokens.css';
-    $tchp_hp_path     = dirname(__DIR__) . '/assets/css/headphones-style.css';
     $tchp_tokens_ver  = file_exists($tchp_tokens_path) ? filemtime($tchp_tokens_path) : '1.0.0';
-    $tchp_hp_ver      = file_exists($tchp_hp_path) ? filemtime($tchp_hp_path) : '1.0.0';
     $tchp_fonts_ver   = file_exists(dirname(__DIR__) . '/assets/css/fonts.css') ? filemtime(dirname(__DIR__) . '/assets/css/fonts.css') : '1.0.0';
     $tchp_build_ver   = file_exists(dirname(__DIR__) . '/assets/css/build.css') ? filemtime(dirname(__DIR__) . '/assets/css/build.css') : '1.0.0';
     $tchp_base_ver    = file_exists(dirname(__DIR__) . '/assets/css/base.css') ? filemtime(dirname(__DIR__) . '/assets/css/base.css') : '1.0.0';
@@ -64,7 +62,6 @@ $tchp_head_escape = static function ($value) {
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/fonts.css?v=<?= $tchp_fonts_ver ?>">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/build.css?v=<?= $tchp_build_ver ?>">
   <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/base.css?v=<?= $tchp_base_ver ?>">
-  <link rel="stylesheet" href="<?= $assets_base ?>/assets/css/headphones-style.css?v=<?= $tchp_hp_ver ?>">
   <?php if (!empty($extra_head)) echo $extra_head; ?>
   <?php if (function_exists('wp_head')) wp_head(); ?>
   <script>
@@ -73,7 +70,7 @@ $tchp_head_escape = static function ($value) {
     window.TCHP_EXPRESS_MATRIX = <?= json_encode(function_exists('tchp_get_express_workbench_matrix') ? tchp_get_express_workbench_matrix() : [], JSON_UNESCAPED_UNICODE) ?>;
   </script>
 </head>
-<body class="tp-headphones font-sans min-h-screen flex flex-col justify-between text-base leading-relaxed">
+<body class="font-sans min-h-screen flex flex-col justify-between text-base leading-relaxed">
   <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:z-50 focus:top-3 focus:left-3 focus:bg-accent focus:text-ink focus:px-4 focus:py-2 focus:rounded focus:font-mono focus:text-xs focus:shadow-md focus:outline-none">
     Перейти к основному содержимому
   </a>
