@@ -86,6 +86,15 @@ if (function_exists('have_posts') && have_posts()) {
         // FAQ items
         $article_faq = function_exists('tchp_get_article_faq') ? tchp_get_article_faq($post_id) : [];
 
+        // Sources items
+        $article_sources = function_exists('tchp_get_article_sources') ? tchp_get_article_sources($post_id) : [];
+        if (empty($article_sources)) {
+            $raw_sources = get_post_meta($post_id, 'tchp_sources', true);
+            if (!empty($raw_sources) && is_array($raw_sources)) {
+                $article_sources = $raw_sources;
+            }
+        }
+
         // Additional head tags (Schema.org & article CSS)
         ob_start();
         ?>
@@ -260,10 +269,80 @@ if (function_exists('have_posts') && have_posts()) {
                 $post_content_html = tchp_process_article_anchors($post_content_html, $article_toc, $detected_duplicates);
                 ?>
 
+                <!-- Mobile Compact Article Passport Card (lg:hidden) -->
+                <div class="block lg:hidden border border-paper-border bg-paper p-4 rounded-lg space-y-3 shadow-xs">
+                  <div class="flex items-center justify-between text-stamp font-mono pb-2 border-b border-paper-border">
+                    <span class="font-bold text-ink uppercase flex items-center gap-1.5">
+                      <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+                      ПАСПОРТ ТЕХПРОЦЕССА
+                    </span>
+                    <span class="text-accent font-bold"><?= esc_html($reading_time) ?> МИН</span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                    <div class="py-0.5">
+                      <span class="text-ink-muted block text-[10px]">Статус:</span>
+                      <?php if (!empty($editorial['is_verified'])): ?>
+                        <span class="font-bold text-emerald-600 dark:text-emerald-400">Регламент готов</span>
+                      <?php elseif (!empty($editorial['is_outdated'])): ?>
+                        <span class="font-bold text-amber-600 dark:text-amber-400">На ревизии</span>
+                      <?php else: ?>
+                        <span class="font-bold text-ink-muted">Черновик</span>
+                      <?php endif; ?>
+                    </div>
+                    <div class="py-0.5">
+                      <span class="text-ink-muted block text-[10px]">Категория:</span>
+                      <span class="text-ink font-bold truncate block"><?= esc_html($primary_cat ? $primary_cat->name : 'Монтаж РЭА') ?></span>
+                    </div>
+                    <div class="py-0.5">
+                      <span class="text-ink-muted block text-[10px]">Сложность:</span>
+                      <span class="text-ink font-bold"><?= esc_html($difficulty) ?></span>
+                    </div>
+                    <div class="py-0.5">
+                      <span class="text-ink-muted block text-[10px]">Стандарт:</span>
+                      <span class="font-bold text-accent font-mono truncate block"><?= esc_html($standard ?: '—') ?></span>
+                    </div>
+                  </div>
+                </div>
+
                 <!-- Gutenberg / Editor Dynamic Post Content (Cards rendered inside) -->
                 <article class="article-content space-y-5 text-ink leading-relaxed">
                   <?= $post_content_html; ?>
                 </article>
+
+                <?php if (!empty($article_sources)): ?>
+                  <!-- Visible Sources Section (Single Source of Truth: tchp_sources) -->
+                  <section class="border border-paper-border rounded-lg bg-paper p-5 sm:p-6 space-y-4 shadow-xs" id="article-sources">
+                    <div class="flex items-center gap-2 pb-2 border-b border-paper-border">
+                      <div class="w-7 h-7 rounded border border-paper-border bg-paper-subtle flex items-center justify-center text-ink shrink-0">
+                        <?= tp_icon('book-open', 'w-4 h-4 text-accent') ?>
+                      </div>
+                      <h2 class="text-lg sm:text-xl font-bold font-serif text-ink m-0">
+                        Источники и нормативная база
+                      </h2>
+                    </div>
+                    <ul class="space-y-2.5 pt-1 text-xs sm:text-sm font-mono list-none p-0 m-0">
+                      <?php foreach ($article_sources as $source_item): ?>
+                        <li class="flex items-start gap-2 border border-paper-border rounded bg-paper-subtle/50 p-3">
+                          <span class="text-accent font-bold shrink-0">§</span>
+                          <div class="flex-grow min-w-0">
+                            <?php if (!empty($source_item['url'])): ?>
+                              <a href="<?= esc_url($source_item['url']) ?>" target="_blank" rel="noopener noreferrer" class="font-bold text-ink hover:text-accent underline transition-colors">
+                                <?= esc_html($source_item['title']) ?>
+                              </a>
+                            <?php else: ?>
+                              <span class="font-bold text-ink"><?= esc_html($source_item['title']) ?></span>
+                            <?php endif; ?>
+                            <?php if (!empty($source_item['standard'])): ?>
+                              <span class="ml-2 inline-block px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-paper border border-paper-border text-ink-muted">
+                                <?= esc_html($source_item['standard']) ?>
+                              </span>
+                            <?php endif; ?>
+                          </div>
+                        </li>
+                      <?php endforeach; ?>
+                    </ul>
+                  </section>
+                <?php endif; ?>
 
                 <?php if (!empty($article_faq)): ?>
                   <!-- Visible FAQ Section (Single Source of Truth) -->

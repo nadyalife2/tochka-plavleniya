@@ -32,8 +32,9 @@ ROOT = Path(__file__).resolve().parents[2]
 REGISTRY = ROOT / "theme4" / "data" / "materials-registry.php"
 SCHEMA = ROOT / "schemas" / "article-contract-v1.1.schema.json"
 
-# Псевдо-ключ для материалов, где конкретный сплав не применим
+# Псевдо-ключи для материалов, где конкретный сплав не применим
 UNIVERSAL = "universal"
+NONE = "none"
 
 # Явные текстовые маркеры сплавов (регистр не важен).
 # Ключи должны совпадать с id в реестре.
@@ -92,8 +93,8 @@ def _parse_registry(path: Path = REGISTRY) -> dict[str, dict]:
 
 REGISTRY_SOLDERS: dict[str, dict] = _parse_registry()
 
-# Канонические ключи, разрешённые в контракте: реестр + universal
-CANONICAL_KEYS: list[str] = list(REGISTRY_SOLDERS.keys()) + [UNIVERSAL]
+# Канонические ключи, разрешённые в контракте: реестр + universal + none
+CANONICAL_KEYS: list[str] = list(REGISTRY_SOLDERS.keys()) + [UNIVERSAL, NONE]
 
 
 def canonical_keys() -> list[str]:
@@ -181,6 +182,8 @@ def work_range(key: str) -> tuple[int, int] | None:
 def alloy_label(key: str) -> str:
     if key == UNIVERSAL:
         return "универсальный (сплав не конкретизирован)"
+    if key == NONE:
+        return "без припоя (тема без пайки)"
     return REGISTRY_SOLDERS.get(key, {}).get("name", key)
 
 
@@ -212,7 +215,7 @@ def main() -> int:
                     errors.append(f"delivery_cli.CANONICAL_ALLOYS != canonical keys: {sorted(dk)}")
 
         for key in CANONICAL_KEYS:
-            if key == UNIVERSAL:
+            if key in (UNIVERSAL, NONE):
                 continue
             if melt_range(key) is None:
                 errors.append(f"{key}: нет t_melt_min/t_melt_max в реестре")

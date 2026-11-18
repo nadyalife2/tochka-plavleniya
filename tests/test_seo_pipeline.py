@@ -63,7 +63,7 @@ class TestCanonicalAlloys(unittest.TestCase):
     def test_no_data_means_no_data(self):
         """Сплав без температур в реестре не должен получать выдуманные цифры."""
         for key in self.canon.CANONICAL_KEYS:
-            if key == self.canon.UNIVERSAL:
+            if key in (self.canon.UNIVERSAL, "none"):
                 self.assertIsNone(self.canon.melt_range(key))
                 continue
             self.assertIsNotNone(self.canon.melt_range(key), f"{key}: нет диапазона плавления")
@@ -129,6 +129,19 @@ class TestPackageContract(unittest.TestCase):
         if res.get("contract") is None:
             self.assertFalse(res["valid"])
             self.assertTrue(any("отсутствует готовый текст" in e for e in res.get("errors", [])))
+
+    def test_all_ready_articles_packaged_valid(self):
+        """Все готовые статьи в БД собираются строго по схеме v1.1 без утечек frontmatter."""
+        with self.pc.get_connection() as conn:
+            rows = conn.execute("SELECT id, title FROM topics WHERE content_markdown IS NOT NULL").fetchall()
+        self.assertGreater(len(rows), 0, "В БД нет статей для проверки")
+        for r in rows:
+            res = self.pc.package_article(r["id"])
+            self.assertTrue(res["valid"], f"Тема #{r['id']} ({r['title']}) не валидна: {res.get('errors')}, {res.get('missing_warnings')}")
+            self.assertGreaterEqual(res.get("faq_count", 0), 4, f"Тема #{r['id']}: меньше 4 FAQ")
+            self.assertGreaterEqual(res.get("sources_count", 0), 2, f"Тема #{r['id']}: меньше 2 источников")
+            html = res["contract"]["content_html"]
+            self.assertFalse(html.startswith("<hr />\n<p>title:"), f"Тема #{r['id']}: утечка frontmatter в HTML")
 
 
 @unittest.skipUnless(DB_FILE.exists(), "нет seo/data/seo.db")

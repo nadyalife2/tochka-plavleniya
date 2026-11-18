@@ -25,8 +25,10 @@ Never:
 
 ## Editorial routing
 Для исследования, статей, редактуры и подготовки публикации сначала прочитай:
-1. [MASTER_EDITORIAL_BOOK.md](gem-knowledge/MASTER_EDITORIAL_BOOK.md) — единая редакционная книга (стратегия, голос Practico, терминология, факты, типы статей, SEO, таблицы, приёмка).
-2. Инструкции профильных агентов в `gem-knowledge/`:
+1. [.agents/skills/tochka-plavleniya-pipeline/SKILL.md](.agents/skills/tochka-plavleniya-pipeline/SKILL.md) — полный стандарт работы автономного конвейера полного цикла (7 этапов: бриф, 2 авторских голоса, парсинг, ОТК-скоринг, упаковка контракта v1.1, безопасная доставка CLI, Schema.org).
+2. [MASTER_EDITORIAL_BOOK.md](gem-knowledge/MASTER_EDITORIAL_BOOK.md) — единая редакционная книга (стратегия, голос Practico, терминология, факты, типы статей, SEO, таблицы, приёмка).
+3. [VOICE_PRACTICO_2.md](gem-knowledge/VOICE_PRACTICO_2.md) — второй голос автора («Голос заказчика» / владельца мастерской).
+4. Инструкции профильных агентов в `gem-knowledge/`:
    - [AGENT_01_RESEARCH_AND_SEO.md](gem-knowledge/AGENT_01_RESEARCH_AND_SEO.md) — исследование, доказательства и бриф.
    - [AGENT_02_AUTHOR.md](gem-knowledge/AGENT_02_AUTHOR.md) — написание и расширение статьи голосом Practico.
    - [AGENT_03_REVIEW_AND_PUBLISH.md](gem-knowledge/AGENT_03_REVIEW_AND_PUBLISH.md) — рецензирование, технический паспорт статьи, валидация по схеме v1.1 и контролируемая доставка.

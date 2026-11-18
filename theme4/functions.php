@@ -582,53 +582,98 @@ add_filter('rank_math/json_ld', function ($data, $jsonld = null) {
     if (!is_array($data) || !function_exists('is_singular') || !is_singular()) {
         return $data;
     }
-    if (!function_exists('tchp_get_geo_facts')) {
-        return $data;
-    }
     $post_id = function_exists('get_queried_object_id') ? (int) get_queried_object_id() : 0;
     if ($post_id <= 0) {
         return $data;
     }
-    $facts = tchp_get_geo_facts($post_id);
-    if (empty($facts['additionalProperty']) && empty($facts['citation']) && empty($facts['reviewedBy'])) {
-        return $data;
-    }
-    $enrich = static function (array &$node) use ($facts) {
-        $type  = $node['@type'] ?? '';
-        $types = is_array($type) ? $type : [$type];
-        if (!array_intersect($types, ['Article', 'TechArticle', 'BlogPosting', 'NewsArticle'])) {
-            return false;
-        }
-        if (!empty($facts['additionalProperty'])) {
-            $existing = isset($node['additionalProperty']) && is_array($node['additionalProperty']) ? $node['additionalProperty'] : [];
-            $node['additionalProperty'] = array_merge($existing, $facts['additionalProperty']);
-        }
-        if (!empty($facts['citation']) && empty($node['citation'])) {
-            $node['citation'] = $facts['citation'];
-        }
-        if (!empty($facts['reviewedBy'])) {
-            $node['reviewedBy'] = $facts['reviewedBy'];
-        }
-        if (!empty($facts['keywords']) && empty($node['keywords'])) {
-            $node['keywords'] = implode(', ', $facts['keywords']);
-        }
-        return true;
-    };
-    foreach ($data as $key => $node) {
-        if (!is_array($node)) {
-            continue;
-        }
-        if ($enrich($data[$key])) {
-            return $data;
-        }
-        if (!empty($node['@graph']) && is_array($node['@graph'])) {
-            foreach ($node['@graph'] as $gkey => $gnode) {
-                if (is_array($gnode) && $enrich($data[$key]['@graph'][$gkey])) {
-                    return $data;
+    $facts = function_exists('tchp_get_geo_facts') ? tchp_get_geo_facts($post_id) : [];
+    if (!empty($facts['additionalProperty']) || !empty($facts['citation']) || !empty($facts['reviewedBy']) || !empty($facts['keywords'])) {
+        $enrich = static function (array &$node) use ($facts) {
+            $type  = $node['@type'] ?? '';
+            $types = is_array($type) ? $type : [$type];
+            if (!array_intersect($types, ['Article', 'TechArticle', 'BlogPosting', 'NewsArticle'])) {
+                return false;
+            }
+            if (!empty($facts['additionalProperty'])) {
+                $existing = isset($node['additionalProperty']) && is_array($node['additionalProperty']) ? $node['additionalProperty'] : [];
+                $node['additionalProperty'] = array_merge($existing, $facts['additionalProperty']);
+            }
+            if (!empty($facts['citation']) && empty($node['citation'])) {
+                $node['citation'] = $facts['citation'];
+            }
+            if (!empty($facts['reviewedBy'])) {
+                $node['reviewedBy'] = $facts['reviewedBy'];
+            }
+            if (!empty($facts['keywords']) && empty($node['keywords'])) {
+                $node['keywords'] = implode(', ', $facts['keywords']);
+            }
+            return true;
+        };
+        foreach ($data as $key => $node) {
+            if (!is_array($node)) {
+                continue;
+            }
+            if ($enrich($data[$key])) {
+                break;
+            }
+            if (!empty($node['@graph']) && is_array($node['@graph'])) {
+                $found = false;
+                foreach ($node['@graph'] as $gkey => $gnode) {
+                    if (is_array($gnode) && $enrich($data[$key]['@graph'][$gkey])) {
+                        $found = true;
+                        break;
+                    }
+                }
+                if ($found) {
+                    break;
                 }
             }
         }
     }
+
+    // Генерация и инъекция ноды @type: FAQPage из метаполей статьи
+    if (function_exists('tchp_get_article_faq')) {
+        $faq = tchp_get_article_faq($post_id);
+        if (!empty($faq)) {
+            $questions = [];
+            foreach ((array) $faq as $item) {
+                if (!empty($item['q']) && !empty($item['a'])) {
+                    $questions[] = [
+                        '@type'          => 'Question',
+                        'name'           => $item['q'],
+                        'acceptedAnswer' => [
+                            '@type' => 'Answer',
+                            'text'  => $item['a'],
+                        ],
+                    ];
+                }
+            }
+            if (!empty($questions)) {
+                $permalink = function_exists('get_permalink') ? get_permalink($post_id) : '';
+                $faq_node = [
+                    '@type'      => 'FAQPage',
+                    '@id'        => $permalink ? ($permalink . '#faq') : '#faq',
+                    'mainEntity' => $questions,
+                ];
+                if (isset($data['@graph']) && is_array($data['@graph'])) {
+                    $data['@graph'][] = $faq_node;
+                } else {
+                    $inserted = false;
+                    foreach ($data as $dkey => $dval) {
+                        if (is_array($dval) && isset($dval['@graph']) && is_array($dval['@graph'])) {
+                            $data[$dkey]['@graph'][] = $faq_node;
+                            $inserted = true;
+                            break;
+                        }
+                    }
+                    if (!$inserted) {
+                        $data['FAQPage'] = $faq_node;
+                    }
+                }
+            }
+        }
+    }
+
     return $data;
 }, 99, 2);
 

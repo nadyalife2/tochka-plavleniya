@@ -27,11 +27,13 @@ except Exception:
     pass
 
 import jsonschema
+import markdown
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "seo" / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 
+import canonical_alloys as canonical
 from db import get_connection
 
 SCHEMA_PATH = ROOT / "schemas" / "article-contract-v1.1.schema.json"
@@ -51,7 +53,7 @@ CATEGORY_MAP = {
 }
 
 CANONICAL_ALLOYS = [
-    "pos61", "sn63pb37", "pos40", "sac305", "sac405",
+    "none", "pos61", "sn63pb37", "pos40", "sac305", "sac405",
     "sn42bi58", "snbiago", "roze", "vuda", "universal",
 ]
 
@@ -60,29 +62,55 @@ def load_schema() -> dict:
     return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
+def extract_faq_block(text: str) -> str:
+    """Выделяет сырой текстовый блок FAQ/Вопросы и ответы до следующего раздела того же или более высокого уровня."""
+    m = re.search(r'(?im)^(?P<hashes>#{2,4})\s*.*?(?:FAQ|Част(?:ые|о задаваемые) вопросы|Вопросы и ответы)[^\n]*\n', text)
+    if not m:
+        return ""
+    level = len(m.group('hashes'))
+    tail = text[m.end():]
+    stop_match = re.search(r'(?m)^\s*#{1,' + str(level) + r'}\s+', tail)
+    if stop_match:
+        return tail[:stop_match.start()].strip()
+    return tail.strip()
+
+
 def parse_faq_from_text(text: str) -> list[dict]:
     """Извлекает реальные вопросы-ответы из блока ## FAQ или ### FAQ: в тексте статьи."""
+    block = extract_faq_block(text)
+    if not block:
+        return []
     faq_items = []
-    faq_block_match = re.search(r"(?im)^#{2,3}\s*(?:FAQ|Частые вопросы|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
-    if faq_block_match:
-        block = faq_block_match.group(1).strip()
-        # 1. Формат q: "..." \n a: "..."
-        qa_pairs = re.findall(r'(?i)q:\s*["«](.+?)["»]\s*\n\s*a:\s*["«](.+?)["»]', block)
-        if qa_pairs:
-            for q, a in qa_pairs:
-                faq_items.append({"q": q.strip(), "a": a.strip()})
-        else:
-            # 2. Формат **Вопрос?** \n Ответ (до следующего вопроса или конца)
-            pairs = re.findall(r'(?m)^\s*(?:\d+[.)]\s*)?\*\*([^*]+\?)\*\*\s*\n+([\s\S]+?)(?=\n\s*(?:\d+[.)]\s*)?\*\*[^*]+\?\*\*|\Z)', block)
-            if pairs:
-                for q, a in pairs:
-                    ans_clean = "\n".join([line.strip() for line in a.strip().splitlines() if not line.strip().startswith("#")])
-                    faq_items.append({"q": q.strip(), "a": ans_clean[:500].strip()})
-            else:
-                # 3. Нумерованный список
-                pairs_num = re.findall(r'(?m)^\s*\d+[.)]\s*\*\*([^*]+)\*\*\s*\n+([^\n]+)', block)
-                for q, a in pairs_num:
-                    faq_items.append({"q": q.strip(), "a": a.strip()})
+    # 1. Формат q: "..." \n a: "..." или **q:** ... \n **a:** ...
+    qa_pairs = re.findall(r'(?im)^\s*(?:\d+[.)]\s*)?(?:\*\*)?q(?:\*\*)?:\s*["«]?([^\n"»]+)["»]?\s*\n\s*(?:\*\*)?a(?:\*\*)?:\s*["«]?([^\n"»]+)["»]?', block)
+    if qa_pairs:
+        for q, a in qa_pairs:
+            faq_items.append({"q": q.strip(), "a": a.strip()})
+        return faq_items
+
+    # 2. Формат ### Вопрос? \n Ответ
+    h3_pairs = re.findall(r'(?m)^###\s+([^\n]+\??)\s*\n+([\s\S]+?)(?=\n^###\s+|\Z)', block)
+    if h3_pairs:
+        for q, a in h3_pairs:
+            ans_clean = "\n".join([line.strip() for line in a.strip().splitlines() if not line.strip().startswith("#")])
+            faq_items.append({"q": q.strip(), "a": ans_clean[:500].strip()})
+        return faq_items
+
+    # 3. Формат **Вопрос?** \n Ответ (до следующего вопроса или конца)
+    pairs = re.findall(r'(?m)^\s*(?:\d+[.)]\s*)?\*\*([^*]+\?)\*\*\s*\n+([\s\S]+?)(?=\n\s*(?:\d+[.)]\s*)?\*\*[^*]+\?\*\*|\Z)', block)
+    if pairs:
+        for q, a in pairs:
+            ans_clean = "\n".join([line.strip() for line in a.strip().splitlines() if not line.strip().startswith("#")])
+            faq_items.append({"q": q.strip(), "a": ans_clean[:500].strip()})
+        return faq_items
+
+    # 4. Нумерованный список 1. **Вопрос** \n Ответ
+    pairs_num = re.findall(r'(?m)^\s*\d+[.)]\s*\*\*([^*]+)\*\*\s*\n+([^\n]+)', block)
+    if pairs_num:
+        for q, a in pairs_num:
+            faq_items.append({"q": q.strip(), "a": a.strip()})
+        return faq_items
+
     return faq_items
 
 
@@ -106,27 +134,45 @@ def parse_sources_from_text(text: str) -> list[dict]:
     return sources[:4]
 
 
+TOOL_CANONICAL_MAP = [
+    (re.compile(r"(?i)\bпаяльн[а-я]*\s+станци[а-я]*\s*([A-Za-z0-9\-]+)?"), "Паяльная станция"),
+    (re.compile(r"(?i)\bтермопинцет[а-я]*\s*([A-Za-z0-9\-]+)?"), "Термопинцет"),
+    (re.compile(r"(?i)\bпаяльник[а-я]*\s*([A-Za-z0-9\-]+)?"), "Паяльник"),
+    (re.compile(r"(?i)\bтермофен[а-я]*\s*([A-Za-z0-9\-]+)?"), "Термофен"),
+    (re.compile(r"(?i)\bфен(?:ом|а|у|е|ы|ов)?\s*([A-Za-z0-9\-]+)?\b"), "Термофен"),
+    (re.compile(r"(?i)\bмикроскоп[а-я]*\s*([A-Za-z0-9\-]+)?"), "Микроскоп"),
+    (re.compile(r"(?i)\bоловоотсос[а-я]*\s*([A-Za-z0-9\-]+)?"), "Оловоотсос"),
+    (re.compile(r"(?i)\bопл[её]тк[а-я]*\s*([A-Za-z0-9\-]+)?"), "Оплётка"),
+]
+
+
 def parse_tools_from_text(text: str) -> list[dict]:
-    """Извлекает упомянутые инструменты."""
+    """Извлекает упомянутые инструменты с канонической нормализацией (именительный падеж ед. число)."""
     tools = []
-    t_matches = re.findall(r"(?i)\b(паяльник[а-я]*|паяльная станция|фен|термофен|микроскоп|оловоотсос|оплетка|термопинцет)\s*([A-Za-z0-9\-]+)?", text)
     seen = set()
-    for name, model in t_matches:
-        name_clean = name.capitalize()
-        if name_clean in seen:
-            continue
-        seen.add(name_clean)
-        tools.append({
-            "name": name_clean,
-            "model": model or "",
-            "purpose": "Пайка и демонтаж",
-        })
+    for pattern, canon_name in TOOL_CANONICAL_MAP:
+        for m in pattern.finditer(text):
+            if canon_name in seen:
+                continue
+            seen.add(canon_name)
+            model = m.group(1) or ""
+            tools.append({
+                "name": canon_name,
+                "model": model,
+                "purpose": "Пайка и демонтаж",
+            })
     if not tools:
         tools.append({"name": "Паяльник", "model": "", "purpose": "Монтаж"})
     return tools[:5]
 
 
-def detect_alloy(text: str) -> str:
+def detect_alloy(text: str, title: str = "") -> str:
+    """Определяет канонический сплав по тексту и заголовку через canonical_alloys."""
+    if hasattr(canonical, "detect_alloy"):
+        res = canonical.detect_alloy(text, title)
+        if isinstance(res, tuple):
+            return res[0]
+        return str(res)
     text_low = text.lower()
     if "sac305" in text_low:
         return "sac305"
@@ -176,22 +222,25 @@ def detect_temp_data(text: str, alloy: str) -> dict | None:
     return None
 
 
+def strip_faq_from_markdown(text: str) -> str:
+    """Вырезает блок FAQ из Markdown-текста перед генерацией content_html, чтобы FAQ не дублировался."""
+    m = re.search(r'(?im)^(?P<hashes>#{2,4})\s*.*?(?:FAQ|Част(?:ые|о задаваемые) вопросы|Вопросы и ответы)[^\n]*\n', text)
+    if not m:
+        return text.strip()
+    start = m.start()
+    level = len(m.group('hashes'))
+    tail = text[m.end():]
+    stop_match = re.search(r'(?m)^\s*#{1,' + str(level) + r'}\s+', tail)
+    if stop_match:
+        end = m.end() + stop_match.start()
+    else:
+        end = len(text)
+    return (text[:start] + text[end:]).strip()
+
+
 def markdown_to_html(md: str) -> str:
-    """Простая конвертация Markdown структуры в HTML."""
-    html = md
-    # H3, H2, H1
-    html = re.sub(r"(?m)^###\s+(.+)$", r"<h3>\1</h3>", html)
-    html = re.sub(r"(?m)^##\s+(.+)$", r"<h2>\1</h2>", html)
-    html = re.sub(r"(?m)^#\s+(.+)$", r"<h1>\1</h1>", html)
-    # Paragraphs
-    paras = [p.strip() for p in re.split(r"\n\s*\n", html) if p.strip()]
-    out = []
-    for p in paras:
-        if p.startswith("<h") or p.startswith("<!--") or p.startswith("---"):
-            out.append(p)
-        else:
-            out.append(f"<p>{p}</p>")
-    return "\n\n".join(out)
+    """Конвертация Markdown структуры в HTML через python-markdown."""
+    return markdown.markdown(md, extensions=['tables', 'fenced_code', 'nl2br'])
 
 
 def package_article(topic_id: int | str) -> dict:
@@ -215,16 +264,35 @@ def package_article(topic_id: int | str) -> dict:
             ],
         }
 
-    # 1. Извлекаем реальные элементы
-    first_para = re.split(r"\n\s*\n", md_text.strip())[0] if md_text else ""
-    first_para_clean = re.sub(r"^#+.*?\n", "", first_para).strip()
-    excerpt = first_para_clean[:280] if len(first_para_clean) >= 20 else (topic["title"] + ": техническое руководство.")
+    # Отсекаем YAML frontmatter при наличии, чтобы он не попадал в HTML и excerpt
+    clean_md = md_text.strip()
+    meta_excerpt = ""
+    if clean_md.startswith("---"):
+        parts = clean_md.split("---", 2)
+        if len(parts) >= 3:
+            fm_text = parts[1]
+            clean_md = parts[2].strip()
+            m_desc = re.search(r'(?m)^(?:meta_)?description:\s*["\']?([^"\'\n]+)["\']?', fm_text)
+            if m_desc:
+                meta_excerpt = m_desc.group(1).strip()
 
-    alloy = detect_alloy(md_text)
-    temp_data = detect_temp_data(md_text, alloy)
-    tools = parse_tools_from_text(md_text)
-    faq = parse_faq_from_text(md_text)
-    sources = parse_sources_from_text(md_text)
+    # 1. Извлекаем реальные элементы
+    if meta_excerpt and len(meta_excerpt) >= 20:
+        excerpt = meta_excerpt[:280]
+    else:
+        first_para = ""
+        for p in re.split(r"\n\s*\n", clean_md):
+            p_clean = re.sub(r"^#+.*?\n?", "", p).strip()
+            if p_clean and not p_clean.startswith("#") and len(p_clean) >= 20:
+                first_para = p_clean
+                break
+        excerpt = first_para[:280] if first_para else (topic["title"] + ": техническое руководство.")
+
+    alloy = detect_alloy(clean_md, topic["title"])
+    temp_data = detect_temp_data(clean_md, alloy)
+    tools = parse_tools_from_text(clean_md)
+    faq = parse_faq_from_text(clean_md)
+    sources = parse_sources_from_text(clean_md)
 
     # Если FAQ не был в markdown, пробуем взять из таблицы briefs
     if not faq and brief_row and brief_row["faq_json"]:
@@ -245,7 +313,9 @@ def package_article(topic_id: int | str) -> dict:
     content_id = f"tchp-{topic['slug'][:40]}" if topic['slug'].startswith("tchp-") else f"tchp-{topic['id']}-{topic['slug'][:30]}"
     content_id = re.sub(r"[^a-z0-9\-]+", "-", content_id.lower()).strip("-")
 
-    reading_time = max(2, min(30, round(len(md_text) / 900)))
+    reading_time = max(2, min(30, round(len(clean_md) / 900)))
+
+    md_for_content = strip_faq_from_markdown(clean_md)
 
     contract_data = {
         "content_id": content_id,
@@ -258,9 +328,9 @@ def package_article(topic_id: int | str) -> dict:
         "reading_time": reading_time,
         "difficulty": "Практик",
         "solder_alloy": alloy,
-        "temp_data": temp_data or {"kind": "joint_temperature", "range": "183 – 190 °C"},
+        "temp_data": temp_data,
         "tools": tools,
-        "content_html": markdown_to_html(md_text),
+        "content_html": markdown_to_html(md_for_content),
         "faq": faq,
         "sources": sources,
     }
@@ -283,7 +353,7 @@ def package_article(topic_id: int | str) -> dict:
         missing_data_warnings.append(
             f"В статье найдено {len(sources)} источников (схема v1.1 требует минимум 2 подтверждённых источника в блоке ## Источники:)."
         )
-    if not temp_data:
+    if not temp_data and alloy != "none":
         missing_data_warnings.append("В тексте не указаны температурные режимы (напр. '280 – 320 °C').")
 
     is_valid = len(validation_errors) == 0 and len(missing_data_warnings) == 0

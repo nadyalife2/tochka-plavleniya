@@ -50,7 +50,7 @@ if hasattr(sys.stderr, "reconfigure"):
     sys.stderr.reconfigure(encoding="utf-8")
 
 CANONICAL_ALLOYS = {
-    "pos61", "sn63pb37", "pos40", "sac305", "sac405",
+    "none", "pos61", "sn63pb37", "pos40", "sac305", "sac405",
     "sn42bi58", "snbiago", "roze", "vuda", "universal",
 }
 
@@ -370,7 +370,7 @@ def build_wp_payload(article_data: dict, client: WordPressRestClient, status: st
         "tchp_schema_version": article_data.get("schema_version", "1.0"),
         "tchp_reading_time": int(article_data.get("reading_time", 5)),
         "tchp_difficulty": article_data.get("difficulty", "Инженер"),
-        "tchp_solder_alloy": normalize_alloy(article_data["solder_alloy"]),
+        "tchp_solder_alloy": normalize_alloy(article_data.get("solder_alloy", "none")),
         "tchp_temp_kind": temp_data.get("kind", "joint_temperature"),
         "tchp_temp_range": temp_data.get("range", ""),
         "tchp_temp_peak": temp_data.get("peak", ""),

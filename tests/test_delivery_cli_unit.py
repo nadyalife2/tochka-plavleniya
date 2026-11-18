@@ -199,6 +199,33 @@ class TestDeliveryCliUnit(unittest.TestCase):
             self.assertEqual(entry["wp_post_id"], 42)
             self.assertEqual(journal2.data.get("version"), "2.0")
 
+    def test_build_wp_payload_with_none_alloy_and_missing_alloy(self):
+        # Case 1: solder_alloy is explicitly 'none'
+        art_none = {
+            "content_id": "tchp-art-none",
+            "title": "Теория бессвинцовых процессов",
+            "content_html": "<p>Теоретический обзор без использования припоя.</p>",
+            "excerpt": "Обзор физико-химических основ процессов.",
+            "slug": "teoriya-bessvintsovyh-protsessov",
+            "solder_alloy": "none",
+            "temp_data": None,
+        }
+        payload_none = build_wp_payload(art_none, None)
+        self.assertEqual(payload_none["meta"]["tchp_solder_alloy"], "none")
+        self.assertEqual(payload_none["meta"]["tchp_temp_range"], "")
+
+        # Case 2: solder_alloy and temp_data are omitted entirely
+        art_omitted = {
+            "content_id": "tchp-art-omitted",
+            "title": "Теория пайки",
+            "content_html": "<p>Текст статьи</p>",
+            "excerpt": "Лид статьи",
+            "slug": "teoriya-payki",
+        }
+        payload_omitted = build_wp_payload(art_omitted, None)
+        self.assertEqual(payload_omitted["meta"]["tchp_solder_alloy"], "none")
+        self.assertEqual(payload_omitted["meta"]["tchp_temp_range"], "")
+
 
 if __name__ == "__main__":
     unittest.main()
