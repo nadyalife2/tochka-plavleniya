@@ -1,0 +1,137 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "version": "1.2.0",
+  "updated_at": "2026-11-18",
+  "standards": [
+    {
+      "id": "gost-21931-76",
+      "code": "ГОСТ 21931-76",
+      "title": "Припои оловянно-свинцовые в изделиях. Технические условия",
+      "category": "alloys",
+      "default_class": "Класс 2 / РЭА",
+      "description": "Технические требования к трубчатым припоям с флюсом и проволоке. Смачиваемость мениска, заполнение отверстий не менее 75%.",
+      "alloys": ["pos-61", "pos-40", "pos-30", "pos-90", "possu-61-0.5"],
+      "url": "https://protect.gost.ru/document1.aspx?control=31&id=117395"
+    },
+    {
+      "id": "gost-21930-76",
+      "code": "ГОСТ 21930-76",
+      "title": "Припои оловянно-свинцовые в чушках. Технические условия",
+      "category": "alloys",
+      "default_class": "Межгосударственный",
+      "description": "Химический состав и пределы вредных примесей в слитках припоя для паяльных ванн и волновой пайки.",
+      "alloys": ["pos-61", "pos-40", "pos-30", "pos-90", "possu-61-0.5", "posu-95-5"],
+      "url": "https://protect.gost.ru/document1.aspx?control=31&id=117394"
+    },
+    {
+      "id": "gost-r-iso-9453-2014",
+      "code": "ГОСТ Р ИСО 9453-2014",
+      "title": "Припои мягкие. Химический состав и формы",
+      "category": "lead_free",
+      "default_class": "RoHS 3 / Lead-Free",
+      "description": "Химический состав бессвинцовых сплавов SAC305, Sn99Cu1, Sn-Bi. Температурные диапазоны ликвидуса и солидуса.",
+      "alloys": ["sac305", "sac0307", "sn99cu1", "sn42bi58"],
+      "url": "https://protect.gost.ru/document1.aspx?control=31&id=184918"
+    },
+    {
+      "id": "gost-r-56427-2022",
+      "code": "ГОСТ Р 56427-2022",
+      "title": "Пайка электронных модулей радиоэлектронных средств. Автоматизированный смешанный и поверхностный монтаж с применением бессвинцовой и традиционной технологий",
+      "category": "assembly",
+      "default_class": "Класс А, В, С",
+      "description": "Технические требования к технологическим операциям поверхностного и смешанного монтажа в РФ взамен стандарта 2015 года.",
+      "alloys": ["pos-61", "sac305"],
+      "url": "https://protect.gost.ru/document1.aspx?control=31&id=241582"
+    },
+    {
+      "id": "ipc-a-610j",
+      "code": "IPC-A-610J",
+      "title": "Acceptability of Electronic Assemblies (Критерии приемки электронных сборок)",
+      "category": "inspection",
+      "default_class": "Class 2 / Class 3",
+      "description": "Международный эталон визуального контроля пайки: угол смачивания <= 90 град, вогнутый мениск, отсутствие надгробий и мостиков.",
+      "alloys": ["pos-61", "sac305", "none"],
+      "url": "https://www.ipc.org/ipc-a-610"
+    },
+    {
+      "id": "ipc-j-std-001j",
+      "code": "IPC J-STD-001J",
+      "title": "Requirements for Soldered Electrical and Electronic Assemblies",
+      "category": "process",
+      "default_class": "Class 2 / Class 3",
+      "description": "Требования к процессам и материалам пайки: термические профили, градиент нагрева до 3 C/c, время выше ликвидуса (TAL) 45-75 с.",
+      "alloys": ["pos-61", "sac305"],
+      "url": "https://www.ipc.org/ipc-j-std-001"
+    },
+    {
+      "id": "ipc-7095e",
+      "code": "IPC-7095E",
+      "title": "Design and Assembly Process Guidance for BGAs",
+      "category": "bga",
+      "default_class": "Class 2 / X-Ray",
+      "description": "Руководство по проектированию и монтажу BGA: норма рентгеновской пустотности шаров не более 25% (в интерфейсе не более 15%), профилактика Head-in-Pillow.",
+      "alloys": ["pos-61", "sac305"],
+      "url": "https://www.ipc.org/ipc-7095"
+    },
+    {
+      "id": "ipc-7093a",
+      "code": "IPC-7093A",
+      "title": "Design and Assembly Process Implementation for Bottom Termination Components (BTCs/QFN)",
+      "category": "qfn_btc",
+      "default_class": "Class 2",
+      "description": "Монтаж безвыводных компонентов с нижней металлизацией: покрытие термопада припоем >= 50%, разделка апертуры трафарета на сегменты.",
+      "alloys": ["pos-61", "sac305"],
+      "url": "https://www.ipc.org/ipc-7093"
+    },
+    {
+      "id": "ipc-j-std-004d",
+      "code": "IPC J-STD-004D",
+      "title": "Requirements for Soldering Fluxes",
+      "category": "fluxes",
+      "default_class": "ROL0 / REL0",
+      "description": "Классификация паяльных флюсов по основе (RO/RE/OR/IN) и активности: бескислотные безотмывочные составы с содержанием галогенидов < 0.05%.",
+      "alloys": ["none", "pos-61", "sac305"],
+      "url": "https://www.ipc.org/ipc-j-std-004"
+    },
+    {
+      "id": "ipc-j-std-005b",
+      "code": "IPC J-STD-005B",
+      "title": "Requirements for Solder Pastes",
+      "category": "paste",
+      "default_class": "Type 3 / Type 4",
+      "description": "Гранулометрия паяльных паст: Тип 3 (25-45 мкм), Тип 4 (20-38 мкм), реология, тест на растекание при преднагреве.",
+      "alloys": ["sac305", "pos-61"],
+      "url": "https://www.ipc.org/ipc-j-std-005"
+    },
+    {
+      "id": "ipc-7711-7721c",
+      "code": "IPC-7711/7721C",
+      "title": "Rework, Modification and Repair of Electronic Assemblies",
+      "category": "rework",
+      "default_class": "Rework / Repair",
+      "description": "Стандарт демонтажа, доработки и восстановления печатных плат: восстановление оторванных пятаков, монтаж проводных перемычек.",
+      "alloys": ["pos-61", "sac305"],
+      "url": "https://www.ipc.org/ipc-7711-7721"
+    },
+    {
+      "id": "gost-r-53734-5-1-2014",
+      "code": "ГОСТ Р 53734.5.1-2014",
+      "title": "Электростатика. Защита электронных устройств от электростатических явлений. Общие требования",
+      "category": "esd",
+      "default_class": "EPA Standard",
+      "description": "Требования к защищенным зонам ЭСР (EPA): заземление паяльника < 2 Ом, утечка < 2 мВ, сопротивление коврика 10^6 - 10^9 Ом, браслет 1 МОм.",
+      "alloys": ["none"],
+      "url": "https://protect.gost.ru/document1.aspx?control=31&id=184904"
+    },
+    {
+      "id": "gost-12-3-040-86",
+      "code": "ГОСТ 12.3.040-86",
+      "title": "ССБТ. Работы паяльные. Требования безопасности",
+      "category": "safety",
+      "default_class": "Охрана труда",
+      "description": "Требования к вытяжной вентиляции (скорость всасывания >= 0.5 м/с), очистке воздуха от свинца и аэрозолей канифоли, защите оператора.",
+      "alloys": ["none"],
+      "url": "https://protect.gost.ru/document1.aspx?control=31&id=141887"
+    }
+  ]
+}
