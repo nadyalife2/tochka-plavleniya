@@ -2940,6 +2940,24 @@ async function runFullPipelineForTopic(tid) {
   askAssistant(`Что с темой #${tid}?`);
 }
 
+function switchFarmView(mode) {
+  const canvasContainer = document.getElementById('farmCanvasContainer');
+  const gridContainer = document.getElementById('craftsmenGrid');
+  const btnCanvas = document.getElementById('btnViewCanvas');
+  const btnGrid = document.getElementById('btnViewGrid');
+
+  if (mode === 'canvas') {
+    if (canvasContainer) canvasContainer.style.display = 'block';
+    if (btnCanvas) btnCanvas.classList.add('btn--primary');
+    if (btnGrid) btnGrid.classList.remove('btn--primary');
+    if (window.farmCanvas) window.farmCanvas.resize();
+  } else {
+    if (canvasContainer) canvasContainer.style.display = 'none';
+    if (btnGrid) btnGrid.classList.add('btn--primary');
+    if (btnCanvas) btnCanvas.classList.remove('btn--primary');
+  }
+}
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeInspector();
