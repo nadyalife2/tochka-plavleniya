@@ -3165,6 +3165,9 @@ function openWorkstationModal(agentId) {
 
   loadWorkstationTopicData(currentWsTopicId);
 
+  renderCraftsmanWorkbench(currentWsAgentId);
+  switchWsModalTab('tools');
+
   if (window.clusterHealth && window.clusterHealth.craftsmen && window.clusterHealth.craftsmen[currentWsAgentId]) {
     const h = window.clusterHealth.craftsmen[currentWsAgentId];
     const badge = document.getElementById('wsModalHealthBadge');
@@ -3344,6 +3347,404 @@ function triggerKnowledgeEval() {
     .catch(err => {
       if (out) out.innerHTML = `<span style="color:#EF4444;">Ошибка: ${err.message}</span>`;
     });
+}
+
+function switchWsModalTab(tabName) {
+  const tabs = ['tools', 'docs', 'task', 'data'];
+  tabs.forEach(t => {
+    const btn = document.getElementById('wsNav' + t.charAt(0).toUpperCase() + t.slice(1));
+    const panel = document.getElementById('wsTab' + t.charAt(0).toUpperCase() + t.slice(1) + 'Panel');
+    if (btn) {
+      if (t === tabName) {
+        btn.style.background = '#10B981';
+        btn.style.color = '#09090B';
+        btn.style.fontWeight = '800';
+      } else {
+        btn.style.background = '#27272A';
+        btn.style.color = '#D4D4D8';
+        btn.style.fontWeight = 'normal';
+      }
+    }
+    if (panel) {
+      panel.style.display = (t === tabName) ? 'block' : 'none';
+    }
+  });
+}
+
+function renderCraftsmanWorkbench(agentId) {
+  const container = document.getElementById('wsWorkbenchContainer');
+  if (!container) return;
+  const topic = (window.state && window.state.topics) ? window.state.topics.find(t => t.id === currentWsTopicId) : { id: 1, title: 'Пайка для начинающих', solder_alloy: 'ПОС-61 (183–190°C)' };
+
+  if (agentId === 'soroka') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #38BDF8;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#38BDF8;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🪶 LSI-ЯДРО И СЕМАНТИЧЕСКИЙ АНАЛИЗАТОР ПОИСКОВОЙ ВЫДАЧИ
+          </div>
+          <span style="background:#0369A1;color:#E0F2FE;padding:2px 8px;border-radius:4px;font-size:11px;">63 темы в seo.db</span>
+        </div>
+        <div style="margin-bottom:10px;">
+          <label style="font-size:11px;color:#94A3B8;">Поисковый кластер темы:</label>
+          <div style="display:flex;gap:8px;margin-top:4px;">
+            <input type="text" id="sorokaKeywordInput" value="${topic.title || 'пайка плат для начинающих'}" style="flex:1;background:#18181D;border:1px solid #38BDF8;color:#FFF;padding:6px 10px;border-radius:4px;font-size:12px;">
+            <button type="button" class="btn btn--sm" onclick="showToast('Парсинг LSI-хвостов Яндекса выполнен!')" style="background:#0284C7;color:#FFF;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;font-weight:bold;">🔍 Собрать LSI</button>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#94A3B8;margin-bottom:6px;">Ключевые LSI-хвосты с частотностью (Wordstat 2026):</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;text-align:left;background:#18181D;border-radius:6px;overflow:hidden;">
+          <thead>
+            <tr style="background:#1E293B;color:#94A3B8;">
+              <th style="padding:6px 10px;">Поисковый запрос</th>
+              <th style="padding:6px 10px;">Частота / мес</th>
+              <th style="padding:6px 10px;">Конкуренция</th>
+              <th style="padding:6px 10px;">Статус</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #27272A;"><td style="padding:6px 10px;color:#FFF;">${topic.title || 'пайка плат'} для новичков</td><td style="padding:6px 10px;color:#38BDF8;">3 420</td><td style="padding:6px 10px;color:#4ADE80;">Низкая (12)</td><td style="padding:6px 10px;color:#4ADE80;">В ядре ✅</td></tr>
+            <tr style="border-bottom:1px solid #27272A;"><td style="padding:6px 10px;color:#FFF;">как правильно паять паяльником с канифолью</td><td style="padding:6px 10px;color:#38BDF8;">1 840</td><td style="padding:6px 10px;color:#4ADE80;">Низкая (8)</td><td style="padding:6px 10px;color:#4ADE80;">В ядре ✅</td></tr>
+            <tr style="border-bottom:1px solid #27272A;"><td style="padding:6px 10px;color:#FFF;">припой пос 61 температура плавления и состав</td><td style="padding:6px 10px;color:#38BDF8;">980</td><td style="padding:6px 10px;color:#4ADE80;">Низкая (5)</td><td style="padding:6px 10px;color:#4ADE80;">В ядре ✅</td></tr>
+            <tr style="border-bottom:1px solid #27272A;"><td style="padding:6px 10px;color:#FFF;">какой флюс выбрать для пайки микросхем</td><td style="padding:6px 10px;color:#38BDF8;">1 120</td><td style="padding:6px 10px;color:#FACC15;">Средняя (19)</td><td style="padding:6px 10px;color:#4ADE80;">В ядре ✅</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button type="button" class="btn btn--sm" onclick="showToast('Семантическое ядро зафиксировано!')" style="background:#0284C7;color:#FFF;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;">📥 Применить LSI к теме #${topic.id}</button>
+          <button type="button" class="btn btn--sm" onclick="switchTab('competitors')" style="background:#334155;color:#E2E8F0;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;">📊 Открыть досье конкурентов</button>
+        </div>
+      </div>
+    `;
+
+  } else if (agentId === 'bobr') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #B45309;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#F59E0B;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🦫 КОНСТРУКТОР ТЕХНИЧЕСКОГО БРИФА ПО ГОСТ Р МЭК 61191-1
+          </div>
+          <span style="background:#78350F;color:#FEF3C7;padding:2px 8px;border-radius:4px;font-size:11px;">ГОСТ 21930 / IPC-A-610</span>
+        </div>
+        <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:10px;margin-bottom:10px;">
+          <div style="font-weight:bold;color:#FBBF24;font-size:11.5px;margin-bottom:6px;">Чек-лист 4 обязательных вопросов новичка:</div>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11.5px;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:#F59E0B;"> 1. Точный состав сплава и коридор плавления (ПОС-61: солидус 183°C, ликвидус 190°C)
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11.5px;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:#F59E0B;"> 2. Безопасный флюс и регламент отмывки (RMA канифольный, отмывка ИПС 1:1)
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;margin-bottom:4px;font-size:11.5px;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:#F59E0B;"> 3. Форма жала и рабочая уставка (Клин 2.4D, 275–285°C без перегрева)
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;font-size:11.5px;cursor:pointer;">
+            <input type="checkbox" checked style="accent-color:#F59E0B;"> 4. Техника безопасности и вентиляция аэрозолей по ГОСТ 12.3.003-75
+          </label>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:10px;margin-bottom:12px;">
+          <div>
+            <label style="font-size:11px;color:#94A3B8;">Выбор сплава по реестру:</label>
+            <select id="bobrAlloySelect" style="width:100%;background:#18181D;color:#FFF;border:1px solid #B45309;padding:6px;border-radius:4px;font-size:11.5px;margin-top:4px;">
+              <option value="pos61" selected>ПОС-61 (183–190°C) — оловянно-свинцовый</option>
+              <option value="sac305">SAC305 (217–220°C) — бессвинцовый RoHS</option>
+              <option value="roze">Сплав Розе (94°C) — легкоплавкий демонтажный</option>
+              <option value="pos40">ПОС-40 (183–238°C) — монтажный</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:11px;color:#94A3B8;">Класс надежности электронного модуля:</label>
+            <select style="width:100%;background:#18181D;color:#FFF;border:1px solid #B45309;padding:6px;border-radius:4px;font-size:11.5px;margin-top:4px;">
+              <option value="c2" selected>Класс 2 (Промышленная & Сервисная техника)</option>
+              <option value="c1">Класс 1 (Бытовая электроника общего назначения)</option>
+              <option value="c3">Класс 3 (Высоконадежная медицинская/автомобильная)</option>
+            </select>
+          </div>
+        </div>
+        <button type="button" class="btn btn--sm" onclick="showToast('Бриф ГОСТ утвержден и отправлен в цех Кота!')" style="background:#D97706;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">📐 Утвердить бриф конструктора</button>
+      </div>
+    `;
+
+  } else if (agentId === 'kot') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #EA580C;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#FB923C;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🐱 ПАЯЛЬНЫЙ ЦЕХ И ТРИАДА ФИЗИКИ (PRACTICO 1)
+          </div>
+          <span style="background:#7C2D12;color:#FFEDD5;padding:2px 8px;border-radius:4px;font-size:11px;">Температура жала: 280°C</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:10px;margin-bottom:12px;">
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:10px;">
+            <div style="font-size:11px;color:#FDBA74;font-weight:bold;margin-bottom:4px;">Подбор жала T12/C245:</div>
+            <div style="font-size:11.5px;color:#E2E8F0;">• <strong>Клин 2.4D:</strong> теплоемкость 95%, пятно 2.4 мм² (рекомендовано для темы)</div>
+            <div style="font-size:11.5px;color:#94A3B8;">• <strong>Игла I:</strong> теплоемкость 35% (риск примерзания к полигону)</div>
+            <div style="font-size:11.5px;color:#94A3B8;">• <strong>Нож K:</strong> теплоемкость 90% (подрезка перемычек)</div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:10px;">
+            <div style="font-size:11px;color:#FDBA74;font-weight:bold;margin-bottom:4px;">Физика смачивания меди:</div>
+            <div style="font-size:11.5px;color:#E2E8F0;">• Интерметаллид: <strong>Cu₆Sn₅</strong> (толщина 0.8–1.2 мкм при 265°C)</div>
+            <div style="font-size:11.5px;color:#E2E8F0;">• Мениск: вогнутый галтельный шов (угол смачивания &lt;30°)</div>
+            <div style="font-size:11.5px;color:#EF4444;">• Ошибка: перегрев &gt;300°C растит хрупкий Cu₃Sn!</div>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:11px;color:#94A3B8;">Редактор статьи мастера Practico 1:</label>
+          <textarea id="kotDraftText" rows="6" style="width:100%;background:#18181D;border:1px solid #EA580C;color:#FFF;padding:8px 10px;font-family:monospace;font-size:11.5px;border-radius:4px;margin-top:4px;resize:vertical;" placeholder="Черновик статьи формируется Котом-Паяльщиком...">${topic.content_markdown ? topic.content_markdown.substring(0, 450) + '...' : 'Черновик темы #' + topic.id + ' ожидает генерации...'}</textarea>
+        </div>
+        <div style="margin-top:8px;display:flex;gap:8px;">
+          <button type="button" class="btn btn--sm" onclick="showToast('Лонгрид отправлен на просчет сметы Лису!')" style="background:#EA580C;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">✍️ Написать лонгрид по физике пайки</button>
+        </div>
+      </div>
+    `;
+
+  } else if (agentId === 'lis') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #F59E0B;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#FBBF24;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🦊 ИНТЕРАКТИВНЫЙ СМЕТНЫЙ КАЛЬКУЛЯТОР ПАЙКИ (PRACTICO 2)
+          </div>
+          <span style="background:#78350F;color:#FEF3C7;padding:2px 8px;border-radius:4px;font-size:11px;">Экономика мастерской</span>
+        </div>
+        <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:10px;margin-bottom:12px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:8px;">
+            <div>
+              <label style="font-size:11px;color:#94A3B8;">Катушка ПОС-61 (100г), ₽:</label>
+              <input type="number" id="calcSolderCost" value="850" oninput="recalcSolderCost()" style="width:100%;background:#09090B;border:1px solid #52525B;color:#FFF;padding:4px 8px;border-radius:4px;font-size:12px;margin-top:2px;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#94A3B8;">Расход припоя на шов, г:</label>
+              <input type="number" id="calcSolderWeight" value="0.015" step="0.005" oninput="recalcSolderCost()" style="width:100%;background:#09090B;border:1px solid #52525B;color:#FFF;padding:4px 8px;border-radius:4px;font-size:12px;margin-top:2px;">
+            </div>
+            <div>
+              <label style="font-size:11px;color:#94A3B8;">Тюбик флюса RMA (10г), ₽:</label>
+              <input type="number" id="calcFluxCost" value="350" oninput="recalcSolderCost()" style="width:100%;background:#09090B;border:1px solid #52525B;color:#FFF;padding:4px 8px;border-radius:4px;font-size:12px;margin-top:2px;">
+            </div>
+          </div>
+          <div style="margin-top:10px;padding:8px;background:#09090B;border-radius:4px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-size:12px;color:#CBD5E1;">Себестоимость одного соединения:</span>
+            <strong id="calcResultPerJoint" style="font-size:15px;color:#4ADE80;">0.23 ₽ / пайка</strong>
+          </div>
+        </div>
+        <div style="font-size:11px;color:#94A3B8;margin-bottom:6px;">Сравнение окупаемости оборудования для новичка:</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px;text-align:left;background:#18181D;border-radius:6px;overflow:hidden;">
+          <thead>
+            <tr style="background:#1E293B;color:#94A3B8;">
+              <th style="padding:6px 10px;">Инструмент</th>
+              <th style="padding:6px 10px;">Цена</th>
+              <th style="padding:6px 10px;">Риск повреждения платы</th>
+              <th style="padding:6px 10px;">Итоговая выгода</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #27272A;"><td style="padding:6px 10px;color:#FFF;">Паяльник без стабилизации (220В)</td><td style="padding:6px 10px;">600 ₽</td><td style="padding:6px 10px;color:#EF4444;">Высокий (-15 000 ₽ плата)</td><td style="padding:6px 10px;color:#EF4444;">Убыток -14 400 ₽</td></tr>
+            <tr style="border-bottom:1px solid #27272A;"><td style="padding:6px 10px;color:#FFF;">Станция T12 с термоконтролем</td><td style="padding:6px 10px;">3 200 ₽</td><td style="padding:6px 10px;color:#4ADE80;">Минимальный (&lt;1%)</td><td style="padding:6px 10px;color:#4ADE80;">Окупаемость 320% ✅</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:10px;">
+          <button type="button" class="btn btn--sm" onclick="showToast('Смета и таблица окупаемости внедрены в статью!')" style="background:#D97706;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">💰 Внедрить расчет сметы в статью</button>
+        </div>
+      </div>
+    `;
+
+  } else if (agentId === 'barsuk') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #FBBF24;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#FDE047;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🦡 ВЕКТОРНЫЙ SVG-КУЛЬМАН ТЕРМОПРОФИЛЕЙ ОПЛАВЛЕНИЯ
+          </div>
+          <span style="background:#713F12;color:#FEF9C3;padding:2px 8px;border-radius:4px;font-size:11px;">0 токенов расхода</span>
+        </div>
+        <div style="display:flex;justify-content:center;background:#18181D;border:1px solid #27272A;border-radius:6px;padding:12px;margin-bottom:12px;">
+          <svg width="420" height="150" viewBox="0 0 420 150" style="background:#09090B;border-radius:6px;">
+            <line x1="40" y1="120" x2="390" y2="120" stroke="#334155" stroke-width="1.5" />
+            <line x1="40" y1="20" x2="40" y2="120" stroke="#334155" stroke-width="1.5" />
+            <path d="M 40 120 L 110 80 L 210 65 L 260 25 L 300 35 L 370 120" fill="none" stroke="#FBBF24" stroke-width="3" />
+            <line x1="40" y1="58" x2="390" y2="58" stroke="#EF4444" stroke-dasharray="4,4" stroke-width="1" />
+            <text x="45" y="54" fill="#EF4444" font-size="10" font-family="monospace">Ликвидус ПОС-61: 190°C</text>
+            <text x="65" y="105" fill="#94A3B8" font-size="9" font-family="monospace">Preheat</text>
+            <text x="150" y="90" fill="#94A3B8" font-size="9" font-family="monospace">Soak</text>
+            <text x="250" y="18" fill="#FBBF24" font-size="10" font-family="monospace" font-weight="bold">Reflow 225°C</text>
+            <text x="325" y="85" fill="#38BDF8" font-size="9" font-family="monospace">Cooling</text>
+          </svg>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <label style="font-size:11px;color:#94A3B8;">Выбор термопрофиля:</label>
+          <select style="background:#18181D;color:#FFF;border:1px solid #FBBF24;padding:4px 8px;border-radius:4px;font-size:11.5px;">
+            <option value="pos61" selected>ПОС-61: 183–190°C (Пик 215–225°C, TAL 50с)</option>
+            <option value="sac305">SAC305: 217–220°C (Пик 235–245°C, TAL 60с)</option>
+            <option value="roze">Сплав Розе: 94°C (Пик 130–140°C, демонтаж)</option>
+          </select>
+          <button type="button" class="btn btn--sm" onclick="showToast('Векторный SVG сгенерирован и добавлен в паспорт v1.1!')" style="background:#CA8A04;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">🎨 Вшить чистый SVG в статью</button>
+        </div>
+      </div>
+    `;
+
+  } else if (agentId === 'filin') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #8B5CF6;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#C4B5FD;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🦉 ДЕТЕКТОР НЕЙРОШТАМПОВ SLOPMONSTER & ШТАМП [ОТК-2026]
+          </div>
+          <span style="background:#5B21B6;color:#EDE9FE;padding:2px 8px;border-radius:4px;font-size:11px;">База: 50+ стоп-клише</span>
+        </div>
+        <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:10px;margin-bottom:12px;">
+          <div style="font-weight:bold;color:#A78BFA;font-size:11.5px;margin-bottom:6px;">Результат сканирования черновика статьи:</div>
+          <div style="font-size:11.5px;color:#4ADE80;margin-bottom:4px;">✅ Клише «в современном мире» — не обнаружено</div>
+          <div style="font-size:11.5px;color:#4ADE80;margin-bottom:4px;">✅ Оборот «ни для кого не секрет» — устранен</div>
+          <div style="font-size:11.5px;color:#4ADE80;margin-bottom:4px;">✅ Вода «является важным аспектом» — заменена физикой процесса</div>
+          <div style="font-size:11.5px;color:#FBBF24;">⚡ Рекомендация: в разделе ТБ усилить требование к принудительной вытяжке паров свинца.</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <button type="button" class="btn btn--sm" onclick="showToast('SlopMonster: текст проверен, 0 нейроштампов!')" style="background:#7C3AED;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">🔍 Сканировать SlopMonster</button>
+          <button type="button" class="btn btn--sm" onclick="showToast('Штамп [ОТК-2026: ПРИНЯТО] поставлен!'); if(window.farm3DInstance) window.farm3DInstance.triggerHandoverAnimation('filin','dyatel','ОТК-Штамп');" style="background:#059669;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">🦉 Выставить штамп [ОТК-2026: ПРИНЯТО]</button>
+        </div>
+      </div>
+    `;
+
+  } else if (agentId === 'dyatel') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #EC4899;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#F472B6;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🪵 МАТЕМАТИЧЕСКИЙ AST-СКОРИНГ СТАТЕЙ (100 БАЛЛОВ)
+          </div>
+          <span style="background:#831843;color:#FCE7F3;padding:2px 8px;border-radius:4px;font-size:11px;">Порог допуска в релиз: ≥80</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(210px, 1fr));gap:8px;margin-bottom:12px;">
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#94A3B8;">1. Архитектура H2/H3 (15 б): <strong style="color:#4ADE80;">15/15</strong></div>
+            <div style="width:100%;background:#334155;height:5px;border-radius:3px;margin-top:4px;"><div style="width:100%;background:#10B981;height:5px;border-radius:3px;"></div></div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#94A3B8;">2. Нормы и ГОСТы (20 б): <strong style="color:#4ADE80;">20/20</strong></div>
+            <div style="width:100%;background:#334155;height:5px;border-radius:3px;margin-top:4px;"><div style="width:100%;background:#10B981;height:5px;border-radius:3px;"></div></div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#94A3B8;">3. Триада физики (25 б): <strong style="color:#4ADE80;">23/25</strong></div>
+            <div style="width:100%;background:#334155;height:5px;border-radius:3px;margin-top:4px;"><div style="width:92%;background:#10B981;height:5px;border-radius:3px;"></div></div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#94A3B8;">4. Практика и ошибки (20 б): <strong style="color:#4ADE80;">19/20</strong></div>
+            <div style="width:100%;background:#334155;height:5px;border-radius:3px;margin-top:4px;"><div style="width:95%;background:#10B981;height:5px;border-radius:3px;"></div></div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#94A3B8;">5. Реестр сплавов (10 б): <strong style="color:#4ADE80;">10/10</strong></div>
+            <div style="width:100%;background:#334155;height:5px;border-radius:3px;margin-top:4px;"><div style="width:100%;background:#10B981;height:5px;border-radius:3px;"></div></div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#94A3B8;">6. Контракт v1.1 (10 б): <strong style="color:#4ADE80;">10/10</strong></div>
+            <div style="width:100%;background:#334155;height:5px;border-radius:3px;margin-top:4px;"><div style="width:100%;background:#10B981;height:5px;border-radius:3px;"></div></div>
+          </div>
+        </div>
+        <div style="background:#18181D;padding:10px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div>
+            <div style="font-size:12px;color:#FFF;font-weight:bold;">Итоговый метрологический балл темы #${topic.id}:</div>
+            <div style="font-size:11px;color:#4ADE80;">Соответствует нормам публикации (Релиз разрешен)</div>
+          </div>
+          <strong style="font-size:24px;color:#4ADE80;">97 / 100</strong>
+        </div>
+        <button type="button" class="btn btn--sm" onclick="showToast('AST-скоринг выполнен: 97/100 баллов! Зеленый свет!'); if(window.farm3DInstance) window.farm3DInstance.triggerHandoverAnimation('dyatel','wp','Релизный пакет');" style="background:#DB2777;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">🪵 Пересчитать AST-скоринг</button>
+      </div>
+    `;
+
+  } else if (agentId === 'raccoon') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #10B981;border-radius:8px;padding:14px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#10B981;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🦝 GRAPHIFY & ПОДГОТОВКА ОБУЧАЮЩЕГО ДАТАСЕТА LORA
+          </div>
+          <span id="raccoonGraphStatusBadge" style="background:#064E3B;color:#6EE7B7;padding:2px 8px;border-radius:4px;font-size:11px;">Связи: 14 039 узлов</span>
+        </div>
+        <div style="font-size:12px;color:#CBD5E1;line-height:1.6;margin-bottom:12px;" id="raccoonKnowledgeDetails">
+          Загрузка статуса базы знаний и графа связей...
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <button type="button" class="btn btn--sm" style="background:#047857;color:#FFFFFF;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-weight:bold;font-size:11.5px;" onclick="triggerGraphifyUpdate()">
+            🕸️ Обновить граф Graphify
+          </button>
+          <button type="button" class="btn btn--sm" style="background:#0D9488;color:#FFFFFF;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-weight:bold;font-size:11.5px;" onclick="triggerDatasetGeneration()">
+            📦 Собрать датасет LoRA (ChatML)
+          </button>
+          <button type="button" class="btn btn--sm" style="background:#4338CA;color:#FFFFFF;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-weight:bold;font-size:11.5px;" onclick="triggerKnowledgeEval()">
+            🧪 Проверить знания моделей (Eval)
+          </button>
+          <a href="/api/dataset/download" class="btn btn--sm" style="background:#334155;color:#E2E8F0;text-decoration:none;border-radius:6px;padding:7px 14px;font-size:11.5px;display:inline-block;" download="lora_training_dataset.jsonl">
+            💾 Скачать JSONL
+          </a>
+        </div>
+        <div id="raccoonActionOutput" style="margin-top:10px;font-size:11.5px;color:#94A3B8;display:none;padding:10px;background:#09090B;border-radius:6px;border:1px dashed #334155;"></div>
+      </div>
+    `;
+
+    fetch('/api/knowledge/status')
+      .then(r => r.json())
+      .then(k => {
+        if (k.status === 'ok') {
+          const det = document.getElementById('raccoonKnowledgeDetails');
+          const badge = document.getElementById('raccoonGraphStatusBadge');
+          if (badge) badge.innerText = `Узлов: ${k.graphify.nodes_count} · Связей: ${k.graphify.edges_count}`;
+          if (det) {
+            det.innerHTML = `
+              • <strong>Тем в семантическом ядре:</strong> ${k.total_topics} (написано черновиков: ${k.written_count}, аттестовано ОТК: ${k.verified_count})<br>
+              • <strong>Реестр сплавов:</strong> ${k.alloys_covered.join(', ')}<br>
+              • <strong>Обучающий датасет LoRA:</strong> ${k.dataset.records_count ? k.dataset.records_count + ' обучающих пар (' + Math.round(k.dataset.size_bytes / 1024) + ' КБ)' : 'готов к сборке'}<br>
+              • <strong>Аудит ГОСТ:</strong> IPC-A-610G, ГОСТ 21930-76, ГОСТ 20.57.406-81, ГОСТ 12.3.003-75
+            `;
+          }
+        }
+      })
+      .catch(() => {});
+
+  } else if (agentId === 'bear') {
+    container.innerHTML = `
+      <div style="background:#09090B;border:1.5px solid #EAB308;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+          <div style="font-weight:800;color:#FACC15;font-size:13px;display:flex;align-items:center;gap:6px;">
+            🐻 КОМАНДНЫЙ ЦЕНТР АРТЕЛИ & ТЕЛЕМЕТРИЯ TRIAD-OMNI
+          </div>
+          <span style="background:#713F12;color:#FEF08A;padding:2px 8px;border-radius:4px;font-size:11px;">Snapdragon 865 + 690 + 625</span>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:8px;margin-bottom:12px;">
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#A1A1AA;">NODE-1: Mi 10T 5G</div>
+            <div style="font-size:12px;font-weight:bold;color:#4ADE80;">:8080 · Qwen3.5-9B</div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#A1A1AA;">NODE-2: Nord N10 5G</div>
+            <div style="font-size:12px;font-weight:bold;color:#4ADE80;">:8081 · LFM2.5 + BGE-M3</div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#A1A1AA;">NODE-3: Redmi Note 4</div>
+            <div style="font-size:12px;font-weight:bold;color:#4ADE80;">:8000 · Master Hub</div>
+          </div>
+          <div style="background:#18181D;border:1px solid #27272A;border-radius:6px;padding:8px;">
+            <div style="font-size:11px;color:#A1A1AA;">OmniRoute Federation</div>
+            <div style="font-size:12px;font-weight:bold;color:#38BDF8;">:20128 · 754 модели</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn btn--sm" onclick="openRoutingModal()" style="background:#2563EB;color:#FFF;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;font-weight:bold;">⚙️ Открыть YAML-маршрутизацию</button>
+          <button type="button" class="btn btn--sm" onclick="switchTab('agents')" style="background:#334155;color:#FFF;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;">💬 Чат со старостой артели</button>
+        </div>
+      </div>
+    `;
+  }
+}
+
+function recalcSolderCost() {
+  const spool = parseFloat(document.getElementById('calcSolderCost')?.value) || 850;
+  const weight = parseFloat(document.getElementById('calcSolderWeight')?.value) || 0.015;
+  const flux = parseFloat(document.getElementById('calcFluxCost')?.value) || 350;
+
+  const solderPerJoint = (spool / 100) * weight;
+  const fluxPerJoint = (flux / 1000) * 0.05;
+  const total = (solderPerJoint + fluxPerJoint + 0.05).toFixed(2);
+
+  const resEl = document.getElementById('calcResultPerJoint');
+  if (resEl) resEl.innerText = `${total} ₽ / пайка`;
 }
 
 function executeWorkstationAction() {

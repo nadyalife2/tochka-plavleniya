@@ -646,6 +646,34 @@
         </button>
       </div>
 
+      <!-- Квестовый трекер конвейера в левом верхнем углу -->
+      <div id="farmQuestTracker" style="position:absolute;top:46px;left:14px;background:rgba(15,23,42,0.92);border:1.5px solid #FFC700;border-radius:8px;padding:8px 12px;z-index:15;backdrop-filter:blur(6px);box-shadow:0 4px 16px rgba(0,0,0,0.5);max-width:300px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <span style="font-size:11px;font-weight:800;color:#FFC700;">🎯 КВЕСТ КОНВЕЙЕРА:</span>
+          <span id="questStepBadge" style="font-size:10px;background:#27272A;color:#FFC700;padding:1px 6px;border-radius:4px;font-family:monospace;">Шаг 1/9</span>
+        </div>
+        <div id="questCurrentText" style="font-size:12px;font-weight:700;color:#FFFFFF;margin-bottom:6px;">
+          🪶 Сорока: Сбор LSI-ядра
+        </div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn--xs" type="button" onclick="window.farm3D && window.farm3D.guideToCurrentQuest()" style="background:#16A34A;color:#FFF;border:none;border-radius:4px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;">
+            📍 Путь к верстаку
+          </button>
+          <button class="btn btn--xs" type="button" onclick="window.farm3D && window.farm3D.nextQuestStep()" style="background:#27272A;color:#E4E4E7;border:1px solid #52525B;border-radius:4px;padding:3px 8px;font-size:10px;cursor:pointer;">
+            Следующий ▶
+          </button>
+        </div>
+      </div>
+
+      <!-- Радар / Миникарта Артели в левом нижнем углу -->
+      <div id="farmMiniMapWrap" style="position:absolute;bottom:12px;left:14px;background:rgba(15,23,42,0.92);border:2px solid #10B981;border-radius:10px;padding:6px;z-index:15;backdrop-filter:blur(6px);box-shadow:0 4px 18px rgba(0,0,0,0.6);">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;font-size:10px;font-weight:800;color:#10B981;letter-spacing:0.5px;">
+          <span>🗺️ РАДАР АРТЕЛИ</span>
+          <span id="miniMapCoords" style="color:#A1A1AA;font-family:monospace;">(0, 0)</span>
+        </div>
+        <canvas id="farmMiniMapCanvas" width="130" height="130" style="display:block;background:#09090B;border-radius:6px;cursor:crosshair;"></canvas>
+      </div>
+
       <!-- Всплывающая подсказка взаимодействия при приближении игрока -->
       <div id="playerInteractionPrompt" style="display:none;position:absolute;bottom:42px;left:50%;transform:translateX(-50%);background:rgba(234,88,12,0.95);color:#FFF;padding:8px 18px;border-radius:24px;font-size:12px;font-weight:700;z-index:20;box-shadow:0 4px 18px rgba(0,0,0,0.6);border:1.5px solid #FFC700;pointer-events:none;white-space:nowrap;">
         💬 НАЖМИТЕ ПРОБЕЛ ИЛИ КЛИКНИТЕ: ОТКРЫТЬ ВЕРСТАК И ДОКУМЕНТАЦИЮ
@@ -903,26 +931,49 @@
       </div>
     </div>
 
+    <!-- Вкладки Терминала Верстака -->
+    <div style="display:flex;gap:6px;border-bottom:1.5px solid #27272A;padding-bottom:10px;margin-bottom:14px;flex-wrap:wrap;">
+      <button type="button" class="btn btn--xs" id="wsNavTools" onclick="switchWsModalTab('tools')" style="background:#10B981;color:#09090B;font-weight:800;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;">
+        🛠️ Интерактивный верстак и таблицы
+      </button>
+      <button type="button" class="btn btn--xs" id="wsNavDocs" onclick="switchWsModalTab('docs')" style="background:#27272A;color:#D4D4D8;border:1px solid #3F3F46;padding:6px 14px;border-radius:6px;cursor:pointer;">
+        📜 Документация и ГОСТы
+      </button>
+      <button type="button" class="btn btn--xs" id="wsNavTask" onclick="switchWsModalTab('task')" style="background:#27272A;color:#D4D4D8;border:1px solid #3F3F46;padding:6px 14px;border-radius:6px;cursor:pointer;">
+        🎯 Задание мастера
+      </button>
+      <button type="button" class="btn btn--xs" id="wsNavData" onclick="switchWsModalTab('data')" style="background:#27272A;color:#D4D4D8;border:1px solid #3F3F46;padding:6px 14px;border-radius:6px;cursor:pointer;">
+        📊 Данные темы seo.db
+      </button>
+    </div>
+
     <!-- Тело верстака (Скроллируемая область) -->
-    <div style="overflow-y:auto;flex:1;padding-right:8px;display:flex;flex-direction:column;gap:16px;">
-      <!-- Блок 1: Нормативная база и ГОСТы -->
-      <div style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
+    <div style="overflow-y:auto;flex:1;padding-right:8px;display:flex;flex-direction:column;gap:14px;">
+      <!-- Вкладка 1: Интерактивный верстак с таблицами и инструментами -->
+      <div id="wsTabToolsPanel" style="display:block;">
+        <div id="wsWorkbenchContainer">
+          <!-- Генерируется динамически через renderCraftsmanWorkbench(agentId) -->
+        </div>
+      </div>
+
+      <!-- Вкладка 2: Нормативная база и ГОСТы -->
+      <div id="wsTabDocsPanel" style="display:none;background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
         <div style="font-size:12px;font-weight:700;color:#FFC700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">
           📜 Нормативная база и ГОСТы мастера
         </div>
         <div id="wsModalDocs" style="font-size:13px;line-height:1.6;color:#D4D4D8;"></div>
       </div>
 
-      <!-- Блок 2: Задача мастера в конвейере -->
-      <div style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
+      <!-- Вкладка 3: Задача мастера в конвейере -->
+      <div id="wsTabTaskPanel" style="display:none;background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
         <div style="font-size:12px;font-weight:700;color:#38BDF8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">
           🎯 Что мастер должен сделать
         </div>
         <div id="wsModalTask" style="font-size:13px;line-height:1.6;color:#E4E4E7;"></div>
       </div>
 
-      <!-- Блок 3: Данные по теме из SQLite seo.db -->
-      <div style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
+      <!-- Вкладка 4: Данные по теме из SQLite seo.db -->
+      <div id="wsTabDataPanel" style="display:none;background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
           <div style="font-size:12px;font-weight:700;color:#A78BFA;text-transform:uppercase;">
             📊 Данные по теме из SQLite seo.db
@@ -932,7 +983,7 @@
             <select id="wsModalTopicSelect" onchange="loadWorkstationTopicData(this.value)" style="background:#18181D;color:#FFF;border:1px solid #3F3F46;font-size:12px;padding:4px 8px;border-radius:4px;max-width:280px;"></select>
           </div>
         </div>
-        <div id="wsModalTopicData" style="font-size:12px;font-family:monospace;background:#18181D;padding:10px;border-radius:6px;border:1px solid #27272A;max-height:160px;overflow-y:auto;color:#CBD5E1;"></div>
+        <div id="wsModalTopicData" style="font-size:12px;font-family:monospace;background:#18181D;padding:10px;border-radius:6px;border:1px solid #27272A;max-height:220px;overflow-y:auto;color:#CBD5E1;"></div>
       </div>
     </div>
 

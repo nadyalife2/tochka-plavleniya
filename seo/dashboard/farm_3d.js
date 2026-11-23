@@ -108,6 +108,12 @@
       // 11. Обработчики ввода (WASD + мышь)
       this.setupInteraction();
 
+      // 11.1. Игровой HUD: Миникарта-Радар, Квестовый Трекер и Луч Waypoint
+      this.setupGameHUD();
+
+      // 11.2. 3D Таблички-Бейджи над головами всех мастеров
+      this.setupOverheadNameplates();
+
       // 12. Первичный запрос статуса здоровья и автозамены
       this.fetchInitialHealth();
 
@@ -1007,6 +1013,216 @@
       }
     }
 
+    setupGameHUD() {
+      // 1. Миникарта (2D Радар Артели)
+      this.miniMapCanvas = document.getElementById('farmMiniMapCanvas');
+      this.miniMapCtx = this.miniMapCanvas ? this.miniMapCanvas.getContext('2d') : null;
+      this.miniMapCoords = document.getElementById('miniMapCoords');
+
+      if (this.miniMapCanvas) {
+        this.miniMapCanvas.addEventListener('click', (e) => {
+          const rect = this.miniMapCanvas.getBoundingClientRect();
+          const mx = e.clientX - rect.left;
+          const my = e.clientY - rect.top;
+          const mapW = this.miniMapCanvas.width;
+          const mapH = this.miniMapCanvas.height;
+
+          // Пересчет координат миникарты в мир (-32..+32)
+          const worldX = ((mx - mapW / 2) / (mapW / 2)) * 30;
+          const worldZ = ((my - mapH / 2) / (mapH / 2)) * 30;
+
+          // Ищем ближайшего мастера к точке клика
+          let clickedAgent = null;
+          let minDist = 8.0;
+          this.agents.forEach(a => {
+            const d = Math.hypot(a.group.position.x - worldX, a.group.position.z - worldZ);
+            if (d < minDist) {
+              minDist = d;
+              clickedAgent = a;
+            }
+          });
+
+          if (clickedAgent) {
+            this.selectAgent(clickedAgent);
+            this.setWaypointTarget(clickedAgent);
+          } else if (this.playerAgent) {
+            this.playerAgent.targetPos.set(worldX, 0, worldZ);
+            this.playerAgent.state = 'walking';
+          }
+        });
+      }
+
+      // 2. Световой путеводный луч (Waypoint Beam) на земле
+      const pts = [new THREE.Vector3(0, 0.08, 0), new THREE.Vector3(0, 0.08, 0)];
+      const lineGeo = new THREE.BufferGeometry().setFromPoints(pts);
+      const lineMat = new THREE.LineDashedMaterial({
+        color: 0x10B981,
+        dashSize: 1.0,
+        gapSize: 0.5,
+        linewidth: 4
+      });
+      this.waypointLine = new THREE.Line(lineGeo, lineMat);
+      this.waypointLine.computeLineDistances();
+      this.waypointLine.visible = false;
+      this.scene.add(this.waypointLine);
+
+      // 3. Квестовый трекер конвейера
+      this.currentQuestIndex = 0;
+      this.questList = [
+        { id: 'soroka', title: '🪶 Сорока: Сбор LSI-ядра и конкурентов' },
+        { id: 'bobr', title: '🦫 Бобёр: Бриф ГОСТ Р МЭК 61191-1' },
+        { id: 'kot', title: '🐱 Кот: Физика шва и ликвидус ПОС-61' },
+        { id: 'lis', title: '🦊 Лис: Смета мастерской и окупаемость' },
+        { id: 'barsuk', title: '🦡 Барсук: Векторный SVG-термопрофиль' },
+        { id: 'filin', title: '🦉 Филин: Проверка SlopMonster [ОТК]' },
+        { id: 'dyatel', title: '🪵 Дятел: AST-скоринг 100 баллов' },
+        { id: 'raccoon', title: '🦝 Енот: Graphify & Датасет LoRA' },
+        { id: 'wp', title: '🚀 WordPress: Финальная публикация' }
+      ];
+      this.updateQuestTrackerUI();
+    }
+
+    setupOverheadNameplates() {
+      this.agents.forEach(agent => {
+        if (agent.id === 'bear') return;
+        const canvas = document.createElement('canvas');
+        canvas.width = 300;
+        canvas.height = 76;
+        const ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+        ctx.roundRect(4, 4, 292, 68, 14);
+        ctx.fill();
+
+        const colorHex = '#' + (agent.accentColor || agent.color).toString(16).padStart(6, '0');
+        ctx.strokeStyle = colorHex;
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        ctx.font = 'bold 22px sans-serif';
+        ctx.fillStyle = '#FFFFFF';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${agent.icon} ${agent.name}`, 150, 34);
+
+        ctx.font = '15px monospace';
+        ctx.fillStyle = colorHex;
+        ctx.fillText(agent.role, 150, 58);
+
+        const tex = new THREE.CanvasTexture(canvas);
+        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+        const sprite = new THREE.Sprite(mat);
+        sprite.position.set(0, 2.95, 0);
+        sprite.scale.set(4.2, 1.05, 1.0);
+        agent.group.add(sprite);
+        agent.nameplateSprite = sprite;
+      });
+    }
+
+    setWaypointTarget(agent) {
+      this.waypointTarget = agent;
+      if (this.waypointLine) {
+        this.waypointLine.visible = !!agent;
+      }
+    }
+
+    guideToCurrentQuest() {
+      const q = this.questList[this.currentQuestIndex];
+      if (!q) return;
+      const targetAgent = this.agents.find(a => a.id === q.id);
+      if (targetAgent) {
+        this.setWaypointTarget(targetAgent);
+        if (typeof showToast === 'function') {
+          showToast(`Цель: ${targetAgent.name}. Идите по световому лучу к верстаку!`);
+        }
+        if (this.playerAgent) {
+          const dir = targetAgent.group.position.clone().sub(this.playerAgent.group.position).normalize();
+          this.playerAgent.group.rotation.y = Math.atan2(dir.x, dir.z);
+        }
+      }
+    }
+
+    nextQuestStep() {
+      this.currentQuestIndex = (this.currentQuestIndex + 1) % this.questList.length;
+      this.updateQuestTrackerUI();
+      this.guideToCurrentQuest();
+    }
+
+    updateQuestTrackerUI() {
+      const q = this.questList[this.currentQuestIndex];
+      const badge = document.getElementById('questStepBadge');
+      const text = document.getElementById('questCurrentText');
+      if (badge) badge.innerText = `Шаг ${this.currentQuestIndex + 1}/${this.questList.length}`;
+      if (text) text.innerText = q ? q.title : '';
+    }
+
+    updateMiniMap() {
+      if (!this.miniMapCtx || !this.miniMapCanvas) return;
+      const ctx = this.miniMapCtx;
+      const w = this.miniMapCanvas.width;
+      const h = this.miniMapCanvas.height;
+      const cx = w / 2;
+      const cy = h / 2;
+      const scale = (w / 2) / 30;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Фон двора
+      ctx.fillStyle = '#0F172A';
+      ctx.beginPath();
+      ctx.arc(cx, cy, w / 2 - 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Окружность радара
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(cx, cy, (w / 2) * 0.5, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Мастера
+      this.agents.forEach(a => {
+        if (a.id === 'bear') return;
+        const ax = cx + a.group.position.x * scale;
+        const ay = cy + a.group.position.z * scale;
+
+        ctx.fillStyle = a.state === 'dead' ? '#EF4444' : (a.healthStatus === 'fallback' ? '#F59E0B' : '#10B981');
+        ctx.beginPath();
+        ctx.arc(ax, ay, 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.font = '10px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(a.icon || '🐾', ax, ay - 7);
+      });
+
+      // Игрок (Медведь)
+      if (this.playerAgent) {
+        const px = cx + this.playerAgent.group.position.x * scale;
+        const py = cy + this.playerAgent.group.position.z * scale;
+
+        const yaw = this.playerAgent.group.rotation.y;
+        ctx.fillStyle = 'rgba(255, 199, 0, 0.28)';
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.arc(px, py, 16, yaw - 0.45, yaw + 0.45);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.fillStyle = '#FFC700';
+        ctx.beginPath();
+        ctx.arc(px, py, 5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#FFFFFF';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        if (this.miniMapCoords) {
+          this.miniMapCoords.innerText = `(${Math.round(this.playerAgent.group.position.x)}, ${Math.round(this.playerAgent.group.position.z)})`;
+        }
+      }
+    }
+
     fetchInitialHealth() {
       fetch('/api/agents/routing')
         .then(r => r.json())
@@ -1325,6 +1541,21 @@
         this.stationMeshes.raccoon.graphMesh.rotation.y += 0.02 * this.speed;
         this.stationMeshes.raccoon.graphMesh.rotation.z = Math.sin(time * 2.0) * 0.15;
         this.stationMeshes.raccoon.graphMesh.position.y = 1.6 + Math.sin(time * 3.0) * 0.08;
+      }
+
+      // 1.2. Обновление миникарты радара
+      this.updateMiniMap();
+
+      // 1.3. Обновление светового луча Waypoint Beam к цели квеста
+      if (this.waypointTarget && this.playerAgent && this.waypointLine) {
+        const p1 = this.playerAgent.group.position.clone();
+        p1.y = 0.12;
+        const p2 = this.waypointTarget.group.position.clone();
+        p2.y = 0.12;
+        this.waypointLine.geometry.setFromPoints([p1, p2]);
+        this.waypointLine.computeLineDistances();
+        this.waypointLine.visible = true;
+        this.waypointLine.material.color.setHex((Math.sin(time * 6.0) > 0) ? 0x10B981 : 0xFFC700);
       }
 
       // 2. Управление Игроком (Медведем-Бригадиром) с клавиатуры (WASD)
