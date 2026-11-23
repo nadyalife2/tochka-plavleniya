@@ -1,12 +1,15 @@
 /**
- * 🎮 3D ИНЖЕНЕРНАЯ ФЕРМА АРТЕЛИ ЗВЕРЕЙ-МАСТЕРОВ v2.0 (Three.js WebGL Engine)
- * - Чистый ландшафт без лишнего визуального шума: верстаки, пашня, ручей и дороги.
- * - Строгая физика состояний:
- *     * IDLE: зверь спокойно СТОИТ на месте без дерганий и прыжков.
- *     * WORKING: зверь РЕАЛЬНО РАБОТАЕТ (Кот паяет с искрами, Бобёр пилит, Барсук чертит, Филин ставит штамп, Дятел калибрует шкалу).
- *     * WALKING: идет с ритмичным шагом лапок.
- * - Информационные 3D-таблички над каждым верстаком: ЧТО СДЕЛАТЬ / УТВЕРДИТЬ / НАПИСАТЬ / ПЕРЕПРОВЕРИТЬ + СТАТУС.
- * - Визуализация физической передачи из лап в лапы: предмет летит по дуге с золотой аурой, подтверждение репликой.
+ * 🎮 3D ИНЖЕНЕРНАЯ ФЕРМА АРТЕЛИ ЗВЕРЕЙ-МАСТЕРОВ v3.0 (Three.js WebGL Engine)
+ * - Управляемый игрок: Медведь-Бригадир (Локальный агент Triad-Omni на 3 смартфонах).
+ *     * Управление: WASD / Стрелки / Клик мыши.
+ *     * Камера следует за персонажем.
+ *     * Подход к любому мастеру -> Диалог и открытие верстака по нажатию ПРОБЕЛ / E / Клик.
+ * - Интерактивный Верстак и Нормативная Документация (ГОСТы, правила триады, таблицы seo.db, AST-скоринг).
+ * - Драматичная физика Смерти / Офлайна:
+ *     * Если узел недоступен -> Зверь падает на бок (X_X), над ним череп 💀, табличка верстака краснеет.
+ *     * Если включена автозамена -> Зверь встает и работает через резервный узел [ 🔄 АВТОЗАМЕНА ].
+ * - Панель управления YAML-маршрутизацией и автозаменой прямо в интерфейсе.
+ * - Визуализация физической передачи предметов из лап в лапы по дуге с подтверждением репликой.
  * Точка Плавления · tochka-plavleniya.ru · Triad-Omni Edge AI Cluster.
  */
 
@@ -31,14 +34,19 @@
 
       this.agents = [];
       this.agentMeshes = {};
-      this.stations = {};
+      this.stationConfigs = {};
       this.stationMeshes = {};
       this.windmills = [];
       this.flowLines = [];
 
-      // Системы частиц для работы
+      // Управление игроком (Медведь-Бригадир)
+      this.playerAgent = null;
+      this.keysPressed = {};
+      this.nearestCraftsman = null;
+      this.cameraFollow = true;
+
+      // Системы эффектов
       this.sparksGroup = null;
-      this.sawdustGroup = null;
 
       this.raycaster = new THREE.Raycaster();
       this.mouse = new THREE.Vector2();
@@ -47,16 +55,16 @@
     }
 
     init() {
-      // 1. Сцена и чистое окружение
+      // 1. Сцена и чистое небо
       this.scene = new THREE.Scene();
       this.scene.background = new THREE.Color(0x93C5FD);
       this.scene.fog = new THREE.FogExp2(0x93C5FD, 0.009);
 
-      // 2. Камера (отличный обзор всей рабочей площадки)
+      // 2. Камера
       const width = this.container.clientWidth || 1000;
       const height = this.container.clientHeight || 560;
       this.camera = new THREE.PerspectiveCamera(40, width / height, 0.5, 300);
-      this.camera.position.set(32, 28, 42);
+      this.camera.position.set(28, 24, 36);
 
       // 3. WebGL Рендерер
       this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
@@ -74,30 +82,36 @@
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.06;
         this.controls.maxPolarAngle = Math.PI / 2.08;
-        this.controls.minDistance = 10;
+        this.controls.minDistance = 8;
         this.controls.maxDistance = 110;
-        this.controls.target.set(0, 1.5, 0);
+        this.controls.target.set(0, 1.2, 0);
       }
 
       // 5. Освещение
       this.setupLighting();
 
-      // 6. Лаконичный ландшафт фермы (без загромождающего антуража)
+      // 6. Чистый ландшафт фермы (без загромождающего антуража)
       this.buildCleanFarmEnvironment();
 
-      // 7. Постройки и информационные 3D-таблички
+      // 7. Постройки и информационные 3D-таблички верстаков
       this.buildStationsWithPlacards();
 
       // 8. 3D Анимированные Персонажи с рабочими инструментами
       this.build3DAgentsWithTools();
 
-      // 9. Рабочие эффекты (искры пайки, дым, стружка)
+      // 9. Назначение игрового аватара (Медведь-Бригадир — локальный агент Triad-Omni)
+      this.setupPlayerAvatar();
+
+      // 10. Рабочие эффекты (искры пайки)
       this.setupWorkEffects();
 
-      // 10. Обработчики кликов
+      // 11. Обработчики ввода (WASD + мышь)
       this.setupInteraction();
 
-      // 11. Анимация
+      // 12. Первичный запрос статуса здоровья и автозамены
+      this.fetchInitialHealth();
+
+      // 13. Анимационный цикл
       window.addEventListener('resize', () => this.onWindowResize());
       this.animate();
     }
@@ -124,27 +138,22 @@
       this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.35);
       this.scene.add(this.ambientLight);
 
-      // Локальный огонек паяльного тигля Кота
       this.forgeLight = new THREE.PointLight(0xFF6600, 1.8, 14);
       this.forgeLight.position.set(-16, 2.5, 7);
       this.scene.add(this.forgeLight);
     }
 
     buildCleanFarmEnvironment() {
-      // 1. Ровный зеленый грунт рабочей зоны
+      // Зеленая рабочая площадка
       const groundGeo = new THREE.PlaneGeometry(95, 95);
-      const groundMat = new THREE.MeshStandardMaterial({
-        color: 0x4F8A4B,
-        roughness: 0.9,
-        flatShading: true
-      });
+      const groundMat = new THREE.MeshStandardMaterial({ color: 0x4F8A4B, roughness: 0.9, flatShading: true });
       const ground = new THREE.Mesh(groundGeo, groundMat);
       ground.rotation.x = -Math.PI / 2;
       ground.receiveShadow = true;
       this.scene.add(ground);
       this.groundMesh = ground;
 
-      // 2. Вспаханное поле / Грядки у Бобра (аккуратный участок)
+      // Пашня у Бобра
       const fieldW = 22;
       const fieldD = 14;
       const soilGeo = new THREE.BoxGeometry(fieldW, 0.15, fieldD);
@@ -154,7 +163,7 @@
       field.receiveShadow = true;
       this.scene.add(field);
 
-      // Борозды пашни с ростками
+      // Борозды и ростки
       const ridgeMat = new THREE.MeshStandardMaterial({ color: 0x341F11, roughness: 1.0 });
       const sproutMat = new THREE.MeshStandardMaterial({ color: 0x86EFAC });
       for (let z = -fieldD / 2 + 1.4; z < fieldD / 2 - 1; z += 2.2) {
@@ -169,31 +178,24 @@
         }
       }
 
-      // Аккуратная изгородь вокруг поля
+      // Изгородь пашни
       this.buildFence(-29, -16, 22, 14);
 
-      // 3. Ручей и пруд с чистой водой
+      // Ручей с деревянным мостиком
       const streamGeo = new THREE.PlaneGeometry(8, 65);
-      const waterMat = new THREE.MeshStandardMaterial({
-        color: 0x38BDF8,
-        roughness: 0.1,
-        metalness: 0.2,
-        transparent: true,
-        opacity: 0.85
-      });
+      const waterMat = new THREE.MeshStandardMaterial({ color: 0x38BDF8, roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.85 });
       const stream = new THREE.Mesh(streamGeo, waterMat);
       stream.position.set(-7, 0.04, -2);
       stream.rotation.x = -Math.PI / 2;
       stream.rotation.z = 0.22;
       this.scene.add(stream);
 
-      // Деревянный мостик
       this.buildBridge(-7, 0.2, 0, 0.22);
 
-      // 4. Песчаные дорожки между верстаками
+      // Песчаные дорожки между верстаками
       this.buildCobblePaths();
 
-      // 5. Несколько аккуратных деревьев ТОЛЬКО по дальней границе (не закрывают обзор)
+      // Деревья строго по дальнему периметру
       this.placePerimeterTrees();
     }
 
@@ -246,17 +248,11 @@
     buildCobblePaths() {
       const pathMat = new THREE.MeshStandardMaterial({ color: 0xD4C39C, roughness: 0.95 });
       const paths = [
-        // Центр площади
         { geo: new THREE.CylinderGeometry(7.5, 7.5, 0.03, 16), x: 0, y: 0.02, z: 0 },
-        // К Кузнице Кота
         { geo: new THREE.BoxGeometry(16, 0.03, 2.8), x: -8, y: 0.02, z: 5, rotY: 0.1 },
-        // К Мельнице Сороки
         { geo: new THREE.BoxGeometry(2.8, 0.03, 16), x: -14, y: 0.02, z: -14 },
-        // К Усадьбе Лиса
         { geo: new THREE.BoxGeometry(16, 0.03, 2.8), x: 10, y: 0.02, z: 3, rotY: 0.15 },
-        // К Башне Филина
         { geo: new THREE.BoxGeometry(14, 0.03, 2.8), x: 9, y: 0.02, z: -8, rotY: -0.5 },
-        // К Кульману Барсука и Элеватору Дятла
         { geo: new THREE.BoxGeometry(2.8, 0.03, 18), x: 0, y: 0.02, z: 10 }
       ];
 
@@ -270,7 +266,6 @@
     }
 
     placePerimeterTrees() {
-      // Только 6 деревьев по периметру вдалеке, чтобы не закрывать обзор
       const coords = [
         { x: -36, z: -30, type: 'pine' },
         { x: 34, z: -28, type: 'pine' },
@@ -279,7 +274,6 @@
         { x: 0, z: -36, type: 'birch' },
         { x: 26, z: 28, type: 'oak' }
       ];
-
       coords.forEach(c => {
         const tree = this.createTree(c.type);
         tree.position.set(c.x, 0, c.z);
@@ -383,7 +377,6 @@
         this.scene.add(stationGroup);
         this.stationMeshes[key] = stationGroup;
 
-        // Создаем четкую 3D-информационную табличку над станцией
         this.createStationPlacard(key, cfg, stationGroup);
       });
     }
@@ -393,7 +386,6 @@
       g.userData = { id: cfg.id, name: cfg.name, icon: cfg.icon, key };
 
       if (key === 'soroka') {
-        // Мельница с лопастями
         const tower = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.6, 6.0, 8), new THREE.MeshStandardMaterial({ color: 0x828282 }));
         tower.position.y = 3.0;
         g.add(tower);
@@ -419,27 +411,21 @@
         g.add(bladeGroup);
         this.windmills.push(bladeGroup);
 
-        // Стол с картой
         const table = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 1.2), new THREE.MeshStandardMaterial({ color: 0x8C5A36 }));
         table.position.set(0, 0.4, 2.6);
         g.add(table);
-        g.workTable = table;
 
       } else if (key === 'bobr') {
-        // Лесопильный верстак и бревно для пиления
         const bench = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.9, 1.6), new THREE.MeshStandardMaterial({ color: 0x784A28 }));
         bench.position.set(0, 0.45, 0);
         g.add(bench);
 
-        // Бревно, которое пилит Бобёр
         const log = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 2.8, 8), new THREE.MeshStandardMaterial({ color: 0x5C381E }));
         log.rotateZ(Math.PI / 2);
         log.position.set(0, 1.15, 0);
         g.add(log);
-        g.workLog = log;
 
       } else if (key === 'kot') {
-        // Кузница и верстак для пайки
         const walls = new THREE.Mesh(new THREE.BoxGeometry(4.8, 2.8, 4.0), new THREE.MeshStandardMaterial({ color: 0x555555 }));
         walls.position.set(0, 1.4, 0);
         g.add(walls);
@@ -449,24 +435,15 @@
         roof.position.set(0, 3.6, 0);
         g.add(roof);
 
-        // Верстак пайки с платой перед кузницей
         const bench = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.85, 1.4), new THREE.MeshStandardMaterial({ color: 0x2A2A2A }));
         bench.position.set(0, 0.42, 2.8);
         g.add(bench);
 
-        // Зеленая печатная плата (PCB)
         const pcb = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.05, 0.7), new THREE.MeshStandardMaterial({ color: 0x166534 }));
         pcb.position.set(0, 0.88, 2.8);
         g.add(pcb);
-        g.workPcb = pcb;
-
-        // Паяльная станция T12
-        const stationBox = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.3, 0.3), new THREE.MeshStandardMaterial({ color: 0x111111 }));
-        stationBox.position.set(-0.8, 1.0, 2.8);
-        g.add(stationBox);
 
       } else if (key === 'bear') {
-        // Большой круглый дубовый стол
         const deck = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.4, 0.25, 16), new THREE.MeshStandardMaterial({ color: 0x734826 }));
         deck.position.y = 0.12;
         g.add(deck);
@@ -480,17 +457,11 @@
         g.add(samovar);
 
       } else if (key === 'lis') {
-        // Конторка со счетами и книгой смет
         const desk = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.0, 1.6), new THREE.MeshStandardMaterial({ color: 0x8C5831 }));
         desk.position.set(0, 0.5, 0);
         g.add(desk);
 
-        const ledger = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.08, 0.6), new THREE.MeshStandardMaterial({ color: 0xFAF5EE }));
-        ledger.position.set(0, 1.04, 0);
-        g.add(ledger);
-
       } else if (key === 'barsuk') {
-        // Чертежный кульман с наклонным листом
         const stand = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.6, 1.2), new THREE.MeshStandardMaterial({ color: 0x444444 }));
         stand.position.set(0, 0.8, 0);
         g.add(stand);
@@ -499,10 +470,8 @@
         board.position.set(0, 1.3, 0.2);
         board.rotation.x = -0.45;
         g.add(board);
-        g.workBoard = board;
 
       } else if (key === 'filin') {
-        // Сторожевой пост ОТК со стендом проверки
         const plat = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.25, 3.6), new THREE.MeshStandardMaterial({ color: 0x5C3B1E }));
         plat.position.y = 5.0;
         g.add(plat);
@@ -513,25 +482,16 @@
           g.add(leg);
         });
 
-        // Столик ревизора на площадке
-        const desk = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 1.0), new THREE.MeshStandardMaterial({ color: 0x8B5CF6 }));
-        desk.position.set(0, 5.5, 0);
-        g.add(desk);
-
       } else if (key === 'dyatel') {
-        // Башня с метрологической шкалой 100 баллов
         const tower = new THREE.Mesh(new THREE.BoxGeometry(2.4, 5.5, 2.4), new THREE.MeshStandardMaterial({ color: 0x831843 }));
         tower.position.y = 2.75;
         g.add(tower);
 
-        // Вертикальная мерная линейка
         const ruler = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4.2, 0.06), new THREE.MeshBasicMaterial({ color: 0x10B981 }));
         ruler.position.set(0, 2.8, 1.24);
         g.add(ruler);
-        g.workRuler = ruler;
 
       } else if (key === 'wp') {
-        // Арка портала WordPress
         const archMat = new THREE.MeshStandardMaterial({ color: 0x0E7490 });
         const postL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 4.0, 0.6), archMat);
         postL.position.set(-1.6, 2.0, 0);
@@ -560,7 +520,6 @@
       const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
       const sprite = new THREE.Sprite(spriteMat);
 
-      // Размещаем табличку высоко над станцией, лицом к камере
       const placardY = (key === 'filin') ? 8.2 : (key === 'soroka' ? 8.8 : 4.8);
       sprite.position.set(0, placardY, 0);
       sprite.scale.set(6.8, 2.5, 1.0);
@@ -580,54 +539,49 @@
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Темный фон плашки с закруглением
       ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
       ctx.roundRect(8, 8, canvas.width - 16, canvas.height - 16, 20);
       ctx.fill();
 
-      // Окантовка цветом мастера
       ctx.strokeStyle = '#' + colorHex.toString(16).padStart(6, '0');
       ctx.lineWidth = 5;
       ctx.stroke();
 
-      // Заголовок станции
       ctx.font = 'bold 24px sans-serif';
       ctx.fillStyle = '#FFFFFF';
       ctx.textAlign = 'left';
       ctx.fillText(title, 26, 46);
 
-      // Основная задача (Что сделать / утвердить / написать)
       ctx.font = 'bold 22px sans-serif';
       ctx.fillStyle = '#FFC700';
       ctx.fillText(taskTitle, 26, 88);
 
-      // Подзадача
       ctx.font = '18px sans-serif';
       ctx.fillStyle = '#E2E8F0';
       ctx.fillText(taskSubtitle, 26, 122);
 
-      // Бейдж статуса справа внизу
       let badgeBg = '#475569';
       let badgeColor = '#FFFFFF';
       if (statusText.includes('РАБОТЕ')) {
         badgeBg = '#EA580C';
-        badgeColor = '#FFFFFF';
       } else if (statusText.includes('ГОТОВ') || statusText.includes('УТВЕРЖДЕНО')) {
         badgeBg = '#16A34A';
-        badgeColor = '#FFFFFF';
       } else if (statusText.includes('АКТИВЕН')) {
         badgeBg = '#2563EB';
-        badgeColor = '#FFFFFF';
+      } else if (statusText.includes('ОФФЛАЙН')) {
+        badgeBg = '#DC2626';
+      } else if (statusText.includes('АВТОЗАМЕНА')) {
+        badgeBg = '#D97706';
       }
 
       ctx.fillStyle = badgeBg;
-      ctx.roundRect(26, 142, 220, 36, 8);
+      ctx.roundRect(26, 142, 240, 36, 8);
       ctx.fill();
 
       ctx.font = 'bold 16px sans-serif';
       ctx.fillStyle = badgeColor;
       ctx.textAlign = 'center';
-      ctx.fillText(`СТАТУС: ${statusText}`, 136, 166);
+      ctx.fillText(`СТАТУС: ${statusText}`, 146, 166);
 
       stationGroup.placardTexture.needsUpdate = true;
     }
@@ -647,15 +601,15 @@
     build3DAgentsWithTools() {
       const agentConfigs = [
         {
-          id: 'bear', name: 'Медведь-Бригадир', role: 'Староста Артели', icon: '🐻',
-          color: 0x8D5B36, x: 0, z: -1.2, speed: 1.4,
-          dialogue: 'Совет Артели в сборе. Все верстаки готовы к работе!',
+          id: 'bear', name: 'Медведь-Бригадир (Игрок)', role: 'Староста Артели', icon: '🐻',
+          color: 0x8D5B36, x: 0, z: -1.2, speed: 1.5,
+          dialogue: 'Совет Артели на связи! Управляйте мной клавишами WASD.',
           earType: 'round', toolType: 'tea_cup'
         },
         {
           id: 'soroka', name: 'Сорока-Разведчица', role: '00-research', icon: '🪶',
           color: 0x1E293B, accentColor: 0x38BDF8, x: -14, z: -17, speed: 2.1,
-          dialogue: 'Парсю поисковую выдачу и калькуляторы припоя конкурентов!',
+          dialogue: 'Парсю выдачу Яндекса и калькуляторы припоя конкурентов!',
           earType: 'beak', toolType: 'spyglass'
         },
         {
@@ -706,16 +660,47 @@
           group: meshGroup,
           targetPos: new THREE.Vector3(cfg.x, 0, cfg.z),
           homePos: new THREE.Vector3(cfg.x, 0, cfg.z),
-          state: 'idle', // idle, walking, working
+          state: 'idle', // idle, walking, working, dead
+          healthStatus: 'alive',
           walkCycle: 0,
           workTimer: 0,
           heldItemMesh: null,
-          bubbleSprite: null
+          statusSprite: null
         };
 
         this.agents.push(agentObj);
         this.agentMeshes[cfg.id] = meshGroup;
       });
+    }
+
+    setupPlayerAvatar() {
+      // Игрок управляет Медведем-Бригадиром
+      this.playerAgent = this.agents.find(a => a.id === 'bear');
+      if (this.playerAgent) {
+        // Создаем золотую корону игрока
+        const crownCanvas = document.createElement('canvas');
+        crownCanvas.width = 256;
+        crownCanvas.height = 64;
+        const cCtx = crownCanvas.getContext('2d');
+        cCtx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+        cCtx.roundRect(4, 4, 248, 56, 12);
+        cCtx.fill();
+        cCtx.strokeStyle = '#FFC700';
+        cCtx.lineWidth = 3;
+        cCtx.stroke();
+        cCtx.font = 'bold 20px sans-serif';
+        cCtx.fillStyle = '#FFC700';
+        cCtx.textAlign = 'center';
+        cCtx.textBaseline = 'middle';
+        cCtx.fillText('👑 ВЫ: Triad-Omni', 128, 32);
+
+        const tex = new THREE.CanvasTexture(crownCanvas);
+        const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+        const crownSprite = new THREE.Sprite(spriteMat);
+        crownSprite.position.set(0, 3.2, 0);
+        crownSprite.scale.set(4.0, 1.0, 1.0);
+        this.playerAgent.group.add(crownSprite);
+      }
     }
 
     create3DAnimalWithTool(cfg) {
@@ -726,18 +711,15 @@
       const accentMat = new THREE.MeshStandardMaterial({ color: cfg.accentColor || 0xFFFFFF });
       const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
 
-      // Тело
       const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.1, 1.4), bodyMat);
       body.position.y = 1.05;
       body.castShadow = true;
       g.add(body);
 
-      // Грудка
       const belly = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.8, 0.08), accentMat);
       belly.position.set(0, 0.95, 0.72);
       g.add(belly);
 
-      // Голова
       const headGroup = new THREE.Group();
       headGroup.position.set(0, 1.75, 0.7);
 
@@ -752,7 +734,6 @@
         headGroup.add(eye);
       });
 
-      // Мордочка / Клюв
       if (cfg.earType === 'beak' || cfg.earType === 'crest') {
         const beak = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.55, 4), new THREE.MeshStandardMaterial({ color: 0xF59E0B }));
         beak.rotateX(Math.PI / 2);
@@ -768,7 +749,6 @@
         headGroup.add(nose);
       }
 
-      // Ушки
       if (cfg.earType === 'pointy') {
         [-0.3, 0.3].forEach(ux => {
           const ear = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.4, 4), bodyMat);
@@ -787,7 +767,6 @@
       g.add(headGroup);
       g.headGroup = headGroup;
 
-      // Шарнирные лапки
       const legMat = new THREE.MeshStandardMaterial({ color: cfg.color, roughness: 0.8 });
       const legs = {};
       [
@@ -806,7 +785,6 @@
       });
       g.legs = legs;
 
-      // Рука/лапа с рабочим инструментом
       const toolArm = new THREE.Group();
       toolArm.position.set(0.48, 1.0, 0.4);
       this.attachWorkingTool(toolArm, cfg.toolType);
@@ -818,36 +796,26 @@
 
     attachWorkingTool(armGroup, toolType) {
       if (toolType === 'soldering_iron') {
-        // Паяльник Кота с горячим жалом
         const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
         handle.rotateX(Math.PI / 3);
         armGroup.add(handle);
-
         const tip = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.25, 6), new THREE.MeshBasicMaterial({ color: 0xF97316 }));
         tip.rotateX(Math.PI / 3);
         tip.position.set(0, -0.3, 0.25);
         armGroup.add(tip);
-
       } else if (toolType === 'saw') {
-        // Пила Бобра
         const sawBlade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.8), new THREE.MeshStandardMaterial({ color: 0xCBD5E1, metalness: 0.9 }));
         sawBlade.position.set(0, -0.15, 0.3);
         armGroup.add(sawBlade);
-
       } else if (toolType === 'pencil_ruler') {
-        // Карандаш Барсука
         const pencil = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0xFBBF24 }));
         pencil.rotateX(Math.PI / 4);
         armGroup.add(pencil);
-
       } else if (toolType === 'otk_stamp') {
-        // Штамп [ОТК] Филина
         const stamp = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.45, 8), new THREE.MeshStandardMaterial({ color: 0x8B5CF6 }));
         stamp.position.set(0, -0.2, 0.15);
         armGroup.add(stamp);
-
       } else if (toolType === 'tea_cup') {
-        // Кружка чая Бригадира
         const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.25, 8), new THREE.MeshStandardMaterial({ color: 0xEAB308 }));
         cup.position.set(0, -0.1, 0.2);
         armGroup.add(cup);
@@ -855,7 +823,6 @@
     }
 
     setupWorkEffects() {
-      // Искры пайки Кота
       const sparkCount = 20;
       const sparkGeo = new THREE.BufferGeometry();
       const sparkPos = new Float32Array(sparkCount * 3);
@@ -872,6 +839,8 @@
 
     setupInteraction() {
       const dom = this.renderer.domElement;
+
+      // 1. Мышь: клик по зверю -> открытие верстака и документации
       dom.addEventListener('pointerdown', (e) => {
         const rect = dom.getBoundingClientRect();
         this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -901,12 +870,30 @@
 
           if (hitAgent) {
             this.selectAgent(hitAgent);
-          } else if (groundHit && this.selectedAgent) {
-            this.selectedAgent.targetPos.copy(groundHit);
-            this.selectedAgent.targetPos.y = 0;
-            this.selectedAgent.state = 'walking';
+          } else if (groundHit && this.playerAgent) {
+            this.playerAgent.targetPos.copy(groundHit);
+            this.playerAgent.targetPos.y = 0;
+            this.playerAgent.state = 'walking';
           }
         }
+      });
+
+      // 2. Клавиатурное управление игроком (WASD / Стрелки / Пробел)
+      window.addEventListener('keydown', (e) => {
+        this.keysPressed[e.code] = true;
+
+        if (e.code === 'Space' || e.code === 'KeyE') {
+          if (this.nearestCraftsman) {
+            e.preventDefault();
+            if (typeof openWorkstationModal === 'function') {
+              openWorkstationModal(this.nearestCraftsman.id);
+            }
+          }
+        }
+      });
+
+      window.addEventListener('keyup', (e) => {
+        this.keysPressed[e.code] = false;
       });
     }
 
@@ -916,10 +903,15 @@
         speakText(`${agent.name}: ${agent.dialogue}`);
       }
 
-      // Камера плавно приближается к выбранному мастеру
+      // Открываем модальное окно верстака и документации мастера
+      if (typeof openWorkstationModal === 'function') {
+        openWorkstationModal(agent.id);
+      }
+
+      // Плавное приближение камеры
       if (this.controls) {
         const targetPos = agent.group.position.clone();
-        const newCamPos = targetPos.clone().add(new THREE.Vector3(9, 7, 11));
+        const newCamPos = targetPos.clone().add(new THREE.Vector3(8, 6, 10));
 
         const startTime = performance.now();
         const startPos = this.camera.position.clone();
@@ -927,7 +919,7 @@
 
         const panAnim = () => {
           const now = performance.now();
-          const p = Math.min((now - startTime) / 500, 1.0);
+          const p = Math.min((now - startTime) / 450, 1.0);
           const ease = p * (2 - p);
 
           this.camera.position.lerpVectors(startPos, newCamPos, ease);
@@ -938,24 +930,113 @@
         };
         panAnim();
       }
+    }
 
-      // Подсветка карточки верстака на веб-странице
-      const cardMap = {
-        soroka: 'card-craftsman-analyzer',
-        bobr: 'card-craftsman-researcher',
-        kot: 'card-craftsman-writer',
-        lis: 'card-craftsman-writer2',
-        barsuk: 'card-craftsman-illustrator',
-        filin: 'card-craftsman-reviewer',
-        dyatel: 'card-craftsman-scorer'
-      };
-      const cId = cardMap[agent.id];
-      if (cId && document.getElementById(cId)) {
-        document.querySelectorAll('.craftsman-card').forEach(el => el.classList.remove('craftsman-highlighted'));
-        const card = document.getElementById(cId);
-        card.classList.add('craftsman-highlighted');
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        setTimeout(() => card.classList.remove('craftsman-highlighted'), 4000);
+    fetchInitialHealth() {
+      fetch('/api/agents/routing')
+        .then(r => r.json())
+        .then(data => {
+          if (data.status === 'ok') {
+            window.clusterHealth = data.health;
+            this.applyHealthStatus(data.health);
+          }
+        })
+        .catch(() => {});
+    }
+
+    // ==========================================
+    // ФИЗИКА СМЕРТИ / ОФФЛАЙНА И АВТОЗАМЕНЫ
+    // ==========================================
+    applyHealthStatus(healthData) {
+      if (!healthData || !healthData.craftsmen) return;
+
+      Object.entries(healthData.craftsmen).forEach(([agentId, info]) => {
+        const agent = this.agents.find(a => a.id === agentId);
+        const stGroup = this.stationMeshes[agentId];
+        if (!agent) return;
+
+        agent.healthStatus = info.status;
+
+        if (info.status === 'dead') {
+          // ДРАМАТИЧНАЯ СМЕРТЬ: зверь падает на бок!
+          agent.state = 'dead';
+          agent.group.rotation.z = Math.PI / 2.2;
+          agent.group.position.y = 0.35;
+          if (agent.group.toolArm) agent.group.toolArm.rotation.set(0.6, 0.4, 0.4);
+
+          this.createOrUpdateStatusSprite(agent, '💀 ОФФЛАЙН (Сбой узла)', '#EF4444');
+
+          if (stGroup) {
+            this.redrawPlacard(stGroup, stGroup.userData.name, '💀 СБОЙ УЗЛА: ' + info.primary, 'Требуется автозамена в YAML!', 'ОФФЛАЙН 💀', 0xEF4444);
+          }
+
+        } else if (info.status === 'fallback') {
+          // В СТРОЮ БЛАГОДАРЯ АВТОЗАМЕНЕ
+          if (agent.state === 'dead') agent.state = 'idle';
+          agent.group.rotation.z = 0;
+          agent.group.position.y = 0;
+
+          this.createOrUpdateStatusSprite(agent, `🔄 РЕЗЕРВ: ${info.active_route}`, '#F59E0B');
+
+          if (stGroup) {
+            this.redrawPlacard(stGroup, stGroup.userData.name, stGroup.userData.name, 'Резервный узел: ' + info.active_route, 'АВТОЗАМЕНА 🔄', 0xF59E0B);
+          }
+
+        } else {
+          // В ШТАТНОМ ОНЛАЙН РЕЖИМЕ
+          if (agent.state === 'dead') agent.state = 'idle';
+          agent.group.rotation.z = 0;
+          agent.group.position.y = 0;
+          this.removeStatusSprite(agent);
+
+          if (stGroup) {
+            const cfg = this.stationConfigs[agentId];
+            if (cfg) {
+              this.redrawPlacard(stGroup, cfg.name, cfg.taskTitle, cfg.taskSubtitle, cfg.status || 'ГОТОВ', cfg.colorHex);
+            }
+          }
+        }
+      });
+    }
+
+    createOrUpdateStatusSprite(agent, text, colorHex) {
+      if (agent.statusSprite) {
+        agent.group.remove(agent.statusSprite);
+        agent.statusSprite = null;
+      }
+
+      const canvas = document.createElement('canvas');
+      canvas.width = 300;
+      canvas.height = 70;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
+      ctx.roundRect(4, 4, 292, 62, 12);
+      ctx.fill();
+
+      ctx.strokeStyle = colorHex;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      ctx.font = 'bold 20px sans-serif';
+      ctx.fillStyle = colorHex;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 150, 35);
+
+      const tex = new THREE.CanvasTexture(canvas);
+      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+      const sprite = new THREE.Sprite(mat);
+      sprite.position.set(0, 3.4, 0);
+      sprite.scale.set(4.5, 1.1, 1.0);
+      agent.group.add(sprite);
+      agent.statusSprite = sprite;
+    }
+
+    removeStatusSprite(agent) {
+      if (agent.statusSprite) {
+        agent.group.remove(agent.statusSprite);
+        agent.statusSprite = null;
       }
     }
 
@@ -965,51 +1046,37 @@
     createHandoverItem(itemType) {
       const g = new THREE.Group();
       if (itemType.includes('LSI')) {
-        // Свиток LSI
         const scroll = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.7, 8), new THREE.MeshStandardMaterial({ color: 0xFDE68A }));
         scroll.rotateZ(Math.PI / 2);
         g.add(scroll);
       } else if (itemType.includes('ГОСТ')) {
-        // Папка ТЗ ГОСТ
         const folder = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.08, 0.45), new THREE.MeshStandardMaterial({ color: 0x92400E }));
         g.add(folder);
       } else if (itemType.includes('Черновик')) {
-        // Тетрадь-черновик статьи
         const draft = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.1, 0.42), new THREE.MeshStandardMaterial({ color: 0xEA580C }));
         g.add(draft);
       } else if (itemType.includes('SVG')) {
-        // Планшет со схемой
         const tablet = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.04, 0.5), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
         g.add(tablet);
       } else if (itemType.includes('Паспорт')) {
-        // Паспорт ОТК с печатью
         const pass = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.08, 0.4), new THREE.MeshStandardMaterial({ color: 0x8B5CF6 }));
         g.add(pass);
       } else {
-        // Релизная посылка
         const box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshStandardMaterial({ color: 0x06B6D4 }));
         g.add(box);
       }
 
-      // Золотая аура предмета
       const glow = new THREE.Mesh(new THREE.SphereGeometry(0.45, 8, 8), new THREE.MeshBasicMaterial({ color: 0xFFC700, transparent: true, opacity: 0.35 }));
       g.add(glow);
-
       return g;
     }
 
     drawConveyorFlowLine(pA, pB) {
-      // Рисуем световую пунктирную линию между верстаками на земле
       const lineGeo = new THREE.BufferGeometry().setFromPoints([
         new THREE.Vector3(pA.x, 0.08, pA.z),
         new THREE.Vector3(pB.x, 0.08, pB.z)
       ]);
-      const lineMat = new THREE.LineDashedMaterial({
-        color: 0xFFC700,
-        dashSize: 1.2,
-        gapSize: 0.6,
-        linewidth: 3
-      });
+      const lineMat = new THREE.LineDashedMaterial({ color: 0xFFC700, dashSize: 1.2, gapSize: 0.6, linewidth: 3 });
       const line = new THREE.Line(lineGeo, lineMat);
       line.computeLineDistances();
       this.scene.add(line);
@@ -1023,42 +1090,12 @@
 
     startMissionPipeline(topicId = 1) {
       const pipelineSteps = [
-        {
-          from: 'soroka', to: 'bobr',
-          itemName: '📜 LSI-ядро #' + topicId,
-          sendSpeech: 'Бобёр, держи собранное LSI-ядро и интент новичка!',
-          receiveSpeech: 'Принял LSI! Утверждаю бриф ГОСТ Р МЭК 61191 с 4 вопросами FAQ.'
-        },
-        {
-          from: 'bobr', to: 'kot',
-          itemName: '🪵 Бриф ГОСТ #' + topicId,
-          sendSpeech: 'Кот, плотина стандартов ГОСТ готова! Пиши триаду фактов!',
-          receiveSpeech: 'Принял бриф! Прогреваю жало T12, паяю физику смачивания.'
-        },
-        {
-          from: 'kot', to: 'barsuk',
-          itemName: '📝 Черновик #' + topicId,
-          sendSpeech: 'Барсук, текст готов! Нужен точный векторный термопрофиль ПОС-61.',
-          receiveSpeech: 'Принял черновик! Черчу кривую ликвидуса 183–190°C по реестру сплавов.'
-        },
-        {
-          from: 'barsuk', to: 'filin',
-          itemName: '📐 SVG-схема #' + topicId,
-          sendSpeech: 'Филин, векторная схема готова! Проверь на слоп и водность.',
-          receiveSpeech: 'Принял схему и текст! SlopMonster проверил: слопа 0%, ставлю [ОТК-2026]!'
-        },
-        {
-          from: 'filin', to: 'dyatel',
-          itemName: '🔍 Паспорт v1.1 #' + topicId,
-          sendSpeech: 'Дятел, штамп ОТК стоит. Запускай метрологический скоринг!',
-          receiveSpeech: 'Принял паспорт! AST-скоринг 94/100 баллов! Передаю в релиз.'
-        },
-        {
-          from: 'dyatel', to: 'wp',
-          itemName: '📦 Релиз 94/100',
-          sendSpeech: 'Шлюз WordPress, пакет статьи доставлен для tochka-plavleniya.ru!',
-          receiveSpeech: 'Релиз успешно развернут на сайте!'
-        }
+        { from: 'soroka', to: 'bobr', itemName: '📜 LSI-ядро #' + topicId, sendSpeech: 'Бобёр, держи LSI-ядро темы #' + topicId, receiveSpeech: 'Принял LSI! Утверждаю бриф ГОСТ Р МЭК 61191.' },
+        { from: 'bobr', to: 'kot', itemName: '🪵 Бриф ГОСТ #' + topicId, sendSpeech: 'Кот, плотина стандартов готова! Пиши триаду!', receiveSpeech: 'Принял бриф! Прогреваю жало T12, паяю физику смачивания.' },
+        { from: 'kot', to: 'barsuk', itemName: '📝 Черновик #' + topicId, sendSpeech: 'Барсук, текст готов! Нужен точный SVG-термопрофиль ПОС-61.', receiveSpeech: 'Принял черновик! Черчу кривую ликвидуса 183–190°C.' },
+        { from: 'barsuk', to: 'filin', itemName: '📐 SVG-схема #' + topicId, sendSpeech: 'Филин, векторная схема готова! Проверь на слоп.', receiveSpeech: 'Принял схему! SlopMonster чист, ставлю штамп [ОТК-2026]!' },
+        { from: 'filin', to: 'dyatel', itemName: '🔍 Паспорт v1.1 #' + topicId, sendSpeech: 'Дятел, штамп ОТК стоит. Запускай метрологический скоринг!', receiveSpeech: 'Принял паспорт! AST-скоринг 94/100 баллов! Передаю в релиз.' },
+        { from: 'dyatel', to: 'wp', itemName: '📦 Релиз 94/100', sendSpeech: 'Шлюз WordPress, пакет статьи доставлен для tochka-plavleniya.ru!', receiveSpeech: 'Релиз успешно развернут на сайте!' }
       ];
 
       let currentStepIdx = 0;
@@ -1081,16 +1118,13 @@
 
         if (!sender || !receiverSt) return;
 
-        // 1. Статус отправителя: В РАБОТЕ
         this.updateStationStatus(step.from, 'В РАБОТЕ ⚙️', 'Формирование: ' + step.itemName);
         sender.state = 'working';
         sender.workTimer = 180;
 
-        // Световая линия конвейера между верстаками
         this.drawConveyorFlowLine(senderSt.pos, receiverSt.pos);
 
         setTimeout(() => {
-          // 2. Отправитель берет предмет в лапы и идет навстречу получателю
           sender.state = 'walking';
           const itemMesh = this.createHandoverItem(step.itemName);
           sender.group.add(itemMesh);
@@ -1109,20 +1143,16 @@
             speakText(`${sender.name}: ${step.sendSpeech}`);
           }
 
-          // 3. Ждем прибытия к точке передачи
           const arrivalCheck = setInterval(() => {
             const dist = sender.group.position.distanceTo(meetPoint);
             if (dist < 1.0) {
               clearInterval(arrivalCheck);
 
-              // 4. ФИЗИЧЕСКАЯ ПЕРЕДАЧА ИЗ ЛАП В ЛАПЫ (Параболический перелет с золотой аурой)
               this.animateItemTransfer(sender, receiver, itemMesh, () => {
-                // Отправитель сдал задачу
                 this.updateStationStatus(step.from, 'УТВЕРЖДЕНО ✅', 'Передано: ' + step.itemName);
                 sender.state = 'walking';
                 sender.targetPos.copy(sender.homePos);
 
-                // Получатель принял задачу и начинает РЕАЛЬНО РАБОТАТЬ
                 if (receiver) {
                   this.updateStationStatus(step.to, 'В РАБОТЕ ⚙️', 'Обработка: ' + step.itemName);
                   receiver.state = 'working';
@@ -1152,7 +1182,6 @@
         return;
       }
 
-      // Открепляем от отправителя и переносим в мировую систему координат
       sender.group.remove(itemMesh);
       this.scene.add(itemMesh);
 
@@ -1160,14 +1189,13 @@
       const endWorld = receiver.group.position.clone().add(new THREE.Vector3(0, 1.2, 0.5));
       itemMesh.position.copy(startWorld);
 
-      const duration = 800; // мс
+      const duration = 800;
       const startTime = performance.now();
 
       const transferLoop = () => {
         const now = performance.now();
         const p = Math.min((now - startTime) / duration, 1.0);
 
-        // Параболическая траектория перелета
         itemMesh.position.lerpVectors(startWorld, endWorld, p);
         itemMesh.position.y += Math.sin(p * Math.PI) * 1.5;
         itemMesh.rotation.y += 0.08;
@@ -1175,17 +1203,14 @@
         if (p < 1.0) {
           requestAnimationFrame(transferLoop);
         } else {
-          // Предмет приземлился в лапы получателя
           this.scene.remove(itemMesh);
           receiver.group.add(itemMesh);
           itemMesh.position.set(0, 1.2, 0.6);
           receiver.heldItemMesh = itemMesh;
 
-          // Получатель возвращается к себе на верстак и работает
           receiver.targetPos.copy(receiver.homePos);
           receiver.state = 'working';
 
-          // Кивок головы получателя в знак согласия
           if (receiver.group.headGroup) {
             receiver.group.headGroup.rotation.x = 0.4;
             setTimeout(() => {
@@ -1220,12 +1245,85 @@
         w.rotation.z += 0.015 * this.speed;
       });
 
-      // 2. Логика состояний: IDLE / WALKING / WORKING
+      // 2. Управление Игроком (Медведем-Бригадиром) с клавиатуры (WASD)
+      if (this.playerAgent && !this.paused && this.playerAgent.state !== 'dead') {
+        const moveVec = new THREE.Vector3(0, 0, 0);
+        if (this.keysPressed['KeyW'] || this.keysPressed['ArrowUp']) moveVec.z -= 1;
+        if (this.keysPressed['KeyS'] || this.keysPressed['ArrowDown']) moveVec.z += 1;
+        if (this.keysPressed['KeyA'] || this.keysPressed['ArrowLeft']) moveVec.x -= 1;
+        if (this.keysPressed['KeyD'] || this.keysPressed['ArrowRight']) moveVec.x += 1;
+
+        if (moveVec.lengthSq() > 0) {
+          moveVec.normalize();
+          // Поворот относительно камеры
+          const camAngle = Math.atan2(this.camera.position.x - this.controls.target.x, this.camera.position.z - this.controls.target.z);
+          moveVec.applyAxisAngle(new THREE.Vector3(0, 1, 0), camAngle);
+
+          const stepSpeed = this.playerAgent.speed * delta * 5.2 * this.speed;
+          this.playerAgent.group.position.addScaledVector(moveVec, stepSpeed);
+
+          const targetAngle = Math.atan2(moveVec.x, moveVec.z);
+          this.playerAgent.group.rotation.y = THREE.MathUtils.lerp(this.playerAgent.group.rotation.y, targetAngle, 0.22);
+
+          this.playerAgent.walkCycle += delta * 14.0 * this.speed;
+          const legSwing = Math.sin(this.playerAgent.walkCycle) * 0.55;
+          if (this.playerAgent.group.legs) {
+            this.playerAgent.group.legs.legFL.rotation.x = legSwing;
+            this.playerAgent.group.legs.legBR.rotation.x = legSwing;
+            this.playerAgent.group.legs.legFR.rotation.x = -legSwing;
+            this.playerAgent.group.legs.legBL.rotation.x = -legSwing;
+          }
+          this.playerAgent.group.position.y = Math.abs(Math.sin(this.playerAgent.walkCycle)) * 0.14;
+
+          // Камера плавно следует за персонажем игрока
+          if (this.cameraFollow && this.controls) {
+            const camTarget = this.playerAgent.group.position.clone().add(new THREE.Vector3(0, 1.2, 0));
+            this.controls.target.lerp(camTarget, 0.08);
+          }
+        } else if (this.playerAgent.state === 'idle') {
+          if (this.playerAgent.group.legs) {
+            this.playerAgent.group.legs.legFL.rotation.x = 0;
+            this.playerAgent.group.legs.legBR.rotation.x = 0;
+            this.playerAgent.group.legs.legFR.rotation.x = 0;
+            this.playerAgent.group.legs.legBL.rotation.x = 0;
+          }
+          this.playerAgent.group.position.y = 0;
+        }
+
+        // Проверка близости игрока к другим зверям
+        let nearest = null;
+        let minDist = 3.8;
+        this.agents.forEach(a => {
+          if (a.id !== 'bear') {
+            const d = this.playerAgent.group.position.distanceTo(a.group.position);
+            if (d < minDist) {
+              minDist = d;
+              nearest = a;
+            }
+          }
+        });
+        this.nearestCraftsman = nearest;
+        const promptEl = document.getElementById('playerInteractionPrompt');
+        if (promptEl) {
+          if (nearest) {
+            promptEl.style.display = 'block';
+            promptEl.innerText = `💬 ВЫ РЯДОМ С ${nearest.name.toUpperCase()}! НАЖМИТЕ ПРОБЕЛ ИЛИ КЛИКНИТЕ: ВЕРСТАК И ДОКУМЕНТАЦИЯ`;
+          } else {
+            promptEl.style.display = 'none';
+          }
+        }
+      }
+
+      // 3. Анимация остальных персонажей
       this.agents.forEach(a => {
+        if (a.state === 'dead') return; // Мертвые звери лежат неподвижно
+
+        // Игрок уже обновлен выше, для остальных — стандартная логика
+        if (a.id === 'bear' && (this.keysPressed['KeyW'] || this.keysPressed['KeyA'] || this.keysPressed['KeyS'] || this.keysPressed['KeyD'])) return;
+
         const dist = a.group.position.distanceTo(a.targetPos);
 
         if (dist > 0.35 && a.state === 'walking') {
-          // --- ДВИЖЕНИЕ (WALKING) ---
           const dir = a.targetPos.clone().sub(a.group.position).normalize();
           const targetAngle = Math.atan2(dir.x, dir.z);
           a.group.rotation.y = THREE.MathUtils.lerp(a.group.rotation.y, targetAngle, 0.2);
@@ -1233,7 +1331,6 @@
           const step = Math.min(a.speed * delta * 2.8 * this.speed, dist);
           a.group.position.addScaledVector(dir, step);
 
-          // Ритмичный шаг лапок
           a.walkCycle += delta * 12.0 * this.speed;
           const legSwing = Math.sin(a.walkCycle) * 0.55;
           if (a.group.legs) {
@@ -1245,10 +1342,7 @@
           a.group.position.y = Math.abs(Math.sin(a.walkCycle)) * 0.14;
 
         } else if (a.state === 'working') {
-          // --- РАБОТА (WORKING): КАЖДЫЙ ЗВЕРЬ ВЫПОЛНЯЕТ РЕАЛЬНОЕ ДЕЙСТВИЕ ---
-          a.group.position.y = 0; // стоит ровно на земле
-
-          // Возвращаем лапки на место
+          a.group.position.y = 0;
           if (a.group.legs) {
             a.group.legs.legFL.rotation.x = 0;
             a.group.legs.legBR.rotation.x = 0;
@@ -1257,78 +1351,44 @@
           }
 
           if (a.id === 'kot') {
-            // Кот: водит паяльником над платой с наклоном корпуса и искрами
             if (a.group.toolArm) {
               a.group.toolArm.rotation.x = Math.sin(time * 8.0) * 0.35;
               a.group.toolArm.rotation.z = Math.cos(time * 6.0) * 0.2;
             }
-            if (a.group.headGroup) {
-              a.group.headGroup.rotation.x = 0.25; // смотрит на плату
-            }
-            // Вспышки искр
-            if (this.sparksGroup) {
-              this.sparksGroup.material.opacity = (Math.sin(time * 16.0) > 0.2) ? 0.9 : 0;
-            }
-            if (this.forgeLight) {
-              this.forgeLight.intensity = 2.0 + Math.sin(time * 12.0) * 0.8;
-            }
+            if (a.group.headGroup) a.group.headGroup.rotation.x = 0.25;
+            if (this.sparksGroup) this.sparksGroup.material.opacity = (Math.sin(time * 16.0) > 0.2) ? 0.9 : 0;
+            if (this.forgeLight) this.forgeLight.intensity = 2.0 + Math.sin(time * 12.0) * 0.8;
 
           } else if (a.id === 'bobr') {
-            // Бобёр: пилит бревно ритмичными движениями пилы вперед-назад
             if (a.group.toolArm) {
               a.group.toolArm.position.z = 0.4 + Math.sin(time * 7.0) * 0.3;
               a.group.toolArm.rotation.x = 0.2;
             }
-            if (a.group.headGroup) {
-              a.group.headGroup.rotation.x = 0.15;
-            }
+            if (a.group.headGroup) a.group.headGroup.rotation.x = 0.15;
 
           } else if (a.id === 'soroka') {
-            // Сорока: ритмично клюет свиток LSI-выдачи на столе
-            if (a.group.headGroup) {
-              a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 8.0)) * 0.4;
-            }
+            if (a.group.headGroup) a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 8.0)) * 0.4;
 
           } else if (a.id === 'lis') {
-            // Лис: водит пером по смете
-            if (a.group.toolArm) {
-              a.group.toolArm.rotation.z = Math.sin(time * 9.0) * 0.3;
-            }
-            if (a.group.headGroup) {
-              a.group.headGroup.rotation.y = Math.sin(time * 4.0) * 0.2;
-            }
+            if (a.group.toolArm) a.group.toolArm.rotation.z = Math.sin(time * 9.0) * 0.3;
+            if (a.group.headGroup) a.group.headGroup.rotation.y = Math.sin(time * 4.0) * 0.2;
 
           } else if (a.id === 'barsuk') {
-            // Барсук: чертит кривую ликвидуса вверх-вниз по кульману
-            if (a.group.toolArm) {
-              a.group.toolArm.position.y = 1.0 + Math.sin(time * 5.0) * 0.25;
-            }
+            if (a.group.toolArm) a.group.toolArm.position.y = 1.0 + Math.sin(time * 5.0) * 0.25;
 
           } else if (a.id === 'filin') {
-            // Филин: опускает печать [ОТК] со штампом вниз на бумагу
-            if (a.group.toolArm) {
-              a.group.toolArm.position.y = 1.0 - Math.abs(Math.sin(time * 3.5)) * 0.4;
-            }
+            if (a.group.toolArm) a.group.toolArm.position.y = 1.0 - Math.abs(Math.sin(time * 3.5)) * 0.4;
 
           } else if (a.id === 'dyatel') {
-            // Дятел: четко и ритмично стучит клювом по мерной линейке
-            if (a.group.headGroup) {
-              a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 12.0)) * 0.4;
-            }
+            if (a.group.headGroup) a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 12.0)) * 0.4;
 
           } else if (a.id === 'bear') {
-            // Бригадир: подносит чашку чая к мордочке
-            if (a.group.toolArm) {
-              a.group.toolArm.position.y = 1.0 + Math.sin(time * 2.0) * 0.2;
-            }
+            if (a.group.toolArm) a.group.toolArm.position.y = 1.0 + Math.sin(time * 2.0) * 0.2;
           }
 
         } else {
-          // --- ПОКОЙ (IDLE): ЗВЕРЬ СПОКОЙНО СТОИТ НА МЕСТЕ БЕЗ ДЕРГАНИЙ ---
           a.state = 'idle';
-          a.group.position.y = 0; // стоит неподвижно на земле
-
-          // Все шарниры в покое
+          a.group.position.y = 0;
           if (a.group.legs) {
             a.group.legs.legFL.rotation.x = 0;
             a.group.legs.legBR.rotation.x = 0;
@@ -1339,12 +1399,8 @@
             a.group.toolArm.rotation.set(0, 0, 0);
             a.group.toolArm.position.set(0.48, 1.0, 0.4);
           }
-          if (a.group.headGroup) {
-            a.group.headGroup.rotation.set(0, 0, 0);
-          }
-          if (a.id === 'kot' && this.sparksGroup) {
-            this.sparksGroup.material.opacity = 0;
-          }
+          if (a.group.headGroup) a.group.headGroup.rotation.set(0, 0, 0);
+          if (a.id === 'kot' && this.sparksGroup) this.sparksGroup.material.opacity = 0;
         }
       });
     }
@@ -1380,8 +1436,8 @@
 
     resetCamera() {
       if (!this.controls || !this.camera) return;
-      this.camera.position.set(32, 28, 42);
-      this.controls.target.set(0, 1.5, 0);
+      this.camera.position.set(28, 24, 36);
+      this.controls.target.set(0, 1.2, 0);
       this.controls.update();
     }
 

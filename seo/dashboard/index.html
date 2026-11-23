@@ -635,8 +635,24 @@
           🌙 Ночь
         </button>
       </div>
+
+      <!-- Правая панель HUD: Автозамена YAML и аватар игрока -->
+      <div style="position:absolute;top:12px;right:14px;display:flex;gap:6px;z-index:10;flex-wrap:wrap;align-items:center;">
+        <span style="font-size:11px;font-family:monospace;background:rgba(15,23,42,0.88);color:#FFC700;padding:4px 8px;border-radius:4px;border:1px solid #52525B;">
+          👑 ВЫ: Медведь-Бригадир (WASD)
+        </span>
+        <button class="btn btn--xs" type="button" onclick="openRoutingModal()" style="background:#2563EB;color:#FFF;border:1px solid #3B82F6;cursor:pointer;font-weight:700;">
+          ⚙️ YAML Маршрутизация & Автозамена
+        </button>
+      </div>
+
+      <!-- Всплывающая подсказка взаимодействия при приближении игрока -->
+      <div id="playerInteractionPrompt" style="display:none;position:absolute;bottom:42px;left:50%;transform:translateX(-50%);background:rgba(234,88,12,0.95);color:#FFF;padding:8px 18px;border-radius:24px;font-size:12px;font-weight:700;z-index:20;box-shadow:0 4px 18px rgba(0,0,0,0.6);border:1.5px solid #FFC700;pointer-events:none;white-space:nowrap;">
+        💬 НАЖМИТЕ ПРОБЕЛ ИЛИ КЛИКНИТЕ: ОТКРЫТЬ ВЕРСТАК И ДОКУМЕНТАЦИЮ
+      </div>
+
       <div style="position:absolute;bottom:10px;right:14px;font-size:10px;font-family:monospace;color:#CBD5E1;background:rgba(15,23,42,0.9);padding:6px 10px;border-radius:4px;border:1px solid #475569;pointer-events:none;z-index:10;">
-        🎮 3D WEBGL: ЛКМ — ВРАЩЕНИЕ · СКРОЛЛ — ЗУМ · КЛИК ПО ЗВЕРЮ — ДИАЛОГ · КЛИК ПО ЗЕМЛЕ — ПЕРЕМЕЩЕНИЕ
+        🎮 УПРАВЛЕНИЕ: WASD / СТРЕЛКИ — ХОДЬБА · ЛКМ — ВРАЩЕНИЕ КАМЕРЫ · СКРОЛЛ — ЗУМ · ПРОБЕЛ — ДИАЛОГ
       </div>
     </div>
 
@@ -865,6 +881,156 @@
 
 </main>
 
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: ВЕРСТАК И НОРМАТИВНАЯ ДОКУМЕНТАЦИЯ МАСТЕРА -->
+<div class="modal-overlay" id="workstationModal" onclick="closeWorkstationModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:920px;width:95vw;max-height:90vh;display:flex;flex-direction:column;padding:24px;border:2px solid #3F3F46;background:#18181D;color:#F4F4F5;box-shadow:0 8px 36px rgba(0,0,0,0.7);border-radius:12px;">
+    <button class="modal-close" onclick="closeWorkstationModal()">✕</button>
+
+    <!-- Шапка мастера -->
+    <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid #27272A;padding-bottom:14px;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div id="wsModalIcon" style="font-size:36px;width:56px;height:56px;background:#27272A;border-radius:12px;display:flex;align-items:center;justify-content:center;border:2px solid #FFC700;">🦫</div>
+        <div>
+          <h2 id="wsModalTitle" style="margin:0;font-size:20px;font-weight:800;color:#FFF;">Бобёр-Конструктор</h2>
+          <div id="wsModalRole" style="font-size:12px;color:#A1A1AA;font-family:monospace;">01-researcher · Бриф ГОСТ Р МЭК 61191-1</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span id="wsModalHealthBadge" style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;font-family:monospace;background:#14532D;color:#4ADE80;border:1px solid #22C55E;">🟢 ОНЛАЙН (Node-1)</span>
+        <button class="btn btn--xs" onclick="openRoutingModal()" style="background:#27272A;color:#FFC700;border:1px solid #52525B;">⚙️ Настроить узел</button>
+      </div>
+    </div>
+
+    <!-- Тело верстака (Скроллируемая область) -->
+    <div style="overflow-y:auto;flex:1;padding-right:8px;display:flex;flex-direction:column;gap:16px;">
+      <!-- Блок 1: Нормативная база и ГОСТы -->
+      <div style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
+        <div style="font-size:12px;font-weight:700;color:#FFC700;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">
+          📜 Нормативная база и ГОСТы мастера
+        </div>
+        <div id="wsModalDocs" style="font-size:13px;line-height:1.6;color:#D4D4D8;"></div>
+      </div>
+
+      <!-- Блок 2: Задача мастера в конвейере -->
+      <div style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
+        <div style="font-size:12px;font-weight:700;color:#38BDF8;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">
+          🎯 Что мастер должен сделать
+        </div>
+        <div id="wsModalTask" style="font-size:13px;line-height:1.6;color:#E4E4E7;"></div>
+      </div>
+
+      <!-- Блок 3: Данные по теме из SQLite seo.db -->
+      <div style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
+          <div style="font-size:12px;font-weight:700;color:#A78BFA;text-transform:uppercase;">
+            📊 Данные по теме из SQLite seo.db
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <label style="font-size:11px;color:#A1A1AA;">Тема:</label>
+            <select id="wsModalTopicSelect" onchange="loadWorkstationTopicData(this.value)" style="background:#18181D;color:#FFF;border:1px solid #3F3F46;font-size:12px;padding:4px 8px;border-radius:4px;max-width:280px;"></select>
+          </div>
+        </div>
+        <div id="wsModalTopicData" style="font-size:12px;font-family:monospace;background:#18181D;padding:10px;border-radius:6px;border:1px solid #27272A;max-height:160px;overflow-y:auto;color:#CBD5E1;"></div>
+      </div>
+    </div>
+
+    <!-- Футер с кнопками выполнения действий -->
+    <div style="border-top:1.5px solid #27272A;padding-top:14px;margin-top:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div style="font-size:11px;color:#A1A1AA;font-family:monospace;">
+        Подключение: <span id="wsModalRoute" style="color:#FFC700;">triad:node1_brain (:8080)</span>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn--sm" onclick="closeWorkstationModal()" style="background:#27272A;color:#FFF;border:1px solid #3F3F46;">Закрыть (Esc)</button>
+        <button class="btn btn--sm btn--primary" id="btnWsExecute" onclick="executeWorkstationAction()">▶ Выполнить задачу на верстаке</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- МОДАЛЬНОЕ ОКНО: YAML МАРШРУТИЗАЦИЯ, МОНИТОРИНГ УЗЛОВ И АВТОЗАМЕНА -->
+<div class="modal-overlay" id="routingModal" onclick="closeRoutingModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:960px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:24px;border:2px solid #3F3F46;background:#18181D;color:#F4F4F5;box-shadow:0 8px 36px rgba(0,0,0,0.7);border-radius:12px;">
+    <button class="modal-close" onclick="closeRoutingModal()">✕</button>
+
+    <div style="border-bottom:1.5px solid #27272A;padding-bottom:12px;margin-bottom:14px;">
+      <h2 style="margin:0;font-size:18px;font-weight:800;color:#FFF;display:flex;align-items:center;gap:8px;">
+        <span>⚙️ Маршрутизация кластера Triad-Omni и YAML-автозамена</span>
+      </h2>
+      <div style="font-size:12px;color:#A1A1AA;margin-top:4px;">
+        Управление узлами инференса, мониторинг доступности портов и правила аварийного переключения (Failover) при отказе смартфонов.
+      </div>
+    </div>
+
+    <!-- Сетка живого статуса узлов кластера -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;margin-bottom:14px;">
+      <div class="node-health-card" id="cardNode1" style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="font-size:12px;color:#FFF;">NODE-1: Mi 10T 5G</strong>
+          <span class="status-dot active" id="dotNode1"></span>
+        </div>
+        <div style="font-size:11px;font-family:monospace;color:#A1A1AA;margin-top:4px;">:8080 · Qwen3.5-9B</div>
+        <div id="statusNode1" style="font-size:11px;color:#22C55E;font-weight:700;margin-top:2px;">Онлайн</div>
+      </div>
+
+      <div class="node-health-card" id="cardNode2" style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="font-size:12px;color:#FFF;">NODE-2: Nord N10</strong>
+          <span class="status-dot active" id="dotNode2"></span>
+        </div>
+        <div style="font-size:11px;font-family:monospace;color:#A1A1AA;margin-top:4px;">:8081 · LFM2.5-8B</div>
+        <div id="statusNode2" style="font-size:11px;color:#22C55E;font-weight:700;margin-top:2px;">Онлайн</div>
+      </div>
+
+      <div class="node-health-card" id="cardNode3" style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="font-size:12px;color:#FFF;">NODE-3: Redmi 4</strong>
+          <span class="status-dot active" id="dotNode3"></span>
+        </div>
+        <div style="font-size:11px;font-family:monospace;color:#A1A1AA;margin-top:4px;">:8000 · Gateway Hub</div>
+        <div id="statusNode3" style="font-size:11px;color:#22C55E;font-weight:700;margin-top:2px;">Онлайн</div>
+      </div>
+
+      <div class="node-health-card" id="cardOmniroute" style="background:#09090B;border:1.5px solid #27272A;border-radius:8px;padding:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="font-size:12px;color:#FFF;">OmniRoute Hub</strong>
+          <span class="status-dot active" id="dotOmniroute"></span>
+        </div>
+        <div style="font-size:11px;font-family:monospace;color:#A1A1AA;margin-top:4px;">:20128 · 754 модели</div>
+        <div id="statusOmniroute" style="font-size:11px;color:#22C55E;font-weight:700;margin-top:2px;">Онлайн</div>
+      </div>
+    </div>
+
+    <!-- Кнопки симуляции отказов и тестирования -->
+    <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:11px;color:#A1A1AA;font-weight:700;">ТЕСТЫ ОТКАЗОУСТОЙЧИВОСТИ:</span>
+      <button class="btn btn--xs" onclick="simulateNodeFailure('node1_brain')" style="background:#7F1D1D;color:#FECACA;border:1px solid #DC2626;">💀 Отключить Node-1</button>
+      <button class="btn btn--xs" onclick="simulateNodeFailure('node2_reflex')" style="background:#7F1D1D;color:#FECACA;border:1px solid #DC2626;">💀 Отключить Node-2</button>
+      <button class="btn btn--xs" onclick="restoreAllNodes()" style="background:#14532D;color:#BBF7D0;border:1px solid #22C55E;">💚 Восстановить все узлы</button>
+      <button class="btn btn--xs" onclick="pingClusterNodes()" style="background:#27272A;color:#FFC700;border:1px solid #52525B;">⚡ Проверить пинг</button>
+    </div>
+
+    <!-- Редактор YAML -->
+    <div style="flex:1;display:flex;flex-direction:column;min-height:220px;">
+      <div style="font-size:11px;font-family:monospace;color:#A1A1AA;margin-bottom:6px;display:flex;justify-content:space-between;">
+        <span>Файл: config/agents_routing.yaml</span>
+        <span style="color:#FFC700;">Синтаксис YAML валидируется сервером</span>
+      </div>
+      <textarea id="routingYamlTextarea" style="flex:1;width:100%;height:240px;background:#09090B;color:#38BDF8;font-family:monospace;font-size:12px;padding:12px;border:1.5px solid #27272A;border-radius:8px;resize:vertical;line-height:1.5;"></textarea>
+    </div>
+
+    <!-- Футер сохранения -->
+    <div style="border-top:1.5px solid #27272A;padding-top:12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div id="routingSaveStatus" style="font-size:11px;font-family:monospace;color:#22C55E;">
+        Конфигурация загружена.
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn--sm" onclick="closeRoutingModal()" style="background:#27272A;color:#FFF;border:1px solid #3F3F46;">Закрыть</button>
+        <button class="btn btn--sm btn--primary" onclick="saveRoutingYaml()">💾 Сохранить YAML и применить автозамену</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- Modal Inspector -->

@@ -1,0 +1,77 @@
+# Конфигурация маршрутизации и автозамены Артели Зверей-Мастеров
+# Точка Плавления · tochka-plavleniya.ru · Triad-Omni Edge AI Cluster
+
+cluster:
+  node1_brain: "http://192.168.31.161:8080" # Xiaomi Mi 10T 5G (Qwen3.5-9B)
+  node2_reflex: "http://192.168.31.57:8081"  # OnePlus Nord N10 5G (LFM2.5-8B)
+  node3_gateway: "http://127.0.0.1:8000"     # Xiaomi Redmi Note 4 (Master Hub)
+  omniroute_hub: "http://127.0.0.1:20128"    # OmniRoute Federated Gateway
+
+craftsmen:
+  soroka:
+    name: "Сорока-Разведчица"
+    role: "00-research (LSI & Конкуренты)"
+    primary: "triad:node2_reflex"
+    fallback_1: "omniroute:auto/thinking"
+    fallback_2: "local_heuristic"
+    auto_failover: true
+    status: "alive" # alive | dead | fallback
+
+  bobr:
+    name: "Бобёр-Конструктор"
+    role: "01-researcher (ГОСТ Р МЭК 61191)"
+    primary: "triad:node1_brain"
+    fallback_1: "omniroute:deepseek-chat"
+    fallback_2: "local_heuristic"
+    auto_failover: true
+    status: "alive"
+
+  kot:
+    name: "Кот-Паяльщик (Practico 1)"
+    role: "02-writer (Физика пайки & ПОС-61)"
+    primary: "triad:node1_brain"
+    fallback_1: "triad:node2_reflex"
+    fallback_2: "omniroute:deepseek-chat"
+    auto_failover: true
+    status: "alive"
+
+  lis:
+    name: "Лис-Прагматик (Practico 2)"
+    role: "02-writer-2 (Сметы & Экономика)"
+    primary: "omniroute:auto/thinking"
+    fallback_1: "triad:node1_brain"
+    fallback_2: "local_heuristic"
+    auto_failover: true
+    status: "alive"
+
+  barsuk:
+    name: "Барсук-Иллюстратор"
+    role: "05-illustrator (SVG-термопрофили)"
+    primary: "local_vector_svg"
+    fallback_1: "triad:node1_brain"
+    auto_failover: true
+    status: "alive"
+
+  filin:
+    name: "Филин-Ревизор [ОТК]"
+    role: "03-reviewer (SlopMonster & Нормы)"
+    primary: "local_slop_monster"
+    fallback_1: "triad:node1_brain"
+    auto_failover: true
+    status: "alive"
+
+  dyatel:
+    name: "Дятел-Метролог"
+    role: "04-scorer (Метрология 100 баллов)"
+    primary: "local_ast_scorer"
+    fallback_1: "triad:node1_brain"
+    auto_failover: true
+    status: "alive"
+
+  bear:
+    name: "Медведь-Бригадир (Игрок)"
+    role: "Староста Артели (Triad-Omni Coordinator)"
+    primary: "triad:local_cluster"
+    fallback_1: "local_rule_engine"
+    auto_failover: true
+    status: "alive"

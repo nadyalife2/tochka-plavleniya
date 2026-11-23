@@ -15,6 +15,7 @@ import json
 import mimetypes
 import os
 import re
+import socket
 import subprocess
 import sys
 import threading
@@ -339,6 +340,126 @@ def check_cluster_telemetry() -> dict:
         "triad": triad_data,
         "omniroute": omniroute_data,
         "timestamp": datetime.now().isoformat()
+    }
+
+
+def load_agents_routing() -> tuple[str, dict]:
+    """Загружает config/agents_routing.yaml."""
+    cfg_path = ROOT / "config" / "agents_routing.yaml"
+    if not cfg_path.exists():
+        alt = Path("D:/tochka-plavleniya/config/agents_routing.yaml")
+        if alt.exists():
+            cfg_path = alt
+    if not cfg_path.exists():
+        return "", {}
+    txt = cfg_path.read_text(encoding="utf-8")
+    try:
+        import yaml
+        data = yaml.safe_load(txt) or {}
+    except Exception:
+        data = {}
+    return txt, data
+
+
+def save_agents_routing(yaml_text: str) -> dict:
+    """Валидирует и сохраняет YAML-конфиг автозамены."""
+    import yaml
+    data = yaml.safe_load(yaml_text)
+    if not isinstance(data, dict):
+        raise ValueError("Некорректный формат YAML: ожидается словарь верхнего уровня.")
+
+    cfg_dir = ROOT / "config"
+    cfg_dir.mkdir(parents=True, exist_ok=True)
+    cfg_file = cfg_dir / "agents_routing.yaml"
+    cfg_file.write_text(yaml_text, encoding="utf-8")
+
+    alt_file = Path("D:/tochka-plavleniya/config/agents_routing.yaml")
+    try:
+        alt_file.parent.mkdir(parents=True, exist_ok=True)
+        alt_file.write_text(yaml_text, encoding="utf-8")
+    except Exception:
+        pass
+    return data
+
+
+def test_single_endpoint(url: str, timeout: float = 0.45) -> bool:
+    """Быстрый сокетный пинг хоста и порта."""
+    try:
+        p = urlparse(url)
+        host = p.hostname or "127.0.0.1"
+        port = p.port or (80 if p.scheme == "http" else 443)
+        with socket.create_connection((host, port), timeout=timeout):
+            return True
+    except Exception:
+        return False
+
+
+def check_all_agents_health(simulation_offline: list = None) -> dict:
+    """Проверяет реальную доступность узлов кластера и вычисляет статус каждого зверя."""
+    txt, cfg = load_agents_routing()
+    cluster_nodes = cfg.get("cluster", {})
+    craftsmen_cfg = cfg.get("craftsmen", {})
+    sim_off = set(simulation_offline or [])
+
+    nodes_status = {}
+    for node_name, node_url in cluster_nodes.items():
+        if node_name in sim_off or node_url in sim_off:
+            nodes_status[node_name] = {"url": node_url, "alive": False, "simulated_offline": True}
+        else:
+            is_up = test_single_endpoint(node_url)
+            nodes_status[node_name] = {"url": node_url, "alive": is_up}
+
+    craftsmen_health = {}
+    for agent_id, a_cfg in craftsmen_cfg.items():
+        primary = a_cfg.get("primary", "")
+        fallback_1 = a_cfg.get("fallback_1", "")
+        fallback_2 = a_cfg.get("fallback_2", "")
+
+        def resolve_route_alive(route_str: str) -> bool:
+            if not route_str:
+                return False
+            if route_str.startswith("local_"):
+                return True
+            if "node1" in route_str:
+                return nodes_status.get("node1_brain", {}).get("alive", False)
+            if "node2" in route_str:
+                return nodes_status.get("node2_reflex", {}).get("alive", False)
+            if "node3" in route_str or "local_cluster" in route_str:
+                return nodes_status.get("node3_gateway", {}).get("alive", False) or True
+            if "omniroute" in route_str:
+                return nodes_status.get("omniroute_hub", {}).get("alive", False)
+            return True
+
+        is_primary_alive = resolve_route_alive(primary)
+        is_fb1_alive = resolve_route_alive(fallback_1)
+        is_fb2_alive = resolve_route_alive(fallback_2)
+
+        if is_primary_alive:
+            status = "alive"
+            active_route = primary
+        elif a_cfg.get("auto_failover", True) and is_fb1_alive:
+            status = "fallback"
+            active_route = fallback_1
+        elif a_cfg.get("auto_failover", True) and is_fb2_alive:
+            status = "fallback"
+            active_route = fallback_2
+        else:
+            status = "dead"
+            active_route = "none"
+
+        craftsmen_health[agent_id] = {
+            "name": a_cfg.get("name", agent_id),
+            "status": status,
+            "active_route": active_route,
+            "primary": primary,
+            "fallback_1": fallback_1,
+            "primary_alive": is_primary_alive,
+            "failover_available": is_fb1_alive or is_fb2_alive
+        }
+
+    return {
+        "nodes": nodes_status,
+        "craftsmen": craftsmen_health
     }
 
 
@@ -873,6 +994,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         if path == "/api/data":
             self.send_json(fetch_all_data())
+            return
+
+        # Конфигурация маршрутизации и живой статус здоровья агентов
+        if path == "/api/agents/routing":
+            txt, data = load_agents_routing()
+            health = check_all_agents_health()
+            self.send_json({
+                "status": "ok",
+                "yaml": txt,
+                "config": data,
+                "health": health
+            })
             return
 
         # Экспорт «что уже есть»: JSON / Markdown / HTML для нейронки
@@ -1751,6 +1884,31 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 "contract_file": contract_file_rel,
                 "passport": passport_dict,
             })
+            return
+
+        # 6.4. Сохранение YAML-маршрутизации и пинг здоровья узлов
+        if path == "/api/agents/routing":
+            new_yaml = payload.get("yaml", "")
+            if not new_yaml:
+                self.send_json({"status": "error", "message": "Пустой YAML-конфиг"}, 400)
+                return
+            try:
+                data = save_agents_routing(new_yaml)
+                health = check_all_agents_health()
+                self.send_json({
+                    "status": "ok",
+                    "message": "Конфигурация автозамены сохранена в config/agents_routing.yaml",
+                    "config": data,
+                    "health": health
+                })
+            except Exception as e:
+                self.send_json({"status": "error", "message": f"Ошибка YAML: {e}"}, 400)
+            return
+
+        if path == "/api/agents/ping":
+            sim_off = payload.get("simulate_offline", [])
+            health = check_all_agents_health(simulation_offline=sim_off)
+            self.send_json({"status": "ok", "health": health})
             return
 
         # 6.5. Интерактивный чат с Говорящим Бригадиром (Староста Артели)

@@ -2989,9 +2989,388 @@ function promptMissionRun() {
   }
 }
 
+// ============================================================
+// ИНТЕРАКТИВНЫЙ ВЕРСТАК И НОРМАТИВНАЯ ДОКУМЕНТАЦИЯ МАСТЕРОВ
+// ============================================================
+const CRAFTSMAN_DOSSIER = {
+  soroka: {
+    title: 'Сорока-Разведчица',
+    role: '00-research · Поисковая семантика, LSI & Конкуренты',
+    icon: '🪶',
+    agentTarget: '00-research',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • Поисковый алгоритм Яндекса (Y1) и Google Helpful Content System.<br>
+      • Сбор LSI-хвостов: 15–20 релевантных сущностей с плотностью ключей не выше 2.5%.<br>
+      • Парсинг сниппетов топ-10 конкурентов: выявление формул, таблиц и калькуляторов припоя.<br>
+      • Классификация интента аудитории: Новичок (выбор жала) vs Практик (реболлинг BGA).
+    `,
+    task: `
+      Собрать актуальное LSI-ядро по выбранной теме, найти сильные стороны конкурентов, зафиксировать пробелы в выдаче и сформировать первичное семантическое ТЗ для Бобра.
+    `
+  },
+  bobr: {
+    title: 'Бобёр-Конструктор',
+    role: '01-researcher · Бриф ГОСТ Р МЭК 61191-1 & Регламент FAQ',
+    icon: '🦫',
+    agentTarget: '01-researcher',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • <strong>ГОСТ Р МЭК 61191-1-2010</strong> — Печатные узлы. Требования к качеству поверхностного монтажа.<br>
+      • <strong>ГОСТ 21931-76</strong> — Припои оловянно-свинцовые. Составы и температура солидус/ликвидус.<br>
+      • <strong>Регламент 4 обязательных вопросов FAQ:</strong><br>
+        1. Какая точная температура плавления сплава?<br>
+        2. Какой флюс выбрать (RMA, бесотмывочный или водосмываемый)?<br>
+        3. Чем грозит перегрев контактной площадки выше 300°C?<br>
+        4. Как правильно очистить жало T12/900M от нагара?
+    `,
+    task: `
+      Сформировать утвержденный инженерный бриф статьи по ГОСТ, зафиксировать нормативные допуски, структуру H2/H3 и передать утвержденный паспорт Коту-Паяльщику.
+    `
+  },
+  kot: {
+    title: 'Кот-Паяльщик (Practico 1)',
+    role: '02-writer · Практический лонгрид, физика пайки и ПОС-61',
+    icon: '🐱',
+    agentTarget: '02-writer',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • <strong>Канонический реестр:</strong> <code>materials-registry.php</code> (ПОС-61, ПОС-40, сплав Розе, Вуда, SAC305).<br>
+      • <strong>Строгая инженерная триада:</strong> «Инженерный факт» → «Физика шва и смачивание» → «Последствие ошибки радиомонтажника».<br>
+      • <strong>Температурный регламент ПОС-61:</strong> солидус 183°C, ликвидус 190°C, рабочая зона пайки 260–280°C.<br>
+      • <strong>Анти-слоп:</strong> категорический запрет фраз «в современном мире», «ни для кого не секрет», «давайте погрузимся».
+    `,
+    task: `
+      Написать исчерпывающий пошаговый лонгрид (от 2500 слов) с пошаговой инструкцией, физикой смачивания меди, подбором жала паяльника и предупреждением типичных ошибок новичков.
+    `
+  },
+  lis: {
+    title: 'Лис-Прагматик (Practico 2)',
+    role: '02-writer-2 · Финансовый аудит, сметы и окупаемость',
+    icon: '🦊',
+    agentTarget: '02-writer-2',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • <strong>Экономика домашней мастерской:</strong> расчет себестоимости одного паяного соединения (0.15–0.40 ₽).<br>
+      • <strong>Сравнение окупаемости:</strong> паяльная станция T12 (3200 ₽) против паяльника без термостабилизации (600 ₽).<br>
+      • <strong>Финансовое правило мастера:</strong> качественный флюс за 300 ₽ окупается при первой же спасенной плате за 15 000 ₽.
+    `,
+    task: `
+      Рассчитать подробную смету необходимого инструмента, табличную калькуляцию затрат для начинающего монтажника и экономическое обоснование выбора расходников.
+    `
+  },
+  barsuk: {
+    title: 'Барсук-Иллюстратор',
+    role: '05-illustrator · Векторные SVG-термопрофили и Hero-визуал',
+    icon: '🦡',
+    agentTarget: '05-illustrator',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • <strong>W3C SVG 1.1:</strong> Чистая векторная графика без сторонних скриптов, 0 токенов расхода нейросети.<br>
+      • <strong>Термопрофиль оплавления:</strong> зона предпрогрева (до 150°C), зона активации флюса (150–183°C), пик пайки (215–235°C), охлаждение.<br>
+      • <strong>Цветовая кибердек-палитра:</strong> Фон <code>#09090B</code>, акценты <code>#FFC700</code>, безопасная зона <code>#22C55E</code>, критический нагрев <code>#EF4444</code>.
+    `,
+    task: `
+      Отрисовать точный векторный график термопрофиля оплавления для сплава темы, внедрить SVG-код в блок media паспорта v1.1 и сгенерировать кибердек-промпт обложки Hero.
+    `
+  },
+  filin: {
+    title: 'Филин-Ревизор [ОТК]',
+    role: '03-reviewer · Детектор нейроштампов SlopMonster и приемка',
+    icon: '🦉',
+    agentTarget: '03-reviewer',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • <strong>Каталог SlopMonster (tools/deslop.py):</strong> детекция 50+ нейросетевых штампов и клише.<br>
+      • <strong>Чек-лист входного контроля [ОТК-2026]:</strong><br>
+        1. Указан ли точный сплав и температурный коридор?<br>
+        2. Есть ли предупреждение о токсичности свинца и вентиляции?<br>
+        3. Соответствует ли FAQ 4 обязательным вопросам брифа?<br>
+        4. Отсутствует ли вода и обобщения в тексте?
+    `,
+    task: `
+      Просканировать черновик статьи, очистить текст от нейросетевых оборотов, выставить объективный вердикт (passed / needs_fix) и поставить штамп [ОТК-2026].
+    `
+  },
+  dyatel: {
+    title: 'Дятел-Метролог',
+    role: '04-scorer · Математический AST-скоринг на 100 баллов',
+    icon: '🪵',
+    agentTarget: '04-scorer',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • <strong>Формула score_article.py (100 баллов):</strong><br>
+        • Блок 1: Архитектурная структура H2/H3 (15 баллов)<br>
+        • Блок 2: Нормы, ГОСТы и стандарты безопасности (20 баллов)<br>
+        • Блок 3: Инженерная триада «факт-физика-последствие» (25 баллов)<br>
+        • Блок 4: Практическая применимость и частые ошибки (20 баллов)<br>
+        • Блок 5: Терминологическая чистота реестра сплавов (10 баллов)<br>
+        • Блок 6: Валидация контракта v1.1 и JSON Schema (10 баллов)
+    `,
+    task: `
+      Рассчитать точный объективный балл качества статьи. Если балл ≥ 80 — выдать допуск к шлюзу экспорта в WordPress.
+    `
+  },
+  bear: {
+    title: 'Медведь-Бригадир (Игрок)',
+    role: 'Староста Артели · Локальный Агент Triad-Omni (Mi 10T + Nord N10 + Redmi 4)',
+    icon: '🐻',
+    agentTarget: 'assistant',
+    docs: `
+      <strong>Архитектура кластера Triad-Omni v4.9:</strong><br>
+      • <strong>NODE-1 (Brain):</strong> Xiaomi Mi 10T 5G (Snapdragon 865, 8GB LPDDR5) — порт <code>:8080</code> (Qwen3.5-9B).<br>
+      • <strong>NODE-2 (Reflexes & RAG):</strong> OnePlus Nord N10 5G (Snapdragon 690, 6GB) — порт <code>:8081</code> (LFM2.5-8B + BGE-M3).<br>
+      • <strong>NODE-3 (Gateway Hub):</strong> Xiaomi Redmi Note 4 (Snapdragon 625) — порт <code>:8000</code>.<br>
+      • <strong>Резервный шлюз:</strong> OmniRoute — порт <code>:20128</code> (754 модели, авто-каскад).
+    `,
+    task: `
+      Координация работы всех верстаков, контроль энергопотребления смартфонов, автоматический failover и выпуск готовых статей в релиз.
+    `
+  }
+};
+
+let currentWsAgentId = null;
+let currentWsTopicId = 1;
+
+function openWorkstationModal(agentId) {
+  currentWsAgentId = agentId || 'bobr';
+  const data = CRAFTSMAN_DOSSIER[currentWsAgentId] || CRAFTSMAN_DOSSIER['bobr'];
+
+  document.getElementById('wsModalIcon').innerText = data.icon;
+  document.getElementById('wsModalTitle').innerText = data.title;
+  document.getElementById('wsModalRole').innerText = data.role;
+  document.getElementById('wsModalDocs').innerHTML = data.docs;
+  document.getElementById('wsModalTask').innerHTML = data.task;
+
+  const select = document.getElementById('wsModalTopicSelect');
+  if (select && window.state && window.state.topics) {
+    select.innerHTML = window.state.topics.map(t => `<option value="${t.id}" ${t.id === currentWsTopicId ? 'selected' : ''}>#${t.id}: ${t.title}</option>`).join('');
+  }
+
+  loadWorkstationTopicData(currentWsTopicId);
+
+  if (window.clusterHealth && window.clusterHealth.craftsmen && window.clusterHealth.craftsmen[currentWsAgentId]) {
+    const h = window.clusterHealth.craftsmen[currentWsAgentId];
+    const badge = document.getElementById('wsModalHealthBadge');
+    const routeSpan = document.getElementById('wsModalRoute');
+    if (h.status === 'dead') {
+      badge.style.background = '#7F1D1D';
+      badge.style.color = '#FECACA';
+      badge.style.borderColor = '#DC2626';
+      badge.innerText = '💀 ОФФЛАЙН (Сбой узла)';
+      routeSpan.innerText = 'Узел недоступен! Требуется автозамена в YAML';
+      routeSpan.style.color = '#EF4444';
+    } else if (h.status === 'fallback') {
+      badge.style.background = '#78350F';
+      badge.style.color = '#FDE68A';
+      badge.style.borderColor = '#D97706';
+      badge.innerText = '🔄 РЕЗЕРВ (Автозамена)';
+      routeSpan.innerText = h.active_route;
+      routeSpan.style.color = '#F59E0B';
+    } else {
+      badge.style.background = '#14532D';
+      badge.style.color = '#4ADE80';
+      badge.style.borderColor = '#22C55E';
+      badge.innerText = '🟢 ОНЛАЙН (' + h.active_route + ')';
+      routeSpan.innerText = h.active_route;
+      routeSpan.style.color = '#22C55E';
+    }
+  }
+
+  const modal = document.getElementById('workstationModal');
+  if (modal) modal.classList.add('active');
+}
+
+function closeWorkstationModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  const modal = document.getElementById('workstationModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function loadWorkstationTopicData(topicId) {
+  currentWsTopicId = parseInt(topicId, 10) || 1;
+  const container = document.getElementById('wsModalTopicData');
+  if (!container) return;
+
+  const topic = (window.state && window.state.topics) ? window.state.topics.find(t => t.id === currentWsTopicId) : null;
+  if (!topic) {
+    container.innerHTML = `Загрузка данных темы #${currentWsTopicId}...`;
+    return;
+  }
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:8px;margin-bottom:8px;">
+      <div><strong>Сплав:</strong> ${topic.solder_alloy || 'ПОС-61 (183–190°C)'}</div>
+      <div><strong>Сложность:</strong> ${topic.difficulty || 'Практик'}</div>
+      <div><strong>Статус:</strong> <span style="color:#FFC700;">${topic.status || 'в очереди'}</span></div>
+      <div><strong>Балл ОТК:</strong> ${topic.score_total ? topic.score_total + '/100' : 'Не рассчитан'}</div>
+    </div>
+    <div style="color:#94A3B8;font-size:11px;">
+      <strong>LSI-хвосты:</strong> ${topic.cluster_name || 'припой, паяльник, жало T12, флюс RMA-223, канифоль, пайка плат'}
+    </div>
+    <div style="margin-top:6px;color:#A1A1AA;font-size:11px;">
+      <strong>Контракт v1.1:</strong> ${topic.has_text ? '✅ Черновик написан (' + (topic.word_count || 1200) + ' слов)' : '⏳ Ожидает написания Котом-Паяльщиком'}
+    </div>
+  `;
+}
+
+function executeWorkstationAction() {
+  const data = CRAFTSMAN_DOSSIER[currentWsAgentId];
+  if (!data) return;
+
+  closeWorkstationModal();
+  if (data.agentTarget === 'assistant') {
+    switchTab('agents');
+    showToast('Координатор Triad-Omni на связи. Задайте команду Бригадиру.');
+    return;
+  }
+
+  if (typeof promptAgentTarget === 'function') {
+    promptAgentTarget(data.agentTarget);
+  } else {
+    showToast(`Запуск верстака ${data.title} для темы #${currentWsTopicId}`);
+  }
+}
+
+// ============================================================
+// YAML МАРШРУТИЗАЦИЯ, МОНИТОРИНГ УЗЛОВ И АВТОЗАМЕНА
+// ============================================================
+let simulatedOfflineNodes = [];
+
+function openRoutingModal() {
+  const modal = document.getElementById('routingModal');
+  if (modal) modal.classList.add('active');
+  fetchRoutingConfig();
+}
+
+function closeRoutingModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  const modal = document.getElementById('routingModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function fetchRoutingConfig() {
+  const statusEl = document.getElementById('routingSaveStatus');
+  if (statusEl) statusEl.innerText = 'Опрос узлов кластера...';
+
+  fetch('/api/agents/routing')
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        const textarea = document.getElementById('routingYamlTextarea');
+        if (textarea) textarea.value = data.yaml;
+        updateClusterHealthCards(data.health);
+        window.clusterHealth = data.health;
+        if (window.farm3D) window.farm3D.applyHealthStatus(data.health);
+        if (statusEl) statusEl.innerText = 'Конфигурация актуальна. Узлы проверены.';
+      }
+    })
+    .catch(err => {
+      if (statusEl) statusEl.innerText = 'Ошибка загрузки маршрутизации: ' + err;
+    });
+}
+
+function updateClusterHealthCards(health) {
+  if (!health || !health.nodes) return;
+  const nodes = health.nodes;
+
+  const nodeMap = {
+    node1_brain: { status: 'statusNode1', dot: 'dotNode1' },
+    node2_reflex: { status: 'statusNode2', dot: 'dotNode2' },
+    node3_gateway: { status: 'statusNode3', dot: 'dotNode3' },
+    omniroute_hub: { status: 'statusOmniroute', dot: 'dotOmniroute' }
+  };
+
+  Object.entries(nodeMap).forEach(([key, els]) => {
+    const info = nodes[key];
+    const sEl = document.getElementById(els.status);
+    const dEl = document.getElementById(els.dot);
+    if (!info || !sEl || !dEl) return;
+
+    if (info.alive) {
+      sEl.style.color = '#22C55E';
+      sEl.innerText = 'Онлайн';
+      dEl.className = 'status-dot active';
+      dEl.style.background = '#22C55E';
+    } else {
+      sEl.style.color = '#EF4444';
+      sEl.innerText = info.simulated_offline ? 'Сбой (Симуляция)' : 'Оффлайн';
+      dEl.className = 'status-dot';
+      dEl.style.background = '#EF4444';
+    }
+  });
+}
+
+function pingClusterNodes() {
+  const statusEl = document.getElementById('routingSaveStatus');
+  if (statusEl) statusEl.innerText = 'Пинг узлов кластера...';
+
+  fetch('/api/agents/ping', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ simulate_offline: simulatedOfflineNodes })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        updateClusterHealthCards(data.health);
+        window.clusterHealth = data.health;
+        if (window.farm3D) window.farm3D.applyHealthStatus(data.health);
+        if (statusEl) statusEl.innerText = 'Пинг выполнен. Статус обновлен.';
+        showToast('Пинг узлов кластера выполнен');
+      }
+    });
+}
+
+function simulateNodeFailure(nodeName) {
+  if (!simulatedOfflineNodes.includes(nodeName)) {
+    simulatedOfflineNodes.push(nodeName);
+  }
+  showToast(`Симуляция: узел ${nodeName} отключен!`);
+  pingClusterNodes();
+}
+
+function restoreAllNodes() {
+  simulatedOfflineNodes = [];
+  showToast('Все узлы кластера восстановлены!');
+  pingClusterNodes();
+}
+
+function saveRoutingYaml() {
+  const textarea = document.getElementById('routingYamlTextarea');
+  const statusEl = document.getElementById('routingSaveStatus');
+  if (!textarea) return;
+
+  const yamlContent = textarea.value;
+  if (statusEl) statusEl.innerText = 'Сохранение и валидация YAML...';
+
+  fetch('/api/agents/routing', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ yaml: yamlContent })
+  })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        if (statusEl) statusEl.innerText = '✅ Сохранено в config/agents_routing.yaml!';
+        updateClusterHealthCards(data.health);
+        window.clusterHealth = data.health;
+        if (window.farm3D) window.farm3D.applyHealthStatus(data.health);
+        showToast('Маршрутизация и автозамена успешно обновлены!');
+      } else {
+        if (statusEl) statusEl.innerText = '❌ ' + (data.message || 'Ошибка валидации');
+      }
+    })
+    .catch(err => {
+      if (statusEl) statusEl.innerText = 'Ошибка сохранения: ' + err;
+    });
+}
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeInspector();
+    closeWorkstationModal();
+    closeRoutingModal();
     return;
   }
   if (e.key === 'Tab') {
