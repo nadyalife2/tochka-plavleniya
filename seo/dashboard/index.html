@@ -549,6 +549,47 @@
       </div>
     </div>
 
+    <!-- Интерактивный виджет Старосты Артели (Говорящий Бригадир) -->
+    <div class="assistant-foreman-panel" id="assistantForemanPanel">
+      <div class="assistant-foreman-header">
+        <div class="assistant-avatar-box">
+          <div class="assistant-avatar-icon">🐻</div>
+          <div>
+            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-0.01em;">Староста Артели (Говорящий Бригадир)</h3>
+            <div style="font-size:11px;color:#A1A1AA;">Живой координатор фермы зверей · знание контекста SQLite и состояния узлов</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <button class="btn btn--xs" id="btnToggleVoice" type="button" onclick="toggleSpeech()" style="background:#27272A;color:#FFC700;border:1px solid #FFC700;">
+            🔇 Голос Артели: ВЫКЛ
+          </button>
+          <button class="btn btn--xs btn--primary" type="button" onclick="promptFullPipelineRun()">
+            ⚡ Полный цикл для темы (#ID)
+          </button>
+        </div>
+      </div>
+
+      <!-- Облако ответа Старосты -->
+      <div class="assistant-reply-bubble" id="assistantReplyBubble">
+        Приветствую на ферме зверей-мастеров! Я слежу за работой каждого верстака в реальном времени. Спросите меня внизу или кликните быстрый вопрос, и я покажу, кто сейчас занят и что делать дальше.
+      </div>
+
+      <!-- Быстрые вопросы-чипы -->
+      <div class="assistant-chips">
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('На чем мы остановились?')">📍 На чем мы остановились?</button>
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Что уже сделали?')">✅ Что уже сделали?</button>
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Что нужно сделать дальше?')">🚀 Что нужно сделать дальше?</button>
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Кто из зверей сейчас занят?')">🐾 Кто из мастеров на связи?</button>
+      </div>
+
+      <!-- Поле ввода для свободного диалога -->
+      <div class="assistant-input-row">
+        <input type="text" class="assistant-input" id="assistantInput" placeholder="Спросить Бригадира (напр. 'какой статус у темы #15' или 'что с картинками')..." onkeydown="if(event.key==='Enter') askAssistant()">
+        <button class="btn btn--primary" type="button" onclick="askAssistant()" style="padding:0 18px;">Спросить</button>
+        <div id="assistantActionBox" style="display:inline-flex;"></div>
+      </div>
+    </div>
+
     <!-- Верстаки Артели (Craftsmen Workshop Grid) -->
     <div class="craftsmen-grid">
 
@@ -705,6 +746,29 @@
             Движок: HTML/LSI Parser · Perplexity Sonar
           </div>
           <button class="btn btn--primary" style="width:100%;" onclick="runAgent('bot-analyzer')">▶ Анализировать фишки</button>
+        </div>
+      </div>
+
+      <!-- Мастер 7: Барсук-Иллюстратор (05-illustrator) -->
+      <div class="craftsman-card" id="card-craftsman-illustrator" style="border:2px solid var(--border);">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="Барсук-Иллюстратор" style="background:#FEF3C7;border-color:#D97706;">🦡</div>
+            <div>
+              <h3 class="craftsman-title">Барсук-Иллюстратор</h3>
+              <div class="craftsman-role">05-illustrator · SVG-схемы & Hero</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--warm">SVG / Flux / Imagen</span>
+        </div>
+        <div class="craftsman-desc">
+          Чертит точные векторные SVG-термопрофили оплавления по реестру сплавов, формирует кибердек-промпты для Hero-обложек (#FFC700) и встраивает блок media в контракт статьи.
+        </div>
+        <div class="craftsman-controls">
+          <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
+            Движок: craftsman_illustrator.py · 0 токенов
+          </div>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('05-illustrator')">▶ Отрисовать визуал (#ID)</button>
         </div>
       </div>
 

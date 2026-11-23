@@ -22,7 +22,10 @@ except Exception:
     pass
 
 from db import build_db_plan as build_plan
-from excel_io import DATA, OUT
+
+ROOT = Path(__file__).resolve().parents[2]
+DATA = ROOT / "seo" / "data"
+OUT = ROOT / "seo" / "out"
 
 SCORES = OUT / "scores"
 

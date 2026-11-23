@@ -37,6 +37,9 @@ def get_php_executable():
     portable_win = Path(r"C:\Users\nadya\php_portable\php.exe")
     if portable_win.exists():
         return str(portable_win)
+    home_win = Path.home() / "php_portable" / "php.exe"
+    if home_win.exists():
+        return str(home_win)
 
     # 4. Default fallback
     return "php"
@@ -120,6 +123,9 @@ def run_json_schema_tests():
 
 def run_php_lint():
     print(f"\n[STEP 2/7] Running PHP Syntax Check using '{PHP_EXE}'...")
+    if not shutil.which(PHP_EXE) and not Path(PHP_EXE).exists():
+        print(f"  [SKIP] PHP binary '{PHP_EXE}' not found on host. Skipping PHP syntax check.")
+        return
     php_files = []
     for scan_root in (ROOT_DIR / "theme4", ROOT_DIR / "wp-content" / "plugins" / "tchp-content"):
         php_files.extend(sorted(scan_root.rglob("*.php")))
@@ -133,6 +139,9 @@ def run_php_lint():
 
 def run_php_unit_tests():
     print("\n[STEP 3/7] Running Business Logic & Schema Contract Unit Tests (Mock WP)...")
+    if not shutil.which(PHP_EXE) and not Path(PHP_EXE).exists():
+        print(f"  [SKIP] PHP binary '{PHP_EXE}' not found on host. Skipping Mock-WP unit tests.")
+        return
     test_script = ROOT_DIR / "tests" / "test-package-a1.php"
     res = subprocess.run([PHP_EXE, str(test_script)], capture_output=True, text=True, encoding="utf-8", errors="replace")
     print(res.stdout)
@@ -149,7 +158,7 @@ def run_python_unit_tests():
         ROOT_DIR / "tests" / "test_server_validation.py",
     ]
     for script in test_scripts:
-        res = subprocess.run([sys.executable, "-m", "unittest", str(script)], capture_output=True, text=True, encoding="utf-8")
+        res = subprocess.run([sys.executable, str(script)], capture_output=True, text=True, encoding="utf-8")
         print(res.stdout)
         if res.returncode != 0:
             print(res.stderr, file=sys.stderr)

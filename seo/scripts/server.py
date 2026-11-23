@@ -74,7 +74,7 @@ LONG_AGENTS = {"00-research", "bot-analyzer"}
 JOB_TIMEOUT_SECONDS = 600
 
 # Агенты, которым нужен конкретный ID темы. Без него запуск бессмысленен.
-TARGET_REQUIRED_AGENTS = {"delivery", "04-scorer", "02-writer", "03-reviewer", "factcheck"}
+TARGET_REQUIRED_AGENTS = {"delivery", "04-scorer", "02-writer", "03-reviewer", "factcheck", "05-illustrator"}
 
 
 def _scalar(value, default=""):
@@ -267,11 +267,22 @@ def voice_generate(model: str, system_prompt: str, user_prompt: str,
     """Генерация выбранной моделью: `oxion:<id>`, `yandex:<id>`, `triad:<id>`, `omniroute:<id>`."""
     spec = (model or "oxion:claude-sonnet-5").strip()
     if spec.startswith("triad:"):
-        from writer_practico import call_triad_omni
-        text = call_triad_omni(user_prompt, system_prompt)
-        if not text:
-            raise RuntimeError("Triad-Omni кластер (:8000) оффлайн или не ответил.")
-        return text, spec
+        from writer_practico import call_triad_omni, call_omniroute
+        try:
+            text = call_triad_omni(user_prompt, system_prompt)
+        except Exception as e:
+            text = None
+        if text:
+            return text, spec
+        # Автоматический каскадный фоллбэк на OmniRoute (порт 20128)
+        print("[CASCADE FALLBACK] Triad-Omni offline, routing to OmniRoute...")
+        try:
+            text = call_omniroute(user_prompt, system_prompt, model="deepseek-chat")
+            if text:
+                return text, "omniroute:deepseek-chat (fallback)"
+        except Exception:
+            pass
+        raise RuntimeError("Triad-Omni кластер (:8000) и резервный OmniRoute (:20128) оффлайн.")
     if spec.startswith("omniroute:"):
         from writer_practico import call_omniroute
         m_id = spec.split(":", 1)[1] if ":" in spec else "auto/thinking"
@@ -1742,6 +1753,112 @@ class DashboardHandler(BaseHTTPRequestHandler):
             })
             return
 
+        # 6.5. Интерактивный чат с Говорящим Бригадиром (Староста Артели)
+        if path == "/api/assistant/chat":
+            msg = (payload.get("message") or "").strip().lower()
+            with get_connection() as conn:
+                total_topics = conn.execute("SELECT count(*) FROM topics").fetchone()[0]
+                written = conn.execute("SELECT count(*) FROM topics WHERE content_markdown IS NOT NULL AND length(content_markdown) > 200").fetchone()[0]
+                reviewed = conn.execute("SELECT count(*) FROM topics WHERE review_status = 'passed'").fetchone()[0]
+                scored = conn.execute("SELECT count(*) FROM topics WHERE score_total IS NOT NULL").fetchone()[0]
+                published = conn.execute("SELECT count(*) FROM topics WHERE wp_post_id IS NOT NULL").fetchone()[0]
+                with_media = conn.execute("SELECT count(*) FROM topics WHERE media_json IS NOT NULL").fetchone()[0]
+                last_topic = conn.execute("SELECT id, title, status, updated_at FROM topics ORDER BY updated_at DESC LIMIT 1").fetchone()
+
+            highlight = "card-craftsman-researcher"
+            action = None
+
+            if any(k in msg for k in ("остановились", "где мы", "на чем", "статус")):
+                last_title = last_topic["title"] if last_topic else "первые темы контура"
+                last_id = last_topic["id"] if last_topic else 1
+                highlight = "card-craftsman-illustrator" if with_media < written else "card-craftsman-writer"
+                reply = (
+                    f"Мы остановились на теме #{last_id} «{last_title}». "
+                    f"В нашей базе {total_topics} тем. Из них лонгридов написано: {written}, "
+                    f"ОТК-проверку Филина прошли: {reviewed}, схем термопрофилей от Барсука: {with_media}, "
+                    f"скоринг Дятла прошли: {scored}, опубликовано в WordPress: {published}. "
+                )
+                if with_media < written:
+                    reply += f"Сейчас самое время запустить Барсука-Иллюстратора отрисовать технологическую SVG-схему для темы #{last_id}!"
+                    action = {"label": f"Запустить Барсука для темы #{last_id}", "agent": "05-illustrator", "target_id": last_id}
+                else:
+                    reply += "Все готовые статьи обеспечены схемами. Можно запускать Кота на следующую тему!"
+                    action = {"label": "Написать следующую статью", "agent": "02-writer", "target_id": last_id}
+
+            elif any(k in msg for k in ("сделали", "что готово", "результат", "итог")):
+                highlight = "card-craftsman-scorer"
+                reply = (
+                    f"Отчитываюсь по ферме зверей: Бобёр подготовил семантическое ядро и брифы для всех {total_topics} тем. "
+                    f"Кот-Паяльщик и Лис написали {written} полных лонгридов по строгой триаде. "
+                    f"Филин-Ревизор проверил {reviewed} статей на ГОСТ и отсутствие слопа через SlopMonster. "
+                    f"Барсук-Иллюстратор подготовил векторные схемы термопрофилей для {with_media} статей. "
+                    f"Дятел-Метролог выполнил математический скоринг {scored} материалов."
+                )
+                action = {"label": "Показать канбан", "action_type": "filter_kanban"}
+
+            elif any(k in msg for k in ("нужно сделать", "дальше", "план", "что делать")):
+                if written < total_topics:
+                    target_t = conn.execute("SELECT id, title FROM topics WHERE content_markdown IS NULL OR length(content_markdown) < 200 ORDER BY priority DESC LIMIT 1").fetchone()
+                    tid = target_t["id"] if target_t else 1
+                    highlight = "card-craftsman-writer"
+                    reply = (
+                        f"Главный следующий шаг — взять тему #{tid} «{target_t['title']}» "
+                        f"и отправить Коту-Паяльщику на NODE-1 (Mi 10T 5G) для генерации лонгрида Practico 1. "
+                        f"После этого Барсук нарисует схему, а Филин и Дятел проведут ОТК-приемку."
+                    )
+                    action = {"label": f"Отправить тему #{tid} Коту", "agent": "02-writer", "target_id": tid}
+                elif with_media < written:
+                    target_t = conn.execute("SELECT id, title FROM topics WHERE media_json IS NULL ORDER BY id ASC LIMIT 1").fetchone()
+                    tid = target_t["id"] if target_t else 1
+                    highlight = "card-craftsman-illustrator"
+                    reply = (
+                        f"Есть готовые статьи без схем! Задача: отправить тему #{tid} «{target_t['title']}» "
+                        f"Барсуку-Иллюстратору для генерации точной SVG-кривой ликвидуса и промпта Hero-обложки."
+                    )
+                    action = {"label": f"Отрисовать схему #{tid}", "agent": "05-illustrator", "target_id": tid}
+                else:
+                    highlight = "card-craftsman-reviewer"
+                    reply = "Все готовые статьи написаны и проиллюстрированы! Следующий этап — пакетная отправка черновиков в WordPress."
+                    action = {"label": "Экспорт в WordPress", "agent": "delivery", "target_id": 1}
+
+            elif any(k in msg for k in ("кто занят", "звери", "ферма", "мастера", "бригада")):
+                highlight = "card-craftsman-writer"
+                reply = (
+                    "Вся артель зверей на местах: "
+                    "🦫 Бобёр строит брифы на NODE-2 (Nord N10), "
+                    "🐱 Кот паяет тексты на NODE-1 (Mi 10T), "
+                    "🦊 Лис считает сметы через OmniRoute, "
+                    "🦡 Барсук чертит векторные SVG-термопрофили, "
+                    "🦉 Филин держит наготове штамп [ОТК] с де-слоппером, "
+                    "🪵 Дятел откалибровал 100-балльный скорер, "
+                    "а 🪶 Сорока отслеживает фишки конкурентов."
+                )
+
+            else:
+                highlight = "card-craftsman-writer"
+                reply = (
+                    f"Приветствую! На нашей ферме {total_topics} тем и {written} готовых лонгридов. "
+                    "Спросите меня: «На чем мы остановились?», «Что уже сделали?», «Что нужно сделать дальше?» "
+                    "или «Кто из зверей сейчас занят?» — и я сразу покажу мастера на верстаке!"
+                )
+
+            self.send_json({
+                "status": "ok",
+                "reply": reply,
+                "voice_text": reply,
+                "highlight_craftsman": highlight,
+                "action": action,
+                "stats": {
+                    "total": total_topics,
+                    "written": written,
+                    "reviewed": reviewed,
+                    "with_media": with_media,
+                    "scored": scored,
+                    "published": published
+                }
+            })
+            return
+
         # 7. Запуск субагента
         if path == "/api/agent/run":
             agent = _scalar(payload.get("agent", ""), "").strip()
@@ -1969,6 +2086,20 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         _save_written_article(target_id, answer, author=f"ai-{voice}")
                         log_output = f"✅ Статья написана: {voice_name} · {used} ({len(answer)} зн.)\n\n{answer[:1500]}"
                         status = "succeeded"
+                elif agent == "05-illustrator" and target_id:
+                    from craftsman_illustrator import design_visual_package_for_topic
+                    res = design_visual_package_for_topic(target_id)
+                    if res["status"] == "success":
+                        log_output = (
+                            f"✅ Барсук-Иллюстратор [05-illustrator]:\n{res['summary']}\n"
+                            f"• Файл схемы: {res['svg_file']}\n"
+                            f"• Сплав: {res['alloy']}\n"
+                            f"• Hero-промпт: {res['media']['hero_image']['prompt'][:120]}..."
+                        )
+                        status = "succeeded"
+                    else:
+                        log_output = f"❌ Ошибка генерации визуала: {res.get('message', 'Неизвестная ошибка')}"
+                        status = "failed"
                 elif agent in ("03-reviewer", "factcheck") and target_id:
                     with get_connection() as conn:
                         row = conn.execute(
@@ -2004,6 +2135,23 @@ class DashboardHandler(BaseHTTPRequestHandler):
                         elif re.search(r"(?i)вердикт[:\s]*(?:доработка|правки|требует правок|не годен|отклон|ошибк)", answer) or "блок" in low_ans:
                             verdict = "needs_fix"
 
+                        # Проверка Humanizer (SlopMonster)
+                        deslop_tool = ROOT / "tools" / "deslop.py"
+                        deslop_report = ""
+                        if deslop_tool.exists():
+                            try:
+                                p_deslop = subprocess.run(
+                                    [sys.executable, str(deslop_tool), "--text", text[:4000]],
+                                    capture_output=True, text=True, encoding="utf-8", timeout=10
+                                )
+                                deslop_out = p_deslop.stdout.strip()
+                                if "needs a cleanse" in deslop_out or "score" in deslop_out:
+                                    deslop_report = f"\n\n[🦉 Humanizer / SlopMonster Report]:\n{deslop_out}"
+                                    if p_deslop.returncode != 0 and verdict == "passed":
+                                        verdict = "needs_fix"
+                            except Exception:
+                                pass
+
                         with get_connection() as conn:
                             conn.execute(
                                 f"UPDATE topics SET {status_column} = ?, {model_column} = ?, "
@@ -2012,7 +2160,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                                  datetime.now().isoformat(timespec="seconds"), target_id),
                             )
                             conn.commit()
-                        log_output = f"✅ {label.capitalize()} завершён: вердикт «{verdict}» (модель {used})\n\n{answer}"
+                        log_output = f"✅ {label.capitalize()} завершён: вердикт «{verdict}» (модель {used}){deslop_report}\n\n{answer}"
                         status = "succeeded"
                 else:
                     log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."

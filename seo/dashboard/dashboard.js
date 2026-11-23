@@ -2808,6 +2808,138 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch(() => {});
 });
 
+/* ── ИНТЕРАКТИВНЫЙ ГОЛОСОВОЙ БРИГАДИР АРТЕЛИ ────────────────────────────────── */
+let speechSynthesisEnabled = false;
+
+function toggleSpeech() {
+  speechSynthesisEnabled = !speechSynthesisEnabled;
+  const btn = document.getElementById('btnToggleVoice');
+  if (btn) {
+    btn.innerHTML = speechSynthesisEnabled ? '🔊 Голос Артели: ВКЛ' : '🔇 Голос Артели: ВЫКЛ';
+    btn.style.background = speechSynthesisEnabled ? '#FFC700' : '#27272A';
+    btn.style.color = speechSynthesisEnabled ? '#000' : '#FFC700';
+  }
+  if (speechSynthesisEnabled) {
+    speakText('Голос Артели активирован. Я готова отвечать!');
+  } else if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+}
+
+function speakText(text) {
+  if (!speechSynthesisEnabled || !window.speechSynthesis) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'ru-RU';
+  utter.rate = 1.05;
+  utter.pitch = 1.0;
+  window.speechSynthesis.speak(utter);
+}
+
+async function askAssistant(customQuestion) {
+  const input = document.getElementById('assistantInput');
+  const q = customQuestion || (input ? input.value : '');
+  if (!q || !q.trim()) return;
+
+  const bubble = document.getElementById('assistantReplyBubble');
+  if (bubble) bubble.innerHTML = '<span style="color:#FFC700;">🐾 Бригадир опрашивает верстаки зверей-мастеров...</span>';
+
+  try {
+    const res = await fetch(API_BASE + '/api/assistant/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: q })
+    });
+    const data = await res.json();
+    if (bubble) {
+      bubble.innerText = data.reply;
+    }
+    if (input && !customQuestion) input.value = '';
+
+    // Голосовое воспроизведение
+    if (data.voice_text) {
+      speakText(data.voice_text);
+    }
+
+    // Подсветка мастера на ферме и плавный скролл
+    if (data.highlight_craftsman) {
+      document.querySelectorAll('.craftsman-card').forEach(el => el.classList.remove('craftsman-highlighted'));
+      const targetCard = document.getElementById(data.highlight_craftsman);
+      if (targetCard) {
+        targetCard.classList.add('craftsman-highlighted');
+        targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => targetCard.classList.remove('craftsman-highlighted'), 7000);
+      }
+    }
+
+    // Кнопка быстрого действия
+    const actBox = document.getElementById('assistantActionBox');
+    if (actBox) {
+      if (data.action && data.action.agent) {
+        actBox.innerHTML = `<button class="btn btn--sm btn--primary" type="button" style="margin-left:8px;" onclick="runAgent('${data.action.agent}', ${data.action.target_id || ''})">⚡ ${data.action.label}</button>`;
+      } else {
+        actBox.innerHTML = '';
+      }
+    }
+  } catch (err) {
+    if (bubble) bubble.innerText = 'Ошибка связи со Старостой Артели: ' + err.message;
+  }
+}
+
+async function promptFullPipelineRun() {
+  const tidStr = prompt('Введите ID темы для запуска сквозного цикла Артели (Бобёр → Кот → Барсук → Филин → Дятел):', '1');
+  if (!tidStr) return;
+  const tid = parseInt(tidStr, 10);
+  if (!tid || tid < 1) {
+    alert('Некорректный ID темы');
+    return;
+  }
+  await runFullPipelineForTopic(tid);
+}
+
+async function runFullPipelineForTopic(tid) {
+  const consoleEl = document.getElementById('agentConsole');
+  if (consoleEl) {
+    consoleEl.innerText = `[СКВОЗНОЙ ЦИКЛ] Запуск полного конвейера Артели для темы #${tid}...\n`;
+  }
+
+  const steps = [
+    { name: '🦫 Бобёр-Конструктор (01-researcher)', agent: '01-researcher' },
+    { name: '🐱 Кот-Паяльщик (02-writer)', agent: '02-writer' },
+    { name: '🦡 Барсук-Иллюстратор (05-illustrator)', agent: '05-illustrator' },
+    { name: '🦉 Филин-Ревизор + Humanizer (03-reviewer)', agent: '03-reviewer' },
+    { name: '🪵 Дятел-Метролог (04-scorer)', agent: '04-scorer' }
+  ];
+
+  for (const step of steps) {
+    if (consoleEl) {
+      consoleEl.innerText += `\n>> Запуск: ${step.name}...\n`;
+    }
+    try {
+      const res = await fetch(API_BASE + '/api/agent/run', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ agent: step.agent, target_id: tid })
+      });
+      const data = await res.json();
+      if (consoleEl) {
+        consoleEl.innerText += (data.log || data.message || 'Шаг завершен') + '\n';
+      }
+    } catch (e) {
+      if (consoleEl) {
+        consoleEl.innerText += `❌ Ошибка на шаге ${step.name}: ${e.message}\n`;
+      }
+      break;
+    }
+  }
+
+  if (consoleEl) {
+    consoleEl.innerText += `\n[ГОТОВО] Сквозной цикл Артели для темы #${tid} завершен!\n`;
+  }
+  refreshData();
+  askAssistant(`Что с темой #${tid}?`);
+}
+
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
     closeInspector();

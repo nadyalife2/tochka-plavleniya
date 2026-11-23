@@ -185,6 +185,35 @@
         "additionalProperties": false
       },
       "description": "Нормативные источники и даташиты (2–4 источника, без плейсхолдеров [web:*])"
+    },
+    "media": {
+      "type": "object",
+      "properties": {
+        "hero_image": {
+          "type": "object",
+          "properties": {
+            "url": { "type": "string" },
+            "alt": { "type": "string" },
+            "width": { "type": "integer" },
+            "height": { "type": "integer" }
+          },
+          "additionalProperties": false
+        },
+        "illustrations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["inline_svg", "image_webp", "schematic"] },
+              "caption": { "type": "string" },
+              "content_or_url": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false,
+      "description": "Медиа-материалы: Hero-обложка, SVG-схемы термопрофилей и иллюстрации Барсука"
     }
   },
   "additionalProperties": false
