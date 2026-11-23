@@ -253,6 +253,7 @@
         { geo: new THREE.BoxGeometry(2.8, 0.03, 16), x: -14, y: 0.02, z: -14 },
         { geo: new THREE.BoxGeometry(16, 0.03, 2.8), x: 10, y: 0.02, z: 3, rotY: 0.15 },
         { geo: new THREE.BoxGeometry(14, 0.03, 2.8), x: 9, y: 0.02, z: -8, rotY: -0.5 },
+        { geo: new THREE.BoxGeometry(2.8, 0.03, 16), x: 0, y: 0.02, z: -8 },
         { geo: new THREE.BoxGeometry(2.8, 0.03, 18), x: 0, y: 0.02, z: 10 }
       ];
 
@@ -360,6 +361,13 @@
           pos: new THREE.Vector3(10, 0, 16), colorHex: 0xEC4899,
           taskTitle: 'СКОРИНГ: Метрология 100 баллов',
           taskSubtitle: 'AST-анализ 6 объективных блоков',
+          status: 'ОЖИДАЕТ'
+        },
+        raccoon: {
+          id: 'ws_raccoon', name: 'АРХИВ ЗНАНИЙ (ЕНОТ-ДАТАСЕТНИК)', icon: '🦝',
+          pos: new THREE.Vector3(0, 0, -15), colorHex: 0x10B981,
+          taskTitle: 'ОБУЧЕНИЕ: Graphify & LoRA JSONL',
+          taskSubtitle: 'Граф связей, аудит базы и подготовка датасета',
           status: 'ОЖИДАЕТ'
         },
         wp: {
@@ -490,6 +498,40 @@
         const ruler = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4.2, 0.06), new THREE.MeshBasicMaterial({ color: 0x10B981 }));
         ruler.position.set(0, 2.8, 1.24);
         g.add(ruler);
+
+      } else if (key === 'raccoon') {
+        const platform = new THREE.Mesh(new THREE.BoxGeometry(4.2, 0.45, 3.2), new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.8 }));
+        platform.position.y = 0.22;
+        g.add(platform);
+
+        const rack = new THREE.Mesh(new THREE.BoxGeometry(0.9, 2.6, 1.2), new THREE.MeshStandardMaterial({ color: 0x0F172A }));
+        rack.position.set(-1.4, 1.5, 0);
+        g.add(rack);
+        for (let i = 0; i < 4; i++) {
+          const led = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.08, 0.05), new THREE.MeshBasicMaterial({ color: (i % 2 === 0) ? 0x10B981 : 0x06B6D4 }));
+          led.position.set(-1.4, 0.7 + i * 0.5, 0.62);
+          g.add(led);
+        }
+
+        const archiveCabinet = new THREE.Mesh(new THREE.BoxGeometry(0.9, 2.6, 1.2), new THREE.MeshStandardMaterial({ color: 0x334155 }));
+        archiveCabinet.position.set(1.4, 1.5, 0);
+        g.add(archiveCabinet);
+
+        const pedestal = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.65, 0.9, 8), new THREE.MeshStandardMaterial({ color: 0x0284C7, roughness: 0.3, metalness: 0.8 }));
+        pedestal.position.set(0, 0.7, 0.2);
+        g.add(pedestal);
+
+        const graphMesh = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.45, 0),
+          new THREE.MeshStandardMaterial({ color: 0x34D399, wireframe: true, emissive: 0x059669, emissiveIntensity: 0.7 })
+        );
+        graphMesh.position.set(0, 1.6, 0.2);
+        g.add(graphMesh);
+        g.graphMesh = graphMesh;
+
+        const pLight = new THREE.PointLight(0x10B981, 1.5, 6);
+        pLight.position.set(0, 1.8, 0.2);
+        g.add(pLight);
 
       } else if (key === 'wp') {
         const archMat = new THREE.MeshStandardMaterial({ color: 0x0E7490 });
@@ -647,6 +689,12 @@
           color: 0xBE185D, accentColor: 0xFCE7F3, x: 10, z: 14, speed: 1.6,
           dialogue: 'AST-анализ: 94/100 баллов! Зеленый свет в шлюз релиза!',
           earType: 'crest', toolType: 'calibrator'
+        },
+        {
+          id: 'raccoon', name: 'Енот-Датасетник', role: '06-knowledge', icon: '🦝',
+          color: 0x475569, accentColor: 0x0F172A, x: 0, z: -13.2, speed: 1.5,
+          dialogue: 'Связываю ГОСТы и статьи в граф Graphify! Датасет JSONL для LoRA собран и вычищен!',
+          earType: 'round', toolType: 'graph_crystal'
         }
       ];
 
@@ -734,6 +782,25 @@
         headGroup.add(eye);
       });
 
+      if (cfg.id === 'raccoon') {
+        const mask = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.22, 0.04), new THREE.MeshBasicMaterial({ color: 0x09090B }));
+        mask.position.set(0, 0.12, 0.43);
+        headGroup.add(mask);
+
+        const tailGroup = new THREE.Group();
+        tailGroup.position.set(0, 0.8, -0.75);
+        tailGroup.rotation.x = -Math.PI / 3;
+        for (let i = 0; i < 4; i++) {
+          const ring = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.16, 0.16, 0.22, 8),
+            new THREE.MeshStandardMaterial({ color: (i % 2 === 0) ? 0x1E293B : 0xCBD5E1 })
+          );
+          ring.position.y = -i * 0.24;
+          tailGroup.add(ring);
+        }
+        g.add(tailGroup);
+      }
+
       if (cfg.earType === 'beak' || cfg.earType === 'crest') {
         const beak = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.55, 4), new THREE.MeshStandardMaterial({ color: 0xF59E0B }));
         beak.rotateX(Math.PI / 2);
@@ -819,6 +886,14 @@
         const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.25, 8), new THREE.MeshStandardMaterial({ color: 0xEAB308 }));
         cup.position.set(0, -0.1, 0.2);
         armGroup.add(cup);
+      } else if (toolType === 'graph_crystal') {
+        const crystal = new THREE.Mesh(
+          new THREE.OctahedronGeometry(0.24, 0),
+          new THREE.MeshStandardMaterial({ color: 0x34D399, wireframe: true, emissive: 0x059669, emissiveIntensity: 0.85 })
+        );
+        crystal.position.set(0, -0.05, 0.25);
+        armGroup.add(crystal);
+        armGroup.crystalMesh = crystal;
       }
     }
 
@@ -1245,6 +1320,13 @@
         w.rotation.z += 0.015 * this.speed;
       });
 
+      // 1.1. Голографический граф связей в Архиве Знаний парит и вращается
+      if (this.stationMeshes && this.stationMeshes.raccoon && this.stationMeshes.raccoon.graphMesh) {
+        this.stationMeshes.raccoon.graphMesh.rotation.y += 0.02 * this.speed;
+        this.stationMeshes.raccoon.graphMesh.rotation.z = Math.sin(time * 2.0) * 0.15;
+        this.stationMeshes.raccoon.graphMesh.position.y = 1.6 + Math.sin(time * 3.0) * 0.08;
+      }
+
       // 2. Управление Игроком (Медведем-Бригадиром) с клавиатуры (WASD)
       if (this.playerAgent && !this.paused && this.playerAgent.state !== 'dead') {
         const moveVec = new THREE.Vector3(0, 0, 0);
@@ -1381,6 +1463,16 @@
 
           } else if (a.id === 'dyatel') {
             if (a.group.headGroup) a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 12.0)) * 0.4;
+
+          } else if (a.id === 'raccoon') {
+            if (a.group.toolArm) {
+              a.group.toolArm.position.y = 1.0 + Math.sin(time * 4.0) * 0.15;
+              if (a.group.toolArm.crystalMesh) {
+                a.group.toolArm.crystalMesh.rotation.y += 0.05;
+                a.group.toolArm.crystalMesh.rotation.x += 0.03;
+              }
+            }
+            if (a.group.headGroup) a.group.headGroup.rotation.x = 0.2 + Math.sin(time * 3.0) * 0.1;
 
           } else if (a.id === 'bear') {
             if (a.group.toolArm) a.group.toolArm.position.y = 1.0 + Math.sin(time * 2.0) * 0.2;

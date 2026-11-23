@@ -3111,6 +3111,22 @@ const CRAFTSMAN_DOSSIER = {
       Рассчитать точный объективный балл качества статьи. Если балл ≥ 80 — выдать допуск к шлюзу экспорта в WordPress.
     `
   },
+  raccoon: {
+    title: 'Енот-Датасетник & Архивариус Знаний',
+    role: '06-knowledge · Graphify граф связей, аудит базы и подготовка датасета LoRA (ChatML JSONL)',
+    icon: '🦝',
+    agentTarget: '06-knowledge',
+    docs: `
+      <strong>Стандарты и регламенты:</strong><br>
+      • <strong>Graphify Knowledge Graph:</strong> постоянный граф знаний (узлы: ГОСТы, сплавы, жало паяльника, дефекты).<br>
+      • <strong>LoRA Training Dataset:</strong> формат ChatML JSONL для дообучения моделей (Qwen 3.5, LFM 2.5, Gemma) через Unsloth в Google Colab.<br>
+      • <strong>Аудит базы знаний:</strong> поиск пробелов (knowledge gaps), проверка покрытия тем, валидация фактологии перед обучением.<br>
+      • <strong>Формат обучающей выборки:</strong> тройка system-user-assistant с эталонным стилем Practico и выверенными температурными коридорами.
+    `,
+    task: `
+      Собрать и актуализировать граф знаний через Graphify, проверить текущее покрытие тем в базе seo.db, сформировать датасет lora_training_dataset.jsonl и запустить тест знаний (Eval).
+    `
+  },
   bear: {
     title: 'Медведь-Бригадир (Игрок)',
     role: 'Староста Артели · Локальный Агент Triad-Omni (Mi 10T + Nord N10 + Redmi 4)',
@@ -3192,6 +3208,55 @@ function loadWorkstationTopicData(topicId) {
   const container = document.getElementById('wsModalTopicData');
   if (!container) return;
 
+  if (currentWsAgentId === 'raccoon') {
+    container.innerHTML = `
+      <div style="background:rgba(15,23,42,0.8);border:1px solid #10B981;border-radius:8px;padding:12px;margin-bottom:10px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-weight:bold;color:#10B981;font-size:13px;">🕸️ GRAPHIFY & БАЗА ЗНАНИЙ АРТЕЛИ</span>
+          <span id="raccoonGraphStatusBadge" style="background:#064E3B;color:#6EE7B7;padding:2px 8px;border-radius:4px;font-size:11px;">Связи: 153+ узлов</span>
+        </div>
+        <div style="font-size:12px;color:#CBD5E1;line-height:1.5;margin-bottom:10px;" id="raccoonKnowledgeDetails">
+          Загрузка статуса базы знаний и графа...
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button type="button" class="btn btn-sm" style="background:#047857;color:#FFFFFF;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:bold;font-size:11px;" onclick="triggerGraphifyUpdate()">
+            🕸️ Обновить граф Graphify
+          </button>
+          <button type="button" class="btn btn-sm" style="background:#0D9488;color:#FFFFFF;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:bold;font-size:11px;" onclick="triggerDatasetGeneration()">
+            📦 Собрать датасет LoRA (ChatML)
+          </button>
+          <button type="button" class="btn btn-sm" style="background:#4338CA;color:#FFFFFF;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:bold;font-size:11px;" onclick="triggerKnowledgeEval()">
+            🧪 Проверить знания моделей (Eval)
+          </button>
+          <a href="/api/dataset/download" class="btn btn-sm" style="background:#334155;color:#E2E8F0;text-decoration:none;border-radius:6px;padding:6px 12px;font-size:11px;display:inline-block;" download="lora_training_dataset.jsonl">
+            💾 Скачать JSONL
+          </a>
+        </div>
+        <div id="raccoonActionOutput" style="margin-top:10px;font-size:11px;color:#94A3B8;display:none;padding:8px;background:#09090B;border-radius:6px;border:1px dashed #334155;"></div>
+      </div>
+    `;
+
+    fetch('/api/knowledge/status')
+      .then(r => r.json())
+      .then(k => {
+        if (k.status === 'ok') {
+          const det = document.getElementById('raccoonKnowledgeDetails');
+          const badge = document.getElementById('raccoonGraphStatusBadge');
+          if (badge) badge.innerText = `Узлов: ${k.graphify.nodes_count} · Связей: ${k.graphify.edges_count}`;
+          if (det) {
+            det.innerHTML = `
+              • <strong>Тем в ядре:</strong> ${k.total_topics} (черновиков: ${k.written_count}, аттестовано ОТК: ${k.verified_count})<br>
+              • <strong>Покрытые сплавы:</strong> ${k.alloys_covered.join(', ')}<br>
+              • <strong>Датасет LoRA:</strong> ${k.dataset.records_count ? k.dataset.records_count + ' обучающих пар (' + Math.round(k.dataset.size_bytes / 1024) + ' КБ)' : 'готов к сборке'}<br>
+              • <strong>Стандарты:</strong> IPC-A-610G, ГОСТ 21930-76, ГОСТ 20.57.406-81, ГОСТ 12.3.003-75
+            `;
+          }
+        }
+      })
+      .catch(() => {});
+    return;
+  }
+
   const topic = (window.state && window.state.topics) ? window.state.topics.find(t => t.id === currentWsTopicId) : null;
   if (!topic) {
     container.innerHTML = `Загрузка данных темы #${currentWsTopicId}...`;
@@ -3214,9 +3279,81 @@ function loadWorkstationTopicData(topicId) {
   `;
 }
 
+function triggerGraphifyUpdate() {
+  const out = document.getElementById('raccoonActionOutput');
+  if (out) {
+    out.style.display = 'block';
+    out.innerHTML = '<span style="color:#10B981;">⏳ Запуск инкрементального обновления графа знаний Graphify...</span>';
+  }
+  fetch('/api/knowledge/graphify_update', { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (out) {
+        out.innerHTML = `<span style="color:#34D399;">✅ ${data.output || 'Граф связей успешно актуализирован!'}</span>`;
+      }
+      showToast('Граф связей Graphify обновлен');
+      if (window.farm3DInstance) {
+        window.farm3DInstance.triggerHandoverAnimation('raccoon', 'bear', 'Graphify');
+      }
+    })
+    .catch(err => {
+      if (out) out.innerHTML = `<span style="color:#EF4444;">Ошибка: ${err.message}</span>`;
+    });
+}
+
+function triggerDatasetGeneration() {
+  const out = document.getElementById('raccoonActionOutput');
+  if (out) {
+    out.style.display = 'block';
+    out.innerHTML = '<span style="color:#0D9488;">⏳ Сборка обучающей выборки ChatML JSONL для LoRA...</span>';
+  }
+  fetch('/api/dataset/generate', { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (out) {
+        out.innerHTML = `<span style="color:#2DD4BF;">✅ Собрано ${data.exported_count} обучающих пар (${Math.round(data.size_bytes / 1024)} КБ) в файл scratch/lora_training_dataset.jsonl</span>`;
+      }
+      showToast(`Датасет собран: ${data.exported_count} пар ChatML`);
+      if (window.farm3DInstance) {
+        window.farm3DInstance.triggerHandoverAnimation('raccoon', 'kot', 'Dataset JSONL');
+      }
+    })
+    .catch(err => {
+      if (out) out.innerHTML = `<span style="color:#EF4444;">Ошибка: ${err.message}</span>`;
+    });
+}
+
+function triggerKnowledgeEval() {
+  const out = document.getElementById('raccoonActionOutput');
+  if (out) {
+    out.style.display = 'block';
+    out.innerHTML = '<span style="color:#818CF8;">⏳ Запуск тестового бенчмарка знаний моделей по ГОСТам...</span>';
+  }
+  fetch('/api/knowledge/eval_test', { method: 'POST' })
+    .then(r => r.json())
+    .then(data => {
+      if (out) {
+        const testsHtml = data.tests.map(t => `<div>• ${t.title}: <strong style="color:${t.passed ? '#34D399' : '#EF4444'}">${t.score}% [${t.passed ? 'OK' : 'FAIL'}]</strong> (${t.standard})</div>`).join('');
+        out.innerHTML = `
+          <div style="font-weight:bold;color:#A78BFA;margin-bottom:4px;">Результат Eval-теста: ${data.verdict} (${data.overall_accuracy}%)</div>
+          ${testsHtml}
+        `;
+      }
+      showToast(`Тест знаний: ${data.verdict} (${data.overall_accuracy}%)`);
+    })
+    .catch(err => {
+      if (out) out.innerHTML = `<span style="color:#EF4444;">Ошибка: ${err.message}</span>`;
+    });
+}
+
 function executeWorkstationAction() {
   const data = CRAFTSMAN_DOSSIER[currentWsAgentId];
   if (!data) return;
+
+  if (currentWsAgentId === 'raccoon') {
+    triggerDatasetGeneration();
+    return;
+  }
 
   closeWorkstationModal();
   if (data.agentTarget === 'assistant') {

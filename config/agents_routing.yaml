@@ -68,6 +68,15 @@ craftsmen:
     auto_failover: true
     status: "alive"
 
+  raccoon:
+    name: "Енот-Датасетник"
+    role: "06-knowledge (Graphify & LoRA Dataset)"
+    primary: "triad:node2_reflex"
+    fallback_1: "triad:node1_brain"
+    fallback_2: "omniroute:auto/thinking"
+    auto_failover: true
+    status: "alive"
+
   bear:
     name: "Медведь-Бригадир (Игрок)"
     role: "Староста Артели (Triad-Omni Coordinator)"
