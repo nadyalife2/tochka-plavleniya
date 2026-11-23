@@ -1,7 +1,12 @@
 /**
- * 🎮 3D ИНЖЕНЕРНАЯ ФЕРМА-ГОРОДОК АРТЕЛИ ЗВЕРЕЙ-МАСТЕРОВ (Three.js WebGL 3D Engine)
- * Полная интерактивная 3D-симуляция фермы: поля, пашня, ручей, деревья, мастерские и анимированные 3D-звери.
- * Вдохновлено a16z-infra/ai-town, Stanford generative_agents и стандартами MuJoCo 3D.
+ * 🎮 3D ИНЖЕНЕРНАЯ ФЕРМА АРТЕЛИ ЗВЕРЕЙ-МАСТЕРОВ v2.0 (Three.js WebGL Engine)
+ * - Чистый ландшафт без лишнего визуального шума: верстаки, пашня, ручей и дороги.
+ * - Строгая физика состояний:
+ *     * IDLE: зверь спокойно СТОИТ на месте без дерганий и прыжков.
+ *     * WORKING: зверь РЕАЛЬНО РАБОТАЕТ (Кот паяет с искрами, Бобёр пилит, Барсук чертит, Филин ставит штамп, Дятел калибрует шкалу).
+ *     * WALKING: идет с ритмичным шагом лапок.
+ * - Информационные 3D-таблички над каждым верстаком: ЧТО СДЕЛАТЬ / УТВЕРДИТЬ / НАПИСАТЬ / ПЕРЕПРОВЕРИТЬ + СТАТУС.
+ * - Визуализация физической передачи из лап в лапы: предмет летит по дуге с золотой аурой, подтверждение репликой.
  * Точка Плавления · tochka-plavleniya.ru · Triad-Omni Edge AI Cluster.
  */
 
@@ -22,15 +27,18 @@
       this.speed = 1.0;
       this.paused = false;
       this.selectedAgent = null;
-      this.timeOfDay = 'day'; // day, sunset, night
+      this.timeOfDay = 'day';
 
       this.agents = [];
       this.agentMeshes = {};
+      this.stations = {};
       this.stationMeshes = {};
-      this.trees = [];
       this.windmills = [];
-      this.smokeParticles = null;
-      this.pollenParticles = null;
+      this.flowLines = [];
+
+      // Системы частиц для работы
+      this.sparksGroup = null;
+      this.sawdustGroup = null;
 
       this.raycaster = new THREE.Raycaster();
       this.mouse = new THREE.Vector2();
@@ -39,25 +47,25 @@
     }
 
     init() {
-      // 1. Сцена и туман
+      // 1. Сцена и чистое окружение
       this.scene = new THREE.Scene();
-      this.scene.background = new THREE.Color(0x87CEEB);
-      this.scene.fog = new THREE.FogExp2(0x87CEEB, 0.012);
+      this.scene.background = new THREE.Color(0x93C5FD);
+      this.scene.fog = new THREE.FogExp2(0x93C5FD, 0.009);
 
-      // 2. Камера
+      // 2. Камера (отличный обзор всей рабочей площадки)
       const width = this.container.clientWidth || 1000;
       const height = this.container.clientHeight || 560;
-      this.camera = new THREE.PerspectiveCamera(42, width / height, 0.5, 300);
-      this.camera.position.set(38, 32, 48);
+      this.camera = new THREE.PerspectiveCamera(40, width / height, 0.5, 300);
+      this.camera.position.set(32, 28, 42);
 
       // 3. WebGL Рендерер
-      this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false, powerPreference: 'high-performance' });
+      this.renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
       this.renderer.setSize(width, height);
       this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       this.renderer.shadowMap.enabled = true;
       this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      this.renderer.toneMappingExposure = 1.05;
+      this.renderer.toneMappingExposure = 1.08;
       this.container.appendChild(this.renderer.domElement);
 
       // 4. OrbitControls
@@ -65,49 +73,47 @@
         this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enableDamping = true;
         this.controls.dampingFactor = 0.06;
-        this.controls.maxPolarAngle = Math.PI / 2.08; // Не даем нырять под землю
-        this.controls.minDistance = 12;
-        this.controls.maxDistance = 120;
-        this.controls.target.set(0, 2, 0);
+        this.controls.maxPolarAngle = Math.PI / 2.08;
+        this.controls.minDistance = 10;
+        this.controls.maxDistance = 110;
+        this.controls.target.set(0, 1.5, 0);
       }
 
       // 5. Освещение
       this.setupLighting();
 
-      // 6. Мир Фермы (Поле, Пашня, Ручей, Деревья, Заборы)
-      this.buildFarmEnvironment();
+      // 6. Лаконичный ландшафт фермы (без загромождающего антуража)
+      this.buildCleanFarmEnvironment();
 
-      // 7. Постройки и Верстаки Мастеров
-      this.buildCraftsmenStations();
+      // 7. Постройки и информационные 3D-таблички
+      this.buildStationsWithPlacards();
 
-      // 8. 3D Анимированные Персонажи
-      this.build3DAgents();
+      // 8. 3D Анимированные Персонажи с рабочими инструментами
+      this.build3DAgentsWithTools();
 
-      // 9. Системы частиц (Дым пайки и пыльца полей)
-      this.buildParticleSystems();
+      // 9. Рабочие эффекты (искры пайки, дым, стружка)
+      this.setupWorkEffects();
 
-      // 10. Обработчики мыши и событий
+      // 10. Обработчики кликов
       this.setupInteraction();
 
-      // 11. Анимационный цикл
+      // 11. Анимация
       window.addEventListener('resize', () => this.onWindowResize());
       this.animate();
     }
 
     setupLighting() {
-      // Мягкий полусферический свет неба и травы
-      this.hemiLight = new THREE.HemisphereLight(0xC6E2FF, 0x3E5E2A, 0.65);
+      this.hemiLight = new THREE.HemisphereLight(0xDCEEFF, 0x3E5E2A, 0.7);
       this.scene.add(this.hemiLight);
 
-      // Теплый солнечный свет
-      this.dirLight = new THREE.DirectionalLight(0xFFF4D4, 1.25);
-      this.dirLight.position.set(35, 45, 25);
+      this.dirLight = new THREE.DirectionalLight(0xFFF7E6, 1.3);
+      this.dirLight.position.set(30, 40, 25);
       this.dirLight.castShadow = true;
       this.dirLight.shadow.mapSize.width = 2048;
       this.dirLight.shadow.mapSize.height = 2048;
       this.dirLight.shadow.camera.near = 1;
-      this.dirLight.shadow.camera.far = 140;
-      const d = 45;
+      this.dirLight.shadow.camera.far = 130;
+      const d = 40;
       this.dirLight.shadow.camera.left = -d;
       this.dirLight.shadow.camera.right = d;
       this.dirLight.shadow.camera.top = d;
@@ -115,233 +121,143 @@
       this.dirLight.shadow.bias = -0.0005;
       this.scene.add(this.dirLight);
 
-      // Фоновый теплый эмбиент
-      this.ambientLight = new THREE.AmbientLight(0xFAF3E0, 0.45);
+      this.ambientLight = new THREE.AmbientLight(0xFFFFFF, 0.35);
       this.scene.add(this.ambientLight);
 
-      // Точечные огоньки у верстаков
-      this.forgePointLight = new THREE.PointLight(0xFF6A00, 2.0, 16);
-      this.forgePointLight.position.set(-18, 3.5, 8);
-      this.scene.add(this.forgePointLight);
-
-      this.owlLight = new THREE.PointLight(0x8B5CF6, 1.5, 20);
-      this.owlLight.position.set(16, 11, -12);
-      this.scene.add(this.owlLight);
+      // Локальный огонек паяльного тигля Кота
+      this.forgeLight = new THREE.PointLight(0xFF6600, 1.8, 14);
+      this.forgeLight.position.set(-16, 2.5, 7);
+      this.scene.add(this.forgeLight);
     }
 
-    buildFarmEnvironment() {
-      // --- А. Основной зеленый ландшафт фермы (Луга и Холмы) ---
-      const groundGeo = new THREE.PlaneGeometry(110, 110, 64, 64);
-      // Придаем рельефу мягкую естественную холмистость
-      const pos = groundGeo.attributes.position;
-      for (let i = 0; i < pos.count; i++) {
-        const vx = pos.getX(i);
-        const vy = pos.getY(i);
-        // Не поднимаем центр, где стоят здания и дорожки
-        const distFromCenter = Math.sqrt(vx * vx + vy * vy);
-        if (distFromCenter > 20) {
-          const elevation = (Math.sin(vx * 0.12) * Math.cos(vy * 0.12) * 1.6) +
-                            (Math.sin(vx * 0.05 + 1.2) * 1.2);
-          pos.setZ(i, elevation);
-        }
-      }
-      groundGeo.computeVertexNormals();
-
-      const grassMat = new THREE.MeshStandardMaterial({
-        color: 0x4D8C47,
-        roughness: 0.85,
-        metalness: 0.05,
+    buildCleanFarmEnvironment() {
+      // 1. Ровный зеленый грунт рабочей зоны
+      const groundGeo = new THREE.PlaneGeometry(95, 95);
+      const groundMat = new THREE.MeshStandardMaterial({
+        color: 0x4F8A4B,
+        roughness: 0.9,
         flatShading: true
       });
-      const ground = new THREE.Mesh(groundGeo, grassMat);
+      const ground = new THREE.Mesh(groundGeo, groundMat);
       ground.rotation.x = -Math.PI / 2;
       ground.receiveShadow = true;
       this.scene.add(ground);
       this.groundMesh = ground;
 
-      // --- Б. Пашня / Вспаханное поле (Farmland Soil with Furrows) ---
-      // Располагаем поле у лесопилки Бобра
-      const fieldW = 28;
-      const fieldD = 18;
-      const soilGeo = new THREE.BoxGeometry(fieldW, 0.3, fieldD);
-      const soilMat = new THREE.MeshStandardMaterial({
-        color: 0x4A2E1B, // Богатый чернозём
-        roughness: 0.95,
-        flatShading: true
-      });
+      // 2. Вспаханное поле / Грядки у Бобра (аккуратный участок)
+      const fieldW = 22;
+      const fieldD = 14;
+      const soilGeo = new THREE.BoxGeometry(fieldW, 0.15, fieldD);
+      const soilMat = new THREE.MeshStandardMaterial({ color: 0x452B19, roughness: 0.95 });
       const field = new THREE.Mesh(soilGeo, soilMat);
-      field.position.set(-20, 0.15, -16);
+      field.position.set(-18, 0.08, -16);
       field.receiveShadow = true;
       this.scene.add(field);
 
-      // Борозды пашни (3D Furrows)
-      const furrowMat = new THREE.MeshStandardMaterial({ color: 0x382012, roughness: 1.0 });
-      const cropMat = new THREE.MeshStandardMaterial({ color: 0x88D44A, roughness: 0.5 });
-      for (let z = -fieldD / 2 + 1.5; z < fieldD / 2 - 1; z += 2.4) {
-        // Гребень земли
-        const ridgeGeo = new THREE.BoxGeometry(fieldW - 2, 0.22, 1.2);
-        const ridge = new THREE.Mesh(ridgeGeo, furrowMat);
-        ridge.position.set(-20, 0.36, -16 + z);
-        ridge.receiveShadow = true;
+      // Борозды пашни с ростками
+      const ridgeMat = new THREE.MeshStandardMaterial({ color: 0x341F11, roughness: 1.0 });
+      const sproutMat = new THREE.MeshStandardMaterial({ color: 0x86EFAC });
+      for (let z = -fieldD / 2 + 1.4; z < fieldD / 2 - 1; z += 2.2) {
+        const ridge = new THREE.Mesh(new THREE.BoxGeometry(fieldW - 1.5, 0.18, 1.0), ridgeMat);
+        ridge.position.set(-18, 0.22, -16 + z);
         this.scene.add(ridge);
 
-        // Зеленые ростки культур вдоль борозды
-        for (let x = -fieldW / 2 + 2; x < fieldW / 2 - 2; x += 2.2) {
-          const sproutGeo = new THREE.ConeGeometry(0.22, 0.5, 4);
-          const sprout = new THREE.Mesh(sproutGeo, cropMat);
-          sprout.position.set(-20 + x, 0.55, -16 + z);
-          sprout.rotation.y = Math.random() * Math.PI;
+        for (let x = -fieldW / 2 + 2; x < fieldW / 2 - 1.5; x += 2.4) {
+          const sprout = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.45, 4), sproutMat);
+          sprout.position.set(-18 + x, 0.42, -16 + z);
           this.scene.add(sprout);
         }
       }
 
-      // Ограждение пашни деревянными колышками
-      this.buildFence(-34, -16, 28, 18);
+      // Аккуратная изгородь вокруг поля
+      this.buildFence(-29, -16, 22, 14);
 
-      // --- В. Извилистая речка и пруд с кувшинками ---
-      const riverCurve = new THREE.CatmullRomCurve3([
-        new THREE.Vector3(-45, 0.05, 30),
-        new THREE.Vector3(-25, 0.05, 22),
-        new THREE.Vector3(-8, 0.05, 12),
-        new THREE.Vector3(6, 0.05, -5),
-        new THREE.Vector3(18, 0.05, -28),
-        new THREE.Vector3(35, 0.05, -45)
-      ]);
-      const riverGeo = new THREE.TubeGeometry(riverCurve, 40, 2.4, 8, false);
+      // 3. Ручей и пруд с чистой водой
+      const streamGeo = new THREE.PlaneGeometry(8, 65);
       const waterMat = new THREE.MeshStandardMaterial({
-        color: 0x2299DD,
-        roughness: 0.15,
-        metalness: 0.3,
+        color: 0x38BDF8,
+        roughness: 0.1,
+        metalness: 0.2,
         transparent: true,
-        opacity: 0.88
+        opacity: 0.85
       });
-      const river = new THREE.Mesh(riverGeo, waterMat);
-      river.scale.set(1, 0.12, 1);
-      this.scene.add(river);
+      const stream = new THREE.Mesh(streamGeo, waterMat);
+      stream.position.set(-7, 0.04, -2);
+      stream.rotation.x = -Math.PI / 2;
+      stream.rotation.z = 0.22;
+      this.scene.add(stream);
 
-      // Пруд у лесопилки Бобра
-      const pondGeo = new THREE.CylinderGeometry(5.5, 5.5, 0.15, 16);
-      const pond = new THREE.Mesh(pondGeo, waterMat);
-      pond.position.set(-5, 0.08, 14);
-      this.scene.add(pond);
+      // Деревянный мостик
+      this.buildBridge(-7, 0.2, 0, 0.22);
 
-      // Кувшинки на пруду
-      const lilyMat = new THREE.MeshStandardMaterial({ color: 0x2E7D32, roughness: 0.6 });
-      for (let i = 0; i < 6; i++) {
-        const lilyGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.02, 8);
-        const lily = new THREE.Mesh(lilyGeo, lilyMat);
-        const ang = Math.random() * Math.PI * 2;
-        const rad = 1.2 + Math.random() * 3.2;
-        lily.position.set(-5 + Math.cos(ang) * rad, 0.16, 14 + Math.sin(ang) * rad);
-        this.scene.add(lily);
-      }
+      // 4. Песчаные дорожки между верстаками
+      this.buildCobblePaths();
 
-      // Деревянный мостик через речку
-      this.buildBridge(-8, 0.35, 12, 0.4);
-
-      // --- Г. Грунтовые дорожки и мощеные тропы ---
-      this.buildPaths();
-
-      // --- Д. Деревья (Березы, Яблони, Дубы, Ели) ---
-      this.populateForestAndOrchard();
-
-      // --- Е. Тюки сена вокруг фермы ---
-      this.placeHayBales();
+      // 5. Несколько аккуратных деревьев ТОЛЬКО по дальней границе (не закрывают обзор)
+      this.placePerimeterTrees();
     }
 
     buildFence(cx, cz, w, d) {
-      const fenceMat = new THREE.MeshStandardMaterial({ color: 0x8D5B36, roughness: 0.9 });
-      const postGeo = new THREE.CylinderGeometry(0.12, 0.14, 1.4, 6);
-      const railGeoX = new THREE.BoxGeometry(w, 0.08, 0.08);
-      const railGeoZ = new THREE.BoxGeometry(0.08, 0.08, d);
+      const fenceMat = new THREE.MeshStandardMaterial({ color: 0x8C5A36, roughness: 0.9 });
+      const postGeo = new THREE.CylinderGeometry(0.08, 0.1, 1.2, 6);
+      const railGeoX = new THREE.BoxGeometry(w, 0.06, 0.06);
 
-      // Верхние и нижние перекладины
-      const topRail1 = new THREE.Mesh(railGeoX, fenceMat);
-      topRail1.position.set(cx + w / 2, 0.8, cz - d / 2);
-      this.scene.add(topRail1);
-      const topRail2 = new THREE.Mesh(railGeoX, fenceMat);
-      topRail2.position.set(cx + w / 2, 0.8, cz + d / 2);
-      this.scene.add(topRail2);
+      const r1 = new THREE.Mesh(railGeoX, fenceMat);
+      r1.position.set(cx + w / 2, 0.6, cz - d / 2);
+      this.scene.add(r1);
 
-      const sideRail1 = new THREE.Mesh(railGeoZ, fenceMat);
-      sideRail1.position.set(cx, 0.8, cz);
-      this.scene.add(sideRail1);
+      const r2 = new THREE.Mesh(railGeoX, fenceMat);
+      r2.position.set(cx + w / 2, 0.6, cz + d / 2);
+      this.scene.add(r2);
 
-      // Столбики
-      for (let x = cx; x <= cx + w; x += 3.5) {
-        const post = new THREE.Mesh(postGeo, fenceMat);
-        post.position.set(x, 0.7, cz - d / 2);
-        post.castShadow = true;
-        this.scene.add(post);
+      for (let x = cx; x <= cx + w; x += 3.2) {
+        const p1 = new THREE.Mesh(postGeo, fenceMat);
+        p1.position.set(x, 0.6, cz - d / 2);
+        this.scene.add(p1);
 
-        const post2 = new THREE.Mesh(postGeo, fenceMat);
-        post2.position.set(x, 0.7, cz + d / 2);
-        post2.castShadow = true;
-        this.scene.add(post2);
+        const p2 = new THREE.Mesh(postGeo, fenceMat);
+        p2.position.set(x, 0.6, cz + d / 2);
+        this.scene.add(p2);
       }
     }
 
     buildBridge(x, y, z, rotY) {
-      const bridgeGroup = new THREE.Group();
+      const bridge = new THREE.Group();
       const woodMat = new THREE.MeshStandardMaterial({ color: 0x784D2B, roughness: 0.85 });
 
-      // Настил
-      const deckGeo = new THREE.BoxGeometry(3.6, 0.2, 5.2);
-      const deck = new THREE.Mesh(deckGeo, woodMat);
-      deck.castShadow = true;
+      const deck = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.15, 6.0), woodMat);
       deck.receiveShadow = true;
-      bridgeGroup.add(deck);
+      bridge.add(deck);
 
-      // Перила
-      const postGeo = new THREE.CylinderGeometry(0.08, 0.08, 1.1, 6);
-      const railGeo = new THREE.BoxGeometry(0.1, 0.1, 5.2);
+      const railGeo = new THREE.BoxGeometry(0.08, 0.08, 6.0);
+      const rL = new THREE.Mesh(railGeo, woodMat);
+      rL.position.set(-1.7, 0.7, 0);
+      bridge.add(rL);
 
-      const r1 = new THREE.Mesh(railGeo, woodMat);
-      r1.position.set(-1.7, 0.9, 0);
-      bridgeGroup.add(r1);
+      const rR = new THREE.Mesh(railGeo, woodMat);
+      rR.position.set(1.7, 0.7, 0);
+      bridge.add(rR);
 
-      const r2 = new THREE.Mesh(railGeo, woodMat);
-      r2.position.set(1.7, 0.9, 0);
-      bridgeGroup.add(r2);
-
-      [-2, 0, 2].forEach(pz => {
-        const pL = new THREE.Mesh(postGeo, woodMat);
-        pL.position.set(-1.7, 0.5, pz);
-        bridgeGroup.add(pL);
-
-        const pR = new THREE.Mesh(postGeo, woodMat);
-        pR.position.set(1.7, 0.5, pz);
-        bridgeGroup.add(pR);
-      });
-
-      bridgeGroup.position.set(x, y, z);
-      bridgeGroup.rotation.y = rotY;
-      this.scene.add(bridgeGroup);
+      bridge.position.set(x, y, z);
+      bridge.rotation.y = rotY;
+      this.scene.add(bridge);
     }
 
-    buildPaths() {
-      // Песчано-гравийные дорожки, связывающие верстаки
-      const pathMat = new THREE.MeshStandardMaterial({
-        color: 0xC8B282,
-        roughness: 0.95,
-        flatShading: true
-      });
-
+    buildCobblePaths() {
+      const pathMat = new THREE.MeshStandardMaterial({ color: 0xD4C39C, roughness: 0.95 });
       const paths = [
-        // Центральная площадь
-        { geo: new THREE.CylinderGeometry(8.5, 8.5, 0.05, 16), x: 0, y: 0.03, z: 0 },
-        // Дорога на запад (Кузница Кота)
-        { geo: new THREE.BoxGeometry(18, 0.05, 3.2), x: -10, y: 0.03, z: 6 },
-        // Дорога на северо-запад (Лесопилка Бобра)
-        { geo: new THREE.BoxGeometry(18, 0.05, 3.2), x: -14, y: 0.03, z: -10, rotY: -0.4 },
-        // Дорога на восток (Усадьба Лиса)
-        { geo: new THREE.BoxGeometry(20, 0.05, 3.2), x: 12, y: 0.03, z: 4, rotY: 0.2 },
-        // Дорога на север (Мельница Сороки)
-        { geo: new THREE.BoxGeometry(3.2, 0.05, 18), x: -4, y: 0.03, z: -16 },
-        // Дорога на северо-восток (Башня Филина)
-        { geo: new THREE.BoxGeometry(16, 0.05, 3.2), x: 10, y: 0.03, z: -10, rotY: -0.6 },
-        // Дорога на юг (Кульман Барсука и Элеватор Дятла)
-        { geo: new THREE.BoxGeometry(3.2, 0.05, 22), x: 2, y: 0.03, z: 12 }
+        // Центр площади
+        { geo: new THREE.CylinderGeometry(7.5, 7.5, 0.03, 16), x: 0, y: 0.02, z: 0 },
+        // К Кузнице Кота
+        { geo: new THREE.BoxGeometry(16, 0.03, 2.8), x: -8, y: 0.02, z: 5, rotY: 0.1 },
+        // К Мельнице Сороки
+        { geo: new THREE.BoxGeometry(2.8, 0.03, 16), x: -14, y: 0.02, z: -14 },
+        // К Усадьбе Лиса
+        { geo: new THREE.BoxGeometry(16, 0.03, 2.8), x: 10, y: 0.02, z: 3, rotY: 0.15 },
+        // К Башне Филина
+        { geo: new THREE.BoxGeometry(14, 0.03, 2.8), x: 9, y: 0.02, z: -8, rotY: -0.5 },
+        // К Кульману Барсука и Элеватору Дятла
+        { geo: new THREE.BoxGeometry(2.8, 0.03, 18), x: 0, y: 0.02, z: 10 }
       ];
 
       paths.forEach(p => {
@@ -353,715 +269,435 @@
       });
     }
 
-    populateForestAndOrchard() {
-      // Генерация реалистичных стилизованных 3D деревьев
-      const treeCoords = [
-        // Лесная опушка около пашни и лесопилки (Бобёр)
-        { x: -32, z: -28, type: 'pine', scale: 1.4 },
-        { x: -36, z: -20, type: 'pine', scale: 1.2 },
-        { x: -38, z: -8,  type: 'oak',  scale: 1.3 },
-        { x: -28, z: -32, type: 'pine', scale: 1.1 },
-
-        // Яблоневый сад у усадьбы Лиса
-        { x: 22, z: 14, type: 'apple', scale: 1.1 },
-        { x: 28, z: 12, type: 'apple', scale: 1.25 },
-        { x: 26, z: 20, type: 'apple', scale: 1.15 },
-        { x: 34, z: 16, type: 'apple', scale: 1.0 },
-
-        // Березы около пруда и реки
-        { x: -14, z: 18, type: 'birch', scale: 1.2 },
-        { x: -2,  z: 22, type: 'birch', scale: 1.35 },
-        { x: 10,  z: 18, type: 'birch', scale: 1.15 },
-
-        // Деревья у башни Филина
-        { x: 26, z: -18, type: 'oak',  scale: 1.4 },
-        { x: 22, z: -26, type: 'pine', scale: 1.3 },
-
-        // Одинокие тенистые дубы у беседки Бригадира
-        { x: -8, z: -4, type: 'oak', scale: 1.2 },
-        { x: 8,  z: -6, type: 'oak', scale: 1.15 }
+    placePerimeterTrees() {
+      // Только 6 деревьев по периметру вдалеке, чтобы не закрывать обзор
+      const coords = [
+        { x: -36, z: -30, type: 'pine' },
+        { x: 34, z: -28, type: 'pine' },
+        { x: 38, z: 22, type: 'oak' },
+        { x: -38, z: 24, type: 'birch' },
+        { x: 0, z: -36, type: 'birch' },
+        { x: 26, z: 28, type: 'oak' }
       ];
 
-      treeCoords.forEach((t, idx) => {
-        const tree = this.createStylizedTree(t.type, t.scale);
-        tree.position.set(t.x, 0, t.z);
+      coords.forEach(c => {
+        const tree = this.createTree(c.type);
+        tree.position.set(c.x, 0, c.z);
         this.scene.add(tree);
-        this.trees.push({ mesh: tree, origY: tree.position.y, seed: idx * 1.3 });
       });
     }
 
-    createStylizedTree(type, scale = 1.0) {
-      const treeGroup = new THREE.Group();
-
+    createTree(type) {
+      const g = new THREE.Group();
       if (type === 'pine') {
-        // Хвойная ель
-        const trunkGeo = new THREE.CylinderGeometry(0.35, 0.55, 3.5, 6);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x4E3524, roughness: 0.9 });
-        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-        trunk.position.y = 1.75;
-        trunk.castShadow = true;
-        treeGroup.add(trunk);
-
-        const pineMat = new THREE.MeshStandardMaterial({ color: 0x27592D, roughness: 0.8, flatShading: true });
-        const tiers = [
-          { r: 2.6, h: 2.8, y: 3.2 },
-          { r: 2.1, h: 2.5, y: 4.8 },
-          { r: 1.5, h: 2.2, y: 6.2 },
-          { r: 0.9, h: 1.8, y: 7.3 }
-        ];
-        tiers.forEach(tr => {
-          const cGeo = new THREE.ConeGeometry(tr.r, tr.h, 7);
-          const cone = new THREE.Mesh(cGeo, pineMat);
-          cone.position.y = tr.y;
-          cone.castShadow = true;
-          treeGroup.add(cone);
-        });
-      } else if (type === 'birch') {
-        // Береза с белым стволом
-        const trunkGeo = new THREE.CylinderGeometry(0.28, 0.42, 5.0, 7);
-        const birchMat = new THREE.MeshStandardMaterial({ color: 0xEDEDED, roughness: 0.8 });
-        const trunk = new THREE.Mesh(trunkGeo, birchMat);
-        trunk.position.y = 2.5;
-        trunk.castShadow = true;
-        treeGroup.add(trunk);
-
-        // Черные крапинки на стволе березы
-        const spotMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
-        for (let i = 0; i < 6; i++) {
-          const spotGeo = new THREE.BoxGeometry(0.35, 0.12, 0.35);
-          const spot = new THREE.Mesh(spotGeo, spotMat);
-          spot.position.set(0, 1.2 + i * 0.6, 0);
-          spot.rotation.y = i * 1.1;
-          treeGroup.add(spot);
-        }
-
-        // Воздушная крона
-        const foliageMat = new THREE.MeshStandardMaterial({ color: 0x65A644, roughness: 0.7, flatShading: true });
-        const spheres = [
-          { r: 1.8, y: 5.2, x: 0, z: 0 },
-          { r: 1.4, y: 6.3, x: 0.4, z: -0.3 },
-          { r: 1.2, y: 5.6, x: -0.6, z: 0.4 }
-        ];
-        spheres.forEach(s => {
-          const fGeo = new THREE.DodecahedronGeometry(s.r, 1);
-          const fMesh = new THREE.Mesh(fGeo, foliageMat);
-          fMesh.position.set(s.x, s.y, s.z);
-          fMesh.castShadow = true;
-          treeGroup.add(fMesh);
-        });
-      } else if (type === 'apple') {
-        // Яблоня в цвету / с плодами
-        const trunkGeo = new THREE.CylinderGeometry(0.32, 0.5, 2.8, 6);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5C381E, roughness: 0.9 });
-        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-        trunk.position.y = 1.4;
-        trunk.castShadow = true;
-        treeGroup.add(trunk);
-
-        const foliageMat = new THREE.MeshStandardMaterial({ color: 0x559E38, roughness: 0.75, flatShading: true });
-        const fGeo = new THREE.DodecahedronGeometry(2.3, 1);
-        const fMesh = new THREE.Mesh(fGeo, foliageMat);
-        fMesh.position.y = 3.6;
-        fMesh.castShadow = true;
-        treeGroup.add(fMesh);
-
-        // Спелые красные яблоки
-        const appleMat = new THREE.MeshStandardMaterial({ color: 0xD32F2F, roughness: 0.4 });
-        for (let i = 0; i < 7; i++) {
-          const aGeo = new THREE.SphereGeometry(0.18, 6, 6);
-          const apple = new THREE.Mesh(aGeo, appleMat);
-          const ang = (i / 7) * Math.PI * 2;
-          apple.position.set(Math.cos(ang) * 1.8, 3.4 + (i % 3) * 0.4, Math.sin(ang) * 1.8);
-          treeGroup.add(apple);
-        }
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.45, 3.2, 6), new THREE.MeshStandardMaterial({ color: 0x4E3524 }));
+        trunk.position.y = 1.6;
+        g.add(trunk);
+        const foliage = new THREE.Mesh(new THREE.ConeGeometry(2.2, 5.0, 6), new THREE.MeshStandardMaterial({ color: 0x2A623D }));
+        foliage.position.y = 4.8;
+        g.add(foliage);
       } else {
-        // Могучий раскидистый Дуб
-        const trunkGeo = new THREE.CylinderGeometry(0.6, 0.9, 3.6, 8);
-        const trunkMat = new THREE.MeshStandardMaterial({ color: 0x482C17, roughness: 0.9 });
-        const trunk = new THREE.Mesh(trunkGeo, trunkMat);
-        trunk.position.y = 1.8;
-        trunk.castShadow = true;
-        treeGroup.add(trunk);
-
-        const foliageMat = new THREE.MeshStandardMaterial({ color: 0x3E7D32, roughness: 0.8, flatShading: true });
-        const clusters = [
-          { r: 2.6, x: 0, y: 4.2, z: 0 },
-          { r: 1.9, x: -1.3, y: 4.0, z: 0.8 },
-          { r: 1.8, x: 1.2, y: 4.3, z: -0.7 },
-          { r: 1.6, x: 0.4, y: 5.4, z: 0.5 }
-        ];
-        clusters.forEach(c => {
-          const cGeo = new THREE.DodecahedronGeometry(c.r, 1);
-          const cMesh = new THREE.Mesh(cGeo, foliageMat);
-          cMesh.position.set(c.x, c.y, c.z);
-          cMesh.castShadow = true;
-          treeGroup.add(cMesh);
-        });
+        const trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.5, 3.0, 6), new THREE.MeshStandardMaterial({ color: 0x5C381E }));
+        trunk.position.y = 1.5;
+        g.add(trunk);
+        const crown = new THREE.Mesh(new THREE.DodecahedronGeometry(2.2, 1), new THREE.MeshStandardMaterial({ color: 0x4A853D, flatShading: true }));
+        crown.position.y = 4.2;
+        g.add(crown);
       }
-
-      treeGroup.scale.set(scale, scale, scale);
-      return treeGroup;
-    }
-
-    placeHayBales() {
-      const hayMat = new THREE.MeshStandardMaterial({ color: 0xDEB843, roughness: 0.9, flatShading: true });
-      const baleGeo = new THREE.CylinderGeometry(1.0, 1.0, 1.6, 12);
-
-      const baleCoords = [
-        { x: -14, z: -6, rZ: Math.PI / 2, rY: 0.4 },
-        { x: -13, z: -4.5, rZ: Math.PI / 2, rY: 0.3 },
-        { x: -13.5, z: -5.2, y: 1.6, rZ: Math.PI / 2, rY: 0.35 },
-        { x: 18, z: 8, rZ: Math.PI / 2, rY: -0.5 },
-        { x: 19.5, z: 9, rZ: Math.PI / 2, rY: -0.4 }
-      ];
-
-      baleCoords.forEach(b => {
-        const bale = new THREE.Mesh(baleGeo, hayMat);
-        bale.position.set(b.x, b.y || 0.8, b.z);
-        if (b.rZ) bale.rotation.z = b.rZ;
-        if (b.rY) bale.rotation.y = b.rY;
-        bale.castShadow = true;
-        bale.receiveShadow = true;
-        this.scene.add(bale);
-      });
-    }
-
-    buildCraftsmenStations() {
-      // 1. Ветряная Мельница Сороки (00-research / Бюро Разведки)
-      this.stationMeshes['soroka'] = this.buildWindmillStation(-16, 0, -22);
-
-      // 2. Лесопилка Бобра (01-researcher / Конструкторское Бюро)
-      this.stationMeshes['bobr'] = this.buildSawmillStation(-22, 0, -6);
-
-      // 3. Паяльная Кузница Кота (02-writer / Practico 1)
-      this.stationMeshes['kot'] = this.buildForgeStation(-18, 0, 8);
-
-      // 4. Беседка Бригадира Медведя (Командный Пункт Артели)
-      this.stationMeshes['bear'] = this.buildGazeboStation(0, 0, 0);
-
-      // 5. Усадьба Лиса (02-writer-2 / Practico 2)
-      this.stationMeshes['lis'] = this.buildFoxManorStation(18, 0, 4);
-
-      // 6. Шатер-Кульман Барсука (05-illustrator / Векторные Схемы)
-      this.stationMeshes['barsuk'] = this.buildDraftingTentStation(-4, 0, 16);
-
-      // 7. Дозорная Башня-Маяк Филина (03-reviewer / ОТК & SlopMonster)
-      this.stationMeshes['filin'] = this.buildWatchtowerStation(16, 0, -14);
-
-      // 8. Метрологический Элеватор Дятла (04-scorer / Метрология 100 баллов)
-      this.stationMeshes['dyatel'] = this.buildElevatorStation(12, 0, 18);
-
-      // 9. Релизный Шлюз WordPress (Портал tochka-plavleniya.ru)
-      this.stationMeshes['wp'] = this.buildReleasePortalStation(28, 0, -4);
-    }
-
-    buildWindmillStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_soroka', name: 'Бюро Разведки (Сорока)', icon: '🪶' };
-
-      // Каменное основание мельницы
-      const baseGeo = new THREE.CylinderGeometry(2.4, 3.2, 7.5, 8);
-      const baseMat = new THREE.MeshStandardMaterial({ color: 0x9E9E9E, roughness: 0.9, flatShading: true });
-      const base = new THREE.Mesh(baseGeo, baseMat);
-      base.position.y = 3.75;
-      base.castShadow = true;
-      base.receiveShadow = true;
-      g.add(base);
-
-      // Деревянная крыша конусом
-      const roofGeo = new THREE.ConeGeometry(2.8, 3.0, 8);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x8D5B36, roughness: 0.8 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.y = 9.0;
-      roof.castShadow = true;
-      g.add(roof);
-
-      // Вращающиеся лопасти мельницы
-      const bladeCenter = new THREE.Group();
-      bladeCenter.position.set(0, 7.8, 2.2);
-
-      const hubGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.6, 8);
-      hubGeo.rotateX(Math.PI / 2);
-      const hubMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
-      const hub = new THREE.Mesh(hubGeo, hubMat);
-      bladeCenter.add(hub);
-
-      const bladeWood = new THREE.MeshStandardMaterial({ color: 0xE8D7B8, roughness: 0.7 });
-      for (let i = 0; i < 4; i++) {
-        const bladeGeo = new THREE.BoxGeometry(0.7, 5.2, 0.08);
-        const blade = new THREE.Mesh(bladeGeo, bladeWood);
-        blade.position.y = 2.8;
-        blade.castShadow = true;
-
-        const bladeArm = new THREE.Group();
-        bladeArm.rotation.z = (i * Math.PI) / 2;
-        bladeArm.add(blade);
-        bladeCenter.add(bladeArm);
-      }
-      g.add(bladeCenter);
-      this.windmills.push(bladeCenter);
-
-      // Вывеска
-      this.addStationSign(g, '🪶 Бюро Разведки', 0x38BDF8, 0, 11.2, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
       return g;
     }
 
-    buildSawmillStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_bobr', name: 'Конструкторское Бюро (Бобёр)', icon: '🦫' };
-
-      // Бревенчатый навес
-      const roofGeo = new THREE.BoxGeometry(6.5, 0.3, 5.5);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x6E4A2A, roughness: 0.85 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.set(0, 3.6, 0);
-      roof.rotation.z = -0.08;
-      roof.castShadow = true;
-      g.add(roof);
-
-      // Опорные бревна
-      const postGeo = new THREE.CylinderGeometry(0.18, 0.22, 3.6, 6);
-      const logMat = new THREE.MeshStandardMaterial({ color: 0x5C3B1E, roughness: 0.9 });
-      [[-2.8, -2.2], [2.8, -2.2], [-2.8, 2.2], [2.8, 2.2]].forEach(([px, pz]) => {
-        const post = new THREE.Mesh(postGeo, logMat);
-        post.position.set(px, 1.8, pz);
-        post.castShadow = true;
-        g.add(post);
-      });
-
-      // Штабель бревен у лесопилки
-      for (let row = 0; row < 3; row++) {
-        for (let col = 0; col < 4 - row; col++) {
-          const timberGeo = new THREE.CylinderGeometry(0.32, 0.32, 4.2, 8);
-          timberGeo.rotateZ(Math.PI / 2);
-          const timber = new THREE.Mesh(timberGeo, logMat);
-          timber.position.set(-2.5 + col * 0.65 + row * 0.32, 0.35 + row * 0.55, 3.2);
-          timber.castShadow = true;
-          g.add(timber);
+    // ==========================================
+    // СТАНЦИИ И ИНФОРМАЦИОННЫЕ ТАБЛИЧКИ
+    // ==========================================
+    buildStationsWithPlacards() {
+      this.stationConfigs = {
+        soroka: {
+          id: 'ws_soroka', name: 'БЮРО РАЗВЕДКИ (СОРОКА)', icon: '🪶',
+          pos: new THREE.Vector3(-14, 0, -20), colorHex: 0x38BDF8,
+          taskTitle: 'СДЕЛАТЬ: Сбор LSI-ядра',
+          taskSubtitle: 'Парсинг выдачи Яндекса и калькуляторов',
+          status: 'ОЖИДАЕТ'
+        },
+        bobr: {
+          id: 'ws_bobr', name: 'КОНСТРУКТОРСКОЕ БЮРО (БОБЁР)', icon: '🦫',
+          pos: new THREE.Vector3(-20, 0, -6), colorHex: 0xB45309,
+          taskTitle: 'УТВЕРДИТЬ: Бриф ГОСТ Р МЭК 61191',
+          taskSubtitle: '4 обязательных вопроса FAQ новичка',
+          status: 'ОЖИДАЕТ'
+        },
+        kot: {
+          id: 'ws_kot', name: 'ПАЯЛЬНЫЙ ЦЕХ (КОТ-ПАЯЛЬЩИК)', icon: '🐱',
+          pos: new THREE.Vector3(-16, 0, 7), colorHex: 0xEA580C,
+          taskTitle: 'НАПИСАТЬ: Триада фактов и физика шва',
+          taskSubtitle: 'Смачивание меди и ликвидус ПОС-61 (183–190°C)',
+          status: 'ОЖИДАЕТ'
+        },
+        bear: {
+          id: 'ws_bear', name: 'СОВЕТ АРТЕЛИ (МЕДВЕДЬ-БРИГАДИР)', icon: '🐻',
+          pos: new THREE.Vector3(0, 0, 0), colorHex: 0xEAB308,
+          taskTitle: 'КООРДИНАЦИЯ: Диспетчер конвейера',
+          taskSubtitle: 'Балансировка ресурсов и энергопотребления',
+          status: 'АКТИВЕН'
+        },
+        lis: {
+          id: 'ws_lis', name: 'СМЕТНОЕ БЮРО (ЛИС-ПРАГМАТИК)', icon: '🦊',
+          pos: new THREE.Vector3(16, 0, 3), colorHex: 0xF59E0B,
+          taskTitle: 'ПОСЧИТАТЬ: Смета и окупаемость',
+          taskSubtitle: 'Расчет стоимости флюса vs спасенной платы',
+          status: 'ОЖИДАЕТ'
+        },
+        barsuk: {
+          id: 'ws_barsuk', name: 'КУЛЬМАН СХЕМ (БАРСУК-ИЛЛЮСТРАТОР)', icon: '🦡',
+          pos: new THREE.Vector3(-4, 0, 14), colorHex: 0xFBBF24,
+          taskTitle: 'НАЧЕРТИТЬ: Векторный SVG-термопрофиль',
+          taskSubtitle: 'Каноническая кривая ликвидуса по реестру',
+          status: 'ОЖИДАЕТ'
+        },
+        filin: {
+          id: 'ws_filin', name: 'СТЕНД ОТК & РЕВИЗОР (ФИЛИН)', icon: '🦉',
+          pos: new THREE.Vector3(14, 0, -12), colorHex: 0x8B5CF6,
+          taskTitle: 'ПЕРЕПРОВЕРИТЬ: ОТК & SlopMonster',
+          taskSubtitle: 'Детекция нейроштампов и лингво-приемка',
+          status: 'ОЖИДАЕТ'
+        },
+        dyatel: {
+          id: 'ws_dyatel', name: 'МЕТРОЛОГИЯ 100 (ДЯТЕЛ-СКОРЕР)', icon: '🪵',
+          pos: new THREE.Vector3(10, 0, 16), colorHex: 0xEC4899,
+          taskTitle: 'СКОРИНГ: Метрология 100 баллов',
+          taskSubtitle: 'AST-анализ 6 объективных блоков',
+          status: 'ОЖИДАЕТ'
+        },
+        wp: {
+          id: 'ws_wp', name: 'ШЛЮЗ РЕЛИЗА (WORDPRESS)', icon: '🚀',
+          pos: new THREE.Vector3(25, 0, -4), colorHex: 0x06B6D4,
+          taskTitle: 'ОПУБЛИКОВАТЬ: Экспорт в tochka-plavleniya',
+          taskSubtitle: 'Поставка zip-пакета и Schema.org разметка',
+          status: 'ГОТОВ'
         }
+      };
+
+      Object.entries(this.stationConfigs).forEach(([key, cfg]) => {
+        const stationGroup = this.buildStationStructure(key, cfg);
+        stationGroup.position.copy(cfg.pos);
+        this.scene.add(stationGroup);
+        this.stationMeshes[key] = stationGroup;
+
+        // Создаем четкую 3D-информационную табличку над станцией
+        this.createStationPlacard(key, cfg, stationGroup);
+      });
+    }
+
+    buildStationStructure(key, cfg) {
+      const g = new THREE.Group();
+      g.userData = { id: cfg.id, name: cfg.name, icon: cfg.icon, key };
+
+      if (key === 'soroka') {
+        // Мельница с лопастями
+        const tower = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.6, 6.0, 8), new THREE.MeshStandardMaterial({ color: 0x828282 }));
+        tower.position.y = 3.0;
+        g.add(tower);
+
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(2.4, 2.2, 8), new THREE.MeshStandardMaterial({ color: 0x6E4423 }));
+        roof.position.y = 7.1;
+        g.add(roof);
+
+        const bladeGroup = new THREE.Group();
+        bladeGroup.position.set(0, 6.2, 1.8);
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.35, 0.35, 0.4, 8), new THREE.MeshStandardMaterial({ color: 0x222222 }));
+        hub.rotateX(Math.PI / 2);
+        bladeGroup.add(hub);
+
+        for (let i = 0; i < 4; i++) {
+          const blade = new THREE.Mesh(new THREE.BoxGeometry(0.5, 4.4, 0.06), new THREE.MeshStandardMaterial({ color: 0xE8D7B8 }));
+          blade.position.y = 2.4;
+          const arm = new THREE.Group();
+          arm.rotation.z = (i * Math.PI) / 2;
+          arm.add(blade);
+          bladeGroup.add(arm);
+        }
+        g.add(bladeGroup);
+        this.windmills.push(bladeGroup);
+
+        // Стол с картой
+        const table = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.8, 1.2), new THREE.MeshStandardMaterial({ color: 0x8C5A36 }));
+        table.position.set(0, 0.4, 2.6);
+        g.add(table);
+        g.workTable = table;
+
+      } else if (key === 'bobr') {
+        // Лесопильный верстак и бревно для пиления
+        const bench = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.9, 1.6), new THREE.MeshStandardMaterial({ color: 0x784A28 }));
+        bench.position.set(0, 0.45, 0);
+        g.add(bench);
+
+        // Бревно, которое пилит Бобёр
+        const log = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.3, 2.8, 8), new THREE.MeshStandardMaterial({ color: 0x5C381E }));
+        log.rotateZ(Math.PI / 2);
+        log.position.set(0, 1.15, 0);
+        g.add(log);
+        g.workLog = log;
+
+      } else if (key === 'kot') {
+        // Кузница и верстак для пайки
+        const walls = new THREE.Mesh(new THREE.BoxGeometry(4.8, 2.8, 4.0), new THREE.MeshStandardMaterial({ color: 0x555555 }));
+        walls.position.set(0, 1.4, 0);
+        g.add(walls);
+
+        const roof = new THREE.Mesh(new THREE.ConeGeometry(3.6, 1.6, 4), new THREE.MeshStandardMaterial({ color: 0x8B321D }));
+        roof.rotateY(Math.PI / 4);
+        roof.position.set(0, 3.6, 0);
+        g.add(roof);
+
+        // Верстак пайки с платой перед кузницей
+        const bench = new THREE.Mesh(new THREE.BoxGeometry(2.4, 0.85, 1.4), new THREE.MeshStandardMaterial({ color: 0x2A2A2A }));
+        bench.position.set(0, 0.42, 2.8);
+        g.add(bench);
+
+        // Зеленая печатная плата (PCB)
+        const pcb = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.05, 0.7), new THREE.MeshStandardMaterial({ color: 0x166534 }));
+        pcb.position.set(0, 0.88, 2.8);
+        g.add(pcb);
+        g.workPcb = pcb;
+
+        // Паяльная станция T12
+        const stationBox = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.3, 0.3), new THREE.MeshStandardMaterial({ color: 0x111111 }));
+        stationBox.position.set(-0.8, 1.0, 2.8);
+        g.add(stationBox);
+
+      } else if (key === 'bear') {
+        // Большой круглый дубовый стол
+        const deck = new THREE.Mesh(new THREE.CylinderGeometry(4.2, 4.4, 0.25, 16), new THREE.MeshStandardMaterial({ color: 0x734826 }));
+        deck.position.y = 0.12;
+        g.add(deck);
+
+        const table = new THREE.Mesh(new THREE.CylinderGeometry(2.0, 2.0, 0.8, 16), new THREE.MeshStandardMaterial({ color: 0x5C381E }));
+        table.position.y = 0.52;
+        g.add(table);
+
+        const samovar = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.25, 0.8, 8), new THREE.MeshStandardMaterial({ color: 0xEAB308, metalness: 0.9 }));
+        samovar.position.set(0, 1.3, 0);
+        g.add(samovar);
+
+      } else if (key === 'lis') {
+        // Конторка со счетами и книгой смет
+        const desk = new THREE.Mesh(new THREE.BoxGeometry(2.6, 1.0, 1.6), new THREE.MeshStandardMaterial({ color: 0x8C5831 }));
+        desk.position.set(0, 0.5, 0);
+        g.add(desk);
+
+        const ledger = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.08, 0.6), new THREE.MeshStandardMaterial({ color: 0xFAF5EE }));
+        ledger.position.set(0, 1.04, 0);
+        g.add(ledger);
+
+      } else if (key === 'barsuk') {
+        // Чертежный кульман с наклонным листом
+        const stand = new THREE.Mesh(new THREE.BoxGeometry(0.12, 1.6, 1.2), new THREE.MeshStandardMaterial({ color: 0x444444 }));
+        stand.position.set(0, 0.8, 0);
+        g.add(stand);
+
+        const board = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.06, 1.3), new THREE.MeshStandardMaterial({ color: 0xFAF9F6 }));
+        board.position.set(0, 1.3, 0.2);
+        board.rotation.x = -0.45;
+        g.add(board);
+        g.workBoard = board;
+
+      } else if (key === 'filin') {
+        // Сторожевой пост ОТК со стендом проверки
+        const plat = new THREE.Mesh(new THREE.BoxGeometry(3.6, 0.25, 3.6), new THREE.MeshStandardMaterial({ color: 0x5C3B1E }));
+        plat.position.y = 5.0;
+        g.add(plat);
+
+        [[-1.5, -1.5], [1.5, -1.5], [-1.5, 1.5], [1.5, 1.5]].forEach(([px, pz]) => {
+          const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, 5.0, 6), new THREE.MeshStandardMaterial({ color: 0x3E2310 }));
+          leg.position.set(px, 2.5, pz);
+          g.add(leg);
+        });
+
+        // Столик ревизора на площадке
+        const desk = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.7, 1.0), new THREE.MeshStandardMaterial({ color: 0x8B5CF6 }));
+        desk.position.set(0, 5.5, 0);
+        g.add(desk);
+
+      } else if (key === 'dyatel') {
+        // Башня с метрологической шкалой 100 баллов
+        const tower = new THREE.Mesh(new THREE.BoxGeometry(2.4, 5.5, 2.4), new THREE.MeshStandardMaterial({ color: 0x831843 }));
+        tower.position.y = 2.75;
+        g.add(tower);
+
+        // Вертикальная мерная линейка
+        const ruler = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4.2, 0.06), new THREE.MeshBasicMaterial({ color: 0x10B981 }));
+        ruler.position.set(0, 2.8, 1.24);
+        g.add(ruler);
+        g.workRuler = ruler;
+
+      } else if (key === 'wp') {
+        // Арка портала WordPress
+        const archMat = new THREE.MeshStandardMaterial({ color: 0x0E7490 });
+        const postL = new THREE.Mesh(new THREE.BoxGeometry(0.6, 4.0, 0.6), archMat);
+        postL.position.set(-1.6, 2.0, 0);
+        g.add(postL);
+
+        const postR = new THREE.Mesh(new THREE.BoxGeometry(0.6, 4.0, 0.6), archMat);
+        postR.position.set(1.6, 2.0, 0);
+        g.add(postR);
+
+        const top = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.6, 0.8), archMat);
+        top.position.set(0, 4.0, 0);
+        g.add(top);
       }
 
-      // Верстак Бобра с чертежами ГОСТ
-      const benchGeo = new THREE.BoxGeometry(2.6, 1.1, 1.4);
-      const benchMat = new THREE.MeshStandardMaterial({ color: 0x8C5E35 });
-      const bench = new THREE.Mesh(benchGeo, benchMat);
-      bench.position.set(0, 0.55, 0);
-      bench.castShadow = true;
-      g.add(bench);
-
-      this.addStationSign(g, '🦫 ГОСТ-Бюро', 0xB45309, 0, 4.6, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
       return g;
     }
 
-    buildForgeStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_kot', name: 'Паяльный Цех (Кот-Паяльщик)', icon: '🐱' };
-
-      // Каменная мастерская
-      const wallMat = new THREE.MeshStandardMaterial({ color: 0x616161, roughness: 0.95, flatShading: true });
-      const wallsGeo = new THREE.BoxGeometry(5.8, 3.2, 5.0);
-      const walls = new THREE.Mesh(wallsGeo, wallMat);
-      walls.position.set(0, 1.6, 0);
-      walls.castShadow = true;
-      walls.receiveShadow = true;
-      g.add(walls);
-
-      // Двускатная черепичная крыша
-      const roofGeo = new THREE.ConeGeometry(4.4, 1.8, 4);
-      roofGeo.rotateY(Math.PI / 4);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x9E3D22, roughness: 0.8 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.set(0, 4.1, 0);
-      roof.scale.set(1.1, 1, 0.9);
-      roof.castShadow = true;
-      g.add(roof);
-
-      // Кирпичная труба
-      const chimGeo = new THREE.BoxGeometry(0.8, 3.4, 0.8);
-      const chimMat = new THREE.MeshStandardMaterial({ color: 0x7E311B, roughness: 0.9 });
-      const chim = new THREE.Mesh(chimGeo, chimMat);
-      chim.position.set(1.8, 4.2, 1.2);
-      chim.castShadow = true;
-      g.add(chim);
-      this.forgeChimneyPos = new THREE.Vector3(x + 1.8, 5.9, z + 1.2);
-
-      // Светящаяся ванна припоя / тигель с раскаленным сплавом (ПОС-61)
-      const potGeo = new THREE.CylinderGeometry(0.7, 0.5, 0.7, 12);
-      const potMat = new THREE.MeshStandardMaterial({ color: 0x222222 });
-      const pot = new THREE.Mesh(potGeo, potMat);
-      pot.position.set(-1.4, 0.65, 2.7);
-      g.add(pot);
-
-      const moltenGeo = new THREE.CylinderGeometry(0.62, 0.62, 0.1, 12);
-      const moltenMat = new THREE.MeshBasicMaterial({ color: 0xFF9900 });
-      const molten = new THREE.Mesh(moltenGeo, moltenMat);
-      molten.position.set(-1.4, 0.98, 2.7);
-      g.add(molten);
-
-      // Наковальня
-      const anvilGeo = new THREE.BoxGeometry(0.9, 0.8, 1.4);
-      const anvilMat = new THREE.MeshStandardMaterial({ color: 0x1F2937, metalness: 0.8, roughness: 0.3 });
-      const anvil = new THREE.Mesh(anvilGeo, anvilMat);
-      anvil.position.set(1.4, 0.4, 2.7);
-      anvil.castShadow = true;
-      g.add(anvil);
-
-      this.addStationSign(g, '🐱 Паяльный Цех', 0xEA580C, 0, 5.4, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
-      return g;
-    }
-
-    buildGazeboStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_bear', name: 'Круглый Стол Артели (Медведь-Бригадир)', icon: '🐻' };
-
-      // Деревянный круглый помост
-      const deckGeo = new THREE.CylinderGeometry(4.8, 5.0, 0.35, 12);
-      const deckMat = new THREE.MeshStandardMaterial({ color: 0x7A502E, roughness: 0.9 });
-      const deck = new THREE.Mesh(deckGeo, deckMat);
-      deck.position.y = 0.18;
-      deck.receiveShadow = true;
-      g.add(deck);
-
-      // Столбики беседки
-      const postMat = new THREE.MeshStandardMaterial({ color: 0x5C381E, roughness: 0.85 });
-      for (let i = 0; i < 6; i++) {
-        const ang = (i / 6) * Math.PI * 2;
-        const postGeo = new THREE.CylinderGeometry(0.14, 0.16, 3.2, 6);
-        const post = new THREE.Mesh(postGeo, postMat);
-        post.position.set(Math.cos(ang) * 4.2, 1.6, Math.sin(ang) * 4.2);
-        post.castShadow = true;
-        g.add(post);
-      }
-
-      // Коническая крыша
-      const roofGeo = new THREE.ConeGeometry(5.4, 2.2, 8);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x3E5E2A, roughness: 0.8 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.y = 4.2;
-      roof.castShadow = true;
-      g.add(roof);
-
-      // Большой круглый дубовый стол
-      const tableGeo = new THREE.CylinderGeometry(2.0, 2.0, 0.25, 12);
-      const table = new THREE.Mesh(tableGeo, deckMat);
-      table.position.y = 1.0;
-      table.castShadow = true;
-      g.add(table);
-
-      // Самовар на столе
-      const samovarGeo = new THREE.CylinderGeometry(0.3, 0.25, 0.8, 8);
-      const samovarMat = new THREE.MeshStandardMaterial({ color: 0xEAB308, metalness: 0.9, roughness: 0.2 });
-      const samovar = new THREE.Mesh(samovarGeo, samovarMat);
-      samovar.position.set(0, 1.5, 0);
-      samovar.castShadow = true;
-      g.add(samovar);
-
-      this.addStationSign(g, '🐻 Совет Артели', 0xEAB308, 0, 5.8, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
-      return g;
-    }
-
-    buildFoxManorStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_lis', name: 'Сметное Бюро (Лис-Прагматик)', icon: '🦊' };
-
-      // Уютный деревянный дом
-      const houseGeo = new THREE.BoxGeometry(5.2, 3.2, 4.6);
-      const woodMat = new THREE.MeshStandardMaterial({ color: 0x8C5831, roughness: 0.85 });
-      const house = new THREE.Mesh(houseGeo, woodMat);
-      house.position.set(0, 1.6, 0);
-      house.castShadow = true;
-      house.receiveShadow = true;
-      g.add(house);
-
-      // Крыша
-      const roofGeo = new THREE.ConeGeometry(4.2, 1.8, 4);
-      roofGeo.rotateY(Math.PI / 4);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x4A6B32, roughness: 0.8 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.set(0, 4.0, 0);
-      roof.scale.set(1.05, 1, 0.9);
-      roof.castShadow = true;
-      g.add(roof);
-
-      // Ящики со сметами и монетами на крыльце
-      const boxMat = new THREE.MeshStandardMaterial({ color: 0x5C3B1E });
-      for (let i = 0; i < 3; i++) {
-        const boxGeo = new THREE.BoxGeometry(0.8, 0.6, 0.8);
-        const box = new THREE.Mesh(boxGeo, boxMat);
-        box.position.set(2.0 + i * 0.5, 0.3, 2.6);
-        box.castShadow = true;
-        g.add(box);
-      }
-
-      this.addStationSign(g, '🦊 Сметное Бюро', 0xF59E0B, 0, 5.2, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
-      return g;
-    }
-
-    buildDraftingTentStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_barsuk', name: 'Кульман Иллюстраций (Барсук)', icon: '🦡' };
-
-      // Полосатый навес-шатер
-      const tentGeo = new THREE.ConeGeometry(3.6, 2.0, 4);
-      tentGeo.rotateY(Math.PI / 4);
-      const tentMat = new THREE.MeshStandardMaterial({ color: 0xFDE047, roughness: 0.7 });
-      const tent = new THREE.Mesh(tentGeo, tentMat);
-      tent.position.y = 2.8;
-      tent.castShadow = true;
-      g.add(tent);
-
-      // Колышки навеса
-      const legMat = new THREE.MeshStandardMaterial({ color: 0x555555 });
-      [[-2.2, -2.2], [2.2, -2.2], [-2.2, 2.2], [2.2, 2.2]].forEach(([px, pz]) => {
-        const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.8, 6), legMat);
-        leg.position.set(px, 1.4, pz);
-        g.add(leg);
-      });
-
-      // Наклонный чертежный стол (Кульман)
-      const boardGeo = new THREE.BoxGeometry(2.0, 0.1, 1.4);
-      const boardMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.4 });
-      const board = new THREE.Mesh(boardGeo, boardMat);
-      board.position.set(0, 1.4, 0);
-      board.rotation.x = -0.35;
-      board.castShadow = true;
-      g.add(board);
-
-      this.addStationSign(g, '🦡 Кульман SVG', 0xFBBF24, 0, 4.2, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
-      return g;
-    }
-
-    buildWatchtowerStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_filin', name: 'Стенд ОТК & Ревизор (Филин)', icon: '🦉' };
-
-      // Высокая бревенчатая сторожевая вышка (12 метров)
-      const postMat = new THREE.MeshStandardMaterial({ color: 0x4A2E1B, roughness: 0.9 });
-      [[-1.8, -1.8], [1.8, -1.8], [-1.8, 1.8], [1.8, 1.8]].forEach(([px, pz]) => {
-        const post = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.28, 9.5, 6), postMat);
-        post.position.set(px * 0.8, 4.75, pz * 0.8);
-        post.rotation.z = -px * 0.03;
-        post.rotation.x = pz * 0.03;
-        post.castShadow = true;
-        g.add(post);
-      });
-
-      // Смотровая площадка на высоте 9.5 метров
-      const platformGeo = new THREE.BoxGeometry(4.2, 0.3, 4.2);
-      const platMat = new THREE.MeshStandardMaterial({ color: 0x5C3B1E });
-      const platform = new THREE.Mesh(platformGeo, platMat);
-      platform.position.y = 9.5;
-      platform.castShadow = true;
-      g.add(platform);
-
-      // Перила площадки
-      const railMat = new THREE.MeshStandardMaterial({ color: 0x332211 });
-      const railGeo = new THREE.BoxGeometry(4.2, 0.8, 0.1);
-      const r1 = new THREE.Mesh(railGeo, railMat);
-      r1.position.set(0, 10.0, 2.0);
-      g.add(r1);
-
-      // Крыша вышки
-      const roofGeo = new THREE.ConeGeometry(3.2, 1.8, 4);
-      roofGeo.rotateY(Math.PI / 4);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x4C1D95, roughness: 0.7 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.y = 11.5;
-      roof.castShadow = true;
-      g.add(roof);
-
-      // Прожектор ОТК
-      const spotGeo = new THREE.CylinderGeometry(0.3, 0.4, 0.6, 8);
-      spotGeo.rotateX(Math.PI / 2);
-      const spotMat = new THREE.MeshStandardMaterial({ color: 0xA78BFA, emissive: 0x8B5CF6, emissiveIntensity: 0.8 });
-      const spotlight = new THREE.Mesh(spotGeo, spotMat);
-      spotlight.position.set(0, 10.2, 1.8);
-      g.add(spotlight);
-
-      this.addStationSign(g, '🦉 Пост ОТК', 0x8B5CF6, 0, 12.8, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
-      return g;
-    }
-
-    buildElevatorStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_dyatel', name: 'Метрологический Стенд (Дятел)', icon: '🪵' };
-
-      // Зерновой амбар / башня метрологии
-      const towerGeo = new THREE.BoxGeometry(3.6, 6.8, 3.6);
-      const towerMat = new THREE.MeshStandardMaterial({ color: 0x9333EA, roughness: 0.85, flatShading: true });
-      const tower = new THREE.Mesh(towerGeo, towerMat);
-      tower.position.y = 3.4;
-      tower.castShadow = true;
-      tower.receiveShadow = true;
-      g.add(tower);
-
-      // Крыша
-      const roofGeo = new THREE.ConeGeometry(2.8, 2.0, 4);
-      roofGeo.rotateY(Math.PI / 4);
-      const roofMat = new THREE.MeshStandardMaterial({ color: 0x3B0764 });
-      const roof = new THREE.Mesh(roofGeo, roofMat);
-      roof.position.y = 7.7;
-      roof.castShadow = true;
-      g.add(roof);
-
-      // Мерная шкала 100 баллов на фасаде
-      const scaleGeo = new THREE.BoxGeometry(0.4, 4.8, 0.08);
-      const scaleMat = new THREE.MeshBasicMaterial({ color: 0x10B981 });
-      const scaleBar = new THREE.Mesh(scaleGeo, scaleMat);
-      scaleBar.position.set(0, 3.4, 1.84);
-      g.add(scaleBar);
-
-      this.addStationSign(g, '🪵 Метрология 100', 0xEC4899, 0, 9.2, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
-      return g;
-    }
-
-    buildReleasePortalStation(x, y, z) {
-      const g = new THREE.Group();
-      g.userData = { id: 'ws_wp', name: 'Шлюз Релиза (WordPress)', icon: '🚀' };
-
-      // Деревянная триумфальная арка ворот фермы
-      const archMat = new THREE.MeshStandardMaterial({ color: 0x1E3A8A, roughness: 0.7 });
-      const p1 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 4.5, 0.8), archMat);
-      p1.position.set(-1.8, 2.25, 0);
-      p1.castShadow = true;
-      g.add(p1);
-
-      const p2 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 4.5, 0.8), archMat);
-      p2.position.set(1.8, 2.25, 0);
-      p2.castShadow = true;
-      g.add(p2);
-
-      const beam = new THREE.Mesh(new THREE.BoxGeometry(4.8, 0.8, 1.0), archMat);
-      beam.position.set(0, 4.5, 0);
-      beam.castShadow = true;
-      g.add(beam);
-
-      // Светящийся портал релиза
-      const portalGeo = new THREE.PlaneGeometry(2.6, 3.8);
-      const portalMat = new THREE.MeshBasicMaterial({
-        color: 0x06B6D4,
-        transparent: true,
-        opacity: 0.65,
-        side: THREE.DoubleSide
-      });
-      const portal = new THREE.Mesh(portalGeo, portalMat);
-      portal.position.set(0, 2.0, 0);
-      g.add(portal);
-
-      this.addStationSign(g, '🚀 В РЕЛИЗ: tochka-plavleniya.ru', 0x06B6D4, 0, 5.5, 0);
-
-      g.position.set(x, y, z);
-      this.scene.add(g);
-      return g;
-    }
-
-    addStationSign(group, text, colorHex, x, y, z) {
-      // 3D Canvas Billboard с названием станции
+    createStationPlacard(key, cfg, stationGroup) {
       const canvas = document.createElement('canvas');
-      canvas.width = 256;
-      canvas.height = 64;
+      canvas.width = 512;
+      canvas.height = 192;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
-      ctx.roundRect(4, 4, 248, 56, 12);
-      ctx.fill();
-      ctx.strokeStyle = '#' + colorHex.toString(16).padStart(6, '0');
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      ctx.font = 'bold 22px sans-serif';
-      ctx.fillStyle = '#FFFFFF';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText(text, 128, 32);
 
       const tex = new THREE.CanvasTexture(canvas);
       tex.minFilter = THREE.LinearFilter;
-      const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true });
+      const spriteMat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
       const sprite = new THREE.Sprite(spriteMat);
-      sprite.position.set(x, y, z);
-      sprite.scale.set(4.0, 1.0, 1.0);
-      group.add(sprite);
+
+      // Размещаем табличку высоко над станцией, лицом к камере
+      const placardY = (key === 'filin') ? 8.2 : (key === 'soroka' ? 8.8 : 4.8);
+      sprite.position.set(0, placardY, 0);
+      sprite.scale.set(6.8, 2.5, 1.0);
+      stationGroup.add(sprite);
+
+      stationGroup.placardCanvas = canvas;
+      stationGroup.placardCtx = ctx;
+      stationGroup.placardTexture = tex;
+
+      this.redrawPlacard(stationGroup, cfg.name, cfg.taskTitle, cfg.taskSubtitle, cfg.status, cfg.colorHex);
     }
 
-    build3DAgents() {
-      // Конфигурация персонажей Артели
+    redrawPlacard(stationGroup, title, taskTitle, taskSubtitle, statusText, colorHex) {
+      const ctx = stationGroup.placardCtx;
+      const canvas = stationGroup.placardCanvas;
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Темный фон плашки с закруглением
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+      ctx.roundRect(8, 8, canvas.width - 16, canvas.height - 16, 20);
+      ctx.fill();
+
+      // Окантовка цветом мастера
+      ctx.strokeStyle = '#' + colorHex.toString(16).padStart(6, '0');
+      ctx.lineWidth = 5;
+      ctx.stroke();
+
+      // Заголовок станции
+      ctx.font = 'bold 24px sans-serif';
+      ctx.fillStyle = '#FFFFFF';
+      ctx.textAlign = 'left';
+      ctx.fillText(title, 26, 46);
+
+      // Основная задача (Что сделать / утвердить / написать)
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillStyle = '#FFC700';
+      ctx.fillText(taskTitle, 26, 88);
+
+      // Подзадача
+      ctx.font = '18px sans-serif';
+      ctx.fillStyle = '#E2E8F0';
+      ctx.fillText(taskSubtitle, 26, 122);
+
+      // Бейдж статуса справа внизу
+      let badgeBg = '#475569';
+      let badgeColor = '#FFFFFF';
+      if (statusText.includes('РАБОТЕ')) {
+        badgeBg = '#EA580C';
+        badgeColor = '#FFFFFF';
+      } else if (statusText.includes('ГОТОВ') || statusText.includes('УТВЕРЖДЕНО')) {
+        badgeBg = '#16A34A';
+        badgeColor = '#FFFFFF';
+      } else if (statusText.includes('АКТИВЕН')) {
+        badgeBg = '#2563EB';
+        badgeColor = '#FFFFFF';
+      }
+
+      ctx.fillStyle = badgeBg;
+      ctx.roundRect(26, 142, 220, 36, 8);
+      ctx.fill();
+
+      ctx.font = 'bold 16px sans-serif';
+      ctx.fillStyle = badgeColor;
+      ctx.textAlign = 'center';
+      ctx.fillText(`СТАТУС: ${statusText}`, 136, 166);
+
+      stationGroup.placardTexture.needsUpdate = true;
+    }
+
+    updateStationStatus(key, statusText, customSub) {
+      const st = this.stationMeshes[key];
+      const cfg = this.stationConfigs[key];
+      if (!st || !cfg) return;
+      cfg.status = statusText;
+      if (customSub) cfg.taskSubtitle = customSub;
+      this.redrawPlacard(st, cfg.name, cfg.taskTitle, cfg.taskSubtitle, cfg.status, cfg.colorHex);
+    }
+
+    // ==========================================
+    // 3D АНИМИРОВАННЫЕ ПЕРСОНАЖИ С ИНСТРУМЕНТАМИ
+    // ==========================================
+    build3DAgentsWithTools() {
       const agentConfigs = [
         {
           id: 'bear', name: 'Медведь-Бригадир', role: 'Староста Артели', icon: '🐻',
-          color: 0x8D5B36, x: 0, z: -1.2, speed: 1.4, thoughts: 'Слежу за полевыми работами и балансом тепла кластера',
-          dialogue: 'Добро пожаловать на 3D Ферму Артели! Здесь рождается чистый инженерный контент.',
-          earType: 'round', snout: 0.45, tail: 'short'
+          color: 0x8D5B36, x: 0, z: -1.2, speed: 1.4,
+          dialogue: 'Совет Артели в сборе. Все верстаки готовы к работе!',
+          earType: 'round', toolType: 'tea_cup'
         },
         {
           id: 'soroka', name: 'Сорока-Разведчица', role: '00-research', icon: '🪶',
-          color: 0x1E293B, accentColor: 0x38BDF8, x: -16, z: -18, speed: 2.1, thoughts: 'Парсю поисковую выдачу и калькуляторы конкурентов',
-          dialogue: 'Собрала 15 LSI-хвостов и нашла 3 формулы расчета припоя!',
-          earType: 'beak', snout: 0.6, tail: 'feather'
+          color: 0x1E293B, accentColor: 0x38BDF8, x: -14, z: -17, speed: 2.1,
+          dialogue: 'Парсю поисковую выдачу и калькуляторы припоя конкурентов!',
+          earType: 'beak', toolType: 'spyglass'
         },
         {
           id: 'bobr', name: 'Бобёр-Конструктор', role: '01-researcher', icon: '🦫',
-          color: 0x78350F, accentColor: 0xB45309, x: -22, z: -2, speed: 1.4, thoughts: 'Проверяю плотину ГОСТ Р МЭК 61191 и FAQ',
-          dialogue: 'Бриф утвержден: 4 обязательных вопроса новичка встроены в ТЗ.',
-          earType: 'round', snout: 0.5, tail: 'paddle'
+          color: 0x78350F, accentColor: 0xB45309, x: -20, z: -4, speed: 1.4,
+          dialogue: 'Сверяю 4 обязательных вопроса новичка по ГОСТ Р МЭК 61191!',
+          earType: 'round', toolType: 'saw'
         },
         {
           id: 'kot', name: 'Кот-Паяльщик (Practico 1)', role: '02-writer', icon: '🐱',
-          color: 0xEA580C, accentColor: 0xFFEDD5, x: -18, z: 5, speed: 1.6, thoughts: 'Триада: факт -> физика шва -> последствие перегрева',
-          dialogue: 'Жало T12 прогрето до 285°C. Физика смачивания меди 1.2 сек.',
-          earType: 'pointy', snout: 0.35, tail: 'long'
+          color: 0xEA580C, accentColor: 0xFFEDD5, x: -16, z: 5, speed: 1.6,
+          dialogue: 'Паяю соединение жалом T12 при 285°C. Физика смачивания меди!',
+          earType: 'pointy', toolType: 'soldering_iron'
         },
         {
           id: 'lis', name: 'Лис-Прагматик (Practico 2)', role: '02-writer-2', icon: '🦊',
-          color: 0xF97316, accentColor: 0xFFFFFF, x: 18, z: 2, speed: 1.7, thoughts: 'Считаю смету домашней мастерской: экономия 14 000₽',
-          dialogue: 'Флюс за 300₽ окупается при первой же спасенной плате!',
-          earType: 'pointy', snout: 0.6, tail: 'bushy'
+          color: 0xF97316, accentColor: 0xFFFFFF, x: 16, z: 1.2, speed: 1.7,
+          dialogue: 'Считаю смету: флюс за 300₽ спасет материнскую плату за 15 000₽!',
+          earType: 'pointy', toolType: 'quill'
         },
         {
           id: 'barsuk', name: 'Барсук-Иллюстратор', role: '05-illustrator', icon: '🦡',
-          color: 0x4B5563, accentColor: 0xFBBF24, x: -4, z: 13, speed: 1.5, thoughts: 'Черчу векторный SVG-термопрофиль ПОС-61 (183–190°C)',
-          dialogue: 'Векторная графика встроена в паспорт статьи. 0 токенов расхода!',
-          earType: 'stripe', snout: 0.45, tail: 'short'
+          color: 0x4B5563, accentColor: 0xFBBF24, x: -4, z: 12, speed: 1.5,
+          dialogue: 'Черчу векторный SVG-термопрофиль ПОС-61 (183–190°C) по ГОСТ!',
+          earType: 'stripe', toolType: 'pencil_ruler'
         },
         {
           id: 'filin', name: 'Филин-Ревизор [ОТК]', role: '03-reviewer', icon: '🦉',
-          color: 0x6D28D9, accentColor: 0xEDE9FE, x: 16, z: -10, speed: 1.3, thoughts: 'Детектор нейроштампов SlopMonster включен на 100%',
-          dialogue: 'Штамп [ОТК-2026] одобрен: водность текста 0%, температура ликвидуса точна.',
-          earType: 'tuft', snout: 0.4, tail: 'wings'
+          color: 0x6D28D9, accentColor: 0xEDE9FE, x: 14, z: -10, speed: 1.3,
+          dialogue: 'SlopMonster заряжен: нейроштампы удалены, штамп [ОТК] готов!',
+          earType: 'tuft', toolType: 'otk_stamp'
         },
         {
           id: 'dyatel', name: 'Дятел-Метролог', role: '04-scorer', icon: '🪵',
-          color: 0xBE185D, accentColor: 0xFCE7F3, x: 12, z: 14, speed: 1.6, thoughts: 'AST-анализ: 6 строгих блоков скоринга на 100 баллов',
-          dialogue: 'Итоговый балл статьи: 94/100. Зеленый свет в WordPress!',
-          earType: 'crest', snout: 0.7, tail: 'stiff'
+          color: 0xBE185D, accentColor: 0xFCE7F3, x: 10, z: 14, speed: 1.6,
+          dialogue: 'AST-анализ: 94/100 баллов! Зеленый свет в шлюз релиза!',
+          earType: 'crest', toolType: 'calibrator'
         }
       ];
 
       agentConfigs.forEach(cfg => {
-        const meshGroup = this.create3DAnimalMesh(cfg);
+        const meshGroup = this.create3DAnimalWithTool(cfg);
         meshGroup.position.set(cfg.x, 0, cfg.z);
         this.scene.add(meshGroup);
 
@@ -1072,309 +708,170 @@
           homePos: new THREE.Vector3(cfg.x, 0, cfg.z),
           state: 'idle', // idle, walking, working
           walkCycle: 0,
-          bubbleSprite: null,
-          bubbleTimer: 240,
-          holdingItem: null
+          workTimer: 0,
+          heldItemMesh: null,
+          bubbleSprite: null
         };
-
-        // Создаем речевое 3D-облачко над головой
-        this.updateAgentSpeechBubble(agentObj, cfg.dialogue);
 
         this.agents.push(agentObj);
         this.agentMeshes[cfg.id] = meshGroup;
       });
     }
 
-    create3DAnimalMesh(cfg) {
+    create3DAnimalWithTool(cfg) {
       const g = new THREE.Group();
       g.userData = { isAgent: true, agentId: cfg.id, name: cfg.name };
 
-      const bodyMat = new THREE.MeshStandardMaterial({ color: cfg.color, roughness: 0.7, flatShading: true });
-      const accentMat = new THREE.MeshStandardMaterial({ color: cfg.accentColor || 0xFFFFFF, roughness: 0.6 });
+      const bodyMat = new THREE.MeshStandardMaterial({ color: cfg.color, roughness: 0.75 });
+      const accentMat = new THREE.MeshStandardMaterial({ color: cfg.accentColor || 0xFFFFFF });
       const eyeMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
 
-      // 1. Тело (Округло-кубический торс)
-      const bodyGeo = new THREE.BoxGeometry(1.2, 1.1, 1.5);
-      const body = new THREE.Mesh(bodyGeo, bodyMat);
-      body.position.y = 1.1;
+      // Тело
+      const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.1, 1.4), bodyMat);
+      body.position.y = 1.05;
       body.castShadow = true;
-      body.receiveShadow = true;
       g.add(body);
 
-      // Грудка / Брюшко акцентного цвета
-      const bellyGeo = new THREE.BoxGeometry(0.9, 0.8, 0.1);
-      const belly = new THREE.Mesh(bellyGeo, accentMat);
-      belly.position.set(0, 1.0, 0.76);
+      // Грудка
+      const belly = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.8, 0.08), accentMat);
+      belly.position.set(0, 0.95, 0.72);
       g.add(belly);
 
-      // 2. Голова
+      // Голова
       const headGroup = new THREE.Group();
-      headGroup.position.set(0, 1.8, 0.75);
+      headGroup.position.set(0, 1.75, 0.7);
 
-      const headGeo = new THREE.BoxGeometry(0.9, 0.85, 0.9);
-      const head = new THREE.Mesh(headGeo, bodyMat);
+      const head = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.8, 0.85), bodyMat);
       head.castShadow = true;
       headGroup.add(head);
 
-      // Мордочка / Клюв
-      if (cfg.earType === 'beak' || cfg.earType === 'crest') {
-        // Клюв птицы
-        const beakGeo = new THREE.ConeGeometry(0.22, cfg.snout, 4);
-        beakGeo.rotateX(Math.PI / 2);
-        const beakMat = new THREE.MeshStandardMaterial({ color: 0xF59E0B, roughness: 0.5 });
-        const beak = new THREE.Mesh(beakGeo, beakMat);
-        beak.position.set(0, -0.05, 0.65);
-        headGroup.add(beak);
-      } else {
-        // Звериная мордочка
-        const snoutGeo = new THREE.BoxGeometry(0.5, 0.38, cfg.snout);
-        const snout = new THREE.Mesh(snoutGeo, accentMat);
-        snout.position.set(0, -0.15, 0.55);
-        headGroup.add(snout);
-
-        // Черный носик
-        const noseGeo = new THREE.BoxGeometry(0.18, 0.14, 0.1);
-        const nose = new THREE.Mesh(noseGeo, eyeMat);
-        nose.position.set(0, -0.05, 0.55 + cfg.snout / 2);
-        headGroup.add(nose);
-      }
-
       // Глазки
-      [-0.26, 0.26].forEach(ex => {
-        const eyeGeo = new THREE.SphereGeometry(0.08, 6, 6);
-        const eye = new THREE.Mesh(eyeGeo, eyeMat);
-        eye.position.set(ex, 0.15, 0.46);
+      [-0.24, 0.24].forEach(ex => {
+        const eye = new THREE.Mesh(new THREE.SphereGeometry(0.07, 6, 6), eyeMat);
+        eye.position.set(ex, 0.12, 0.44);
         headGroup.add(eye);
       });
 
-      // Ушки / Гребень / Хохолок
+      // Мордочка / Клюв
+      if (cfg.earType === 'beak' || cfg.earType === 'crest') {
+        const beak = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.55, 4), new THREE.MeshStandardMaterial({ color: 0xF59E0B }));
+        beak.rotateX(Math.PI / 2);
+        beak.position.set(0, -0.05, 0.6);
+        headGroup.add(beak);
+      } else {
+        const snout = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.32, 0.4), accentMat);
+        snout.position.set(0, -0.12, 0.52);
+        headGroup.add(snout);
+
+        const nose = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.08), eyeMat);
+        nose.position.set(0, -0.04, 0.73);
+        headGroup.add(nose);
+      }
+
+      // Ушки
       if (cfg.earType === 'pointy') {
-        // Острые треугольные уши (Кот, Лис)
-        [-0.32, 0.32].forEach(ux => {
-          const earGeo = new THREE.ConeGeometry(0.2, 0.45, 4);
-          const ear = new THREE.Mesh(earGeo, bodyMat);
-          ear.position.set(ux, 0.58, 0);
-          headGroup.add(ear);
-        });
-      } else if (cfg.earType === 'round') {
-        // Круглые уши (Медведь, Бобёр)
-        [-0.35, 0.35].forEach(ux => {
-          const earGeo = new THREE.CylinderGeometry(0.2, 0.2, 0.1, 8);
-          earGeo.rotateZ(Math.PI / 2);
-          const ear = new THREE.Mesh(earGeo, bodyMat);
+        [-0.3, 0.3].forEach(ux => {
+          const ear = new THREE.Mesh(new THREE.ConeGeometry(0.18, 0.4, 4), bodyMat);
           ear.position.set(ux, 0.52, 0);
           headGroup.add(ear);
         });
-      } else if (cfg.earType === 'tuft') {
-        // Кисточки Филина
-        [-0.3, 0.3].forEach(ux => {
-          const tuftGeo = new THREE.ConeGeometry(0.12, 0.4, 4);
-          const tuft = new THREE.Mesh(tuftGeo, bodyMat);
-          tuft.position.set(ux, 0.55, 0.1);
-          headGroup.add(tuft);
+      } else if (cfg.earType === 'round') {
+        [-0.32, 0.32].forEach(ux => {
+          const ear = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.08, 8), bodyMat);
+          ear.rotateZ(Math.PI / 2);
+          ear.position.set(ux, 0.48, 0);
+          headGroup.add(ear);
         });
       }
 
       g.add(headGroup);
       g.headGroup = headGroup;
 
-      // 3. Лапки с шарнирами (Для реалистичной анимации ходьбы!)
-      const legGeo = new THREE.BoxGeometry(0.32, 0.65, 0.32);
+      // Шарнирные лапки
       const legMat = new THREE.MeshStandardMaterial({ color: cfg.color, roughness: 0.8 });
-
       const legs = {};
-      const legPositions = [
-        { key: 'legFL', x: -0.42, z: 0.45 },
-        { key: 'legFR', x: 0.42,  z: 0.45 },
-        { key: 'legBL', x: -0.42, z: -0.45 },
-        { key: 'legBR', x: 0.42,  z: -0.45 }
-      ];
-
-      legPositions.forEach(lp => {
-        const legPivot = new THREE.Group();
-        legPivot.position.set(lp.x, 0.6, lp.z);
-
-        const legMesh = new THREE.Mesh(legGeo, legMat);
-        legMesh.position.y = -0.3;
-        legMesh.castShadow = true;
-        legPivot.add(legMesh);
-
-        g.add(legPivot);
-        legs[lp.key] = legPivot;
+      [
+        { key: 'legFL', x: -0.38, z: 0.4 },
+        { key: 'legFR', x: 0.38,  z: 0.4 },
+        { key: 'legBL', x: -0.38, z: -0.4 },
+        { key: 'legBR', x: 0.38,  z: -0.4 }
+      ].forEach(lp => {
+        const pivot = new THREE.Group();
+        pivot.position.set(lp.x, 0.55, lp.z);
+        const leg = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.58, 0.28), legMat);
+        leg.position.y = -0.28;
+        pivot.add(leg);
+        g.add(pivot);
+        legs[lp.key] = pivot;
       });
       g.legs = legs;
 
-      // 4. Хвостик
-      const tailGroup = new THREE.Group();
-      tailGroup.position.set(0, 1.0, -0.75);
-
-      if (cfg.tail === 'bushy') {
-        // Пушистый лисий хвост
-        const tailGeo = new THREE.ConeGeometry(0.35, 1.2, 6);
-        tailGeo.rotateX(-Math.PI / 2.8);
-        const tail = new THREE.Mesh(tailGeo, bodyMat);
-        tail.position.set(0, 0.2, -0.5);
-        tailGroup.add(tail);
-      } else if (cfg.tail === 'paddle') {
-        // Широкий хвост бобра
-        const tailGeo = new THREE.BoxGeometry(0.65, 0.12, 1.1);
-        const tailMat = new THREE.MeshStandardMaterial({ color: 0x3E2310 });
-        const tail = new THREE.Mesh(tailGeo, tailMat);
-        tail.position.set(0, -0.2, -0.5);
-        tailGroup.add(tail);
-      } else {
-        // Обычный хвостик
-        const tailGeo = new THREE.CylinderGeometry(0.1, 0.08, 0.8, 6);
-        tailGeo.rotateX(-Math.PI / 3);
-        const tail = new THREE.Mesh(tailGeo, bodyMat);
-        tail.position.set(0, 0.2, -0.35);
-        tailGroup.add(tail);
-      }
-      g.add(tailGroup);
-      g.tailGroup = tailGroup;
+      // Рука/лапа с рабочим инструментом
+      const toolArm = new THREE.Group();
+      toolArm.position.set(0.48, 1.0, 0.4);
+      this.attachWorkingTool(toolArm, cfg.toolType);
+      g.add(toolArm);
+      g.toolArm = toolArm;
 
       return g;
     }
 
-    updateAgentSpeechBubble(agent, text) {
-      if (agent.bubbleSprite) {
-        agent.group.remove(agent.bubbleSprite);
-        if (agent.bubbleSprite.material.map) agent.bubbleSprite.material.map.dispose();
-        agent.bubbleSprite.material.dispose();
+    attachWorkingTool(armGroup, toolType) {
+      if (toolType === 'soldering_iron') {
+        // Паяльник Кота с горячим жалом
+        const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
+        handle.rotateX(Math.PI / 3);
+        armGroup.add(handle);
+
+        const tip = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.25, 6), new THREE.MeshBasicMaterial({ color: 0xF97316 }));
+        tip.rotateX(Math.PI / 3);
+        tip.position.set(0, -0.3, 0.25);
+        armGroup.add(tip);
+
+      } else if (toolType === 'saw') {
+        // Пила Бобра
+        const sawBlade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.8), new THREE.MeshStandardMaterial({ color: 0xCBD5E1, metalness: 0.9 }));
+        sawBlade.position.set(0, -0.15, 0.3);
+        armGroup.add(sawBlade);
+
+      } else if (toolType === 'pencil_ruler') {
+        // Карандаш Барсука
+        const pencil = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0xFBBF24 }));
+        pencil.rotateX(Math.PI / 4);
+        armGroup.add(pencil);
+
+      } else if (toolType === 'otk_stamp') {
+        // Штамп [ОТК] Филина
+        const stamp = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.45, 8), new THREE.MeshStandardMaterial({ color: 0x8B5CF6 }));
+        stamp.position.set(0, -0.2, 0.15);
+        armGroup.add(stamp);
+
+      } else if (toolType === 'tea_cup') {
+        // Кружка чая Бригадира
+        const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.25, 8), new THREE.MeshStandardMaterial({ color: 0xEAB308 }));
+        cup.position.set(0, -0.1, 0.2);
+        armGroup.add(cup);
       }
-
-      if (!text) return;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = 384;
-      canvas.height = 128;
-      const ctx = canvas.getContext('2d');
-
-      // Плашка диалога с хвостиком
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-      ctx.roundRect(6, 6, 372, 96, 16);
-      ctx.fill();
-
-      ctx.strokeStyle = '#' + (agent.accentColor || 0xFFC700).toString(16).padStart(6, '0');
-      ctx.lineWidth = 4;
-      ctx.stroke();
-
-      // Треугольный хвостик вниз
-      ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-      ctx.beginPath();
-      ctx.moveTo(180, 102);
-      ctx.lineTo(204, 102);
-      ctx.lineTo(192, 120);
-      ctx.closePath();
-      ctx.fill();
-
-      // Текст реплики
-      ctx.font = 'bold 20px sans-serif';
-      ctx.fillStyle = '#FFC700';
-      ctx.fillText(`${agent.icon} ${agent.name}:`, 20, 36);
-
-      ctx.font = '16px sans-serif';
-      ctx.fillStyle = '#FFFFFF';
-      this.wrapText(ctx, text, 20, 64, 340, 22);
-
-      const tex = new THREE.CanvasTexture(canvas);
-      tex.minFilter = THREE.LinearFilter;
-      const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
-      const sprite = new THREE.Sprite(mat);
-      sprite.position.set(0, 3.4, 0);
-      sprite.scale.set(5.5, 1.8, 1.0);
-      agent.group.add(sprite);
-      agent.bubbleSprite = sprite;
-      agent.bubbleTimer = 300;
     }
 
-    wrapText(ctx, text, x, y, maxWidth, lineHeight) {
-      const words = text.split(' ');
-      let line = '';
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + ' ';
-        const metrics = ctx.measureText(testLine);
-        if (metrics.width > maxWidth && n > 0) {
-          ctx.fillText(line, x, y);
-          line = words[n] + ' ';
-          y += lineHeight;
-        } else {
-          line = testLine;
-        }
+    setupWorkEffects() {
+      // Искры пайки Кота
+      const sparkCount = 20;
+      const sparkGeo = new THREE.BufferGeometry();
+      const sparkPos = new Float32Array(sparkCount * 3);
+      for (let i = 0; i < sparkCount; i++) {
+        sparkPos[i * 3] = -16;
+        sparkPos[i * 3 + 1] = 0.9;
+        sparkPos[i * 3 + 2] = 7.8;
       }
-      ctx.fillText(line, x, y);
-    }
-
-    buildParticleSystems() {
-      // 1. Дым канифоли и кузницы Кота
-      const smokeCount = 35;
-      const smokeGeo = new THREE.BufferGeometry();
-      const smokePositions = new Float32Array(smokeCount * 3);
-      this.smokeData = [];
-
-      const startX = -18 + 1.8;
-      const startY = 5.9;
-      const startZ = 8 + 1.2;
-
-      for (let i = 0; i < smokeCount; i++) {
-        smokePositions[i * 3] = startX + (Math.random() - 0.5) * 0.4;
-        smokePositions[i * 3 + 1] = startY + Math.random() * 4.0;
-        smokePositions[i * 3 + 2] = startZ + (Math.random() - 0.5) * 0.4;
-
-        this.smokeData.push({
-          vx: (Math.random() - 0.5) * 0.02,
-          vy: 0.04 + Math.random() * 0.03,
-          vz: (Math.random() - 0.5) * 0.02,
-          origY: startY
-        });
-      }
-      smokeGeo.setAttribute('position', new THREE.BufferAttribute(smokePositions, 3));
-
-      // Круглая текстура частицы
-      const pCanvas = document.createElement('canvas');
-      pCanvas.width = 32;
-      pCanvas.height = 32;
-      const pCtx = pCanvas.getContext('2d');
-      const grad = pCtx.createRadialGradient(16, 16, 0, 16, 16, 16);
-      grad.addColorStop(0, 'rgba(235, 235, 245, 0.8)');
-      grad.addColorStop(1, 'rgba(235, 235, 245, 0.0)');
-      pCtx.fillStyle = grad;
-      pCtx.fillRect(0, 0, 32, 32);
-
-      const smokeTex = new THREE.CanvasTexture(pCanvas);
-      const smokeMat = new THREE.PointsMaterial({
-        size: 1.6,
-        map: smokeTex,
-        transparent: true,
-        opacity: 0.45,
-        depthWrite: false
-      });
-      this.smokeParticles = new THREE.Points(smokeGeo, smokeMat);
-      this.scene.add(this.smokeParticles);
-
-      // 2. Цветочная пыльца над полями фермы
-      const pollenCount = 120;
-      const pollenGeo = new THREE.BufferGeometry();
-      const pollenPositions = new Float32Array(pollenCount * 3);
-      for (let i = 0; i < pollenCount; i++) {
-        pollenPositions[i * 3] = (Math.random() - 0.5) * 70;
-        pollenPositions[i * 3 + 1] = 0.5 + Math.random() * 4.5;
-        pollenPositions[i * 3 + 2] = (Math.random() - 0.5) * 70;
-      }
-      pollenGeo.setAttribute('position', new THREE.BufferAttribute(pollenPositions, 3));
-      const pollenMat = new THREE.PointsMaterial({
-        size: 0.35,
-        color: 0xFEF08A,
-        transparent: true,
-        opacity: 0.75
-      });
-      this.pollenParticles = new THREE.Points(pollenGeo, pollenMat);
-      this.scene.add(this.pollenParticles);
+      sparkGeo.setAttribute('position', new THREE.BufferAttribute(sparkPos, 3));
+      const sparkMat = new THREE.PointsMaterial({ color: 0xFFC700, size: 0.25, transparent: true, opacity: 0 });
+      this.sparksGroup = new THREE.Points(sparkGeo, sparkMat);
+      this.scene.add(this.sparksGroup);
     }
 
     setupInteraction() {
       const dom = this.renderer.domElement;
-
       dom.addEventListener('pointerdown', (e) => {
         const rect = dom.getBoundingClientRect();
         this.mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
@@ -1384,9 +881,7 @@
         const intersects = this.raycaster.intersectObjects(this.scene.children, true);
 
         if (intersects.length > 0) {
-          // Ищем среди родителей агента
           let hitAgent = null;
-          let hitStation = null;
           let groundHit = null;
 
           for (const hit of intersects) {
@@ -1395,9 +890,6 @@
               if (cur.userData && cur.userData.isAgent) {
                 hitAgent = this.agents.find(a => a.id === cur.userData.agentId);
                 break;
-              }
-              if (cur.userData && cur.userData.id && cur.userData.id.startsWith('ws_')) {
-                hitStation = cur.userData;
               }
               cur = cur.parent;
             }
@@ -1410,11 +902,9 @@
           if (hitAgent) {
             this.selectAgent(hitAgent);
           } else if (groundHit && this.selectedAgent) {
-            // Направляем выбранного зверя на точку клика
             this.selectedAgent.targetPos.copy(groundHit);
             this.selectedAgent.targetPos.y = 0;
             this.selectedAgent.state = 'walking';
-            this.updateAgentSpeechBubble(this.selectedAgent, `Бегу по полю на позицию (${Math.round(groundHit.x)}, ${Math.round(groundHit.z)})!`);
           }
         }
       });
@@ -1422,13 +912,14 @@
 
     selectAgent(agent) {
       this.selectedAgent = agent;
-      this.updateAgentSpeechBubble(agent, `Привет! Я ${agent.name}. Моя задача: ${agent.thoughts}`);
+      if (typeof speakText === 'function') {
+        speakText(`${agent.name}: ${agent.dialogue}`);
+      }
 
-      // Плавное приближение камеры к персонажу
+      // Камера плавно приближается к выбранному мастеру
       if (this.controls) {
         const targetPos = agent.group.position.clone();
-        const camOffset = new THREE.Vector3(12, 9, 14);
-        const newCamPos = targetPos.clone().add(camOffset);
+        const newCamPos = targetPos.clone().add(new THREE.Vector3(9, 7, 11));
 
         const startTime = performance.now();
         const startPos = this.camera.position.clone();
@@ -1436,7 +927,7 @@
 
         const panAnim = () => {
           const now = performance.now();
-          const p = Math.min((now - startTime) / 600, 1.0);
+          const p = Math.min((now - startTime) / 500, 1.0);
           const ease = p * (2 - p);
 
           this.camera.position.lerpVectors(startPos, newCamPos, ease);
@@ -1448,12 +939,7 @@
         panAnim();
       }
 
-      // Голосовая озвучка реплики
-      if (typeof speakText === 'function') {
-        speakText(`${agent.name}: ${agent.dialogue}`);
-      }
-
-      // Подсветка карточки на веб-странице
+      // Подсветка карточки верстака на веб-странице
       const cardMap = {
         soroka: 'card-craftsman-analyzer',
         bobr: 'card-craftsman-researcher',
@@ -1469,98 +955,395 @@
         const card = document.getElementById(cId);
         card.classList.add('craftsman-highlighted');
         card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        setTimeout(() => card.classList.remove('craftsman-highlighted'), 5000);
+        setTimeout(() => card.classList.remove('craftsman-highlighted'), 4000);
       }
     }
 
+    // ==========================================
+    // ВИЗУАЛИЗАЦИЯ ПЕРЕДАЧИ ИЗ ЛАП В ЛАПЫ (HANDOVER)
+    // ==========================================
+    createHandoverItem(itemType) {
+      const g = new THREE.Group();
+      if (itemType.includes('LSI')) {
+        // Свиток LSI
+        const scroll = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.7, 8), new THREE.MeshStandardMaterial({ color: 0xFDE68A }));
+        scroll.rotateZ(Math.PI / 2);
+        g.add(scroll);
+      } else if (itemType.includes('ГОСТ')) {
+        // Папка ТЗ ГОСТ
+        const folder = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.08, 0.45), new THREE.MeshStandardMaterial({ color: 0x92400E }));
+        g.add(folder);
+      } else if (itemType.includes('Черновик')) {
+        // Тетрадь-черновик статьи
+        const draft = new THREE.Mesh(new THREE.BoxGeometry(0.55, 0.1, 0.42), new THREE.MeshStandardMaterial({ color: 0xEA580C }));
+        g.add(draft);
+      } else if (itemType.includes('SVG')) {
+        // Планшет со схемой
+        const tablet = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.04, 0.5), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
+        g.add(tablet);
+      } else if (itemType.includes('Паспорт')) {
+        // Паспорт ОТК с печатью
+        const pass = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.08, 0.4), new THREE.MeshStandardMaterial({ color: 0x8B5CF6 }));
+        g.add(pass);
+      } else {
+        // Релизная посылка
+        const box = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), new THREE.MeshStandardMaterial({ color: 0x06B6D4 }));
+        g.add(box);
+      }
+
+      // Золотая аура предмета
+      const glow = new THREE.Mesh(new THREE.SphereGeometry(0.45, 8, 8), new THREE.MeshBasicMaterial({ color: 0xFFC700, transparent: true, opacity: 0.35 }));
+      g.add(glow);
+
+      return g;
+    }
+
+    drawConveyorFlowLine(pA, pB) {
+      // Рисуем световую пунктирную линию между верстаками на земле
+      const lineGeo = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(pA.x, 0.08, pA.z),
+        new THREE.Vector3(pB.x, 0.08, pB.z)
+      ]);
+      const lineMat = new THREE.LineDashedMaterial({
+        color: 0xFFC700,
+        dashSize: 1.2,
+        gapSize: 0.6,
+        linewidth: 3
+      });
+      const line = new THREE.Line(lineGeo, lineMat);
+      line.computeLineDistances();
+      this.scene.add(line);
+      this.flowLines.push(line);
+    }
+
+    clearFlowLines() {
+      this.flowLines.forEach(l => this.scene.remove(l));
+      this.flowLines = [];
+    }
+
+    startMissionPipeline(topicId = 1) {
+      const pipelineSteps = [
+        {
+          from: 'soroka', to: 'bobr',
+          itemName: '📜 LSI-ядро #' + topicId,
+          sendSpeech: 'Бобёр, держи собранное LSI-ядро и интент новичка!',
+          receiveSpeech: 'Принял LSI! Утверждаю бриф ГОСТ Р МЭК 61191 с 4 вопросами FAQ.'
+        },
+        {
+          from: 'bobr', to: 'kot',
+          itemName: '🪵 Бриф ГОСТ #' + topicId,
+          sendSpeech: 'Кот, плотина стандартов ГОСТ готова! Пиши триаду фактов!',
+          receiveSpeech: 'Принял бриф! Прогреваю жало T12, паяю физику смачивания.'
+        },
+        {
+          from: 'kot', to: 'barsuk',
+          itemName: '📝 Черновик #' + topicId,
+          sendSpeech: 'Барсук, текст готов! Нужен точный векторный термопрофиль ПОС-61.',
+          receiveSpeech: 'Принял черновик! Черчу кривую ликвидуса 183–190°C по реестру сплавов.'
+        },
+        {
+          from: 'barsuk', to: 'filin',
+          itemName: '📐 SVG-схема #' + topicId,
+          sendSpeech: 'Филин, векторная схема готова! Проверь на слоп и водность.',
+          receiveSpeech: 'Принял схему и текст! SlopMonster проверил: слопа 0%, ставлю [ОТК-2026]!'
+        },
+        {
+          from: 'filin', to: 'dyatel',
+          itemName: '🔍 Паспорт v1.1 #' + topicId,
+          sendSpeech: 'Дятел, штамп ОТК стоит. Запускай метрологический скоринг!',
+          receiveSpeech: 'Принял паспорт! AST-скоринг 94/100 баллов! Передаю в релиз.'
+        },
+        {
+          from: 'dyatel', to: 'wp',
+          itemName: '📦 Релиз 94/100',
+          sendSpeech: 'Шлюз WordPress, пакет статьи доставлен для tochka-plavleniya.ru!',
+          receiveSpeech: 'Релиз успешно развернут на сайте!'
+        }
+      ];
+
+      let currentStepIdx = 0;
+      this.clearFlowLines();
+
+      const executeStep = () => {
+        if (currentStepIdx >= pipelineSteps.length) {
+          if (typeof speakText === 'function') {
+            speakText('Сквозной цикл Артели успешно завершен! Все верстаки сдали работу.');
+          }
+          this.updateStationStatus('wp', 'ОПУБЛИКОВАНО ✅', 'Статья активна на tochka-plavleniya.ru');
+          return;
+        }
+
+        const step = pipelineSteps[currentStepIdx];
+        const sender = this.agents.find(a => a.id === step.from);
+        const receiver = this.agents.find(a => a.id === step.to);
+        const senderSt = this.stationConfigs[step.from];
+        const receiverSt = this.stationConfigs[step.to];
+
+        if (!sender || !receiverSt) return;
+
+        // 1. Статус отправителя: В РАБОТЕ
+        this.updateStationStatus(step.from, 'В РАБОТЕ ⚙️', 'Формирование: ' + step.itemName);
+        sender.state = 'working';
+        sender.workTimer = 180;
+
+        // Световая линия конвейера между верстаками
+        this.drawConveyorFlowLine(senderSt.pos, receiverSt.pos);
+
+        setTimeout(() => {
+          // 2. Отправитель берет предмет в лапы и идет навстречу получателю
+          sender.state = 'walking';
+          const itemMesh = this.createHandoverItem(step.itemName);
+          sender.group.add(itemMesh);
+          itemMesh.position.set(0, 1.2, 0.6);
+          sender.heldItemMesh = itemMesh;
+
+          const meetPoint = new THREE.Vector3().lerpVectors(senderSt.pos, receiverSt.pos, 0.65);
+          sender.targetPos.copy(meetPoint);
+
+          if (receiver) {
+            receiver.targetPos.copy(meetPoint.clone().add(new THREE.Vector3(1.2, 0, 1.2)));
+            receiver.state = 'walking';
+          }
+
+          if (typeof speakText === 'function') {
+            speakText(`${sender.name}: ${step.sendSpeech}`);
+          }
+
+          // 3. Ждем прибытия к точке передачи
+          const arrivalCheck = setInterval(() => {
+            const dist = sender.group.position.distanceTo(meetPoint);
+            if (dist < 1.0) {
+              clearInterval(arrivalCheck);
+
+              // 4. ФИЗИЧЕСКАЯ ПЕРЕДАЧА ИЗ ЛАП В ЛАПЫ (Параболический перелет с золотой аурой)
+              this.animateItemTransfer(sender, receiver, itemMesh, () => {
+                // Отправитель сдал задачу
+                this.updateStationStatus(step.from, 'УТВЕРЖДЕНО ✅', 'Передано: ' + step.itemName);
+                sender.state = 'walking';
+                sender.targetPos.copy(sender.homePos);
+
+                // Получатель принял задачу и начинает РЕАЛЬНО РАБОТАТЬ
+                if (receiver) {
+                  this.updateStationStatus(step.to, 'В РАБОТЕ ⚙️', 'Обработка: ' + step.itemName);
+                  receiver.state = 'working';
+                  receiver.workTimer = 220;
+
+                  if (typeof speakText === 'function') {
+                    speakText(`${receiver.name}: ${step.receiveSpeech}`);
+                  }
+                }
+
+                currentStepIdx++;
+                setTimeout(executeStep, 2600);
+              });
+            }
+          }, 200);
+
+        }, 1500);
+      };
+
+      executeStep();
+    }
+
+    animateItemTransfer(sender, receiver, itemMesh, onComplete) {
+      if (!receiver) {
+        if (sender.heldItemMesh) sender.group.remove(sender.heldItemMesh);
+        if (onComplete) onComplete();
+        return;
+      }
+
+      // Открепляем от отправителя и переносим в мировую систему координат
+      sender.group.remove(itemMesh);
+      this.scene.add(itemMesh);
+
+      const startWorld = sender.group.position.clone().add(new THREE.Vector3(0, 1.2, 0.5));
+      const endWorld = receiver.group.position.clone().add(new THREE.Vector3(0, 1.2, 0.5));
+      itemMesh.position.copy(startWorld);
+
+      const duration = 800; // мс
+      const startTime = performance.now();
+
+      const transferLoop = () => {
+        const now = performance.now();
+        const p = Math.min((now - startTime) / duration, 1.0);
+
+        // Параболическая траектория перелета
+        itemMesh.position.lerpVectors(startWorld, endWorld, p);
+        itemMesh.position.y += Math.sin(p * Math.PI) * 1.5;
+        itemMesh.rotation.y += 0.08;
+
+        if (p < 1.0) {
+          requestAnimationFrame(transferLoop);
+        } else {
+          // Предмет приземлился в лапы получателя
+          this.scene.remove(itemMesh);
+          receiver.group.add(itemMesh);
+          itemMesh.position.set(0, 1.2, 0.6);
+          receiver.heldItemMesh = itemMesh;
+
+          // Получатель возвращается к себе на верстак и работает
+          receiver.targetPos.copy(receiver.homePos);
+          receiver.state = 'working';
+
+          // Кивок головы получателя в знак согласия
+          if (receiver.group.headGroup) {
+            receiver.group.headGroup.rotation.x = 0.4;
+            setTimeout(() => {
+              if (receiver.group.headGroup) receiver.group.headGroup.rotation.x = 0;
+            }, 400);
+          }
+
+          setTimeout(() => {
+            if (receiver.heldItemMesh) {
+              receiver.group.remove(receiver.heldItemMesh);
+              receiver.heldItemMesh = null;
+            }
+          }, 3000);
+
+          if (onComplete) onComplete();
+        }
+      };
+
+      transferLoop();
+    }
+
+    // ==========================================
+    // ГЛАВНЫЙ ЦИКЛ ОБНОВЛЕНИЯ И АНИМАЦИИ
+    // ==========================================
     update() {
       if (this.paused) return;
       const delta = this.clock.getDelta();
       const time = this.clock.getElapsedTime();
 
-      // 1. Вращение лопастей мельницы
+      // 1. Мельница вращается
       this.windmills.forEach(w => {
-        w.rotation.z += 0.018 * this.speed;
+        w.rotation.z += 0.015 * this.speed;
       });
 
-      // 2. Колебание деревьев на ветру
-      this.trees.forEach(t => {
-        t.mesh.rotation.z = Math.sin(time * 1.6 + t.seed) * 0.03;
-        t.mesh.rotation.x = Math.cos(time * 1.2 + t.seed) * 0.02;
-      });
-
-      // 3. Анимация дыма кузницы
-      if (this.smokeParticles) {
-        const pos = this.smokeParticles.geometry.attributes.position;
-        for (let i = 0; i < this.smokeData.length; i++) {
-          const d = this.smokeData[i];
-          pos.setX(i, pos.getX(i) + d.vx * this.speed);
-          pos.setY(i, pos.getY(i) + d.vy * this.speed);
-          pos.setZ(i, pos.getZ(i) + d.vz * this.speed);
-
-          if (pos.getY(i) > d.origY + 5.5) {
-            pos.setX(i, this.forgeChimneyPos.x + (Math.random() - 0.5) * 0.3);
-            pos.setY(i, this.forgeChimneyPos.y);
-            pos.setZ(i, this.forgeChimneyPos.z + (Math.random() - 0.5) * 0.3);
-          }
-        }
-        pos.needsUpdate = true;
-      }
-
-      // 4. Мерцание огня кузницы
-      if (this.forgePointLight) {
-        this.forgePointLight.intensity = 1.8 + Math.sin(time * 8.0) * 0.5;
-      }
-
-      // 5. Логика и анимация ходьбы персонажей Артели
+      // 2. Логика состояний: IDLE / WALKING / WORKING
       this.agents.forEach(a => {
         const dist = a.group.position.distanceTo(a.targetPos);
 
-        if (dist > 0.4 && a.state === 'walking') {
-          // Поворачиваем зверя лицом к направлению движения
+        if (dist > 0.35 && a.state === 'walking') {
+          // --- ДВИЖЕНИЕ (WALKING) ---
           const dir = a.targetPos.clone().sub(a.group.position).normalize();
           const targetAngle = Math.atan2(dir.x, dir.z);
-          a.group.rotation.y = THREE.MathUtils.lerp(a.group.rotation.y, targetAngle, 0.15);
+          a.group.rotation.y = THREE.MathUtils.lerp(a.group.rotation.y, targetAngle, 0.2);
 
-          // Движение вперед
           const step = Math.min(a.speed * delta * 2.8 * this.speed, dist);
           a.group.position.addScaledVector(dir, step);
 
-          // Анимация шага лапок
+          // Ритмичный шаг лапок
           a.walkCycle += delta * 12.0 * this.speed;
-          const legSwing = Math.sin(a.walkCycle) * 0.5;
+          const legSwing = Math.sin(a.walkCycle) * 0.55;
           if (a.group.legs) {
             a.group.legs.legFL.rotation.x = legSwing;
             a.group.legs.legBR.rotation.x = legSwing;
             a.group.legs.legFR.rotation.x = -legSwing;
             a.group.legs.legBL.rotation.x = -legSwing;
           }
-          // Покачивание тела
-          a.group.position.y = Math.abs(Math.sin(a.walkCycle)) * 0.18;
-          if (a.group.tailGroup) {
-            a.group.tailGroup.rotation.y = Math.sin(a.walkCycle * 0.8) * 0.3;
+          a.group.position.y = Math.abs(Math.sin(a.walkCycle)) * 0.14;
+
+        } else if (a.state === 'working') {
+          // --- РАБОТА (WORKING): КАЖДЫЙ ЗВЕРЬ ВЫПОЛНЯЕТ РЕАЛЬНОЕ ДЕЙСТВИЕ ---
+          a.group.position.y = 0; // стоит ровно на земле
+
+          // Возвращаем лапки на место
+          if (a.group.legs) {
+            a.group.legs.legFL.rotation.x = 0;
+            a.group.legs.legBR.rotation.x = 0;
+            a.group.legs.legFR.rotation.x = 0;
+            a.group.legs.legBL.rotation.x = 0;
           }
-        } else {
-          if (a.state === 'walking') {
-            a.state = 'working';
-            // Возвращаем лапки в исходное положение
-            if (a.group.legs) {
-              a.group.legs.legFL.rotation.x = 0;
-              a.group.legs.legBR.rotation.x = 0;
-              a.group.legs.legFR.rotation.x = 0;
-              a.group.legs.legBL.rotation.x = 0;
+
+          if (a.id === 'kot') {
+            // Кот: водит паяльником над платой с наклоном корпуса и искрами
+            if (a.group.toolArm) {
+              a.group.toolArm.rotation.x = Math.sin(time * 8.0) * 0.35;
+              a.group.toolArm.rotation.z = Math.cos(time * 6.0) * 0.2;
+            }
+            if (a.group.headGroup) {
+              a.group.headGroup.rotation.x = 0.25; // смотрит на плату
+            }
+            // Вспышки искр
+            if (this.sparksGroup) {
+              this.sparksGroup.material.opacity = (Math.sin(time * 16.0) > 0.2) ? 0.9 : 0;
+            }
+            if (this.forgeLight) {
+              this.forgeLight.intensity = 2.0 + Math.sin(time * 12.0) * 0.8;
+            }
+
+          } else if (a.id === 'bobr') {
+            // Бобёр: пилит бревно ритмичными движениями пилы вперед-назад
+            if (a.group.toolArm) {
+              a.group.toolArm.position.z = 0.4 + Math.sin(time * 7.0) * 0.3;
+              a.group.toolArm.rotation.x = 0.2;
+            }
+            if (a.group.headGroup) {
+              a.group.headGroup.rotation.x = 0.15;
+            }
+
+          } else if (a.id === 'soroka') {
+            // Сорока: ритмично клюет свиток LSI-выдачи на столе
+            if (a.group.headGroup) {
+              a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 8.0)) * 0.4;
+            }
+
+          } else if (a.id === 'lis') {
+            // Лис: водит пером по смете
+            if (a.group.toolArm) {
+              a.group.toolArm.rotation.z = Math.sin(time * 9.0) * 0.3;
+            }
+            if (a.group.headGroup) {
+              a.group.headGroup.rotation.y = Math.sin(time * 4.0) * 0.2;
+            }
+
+          } else if (a.id === 'barsuk') {
+            // Барсук: чертит кривую ликвидуса вверх-вниз по кульману
+            if (a.group.toolArm) {
+              a.group.toolArm.position.y = 1.0 + Math.sin(time * 5.0) * 0.25;
+            }
+
+          } else if (a.id === 'filin') {
+            // Филин: опускает печать [ОТК] со штампом вниз на бумагу
+            if (a.group.toolArm) {
+              a.group.toolArm.position.y = 1.0 - Math.abs(Math.sin(time * 3.5)) * 0.4;
+            }
+
+          } else if (a.id === 'dyatel') {
+            // Дятел: четко и ритмично стучит клювом по мерной линейке
+            if (a.group.headGroup) {
+              a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 12.0)) * 0.4;
+            }
+
+          } else if (a.id === 'bear') {
+            // Бригадир: подносит чашку чая к мордочке
+            if (a.group.toolArm) {
+              a.group.toolArm.position.y = 1.0 + Math.sin(time * 2.0) * 0.2;
             }
           }
-          // Дыхание на месте
-          a.group.position.y = Math.sin(time * 2.5 + a.homePos.x) * 0.05;
-        }
 
-        // Таймер речевого облачка
-        if (a.bubbleTimer > 0) {
-          a.bubbleTimer -= 1 * this.speed;
-          if (a.bubbleTimer <= 0 && a.bubbleSprite) {
-            a.group.remove(a.bubbleSprite);
-            a.bubbleSprite = null;
+        } else {
+          // --- ПОКОЙ (IDLE): ЗВЕРЬ СПОКОЙНО СТОИТ НА МЕСТЕ БЕЗ ДЕРГАНИЙ ---
+          a.state = 'idle';
+          a.group.position.y = 0; // стоит неподвижно на земле
+
+          // Все шарниры в покое
+          if (a.group.legs) {
+            a.group.legs.legFL.rotation.x = 0;
+            a.group.legs.legBR.rotation.x = 0;
+            a.group.legs.legFR.rotation.x = 0;
+            a.group.legs.legBL.rotation.x = 0;
+          }
+          if (a.group.toolArm) {
+            a.group.toolArm.rotation.set(0, 0, 0);
+            a.group.toolArm.position.set(0.48, 1.0, 0.4);
+          }
+          if (a.group.headGroup) {
+            a.group.headGroup.rotation.set(0, 0, 0);
+          }
+          if (a.id === 'kot' && this.sparksGroup) {
+            this.sparksGroup.material.opacity = 0;
           }
         }
       });
@@ -1597,100 +1380,38 @@
 
     resetCamera() {
       if (!this.controls || !this.camera) return;
-      this.camera.position.set(38, 32, 48);
-      this.controls.target.set(0, 2, 0);
+      this.camera.position.set(32, 28, 42);
+      this.controls.target.set(0, 1.5, 0);
       this.controls.update();
     }
 
     setTimeOfDay(timeMode) {
       this.timeOfDay = timeMode;
       if (timeMode === 'sunset') {
-        this.scene.background = new THREE.Color(0xF97316);
-        this.scene.fog.color = new THREE.Color(0xFB923C);
-        this.dirLight.color = new THREE.Color(0xFF8844);
-        this.dirLight.intensity = 1.4;
-        this.hemiLight.color = new THREE.Color(0xFDBA74);
+        this.scene.background = new THREE.Color(0xFB923C);
+        this.scene.fog.color = new THREE.Color(0xFDBA74);
+        this.dirLight.color = new THREE.Color(0xF97316);
+        this.dirLight.intensity = 1.35;
       } else if (timeMode === 'night') {
         this.scene.background = new THREE.Color(0x0F172A);
         this.scene.fog.color = new THREE.Color(0x0F172A);
         this.dirLight.color = new THREE.Color(0x38BDF8);
         this.dirLight.intensity = 0.35;
-        this.hemiLight.color = new THREE.Color(0x1E293B);
       } else {
-        this.scene.background = new THREE.Color(0x87CEEB);
-        this.scene.fog.color = new THREE.Color(0x87CEEB);
-        this.dirLight.color = new THREE.Color(0xFFF4D4);
-        this.dirLight.intensity = 1.25;
-        this.hemiLight.color = new THREE.Color(0xC6E2FF);
+        this.scene.background = new THREE.Color(0x93C5FD);
+        this.scene.fog.color = new THREE.Color(0x93C5FD);
+        this.dirLight.color = new THREE.Color(0xFFF7E6);
+        this.dirLight.intensity = 1.3;
       }
-    }
-
-    /**
-     * Сквозная сценарная миссия Артели (Mission Pipeline)
-     */
-    startMissionPipeline(topicId = 1) {
-      const pipelineSequence = [
-        { from: 'soroka', to: 'bobr', item: '📜 LSI-ядро темы #' + topicId, dialogue: 'Бобёр, держи LSI-хвосты и интент новичка!' },
-        { from: 'bobr', to: 'kot', item: '🪵 Бриф ГОСТ Р МЭК #' + topicId, dialogue: 'Кот, плотина стандартов готова! Пиши триаду!' },
-        { from: 'kot', to: 'barsuk', item: '📝 Черновик статьи #' + topicId, dialogue: 'Барсук, текст готов! Нужен точный термопрофиль ПОС-61.' },
-        { from: 'barsuk', to: 'filin', item: '📐 SVG-схема + Текст #' + topicId, dialogue: 'Филин, держи векторный ликвидус 183°C. Проверь на слоп!' },
-        { from: 'filin', to: 'dyatel', item: '🔍 Паспорт v1.1 [ОТК OK]', dialogue: 'Дятел, штамп [ОТК] стоит, слопа 0. Запускай скоринг!' },
-        { from: 'dyatel', to: 'wp', item: '📦 Релиз 94/100 -> WP', dialogue: 'Score 94 балла! Пакет доставлен в шлюз WordPress!' }
-      ];
-
-      let currentStep = 0;
-
-      const runStep = () => {
-        if (currentStep >= pipelineSequence.length) {
-          if (typeof speakText === 'function') {
-            speakText('Сквозной цикл Артели успешно завершен! Статья готова к публикации.');
-          }
-          return;
-        }
-
-        const step = pipelineSequence[currentStep];
-        const sender = this.agents.find(a => a.id === step.from);
-        const receiverStation = this.stationMeshes[step.to];
-
-        if (sender && receiverStation) {
-          sender.holdingItem = step.item;
-          sender.targetPos.copy(receiverStation.position).add(new THREE.Vector3(2, 0, 2));
-          sender.state = 'walking';
-          this.updateAgentSpeechBubble(sender, step.dialogue);
-
-          if (typeof speakText === 'function') {
-            speakText(`${sender.name}: ${step.dialogue}`);
-          }
-
-          const checkArrival = setInterval(() => {
-            const dist = sender.group.position.distanceTo(sender.targetPos);
-            if (dist < 1.2) {
-              clearInterval(checkArrival);
-              sender.state = 'working';
-              setTimeout(() => {
-                sender.targetPos.copy(sender.homePos);
-                sender.state = 'walking';
-                currentStep++;
-                setTimeout(runStep, 1500);
-              }, 2000);
-            }
-          }, 300);
-        }
-      };
-
-      runStep();
     }
   }
 
-  // Экспортируем глобально
   window.Farm3DEngine = Farm3DEngine;
 
-  // Инициализация при загрузке документа
   document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('farm3DContainer');
     if (container && typeof THREE !== 'undefined') {
       window.farm3D = new Farm3DEngine('farm3DContainer');
-      // Сохраняем совместимость с window.aiTown
       window.aiTown = window.farm3D;
     }
   });
