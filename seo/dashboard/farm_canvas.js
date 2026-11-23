@@ -579,9 +579,10 @@ class AITownEngine {
   }
 }
 
-// Глобальная инициализация движка
+// Глобальная инициализация 2D-движка
 document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('farmInteractiveCanvas')) {
-    window.aiTown = new AITownEngine('farmInteractiveCanvas');
+    window.aiTown2D = new AITownEngine('farmInteractiveCanvas');
+    if (!window.aiTown) window.aiTown = window.aiTown2D;
   }
 });

@@ -20,6 +20,7 @@ package-lock.json
 .vscode/
 scratch/
 *.xml
+!mujoco/**/*.xml
 *.pdf
 tochka-plavleniya.ru/
 *.sql

@@ -2941,20 +2941,32 @@ async function runFullPipelineForTopic(tid) {
 }
 
 function switchFarmView(mode) {
+  const container3D = document.getElementById('farm3DContainer');
   const canvasContainer = document.getElementById('farmCanvasContainer');
   const gridContainer = document.getElementById('craftsmenGrid');
+  const btn3D = document.getElementById('btnView3D');
   const btnCanvas = document.getElementById('btnViewCanvas');
   const btnGrid = document.getElementById('btnViewGrid');
 
-  if (mode === 'canvas') {
-    if (canvasContainer) canvasContainer.style.display = 'block';
-    if (btnCanvas) btnCanvas.classList.add('btn--primary');
-    if (btnGrid) btnGrid.classList.remove('btn--primary');
-    if (window.aiTown) window.aiTown.resize();
-  } else {
+  [btn3D, btnCanvas, btnGrid].forEach(b => b && b.classList.remove('btn--primary'));
+
+  if (mode === '3d') {
+    if (container3D) container3D.style.display = 'block';
     if (canvasContainer) canvasContainer.style.display = 'none';
+    if (gridContainer) gridContainer.style.display = 'grid';
+    if (btn3D) btn3D.classList.add('btn--primary');
+    if (window.farm3D) window.farm3D.resize();
+  } else if (mode === 'canvas') {
+    if (container3D) container3D.style.display = 'none';
+    if (canvasContainer) canvasContainer.style.display = 'block';
+    if (gridContainer) gridContainer.style.display = 'grid';
+    if (btnCanvas) btnCanvas.classList.add('btn--primary');
+    if (window.aiTown2D) window.aiTown2D.resize();
+  } else {
+    if (container3D) container3D.style.display = 'none';
+    if (canvasContainer) canvasContainer.style.display = 'none';
+    if (gridContainer) gridContainer.style.display = 'grid';
     if (btnGrid) btnGrid.classList.add('btn--primary');
-    if (btnCanvas) btnCanvas.classList.remove('btn--primary');
   }
 }
 

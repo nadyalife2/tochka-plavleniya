@@ -1,0 +1,154 @@
+<mujoco model="tochka_plavleniya_farm_3d">
+  <!--
+    3D MuJoCo Scene: Инженерная Ферма-Городок Артели Мастеров (tochka-plavleniya.ru)
+    Стандарты MuJoCo XML / MJCF:
+    - compiler: angle="degree", coordinate="local"
+    - asset: текстуры, материалы, свет
+    - worldbody: земля, пашня, река, деревья, мастерские, сочлененные тела зверей-мастеров
+  -->
+  <compiler angle="degree" coordinate="local" inertiafromgeom="true"/>
+  <option timestep="0.005" gravity="0 0 -9.81" integrator="RK4"/>
+
+  <visual>
+    <headlight ambient="0.4 0.4 0.4" diffuse="0.8 0.8 0.8" specular="0.2 0.2 0.2"/>
+    <rgba fog="0.53 0.81 0.92 1"/>
+    <map fogstart="40" fogend="160"/>
+    <quality shadowsize="2048"/>
+  </visual>
+
+  <asset>
+    <!-- Текстуры и процедурные материалы -->
+    <texture type="skybox" builtin="gradient" rgb1="0.53 0.81 0.92" rgb2="0.99 0.95 0.8" width="512" height="512"/>
+    <texture name="grass_tex" type="2d" builtin="flat" rgb1="0.30 0.55 0.28" rgb2="0.25 0.48 0.24" width="128" height="128"/>
+    <texture name="soil_tex" type="2d" builtin="flat" rgb1="0.29 0.18 0.11" rgb2="0.22 0.13 0.08" width="128" height="128"/>
+    <texture name="wood_tex" type="2d" builtin="flat" rgb1="0.48 0.31 0.18" rgb2="0.38 0.23 0.13" width="128" height="128"/>
+
+    <material name="mat_grass" texture="grass_tex" reflectance="0.05" roughness="0.85"/>
+    <material name="mat_soil" texture="soil_tex" reflectance="0.02" roughness="0.95"/>
+    <material name="mat_wood" texture="wood_tex" reflectance="0.1" roughness="0.8"/>
+    <material name="mat_water" rgba="0.13 0.60 0.87 0.85" reflectance="0.4" roughness="0.1"/>
+    <material name="mat_stone" rgba="0.55 0.55 0.58 1" reflectance="0.1" roughness="0.9"/>
+    <material name="mat_roof" rgba="0.62 0.24 0.13 1" reflectance="0.1" roughness="0.7"/>
+
+    <!-- Цвета шерсти мастеров Артели -->
+    <material name="mat_bear" rgba="0.55 0.36 0.21 1" reflectance="0.1"/>
+    <material name="mat_soroka" rgba="0.12 0.16 0.23 1" reflectance="0.2"/>
+    <material name="mat_bobr" rgba="0.47 0.21 0.06 1" reflectance="0.1"/>
+    <material name="mat_kot" rgba="0.92 0.35 0.05 1" reflectance="0.15"/>
+    <material name="mat_lis" rgba="0.98 0.45 0.09 1" reflectance="0.2"/>
+    <material name="mat_barsuk" rgba="0.29 0.33 0.39 1" reflectance="0.1"/>
+    <material name="mat_filin" rgba="0.43 0.16 0.85 1" reflectance="0.2"/>
+    <material name="mat_dyatel" rgba="0.75 0.09 0.36 1" reflectance="0.15"/>
+    <material name="mat_gold" rgba="1.0 0.78 0.0 1" reflectance="0.6" specular="0.8"/>
+  </asset>
+
+  <worldbody>
+    <!-- Камеры обзора -->
+    <camera name="farm_overview" pos="36 32 46" xyaxes="-0.707 0.707 0 -0.408 -0.408 0.816"/>
+    <camera name="forge_close" pos="-12 6 14" xyaxes="-0.8 0.6 0 -0.3 -0.4 0.86"/>
+
+    <!-- Солнечный свет -->
+    <light name="sunlight" directional="true" pos="35 45 30" dir="-0.5 -0.6 -0.6" diffuse="1.2 1.15 0.95" specular="0.3 0.3 0.3" castshadow="true"/>
+    <light name="forge_glow" pos="-18 3.5 8" dir="0 0 -1" diffuse="1.8 0.7 0.1" specular="0.4 0.2 0.0"/>
+
+    <!-- 1. Основной ландшафт лугов (Ground Plane) -->
+    <geom name="ground" type="plane" size="55 55 1" material="mat_grass" condim="3"/>
+
+    <!-- 2. Вспаханное поле / Пашня Бобра (Plowed Farmland with Furrows) -->
+    <body name="farmland_field" pos="-20 0.15 -16">
+      <geom name="field_soil" type="box" size="14 9 0.15" material="mat_soil"/>
+      <!-- Борозды вспаханной земли -->
+      <geom name="furrow_1" type="box" size="13 0.5 0.1" pos="0 -6 0.15" material="mat_soil"/>
+      <geom name="furrow_2" type="box" size="13 0.5 0.1" pos="0 -3 0.15" material="mat_soil"/>
+      <geom name="furrow_3" type="box" size="13 0.5 0.1" pos="0 0 0.15" material="mat_soil"/>
+      <geom name="furrow_4" type="box" size="13 0.5 0.1" pos="0 3 0.15" material="mat_soil"/>
+      <geom name="furrow_5" type="box" size="13 0.5 0.1" pos="0 6 0.15" material="mat_soil"/>
+    </body>
+
+    <!-- 3. Река и пруд у лесопилки Бобра -->
+    <body name="mill_pond" pos="-5 0.08 14">
+      <geom name="pond_water" type="cylinder" size="5.5 0.08" material="mat_water"/>
+    </body>
+
+    <!-- 4. Деревья на ферме (Ствол + Сферическая крона) -->
+    <body name="tree_oak_1" pos="-8 0 -4">
+      <geom name="trunk_oak_1" type="cylinder" size="0.6 1.8" pos="0 0 1.8" material="mat_wood"/>
+      <geom name="foliage_oak_1" type="sphere" size="2.6" pos="0 0 4.5" material="mat_grass"/>
+    </body>
+    <body name="tree_oak_2" pos="8 0 -6">
+      <geom name="trunk_oak_2" type="cylinder" size="0.55 1.7" pos="0 0 1.7" material="mat_wood"/>
+      <geom name="foliage_oak_2" type="sphere" size="2.4" pos="0 0 4.2" material="mat_grass"/>
+    </body>
+    <body name="tree_pine_1" pos="-32 0 -28">
+      <geom name="trunk_pine_1" type="cylinder" size="0.35 1.8" pos="0 0 1.8" material="mat_wood"/>
+      <geom name="foliage_pine_1" type="cone" size="2.4 2.8" pos="0 0 4.2" material="mat_grass"/>
+    </body>
+    <body name="tree_apple_1" pos="24 0 14">
+      <geom name="trunk_apple_1" type="cylinder" size="0.35 1.4" pos="0 0 1.4" material="mat_wood"/>
+      <geom name="foliage_apple_1" type="sphere" size="2.2" pos="0 0 3.6" material="mat_grass"/>
+    </body>
+
+    <!-- 5. Постройки и Верстаки Мастеров -->
+    <!-- Кузница Кота -->
+    <body name="station_forge" pos="-18 0 8">
+      <geom name="forge_walls" type="box" size="2.9 2.5 1.6" pos="0 0 1.6" material="mat_stone"/>
+      <geom name="forge_roof" type="box" size="3.1 2.7 0.3" pos="0 0 3.4" material="mat_roof"/>
+      <geom name="forge_chimney" type="box" size="0.4 0.4 1.8" pos="1.8 1.2 4.2" material="mat_roof"/>
+    </body>
+
+    <!-- Мельница Сороки -->
+    <body name="station_windmill" pos="-16 0 -22">
+      <geom name="windmill_tower" type="cylinder" size="2.4 3.8" pos="0 0 3.8" material="mat_stone"/>
+      <geom name="windmill_roof" type="cone" size="2.8 2.0" pos="0 0 8.6" material="mat_wood"/>
+    </body>
+
+    <!-- Дозорная вышка Филина -->
+    <body name="station_watchtower" pos="16 0 -14">
+      <geom name="tower_plat" type="box" size="2.1 2.1 0.2" pos="0 0 9.5" material="mat_wood"/>
+      <geom name="tower_roof" type="cone" size="2.4 1.8" pos="0 0 11.2" material="mat_roof"/>
+    </body>
+
+    <!-- Беседка Бригадира -->
+    <body name="station_gazebo" pos="0 0 0">
+      <geom name="gazebo_table" type="cylinder" size="2.0 0.2" pos="0 0 1.0" material="mat_wood"/>
+      <geom name="gazebo_samovar" type="cylinder" size="0.3 0.4" pos="0 0 1.5" material="mat_gold"/>
+    </body>
+
+    <!-- 6. Сочлененные тела зверей-мастеров (Articulated Animals) -->
+    <!-- Кот-Паяльщик -->
+    <body name="agent_kot" pos="-16 0 7">
+      <joint name="kot_slide_x" type="slide" axis="1 0 0" damping="0.5"/>
+      <joint name="kot_slide_y" type="slide" axis="0 1 0" damping="0.5"/>
+      <joint name="kot_rot_z" type="hinge" axis="0 0 1" damping="0.2"/>
+      <geom name="kot_body" type="box" size="0.6 0.7 0.55" pos="0 0 0.8" material="mat_kot" mass="5.0"/>
+      <geom name="kot_head" type="sphere" size="0.45" pos="0 0.4 1.4" material="mat_kot" mass="1.5"/>
+    </body>
+
+    <!-- Медведь-Бригадир -->
+    <body name="agent_bear" pos="0 0 -1.5">
+      <joint name="bear_slide_x" type="slide" axis="1 0 0" damping="0.8"/>
+      <joint name="bear_slide_y" type="slide" axis="0 1 0" damping="0.8"/>
+      <joint name="bear_rot_z" type="hinge" axis="0 0 1" damping="0.3"/>
+      <geom name="bear_body" type="box" size="0.8 0.9 0.75" pos="0 0 1.1" material="mat_bear" mass="12.0"/>
+      <geom name="bear_head" type="sphere" size="0.6" pos="0 0.5 1.8" material="mat_bear" mass="3.0"/>
+    </body>
+
+    <!-- Бобёр-Конструктор -->
+    <body name="agent_bobr" pos="-20 0 -4">
+      <joint name="bobr_slide_x" type="slide" axis="1 0 0" damping="0.6"/>
+      <joint name="bobr_slide_y" type="slide" axis="0 1 0" damping="0.6"/>
+      <joint name="bobr_rot_z" type="hinge" axis="0 0 1" damping="0.2"/>
+      <geom name="bobr_body" type="box" size="0.6 0.75 0.55" pos="0 0 0.8" material="mat_bobr" mass="6.0"/>
+      <geom name="bobr_head" type="sphere" size="0.45" pos="0 0.4 1.4" material="mat_bobr" mass="1.8"/>
+    </body>
+
+    <!-- Сорока-Разведчица -->
+    <body name="agent_soroka" pos="-15 0 -18">
+      <joint name="soroka_slide_x" type="slide" axis="1 0 0" damping="0.4"/>
+      <joint name="soroka_slide_y" type="slide" axis="0 1 0" damping="0.4"/>
+      <joint name="soroka_rot_z" type="hinge" axis="0 0 1" damping="0.1"/>
+      <geom name="soroka_body" type="box" size="0.45 0.55 0.45" pos="0 0 0.7" material="mat_soroka" mass="2.5"/>
+      <geom name="soroka_head" type="sphere" size="0.35" pos="0 0.3 1.2" material="mat_soroka" mass="0.8"/>
+    </body>
+  </worldbody>
+</mujoco>
