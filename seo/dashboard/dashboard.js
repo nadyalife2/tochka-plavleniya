@@ -2950,11 +2950,30 @@ function switchFarmView(mode) {
     if (canvasContainer) canvasContainer.style.display = 'block';
     if (btnCanvas) btnCanvas.classList.add('btn--primary');
     if (btnGrid) btnGrid.classList.remove('btn--primary');
-    if (window.farmCanvas) window.farmCanvas.resize();
+    if (window.aiTown) window.aiTown.resize();
   } else {
     if (canvasContainer) canvasContainer.style.display = 'none';
     if (btnGrid) btnGrid.classList.add('btn--primary');
     if (btnCanvas) btnCanvas.classList.remove('btn--primary');
+  }
+}
+
+function toggleTownPause() {
+  if (!window.aiTown) return;
+  const isPaused = window.aiTown.togglePause();
+  const btn = document.getElementById('btnTownPause');
+  if (btn) {
+    btn.innerText = isPaused ? '▶ Старт' : '⏸ Пауза';
+    btn.style.background = isPaused ? '#FFC700' : '#27272A';
+    btn.style.color = isPaused ? '#000' : '#FFF';
+  }
+}
+
+function promptMissionRun() {
+  const tid = prompt('Введите ID темы для запуска сюжетной миссии в Городке (Сорока -> Бобёр -> Кот -> Барсук -> Филин -> Дятел -> WP):', '1');
+  if (!tid) return;
+  if (window.aiTown) {
+    window.aiTown.startMissionPipeline(parseInt(tid, 10) || 1);
   }
 }
 

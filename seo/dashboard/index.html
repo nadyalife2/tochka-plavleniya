@@ -594,24 +594,32 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:10px;">
       <div style="display:flex;gap:6px;">
         <button class="btn btn--sm btn--primary" id="btnViewCanvas" type="button" onclick="switchFarmView('canvas')" style="display:inline-flex;align-items:center;gap:6px;">
-          <span>🗺️ Живая Карта-Ферма (Интерактивная Схема)</span>
+          <span>🎮 Инженерный Городок Артели (AI Town 2D)</span>
         </button>
         <button class="btn btn--sm" id="btnViewGrid" type="button" onclick="switchFarmView('grid')" style="display:inline-flex;align-items:center;gap:6px;">
           <span>📋 Сетка Верстаков</span>
         </button>
       </div>
-      <div style="display:flex;gap:8px;">
-        <button class="btn btn--xs" type="button" onclick="window.farmCanvas && window.farmCanvas.simulateFullFlow()" style="background:#27272A;color:#FFC700;border:1px solid #FFC700;cursor:pointer;">
-          ⚡ Запустить визуальный импульс сквозного цикла
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn--xs btn--primary" type="button" onclick="promptMissionRun()" style="cursor:pointer;">
+          🚀 Запустить миссию статьи (AI Town Flow)
         </button>
+        <button class="btn btn--xs" type="button" onclick="toggleTownPause()" id="btnTownPause" style="background:#27272A;color:#FFF;border:1px solid #52525B;cursor:pointer;">
+          ⏸ Пауза
+        </button>
+        <select onchange="window.aiTown && window.aiTown.setSpeed(parseFloat(this.value))" style="background:#27272A;color:#FFC700;border:1px solid #52525B;font-size:11px;padding:2px 6px;border-radius:4px;cursor:pointer;">
+          <option value="1.0">Скорость: 1x</option>
+          <option value="2.0">Скорость: 2x</option>
+          <option value="3.5">Скорость: 3.5x</option>
+        </select>
       </div>
     </div>
 
-    <!-- Интерактивный Холст: Живая Ферма Зверей на Печатной Плате -->
-    <div id="farmCanvasContainer" style="background:#0F0F13;border:2px solid #27272A;border-radius:8px;overflow:hidden;margin-bottom:20px;box-shadow:inset 0 2px 10px rgba(0,0,0,0.5);position:relative;">
-      <canvas id="farmInteractiveCanvas" style="display:block;width:100%;height:420px;"></canvas>
-      <div style="position:absolute;bottom:10px;left:14px;font-size:10px;font-family:monospace;color:#71717A;pointer-events:none;">
-        PCB BUS: 8 NODES · DATA STREAM 60FPS · КЛИКНИТЕ НА ЛЮБОГО ЗВЕРЯ ДЛЯ ВЫЗОВА
+    <!-- Интерактивный Холст: Инженерный Городок Артели (AI Town) -->
+    <div id="farmCanvasContainer" style="background:#18181D;border:2px solid #3F3F46;border-radius:8px;overflow:hidden;margin-bottom:20px;box-shadow:inset 0 2px 14px rgba(0,0,0,0.6);position:relative;">
+      <canvas id="farmInteractiveCanvas" style="display:block;width:100%;height:540px;"></canvas>
+      <div style="position:absolute;bottom:10px;right:14px;font-size:10px;font-family:monospace;color:#A1A1AA;background:rgba(9,9,11,0.85);padding:4px 8px;border-radius:4px;pointer-events:none;">
+        🎮 AI TOWN ENGINE: КЛИКНИТЕ НА ЗВЕРЯ ДЛЯ ДИАЛОГА ИЛИ НА ПОЛ ДЛЯ ПЕРЕМЕЩЕНИЯ
       </div>
     </div>
 
