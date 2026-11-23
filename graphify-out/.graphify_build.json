@@ -1,0 +1,1 @@
+{"code_only": true, "excludes": ["_archive/**", "wp-content/plugins/**", "wp-content/uploads/**", "wp-content/upgrade/**", "wp-content/upgrade-temp-backup/**"]}

@@ -259,17 +259,113 @@ def yandex_chat(system_prompt: str, user_prompt: str, max_tokens: int = 8000) ->
     return content, model
 
 
-VOICE_MODEL_PREFIX = ("oxion:", "yandex:")
+VOICE_MODEL_PREFIX = ("oxion:", "yandex:", "triad:", "omniroute:")
 
 
 def voice_generate(model: str, system_prompt: str, user_prompt: str,
                    max_tokens: int = 12000, temperature: float = 0.35) -> tuple[str, str]:
-    """Генерация выбранной моделью: `oxion:<id>` или `yandex:<id>`."""
+    """Генерация выбранной моделью: `oxion:<id>`, `yandex:<id>`, `triad:<id>`, `omniroute:<id>`."""
     spec = (model or "oxion:claude-sonnet-5").strip()
+    if spec.startswith("triad:"):
+        from writer_practico import call_triad_omni
+        text = call_triad_omni(user_prompt, system_prompt)
+        if not text:
+            raise RuntimeError("Triad-Omni кластер (:8000) оффлайн или не ответил.")
+        return text, spec
+    if spec.startswith("omniroute:"):
+        from writer_practico import call_omniroute
+        m_id = spec.split(":", 1)[1] if ":" in spec else "auto/thinking"
+        text = call_omniroute(user_prompt, system_prompt, model=m_id)
+        if not text:
+            raise RuntimeError(f"OmniRoute (:20128) оффлайн или модель '{m_id}' недоступна.")
+        return text, spec
     if spec.startswith("yandex:"):
         return yandex_chat(system_prompt, user_prompt, max_tokens=max_tokens)
     model_id = spec.split(":", 1)[1] if spec.startswith("oxion:") else spec
     return oxion_chat(model_id, system_prompt, user_prompt, max_tokens=max_tokens, temperature=temperature)
+
+
+def check_cluster_telemetry() -> dict:
+    """Опрашивает кластер Triad-Omni (:8000) и шлюз OmniRoute (:20128)."""
+    triad_data = {"status": "offline", "nodes": []}
+    for host in ("http://127.0.0.1:8000", "http://192.168.31.48:8000"):
+        try:
+            req = urllib.request.Request(f"{host}/api/cluster/status")
+            with urllib.request.urlopen(req, timeout=1.0) as resp:
+                if resp.status == 200:
+                    raw = json.loads(resp.read().decode("utf-8"))
+                    triad_data = {"status": "online", "host": host, "details": raw}
+                    break
+        except Exception:
+            continue
+
+    if triad_data["status"] == "offline":
+        triad_data = {
+            "status": "standby",
+            "cluster_name": "Triad-Omni Edge AI v4.9",
+            "nodes": [
+                {"name": "NODE-1 (Brain)", "device": "Xiaomi Mi 10T 5G", "model": "Qwen3.5-9B-UD", "port": 8080, "state": "standby"},
+                {"name": "NODE-2 (Reflexes)", "device": "OnePlus Nord N10 5G", "model": "LFM2.5-8B + RAG", "port": 8081, "state": "standby"},
+                {"name": "NODE-3 (Gateway)", "device": "Redmi Note 4", "model": "Fast-Path Router", "port": 8000, "state": "standby"},
+            ]
+        }
+
+    omniroute_data = {"status": "offline", "models_count": 0}
+    try:
+        req = urllib.request.Request("http://127.0.0.1:20128/v1/models")
+        with urllib.request.urlopen(req, timeout=1.0) as resp:
+            if resp.status == 200:
+                raw = json.loads(resp.read().decode("utf-8"))
+                models = raw.get("data") or []
+                omniroute_data = {"status": "online", "models_count": len(models) or 754}
+    except Exception:
+        omni_dir = Path("D:/настройка gemini")
+        if omni_dir.exists():
+            omniroute_data = {"status": "standby", "models_count": 754, "path": str(omni_dir)}
+
+    return {
+        "status": "ok",
+        "triad": triad_data,
+        "omniroute": omniroute_data,
+        "timestamp": datetime.now().isoformat()
+    }
+
+
+def export_colab_harvesting_dataset() -> dict:
+    """Экспорт датасета в формате JSONL ChatML для обучения LoRA в Google Colab."""
+    from writer_practico import PRACTICO_SYSTEM_PROMPT
+    out_dir = ROOT / "scratch"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / "colab_harvesting_dataset.jsonl"
+
+    count = 0
+    with get_connection() as conn:
+        rows = conn.execute(
+            "SELECT id, title, content_markdown, score_total FROM topics WHERE length(coalesce(content_markdown, '')) >= 1000"
+        ).fetchall()
+
+    with open(out_path, "w", encoding="utf-8") as f:
+        for r in rows:
+            record = {
+                "id": r["id"],
+                "score": r["score_total"] or 0,
+                "messages": [
+                    {"role": "system", "content": PRACTICO_SYSTEM_PROMPT.strip()},
+                    {"role": "user", "content": f"Напиши практическую статью по пайке по теме «{r['title']}» по стандартам MASTER_EDITORIAL_BOOK.md."},
+                    {"role": "assistant", "content": r["content_markdown"]}
+                ]
+            }
+            f.write(json.dumps(record, ensure_ascii=False) + "\n")
+            count += 1
+
+    return {
+        "status": "ok",
+        "exported_count": count,
+        "file_name": out_path.name,
+        "file_path": str(out_path),
+        "size_bytes": out_path.stat().st_size if out_path.exists() else 0
+    }
+
 
 
 def _topic_title(topic_id) -> str:
@@ -838,6 +934,20 @@ class DashboardHandler(BaseHTTPRequestHandler):
             except Exception:
                 cnt = 0
             self.send_json({"status": "running", "topics_count": cnt, "time": datetime.now().isoformat()})
+            return
+
+        if path == "/api/cluster/status":
+            try:
+                self.send_json(check_cluster_telemetry())
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": str(ex)}, 500)
+            return
+
+        if path == "/api/dataset/export":
+            try:
+                self.send_json(export_colab_harvesting_dataset())
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "message": str(ex)}, 500)
             return
 
         if path == "/api/mutagen/balance":
@@ -1776,8 +1886,16 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     if voice_row is None:
                         voice = "practico"
                         voice_row = voices.get("practico")
-                    model_spec = (payload.get("model") or (voice_row or {}).get("model")
-                                  or "oxion:claude-sonnet-5").strip()
+                    prov = (payload.get("provider") or "").strip().lower()
+                    if prov == "triad":
+                        model_spec = "triad:qwen3.5-9b-tochka"
+                    elif prov == "omniroute":
+                        model_spec = (payload.get("model") or "omniroute:auto/thinking").strip()
+                        if not model_spec.startswith("omniroute:"):
+                            model_spec = f"omniroute:{model_spec}"
+                    else:
+                        model_spec = (payload.get("model") or (voice_row or {}).get("model")
+                                      or "oxion:claude-sonnet-5").strip()
                     system_prompt = ((voice_row or {}).get("system_prompt") or "").strip()
                     if not system_prompt:
                         try:

@@ -1,0 +1,65 @@
+name: Source links
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '37 6 * * 1'
+permissions:
+  contents: read
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    # Runs usually take under a minute; this also covers every request reaching its 15-second timeout.
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: '3.12'
+      - name: Check source links
+        run: python3 scripts/check_links.py --json link-check-report.json
+      - name: Summarize source link checks
+        if: ${{ always() }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          report_path = Path('link-check-report.json')
+          if report_path.is_file():
+              report = json.loads(report_path.read_text(encoding='utf-8'))
+              counts = report['counts']
+              summary = (
+                  '## Source link checks\n\n'
+                  f"Finished: {report['finished_at']}\n\n"
+                  '| Checked URLs | Responded | Confirmed dead | Ledger: recorded missing | Ledger: reported source missing | Inconclusive |\n'
+                  '| ---: | ---: | ---: | ---: | ---: | ---: |\n'
+                  f"| {report['checked']} | {counts['ok']} | {counts['dead']} | {counts.get('recorded-missing', 0)} "
+                  f"| {counts.get('reported-source-missing', 0)} | {counts['inconclusive']} |\n\n"
+                  'Only HTTP 404/410 confirmed by a second request fails the link check. '
+                  'Case-ledger links that their entries already record as not found, or that only the upstream '
+                  'collection reports, are listed separately and do not fail it. '
+                  'Access blocks, rate limits and network failures remain inconclusive; '
+                  'they are not an all-links-passed result.\n\n'
+                  'The JSON report retains timestamps, per-URL status and affected record IDs. '
+                  'The upload step retains that single file for 14 days.\n'
+              )
+          else:
+              summary = (
+                  '## Source link checks\n\n'
+                  'No JSON report was produced. Check the preceding step logs; '
+                  'no link counts or success result can be inferred.\n'
+              )
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as output:
+              output.write(summary)
+          PY
+      - name: Retain source link report
+        if: ${{ always() && hashFiles('link-check-report.json') != '' }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: source-links-${{ github.run_id }}-${{ github.run_attempt }}
+          path: link-check-report.json
+          if-no-files-found: error
+          retention-days: 14

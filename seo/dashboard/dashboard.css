@@ -1110,3 +1110,166 @@
       --border-hairline: #000;
     }
   }
+
+  /* ==========================================================================
+     ИНЖЕНЕРНАЯ АРТЕЛЬ МАСТЕРОВ & КЛАСТЕР ТЕЛЕМЕТРИИ (TRIAD-OMNI + OMNIROUTE)
+     ========================================================================== */
+  .cluster-telemetry-bar {
+    background: var(--paper, #fff);
+    border: 1.5px solid var(--border);
+    padding: 12px 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+  }
+  .cluster-telemetry__nodes {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .telemetry-node-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 8px;
+    border: 1px solid var(--border);
+    background: #fbfbfb;
+    border-radius: 4px;
+  }
+  .telemetry-node-badge.online {
+    border-color: #1A7F4C;
+    background: #E8F5E9;
+    color: #1A7F4C;
+  }
+  .telemetry-node-badge.standby {
+    border-color: #B45309;
+    background: #FEF3C7;
+    color: #92400E;
+  }
+  .telemetry-node-badge .pulse-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: pulseBeacon 2s infinite ease-in-out;
+  }
+
+  @keyframes pulseBeacon {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.2); }
+  }
+
+  /* Верстаки Артели */
+  .craftsmen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .craftsman-card {
+    background: var(--paper, #fff);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.08);
+  }
+  .craftsman-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 4px 4px 0 rgba(0,0,0,0.12);
+  }
+  .craftsman-card.active-work {
+    border-color: var(--accent, #FFC700);
+    background: #FFFDF5;
+  }
+  .craftsman-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .craftsman-avatar-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .craftsman-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    background: #f7f7f8;
+    font-size: 20px;
+  }
+  .craftsman-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.25;
+  }
+  .craftsman-role {
+    font-family: var(--font-mono, monospace);
+    font-size: 11px;
+    color: var(--muted, #666);
+    font-weight: 600;
+  }
+  .craftsman-desc {
+    font-size: 12px;
+    line-height: 1.5;
+    color: var(--text, #111);
+    margin-bottom: 12px;
+    flex-grow: 1;
+  }
+  .craftsman-controls {
+    border-top: 1px dashed var(--border-soft, #ddd);
+    padding-top: 10px;
+    margin-top: auto;
+  }
+  .craftsman-model-select {
+    width: 100%;
+    padding: 5px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    margin-bottom: 8px;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  /* Паяльный дымок анимация */
+  .solder-smoke {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+  .solder-smoke path {
+    stroke-dasharray: 40;
+    stroke-dashoffset: 40;
+    animation: curlSmoke 3s infinite linear;
+  }
+  @keyframes curlSmoke {
+    0% { stroke-dashoffset: 40; opacity: 0; transform: translateY(0) scaleX(1); }
+    50% { opacity: 0.9; transform: translateY(-4px) scaleX(1.1); }
+    100% { stroke-dashoffset: 0; opacity: 0; transform: translateY(-10px) scaleX(0.9); }
+  }
+

@@ -140,11 +140,10 @@ PRACTICO2_SYSTEM_PROMPT = """Ты — автор проекта «Точка П�
    - Раздел «## Источники и нормативные документы» — 2–4 реальных ГОСТ / IPC / TDS.
    - В самом конце служебный блок `### FAQ:` — 4–6 практических вопросов, ответы прямые в 1–3 предложения.
    - Никаких дежурных вопросов читателю в конце («А что думаете Вы?»). Статья заканчивается там, где решена задача.
-"""
 
-8. ОБЪЁМ: строго 5 500 – 7 000 знаков с пробелами.
+7. ОБЪЁМ: строго 5 500 – 7 000 знаков с пробелами.
 
-9. СТОП-ФРАЗЫ (запрещены):
+8. СТОП-ФРАЗЫ (запрещены):
    - «идеальный результат», «абсолютно безопасно», «проще простого», «справится любой», «в заключение», «подводя итоги», «стоит отметить».
    - Вопросов читателю в конце не задавать.
 """
@@ -251,6 +250,72 @@ def call_yandex_ai_studio(prompt: str, system_prompt: str) -> str | None:
         return text or None
     except Exception:
         return None
+
+
+def call_triad_omni(prompt: str, system_prompt: str, base_url: str = "http://127.0.0.1:8000") -> str | None:
+    """Локальный кластер Triad-Omni Edge AI (Node-1 Mi 10T + Node-2 Nord N10).
+
+    Эндпоинт OpenAI-совместимый: /v1/chat/completions на шлюзе fast-path router.
+    0 рублей затрат, 100% приватность, без VPN.
+    """
+    endpoints = [base_url, "http://192.168.31.48:8000"]
+    body = {
+        "model": "qwen3.5-9b-tochka",
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.35,
+        "max_tokens": 4096,
+    }
+    data_bytes = json.dumps(body, ensure_ascii=False).encode("utf-8")
+    for ep in endpoints:
+        try:
+            req = urllib.request.Request(
+                f"{ep.rstrip('/')}/v1/chat/completions",
+                data=data_bytes,
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+            content = data["choices"][0]["message"]["content"]
+            content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+            if len(content) > 300:
+                return content
+        except Exception:
+            continue
+    return None
+
+
+def call_omniroute(prompt: str, system_prompt: str, model: str = "auto/thinking", base_url: str = "http://127.0.0.1:20128") -> str | None:
+    """Шлюз OmniRoute (D:\\настройка gemini, порт 20128). 750+ моделей.
+
+    Обеспечивает мульти-модельный инференс без ограничений.
+    """
+    body = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": prompt},
+        ],
+        "temperature": 0.35,
+        "max_tokens": 4096,
+    }
+    try:
+        req = urllib.request.Request(
+            f"{base_url.rstrip('/')}/v1/chat/completions",
+            data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+        )
+        with urllib.request.urlopen(req, timeout=120) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+        content = data["choices"][0]["message"]["content"]
+        content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
+        if len(content) > 300:
+            return content
+    except Exception:
+        pass
+    return None
 
 
 def call_openrouter_claude(prompt: str, system_prompt: str) -> str:
@@ -468,6 +533,26 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico", provid
     generated_text = None
     model_used = ""
 
+    def try_triad() -> str | None:
+        nonlocal model_used
+        print("   (Пробую локальный кластер Triad-Omni Edge AI)...", flush=True)
+        text = call_triad_omni(user_prompt, system_prompt)
+        if text:
+            model_used = f"Triad-Omni Edge Cluster (Qwen3.5-9B), {voice_name}"
+        else:
+            print("   (Triad-Omni шлюз :8000 оффлайн или не ответил)...", flush=True)
+        return text
+
+    def try_omniroute() -> str | None:
+        nonlocal model_used
+        print("   (Пробую шлюз OmniRoute :20128)...", flush=True)
+        text = call_omniroute(user_prompt, system_prompt)
+        if text:
+            model_used = f"OmniRoute Gateway (:20128), {voice_name}"
+        else:
+            print("   (OmniRoute шлюз :20128 оффлайн)...", flush=True)
+        return text
+
     def try_claude() -> str | None:
         nonlocal model_used
         text = call_antigravity_cli(f"{system_prompt}\n\n{user_prompt}")
@@ -503,15 +588,19 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico", provid
             print("   (Yandex AI Studio недоступен)...", flush=True)
         return text
 
-    if provider == "claude":
+    if provider == "triad":
+        generated_text = try_triad()
+    elif provider == "omniroute":
+        generated_text = try_omniroute()
+    elif provider == "claude":
         generated_text = try_claude()
     elif provider == "deepseek":
         generated_text = try_deepseek()
     elif provider == "yandex":
         generated_text = try_yandex()
-    else:  # auto: максимальный шанс получить текст
+    else:  # auto: каскад с приоритетом локального инференса (0 ₽) -> OmniRoute -> Claude -> DeepSeek -> Yandex
         print(f"   [1/3] Запрос к модели (голос: {voice_name}, канал: авто)...", flush=True)
-        generated_text = try_claude() or try_deepseek() or try_yandex()
+        generated_text = try_triad() or try_omniroute() or try_claude() or try_deepseek() or try_yandex()
 
     if not generated_text or len(generated_text) < 1500:
         raise RuntimeError("Модель вернула слишком короткий текст.")

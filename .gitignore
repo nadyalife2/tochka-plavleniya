@@ -44,9 +44,14 @@ tchp-content-fixed/
 seo/data/_backup/
 seo/data/tmp/
 seo/data/suggestions_*.json
-articles/
+# articles/
 *.db-wal
 *.db-shm
+
+# Graphify internal virtualenvs and caches
+.graphify/
+graphify-out/cache/
+
 
 # --- Секреты проекта: единый файл ключей (правит владелец, в git не попадает) ---
 config/api-keys.local.yaml

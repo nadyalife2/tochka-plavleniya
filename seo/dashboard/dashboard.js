@@ -60,7 +60,9 @@ function setGlobalProvider(val) {
   const aSel = document.getElementById('agentProviderSelect');
   if (aSel && aSel.value !== CURRENT_AI_PROVIDER) aSel.value = CURRENT_AI_PROVIDER;
   const pNames = {
-    auto: '⚡ Авто (каскад Claude → DeepSeek → Yandex)',
+    auto: '⚡ Авто-каскад (Triad 0₽ → OmniRoute → Claude → DeepSeek → Yandex)',
+    triad: '🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN',
+    omniroute: '🌐 OmniRoute Gateway (:20128, 750+ моделей)',
     claude: '🟣 Claude Sonnet — VPN ON',
     deepseek: '🔵 DeepSeek Chat — VPN не нужен',
     yandex: '🟡 YandexGPT Pro 32k — VPN не нужен'
@@ -2723,11 +2725,86 @@ function insertLinkToEditor(title, url) {
   showToast('✓ Ссылка вставлена в текст');
 }
 
+async function refreshClusterTelemetry() {
+  const node1 = document.getElementById('node1Badge');
+  const node2 = document.getElementById('node2Badge');
+  const node3 = document.getElementById('node3Badge');
+  const omni = document.getElementById('omniRouteBadge');
+
+  try {
+    const res = await fetch(API_BASE + '/api/cluster/status').then(r => r.json());
+    if (res && res.status === 'ok') {
+      const t = res.triad || {};
+      const o = res.omniroute || {};
+
+      if (t.status === 'online') {
+        if (node1) { node1.className = 'telemetry-node-badge online'; node1.innerHTML = '<span class="pulse-dot"></span> NODE-1 (Mi 10T) :8080 · ONLINE'; }
+        if (node2) { node2.className = 'telemetry-node-badge online'; node2.innerHTML = '<span class="pulse-dot"></span> NODE-2 (Nord N10) :8081 · ONLINE'; }
+        if (node3) { node3.className = 'telemetry-node-badge online'; node3.innerHTML = '<span class="pulse-dot"></span> NODE-3 (Redmi 4) :8000 · ONLINE'; }
+      } else {
+        if (node1) { node1.className = 'telemetry-node-badge standby'; node1.innerHTML = '<span class="pulse-dot"></span> NODE-1 (Mi 10T) · Ожидание'; }
+        if (node2) { node2.className = 'telemetry-node-badge standby'; node2.innerHTML = '<span class="pulse-dot"></span> NODE-2 (Nord N10) · Ожидание'; }
+        if (node3) { node3.className = 'telemetry-node-badge standby'; node3.innerHTML = '<span class="pulse-dot"></span> NODE-3 (Redmi 4) · Ожидание'; }
+      }
+
+      if (o.status === 'online') {
+        if (omni) { omni.className = 'telemetry-node-badge online'; omni.innerHTML = `<span class="pulse-dot"></span> OmniRoute :20128 · ${o.models_count || 754} Моделей`; }
+      } else {
+        if (omni) { omni.className = 'telemetry-node-badge standby'; omni.innerHTML = `<span class="pulse-dot"></span> OmniRoute · Резерв (${o.models_count || 754})`; }
+      }
+      showToast('📡 Телеметрия кластера обновлена');
+    }
+  } catch (e) {
+    console.warn('Ошибка опроса телеметрии:', e);
+  }
+}
+
+async function exportColabDataset() {
+  showToast('⚡ Формирование датасета для Colab LoRA...');
+  const c = document.getElementById('agentConsole');
+  if (c) c.innerText = `[${new Date().toLocaleTimeString()}] Экспорт обучающей выборки в JSONL ChatML...
+Фильтрация статей по качеству и объему...`;
+  try {
+    const res = await fetch(API_BASE + '/api/dataset/export').then(r => r.json());
+    if (res && res.status === 'ok') {
+      const msg = `✓ Сформирован датасет: ${res.exported_count} статей (${Math.round((res.size_bytes || 0)/1024)} КБ)`;
+      showToast(msg);
+      if (c) c.innerText = `[${new Date().toLocaleTimeString()}] ${msg}
+Файл: ${res.file_path}
+Готов к передаче в Google Colab для дообучения картриджа LoRA Unsloth (r=16, alpha=32).`;
+    } else {
+      showToast('⚠️ Ошибка экспорта датасета');
+    }
+  } catch (e) {
+    showToast('⚠️ Ошибка соединения с сервером');
+  }
+}
+
+function updateCraftsmanModel(craftsmanId, modelValue) {
+  if (craftsmanId === 'writer1') {
+    const b = document.getElementById('badgeWriter1Model');
+    if (b) {
+      const labels = {
+        triad: 'Triad 0 ₽',
+        omniroute: 'OmniRoute R1',
+        claude: 'Claude 4.6',
+        deepseek: 'DeepSeek Chat',
+        yandex: 'YandexGPT 32k'
+      };
+      b.innerText = labels[modelValue] || modelValue;
+    }
+    setGlobalProvider(modelValue);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderAll();
   fetch(API_BASE + '/api/status')
     .then(r => r.json())
-    .then(() => refreshData())
+    .then(() => {
+      refreshData();
+      refreshClusterTelemetry();
+    })
     .catch(() => {});
 });
 

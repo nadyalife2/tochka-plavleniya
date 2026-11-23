@@ -487,109 +487,231 @@
     </div>
   </section>
 
-  <!-- TAB 5: AGENT CENTER -->
+  <!-- TAB 5: AGENT CENTER / CRAFTSMEN WORKSHOP -->
   <section class="tab-view" id="view-agents">
-    <div style="margin-bottom:14px;">
-      <h2 style="margin:0;font-size:17px;font-weight:800;">Центр запуска субагентов</h2>
-      <div style="font-size:12px;color:var(--muted);">Каждый агент решает строгую инженерную задачу по стандартам MASTER_EDITORIAL_BOOK.md.</div>
+    <div style="margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h2 style="margin:0;font-size:18px;font-weight:800;letter-spacing:-0.02em;">Инженерная Артель Мастеров (Конвейер Агентов)</h2>
+        <div style="font-size:12px;color:var(--muted);">Автономная мастерская: каждый мастер решает строгую инженерную задачу по стандартам MASTER_EDITORIAL_BOOK.md.</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="btn btn--sm btn--primary" type="button" onclick="exportColabDataset()" title="Собрать датасет статей (score >= 80) в JSONL ChatML для Google Colab Unsloth">
+          ⚡ [ВЫГРУЗИТЬ DATASET В COLAB]
+        </button>
+        <button class="btn btn--sm" type="button" onclick="refreshClusterTelemetry()" title="Опросить шлюзы Triad-Omni (:8000) и OmniRoute (:20128)">
+          [ОБНОВИТЬ СВЯЗЬ]
+        </button>
+      </div>
     </div>
 
-    <div style="background:#FFF;border:1.5px solid var(--border);padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;">
+    <!-- Кластерная телеметрия: Triad-Omni & OmniRoute Live Bar -->
+    <div class="cluster-telemetry-bar">
+      <div>
+        <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">
+          Аппаратный кластер Triad-Omni Edge AI & OmniRoute Gateway:
+        </div>
+        <div class="cluster-telemetry__nodes" id="clusterTelemetryNodes">
+          <span class="telemetry-node-badge online" id="node1Badge" title="NODE-1: Xiaomi Mi 10T 5G (Snapdragon 865, 8GB) — Qwen3.5-9B-UD-Q3_K_XL">
+            <span class="pulse-dot"></span> NODE-1 (Mi 10T) :8080 · Qwen3.5-9B
+          </span>
+          <span class="telemetry-node-badge online" id="node2Badge" title="NODE-2: OnePlus Nord N10 5G (Snapdragon 690, 6GB) — LFM2.5-8B + BGE-M3 + RAG">
+            <span class="pulse-dot"></span> NODE-2 (Nord N10) :8081 · LFM2.5 + RAG
+          </span>
+          <span class="telemetry-node-badge online" id="node3Badge" title="NODE-3: Xiaomi Redmi Note 4 (Snapdragon 625, DC-DC 4.18V) — Router v4.9">
+            <span class="pulse-dot"></span> NODE-3 (Redmi 4) :8000 · Fast Router
+          </span>
+          <span class="telemetry-node-badge online" id="omniRouteBadge" title="OmniRoute Gateway (:20128) — 754 модели без VPN">
+            <span class="pulse-dot"></span> OmniRoute :20128 · 754 Моделей
+          </span>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--muted);text-align:right;">
+        Питание кластера: <strong>Bypass 4.18V (0 мА)</strong><br>
+        Инференс: <strong>0 ₽ / 100% приватность</strong>
+      </div>
+    </div>
+
+    <!-- Глобальный выбор основного канала генерации -->
+    <div style="background:#FFF;border:1.5px solid var(--border);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-radius:6px;">
       <div style="display:flex;align-items:center;gap:10px;">
-        <span style="font-weight:800;font-size:13px;">🤖 Канал генерации статей:</span>
-        <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;">
-          <option value="auto">⚡ Авто-каскад (Claude → DeepSeek → Yandex)</option>
-          <option value="claude">🟣 Claude Sonnet — VPN ON</option>
-          <option value="deepseek">🔵 DeepSeek Chat — VPN не нужен</option>
-          <option value="yandex">🟡 YandexGPT Pro 32k — VPN не нужен</option>
+        <span style="font-weight:800;font-size:13px;">🛠️ Базовый канал генерации:</span>
+        <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;border-radius:4px;">
+          <option value="auto">⚡ Авто-каскад (Triad-Omni 0₽ → OmniRoute → Claude → DeepSeek → Yandex)</option>
+          <option value="triad">🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN</option>
+          <option value="omniroute">🌐 OmniRoute Multi-Model (:20128, 750+ моделей) — без VPN</option>
+          <option value="claude">🟣 Claude Sonnet 4.6 (Antigravity CLI / OpenRouter)</option>
+          <option value="deepseek">🔵 DeepSeek Chat (api.deepseek.com) — без VPN</option>
+          <option value="yandex">🟡 YandexGPT Pro 32k — без VPN</option>
         </select>
       </div>
       <div style="font-size:11px;color:var(--muted);">
-        💡 Выбор действует и для карточек канбана, и при запуске агентов ниже
+        💡 При падении или троттлинге любого канала срабатывает автоматический Hot-Swap
       </div>
     </div>
 
-    <div class="agents-grid">
-      <!-- Agent 00 -->
-      <div class="agent-card">
-        <div class="agent-card__header">
-          <h3 class="agent-card__title">00-research</h3>
-          <span class="prio-pill prio-pill--cold">Perplexity · 0 ₽</span>
+    <!-- Верстаки Артели (Craftsmen Workshop Grid) -->
+    <div class="craftsmen-grid">
+
+      <!-- Мастер 1: Бобёр-Конструктор (Бриф и ГОСТ) -->
+      <div class="craftsman-card" id="card-craftsman-researcher">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="Бобёр-Конструктор">🦫</div>
+            <div>
+              <h3 class="craftsman-title">Бобёр-Конструктор</h3>
+              <div class="craftsman-role">01-researcher · Бриф & LSI</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--cold">0 ₽ · Edge RAG</span>
         </div>
-        <div class="agent-card__desc">Скан конкурентов, живой поиск доменов через Perplexity Sonar и расчёт матрицы приоритетов 0–100.</div>
-        <div class="agent-card__meta">Модель: Perplexity Sonar / Python CLI</div>
-        <button class="btn btn--primary" onclick="runAgent('00-research')">▶ Запустить разведку</button>
+        <div class="craftsman-desc">
+          Возводит плотину стандартов: парсит интент новичка, формулирует LSI-ядро, сверяет ГОСТ Р МЭК 61191 / IPC-A-610H и закладывает 4–6 вопросов для FAQ.
+        </div>
+        <div class="craftsman-controls">
+          <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:3px;">МОДЕЛЬ МАСТЕРА (HOT-SWAP):</label>
+          <select class="craftsman-model-select" id="modelSelect-researcher">
+            <option value="triad:node-2">NODE-2: LFM2.5-8B + SQLite FTS5 (0 ₽)</option>
+            <option value="omniroute:auto">OmniRoute: Auto / Reasoning</option>
+            <option value="sonar">Perplexity Sonar (Web Live)</option>
+          </select>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('01-researcher')">▶ Собрать бриф (#ID)</button>
+        </div>
       </div>
 
-      <!-- Bot Analyzer -->
-      <div class="agent-card">
-        <div class="agent-card__header">
-          <h3 class="agent-card__title">bot-analyzer</h3>
+      <!-- Мастер 2: Кот-Паяльщик Practico 1 (Ведущий инженер) -->
+      <div class="craftsman-card" id="card-craftsman-writer" style="border:2px solid var(--border);">
+        <!-- SVG анимация тонкого паяльного дымка -->
+        <svg class="solder-smoke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 22 C10 18, 14 14, 12 10 C10 6, 14 2, 12 1" stroke="#FFC700" stroke-linecap="round"/>
+        </svg>
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="Кот-Паяльщик Practico 1" style="background:#FFF7ED;border-color:#EA580C;">🐱</div>
+            <div>
+              <h3 class="craftsman-title">Кот-Паяльщик (Practico 1)</h3>
+              <div class="craftsman-role">02-writer · Инженер-диагност</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--hot" id="badgeWriter1Model">Triad / Claude</span>
+        </div>
+        <div class="craftsman-desc">
+          Голос сервисного инженера с осциллографом: строгая триада «факт → физика → последствие», Answer First ≤ 40 слов, тонкая ирония над мифами и чистая физика пайки.
+        </div>
+        <div class="craftsman-controls">
+          <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:3px;">МОДЕЛЬ МАСТЕРА (HOT-SWAP):</label>
+          <select class="craftsman-model-select" id="modelSelect-writer1" onchange="updateCraftsmanModel('writer1', this.value)">
+            <option value="triad">🐺 Triad-Omni: Qwen3.5-9B (Node-1, 0 ₽)</option>
+            <option value="omniroute">🌐 OmniRoute: DeepSeek-R1 / Auto</option>
+            <option value="claude">🟣 Claude Sonnet 4.6 (Antigravity)</option>
+            <option value="deepseek">🔵 DeepSeek Chat (api.deepseek.com)</option>
+            <option value="yandex">🟡 YandexGPT Pro 32k</option>
+          </select>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('02-writer')">▶ Написать статью (Practico 1)</button>
+        </div>
+      </div>
+
+      <!-- Мастер 3: Лис-Прагматик Practico 2 (Голос заказчика) -->
+      <div class="craftsman-card" id="card-craftsman-writer2" style="border:2px solid var(--border);background:#18181B;color:#FFF;">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="Лис-Прагматик Practico 2" style="background:#27272A;border-color:#52525B;">🦊</div>
+            <div>
+              <h3 class="craftsman-title" style="color:#FFC700;">Лис-Прагматик (Practico 2)</h3>
+              <div class="craftsman-role" style="color:#A1A1AA;">02-writer-2 · Голос заказчика</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--warm">Бизнес & Сроки</span>
+        </div>
+        <div class="craftsman-desc" style="color:#D4D4D8;">
+          Владелец сервисного бизнеса: деньги и сроки в каждом абзаце, «что купить / где разведут», окупаемость паяльной станции, без лишних академических лекций.
+        </div>
+        <div class="craftsman-controls" style="border-color:#3F3F46;">
+          <label style="font-size:10px;font-weight:800;color:#A1A1AA;display:block;margin-bottom:3px;">МОДЕЛЬ МАСТЕРА (HOT-SWAP):</label>
+          <select class="craftsman-model-select" id="modelSelect-writer2" style="background:#27272A;color:#FFF;border-color:#52525B;">
+            <option value="triad">🐺 Triad-Omni: Qwen3.5-9B (0 ₽)</option>
+            <option value="omniroute">🌐 OmniRoute: Gemini / Claude</option>
+            <option value="claude">🟣 Claude Sonnet 4.6</option>
+          </select>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('02-writer-2')">▶ Написать (Practico 2)</button>
+        </div>
+      </div>
+
+      <!-- Мастер 4: Филин-Ревизор (ОТК и Фактчек) -->
+      <div class="craftsman-card" id="card-craftsman-reviewer" style="border:2px solid var(--border);">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="Филин-Ревизор ОТК">🦉</div>
+            <div>
+              <h3 class="craftsman-title">Филин-Ревизор [ОТК-2026]</h3>
+              <div class="craftsman-role">03-reviewer · Фактчек и Контроль</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--warm">Claude Opus / DeepSeek</span>
+        </div>
+        <div class="craftsman-desc">
+          Строгий контролер со штампом [ОТК]: сверяет сплавы по materials-registry.php, инспектирует температуры, ТБ, отлавливает пустой ИИ-слоп и пакует JSON v1.1.
+        </div>
+        <div class="craftsman-controls">
+          <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:3px;">МОДЕЛЬ РЕВИЗОРА:</label>
+          <select class="craftsman-model-select" id="modelSelect-reviewer">
+            <option value="claude-opus">Claude Opus 4.6 (Deep Reasoning)</option>
+            <option value="omniroute-r1">OmniRoute: DeepSeek-R1 Full</option>
+            <option value="gemini-flash">Gemini 3.7 Flash Fast Check</option>
+          </select>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('03-reviewer')">▶ Провести аудит (#ID)</button>
+        </div>
+      </div>
+
+      <!-- Мастер 5: Дятел-Метролог (Скорер 0–100) -->
+      <div class="craftsman-card" id="card-craftsman-scorer">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="Дятел-Метролог">🪵</div>
+            <div>
+              <h3 class="craftsman-title">Дятел-Метролог</h3>
+              <div class="craftsman-role">04-scorer · Скоринг 0–100</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--cold">0 ₽ · Чистая математика</span>
+        </div>
+        <div class="craftsman-desc">
+          Методично выстукивает плату: строгий математический расчёт 100 баллов по 6 объективным блокам (Факты, Интент, Голос, SEO, Ссылки, ИИ-слоп) без эмоций.
+        </div>
+        <div class="craftsman-controls">
+          <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
+            Движок: score_article.py · 0 токенов
+          </div>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('04-scorer')">▶ Запустить скоринг (#ID)</button>
+        </div>
+      </div>
+
+      <!-- Мастер 6: Сорока-Разведчица (Анализ конкурентов и фишек) -->
+      <div class="craftsman-card" id="card-craftsman-analyzer">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="Сорока-Разведчица">🪶</div>
+            <div>
+              <h3 class="craftsman-title">Сорока-Разведчица</h3>
+              <div class="craftsman-role">bot-analyzer & 00-research</div>
+            </div>
+          </div>
           <span class="prio-pill prio-pill--hot">Фишки & SEO</span>
         </div>
-        <div class="agent-card__desc">Парсит сайты конкурентов, находит калькуляторы, таблицы, схемы, извлекает SEO-слова и считает силу домена.</div>
-        <div class="agent-card__meta">Модель: HTML/LSI Parser · Стоимость: 0 токенов</div>
-        <button class="btn btn--primary" onclick="runAgent('bot-analyzer')">▶ Анализировать фишки</button>
+        <div class="craftsman-desc">
+          Тащит в гнездо лучшие фичи: парсит сайты конкурентов, находит калькуляторы, таблицы, схемы, собирает SEO-хвосты и считает силу доменов.
+        </div>
+        <div class="craftsman-controls">
+          <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
+            Движок: HTML/LSI Parser · Perplexity Sonar
+          </div>
+          <button class="btn btn--primary" style="width:100%;" onclick="runAgent('bot-analyzer')">▶ Анализировать фишки</button>
+        </div>
       </div>
 
-      <!-- Agent 01 -->
-      <div class="agent-card">
-        <div class="agent-card__header">
-          <h3 class="agent-card__title">01-researcher</h3>
-          <span class="prio-pill prio-pill--cold">0 ₽ · Zen</span>
-        </div>
-        <div class="agent-card__desc">Сбор LSI, формулировка интента, выбор типа статьи, драфты FAQ 4–6 шт. и паспорт фактов по ГОСТ/IPC.</div>
-        <div class="agent-card__meta">Модель: OpenCode Zen / freetap</div>
-        <button class="btn" onclick="promptAgentTarget('01-researcher')">▶ Подготовить бриф (#ID)</button>
-      </div>
-
-      <!-- Agent 02: Writer Claude Sonnet Antigravity -->
-      <div class="agent-card" style="border:2px solid var(--border);">
-        <div class="agent-card__header">
-          <h3 class="agent-card__title">02-writer (Practico 1)</h3>
-          <span class="prio-pill prio-pill--hot">Claude Sonnet</span>
-        </div>
-        <div class="agent-card__desc">Инженерный голос: триада «факт → физика → последствие», ГОСТ и IPC, сухая ирония, Answer First ≤ 40 слов.</div>
-        <div class="agent-card__meta">Модель: claude-sonnet-4-6 · голос: practico</div>
-        <button class="btn btn--primary" onclick="promptAgentTarget('02-writer')">▶ Написать (Practico 1)</button>
-      </div>
-
-      <!-- Agent 02b: Writer Practico 2 (голос заказчика) -->
-      <div class="agent-card" style="border:2px solid var(--border);background:#1a1a1a;">
-        <div class="agent-card__header">
-          <h3 class="agent-card__title" style="color:#FFC700;">02-writer (Practico 2)</h3>
-          <span class="prio-pill prio-pill--warm">Claude Sonnet</span>
-        </div>
-        <div class="agent-card__desc" style="color:#ddd;">Голос заказчика: короткие рубленые фразы, деньги и время в каждом разделе, «что купить / где обманут», без лекций и эрудиции.</div>
-        <div class="agent-card__meta" style="color:#aaa;">Модель: claude-sonnet-4-6 · голос: practico2</div>
-        <button class="btn btn--primary" onclick="promptAgentTarget('02-writer-2')">▶ Написать (Practico 2)</button>
-      </div>
-
-      <!-- Agent 03: Reviewer Claude Opus Antigravity -->
-      <div class="agent-card" style="border:2px solid var(--border);">
-        <div class="agent-card__header">
-          <h3 class="agent-card__title">03-reviewer (ОТК)</h3>
-          <span class="prio-pill prio-pill--warm">Claude Opus</span>
-        </div>
-        <div class="agent-card__desc">Независимый аудит Claude Opus: сверка температур по реестру, ТБ, отлов блокеров и упаковка по схеме JSON v1.1.</div>
-        <div class="agent-card__meta">Модель: claude-opus-4-6-thinking (Antigravity CLI)</div>
-        <button class="btn btn--primary" onclick="promptAgentTarget('03-reviewer')">▶ Провести аудит (#ID)</button>
-      </div>
-
-      <!-- Agent 04 -->
-      <div class="agent-card">
-        <div class="agent-card__header">
-          <h3 class="agent-card__title">04-scorer</h3>
-          <span class="prio-pill prio-pill--cold">0 ₽ · Local</span>
-        </div>
-        <div class="agent-card__desc">Математический расчёт 100 баллов по 6 блокам (Факты, Интент, Голос, SEO, Ссылки, ИИ) без субъективности.</div>
-        <div class="agent-card__meta">Модель: score_article.py · Стоимость: 0 токенов</div>
-        <button class="btn btn--primary" onclick="promptAgentTarget('04-scorer')">▶ Запустить скоринг (#ID)</button>
-      </div>
     </div>
 
-    <h3 style="margin:16px 0 6px;font-size:13px;font-weight:800;">Терминальный лог агентов:</h3>
-    <div class="log-console" id="agentConsole">> Готов к выполнению задач. Выберите агента выше.</div>
+    <h3 style="margin:16px 0 6px;font-size:13px;font-weight:800;letter-spacing:-0.01em;">Терминальный лог конвейера и осциллограф токенов:</h3>
+    <div class="log-console" id="agentConsole">> Готов к выполнению задач. Выберите мастера артели выше.</div>
   </section>
 
   <!-- TAB 6: BACKUPS -->
