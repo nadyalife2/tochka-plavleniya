@@ -1,0 +1,147 @@
+# =====================================================================
+# ИЕРАРХИЯ МОДЕЛЕЙ TRIAD-OMNI ДЛЯ 9 МАСТЕРОВ ФЕРМЫ (1 + 4)
+# =====================================================================
+# Приоритет №1: Локальный мобильный кластер Triad-Omni (0 затрат, оффлайн)
+# Альтернативы (4 варианта): Облачные и локальные модели на выбор пользователя
+
+providers:
+  triad_cluster:
+    name: "Локальный мобильный кластер Triad-Omni"
+    nodes:
+      node1_brain: "http://192.168.31.161:8080/v1"
+      node2_reflex: "http://192.168.31.57:8081/v1"
+      node3_gateway: "http://7LS8SKLV55IZSK7S:8000"
+      omniroute: "http://127.0.0.1:20128"
+    active: true
+
+  openrouter:
+    name: "OpenRouter (Единый шлюз ко всем моделям)"
+    api_key: ""
+    base_url: "https://openrouter.ai/api/v1"
+    active: false
+
+  deepseek:
+    name: "DeepSeek API (Официальный)"
+    api_key: ""
+    base_url: "https://api.deepseek.com/v1"
+    active: false
+
+  gemini:
+    name: "Google Gemini API"
+    api_key: ""
+    base_url: "https://generativelanguage.googleapis.com/v1beta"
+    active: false
+
+  anthropic:
+    name: "Anthropic Claude API"
+    api_key: ""
+    base_url: "https://api.anthropic.com/v1"
+    active: false
+
+  local_ollama:
+    name: "Локальный Ollama / vLLM на ПК"
+    base_url: "http://127.0.0.1:11434/v1"
+    active: false
+
+# ---------------------------------------------------------------------
+# Назначение моделей по персонажам фермы
+# ---------------------------------------------------------------------
+animals:
+  clara:
+    name: "Сорока Клара"
+    role: "Поиск семантики, LSI и ГОСТ-радар"
+    primary: "triad:node2_reflex" # LFM2.5-8B + BGE-M3
+    alternatives:
+      alt1: "deepseek/deepseek-chat"
+      alt2: "qwen/qwen-2.5-32b-instruct"
+      alt3: "google/gemini-2.0-flash-exp:free"
+      alt4: "anthropic/claude-3.5-sonnet"
+    current_selection: "primary"
+
+  boris:
+    name: "Бобёр Борис"
+    role: "Архитектор ТЗ, матрицы допусков ГОСТ"
+    primary: "triad:node1_brain" # Qwen3.5-9B + FTS5 RAG
+    alternatives:
+      alt1: "deepseek/deepseek-reasoner"
+      alt2: "qwen/qwen-2.5-72b-instruct"
+      alt3: "openai/gpt-4o-mini"
+      alt4: "anthropic/claude-3.5-sonnet"
+    current_selection: "primary"
+
+  felix:
+    name: "Кот Феликс"
+    role: "Физика пайки, автор научного черновика статьи"
+    primary: "triad:node1_brain" # Qwen3.5-9B-MTP UD-Q3_K_XL
+    alternatives:
+      alt1: "anthropic/claude-3.5-sonnet"
+      alt2: "deepseek/deepseek-chat"
+      alt3: "qwen/qwen-2.5-72b-instruct"
+      alt4: "google/gemini-1.5-pro"
+    current_selection: "primary"
+
+  reynard:
+    name: "Лис Рейнард"
+    role: "Экономист себестоимости и окупаемости пайки"
+    primary: "triad:node3_gateway" # Нативный расчет + Regex Fast-Path
+    alternatives:
+      alt1: "deepseek/deepseek-chat"
+      alt2: "qwen/qwen-2.5-14b-instruct"
+      alt3: "google/gemini-2.0-flash-exp:free"
+      alt4: "meta-llama/llama-3.3-70b-instruct"
+    current_selection: "primary"
+
+  bruno:
+    name: "Барсук Бруно"
+    role: "Инженер термопрофиля и векторных SVG схем"
+    primary: "triad:node2_reflex" # Нативный SVG генератор
+    alternatives:
+      alt1: "anthropic/claude-3.5-sonnet"
+      alt2: "qwen/qwen-2.5-coder-32b-instruct"
+      alt3: "deepseek/deepseek-chat"
+      alt4: "openai/gpt-4o"
+    current_selection: "primary"
+
+  archimedes:
+    name: "Филин Архимед"
+    role: "Главред ОТК, фильтр штампов SlopMonster и ГОСТ-аудит"
+    primary: "triad:node1_brain" # AST словарь + Qwen3.5-9B
+    alternatives:
+      alt1: "deepseek/deepseek-reasoner"
+      alt2: "anthropic/claude-3.5-sonnet"
+      alt3: "qwen/qwen-2.5-72b-instruct"
+      alt4: "google/gemini-2.0-flash-exp:free"
+    current_selection: "primary"
+
+  woody:
+    name: "Дятел Вуди"
+    role: "Математический аудитор 100-балльного AST-скоринга"
+    primary: "triad:node3_gateway" # Нативный validator.py AST
+    alternatives:
+      alt1: "deepseek/deepseek-reasoner"
+      alt2: "qwen/qwen-2.5-coder-32b-instruct"
+      alt3: "openai/gpt-4o-mini"
+      alt4: "anthropic/claude-3.5-sonnet"
+    current_selection: "primary"
+
+  rocky:
+    name: "Енот Рокки"
+    role: "Хранитель Базы Знаний, оцифровка PDF и LoRA датасеты"
+    primary: "triad:node2_reflex" # pypdf + Graphify + BGE-M3
+    alternatives:
+      alt1: "deepseek/deepseek-chat"
+      alt2: "qwen/qwen-2.5-72b-instruct"
+      alt3: "google/gemini-2.0-flash-exp:free"
+      alt4: "meta-llama/llama-3.3-70b-instruct"
+    current_selection: "primary"
+
+  mikhalych:
+    name: "Медведь Михалыч"
+    role: "Прораб кластера, телеметрия и маршрутизация"
+    primary: "triad:node3_gateway" # Fast-Path Router :8000
+    alternatives:
+      alt1: "deepseek/deepseek-chat"
+      alt2: "qwen/qwen-2.5-7b-instruct"
+      alt3: "google/gemini-2.0-flash-exp:free"
+      alt4: "anthropic/claude-3.5-haiku"
+    current_selection: "primary"

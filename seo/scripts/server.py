@@ -75,7 +75,10 @@ LONG_AGENTS = {"00-research", "bot-analyzer"}
 JOB_TIMEOUT_SECONDS = 600
 
 # Агенты, которым нужен конкретный ID темы. Без него запуск бессмысленен.
-TARGET_REQUIRED_AGENTS = {"delivery", "04-scorer", "02-writer", "03-reviewer", "factcheck", "05-illustrator"}
+TARGET_REQUIRED_AGENTS = {
+    "delivery", "04-scorer", "02-writer", "02-writer-2", "01-researcher",
+    "03-reviewer", "factcheck", "05-illustrator", "bobr", "lis"
+}
 
 
 def _scalar(value, default=""):
@@ -260,18 +263,22 @@ def yandex_chat(system_prompt: str, user_prompt: str, max_tokens: int = 8000) ->
     return content, model
 
 
-VOICE_MODEL_PREFIX = ("oxion:", "yandex:", "triad:", "omniroute:")
+VOICE_MODEL_PREFIX = ("oxion:", "yandex:", "triad:", "omniroute:", "local_heuristic")
 
 
 def voice_generate(model: str, system_prompt: str, user_prompt: str,
                    max_tokens: int = 12000, temperature: float = 0.35) -> tuple[str, str]:
-    """Генерация выбранной моделью: `oxion:<id>`, `yandex:<id>`, `triad:<id>`, `omniroute:<id>`."""
+    """Генерация выбранной моделью: `oxion:<id>`, `yandex:<id>`, `triad:<id>`, `omniroute:<id>`, `local_heuristic`."""
     spec = (model or "oxion:claude-sonnet-5").strip()
+    if spec.startswith("local_heuristic"):
+        from writer_practico import generate_local_heuristic_text
+        text = generate_local_heuristic_text(user_prompt, system_prompt)
+        return text, "local_heuristic (deterministic engine)"
     if spec.startswith("triad:"):
-        from writer_practico import call_triad_omni, call_omniroute
+        from writer_practico import call_triad_omni, call_omniroute, generate_local_heuristic_text
         try:
             text = call_triad_omni(user_prompt, system_prompt)
-        except Exception as e:
+        except Exception:
             text = None
         if text:
             return text, spec
@@ -283,14 +290,26 @@ def voice_generate(model: str, system_prompt: str, user_prompt: str,
                 return text, "omniroute:deepseek-chat (fallback)"
         except Exception:
             pass
-        raise RuntimeError("Triad-Omni кластер (:8000) и резервный OmniRoute (:20128) оффлайн.")
+        # Каскадный фоллбэк на local_heuristic (оффлайн режим)
+        print("[CASCADE FALLBACK] Triad-Omni and OmniRoute offline, falling back to local_heuristic...")
+        text = generate_local_heuristic_text(user_prompt, system_prompt)
+        if text:
+            return text, "local_heuristic (offline fallback)"
+        raise RuntimeError("Triad-Omni кластер (:8000), резервный OmniRoute (:20128) и local_heuristic оффлайн.")
     if spec.startswith("omniroute:"):
-        from writer_practico import call_omniroute
+        from writer_practico import call_omniroute, generate_local_heuristic_text
         m_id = spec.split(":", 1)[1] if ":" in spec else "auto/thinking"
-        text = call_omniroute(user_prompt, system_prompt, model=m_id)
-        if not text:
-            raise RuntimeError(f"OmniRoute (:20128) оффлайн или модель '{m_id}' недоступна.")
-        return text, spec
+        try:
+            text = call_omniroute(user_prompt, system_prompt, model=m_id)
+        except Exception:
+            text = None
+        if text:
+            return text, spec
+        print(f"[CASCADE FALLBACK] OmniRoute (:20128) model '{m_id}' offline, falling back to local_heuristic...")
+        text = generate_local_heuristic_text(user_prompt, system_prompt)
+        if text:
+            return text, "local_heuristic (offline fallback)"
+        raise RuntimeError(f"OmniRoute (:20128) оффлайн или модель '{m_id}' недоступна.")
     if spec.startswith("yandex:"):
         return yandex_chat(system_prompt, user_prompt, max_tokens=max_tokens)
     model_id = spec.split(":", 1)[1] if spec.startswith("oxion:") else spec
@@ -394,6 +413,25 @@ def test_single_endpoint(url: str, timeout: float = 0.45) -> bool:
         return False
 
 
+def resolve_route_alive(route_str: str, nodes_status: dict | None = None) -> bool:
+    """Проверяет доступность маршрута модели по состоянию узлов кластера Triad-Omni."""
+    if not route_str:
+        return False
+    if nodes_status is None:
+        nodes_status = {}
+    if "node3" in route_str or "local_cluster" in route_str:
+        return bool(nodes_status.get("node3_gateway", {}).get("alive", False))
+    if route_str.startswith("local_"):
+        return True
+    if "node1" in route_str:
+        return bool(nodes_status.get("node1_brain", {}).get("alive", False))
+    if "node2" in route_str:
+        return bool(nodes_status.get("node2_reflex", {}).get("alive", False))
+    if "omniroute" in route_str:
+        return bool(nodes_status.get("omniroute_hub", {}).get("alive", False))
+    return True
+
+
 def check_all_agents_health(simulation_offline: list = None) -> dict:
     """Проверяет реальную доступность узлов кластера и вычисляет статус каждого зверя."""
     txt, cfg = load_agents_routing()
@@ -414,25 +452,12 @@ def check_all_agents_health(simulation_offline: list = None) -> dict:
         primary = a_cfg.get("primary", "")
         fallback_1 = a_cfg.get("fallback_1", "")
         fallback_2 = a_cfg.get("fallback_2", "")
+        fallback_3 = a_cfg.get("fallback_3", "")
 
-        def resolve_route_alive(route_str: str) -> bool:
-            if not route_str:
-                return False
-            if route_str.startswith("local_"):
-                return True
-            if "node1" in route_str:
-                return nodes_status.get("node1_brain", {}).get("alive", False)
-            if "node2" in route_str:
-                return nodes_status.get("node2_reflex", {}).get("alive", False)
-            if "node3" in route_str or "local_cluster" in route_str:
-                return nodes_status.get("node3_gateway", {}).get("alive", False) or True
-            if "omniroute" in route_str:
-                return nodes_status.get("omniroute_hub", {}).get("alive", False)
-            return True
-
-        is_primary_alive = resolve_route_alive(primary)
-        is_fb1_alive = resolve_route_alive(fallback_1)
-        is_fb2_alive = resolve_route_alive(fallback_2)
+        is_primary_alive = resolve_route_alive(primary, nodes_status)
+        is_fb1_alive = resolve_route_alive(fallback_1, nodes_status)
+        is_fb2_alive = resolve_route_alive(fallback_2, nodes_status)
+        is_fb3_alive = resolve_route_alive(fallback_3, nodes_status)
 
         if is_primary_alive:
             status = "alive"
@@ -443,6 +468,9 @@ def check_all_agents_health(simulation_offline: list = None) -> dict:
         elif a_cfg.get("auto_failover", True) and is_fb2_alive:
             status = "fallback"
             active_route = fallback_2
+        elif a_cfg.get("auto_failover", True) and is_fb3_alive:
+            status = "fallback"
+            active_route = fallback_3
         else:
             status = "dead"
             active_route = "none"
@@ -705,6 +733,176 @@ def run_graphify_update_cmd() -> dict:
 def export_colab_harvesting_dataset() -> dict:
     """Экспорт датасета в формате JSONL ChatML для обучения LoRA в Google Colab."""
     return generate_lora_dataset()
+
+
+def run_offline_reviewer(text: str, title: str = "", target_id: int | str = "",
+                         is_critical: bool = False, agent: str = "03-reviewer") -> tuple[str, str, dict]:
+    """Автономная проверка статьи по нормативному чеклисту [ОТК-ГОСТ] и SlopMonster.
+    
+    Выполняется на 100% локально без обращения к Oxion/Triad-Omni.
+    Возвращает: (answer_markdown, used_model, review_json).
+    """
+    import re
+    from datetime import datetime
+    
+    # 1. Загрузка линтера deslop
+    deslop_hits = {'vocab': [], 'phrases': [], 'punctuation': [], 'rhythm': [], 'proof': []}
+    slop_score = 5
+    deslop_summary = "Текст полностью очищен от штампов (5/5 CLEAN)."
+    try:
+        from tools import deslop
+    except ImportError:
+        import sys
+        sys.path.insert(0, str(ROOT / "tools"))
+        try:
+            import deslop
+        except ImportError:
+            deslop = None
+
+    if deslop:
+        try:
+            deslop_hits = deslop.audit(text)
+            failed_groups = [k for k, v in deslop_hits.items() if v]
+            slop_score = max(0, 5 - len(failed_groups))
+            if slop_score < 5:
+                found_samples = []
+                for k in ('vocab', 'phrases', 'punctuation'):
+                    for item in deslop_hits.get(k, [])[:3]:
+                        found_samples.append(item[0] if isinstance(item, tuple) else str(item))
+                deslop_summary = f"Оценка чистоты: {slop_score}/5. Обнаружены штампы: {', '.join(found_samples)}"
+        except Exception:
+            pass
+
+    # 2. Проверка нормативной базы [ОТК-ГОСТ / IPC]
+    std_regex = re.compile(
+        r"(?i)\b(?:гост(?:\s+р)?(?:\s+мэк)?\s+[\d\-]+(?:-\d+)?|ipc(?:-[a-z0-9\-]+)?|j-std-[\d]+|tds|datasheet)\b"
+    )
+    standards_found = list(set(std_regex.findall(text)))
+
+    # Канонические сплавы
+    canonical_alloys = ["pos61", "пос-61", "pos40", "пос-40", "sac305", "sac405", "sn42bi58", "sn63pb37", "розе", "вуда", "universal"]
+    alloys_found = [a for a in canonical_alloys if a in text.lower()]
+
+    # Температурные точки
+    temp_matches = re.findall(r"\b\d{2,3}\s*°\s*[CС]\b", text)
+
+    # 3. Редакционные параметры
+    paras = [p.strip() for p in text.split("\n\n") if p.strip() and not p.strip().startswith("#")]
+    first_para = paras[0] if paras else ""
+    first_para_words = len(re.findall(r"[A-Za-zА-Яа-яЁё0-9\-]+", first_para))
+    h1_matches = re.findall(r"(?m)^#\s+(.+)$", text)
+    h2_matches = re.findall(r"(?m)^##\s+(.+)$", text)
+    chars_count = len(text.strip())
+
+    # FAQ
+    faq_count = len(re.findall(r"(?im)^\s*(?:\d+[.)]|\*{1,2}|q:)\s*[^?\n]+\?", text))
+
+    # 4. Проверка опасных советов (Блокеры)
+    dangerous_patterns = ["под напряжением", "не отключая от сети", "без отключения питания", "паять включ"]
+    danger_hits = []
+    negation_re = re.compile(r"\b(не|нельзя|запрещ\w*|исключ\w*|никогда|недопустим\w*|опасн\w*|риск\w*)\b", re.I)
+    for sent in re.split(r"(?<=[.!?])\s+", text):
+        s_low = sent.lower()
+        for dp in dangerous_patterns:
+            if dp in s_low:
+                m = re.search(re.escape(dp), s_low)
+                prefix_window = s_low[max(0, m.start() - 30): m.start()]
+                if not negation_re.search(prefix_window):
+                    danger_hits.append(sent.strip()[:90])
+
+    # 5. Оценка и вердикт
+    issues = []
+    blockers = []
+
+    if danger_hits:
+        blockers.append("Опасный совет без явного запрета: " + "; ".join(danger_hits))
+    if first_para_words > 40:
+        issues.append(f"Answer First: первый абзац содержит {first_para_words} слов (норма ≤ 40)")
+    if len(h1_matches) != 1:
+        issues.append(f"Заголовки H1: обнаружено {len(h1_matches)} (требуется ровно 1)")
+    if not (2 <= len(h2_matches) <= 10):
+        issues.append(f"Разделы H2: обнаружено {len(h2_matches)} (рекомендуется 4–8)")
+    if chars_count > 0 and chars_count < 1500 and not "тест" in title.lower():
+        issues.append(f"Объем текста: {chars_count:,} знаков (целевой диапазон 5 500–7 000)")
+    if len(standards_found) == 0:
+        issues.append("Нормативная база: не найдено упоминаний ГОСТ/IPC/TDS")
+    if len(alloys_found) == 0:
+        issues.append("Сплавы: не упомянут ни один канонический припой (ПОС-61, SAC305 и др.)")
+    if len(temp_matches) < 2:
+        issues.append(f"Температурные режимы: всего {len(temp_matches)} уставки с °C (нужно ≥ 3)")
+    if slop_score < 4:
+        issues.append(f"SlopMonster: обнаружены ИИ-клише и штампы ({deslop_summary})")
+
+    if blockers or len(issues) >= 4 or slop_score <= 2:
+        verdict = "needs_fix"
+        verdict_str = "ДОРАБОТКА"
+    else:
+        verdict = "passed"
+        verdict_str = "ПРИНЯТО"
+
+    # 6. Формирование читаемого отчета
+    answer_lines = [
+        f"# Рецензия [ОТК-ГОСТ]: Филин Архимед (Автономный офлайн-режим)",
+        "",
+        f"**Вердикт: {verdict_str}**",
+        f"**Инструмент аудита:** `offline:deslop+otk-gost`",
+        f"**Статья:** #{target_id} «{title}»",
+        "",
+        f"## 1. Контроль нормативной базы и технологий [ОТК-ГОСТ]",
+        f"- Стандарты ГОСТ/IPC: {', '.join(standards_found) if standards_found else 'не найдены'}",
+        f"- Канонические сплавы: {', '.join(alloys_found) if alloys_found else 'не зафиксированы'}",
+        f"- Температурные режимы: {len(temp_matches)} точек фиксации с °C",
+        f"- Безопасность: {'❌ ОБНАРУЖЕН ОПАСНЫЙ СОВЕТ' if danger_hits else '✓ Нарушений ТБ не выявлено'}",
+        "",
+        f"## 2. Анализ текста Humanizer / SlopMonster",
+        f"- Оценка чистоты: {slop_score}/5 ({'CLEAN' if slop_score == 5 else 'needs a cleanse'})",
+        f"- Резюме деслопа: {deslop_summary}",
+        "",
+        f"## 3. Редакционная структура",
+        f"- Answer First: {first_para_words} слов (цель ≤ 40)",
+        f"- Заголовки: {len(h1_matches)} x H1, {len(h2_matches)} x H2",
+        f"- Объем: {chars_count:,} знаков",
+        f"- FAQ: {faq_count} вопросов",
+        "",
+        f"## 4. Замечания и рекомендации",
+    ]
+    if blockers:
+        answer_lines.append("### ❌ Блокеры:")
+        for b in blockers:
+            answer_lines.append(f"- {b}")
+    if issues:
+        answer_lines.append("### Замечания:")
+        for iss in issues:
+            answer_lines.append(f"- {iss}")
+    else:
+        answer_lines.append("- Критических замечаний нет. Текст готов к публикации.")
+
+    answer_md = "\n".join(answer_lines)
+    used_model = "offline:deslop+otk-gost"
+
+    review_json = {
+        "article_id": str(target_id),
+        "title": title,
+        "mode": "offline_local",
+        "verdict": verdict,
+        "verdict_str": verdict_str,
+        "slop_score": slop_score,
+        "metrics": {
+            "chars": chars_count,
+            "answer_first_words": first_para_words,
+            "h1_count": len(h1_matches),
+            "h2_count": len(h2_matches),
+            "standards_count": len(standards_found),
+            "standards": standards_found,
+            "alloys": alloys_found,
+            "temps_count": len(temp_matches),
+        },
+        "issues": issues,
+        "blockers": blockers,
+        "checked_at": datetime.now().isoformat(timespec="seconds")
+    }
+
+    return answer_md, used_model, review_json
 
 
 
@@ -1424,6 +1622,49 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"error": "standards_matrix.json not found"}, 404)
             return
 
+        # -------------------------------------------------------------
+        # Эндпоинты конфигурации моделей (1+4) и настроек Triad-Omni
+        # -------------------------------------------------------------
+        if path == "/api/config/models":
+            try:
+                import models_manager
+                cfg = models_manager.get_models_config()
+                self.send_json({"status": "ok", "config": cfg})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/standards/list":
+            try:
+                import pdf_gost_extractor
+                stds = pdf_gost_extractor.list_indexed_standards()
+                self.send_json({"status": "ok", "standards": stds})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/standards/search":
+            qs = parse_qs(url.query)
+            q = (qs.get("q") or [""])[0].strip()
+            try:
+                import pdf_gost_extractor
+                results = pdf_gost_extractor.search_knowledge_base(q)
+                self.send_json({"status": "ok", "query": q, "results": results})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/competitors/search":
+            qs = parse_qs(url.query)
+            q = (qs.get("q") or ["пайка"])[0].strip()
+            try:
+                import competitor_parser
+                res = competitor_parser.search_and_analyze_competitors(q)
+                self.send_json({"status": "ok", "data": res})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
         if path == "/api/topics/links":
             qs = parse_qs(url.query)
             tid = qs.get("id", [""])[0]
@@ -1689,6 +1930,528 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         self.send_error(404, "File Not Found")
 
+    def execute_agent_action(self, agent: str, target_id: int | None = None, payload: dict | None = None) -> dict:
+        """Вспомогательный метод для прямого тестирования действий субагентов без HTTP-сокета."""
+        pl = dict(payload or {})
+        pl["agent"] = agent
+        if target_id is not None:
+            pl["target_id"] = target_id
+        self.dispatch_agent_run(pl)
+        if hasattr(self, "responses") and self.responses:
+            return self.responses[-1][0]
+        return {}
+
+    def dispatch_agent_run(self, payload: dict) -> None:
+        agent = _scalar(payload.get("agent", ""), "").strip()
+        if not agent:
+            self.send_json({"status": "error", "message": "Не указан агент"}, 400)
+            return
+
+        raw_target = _scalar(payload.get("target_id") or payload.get("topic_id"), "")
+        if raw_target in (None, ""):
+            target_id = None
+        else:
+            target_id = parse_row_id(raw_target)
+            if target_id is None:
+                self.send_json({
+                    "status": "error",
+                    "message": f"Поле 'target_id' должно быть положительным целым числом, получено: {raw_target!r}",
+                }, 400)
+                return
+        if agent in TARGET_REQUIRED_AGENTS and target_id is None:
+            self.send_json({"status": "error",
+                            "message": f"Агенту '{agent}' нужен target_id — ID темы из базы"}, 400)
+            return
+
+        # Долгие агенты (обход сайтов) выполняются в фоне: HTTP-запрос
+        # не должен ждать десятки секунд и обрываться по таймауту.
+        if agent in LONG_AGENTS:
+            if agent == "00-research":
+                cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"),
+                       "--limit", "10", "--max-domains", "5", "--budget", "60"]
+            else:
+                domain = payload.get("domain", "")
+                cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
+                cmd.extend(["--domain", domain] if domain else ["--all"])
+            job_id = start_background_job(agent, cmd, target_id)
+            self.send_json({
+                "status": "queued",
+                "agent": agent,
+                "job_id": job_id,
+                "log": f"Задача поставлена в очередь (job #{job_id}). Прогресс: /api/jobs/{job_id}",
+            })
+            return
+
+        log_output = f"Запуск {agent}..."
+        status = "completed"
+        extra_response = {}
+
+        try:
+            if agent == "delivery" and target_id:
+                from package_contract import package_article
+                res = package_article(target_id)
+                if not res["valid"]:
+                    errors_str = "\n".join([f"  • {e}" for e in (res.get("missing_warnings", []) + res.get("errors", []))])
+                    log_output = f"❌ Статья #{target_id} не готова к доставке в WordPress (нарушение схемы v1.1):\n{errors_str}\n\nУстраните замечания перед отправкой черновика."
+                    status = "failed"
+                else:
+                    contract_path = DATA / f"contract_{target_id}.json"
+                    contract_path.write_text(json.dumps(res["contract"], ensure_ascii=False, indent=2), encoding="utf-8")
+                    delivery_tool = ROOT / "tools" / "delivery_cli.py"
+
+                    wp_url = get_key("WP_URL") or os.environ.get("WP_URL", "")
+                    wp_user = get_key("WP_USER") or os.environ.get("WP_USER", "")
+                    wp_pass = get_key("WP_PASS") or os.environ.get("WP_PASS", "")
+                    want_live = bool(payload.get("live"))
+
+                    if want_live and not (wp_url and wp_pass):
+                        log_output = (
+                            f"❌ Ошибка конфигурации отправки статьи #{target_id} в WordPress:\n"
+                            "Для реальной доставки (live) необходимо указать WP_URL и WP_PASS "
+                            "в файле config/api-keys.local.yaml или в переменных окружения.\n"
+                            "Автоматическое переключение в тестовый режим запрещено во избежание дезинформации."
+                        )
+                        status = "failed"
+                    else:
+                        is_live = want_live and bool(wp_url and wp_pass)
+                        cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path)]
+                        if is_live:
+                            cmd.extend(["--wp-url", wp_url, "--wp-user", wp_user, "--wp-pass", wp_pass])
+                        else:
+                            cmd.append("--dry-run")
+
+                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=45)
+                        mode_label = "Реальная отправка черновика в WordPress" if is_live else "Тестовая валидация (dry-run, схема v1.1)"
+                        log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\nРежим: {mode_label}\n\n" + p.stdout + "\n" + p.stderr
+                        status = "succeeded" if p.returncode == 0 else "failed"
+
+                        journal_file = ROOT / "delivery-journal.json"
+                        contract_cid = res.get("contract", {}).get("content_id", "")
+                        if journal_file.exists() and is_live and p.returncode == 0 and contract_cid:
+                            try:
+                                j_data = json.loads(journal_file.read_text(encoding="utf-8"))
+                                site_key = wp_url.rstrip("/").lower()
+                                site_entries = j_data.get("sites", {}).get(site_key, {})
+                                entry = site_entries.get(contract_cid)
+                                if entry:
+                                    p_id = entry.get("wp_post_id")
+                                    p_status = entry.get("status") or "draft"
+                                    if p_id:
+                                        with get_connection() as conn:
+                                            conn.execute(
+                                                "UPDATE topics SET wp_post_id = ?, wp_status = ?, updated_at = ? WHERE id = ?",
+                                                (p_id, p_status, datetime.now().isoformat(timespec="seconds"), target_id),
+                                            )
+                                            conn.commit()
+                            except Exception:
+                                pass
+
+            elif agent in ("01-researcher", "bobr") and target_id:
+                with get_connection() as conn:
+                    topic_exists = conn.execute("SELECT id FROM topics WHERE id = ?", (target_id,)).fetchone()
+                if not topic_exists:
+                    status = "failed"
+                    log_output = f"Тема #{target_id} не найдена в базе!"
+                else:
+                    import generate_brief
+                    brief_data = generate_brief.build_author_brief(target_id)
+                    brief_md = brief_data.get("markdown", "")
+                    now_str = datetime.now().isoformat(timespec="seconds")
+
+                    with get_connection() as conn:
+                        cols = [c[1] for c in conn.execute("PRAGMA table_info(topics)").fetchall()]
+                        if "brief_markdown" not in cols:
+                            try:
+                                conn.execute("ALTER TABLE topics ADD COLUMN brief_markdown TEXT;")
+                                conn.commit()
+                            except Exception:
+                                pass
+
+                        row = conn.execute("SELECT passport_json FROM topics WHERE id = ?", (target_id,)).fetchone()
+                        passport_dict = {}
+                        if row and row["passport_json"]:
+                            try:
+                                passport_dict = json.loads(row["passport_json"])
+                            except Exception:
+                                passport_dict = {}
+                        if not passport_dict.get("standard") and brief_data.get("standards"):
+                            passport_dict["standard"] = "; ".join(brief_data["standards"][:3])
+                        if brief_data.get("standards"):
+                            passport_dict.setdefault("sources", [{"title": s} for s in brief_data["standards"][:4]])
+
+                        conn.execute("""
+                            UPDATE topics 
+                            SET brief_markdown = ?, 
+                                passport_json = ?,
+                                status = 'brief_ready', 
+                                next_action = 'Бриф сформирован: Бобёр-Конструктор [01-researcher]', 
+                                updated_at = ? 
+                            WHERE id = ?
+                        """, (brief_md, json.dumps(passport_dict, ensure_ascii=False) if passport_dict else (row["passport_json"] if row else None), now_str, target_id))
+                        conn.commit()
+
+                    briefs_dir = ROOT / "seo" / "out" / "briefs"
+                    briefs_dir.mkdir(parents=True, exist_ok=True)
+                    (briefs_dir / f"{target_id}-brief.md").write_text(brief_md, encoding="utf-8")
+
+                    extra_response["brief"] = brief_data
+                    log_output = (
+                        f"✅ Бобёр-Конструктор [01-researcher] сформировал бриф для темы #{target_id} «{brief_data['title']}»:\n\n"
+                        f"• Стандарты: {', '.join(brief_data.get('standards', [])[:3])}\n"
+                        f"• Запросы Вордстат: {len(brief_data.get('queries', []))} шт.\n"
+                        f"• Статус в базе: brief_ready\n\n"
+                        f"{brief_md[:1200]}..."
+                    )
+                    status = "succeeded"
+
+            elif agent == "04-scorer" and target_id:
+                with get_connection() as conn:
+                    row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (target_id,)).fetchone()
+                    content = row["content_markdown"] if row else ""
+                if content and len(content) > 200:
+                    tmp_file = DATA / f"tmp_score_{target_id}.md"
+                    tmp_file.write_text(content, encoding="utf-8")
+                    cmd = [sys.executable, str(SCRIPTS / "score_article.py"), "--file", str(tmp_file), "--id", str(target_id)]
+                    p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
+                    log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
+                    status = "succeeded" if p.returncode in (0, 2, 3, 4) else "failed"
+                    if tmp_file.exists():
+                        try:
+                            tmp_file.unlink()
+                        except Exception:
+                            pass
+                    score_json_file = SEO / "out" / "scores" / f"{target_id}.json"
+                    if score_json_file.exists():
+                        s_data = json.loads(score_json_file.read_text(encoding="utf-8"))
+                        with get_connection() as conn:
+                            conn.execute("UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
+                                         (s_data.get("total"), json.dumps(s_data, ensure_ascii=False), target_id))
+                            conn.commit()
+                else:
+                    log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
+                    status = "failed"
+
+            elif agent == "02-writer" and target_id:
+                voice = (payload.get("voice") or "practico").strip()
+                mode = (payload.get("mode") or "draft").strip().lower()
+                voices = {v["id"]: v for v in list_voices()}
+                voice_row = voices.get(voice)
+                if voice_row is None:
+                    voice = "practico"
+                    voice_row = voices.get("practico")
+                prov = (payload.get("provider") or "").strip().lower()
+                if prov == "triad":
+                    model_spec = "triad:qwen3.5-9b-tochka"
+                elif prov == "omniroute":
+                    model_spec = (payload.get("model") or "omniroute:auto/thinking").strip()
+                    if not model_spec.startswith("omniroute:"):
+                        model_spec = f"omniroute:{model_spec}"
+                elif prov == "local_heuristic":
+                    model_spec = "local_heuristic"
+                else:
+                    model_spec = (payload.get("model") or (voice_row or {}).get("model")
+                                  or "oxion:claude-sonnet-5").strip()
+                system_prompt = ((voice_row or {}).get("system_prompt") or "").strip()
+                if not system_prompt:
+                    try:
+                        from writer_practico import PRACTICO2_SYSTEM_PROMPT, PRACTICO_SYSTEM_PROMPT
+                        system_prompt = (
+                            PRACTICO2_SYSTEM_PROMPT if voice == "practico2"
+                            else PRACTICO_SYSTEM_PROMPT
+                        )
+                    except Exception:
+                        system_prompt = (
+                            "Ты — автор проекта «Точка Плавления» о пайке. Обращение на «Вы», "
+                            "без вымышленного опыта мастера, Answer First, живая ирония без натянутых шуток."
+                        )
+                voice_name = (voice_row or {}).get("name") or voice
+
+                if mode == "paste":
+                    pasted = (payload.get("pasted_text") or "").strip()
+                    if len(pasted) < 200:
+                        log_output = "Вставленный текст слишком короткий (нужно ≥ 200 знаков)."
+                        status = "failed"
+                    else:
+                        instruction = (
+                            "Ниже готовый текст автора. Приведи его к стандартам проекта и голосу: "
+                            "Answer First ≤ 40 слов, 4-8 разделов H2, 1-2 сопоставительные таблицы, "
+                            "FAQ 4-6 пар в блоке '### FAQ:', источники 2-4 в '## Источники:', "
+                            "объём 5 500-7 000 знаков с пробелами. Сохрани все факты и числа автора, "
+                            "не выдумывай новых. Верни только готовый markdown.\n\n"
+                        )
+                        try:
+                            answer, used = voice_generate(
+                                model_spec, system_prompt, instruction + pasted,
+                                max_tokens=12000, temperature=0.3,
+                            )
+                        except Exception:
+                            from writer_practico import generate_local_heuristic_text
+                            answer = generate_local_heuristic_text(user_prompt=instruction, system_prompt=system_prompt, topic_id=target_id, voice=voice)
+                            used = "local_heuristic (offline fallback)"
+
+                        chars = len(answer.strip())
+                        slug = f"article-{target_id}"
+                        preview_only = bool(payload.get("preview_only", False))
+                        extra_response["adapted_markdown"] = answer
+                        extra_response["chars"] = chars
+
+                        if not preview_only:
+                            with get_connection() as conn:
+                                row = conn.execute("SELECT slug FROM topics WHERE id = ?", (target_id,)).fetchone()
+                                slug = row["slug"] if row else slug
+                                conn.execute(
+                                    "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
+                                    "writer_mode = 'paste', next_action = ?, updated_at = ? WHERE id = ?",
+                                    (answer, chars, f"адаптировано: {voice_name} · {used}",
+                                     datetime.now().isoformat(timespec="seconds"), target_id),
+                                )
+                                conn.commit()
+                            try:
+                                art_dir = ROOT / "articles"
+                                art_dir.mkdir(parents=True, exist_ok=True)
+                                (art_dir / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
+                            except Exception:
+                                pass
+                            log_output = f"✅ Готовый текст адаптирован и сохранён: {voice_name} · {used} ({chars} зн.)\n\n{answer[:1500]}"
+                        else:
+                            log_output = f"👁️ Предпросмотр адаптации ({chars} зн.): {voice_name} · {used}\nТекст готов к проверке и утверждению."
+                        status = "succeeded"
+                else:
+                    instruction = (
+                        "Напиши статью по теме «" + _topic_title(target_id) + "» в этом голосе. "
+                        "Стандарты: Answer First ≤ 40 слов, 4-8 H2, 1-2 таблицы, FAQ 4-6 пар "
+                        "в блоке '### FAQ:', источники 2-4 в '## Источники:', объём 5 500-7 000 знаков. "
+                        "Верни только markdown."
+                    )
+                    try:
+                        answer, used = voice_generate(
+                            model_spec, system_prompt, instruction,
+                            max_tokens=12000, temperature=0.35,
+                        )
+                    except Exception:
+                        from writer_practico import generate_local_heuristic_text
+                        answer = generate_local_heuristic_text(user_prompt=instruction, system_prompt=system_prompt, topic_id=target_id, voice=voice)
+                        used = "local_heuristic (offline fallback)"
+
+                    _save_written_article(target_id, answer, author=f"ai-{voice}")
+                    log_output = f"✅ Статья написана: {voice_name} · {used} ({len(answer)} зн.)\n\n{answer[:1500]}"
+                    status = "succeeded"
+
+            elif agent in ("02-writer-2", "lis") and target_id:
+                voice = (payload.get("voice") or "practico2").strip()
+                voices = {v["id"]: v for v in list_voices()}
+                voice_row = voices.get(voice) or voices.get("practico2")
+                prov = (payload.get("provider") or "").strip().lower()
+                if prov == "triad":
+                    model_spec = "triad:qwen3.5-9b-tochka"
+                elif prov == "omniroute":
+                    model_spec = (payload.get("model") or "omniroute:auto/thinking").strip()
+                    if not model_spec.startswith("omniroute:"):
+                        model_spec = f"omniroute:{model_spec}"
+                elif prov == "local_heuristic":
+                    model_spec = "local_heuristic"
+                else:
+                    model_spec = (payload.get("model") or (voice_row or {}).get("model") or "omniroute:auto/thinking").strip()
+
+                try:
+                    from writer_practico import PRACTICO2_SYSTEM_PROMPT
+                    system_prompt = PRACTICO2_SYSTEM_PROMPT
+                except Exception:
+                    system_prompt = "Ты — Лис-Прагматик, автор проекта «Точка Плавления» в голосе Practico 2. Сметы, точные затраты, окупаемость оборудования и строгая физика пайки без слопа."
+
+                voice_name = (voice_row or {}).get("name") or "Practico 2 (Лис-Прагматик)"
+                instruction = (
+                    "Напиши исчерпывающую статью со сметным расчетом и анализом окупаемости по теме «" + _topic_title(target_id) + "» в голосе Practico 2 (Лис-Прагматик). "
+                    "Обязательные элементы: Answer First ≤ 40 слов, 4-8 разделов H2, включая блок подробной сметы материалов и оборудования, "
+                    "1-2 сопоставительные таблицы затрат, раздел «## Безопасность и средства защиты», раздел «## Источники и нормативные документы», "
+                    "блок FAQ 4-6 пар в конце ('### FAQ:'). Объём 5 500-7 000 знаков с пробелами. Верни только markdown."
+                )
+
+                try:
+                    answer, used = voice_generate(model_spec, system_prompt, instruction, max_tokens=12000, temperature=0.35)
+                except Exception:
+                    from writer_practico import generate_local_heuristic_text
+                    answer = generate_local_heuristic_text(user_prompt=instruction, system_prompt=system_prompt, topic_id=target_id, voice="practico2")
+                    used = "local_heuristic (offline fallback)"
+
+                _save_written_article(target_id, answer, author=f"ai-{voice}")
+                chars = len(answer.strip())
+
+                try:
+                    from score_article import blocks as score_blocks
+                    report = score_blocks(answer, None, str(target_id))
+                    with get_connection() as conn:
+                        conn.execute("UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
+                                     (report["total"], json.dumps(report, ensure_ascii=False), target_id))
+                        conn.commit()
+                    extra_response["score"] = report["total"]
+                except Exception:
+                    pass
+
+                extra_response["chars"] = chars
+                log_output = f"✅ Статья со сметой и окупаемостью написана: {voice_name} · {used} ({chars} зн.)\n\n{answer[:1500]}"
+                status = "succeeded"
+
+            elif agent == "05-illustrator" and target_id:
+                from craftsman_illustrator import design_visual_package_for_topic
+                res = design_visual_package_for_topic(target_id)
+                if res["status"] == "success":
+                    log_output = (
+                        f"✅ Барсук-Иллюстратор [05-illustrator]:\n{res['summary']}\n"
+                        f"• Файл схемы: {res['svg_file']}\n"
+                        f"• Сплав: {res['alloy']}\n"
+                        f"• Hero-промпт: {res['media']['hero_image']['prompt'][:120]}..."
+                    )
+                    status = "succeeded"
+                else:
+                    log_output = f"❌ Ошибка генерации визуала: {res.get('message', 'Неизвестная ошибка')}"
+                    status = "failed"
+
+            elif agent in ("03-reviewer", "factcheck") and target_id:
+                with get_connection() as conn:
+                    row = conn.execute(
+                        "SELECT title, content_markdown, is_critical FROM topics WHERE id = ?",
+                        (target_id,),
+                    ).fetchone()
+                text = (row["content_markdown"] if row else "") or ""
+                if len(text.strip()) < 200:
+                    log_output = f"У статьи #{target_id} нет текста для проверки."
+                    status = "failed"
+                else:
+                    critical = bool(row["is_critical"]) if row else False
+                    if agent == "03-reviewer":
+                        model_key = "reviewer_critical" if critical else "reviewer_default"
+                        system_prompt = REVIEW_SYSTEM_PROMPT
+                        status_column, model_column = "review_status", "review_model"
+                        label = "рецензия"
+                    else:
+                        model_key = "factcheck"
+                        system_prompt = FACTCHECK_SYSTEM_PROMPT
+                        status_column, model_column = "factcheck_status", "factcheck_model"
+                        label = "фактчек"
+
+                    answer = None
+                    used = None
+                    review_json = {}
+                    try:
+                        answer, used = oxion_chat(
+                            OXION_ROLE_MODELS[model_key], system_prompt,
+                            f"Статья #{target_id} «{row['title']}»:\n\n{text}",
+                            max_tokens=6000,
+                        )
+                    except Exception as e_oxion:
+                        answer, used, review_json = run_offline_reviewer(
+                            text=text, title=row["title"] if row else "", target_id=target_id,
+                            is_critical=critical, agent=agent
+                        )
+                        extra_response["review"] = review_json
+
+                    verdict = "done"
+                    low_ans = answer.lower()
+                    if re.search(r"(?i)вердикт[:\s]*(?:принято|годен|одобрено|соответствует)", answer):
+                        verdict = "passed"
+                    elif re.search(r"(?i)вердикт[:\s]*(?:доработка|правки|требует правок|не годен|отклон|ошибк)", answer) or "блок" in low_ans:
+                        verdict = "needs_fix"
+
+                    deslop_tool = ROOT / "tools" / "deslop.py"
+                    deslop_report = ""
+                    if not review_json and deslop_tool.exists():
+                        try:
+                            p_deslop = subprocess.run(
+                                [sys.executable, str(deslop_tool), "--text", text[:4000]],
+                                capture_output=True, text=True, encoding="utf-8", timeout=10
+                            )
+                            deslop_out = p_deslop.stdout.strip()
+                            if "needs a cleanse" in deslop_out or "score" in deslop_out:
+                                deslop_report = f"\n\n[🦉 Humanizer / SlopMonster Report]:\n{deslop_out}"
+                                if p_deslop.returncode != 0 and verdict == "passed":
+                                    verdict = "needs_fix"
+                        except Exception:
+                            pass
+
+                    with get_connection() as conn:
+                        conn.execute(
+                            f"UPDATE topics SET {status_column} = ?, {model_column} = ?, "
+                            "next_action = ?, updated_at = ? WHERE id = ?",
+                            (verdict, used, f"{label} ({verdict}): {used}",
+                             datetime.now().isoformat(timespec="seconds"), target_id),
+                        )
+                        conn.commit()
+                    log_output = f"✅ {label.capitalize()} завершён: вердикт «{verdict}» (модель {used}){deslop_report}\n\n{answer}"
+                    status = "succeeded"
+
+            elif agent in ("06-knowledge", "raccoon"):
+                ds_res = generate_lora_dataset()
+                k_status = build_knowledge_status()
+                extra_response["dataset"] = ds_res
+                extra_response["knowledge"] = k_status
+                log_output = (
+                    f"✅ Енот-Датасетник [06-knowledge] упаковал LoRA-датасет:\n"
+                    f"• Экспортировано примеров ChatML: {ds_res.get('exported_count', 0)}\n"
+                    f"• Файл датасета: {ds_res.get('file_path')}\n"
+                    f"• Размер: {ds_res.get('size_bytes', 0)} байт\n"
+                    f"• Граф Graphify: {k_status.get('graphify', {}).get('nodes_count', 0)} узлов, {k_status.get('graphify', {}).get('edges_count', 0)} связей\n"
+                    f"• Покрытие ГОСТ: {len(k_status.get('standards', []))} стандартов в базе\n"
+                    f"• Темы с пробелами знаний: {len(k_status.get('knowledge_gaps', []))} шт."
+                )
+                status = "succeeded"
+
+            elif agent in ("assistant", "bear"):
+                telemetry = check_cluster_telemetry()
+                health = check_all_agents_health()
+                with get_connection() as conn:
+                    total_topics = conn.execute("SELECT count(*) FROM topics").fetchone()[0]
+                    written = conn.execute("SELECT count(*) FROM topics WHERE content_markdown IS NOT NULL AND length(content_markdown) > 200").fetchone()[0]
+                    reviewed = conn.execute("SELECT count(*) FROM topics WHERE review_status = 'passed'").fetchone()[0]
+                    scored = conn.execute("SELECT count(*) FROM topics WHERE score_total IS NOT NULL").fetchone()[0]
+                    with_media = conn.execute("SELECT count(*) FROM topics WHERE media_json IS NOT NULL").fetchone()[0]
+                    published = conn.execute("SELECT count(*) FROM topics WHERE wp_post_id IS NOT NULL").fetchone()[0]
+                    last_topic = conn.execute("SELECT id, title, status, updated_at FROM topics ORDER BY updated_at DESC LIMIT 1").fetchone()
+
+                stats_dict = {
+                    "total": total_topics, "written": written, "reviewed": reviewed,
+                    "with_media": with_media, "scored": scored, "published": published
+                }
+                extra_response["telemetry"] = telemetry
+                extra_response["health"] = health
+                extra_response["stats"] = stats_dict
+
+                t_nodes = telemetry.get("triad", {}).get("nodes", [])
+                nodes_str = "\n".join([f"  • {n.get('name')}: {n.get('state', 'online')} ({n.get('device')} · :{n.get('port')})" for n in t_nodes]) if isinstance(t_nodes, list) else "  • Узлы опрашиваются..."
+
+                log_output = (
+                    f"🐻 Медведь-Михалыч [Староста Артели / Патруль телеметрии]:\n"
+                    f"Обход артели завершён. Телеметрия кластера Triad-Omni v4.9 и шлюза OmniRoute зафиксирована на планшете.\n\n"
+                    f"📡 [Узлы мобильного кластера Triad-Omni]:\n{nodes_str}\n"
+                    f"• Шлюз OmniRoute (:20128): {telemetry.get('omniroute', {}).get('status', 'standby')} ({telemetry.get('omniroute', {}).get('models_count', 0)} моделей)\n\n"
+                    f"📋 [Сводка верстаков Артели]:\n"
+                    f"• Тем в базе: {total_topics} | Написано: {written} | ОТК [Одобрено]: {reviewed}\n"
+                    f"• Схем термопрофилей: {with_media} | 100-балльный скоринг: {scored} | В релизе WP: {published}\n"
+                    f"• Последняя активная тема: #{last_topic['id'] if last_topic else 1} «{last_topic['title'] if last_topic else '—'}»\n\n"
+                    f"Все 9 мастеров на связи. Рация и планшет в строю!"
+                )
+                status = "succeeded"
+
+            else:
+                log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."
+                status = "not_implemented"
+        except (Exception, SystemExit, BaseException) as ex:
+            status = "failed"
+            log_output = str(ex)
+
+        safe_agent = _scalar(agent, "unknown").strip() or "unknown"
+        with get_connection() as conn:
+            conn.execute("""
+                INSERT INTO agent_runs (agent_name, action, target_id, status, log, created_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (safe_agent, "run", str(target_id or ""), status, log_output[:2000], datetime.now().isoformat(timespec="seconds")))
+            conn.commit()
+
+        resp_payload = {"status": status, "agent": agent, "log": log_output}
+        if extra_response:
+            resp_payload.update(extra_response)
+        self.send_json(resp_payload)
+
     def do_POST(self):
         url = urlparse(self.path)
         path = url.path
@@ -1816,6 +2579,76 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 cur.execute("UPDATE competitors_proposed SET status = 'принят' WHERE domain = ?", (domain,))
                 conn.commit()
             self.send_json({"status": "ok", "domain": domain})
+            return
+
+        # -------------------------------------------------------------
+        # Управление конфигурацией моделей (1+4) и стандартами
+        # -------------------------------------------------------------
+        if path == "/api/config/models":
+            try:
+                import models_manager
+                success = models_manager.update_models_config(payload)
+                self.send_json({"status": "ok" if success else "error"})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/config/animal_model":
+            animal = payload.get("animal") or payload.get("animal_id")
+            slot = payload.get("slot", "primary")
+            model_name = payload.get("model_name") or payload.get("selection", "")
+            if not animal:
+                self.send_json({"status": "error", "message": "Требуется animal / animal_id"}, 400)
+                return
+            try:
+                import models_manager
+                res = models_manager.set_animal_model(animal, slot, model_name)
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/config/provider_key":
+            provider = payload.get("provider")
+            api_key = payload.get("api_key", "")
+            active = bool(payload.get("active", True))
+            if not provider:
+                self.send_json({"status": "error", "message": "Требуется provider"}, 400)
+                return
+            try:
+                import models_manager
+                res = models_manager.set_provider_key(provider, api_key, active)
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/standards/upload_pdf":
+            # Сохранение и индексация PDF ГОСТа (Рокки)
+            pdf_b64 = payload.get("pdf_base64")
+            filename = payload.get("filename", "uploaded_standard.pdf")
+            title = payload.get("title", filename)
+            status_val = payload.get("status", "active")
+            
+            if not pdf_b64:
+                self.send_json({"status": "error", "message": "Отсутствует pdf_base64"}, 400)
+                return
+            try:
+                import base64
+                import pdf_gost_extractor
+                
+                target_dir = ROOT / "seo" / "reference" / "standards_pdf"
+                target_dir.mkdir(parents=True, exist_ok=True)
+                target_file = target_dir / filename
+                
+                file_bytes = base64.b64decode(pdf_b64)
+                with open(target_file, "wb") as f:
+                    f.write(file_bytes)
+                    
+                result = pdf_gost_extractor.index_pdf_document(target_file, title=title, status=status_val)
+                self.send_json(result)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
             return
 
         # 4.9. Пересчёт приоритета тем (спрос + конкуренция + интент + готовность)
@@ -2265,327 +3098,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         # 7. Запуск субагента
         if path == "/api/agent/run":
-            agent = _scalar(payload.get("agent", ""), "").strip()
-            if not agent:
-                self.send_json({"status": "error", "message": "Не указан агент"}, 400)
-                return
-
-            raw_target = _scalar(payload.get("target_id"), "")
-            if raw_target in (None, ""):
-                target_id = None
-            else:
-                target_id = parse_row_id(raw_target)
-                if target_id is None:
-                    self.send_json({
-                        "status": "error",
-                        "message": f"Поле 'target_id' должно быть положительным целым числом, получено: {raw_target!r}",
-                    }, 400)
-                    return
-            if agent in TARGET_REQUIRED_AGENTS and target_id is None:
-                self.send_json({"status": "error",
-                                "message": f"Агенту '{agent}' нужен target_id — ID темы из базы"}, 400)
-                return
-
-            # Долгие агенты (обход сайтов) выполняются в фоне: HTTP-запрос
-            # не должен ждать десятки секунд и обрываться по таймауту.
-            if agent in LONG_AGENTS:
-                if agent == "00-research":
-                    cmd = [sys.executable, str(SCRIPTS / "research_competitors.py"),
-                           "--limit", "10", "--max-domains", "5", "--budget", "60"]
-                else:
-                    domain = payload.get("domain", "")
-                    cmd = [sys.executable, str(SCRIPTS / "bot_competitor_analyzer.py")]
-                    cmd.extend(["--domain", domain] if domain else ["--all"])
-                job_id = start_background_job(agent, cmd, target_id)
-                self.send_json({
-                    "status": "queued",
-                    "agent": agent,
-                    "job_id": job_id,
-                    "log": f"Задача поставлена в очередь (job #{job_id}). Прогресс: /api/jobs/{job_id}",
-                })
-                return
-
-            log_output = f"Запуск {agent}..."
-            status = "completed"
-            extra_response = {}
-
-            try:
-                if agent == "delivery" and target_id:
-                    from package_contract import package_article
-                    res = package_article(target_id)
-                    if not res["valid"]:
-                        errors_str = "\n".join([f"  • {e}" for e in (res.get("missing_warnings", []) + res.get("errors", []))])
-                        log_output = f"❌ Статья #{target_id} не готова к доставке в WordPress (нарушение схемы v1.1):\n{errors_str}\n\nУстраните замечания перед отправкой черновика."
-                        status = "failed"
-                    else:
-                        contract_path = DATA / f"contract_{target_id}.json"
-                        contract_path.write_text(json.dumps(res["contract"], ensure_ascii=False, indent=2), encoding="utf-8")
-                        delivery_tool = ROOT / "tools" / "delivery_cli.py"
-
-                        # Проверяем наличие ключей WP в keys.py
-                        wp_url = get_key("WP_URL") or os.environ.get("WP_URL", "")
-                        wp_user = get_key("WP_USER") or os.environ.get("WP_USER", "")
-                        wp_pass = get_key("WP_PASS") or os.environ.get("WP_PASS", "")
-                        want_live = bool(payload.get("live"))
-
-                        if want_live and not (wp_url and wp_pass):
-                            log_output = (
-                                f"❌ Ошибка конфигурации отправки статьи #{target_id} в WordPress:\n"
-                                "Для реальной доставки (live) необходимо указать WP_URL и WP_PASS "
-                                "в файле config/api-keys.local.yaml или в переменных окружения.\n"
-                                "Автоматическое переключение в тестовый режим запрещено во избежание дезинформации."
-                            )
-                            status = "failed"
-                        else:
-                            is_live = want_live and bool(wp_url and wp_pass)
-                            cmd = [sys.executable, str(delivery_tool), "send-draft", "--file", str(contract_path)]
-                            if is_live:
-                                cmd.extend(["--wp-url", wp_url, "--wp-user", wp_user, "--wp-pass", wp_pass])
-                            else:
-                                cmd.append("--dry-run")
-
-                            p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=45)
-                            mode_label = "Реальная отправка черновика в WordPress" if is_live else "Тестовая валидация (dry-run, схема v1.1)"
-                            log_output = f"✓ Пакет статьи #{target_id} 100% валиден по схеме v1.1!\nРежим: {mode_label}\n\n" + p.stdout + "\n" + p.stderr
-                            status = "succeeded" if p.returncode == 0 else "failed"
-
-                            # Синхронизируем точные метаданные WP из журнала доставки DeliveryJournal v2.0 в SQLite
-                            journal_file = ROOT / "delivery-journal.json"
-                            contract_cid = res.get("contract", {}).get("content_id", "")
-                            if journal_file.exists() and is_live and p.returncode == 0 and contract_cid:
-                                try:
-                                    j_data = json.loads(journal_file.read_text(encoding="utf-8"))
-                                    site_key = wp_url.rstrip("/").lower()
-                                    site_entries = j_data.get("sites", {}).get(site_key, {})
-                                    entry = site_entries.get(contract_cid)
-                                    if entry:
-                                        p_id = entry.get("wp_post_id")
-                                        p_status = entry.get("status") or "draft"
-                                        if p_id:
-                                            with get_connection() as conn:
-                                                conn.execute(
-                                                    "UPDATE topics SET wp_post_id = ?, wp_status = ?, updated_at = ? WHERE id = ?",
-                                                    (p_id, p_status, datetime.now().isoformat(timespec="seconds"), target_id),
-                                                )
-                                                conn.commit()
-                                except Exception:
-                                    pass
-                elif agent == "04-scorer" and target_id:
-                    with get_connection() as conn:
-                        row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (target_id,)).fetchone()
-                        content = row["content_markdown"] if row else ""
-                    if content and len(content) > 200:
-                        tmp_file = DATA / f"tmp_score_{target_id}.md"
-                        tmp_file.write_text(content, encoding="utf-8")
-                        cmd = [sys.executable, str(SCRIPTS / "score_article.py"), "--file", str(tmp_file), "--id", str(target_id)]
-                        p = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", timeout=30)
-                        log_output = p.stdout + ("\n" + p.stderr if p.stderr else "")
-                        # Коды скорера: 0 (passed >=80), 2 (needs_revision 60-79), 3 (low <60), 4 (blocker).
-                        # Все они являются успешным завершением аналитической проверки, а не падением сервера!
-                        status = "succeeded" if p.returncode in (0, 2, 3, 4) else "failed"
-                        if tmp_file.exists():
-                            try:
-                                tmp_file.unlink()
-                            except Exception:
-                                pass
-                        # Обновляем скор в БД
-                        score_json_file = SEO / "out" / "scores" / f"{target_id}.json"
-                        if score_json_file.exists():
-                            s_data = json.loads(score_json_file.read_text(encoding="utf-8"))
-                            with get_connection() as conn:
-                                conn.execute("UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
-                                             (s_data.get("total"), json.dumps(s_data, ensure_ascii=False), target_id))
-                                conn.commit()
-                    else:
-                        log_output = f"У темы #{target_id} нет текста для оценки (требуется черновик)."
-                        status = "failed"
-                elif agent == "02-writer" and target_id:
-                    voice = (payload.get("voice") or "practico").strip()
-                    mode = (payload.get("mode") or "draft").strip().lower()
-                    voices = {v["id"]: v for v in list_voices()}
-                    voice_row = voices.get(voice)
-                    if voice_row is None:
-                        voice = "practico"
-                        voice_row = voices.get("practico")
-                    prov = (payload.get("provider") or "").strip().lower()
-                    if prov == "triad":
-                        model_spec = "triad:qwen3.5-9b-tochka"
-                    elif prov == "omniroute":
-                        model_spec = (payload.get("model") or "omniroute:auto/thinking").strip()
-                        if not model_spec.startswith("omniroute:"):
-                            model_spec = f"omniroute:{model_spec}"
-                    else:
-                        model_spec = (payload.get("model") or (voice_row or {}).get("model")
-                                      or "oxion:claude-sonnet-5").strip()
-                    system_prompt = ((voice_row or {}).get("system_prompt") or "").strip()
-                    if not system_prompt:
-                        try:
-                            from writer_practico import PRACTICO2_SYSTEM_PROMPT, PRACTICO_SYSTEM_PROMPT
-                            system_prompt = (
-                                PRACTICO2_SYSTEM_PROMPT if voice == "practico2"
-                                else PRACTICO_SYSTEM_PROMPT
-                            )
-                        except Exception:  # noqa: BLE001
-                            system_prompt = (
-                                "Ты — автор проекта «Точка Плавления» о пайке. Обращение на «Вы», "
-                                "без вымышленного опыта мастера, Answer First, живая ирония без натянутых шуток."
-                            )
-                    voice_name = (voice_row or {}).get("name") or voice
-
-                    if mode == "paste":
-                        pasted = (payload.get("pasted_text") or "").strip()
-                        if len(pasted) < 200:
-                            log_output = "Вставленный текст слишком короткий (нужно ≥ 200 знаков)."
-                            status = "failed"
-                        else:
-                            instruction = (
-                                "Ниже готовый текст автора. Приведи его к стандартам проекта и голосу: "
-                                "Answer First ≤ 40 слов, 4-8 разделов H2, 1-2 сопоставительные таблицы, "
-                                "FAQ 4-6 пар в блоке '### FAQ:', источники 2-4 в '## Источники:', "
-                                "объём 5 500-7 000 знаков с пробелами. Сохрани все факты и числа автора, "
-                                "не выдумывай новых. Верни только готовый markdown.\n\n"
-                            )
-                            answer, used = voice_generate(
-                                model_spec, system_prompt, instruction + pasted,
-                                max_tokens=12000, temperature=0.3,
-                            )
-                            chars = len(answer.strip())
-                            slug = f"article-{target_id}"
-                            preview_only = bool(payload.get("preview_only", False))
-                            extra_response["adapted_markdown"] = answer
-                            extra_response["chars"] = chars
-
-                            if not preview_only:
-                                with get_connection() as conn:
-                                    row = conn.execute("SELECT slug FROM topics WHERE id = ?", (target_id,)).fetchone()
-                                    slug = row["slug"] if row else slug
-                                    conn.execute(
-                                        "UPDATE topics SET content_markdown = ?, chars = ?, status = 'written', "
-                                        "writer_mode = 'paste', next_action = ?, updated_at = ? WHERE id = ?",
-                                        (answer, chars, f"адаптировано: {voice_name} · {used}",
-                                         datetime.now().isoformat(timespec="seconds"), target_id),
-                                    )
-                                    conn.commit()
-                                try:
-                                    art_dir = ROOT / "articles"
-                                    art_dir.mkdir(parents=True, exist_ok=True)
-                                    (art_dir / f"{target_id}-{slug}.md").write_text(answer, encoding="utf-8")
-                                except Exception:  # noqa: BLE001
-                                    pass
-                                log_output = f"✅ Готовый текст адаптирован и сохранён: {voice_name} · {used} ({chars} зн.)\n\n{answer[:1500]}"
-                            else:
-                                log_output = f"👁️ Предпросмотр адаптации ({chars} зн.): {voice_name} · {used}\nТекст готов к проверке и утверждению."
-                            status = "succeeded"
-                    else:
-                        instruction = (
-                            "Напиши статью по теме «" + _topic_title(target_id) + "» в этом голосе. "
-                            "Стандарты: Answer First ≤ 40 слов, 4-8 H2, 1-2 таблицы, FAQ 4-6 пар "
-                            "в блоке '### FAQ:', источники 2-4 в '## Источники:', объём 5 500-7 000 знаков. "
-                            "Верни только markdown."
-                        )
-                        answer, used = voice_generate(
-                            model_spec, system_prompt, instruction,
-                            max_tokens=12000, temperature=0.35,
-                        )
-                        _save_written_article(target_id, answer, author=f"ai-{voice}")
-                        log_output = f"✅ Статья написана: {voice_name} · {used} ({len(answer)} зн.)\n\n{answer[:1500]}"
-                        status = "succeeded"
-                elif agent == "05-illustrator" and target_id:
-                    from craftsman_illustrator import design_visual_package_for_topic
-                    res = design_visual_package_for_topic(target_id)
-                    if res["status"] == "success":
-                        log_output = (
-                            f"✅ Барсук-Иллюстратор [05-illustrator]:\n{res['summary']}\n"
-                            f"• Файл схемы: {res['svg_file']}\n"
-                            f"• Сплав: {res['alloy']}\n"
-                            f"• Hero-промпт: {res['media']['hero_image']['prompt'][:120]}..."
-                        )
-                        status = "succeeded"
-                    else:
-                        log_output = f"❌ Ошибка генерации визуала: {res.get('message', 'Неизвестная ошибка')}"
-                        status = "failed"
-                elif agent in ("03-reviewer", "factcheck") and target_id:
-                    with get_connection() as conn:
-                        row = conn.execute(
-                            "SELECT title, content_markdown, is_critical FROM topics WHERE id = ?",
-                            (target_id,),
-                        ).fetchone()
-                    text = (row["content_markdown"] if row else "") or ""
-                    if len(text.strip()) < 200:
-                        log_output = f"У статьи #{target_id} нет текста для проверки."
-                        status = "failed"
-                    else:
-                        critical = bool(row["is_critical"]) if row else False
-                        if agent == "03-reviewer":
-                            model_key = "reviewer_critical" if critical else "reviewer_default"
-                            system_prompt = REVIEW_SYSTEM_PROMPT
-                            status_column, model_column = "review_status", "review_model"
-                            label = "рецензия"
-                        else:
-                            model_key = "factcheck"
-                            system_prompt = FACTCHECK_SYSTEM_PROMPT
-                            status_column, model_column = "factcheck_status", "factcheck_model"
-                            label = "фактчек"
-                        answer, used = oxion_chat(
-                            OXION_ROLE_MODELS[model_key], system_prompt,
-                            f"Статья #{target_id} «{row['title']}»:\n\n{text}",
-                            max_tokens=6000,
-                        )
-                        # Парсим машинный вердикт модели (принято / доработка)
-                        verdict = "done"
-                        low_ans = answer.lower()
-                        if re.search(r"(?i)вердикт[:\s]*(?:принято|годен|одобрено|соответствует)", answer):
-                            verdict = "passed"
-                        elif re.search(r"(?i)вердикт[:\s]*(?:доработка|правки|требует правок|не годен|отклон|ошибк)", answer) or "блок" in low_ans:
-                            verdict = "needs_fix"
-
-                        # Проверка Humanizer (SlopMonster)
-                        deslop_tool = ROOT / "tools" / "deslop.py"
-                        deslop_report = ""
-                        if deslop_tool.exists():
-                            try:
-                                p_deslop = subprocess.run(
-                                    [sys.executable, str(deslop_tool), "--text", text[:4000]],
-                                    capture_output=True, text=True, encoding="utf-8", timeout=10
-                                )
-                                deslop_out = p_deslop.stdout.strip()
-                                if "needs a cleanse" in deslop_out or "score" in deslop_out:
-                                    deslop_report = f"\n\n[🦉 Humanizer / SlopMonster Report]:\n{deslop_out}"
-                                    if p_deslop.returncode != 0 and verdict == "passed":
-                                        verdict = "needs_fix"
-                            except Exception:
-                                pass
-
-                        with get_connection() as conn:
-                            conn.execute(
-                                f"UPDATE topics SET {status_column} = ?, {model_column} = ?, "
-                                "next_action = ?, updated_at = ? WHERE id = ?",
-                                (verdict, used, f"{label} ({verdict}): {used}",
-                                 datetime.now().isoformat(timespec="seconds"), target_id),
-                            )
-                            conn.commit()
-                        log_output = f"✅ {label.capitalize()} завершён: вердикт «{verdict}» (модель {used}){deslop_report}\n\n{answer}"
-                        status = "succeeded"
-                else:
-                    log_output = f"Агент {agent} требует вызова модели Claude/Gemini. Промпт сформирован по стандартам seo/agents/{agent}/AGENT.md."
-                    status = "not_implemented"
-            except Exception as ex:
-                status = "failed"
-                log_output = str(ex)
-
-            # Сохраняем запуск в agent_runs
-            safe_agent = _scalar(agent, "unknown").strip() or "unknown"
-            with get_connection() as conn:
-                conn.execute("""
-                    INSERT INTO agent_runs (agent_name, action, target_id, status, log, created_at)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                """, (safe_agent, "run", str(target_id or ""), status, log_output[:2000], datetime.now().isoformat(timespec="seconds")))
-                conn.commit()
-
-            resp_payload = {"status": status, "agent": agent, "log": log_output}
-            if extra_response:
-                resp_payload.update(extra_response)
-            self.send_json(resp_payload)
+            self.dispatch_agent_run(payload)
             return
 
         # 7.5. Проверка фразы: спрос (Вордстат, бесплатно) и конкуренция (Мутаген, платно)

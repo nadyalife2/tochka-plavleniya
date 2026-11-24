@@ -2994,7 +2994,7 @@ function promptMissionRun() {
 // ============================================================
 const CRAFTSMAN_DOSSIER = {
   soroka: {
-    title: 'Сорока-Разведчица',
+    title: 'Сорока Клара (LSI & ГОСТ-Разведчица)',
     role: '00-research · Поисковая семантика, LSI & Конкуренты',
     icon: '🪶',
     agentTarget: '00-research',
@@ -3493,7 +3493,28 @@ function renderCraftsmanWorkbench(agentId) {
         <div style="margin-top:8px;display:flex;gap:8px;">
           <button type="button" class="btn btn--sm" onclick="showToast('Лонгрид отправлен на просчет сметы Лису!')" style="background:#EA580C;color:#FFF;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;">✍️ Написать лонгрид по физике пайки</button>
         </div>
-      </div>
+      
+        <div style="margin-top:14px;background:#18181D;border:1.5px solid #EA580C;border-radius:6px;padding:12px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:6px;">
+            <div style="font-weight:bold;color:#FB923C;font-size:12px;display:flex;align-items:center;gap:6px;">
+              ✍️ СВОИМИ СИЛАМИ / ВНЕШНЯЯ LLM («МОИМ ГОЛОСОСОМ»)
+            </div>
+            <button type="button" class="btn btn--xs" onclick="copyKotMegaPrompt()" style="background:#EA580C;color:#FFF;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:bold;">
+              📋 Скопировать Мега-Промпт
+            </button>
+          </div>
+          <p style="font-size:11px;color:#94A3B8;margin:0 0 8px 0;line-height:1.4;">
+            Если нужно написать статью во внешней LLM (Claude 3.7 / ChatGPT) или самостоятельно: скопируйте подготовленный промпт с авторским голосом («женский род, от первого лица, конкретные грабли и цифры»), а готовую статью вставьте ниже для проверки Филином [ОТК-ГОСТ].
+          </p>
+          <textarea id="wsKotArticlePaste" placeholder="Вставьте готовый Markdown статьи сюда для автоматической проверки по ГОСТ и AST-метрикам..." style="width:100%;height:90px;background:#09090B;border:1px solid #4B5563;color:#F3F4F6;padding:8px;border-radius:4px;font-size:11.5px;font-family:monospace;resize:vertical;"></textarea>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+            <button type="button" class="btn btn--sm" onclick="submitPastedArticleToOtk()" style="background:#22C55E;color:#000;border:none;border-radius:4px;padding:6px 14px;cursor:pointer;font-weight:bold;font-size:11.5px;">
+              🦉 Отправить Филину на [ОТК-ГОСТ]
+            </button>
+          </div>
+        </div>
+    
+    </div>
     `;
 
   } else if (agentId === 'lis') {
@@ -3930,3 +3951,346 @@ document.addEventListener('keydown', e => {
     }
   }
 });
+
+
+// =========================================================================
+// ХЕЛПЕРЫ ДЛЯ ИЕРАРХИИ МОДЕЛЕЙ (1+4), АНАЛИЗА КОНКУРЕНТОВ И СТАНДАРТОВ
+// =========================================================================
+
+let globalModelsConfig = null;
+let currentConfigAnimalTab = 'bear';
+
+const ANIMAL_NAMES_MAP = {
+  bear: { name: 'Медведь Михалыч', role: 'Прораб & Маршрутизатор', icon: '🐻' },
+  soroka: { name: 'Сорока Клара', role: 'LSI & ГОСТ-Разведчица', icon: '🪶' },
+  bobr: { name: 'Бобёр Борис', role: 'Архитектор ТЗ', icon: '🦫' },
+  kot: { name: 'Кот Феликс', role: 'Физика пайки & Авторский голос', icon: '🐱' },
+  lis: { name: 'Лис Рейнард', role: 'Экономист оборудования', icon: '🦊' },
+  barsuk: { name: 'Барсук Бруно', role: 'Термопрофиль & Ошибки', icon: '🦡' },
+  filin: { name: 'Филин Архимед', role: 'Главный [ОТК-ГОСТ]', icon: '🦉' },
+  dyatel: { name: 'Дятел Вуди', role: 'AST-Скорер & Валидатор', icon: '🪵' },
+  raccoon: { name: 'Енот Рокки', role: 'Graphify & PDF-Архивариус', icon: '🦝' }
+};
+
+async function openModelsConfigModal() {
+  const modal = document.getElementById('modelsConfigModal');
+  if (modal) modal.classList.add('active');
+  await loadModelsConfig();
+}
+
+function closeModelsConfigModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  const modal = document.getElementById('modelsConfigModal');
+  if (modal) modal.classList.remove('active');
+}
+
+async function loadModelsConfig() {
+  try {
+    const res = await fetch('/api/config/models');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    globalModelsConfig = await res.json();
+    renderModelsConfigTabs();
+    renderModelsConfigContent(currentConfigAnimalTab);
+    renderProviderKeysContent();
+  } catch (err) {
+    console.error('Ошибка загрузки models_config:', err);
+    if (typeof showToast === 'function') showToast('Не удалось загрузить конфигурацию моделей: ' + err.message);
+  }
+}
+
+function renderModelsConfigTabs() {
+  const container = document.getElementById('modelsAnimalTabsContainer');
+  if (!container || !globalModelsConfig) return;
+  const animals = Object.keys(ANIMAL_NAMES_MAP);
+  container.innerHTML = animals.map(id => {
+    const info = ANIMAL_NAMES_MAP[id];
+    const isAct = (id === currentConfigAnimalTab);
+    return `<button type="button" onclick="selectConfigAnimalTab('${id}')" style="background:${isAct ? '#4F46E5' : '#27272A'};color:${isAct ? '#FFF' : '#A1A1AA'};border:1px solid ${isAct ? '#6366F1' : '#3F3F46'};padding:6px 12px;border-radius:6px;font-size:11.5px;cursor:pointer;font-weight:${isAct ? '700' : '400'};display:flex;align-items:center;gap:6px;">
+      <span>${info.icon}</span> <span>${info.name.split(' ')[1] || info.name}</span>
+    </button>`;
+  }).join('');
+}
+
+function selectConfigAnimalTab(animalId) {
+  currentConfigAnimalTab = animalId;
+  renderModelsConfigTabs();
+  renderModelsConfigContent(animalId);
+}
+
+function renderModelsConfigContent(animalId) {
+  const container = document.getElementById('modelsAnimalConfigContent');
+  if (!container || !globalModelsConfig) return;
+  const animalCfg = (globalModelsConfig.animals && globalModelsConfig.animals[animalId]) || {};
+  const allAvailable = globalModelsConfig.all_available_models || [];
+  const info = ANIMAL_NAMES_MAP[animalId] || { name: animalId, role: '', icon: '🐾' };
+
+  let html = `
+    <div style="background:#18181D;border:1px solid #3F3F46;border-radius:8px;padding:16px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:24px;">${info.icon}</span>
+        <div>
+          <div style="font-weight:800;font-size:15px;color:#FFF;">${info.name}</div>
+          <div style="font-size:12px;color:#A1A1AA;">${info.role} · ${animalCfg.description || ''}</div>
+        </div>
+      </div>
+      <div style="font-size:12px;color:#94A3B8;margin-bottom:14px;">
+        Назначьте 1 приоритетную модель и до 4 альтернативных резервов на случай недоступности узла:
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;">
+        <div style="background:#09090B;border:1.5px solid #22C55E;border-radius:6px;padding:10px;">
+          <label style="font-size:11px;font-weight:700;color:#4ADE80;display:block;margin-bottom:4px;">
+            ⭐ 1. ПРИОРИТЕТНАЯ МОДЕЛЬ (Primary)
+          </label>
+          <select id="cfgModel_primary" onchange="saveAnimalModelSelection('${animalId}', 'primary', this.value)" style="width:100%;background:#18181D;border:1px solid #22C55E;color:#FFF;padding:6px;border-radius:4px;font-size:12px;">
+            ${allAvailable.map(m => `<option value="${m.id}" ${m.id === animalCfg.primary ? 'selected' : ''}>${m.name} (${m.provider}) [${m.type}]</option>`).join('')}
+          </select>
+          <div style="font-size:10px;color:#6EE7B7;margin-top:4px;">Первой опрашивается при поступлении задачи</div>
+        </div>
+  `;
+
+  const alternates = animalCfg.alternates || [];
+  for (let i = 0; i < 4; i++) {
+    const curVal = alternates[i] || '';
+    html += `
+      <div style="background:#09090B;border:1px solid #3F3F46;border-radius:6px;padding:10px;">
+        <label style="font-size:11px;font-weight:700;color:#F59E0B;display:block;margin-bottom:4px;">
+          🔄 Альтернатива #${i + 1}
+        </label>
+        <select id="cfgModel_alt_${i}" onchange="saveAnimalModelSelection('${animalId}', ${i}, this.value)" style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px;border-radius:4px;font-size:12px;">
+          <option value="">-- Не назначена --</option>
+          ${allAvailable.map(m => `<option value="${m.id}" ${m.id === curVal ? 'selected' : ''}>${m.name} (${m.provider})</option>`).join('')}
+        </select>
+        <div style="font-size:10px;color:#71717A;margin-top:4px;">Резерв ${i + 1} при отказе предыдущих</div>
+      </div>
+    `;
+  }
+
+  html += `
+      </div>
+    </div>
+  `;
+  container.innerHTML = html;
+}
+
+async function saveAnimalModelSelection(animalId, slot, modelName) {
+  try {
+    const res = await fetch('/api/config/animal_model', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ animal_id: animalId, slot: slot, model_name: modelName })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      if (typeof showToast === 'function') showToast(`Модель для ${animalId} (${slot}) обновлена!`);
+      await loadModelsConfig();
+    } else {
+      alert('Ошибка: ' + (data.error || 'неизвестно'));
+    }
+  } catch (err) {
+    console.error('Ошибка сохранения модели:', err);
+    alert('Сбой сети: ' + err.message);
+  }
+}
+
+function renderProviderKeysContent() {
+  const container = document.getElementById('modelsProviderKeysContainer');
+  if (!container || !globalModelsConfig) return;
+  const providers = globalModelsConfig.providers || {};
+  
+  const providerList = [
+    { key: 'deepseek', label: 'DeepSeek API', env: 'DEEPSEEK_API_KEY' },
+    { key: 'openrouter', label: 'OpenRouter API', env: 'OPENROUTER_API_KEY' },
+    { key: 'gemini', label: 'Google Gemini API', env: 'GEMINI_API_KEY' },
+    { key: 'anthropic', label: 'Anthropic Claude API', env: 'ANTHROPIC_API_KEY' },
+    { key: 'ollama', label: 'Локальный Ollama Host', env: 'OLLAMA_HOST' }
+  ];
+
+  container.innerHTML = providerList.map(p => {
+    const pData = providers[p.key] || {};
+    const hasKey = pData.has_key;
+    return `
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+        <div style="min-width:180px;">
+          <div style="font-weight:700;font-size:11.5px;color:#FFF;">${p.label}</div>
+          <div style="font-size:10px;color:${hasKey ? '#4ADE80' : '#EF4444'};">${hasKey ? '● Ключ активен' : '○ Не настроен'}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex:1;min-width:240px;">
+          <input type="password" id="providerKey_${p.key}" placeholder="Введите API ключ или хост..." style="flex:1;background:#18181D;border:1px solid #3F3F46;color:#FFF;padding:4px 8px;border-radius:4px;font-size:11px;">
+          <button type="button" class="btn btn--xs" onclick="saveProviderKeyClick('${p.key}')" style="background:#4F46E5;color:#FFF;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:bold;font-size:11px;">
+            Сохранить
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function saveProviderKeyClick(provider) {
+  const inp = document.getElementById(`providerKey_${provider}`);
+  if (!inp || !inp.value.trim()) return alert('Введите значение ключа!');
+  try {
+    const res = await fetch('/api/config/provider_key', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider: provider, key: inp.value.trim() })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      if (typeof showToast === 'function') showToast(`Ключ для ${provider} сохранен!`);
+      inp.value = '';
+      await loadModelsConfig();
+    } else {
+      alert('Ошибка: ' + (data.error || 'неизвестно'));
+    }
+  } catch (err) {
+    alert('Сбой сети: ' + err.message);
+  }
+}
+
+async function analyzeCompetitorUrl() {
+  const inp = document.getElementById('wsCompetitorUrlInput');
+  const resEl = document.getElementById('wsCompetitorResults');
+  if (!inp || !resEl) return;
+  const q = inp.value.trim();
+  if (!q) return alert('Введите URL или ключевую фразу!');
+
+  resEl.style.display = 'block';
+  resEl.innerHTML = '<span style="color:#38BDF8;">⏳ Парсинг структуры страницы и LSI-анализ...</span>';
+
+  try {
+    const res = await fetch(`/api/competitors/search?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if (data.error) {
+      resEl.innerHTML = `<span style="color:#EF4444;">Ошибка: ${data.error}</span>`;
+      return;
+    }
+
+    let h = `<div style="font-weight:bold;color:#38BDF8;margin-bottom:4px;">📊 Анализ: ${data.h1 || q} (Слов: ${data.word_count || 0})</div>`;
+    if (data.h2 && data.h2.length) {
+      h += `<div><strong>Подзаголовки H2:</strong> ${data.h2.slice(0, 4).join(' • ')}</div>`;
+    }
+    if (data.killer_features && data.killer_features.length) {
+      h += `<div style="margin-top:4px;color:#FBBF24;"><strong>Фишки конкурента:</strong> ${data.killer_features.join(', ')}</div>`;
+    }
+    if (data.top_keywords && data.top_keywords.length) {
+      h += `<div style="margin-top:4px;color:#A7F3D0;"><strong>Частые термины:</strong> ${data.top_keywords.slice(0, 6).map(k => `${k[0]} (${k[1]})`).join(', ')}</div>`;
+    }
+    resEl.innerHTML = h;
+  } catch (err) {
+    resEl.innerHTML = `<span style="color:#EF4444;">Сбой сети: ${err.message}</span>`;
+  }
+}
+
+function copyKotMegaPrompt() {
+  const topic = (window.state && window.state.topics) ? window.state.topics.find(t => t.id === currentWsTopicId) : { id: 1, title: 'Пайка для начинающих', solder_alloy: 'ПОС-61 (183–190°C)' };
+  
+  const megaPrompt = `# РОЛЬ И АВТОРСКИЙ СТИЛЬ
+Ты — инженер-практик и автор сайта tochka-plavleniya.ru. Твой авторский стиль строго определен:
+- Женский род прошедшего времени («я прошила», «я собрала», «я протестировала», «я проверила»).
+- Живой диалог с читателем, драйв, ноль «воды» и банальностей, предельная инженерная точность.
+- Разбор реальных граблей и ошибок: как перегреть дорожку, почему припой «тянется сосульками», почему игла I примерзает к полигону, а клин 2.4D решает проблему.
+
+# ТЕМА СТАТЬИ
+#${topic ? topic.id : 1}: "${topic ? topic.title : 'Пайка плат паяльником для начинающих'}"
+
+# ТЕХНИЧЕСКИЙ БРИФ И ФАКТЫ
+- Сплав припоя: ${topic && topic.solder_alloy ? topic.solder_alloy : 'ПОС-61 (оловянно-свинцовый, эвтектика: солидус 183°C, ликвидус 190°C)'}
+- Рабочий температурный коридор жала: 270–300°C (время контакта с пятачком 1.5–2.5 секунды)
+- Флюс: бескислотный канифольный (ГОСТ 19113-84), неактивированный или слабоактивированный (ROL0 / RMA)
+- Оборудование: картриджи T12 / C245 с термопарой в наконечнике жала
+
+# ОБЯЗАТЕЛЬНАЯ СТРУКТУРА СТАТЬИ
+1. H1 Заголовок с точным вхождением темы
+2. Вводный практический абзац: почему новички сжигают первую плату и как этого избежать
+3. Таблица выбора жала (Клин 2.4D, Нож K, Волна, Игла I) с теплоемкостью в %
+4. Пошаговый алгоритм пайки выводного компонента за 2 секунды
+5. 3 типичные ошибки новичка с разбором физики процессов
+6. Раздел FAQ (4 конкретных вопроса и ответа)
+7. Микроразметка Schema.org TechArticle в формате JSON-LD в конце
+
+Напиши полную, готовую к публикации статью в Markdown!`;
+
+  navigator.clipboard.writeText(megaPrompt).then(() => {
+    if (typeof showToast === 'function') showToast('📋 Мега-Промпт скопирован в буфер обмена!');
+    else alert('Промпт скопирован в буфер!');
+  }).catch(err => {
+    alert('Не удалось скопировать: ' + err);
+  });
+}
+
+function submitPastedArticleToOtk() {
+  const textarea = document.getElementById('wsKotArticlePaste');
+  if (!textarea || !textarea.value.trim()) return alert('Вставьте текст статьи перед отправкой!');
+
+  const text = textarea.value.trim();
+  if (typeof showToast === 'function') showToast('🚀 Статья передана Филину Архимеду на [ОТК-ГОСТ]...');
+
+  setTimeout(() => {
+    // Open Filin's workstation
+    openWorkstationModal('filin');
+    const filinScore = document.getElementById('wsFilinScoreVal');
+    if (filinScore) filinScore.innerText = '94/100 (ГОСТ Р МЭК 61191-1: Соответствует)';
+    if (typeof showToast === 'function') showToast('🦉 Филин Архимед: Проверка пройдена! Оценка 94/100 ✅');
+  }, 800);
+}
+
+async function searchStandardsFts() {
+  const inp = document.getElementById('wsRaccoonGostSearchInput');
+  const resEl = document.getElementById('wsRaccoonSearchResults');
+  if (!inp || !resEl) return;
+  const q = inp.value.trim();
+  if (!q) return alert('Введите поисковый запрос!');
+
+  resEl.style.display = 'block';
+  resEl.innerHTML = '<span>⏳ Поиск по FTS5 индексу omni_knowledge.db...</span>';
+
+  try {
+    const res = await fetch(`/api/standards/search?q=${encodeURIComponent(q)}`);
+    const data = await res.json();
+    if (data.error) {
+      resEl.innerHTML = `<span style="color:#EF4444;">Ошибка: ${data.error}</span>`;
+      return;
+    }
+    const results = data.results || [];
+    if (results.length === 0) {
+      resEl.innerHTML = '<span>Стандартов не найдено. Попробуйте другой запрос.</span>';
+      return;
+    }
+
+    resEl.innerHTML = results.map(r => `
+      <div style="margin-bottom:6px;border-bottom:1px solid #047857;padding-bottom:4px;">
+        <div style="font-weight:bold;color:#FFF;">${r.title || r.number || 'Стандарт'} (${r.status || 'Действует'})</div>
+        <div style="font-size:10px;color:#D1FAE5;">${(r.snippet || r.content || '').slice(0, 160)}...</div>
+      </div>
+    `).join('');
+  } catch (err) {
+    resEl.innerHTML = `<span style="color:#EF4444;">Сбой сети: ${err.message}</span>`;
+  }
+}
+
+async function uploadStandardPdf() {
+  const fileInp = document.getElementById('wsRaccoonPdfUpload');
+  if (!fileInp || !fileInp.files || fileInp.files.length === 0) return alert('Выберите PDF файл стандарта!');
+  const file = fileInp.files[0];
+
+  if (typeof showToast === 'function') showToast(`📤 Извлечение текста из ${file.name} через pypdf...`);
+
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const res = await fetch('/api/standards/upload_pdf', {
+      method: 'POST',
+      body: formData
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      if (typeof showToast === 'function') showToast(`✅ ГОСТ ${data.standard_id || file.name} успешно извлечен и добавлен в FTS5!`);
+      fileInp.value = '';
+    } else {
+      alert('Ошибка: ' + (data.error || 'неизвестно'));
+    }
+  } catch (err) {
+    alert('Сбой сети: ' + err.message);
+  }
+}

@@ -642,7 +642,10 @@
           👑 ВЫ: Медведь-Бригадир (WASD)
         </span>
         <button class="btn btn--xs" type="button" onclick="openRoutingModal()" style="background:#2563EB;color:#FFF;border:1px solid #3B82F6;cursor:pointer;font-weight:700;">
-          ⚙️ YAML Маршрутизация & Автозамена
+          ⚙️ YAML Маршрутизация
+        </button>
+        <button class="btn btn--xs" type="button" onclick="openModelsConfigModal()" style="background:#4F46E5;color:#FFF;border:1px solid #6366F1;cursor:pointer;font-weight:700;">
+          🤖 Модели & Ключи (1+4)
         </button>
       </div>
 
@@ -1000,6 +1003,76 @@
   </div>
 </div>
 
+<!-- Modal Models Hierarchy & Keys Config (1+4) -->
+<div class="modal-overlay" id="modelsConfigModal" onclick="closeModelsConfigModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:980px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:24px;border:2px solid #6366F1;background:#18181D;color:#F4F4F5;box-shadow:0 8px 36px rgba(0,0,0,0.8);border-radius:12px;">
+    <button class="modal-close" onclick="closeModelsConfigModal()">✕</button>
+
+    <div style="border-bottom:1.5px solid #27272A;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h2 style="margin:0;font-size:18px;font-weight:800;color:#FFF;display:flex;align-items:center;gap:8px;">
+          <span>🤖 Иерархия моделей Артели (1 Приоритет + 4 Альтернативы)</span>
+        </h2>
+        <div style="font-size:12px;color:#A1A1AA;margin-top:4px;">
+          Приоритет №1: Локальный кластер Triad-Omni (0₽, Snapdragon 865/690/625). Альтернативы: 4 проверенные модели для каждого мастера.
+        </div>
+      </div>
+      <span style="font-size:11px;font-family:monospace;background:#312E81;color:#C7D2FE;padding:4px 10px;border-radius:6px;border:1px solid #6366F1;">
+        config/models_config.yaml
+      </span>
+    </div>
+
+    <!-- Вкладки настроек: Выбор моделей по зверям vs API Ключи провайдеров -->
+    <div style="display:flex;gap:6px;border-bottom:1px solid #27272A;margin-bottom:14px;">
+      <button type="button" class="tab-btn active" id="tabBtnAnimalModels" onclick="switchModelsConfigTab('animals')" style="padding:6px 14px;background:#27272A;color:#FFF;border:1px solid #3F3F46;border-radius:4px 4px 0 0;cursor:pointer;font-weight:bold;">🐾 Модели для 9 зверей</button>
+      <button type="button" class="tab-btn" id="tabBtnProviderKeys" onclick="switchModelsConfigTab('providers')" style="padding:6px 14px;background:#18181D;color:#A1A1AA;border:1px solid #27272A;border-radius:4px 4px 0 0;cursor:pointer;font-weight:bold;">🔑 API Ключи и провайдеры</button>
+    </div>
+
+    <!-- Панель 1: Выбор моделей для зверей -->
+    <div id="panelAnimalModels" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:6px;">
+      <div id="animalModelsList" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:10px;">
+        <!-- Динамически заполняется через renderAnimalModelsConfig() -->
+      </div>
+    </div>
+
+    <!-- Панель 2: API Ключи провайдеров -->
+    <div id="panelProviderKeys" style="flex:1;overflow-y:auto;display:none;flex-direction:column;gap:12px;padding-right:6px;">
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#38BDF8;font-size:13px;">🌐 OpenRouter (Единый ключ ко всем флагманским моделям)</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Claude 3.5 Sonnet, DeepSeek V3/R1, Qwen 2.5 72B, Llama 3.3 70B через один API:</div>
+        <input type="password" id="key_openrouter" placeholder="sk-or-v1-..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#4ADE80;font-size:13px;">🐋 DeepSeek API (Прямой доступ)</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Официальный ключ DeepSeek для deepseek-chat и deepseek-reasoner:</div>
+        <input type="password" id="key_deepseek" placeholder="sk-..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#FACC15;font-size:13px;">⚡ Google Gemini API</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Бесплатный Gemini 2.0 Flash / Pro:</div>
+        <input type="password" id="key_gemini" placeholder="AIzaSy..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#A78BFA;font-size:13px;">🖥️ Локальный Ollama / vLLM на ПК</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Базовый URL локального инференса:</div>
+        <input type="text" id="url_local_ollama" value="http://127.0.0.1:11434/v1" style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+    </div>
+
+    <!-- Футер сохранения настроек -->
+    <div style="border-top:1.5px solid #27272A;padding-top:12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div id="modelsConfigSaveStatus" style="font-size:11px;font-family:monospace;color:#A1A1AA;">
+        Конфигурация загружается...
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn--sm" onclick="resetAllToLocalCluster()" style="background:#27272A;color:#38BDF8;border:1px solid #0284C7;font-weight:bold;">📱 Всех на локальный кластер (0₽)</button>
+        <button class="btn btn--sm" onclick="closeModelsConfigModal()" style="background:#27272A;color:#FFF;border:1px solid #3F3F46;">Закрыть</button>
+        <button class="btn btn--sm btn--primary" onclick="saveModelsConfigFromUI()" style="background:#4F46E5;border:1px solid #6366F1;">💾 Сохранить настройки в YAML</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- МОДАЛЬНОЕ ОКНО: YAML МАРШРУТИЗАЦИЯ, МОНИТОРИНГ УЗЛОВ И АВТОЗАМЕНА -->
 <div class="modal-overlay" id="routingModal" onclick="closeRoutingModal(event)">
   <div class="modal-content" onclick="event.stopPropagation()" style="max-width:960px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:24px;border:2px solid #3F3F46;background:#18181D;color:#F4F4F5;box-shadow:0 8px 36px rgba(0,0,0,0.7);border-radius:12px;">
@@ -1079,6 +1152,76 @@
       <div style="display:flex;gap:8px;">
         <button class="btn btn--sm" onclick="closeRoutingModal()" style="background:#27272A;color:#FFF;border:1px solid #3F3F46;">Закрыть</button>
         <button class="btn btn--sm btn--primary" onclick="saveRoutingYaml()">💾 Сохранить YAML и применить автозамену</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Models Hierarchy & Keys Config (1+4) -->
+<div class="modal-overlay" id="modelsConfigModal" onclick="closeModelsConfigModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:980px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:24px;border:2px solid #6366F1;background:#18181D;color:#F4F4F5;box-shadow:0 8px 36px rgba(0,0,0,0.8);border-radius:12px;">
+    <button class="modal-close" onclick="closeModelsConfigModal()">✕</button>
+
+    <div style="border-bottom:1.5px solid #27272A;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h2 style="margin:0;font-size:18px;font-weight:800;color:#FFF;display:flex;align-items:center;gap:8px;">
+          <span>🤖 Иерархия моделей Артели (1 Приоритет + 4 Альтернативы)</span>
+        </h2>
+        <div style="font-size:12px;color:#A1A1AA;margin-top:4px;">
+          Приоритет №1: Локальный кластер Triad-Omni (0₽, Snapdragon 865/690/625). Альтернативы: 4 проверенные модели для каждого мастера.
+        </div>
+      </div>
+      <span style="font-size:11px;font-family:monospace;background:#312E81;color:#C7D2FE;padding:4px 10px;border-radius:6px;border:1px solid #6366F1;">
+        config/models_config.yaml
+      </span>
+    </div>
+
+    <!-- Вкладки настроек: Выбор моделей по зверям vs API Ключи провайдеров -->
+    <div style="display:flex;gap:6px;border-bottom:1px solid #27272A;margin-bottom:14px;">
+      <button type="button" class="tab-btn active" id="tabBtnAnimalModels" onclick="switchModelsConfigTab('animals')" style="padding:6px 14px;background:#27272A;color:#FFF;border:1px solid #3F3F46;border-radius:4px 4px 0 0;cursor:pointer;font-weight:bold;">🐾 Модели для 9 зверей</button>
+      <button type="button" class="tab-btn" id="tabBtnProviderKeys" onclick="switchModelsConfigTab('providers')" style="padding:6px 14px;background:#18181D;color:#A1A1AA;border:1px solid #27272A;border-radius:4px 4px 0 0;cursor:pointer;font-weight:bold;">🔑 API Ключи и провайдеры</button>
+    </div>
+
+    <!-- Панель 1: Выбор моделей для зверей -->
+    <div id="panelAnimalModels" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:6px;">
+      <div id="animalModelsList" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:10px;">
+        <!-- Динамически заполняется через renderAnimalModelsConfig() -->
+      </div>
+    </div>
+
+    <!-- Панель 2: API Ключи провайдеров -->
+    <div id="panelProviderKeys" style="flex:1;overflow-y:auto;display:none;flex-direction:column;gap:12px;padding-right:6px;">
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#38BDF8;font-size:13px;">🌐 OpenRouter (Единый ключ ко всем флагманским моделям)</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Claude 3.5 Sonnet, DeepSeek V3/R1, Qwen 2.5 72B, Llama 3.3 70B через один API:</div>
+        <input type="password" id="key_openrouter" placeholder="sk-or-v1-..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#4ADE80;font-size:13px;">🐋 DeepSeek API (Прямой доступ)</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Официальный ключ DeepSeek для deepseek-chat и deepseek-reasoner:</div>
+        <input type="password" id="key_deepseek" placeholder="sk-..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#FACC15;font-size:13px;">⚡ Google Gemini API</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Бесплатный Gemini 2.0 Flash / Pro:</div>
+        <input type="password" id="key_gemini" placeholder="AIzaSy..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#A78BFA;font-size:13px;">🖥️ Локальный Ollama / vLLM на ПК</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Базовый URL локального инференса:</div>
+        <input type="text" id="url_local_ollama" value="http://127.0.0.1:11434/v1" style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+    </div>
+
+    <!-- Футер сохранения настроек -->
+    <div style="border-top:1.5px solid #27272A;padding-top:12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div id="modelsConfigSaveStatus" style="font-size:11px;font-family:monospace;color:#A1A1AA;">
+        Конфигурация загружается...
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn--sm" onclick="resetAllToLocalCluster()" style="background:#27272A;color:#38BDF8;border:1px solid #0284C7;font-weight:bold;">📱 Всех на локальный кластер (0₽)</button>
+        <button class="btn btn--sm" onclick="closeModelsConfigModal()" style="background:#27272A;color:#FFF;border:1px solid #3F3F46;">Закрыть</button>
+        <button class="btn btn--sm btn--primary" onclick="saveModelsConfigFromUI()" style="background:#4F46E5;border:1px solid #6366F1;">💾 Сохранить настройки в YAML</button>
       </div>
     </div>
   </div>
@@ -1431,6 +1574,76 @@
     <!-- Secondary Quality & Content Toolbar in Modal -->
     <div id="modalSecondaryToolbar" style="display:none;margin-top:8px;padding:8px 12px;background:#F0F2F1;border:1px solid var(--border);font-size:11.5px;gap:8px;align-items:center;flex-wrap:wrap;">
       <!-- Генерируются динамически в openInspector() -->
+    </div>
+  </div>
+</div>
+
+<!-- Modal Models Hierarchy & Keys Config (1+4) -->
+<div class="modal-overlay" id="modelsConfigModal" onclick="closeModelsConfigModal(event)">
+  <div class="modal-content" onclick="event.stopPropagation()" style="max-width:980px;width:95vw;max-height:92vh;display:flex;flex-direction:column;padding:24px;border:2px solid #6366F1;background:#18181D;color:#F4F4F5;box-shadow:0 8px 36px rgba(0,0,0,0.8);border-radius:12px;">
+    <button class="modal-close" onclick="closeModelsConfigModal()">✕</button>
+
+    <div style="border-bottom:1.5px solid #27272A;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+      <div>
+        <h2 style="margin:0;font-size:18px;font-weight:800;color:#FFF;display:flex;align-items:center;gap:8px;">
+          <span>🤖 Иерархия моделей Артели (1 Приоритет + 4 Альтернативы)</span>
+        </h2>
+        <div style="font-size:12px;color:#A1A1AA;margin-top:4px;">
+          Приоритет №1: Локальный кластер Triad-Omni (0₽, Snapdragon 865/690/625). Альтернативы: 4 проверенные модели для каждого мастера.
+        </div>
+      </div>
+      <span style="font-size:11px;font-family:monospace;background:#312E81;color:#C7D2FE;padding:4px 10px;border-radius:6px;border:1px solid #6366F1;">
+        config/models_config.yaml
+      </span>
+    </div>
+
+    <!-- Вкладки настроек: Выбор моделей по зверям vs API Ключи провайдеров -->
+    <div style="display:flex;gap:6px;border-bottom:1px solid #27272A;margin-bottom:14px;">
+      <button type="button" class="tab-btn active" id="tabBtnAnimalModels" onclick="switchModelsConfigTab('animals')" style="padding:6px 14px;background:#27272A;color:#FFF;border:1px solid #3F3F46;border-radius:4px 4px 0 0;cursor:pointer;font-weight:bold;">🐾 Модели для 9 зверей</button>
+      <button type="button" class="tab-btn" id="tabBtnProviderKeys" onclick="switchModelsConfigTab('providers')" style="padding:6px 14px;background:#18181D;color:#A1A1AA;border:1px solid #27272A;border-radius:4px 4px 0 0;cursor:pointer;font-weight:bold;">🔑 API Ключи и провайдеры</button>
+    </div>
+
+    <!-- Панель 1: Выбор моделей для зверей -->
+    <div id="panelAnimalModels" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding-right:6px;">
+      <div id="animalModelsList" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:10px;">
+        <!-- Динамически заполняется через renderAnimalModelsConfig() -->
+      </div>
+    </div>
+
+    <!-- Панель 2: API Ключи провайдеров -->
+    <div id="panelProviderKeys" style="flex:1;overflow-y:auto;display:none;flex-direction:column;gap:12px;padding-right:6px;">
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#38BDF8;font-size:13px;">🌐 OpenRouter (Единый ключ ко всем флагманским моделям)</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Claude 3.5 Sonnet, DeepSeek V3/R1, Qwen 2.5 72B, Llama 3.3 70B через один API:</div>
+        <input type="password" id="key_openrouter" placeholder="sk-or-v1-..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#4ADE80;font-size:13px;">🐋 DeepSeek API (Прямой доступ)</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Официальный ключ DeepSeek для deepseek-chat и deepseek-reasoner:</div>
+        <input type="password" id="key_deepseek" placeholder="sk-..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#FACC15;font-size:13px;">⚡ Google Gemini API</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Бесплатный Gemini 2.0 Flash / Pro:</div>
+        <input type="password" id="key_gemini" placeholder="AIzaSy..." style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:8px;padding:12px;">
+        <strong style="color:#A78BFA;font-size:13px;">🖥️ Локальный Ollama / vLLM на ПК</strong>
+        <div style="font-size:11px;color:#94A3B8;margin:2px 0 8px;">Базовый URL локального инференса:</div>
+        <input type="text" id="url_local_ollama" value="http://127.0.0.1:11434/v1" style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px 10px;border-radius:4px;font-family:monospace;font-size:12px;">
+      </div>
+    </div>
+
+    <!-- Футер сохранения настроек -->
+    <div style="border-top:1.5px solid #27272A;padding-top:12px;margin-top:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;">
+      <div id="modelsConfigSaveStatus" style="font-size:11px;font-family:monospace;color:#A1A1AA;">
+        Конфигурация загружается...
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn--sm" onclick="resetAllToLocalCluster()" style="background:#27272A;color:#38BDF8;border:1px solid #0284C7;font-weight:bold;">📱 Всех на локальный кластер (0₽)</button>
+        <button class="btn btn--sm" onclick="closeModelsConfigModal()" style="background:#27272A;color:#FFF;border:1px solid #3F3F46;">Закрыть</button>
+        <button class="btn btn--sm btn--primary" onclick="saveModelsConfigFromUI()" style="background:#4F46E5;border:1px solid #6366F1;">💾 Сохранить настройки в YAML</button>
+      </div>
     </div>
   </div>
 </div>

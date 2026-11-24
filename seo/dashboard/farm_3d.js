@@ -649,57 +649,57 @@
     build3DAgentsWithTools() {
       const agentConfigs = [
         {
-          id: 'bear', name: 'Медведь-Бригадир (Игрок)', role: 'Староста Артели', icon: '🐻',
+          id: 'bear', name: 'Медведь Михалыч (Прораб)', role: 'Шлюз Triad-Omni & Телеметрия', icon: '🐻',
           color: 0x8D5B36, x: 0, z: -1.2, speed: 1.5,
-          dialogue: 'Совет Артели на связи! Управляйте мной клавишами WASD.',
-          earType: 'round', toolType: 'tea_cup'
+          dialogue: 'Совет Артели на связи! Я координирую мобильный кластер и роутинг.',
+          earType: 'round', toolType: 'walkie_talkie'
         },
         {
-          id: 'soroka', name: 'Сорока-Разведчица', role: '00-research', icon: '🪶',
+          id: 'soroka', name: 'Сорока Клара', role: 'Семантика, LSI & ГОСТ-радар', icon: '🪶',
           color: 0x1E293B, accentColor: 0x38BDF8, x: -14, z: -17, speed: 2.1,
-          dialogue: 'Парсю выдачу Яндекса и калькуляторы припоя конкурентов!',
-          earType: 'beak', toolType: 'spyglass'
+          dialogue: 'Мониторю реестры ГОСТов, выкачиваю PDF и парсю выдачу конкурентов!',
+          earType: 'beak', toolType: 'scroll_key'
         },
         {
-          id: 'bobr', name: 'Бобёр-Конструктор', role: '01-researcher', icon: '🦫',
+          id: 'bobr', name: 'Бобёр Борис', role: 'Архитектор ТЗ & Допуски ГОСТ', icon: '🦫',
           color: 0x78350F, accentColor: 0xB45309, x: -20, z: -4, speed: 1.4,
-          dialogue: 'Сверяю 4 обязательных вопроса новичка по ГОСТ Р МЭК 61191!',
-          earType: 'round', toolType: 'saw'
+          dialogue: 'Сверяю 4 обязательных вопроса новичка и матрицы допусков ГОСТ Р МЭК 61191-1!',
+          earType: 'round', toolType: 'architect_ruler'
         },
         {
-          id: 'kot', name: 'Кот-Паяльщик (Practico 1)', role: '02-writer', icon: '🐱',
+          id: 'kot', name: 'Кот Феликс', role: 'Физика пайки & Автор статьи', icon: '🐱',
           color: 0xEA580C, accentColor: 0xFFEDD5, x: -16, z: 5, speed: 1.6,
-          dialogue: 'Паяю соединение жалом T12 при 285°C. Физика смачивания меди!',
-          earType: 'pointy', toolType: 'soldering_iron'
+          dialogue: 'Пишу черновик «Моим голосом»: жало T12, 285°C, интерметаллид Cu6Sn5!',
+          earType: 'pointy', toolType: 'quill_book'
         },
         {
-          id: 'lis', name: 'Лис-Прагматик (Practico 2)', role: '02-writer-2', icon: '🦊',
+          id: 'lis', name: 'Лис Рейнард', role: 'Экономист & Калькулятор себестоимости', icon: '🦊',
           color: 0xF97316, accentColor: 0xFFFFFF, x: 16, z: 1.2, speed: 1.7,
-          dialogue: 'Считаю смету: флюс за 300₽ спасет материнскую плату за 15 000₽!',
-          earType: 'pointy', toolType: 'quill'
+          dialogue: 'Считаю смету: себестоимость точки пайки 0.23 ₽, окупаемость T12 за 4 ремонта!',
+          earType: 'pointy', toolType: 'abacus'
         },
         {
-          id: 'barsuk', name: 'Барсук-Иллюстратор', role: '05-illustrator', icon: '🦡',
+          id: 'barsuk', name: 'Барсук Бруно', role: 'Инженер термопрофиля & Векторные схемы', icon: '🦡',
           color: 0x4B5563, accentColor: 0xFBBF24, x: -4, z: 12, speed: 1.5,
-          dialogue: 'Черчу векторный SVG-термопрофиль ПОС-61 (183–190°C) по ГОСТ!',
-          earType: 'stripe', toolType: 'pencil_ruler'
+          dialogue: 'Черчу координатный SVG-термопрофиль ПОС-61 (183–190°C) по 4 зонам!',
+          earType: 'stripe', toolType: 'thermal_board'
         },
         {
-          id: 'filin', name: 'Филин-Ревизор [ОТК]', role: '03-reviewer', icon: '🦉',
+          id: 'filin', name: 'Филин Архимед', role: 'Главред [ОТК-ГОСТ] & SlopMonster', icon: '🦉',
           color: 0x6D28D9, accentColor: 0xEDE9FE, x: 14, z: -10, speed: 1.3,
-          dialogue: 'SlopMonster заряжен: нейроштампы удалены, штамп [ОТК] готов!',
-          earType: 'tuft', toolType: 'otk_stamp'
+          dialogue: 'Выжигаю нейроштампы SlopMonster, сверяю режимы с базой знаний и ставлю штамп [ОТК]!',
+          earType: 'tuft', toolType: 'magnifier_stamp'
         },
         {
-          id: 'dyatel', name: 'Дятел-Метролог', role: '04-scorer', icon: '🪵',
+          id: 'dyatel', name: 'Дятел Вуди', role: 'Метролог & 100-балльный AST-скоринг', icon: '🪵',
           color: 0xBE185D, accentColor: 0xFCE7F3, x: 10, z: 14, speed: 1.6,
-          dialogue: 'AST-анализ: 94/100 баллов! Зеленый свет в шлюз релиза!',
-          earType: 'crest', toolType: 'calibrator'
+          dialogue: 'Выстукиваю баллы по 6 блокам статьи! Проверка ссылок на действующие ГОСТы!',
+          earType: 'crest', toolType: 'ast_counter'
         },
         {
-          id: 'raccoon', name: 'Енот-Датасетник', role: '06-knowledge', icon: '🦝',
+          id: 'raccoon', name: 'Енот Рокки', role: 'Хранитель Базы Знаний & LoRA Датасеты', icon: '🦝',
           color: 0x475569, accentColor: 0x0F172A, x: 0, z: -13.2, speed: 1.5,
-          dialogue: 'Связываю ГОСТы и статьи в граф Graphify! Датасет JSONL для LoRA собран и вычищен!',
+          dialogue: 'Оцифровываю PDF ГОСТов в omni_knowledge.db, кручу кристалл Graphify и готовлю LoRA-датасет!',
           earType: 'round', toolType: 'graph_crystal'
         }
       ];
@@ -868,38 +868,124 @@
     }
 
     attachWorkingTool(armGroup, toolType) {
-      if (toolType === 'soldering_iron') {
-        const handle = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0x1E293B }));
-        handle.rotateX(Math.PI / 3);
-        armGroup.add(handle);
-        const tip = new THREE.Mesh(new THREE.ConeGeometry(0.04, 0.25, 6), new THREE.MeshBasicMaterial({ color: 0xF97316 }));
-        tip.rotateX(Math.PI / 3);
-        tip.position.set(0, -0.3, 0.25);
-        armGroup.add(tip);
-      } else if (toolType === 'saw') {
-        const sawBlade = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.3, 0.8), new THREE.MeshStandardMaterial({ color: 0xCBD5E1, metalness: 0.9 }));
-        sawBlade.position.set(0, -0.15, 0.3);
-        armGroup.add(sawBlade);
-      } else if (toolType === 'pencil_ruler') {
-        const pencil = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.5, 6), new THREE.MeshStandardMaterial({ color: 0xFBBF24 }));
-        pencil.rotateX(Math.PI / 4);
-        armGroup.add(pencil);
-      } else if (toolType === 'otk_stamp') {
-        const stamp = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, 0.45, 8), new THREE.MeshStandardMaterial({ color: 0x8B5CF6 }));
-        stamp.position.set(0, -0.2, 0.15);
+      if (toolType === 'walkie_talkie') {
+        // Рация с антенной и планшет телеметрии (Медведь Михалыч)
+        const radioBody = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.28, 0.08), new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.5 }));
+        radioBody.position.set(0, -0.05, 0.2);
+        armGroup.add(radioBody);
+        const antenna = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.25, 6), new THREE.MeshStandardMaterial({ color: 0x94A3B8 }));
+        antenna.position.set(0.04, 0.16, 0.2);
+        armGroup.add(antenna);
+        const screen = new THREE.Mesh(new THREE.PlaneGeometry(0.1, 0.12), new THREE.MeshBasicMaterial({ color: 0x10B981 }));
+        screen.position.set(0, -0.04, 0.245);
+        armGroup.add(screen);
+        armGroup.walkieMesh = radioBody;
+
+      } else if (toolType === 'scroll_key') {
+        // Золотистый свиток и ключ семантики/ГОСТов (Сорока Клара)
+        const scroll = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.45, 8), new THREE.MeshStandardMaterial({ color: 0xFEF08A }));
+        scroll.rotateZ(Math.PI / 3);
+        scroll.position.set(0, -0.08, 0.22);
+        armGroup.add(scroll);
+        const keyRing = new THREE.Mesh(new THREE.TorusGeometry(0.08, 0.02, 6, 12), new THREE.MeshStandardMaterial({ color: 0xF59E0B, metalness: 0.8 }));
+        keyRing.position.set(0.12, 0.05, 0.26);
+        armGroup.add(keyRing);
+        armGroup.scrollMesh = scroll;
+
+      } else if (toolType === 'architect_ruler') {
+        // Чертежный угольник и линейка допусков ГОСТ (Бобёр Борис)
+        const ruler = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.65, 0.12), new THREE.MeshStandardMaterial({ color: 0xD97706, roughness: 0.6 }));
+        ruler.rotateX(Math.PI / 4);
+        ruler.position.set(0, -0.15, 0.25);
+        armGroup.add(ruler);
+        const triangle = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.03, 3), new THREE.MeshStandardMaterial({ color: 0xFDE68A }));
+        triangle.rotateZ(Math.PI / 6);
+        triangle.position.set(0, 0.08, 0.3);
+        armGroup.add(triangle);
+        armGroup.rulerMesh = ruler;
+
+      } else if (toolType === 'quill_book') {
+        // Гусиное перо и раскрытый фолиант по физике пайки (Кот Феликс)
+        const bookCover = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.06, 0.45), new THREE.MeshStandardMaterial({ color: 0x7F1D1D }));
+        bookCover.position.set(0, -0.15, 0.28);
+        armGroup.add(bookCover);
+        const pages = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.05, 0.42), new THREE.MeshStandardMaterial({ color: 0xFFFBEB }));
+        pages.position.set(0, -0.13, 0.28);
+        armGroup.add(pages);
+        const quill = new THREE.Mesh(new THREE.ConeGeometry(0.03, 0.38, 4), new THREE.MeshStandardMaterial({ color: 0xFFFFFF }));
+        quill.rotateX(Math.PI / 3);
+        quill.position.set(0.1, 0.04, 0.22);
+        armGroup.add(quill);
+        armGroup.quillMesh = quill;
+
+      } else if (toolType === 'abacus') {
+        // Деревянные счеты с разноцветными костяшками (Лис Рейнард)
+        const abacusFrame = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.35), new THREE.MeshStandardMaterial({ color: 0x92400E }));
+        abacusFrame.position.set(0, -0.12, 0.24);
+        armGroup.add(abacusFrame);
+        for (let r = 0; r < 3; r++) {
+          const wire = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.32, 6), new THREE.MeshStandardMaterial({ color: 0xCBD5E1, metalness: 0.9 }));
+          wire.rotateX(Math.PI / 2);
+          wire.position.set(0.01, -0.22 + r * 0.1, 0.24);
+          armGroup.add(wire);
+          const bead = new THREE.Mesh(new THREE.SphereGeometry(0.035, 6, 6), new THREE.MeshStandardMaterial({ color: (r === 1) ? 0xDC2626 : 0xF59E0B }));
+          bead.position.set(0.01, -0.22 + r * 0.1, 0.18 + r * 0.05);
+          armGroup.add(bead);
+        }
+        armGroup.abacusMesh = abacusFrame;
+
+      } else if (toolType === 'thermal_board') {
+        // Координатная доска с неоновой кривой термопрофиля (Барсук Бруно)
+        const board = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.45, 0.55), new THREE.MeshStandardMaterial({ color: 0x1E293B, roughness: 0.3 }));
+        board.position.set(0, -0.08, 0.25);
+        armGroup.add(board);
+        const curvePlane = new THREE.Mesh(new THREE.PlaneGeometry(0.48, 0.38), new THREE.MeshBasicMaterial({ color: 0x06B6D4, wireframe: true }));
+        curvePlane.rotateY(Math.PI / 2);
+        curvePlane.position.set(0.025, -0.08, 0.25);
+        armGroup.add(curvePlane);
+        armGroup.boardMesh = board;
+
+      } else if (toolType === 'magnifier_stamp') {
+        // Медная лупа и красный штамп [ОТК-ГОСТ] (Филин Архимед)
+        const magRim = new THREE.Mesh(new THREE.TorusGeometry(0.12, 0.02, 6, 12), new THREE.MeshStandardMaterial({ color: 0xB45309, metalness: 0.8 }));
+        magRim.position.set(0, 0.02, 0.32);
+        armGroup.add(magRim);
+        const magLens = new THREE.Mesh(new THREE.CircleGeometry(0.11, 12), new THREE.MeshBasicMaterial({ color: 0x38BDF8, transparent: true, opacity: 0.6 }));
+        magLens.position.set(0, 0.02, 0.32);
+        armGroup.add(magLens);
+        const stamp = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 0.35, 8), new THREE.MeshStandardMaterial({ color: 0xEF4444 }));
+        stamp.position.set(0.15, -0.18, 0.22);
         armGroup.add(stamp);
-      } else if (toolType === 'tea_cup') {
-        const cup = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.1, 0.25, 8), new THREE.MeshStandardMaterial({ color: 0xEAB308 }));
-        cup.position.set(0, -0.1, 0.2);
-        armGroup.add(cup);
+        armGroup.stampMesh = stamp;
+
+      } else if (toolType === 'ast_counter') {
+        // 100-балльный циферблат скоринга со стрелкой (Дятел Вуди)
+        const dial = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.06, 12), new THREE.MeshStandardMaterial({ color: 0x0F172A }));
+        dial.rotateZ(Math.PI / 2);
+        dial.position.set(0, -0.1, 0.25);
+        armGroup.add(dial);
+        const dialFace = new THREE.Mesh(new THREE.CircleGeometry(0.19, 12), new THREE.MeshBasicMaterial({ color: 0x10B981, wireframe: true }));
+        dialFace.rotateY(Math.PI / 2);
+        dialFace.position.set(0.035, -0.1, 0.25);
+        armGroup.add(dialFace);
+        const pointer = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.16, 0.02), new THREE.MeshBasicMaterial({ color: 0xFACC15 }));
+        pointer.position.set(0.04, -0.06, 0.25);
+        armGroup.add(pointer);
+        armGroup.counterMesh = dial;
+
       } else if (toolType === 'graph_crystal') {
+        // Вращающийся октаэдрический кристалл знаний Graphify (Енот Рокки)
         const crystal = new THREE.Mesh(
           new THREE.OctahedronGeometry(0.24, 0),
-          new THREE.MeshStandardMaterial({ color: 0x34D399, wireframe: true, emissive: 0x059669, emissiveIntensity: 0.85 })
+          new THREE.MeshStandardMaterial({ color: 0x06B6D4, wireframe: true, emissive: 0x0284C7, emissiveIntensity: 0.9 })
         );
         crystal.position.set(0, -0.05, 0.25);
         armGroup.add(crystal);
         armGroup.crystalMesh = crystal;
+
+        const archiveBox = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.2), new THREE.MeshStandardMaterial({ color: 0x475569 }));
+        archiveBox.position.set(0, -0.25, 0.25);
+        armGroup.add(archiveBox);
       }
     }
 
@@ -1069,50 +1155,49 @@
       // 3. Квестовый трекер конвейера
       this.currentQuestIndex = 0;
       this.questList = [
-        { id: 'soroka', title: '🪶 Сорока: Сбор LSI-ядра и конкурентов' },
-        { id: 'bobr', title: '🦫 Бобёр: Бриф ГОСТ Р МЭК 61191-1' },
-        { id: 'kot', title: '🐱 Кот: Физика шва и ликвидус ПОС-61' },
-        { id: 'lis', title: '🦊 Лис: Смета мастерской и окупаемость' },
-        { id: 'barsuk', title: '🦡 Барсук: Векторный SVG-термопрофиль' },
-        { id: 'filin', title: '🦉 Филин: Проверка SlopMonster [ОТК]' },
-        { id: 'dyatel', title: '🪵 Дятел: AST-скоринг 100 баллов' },
-        { id: 'raccoon', title: '🦝 Енот: Graphify & Датасет LoRA' },
-        { id: 'wp', title: '🚀 WordPress: Финальная публикация' }
+        { id: 'soroka', title: '🪶 Сорока Клара: Сбор LSI-ядра и ГОСТ-радар' },
+        { id: 'bobr', title: '🦫 Бобёр Борис: Бриф ГОСТ Р МЭК 61191-1' },
+        { id: 'kot', title: '🐱 Кот Феликс: Физика шва и черновик статьи' },
+        { id: 'lis', title: '🦊 Лис Рейнард: Смета мастерской и окупаемость' },
+        { id: 'barsuk', title: '🦡 Барсук Бруно: Векторный SVG-термопрофиль' },
+        { id: 'filin', title: '🦉 Филин Архимед: Проверка SlopMonster [ОТК-ГОСТ]' },
+        { id: 'dyatel', title: '🪵 Дятел Вуди: AST-скоринг 100 баллов' },
+        { id: 'raccoon', title: '🦝 Енот Рокки: Graphify, PDF-экстракт & LoRA' },
+        { id: 'bear', title: '🐻 Медведь Михалыч: Шлюз публикации и телеметрия' }
       ];
       this.updateQuestTrackerUI();
     }
 
     setupOverheadNameplates() {
       this.agents.forEach(agent => {
-        if (agent.id === 'bear') return;
         const canvas = document.createElement('canvas');
-        canvas.width = 300;
-        canvas.height = 76;
+        canvas.width = 320;
+        canvas.height = 80;
         const ctx = canvas.getContext('2d');
 
-        ctx.fillStyle = 'rgba(15, 23, 42, 0.92)';
-        ctx.roundRect(4, 4, 292, 68, 14);
+        ctx.fillStyle = 'rgba(15, 23, 42, 0.94)';
+        ctx.roundRect(4, 4, 312, 72, 14);
         ctx.fill();
 
         const colorHex = '#' + (agent.accentColor || agent.color).toString(16).padStart(6, '0');
         ctx.strokeStyle = colorHex;
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 3.5;
         ctx.stroke();
 
-        ctx.font = 'bold 22px sans-serif';
+        ctx.font = 'bold 20px sans-serif';
         ctx.fillStyle = '#FFFFFF';
         ctx.textAlign = 'center';
-        ctx.fillText(`${agent.icon} ${agent.name}`, 150, 34);
+        ctx.fillText(`${agent.icon} ${agent.name}`, 160, 34);
 
-        ctx.font = '15px monospace';
+        ctx.font = '13px monospace';
         ctx.fillStyle = colorHex;
-        ctx.fillText(agent.role, 150, 58);
+        ctx.fillText(agent.role, 160, 60);
 
         const tex = new THREE.CanvasTexture(canvas);
         const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
         const sprite = new THREE.Sprite(mat);
-        sprite.position.set(0, 2.95, 0);
-        sprite.scale.set(4.2, 1.05, 1.0);
+        sprite.position.set(0, (agent.id === 'bear') ? 3.3 : 2.95, 0);
+        sprite.scale.set(4.5, 1.15, 1.0);
         agent.group.add(sprite);
         agent.nameplateSprite = sprite;
       });
@@ -1664,49 +1749,94 @@
           }
 
           if (a.id === 'kot') {
+            // Кот Феликс: водит пером по фолианту и паяет жалом T12
             if (a.group.toolArm) {
               a.group.toolArm.rotation.x = Math.sin(time * 8.0) * 0.35;
-              a.group.toolArm.rotation.z = Math.cos(time * 6.0) * 0.2;
+              a.group.toolArm.rotation.y = Math.cos(time * 8.0) * 0.25;
+              a.group.toolArm.position.z = 0.4 + Math.sin(time * 4.0) * 0.1;
             }
-            if (a.group.headGroup) a.group.headGroup.rotation.x = 0.25;
+            if (a.group.headGroup) a.group.headGroup.rotation.x = 0.25 + Math.sin(time * 4.0) * 0.08;
             if (this.sparksGroup) this.sparksGroup.material.opacity = (Math.sin(time * 16.0) > 0.2) ? 0.9 : 0;
             if (this.forgeLight) this.forgeLight.intensity = 2.0 + Math.sin(time * 12.0) * 0.8;
 
           } else if (a.id === 'bobr') {
+            // Бобёр Борис: водит чертежным угольником по ТЗ
             if (a.group.toolArm) {
-              a.group.toolArm.position.z = 0.4 + Math.sin(time * 7.0) * 0.3;
+              a.group.toolArm.position.z = 0.38 + Math.sin(time * 6.0) * 0.26;
+              a.group.toolArm.rotation.y = Math.cos(time * 6.0) * 0.25;
               a.group.toolArm.rotation.x = 0.2;
+            }
+            if (a.group.headGroup) a.group.headGroup.rotation.x = 0.18 + Math.sin(time * 3.0) * 0.1;
+
+          } else if (a.id === 'soroka') {
+            // Сорока Клара: высматривает ключи и клюет свиток ГОСТов
+            if (a.group.headGroup) {
+              a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 10.0)) * 0.45;
+              a.group.headGroup.rotation.y = Math.sin(time * 5.0) * 0.35;
+            }
+            if (a.group.toolArm) {
+              a.group.toolArm.rotation.z = Math.sin(time * 6.0) * 0.3;
+              a.group.toolArm.position.y = 1.0 + Math.sin(time * 8.0) * 0.12;
+            }
+
+          } else if (a.id === 'lis') {
+            // Лис Рейнард: перебирает костяшки на деревянных счетах
+            if (a.group.toolArm) {
+              a.group.toolArm.rotation.x = Math.sin(time * 12.0) * 0.25;
+              a.group.toolArm.rotation.z = Math.cos(time * 8.0) * 0.2;
+              a.group.toolArm.position.y = 1.0 + Math.sin(time * 6.0) * 0.08;
+            }
+            if (a.group.headGroup) a.group.headGroup.rotation.y = Math.sin(time * 4.0) * 0.25;
+
+          } else if (a.id === 'barsuk') {
+            // Барсук Бруно: вычерчивает кривую термопрофиля на доске
+            if (a.group.toolArm) {
+              a.group.toolArm.position.y = 1.0 + Math.sin(time * 4.5) * 0.28;
+              a.group.toolArm.position.z = 0.38 + Math.cos(time * 4.5) * 0.16;
+              a.group.toolArm.rotation.z = Math.sin(time * 4.5) * 0.2;
             }
             if (a.group.headGroup) a.group.headGroup.rotation.x = 0.15;
 
-          } else if (a.id === 'soroka') {
-            if (a.group.headGroup) a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 8.0)) * 0.4;
-
-          } else if (a.id === 'lis') {
-            if (a.group.toolArm) a.group.toolArm.rotation.z = Math.sin(time * 9.0) * 0.3;
-            if (a.group.headGroup) a.group.headGroup.rotation.y = Math.sin(time * 4.0) * 0.2;
-
-          } else if (a.id === 'barsuk') {
-            if (a.group.toolArm) a.group.toolArm.position.y = 1.0 + Math.sin(time * 5.0) * 0.25;
-
           } else if (a.id === 'filin') {
-            if (a.group.toolArm) a.group.toolArm.position.y = 1.0 - Math.abs(Math.sin(time * 3.5)) * 0.4;
+            // Филин Архимед: смотрит через лупу и опускает печать [ОТК-ГОСТ]
+            if (a.group.toolArm) {
+              const stampDrop = Math.abs(Math.sin(time * 3.0));
+              a.group.toolArm.position.y = 1.0 - stampDrop * 0.45;
+              a.group.toolArm.rotation.x = (stampDrop > 0.8) ? 0.3 : 0;
+            }
+            if (a.group.headGroup) a.group.headGroup.rotation.x = 0.25 + Math.sin(time * 3.0) * 0.15;
 
           } else if (a.id === 'dyatel') {
-            if (a.group.headGroup) a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 12.0)) * 0.4;
+            // Дятел Вуди: ритмично и часто выстукивает клювом по счетчику
+            if (a.group.headGroup) {
+              a.group.headGroup.rotation.x = Math.abs(Math.sin(time * 14.0)) * 0.55;
+            }
+            if (a.group.toolArm) {
+              a.group.toolArm.rotation.z = Math.sin(time * 14.0) * 0.25;
+              a.group.toolArm.position.y = 1.0 + Math.sin(time * 14.0) * 0.06;
+            }
 
           } else if (a.id === 'raccoon') {
+            // Енот Рокки: вращает октаэдр Graphify и упаковывает в картотеку
             if (a.group.toolArm) {
               a.group.toolArm.position.y = 1.0 + Math.sin(time * 4.0) * 0.15;
               if (a.group.toolArm.crystalMesh) {
-                a.group.toolArm.crystalMesh.rotation.y += 0.05;
-                a.group.toolArm.crystalMesh.rotation.x += 0.03;
+                a.group.toolArm.crystalMesh.rotation.y += 0.06;
+                a.group.toolArm.crystalMesh.rotation.x += 0.04;
+                const pulse = 0.8 + Math.sin(time * 6.0) * 0.3;
+                a.group.toolArm.crystalMesh.material.emissiveIntensity = pulse;
               }
             }
             if (a.group.headGroup) a.group.headGroup.rotation.x = 0.2 + Math.sin(time * 3.0) * 0.1;
 
           } else if (a.id === 'bear') {
-            if (a.group.toolArm) a.group.toolArm.position.y = 1.0 + Math.sin(time * 2.0) * 0.2;
+            // Медведь Михалыч: держит рацию у уха и инспектирует ферму
+            if (a.group.toolArm) {
+              a.group.toolArm.position.y = 1.15 + Math.sin(time * 2.5) * 0.1;
+              a.group.toolArm.position.z = 0.32;
+              a.group.toolArm.rotation.x = -Math.PI / 8;
+            }
+            if (a.group.headGroup) a.group.headGroup.rotation.y = Math.sin(time * 1.8) * 0.3;
           }
 
         } else {
