@@ -3769,25 +3769,27 @@ function recalcSolderCost() {
 }
 
 function executeWorkstationAction() {
-  const data = CRAFTSMAN_DOSSIER[currentWsAgentId];
+  const agentId = currentWsAgentId;
+  const topicId = currentWsTopicId || 1;
+  const data = CRAFTSMAN_DOSSIER[agentId];
   if (!data) return;
 
-  if (currentWsAgentId === 'raccoon') {
-    triggerDatasetGeneration();
-    return;
-  }
-
   closeWorkstationModal();
-  if (data.agentTarget === 'assistant') {
-    switchTab('agents');
-    showToast('Координатор Triad-Omni на связи. Задайте команду Бригадиру.');
-    return;
+  if (typeof showToast === 'function') {
+    showToast(`⚙️ Мастер ${data.title} приступил к выполнению задачи по теме #${topicId}...`);
   }
 
-  if (typeof promptAgentTarget === 'function') {
-    promptAgentTarget(data.agentTarget);
-  } else {
-    showToast(`Запуск верстака ${data.title} для темы #${currentWsTopicId}`);
+  // 1. Если 3D-ферма загружена, запускаем анимацию передачи задачи следующему мастеру
+  if (window.farm3d && typeof window.farm3d.triggerAgentHandover === 'function') {
+    window.farm3d.triggerAgentHandover(agentId, topicId);
+  } else if (typeof window.onConveyorStepCompleted === 'function') {
+    const nextMap = {
+      soroka: 'bobr', bobr: 'kot', kot: 'lis', lis: 'barsuk',
+      barsuk: 'filin', filin: 'dyatel', dyatel: 'raccoon', raccoon: 'bear', bear: 'wp'
+    };
+    const stepNums = { soroka: 1, bobr: 2, kot: 3, lis: 4, barsuk: 5, filin: 6, dyatel: 7, raccoon: 8, bear: 9 };
+    const toAgent = nextMap[agentId] || 'wp';
+    window.onConveyorStepCompleted(agentId, toAgent, topicId, stepNums[agentId] || 1, 9);
   }
 }
 

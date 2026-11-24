@@ -1464,14 +1464,95 @@
       this.flowLines = [];
     }
 
+
+    triggerAgentHandover(fromAgentId, topicId = 1) {
+      const nextMap = {
+        soroka: { to: 'bobr', item: '📜 LSI & 4 Медиа-слота #' + topicId, send: 'Бобёр, держи LSI-ядро и 4 слота медиа!', recv: 'Принял LSI! Строю технический бриф.' },
+        bobr: { to: 'kot', item: '🪵 Бриф ГОСТ #' + topicId, send: 'Кот Феликс, бриф готов! Пиши физику смачивания.', recv: 'Принял бриф! Паяю черновик.' },
+        kot: { to: 'lis', item: '📝 Черновик #' + topicId, send: 'Лис, физика выверена! Считай себестоимость.', recv: 'Принял черновик! Считаю окупаемость C245.' },
+        lis: { to: 'barsuk', item: '💰 Экономика #' + topicId, send: 'Барсук, расчеты готовы! Черти термопрофиль.', recv: 'Принял экономику! Строю кривую 183–190°C.' },
+        barsuk: { to: 'filin', item: '📐 Термопрофиль #' + topicId, send: 'Филин, схема готова! Проверяй ГОСТ.', recv: 'Принял термопрофиль! Ставлю штамп ОТК!' },
+        filin: { to: 'dyatel', item: '🦉 [ОТК-ГОСТ] #' + topicId, send: 'Дятел, штамп стоит. Запускай скоринг!', recv: 'Принял паспорт! Скор 94/100 баллов.' },
+        dyatel: { to: 'raccoon', item: '🪵 Паспорт 94/100 #' + topicId, send: 'Рокки, скоринг сдан! Вплетай в граф.', recv: 'Принял статью! Индексирую в FTS5.' },
+        raccoon: { to: 'bear', item: '💾 База знаний #' + topicId, send: 'Михалыч, знания в базе! Готовь релиз.', recv: 'Принял пакет! Отправляю в WordPress.' },
+        bear: { to: 'wp', item: '📦 Релиз #' + topicId, send: 'WordPress, пакет готов к публикации!', recv: 'Статья опубликована на tochka-plavleniya.ru!' }
+      };
+
+      const step = nextMap[fromAgentId];
+      if (!step) return;
+
+      const sender = this.agents.find(a => a.id === fromAgentId);
+      const receiver = this.agents.find(a => a.id === step.to);
+      const senderSt = this.stationConfigs[fromAgentId];
+      const receiverSt = this.stationConfigs[step.to];
+
+      if (!sender || !receiverSt) return;
+
+      this.updateStationStatus(fromAgentId, 'В РАБОТЕ ⚙️', 'Передача: ' + step.item);
+      sender.state = 'working';
+      sender.workTimer = 140;
+
+      this.drawConveyorFlowLine(senderSt.pos, receiverSt.pos);
+
+      setTimeout(() => {
+        sender.state = 'walking';
+        const itemMesh = this.createHandoverItem(step.item);
+        sender.group.add(itemMesh);
+        itemMesh.position.set(0, 1.2, 0.6);
+        sender.heldItemMesh = itemMesh;
+
+        const meetPoint = new THREE.Vector3().lerpVectors(senderSt.pos, receiverSt.pos, 0.65);
+        sender.targetPos.copy(meetPoint);
+
+        if (receiver) {
+          receiver.targetPos.copy(meetPoint.clone().add(new THREE.Vector3(1.2, 0, 1.2)));
+          receiver.state = 'walking';
+        }
+
+        if (typeof speakText === 'function') {
+          speakText(`${sender.name}: ${step.send}`);
+        }
+
+        const arrivalCheck = setInterval(() => {
+          const dist = sender.group.position.distanceTo(meetPoint);
+          if (dist < 1.0) {
+            clearInterval(arrivalCheck);
+
+            this.animateItemTransfer(sender, receiver, itemMesh, () => {
+              this.updateStationStatus(fromAgentId, 'УТВЕРЖДЕНО ✅', 'Сдано: ' + step.item);
+              sender.state = 'walking';
+              sender.targetPos.copy(sender.homePos);
+
+              if (receiver) {
+                this.updateStationStatus(step.to, 'В РАБОТЕ ⚙️', 'Принято: ' + step.item);
+                receiver.state = 'working';
+                receiver.workTimer = 180;
+                if (typeof speakText === 'function') {
+                  speakText(`${receiver.name}: ${step.recv}`);
+                }
+              }
+
+              if (typeof window.onConveyorStepCompleted === 'function') {
+                const stepNums = { soroka: 1, bobr: 2, kot: 3, lis: 4, barsuk: 5, filin: 6, dyatel: 7, raccoon: 8, bear: 9 };
+                window.onConveyorStepCompleted(fromAgentId, step.to, topicId, stepNums[fromAgentId] || 1, 9);
+              }
+            });
+          }
+        }, 200);
+      }, 1200);
+    }
+
     startMissionPipeline(topicId = 1) {
       const pipelineSteps = [
-        { from: 'soroka', to: 'bobr', itemName: '📜 LSI-ядро #' + topicId, sendSpeech: 'Бобёр, держи LSI-ядро темы #' + topicId, receiveSpeech: 'Принял LSI! Утверждаю бриф ГОСТ Р МЭК 61191.' },
-        { from: 'bobr', to: 'kot', itemName: '🪵 Бриф ГОСТ #' + topicId, sendSpeech: 'Кот, плотина стандартов готова! Пиши триаду!', receiveSpeech: 'Принял бриф! Прогреваю жало T12, паяю физику смачивания.' },
-        { from: 'kot', to: 'barsuk', itemName: '📝 Черновик #' + topicId, sendSpeech: 'Барсук, текст готов! Нужен точный SVG-термопрофиль ПОС-61.', receiveSpeech: 'Принял черновик! Черчу кривую ликвидуса 183–190°C.' },
-        { from: 'barsuk', to: 'filin', itemName: '📐 SVG-схема #' + topicId, sendSpeech: 'Филин, векторная схема готова! Проверь на слоп.', receiveSpeech: 'Принял схему! SlopMonster чист, ставлю штамп [ОТК-2026]!' },
-        { from: 'filin', to: 'dyatel', itemName: '🔍 Паспорт v1.1 #' + topicId, sendSpeech: 'Дятел, штамп ОТК стоит. Запускай метрологический скоринг!', receiveSpeech: 'Принял паспорт! AST-скоринг 94/100 баллов! Передаю в релиз.' },
-        { from: 'dyatel', to: 'wp', itemName: '📦 Релиз 94/100', sendSpeech: 'Шлюз WordPress, пакет статьи доставлен для tochka-plavleniya.ru!', receiveSpeech: 'Релиз успешно развернут на сайте!' }
+        { from: 'soroka', to: 'bobr', itemName: '📜 LSI & 4 Медиа-слота #' + topicId, sendSpeech: 'Бобёр Борис, держи LSI-ядро и 4 медиа-слота темы #' + topicId, receiveSpeech: 'Принял LSI! Строю технический бриф по ГОСТ 21931-76.' },
+        { from: 'bobr', to: 'kot', itemName: '🪵 Бриф ГОСТ #' + topicId, sendSpeech: 'Кот Феликс, бриф и допуски сплава готовы! Пиши физику смачивания.', receiveSpeech: 'Принял бриф! Разогреваю жало T12 до 280°C, паяю черновик.' },
+        { from: 'kot', to: 'lis', itemName: '📝 Черновик статьи #' + topicId, sendSpeech: 'Лис Рейнард, физика выверена! Считай себестоимость пайки и ресурс жала.', receiveSpeech: 'Принял черновик! Считаю окупаемость C245 и стоимость точки 0.12 ₽.' },
+        { from: 'lis', to: 'barsuk', itemName: '💰 Смета и Экономика #' + topicId, sendSpeech: 'Барсук Бруно, расчеты себестоимости встроены! Черти термопрофиль.', receiveSpeech: 'Принял экономику! Строю кривую ликвидуса 183–190°C и дефекты.' },
+        { from: 'barsuk', to: 'filin', itemName: '📐 SVG-Термопрофиль #' + topicId, sendSpeech: 'Филин Архимед, схема и дефекты готовы! Проверяй на стандарты ГОСТ.', receiveSpeech: 'Принял термопрофиль! ГОСТ Р МЭК 61191-1 соблюден, ставлю штамп ОТК!' },
+        { from: 'filin', to: 'dyatel', itemName: '🦉 Штамп [ОТК-ГОСТ] #' + topicId, sendSpeech: 'Дятел Вуди, штамп приемки стоит. Запускай метрологический скоринг!', receiveSpeech: 'Принял паспорт! Валидация схемы v1.1: скор 94/100 баллов.' },
+        { from: 'dyatel', to: 'raccoon', itemName: '🪵 Паспорт AST-94 #' + topicId, sendSpeech: 'Енот Рокки, скоринг сдан! Вплетай статью в граф и датасет LoRA.', receiveSpeech: 'Принял статью! Индексирую в FTS5 и собираю датасет ChatML.' },
+        { from: 'raccoon', to: 'bear', itemName: '💾 База знаний и LoRA #' + topicId, sendSpeech: 'Медведь Михалыч, знания зафиксированы! Давай отмашку на финальный релиз.', receiveSpeech: 'Принял пакет! Проверяю манифест и отправляю в WordPress.' },
+        { from: 'bear', to: 'wp', itemName: '📦 Финальный Релиз #' + topicId, sendSpeech: 'Шлюз WordPress, пакет статьи доставлен для tochka-plavleniya.ru!', receiveSpeech: 'Статья успешно опубликована на сайте!' }
       ];
 
       let currentStepIdx = 0;
@@ -1537,6 +1618,10 @@
                   if (typeof speakText === 'function') {
                     speakText(`${receiver.name}: ${step.receiveSpeech}`);
                   }
+                }
+
+                if (typeof window.onConveyorStepCompleted === 'function') {
+                  window.onConveyorStepCompleted(step.from, step.to, topicId, currentStepIdx + 1, pipelineSteps.length);
                 }
 
                 currentStepIdx++;
