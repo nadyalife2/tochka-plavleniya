@@ -4294,3 +4294,212 @@ async function uploadStandardPdf() {
     alert('Сбой сети: ' + err.message);
   }
 }
+
+
+// =========================================================================
+// ХЕЛПЕРЫ ДЛЯ МЕДИА-ПЛАНА (СОРОКА КЛАРА) И КАРТРИДЖЕЙ (ЕНОТ РОККИ)
+// =========================================================================
+
+let globalMediaPack = null;
+let currentMediaSlot = 'slot_1_hero';
+
+async function loadArticleMediaPlan() {
+  const container = document.getElementById('wsMediaSlotContent');
+  if (!container) return;
+  const topic = (window.state && window.state.topics) ? window.state.topics.find(t => t.id === currentWsTopicId) : { id: 1, title: 'Пайка плат для начинающих', solder_alloy: 'ПОС-61 (183–190°C)' };
+  
+  container.innerHTML = '<span style="color:#FBBF24;">⏳ Сорока Клара составляет медиа-план и SEO-Geo промпты...</span>';
+  try {
+    const res = await fetch(`/api/media/plan?title=${encodeURIComponent(topic.title || '')}&alloy=${encodeURIComponent(topic.solder_alloy || '')}`);
+    globalMediaPack = await res.json();
+    renderMediaSlotContent(currentMediaSlot);
+  } catch (err) {
+    container.innerHTML = `<span style="color:#EF4444;">Ошибка загрузки медиа-плана: ${err.message}</span>`;
+  }
+}
+
+function selectMediaSlot(slotKey) {
+  currentMediaSlot = slotKey;
+  ['slot_1_hero', 'slot_2_macro', 'slot_3_diagram', 'slot_4_defect'].forEach(k => {
+    const tab = document.getElementById(`tab_${k}`);
+    if (tab) {
+      if (k === slotKey) {
+        tab.style.background = '#F59E0B';
+        tab.style.color = '#000';
+        tab.style.fontWeight = 'bold';
+      } else {
+        tab.style.background = '#27272A';
+        tab.style.color = '#A1A1AA';
+        tab.style.fontWeight = 'normal';
+      }
+    }
+  });
+  renderMediaSlotContent(slotKey);
+}
+
+function renderMediaSlotContent(slotKey) {
+  const container = document.getElementById('wsMediaSlotContent');
+  if (!container || !globalMediaPack || !globalMediaPack.slots) return;
+  const slot = globalMediaPack.slots[slotKey];
+  if (!slot) return;
+
+  container.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;flex-wrap:wrap;gap:6px;">
+      <div style="font-weight:bold;color:#FBBF24;font-size:12px;">${slot.title} (${slot.aspect_ratio})</div>
+      <span style="background:#78350F;color:#FEF3C7;padding:2px 6px;border-radius:4px;font-size:10px;">Модель: ${slot.recommended_model}</span>
+    </div>
+    <div style="font-size:11px;color:#CBD5E1;margin-bottom:8px;">${slot.purpose}</div>
+    
+    <div style="background:#09090B;border:1px solid #3F3F46;border-radius:4px;padding:8px;margin-bottom:8px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+        <span style="font-size:10.5px;font-weight:bold;color:#38BDF8;">ПРОМПТ №1 (ДЛЯ ГЕНЕРАЦИИ В FLUX / MIDJOURNEY):</span>
+        <button type="button" class="btn btn--xs" onclick="navigator.clipboard.writeText('${slot.prompt_1.replace(/'/g, "\\\'")}'); if(typeof showToast==='function') showToast('Промпт №1 скопирован!');" style="background:#0284C7;color:#FFF;border:none;border-radius:3px;padding:2px 6px;cursor:pointer;font-size:10px;">📋 Копировать</button>
+      </div>
+      <div style="font-size:10.5px;color:#E2E8F0;font-family:monospace;line-height:1.4;">${slot.prompt_1}</div>
+    </div>
+
+    <div style="background:#09090B;border:1px solid #27272A;border-radius:4px;padding:6px;font-size:10.5px;line-height:1.5;">
+      <div><strong style="color:#A7F3D0;">SEO Alt:</strong> <span style="color:#FFF;">${slot.seo_meta.alt}</span></div>
+      <div><strong style="color:#A7F3D0;">SEO Title:</strong> <span style="color:#FFF;">${slot.seo_meta.title}</span></div>
+      <div><strong style="color:#A7F3D0;">GEO Tag:</strong> <span style="color:#FDE68A;">${slot.seo_meta.geo_tag}</span></div>
+    </div>
+  `;
+}
+
+async function requestRefinedPrompt() {
+  const critiqueInp = document.getElementById('wsMediaCritiqueInput');
+  const box = document.getElementById('wsMediaRefinedPromptBox');
+  if (!critiqueInp || !box) return;
+  const critique = critiqueInp.value.trim();
+  if (!critique) return alert('Опишите, что не понравилось в картинке!');
+
+  if (!globalMediaPack || !globalMediaPack.slots || !globalMediaPack.slots[currentMediaSlot]) {
+    await loadArticleMediaPlan();
+  }
+  const basePrompt = globalMediaPack.slots[currentMediaSlot].prompt_1;
+
+  box.style.display = 'block';
+  box.innerHTML = '<span>⏳ Сорока Клара формулирует Промпт №2 с оптическими исправлениями...</span>';
+
+  try {
+    const res = await fetch('/api/media/refine_prompt', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ slot_key: currentMediaSlot, user_critique: critique, base_prompt: basePrompt })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      box.innerHTML = `
+        <div style="font-weight:bold;color:#4ADE80;margin-bottom:4px;">✨ ПРЕДЛОЖЕНИЕ-ПРОМПТ №2 (С УЧЕТОМ ВАШИХ ПРАВОК):</div>
+        <div style="font-family:monospace;font-size:10.5px;color:#FFF;line-height:1.4;margin-bottom:6px;">${data.prompt_2}</div>
+        <div style="font-size:10px;color:#94A3B8;margin-bottom:6px;">💡 <em>${data.advice_from_clara}</em></div>
+        <button type="button" class="btn btn--xs" onclick="navigator.clipboard.writeText('${data.prompt_2.replace(/'/g, "\\\'")}'); if(typeof showToast==='function') showToast('Промпт №2 скопирован!');" style="background:#22C55E;color:#000;border:none;border-radius:4px;padding:3px 8px;cursor:pointer;font-weight:bold;">
+          📋 Скопировать Промпт №2
+        </button>
+      `;
+    } else {
+      box.innerHTML = `<span style="color:#EF4444;">Ошибка: ${data.message}</span>`;
+    }
+  } catch (err) {
+    box.innerHTML = `<span style="color:#EF4444;">Сбой сети: ${err.message}</span>`;
+  }
+}
+
+async function evaluateUploadedMedia() {
+  const fileInp = document.getElementById('wsMediaUploadInput');
+  const resBox = document.getElementById('wsMediaEvaluationResult');
+  if (!fileInp || !resBox) return;
+  if (!fileInp.files || fileInp.files.length === 0) return alert('Выберите файл картинки для оценки!');
+
+  const file = fileInp.files[0];
+  const sizeKb = Math.round(file.size / 1024);
+
+  resBox.style.display = 'block';
+  resBox.style.background = '#1E1B4B';
+  resBox.style.color = '#C7D2FE';
+  resBox.innerHTML = '<span>🦉 Филин Архимед проверяет соответствие стандартам Точки Плавления...</span>';
+
+  try {
+    const res = await fetch('/api/media/evaluate_image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ file_name: file.name, file_size_kb: sizeKb, width: 1200, height: 675 })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      const isOk = data.passed;
+      resBox.style.background = isOk ? '#064E3B' : '#7F1D1D';
+      resBox.style.color = isOk ? '#A7F3D0' : '#FECACA';
+      resBox.innerHTML = `
+        <div style="font-weight:bold;">${isOk ? '✅' : '⚠️'} Вердикт [ОТК-ГОСТ]: ${data.verdict} (Оценка: ${data.score}/100)</div>
+        <div style="font-size:10px;margin-top:2px;">• ${data.reasons.join('<br>• ')}</div>
+      `;
+    }
+  } catch (err) {
+    resBox.innerHTML = `<span style="color:#EF4444;">Сбой сети: ${err.message}</span>`;
+  }
+}
+
+async function loadCartridgesVault() {
+  const container = document.getElementById('wsCartridgesListContainer');
+  if (!container) return;
+  container.innerHTML = '<span style="color:#6EE7B7;">⏳ Загрузка пула версий картриджей...</span>';
+
+  try {
+    const res = await fetch('/api/cartridges/list');
+    const data = await res.json();
+    const list = data.cartridges || [];
+    if (list.length === 0) {
+      container.innerHTML = '<span>Картриджей в хранилище пока нет.</span>';
+      return;
+    }
+
+    container.innerHTML = list.map(c => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #065F46;gap:8px;flex-wrap:wrap;">
+        <div>
+          <span style="font-weight:bold;color:#FFF;">${c.name}</span>
+          <span style="color:#A7F3D0;font-size:10px;">(${c.size_mb} МБ · ${c.type})</span>
+          ${c.is_active ? '<span style="background:#10B981;color:#000;padding:1px 5px;border-radius:3px;font-size:9.5px;font-weight:bold;margin-left:4px;">АКТИВЕН</span>' : ''}
+        </div>
+        <button type="button" class="btn btn--xs" onclick="deployCartridge('${c.name}')" style="background:#059669;color:#FFF;border:none;border-radius:3px;padding:3px 8px;cursor:pointer;font-weight:bold;font-size:10px;">
+          ⚡ Прошить на Node-1
+        </button>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = `<span style="color:#EF4444;">Ошибка: ${err.message}</span>`;
+  }
+}
+
+async function deployCartridge(name) {
+  if (typeof showToast === 'function') showToast(`⚡ Прошивка картриджа ${name} на Node-1 (Mi 10T 5G)...`);
+  try {
+    const res = await fetch('/api/cartridges/deploy', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cartridge_name: name })
+    });
+    const data = await res.json();
+    if (data.status === 'ok') {
+      if (typeof showToast === 'function') showToast(`✅ ${data.message}`);
+      await loadCartridgesVault();
+    } else {
+      alert('Ошибка прошивки: ' + data.message);
+    }
+  } catch (err) {
+    alert('Сбой сети: ' + err.message);
+  }
+}
+
+// Авто-инициализация при открытии модалки верстака
+const originalOpenWs = window.openWorkstationModal;
+window.openWorkstationModal = function(agentId) {
+  if (typeof originalOpenWs === 'function') originalOpenWs(agentId);
+  setTimeout(() => {
+    if (agentId === 'soroka') {
+      loadArticleMediaPlan();
+    } else if (agentId === 'raccoon') {
+      loadCartridgesVault();
+    }
+  }, 100);
+};

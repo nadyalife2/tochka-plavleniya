@@ -10,7 +10,7 @@ providers:
     nodes:
       node1_brain: "http://192.168.31.161:8080/v1"
       node2_reflex: "http://192.168.31.57:8081/v1"
-      node3_gateway: "http://7LS8SKLV55IZSK7S:8000"
+      node3_gateway: "http://127.0.0.1:8000"
       omniroute: "http://127.0.0.1:20128"
     active: true
 

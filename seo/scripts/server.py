@@ -1654,6 +1654,27 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": str(e)}, 500)
             return
 
+        if path == "/api/cartridges/list":
+            try:
+                import media_cartridge_manager
+                cartridges = media_cartridge_manager.list_cartridges()
+                self.send_json({"status": "ok", "cartridges": cartridges})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/media/plan":
+            qs = parse_qs(url.query)
+            topic_title = (qs.get("title") or ["Пайка плат для начинающих"])[0]
+            solder_alloy = (qs.get("alloy") or ["ПОС-61 (183–190°C)"])[0]
+            try:
+                import media_cartridge_manager
+                plan = media_cartridge_manager.generate_article_media_pack(topic_title, solder_alloy)
+                self.send_json(plan)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
         if path == "/api/competitors/search":
             qs = parse_qs(url.query)
             q = (qs.get("q") or ["пайка"])[0].strip()
@@ -2618,6 +2639,44 @@ class DashboardHandler(BaseHTTPRequestHandler):
             try:
                 import models_manager
                 res = models_manager.set_provider_key(provider, api_key, active)
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/cartridges/deploy":
+            c_name = payload.get("cartridge_name") or payload.get("name")
+            if not c_name:
+                self.send_json({"status": "error", "message": "Не указано имя картриджа"}, 400)
+                return
+            try:
+                import media_cartridge_manager
+                res = media_cartridge_manager.deploy_cartridge_to_node1(c_name)
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/media/refine_prompt":
+            slot_key = payload.get("slot_key") or "slot_1_hero"
+            user_critique = payload.get("user_critique") or ""
+            base_prompt = payload.get("base_prompt") or ""
+            try:
+                import media_cartridge_manager
+                res = media_cartridge_manager.refine_image_prompt_iteration(slot_key, user_critique, base_prompt)
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/media/evaluate_image":
+            file_name = payload.get("file_name") or "image.webp"
+            file_size_kb = int(payload.get("file_size_kb") or 150)
+            width = int(payload.get("width") or 1200)
+            height = int(payload.get("height") or 675)
+            try:
+                import media_cartridge_manager
+                res = media_cartridge_manager.evaluate_uploaded_image(file_name, file_size_kb, width, height)
                 self.send_json(res)
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, 500)
