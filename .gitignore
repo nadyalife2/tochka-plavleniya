@@ -59,3 +59,5 @@ config/api-keys.local.yaml
 config/*.local.yaml
 config/*.key
 api-keys*.yaml
+
+*.xlsx

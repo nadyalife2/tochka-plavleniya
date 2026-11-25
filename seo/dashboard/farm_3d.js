@@ -1206,6 +1206,89 @@
       });
     }
 
+
+    setupAttentionMarkers() {
+      this.agents.forEach(agent => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 280;
+        canvas.height = 140;
+        const ctx = canvas.getContext('2d');
+
+        const tex = new THREE.CanvasTexture(canvas);
+        tex.minFilter = THREE.LinearFilter;
+        const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthTest: false });
+        const sprite = new THREE.Sprite(mat);
+        const baseY = (agent.id === 'bear') ? 4.5 : 4.1;
+        sprite.position.set(0, baseY, 0);
+        sprite.scale.set(3.4, 1.7, 1.0);
+        sprite.visible = false; // Скрыт, пока нет задачи для пользователя
+
+        agent.group.add(sprite);
+        agent.attentionMarker = sprite;
+        agent.attentionCanvas = canvas;
+        agent.attentionCtx = ctx;
+        agent.attentionTex = tex;
+      });
+    }
+
+    updateAgentAttention(agentId, type, taskText, dateStr) {
+      const agent = this.agents.find(a => a.id === agentId);
+      if (!agent || !agent.attentionMarker) return;
+
+      if (!type || type === 'none') {
+        agent.attentionMarker.visible = false;
+        return;
+      }
+
+      const canvas = agent.attentionCanvas;
+      const ctx = agent.attentionCtx;
+      const tex = agent.attentionTex;
+      if (!ctx || !canvas) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const isRed = (type === 'red');
+      const bgColor = isRed ? '#DC2626' : '#EAB308';
+      const borderColor = isRed ? '#991B1B' : '#CA8A04';
+      const textColor = isRed ? '#FFFFFF' : '#000000';
+      const badgeDateBg = isRed ? '#7F1D1D' : '#78350F';
+      const badgeDateText = isRed ? '#FECACA' : '#FEF3C7';
+
+      // 1. Фоновый щит-бейдж
+      ctx.fillStyle = bgColor;
+      ctx.beginPath();
+      ctx.roundRect(8, 8, canvas.width - 16, canvas.height - 16, 18);
+      ctx.fill();
+
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 4.5;
+      ctx.stroke();
+
+      // 2. Крупный восклицательный знак
+      ctx.font = '900 44px sans-serif';
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'center';
+      ctx.fillText('!', canvas.width / 2, 48);
+
+      // 3. Текст действия
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillStyle = textColor;
+      ctx.fillText((taskText || 'ТРЕБУЕТ ОДОБРЕНИЯ').toUpperCase(), canvas.width / 2, 78);
+
+      // 4. Плашка с датой и временем появления задачи
+      ctx.fillStyle = badgeDateBg;
+      ctx.beginPath();
+      ctx.roundRect(20, 92, canvas.width - 40, 36, 8);
+      ctx.fill();
+
+      ctx.font = 'bold 13px monospace';
+      ctx.fillStyle = badgeDateText;
+      ctx.fillText(`📅 ${dateStr || 'Сегодня 16:15'}`, canvas.width / 2, 116);
+
+      tex.needsUpdate = true;
+      agent.attentionMarker.visible = true;
+    }
+
     setWaypointTarget(agent) {
       this.waypointTarget = agent;
       if (this.waypointLine) {

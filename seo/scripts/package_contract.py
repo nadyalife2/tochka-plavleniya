@@ -174,7 +174,7 @@ def detect_temp_data(text: str, alloy: str) -> dict | None:
     setpoint_matches = []
     for m in re.finditer(r"(?i)(?:уставк\w*|паяльник\w*|жал\w*|на станци\w*|режим\w*|паять при|температур\w*)\s*(?:жала|паяльника|станции|регулятора|составляет|равна|—|-|:)?\s*(\d{2,3})\s*(?:[–—\-]|до)\s*(\d{2,3})\s*°\s*[CС]", text):
         lo, hi = int(m.group(1)), int(m.group(2))
-        if 230 <= lo < hi <= 400:
+        if 90 <= lo < hi <= 400:
             setpoint_matches.append((lo, hi))
 
     if setpoint_matches:
@@ -195,7 +195,7 @@ def detect_temp_data(text: str, alloy: str) -> dict | None:
         if is_melting or (melt_r and (abs(lo - melt_r[0]) <= 5 and abs(hi - melt_r[1]) <= 5)):
             continue  # Пропускаем температуру плавления
 
-        if 240 <= lo and hi <= 380:
+        if 100 <= lo and hi <= 380:
             return {"kind": "station_setpoint", "range": f"{lo} – {hi} °C"}
 
     # Если уставка не названа явно в тексте — возвращаем None (выдумывать запрещено!)
@@ -326,6 +326,10 @@ def markdown_to_html(md: str) -> str:
         items = re.findall(r'(?m)^\d+\.\s+(.+)$', match.group(0))
         return '<ol>' + ''.join(f'<li>{it}</li>' for it in items) + '</ol>'
     text = re.sub(r'(?:^\d+\.\s+.+$\n?)+', convert_ol, text, flags=re.MULTILINE)
+
+    # 8.5. Нормализация границ блочных элементов (предотвращает вложение h2/ul внутрь <p>)
+    block_tags = r'(?:<h[1-6]>.*?</h[1-6]>|<table[\s\S]*?</table>|<div[\s\S]*?</div>|<ul[\s\S]*?</ul>|<ol[\s\S]*?</ol>|<blockquote[\s\S]*?</blockquote>|<hr\s*/?>|<!--[\s\S]*?-->)'
+    text = re.sub(r'(' + block_tags + r')', r'\n\n\1\n\n', text)
 
     # 9. Формирование абзацев
     blocks = [b.strip() for b in re.split(r'\n\s*\n', text) if b.strip()]

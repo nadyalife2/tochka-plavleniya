@@ -163,6 +163,62 @@ def set_provider_key(provider_id: str, api_key: str, active: bool = True) -> Dic
     return {"status": "error", "message": f"Неизвестный провайдер: {provider_id}"}
 
 
+def test_provider_connection(provider_id: str) -> Dict[str, Any]:
+    """Проверяет доступность и пинг указанного провайдера моделей."""
+    import socket, urllib.request, time
+    raw = load_yaml_raw(MODELS_YAML)
+    providers = raw.get("providers", {})
+    p_info = providers.get(provider_id, {})
+    
+    if provider_id == "triad_cluster":
+        # Проверяем порты 8080 (Node-1) и 8000 (Node-3)
+        nodes = [
+            ("Node-1 Brain (Mi 10T)", "127.0.0.1", 8080),
+            ("Node-2 Reflex (Nord N10)", "127.0.0.1", 8081),
+            ("Node-3 Gateway (Redmi Note 4)", "127.0.0.1", 8000)
+        ]
+        status_list = []
+        for name, host, port in nodes:
+            t0 = time.time()
+            try:
+                s = socket.create_connection((host, port), timeout=0.8)
+                s.close()
+                dt = round((time.time() - t0) * 1000, 1)
+                status_list.append({"node": name, "online": True, "ping_ms": dt})
+            except Exception:
+                status_list.append({"node": name, "online": False, "ping_ms": None})
+        online_count = sum(1 for n in status_list if n["online"])
+        return {
+            "status": "ok",
+            "provider": provider_id,
+            "connected": online_count > 0,
+            "details": f"Онлайн {online_count}/3 узлов Triad-Omni",
+            "nodes": status_list
+        }
+    
+    if provider_id == "ollama_local":
+        t0 = time.time()
+        try:
+            req = urllib.request.Request("http://127.0.0.1:11434/api/tags", headers={"User-Agent": "Triad/1.0"})
+            with urllib.request.urlopen(req, timeout=1.0) as resp:
+                dt = round((time.time() - t0) * 1000, 1)
+                return {"status": "ok", "provider": provider_id, "connected": True, "ping_ms": dt, "details": "Ollama активен на 127.0.0.1:11434"}
+        except Exception:
+            return {"status": "ok", "provider": provider_id, "connected": False, "details": "Ollama оффлайн на 11434"}
+            
+    # Облачные провайдеры (проверка наличия ключа)
+    key = p_info.get("api_key", "").strip()
+    if not key:
+        return {"status": "ok", "provider": provider_id, "connected": False, "details": "API ключ не задан"}
+    return {
+        "status": "ok",
+        "provider": provider_id,
+        "connected": True,
+        "details": f"API ключ настроен ({key[:4]}...{key[-3:] if len(key)>6 else ''})"
+    }
+
+
+
 if __name__ == "__main__":
     cfg = get_models_config()
     print("Конфигурация моделей загружена:")

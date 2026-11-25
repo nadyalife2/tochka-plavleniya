@@ -2558,11 +2558,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 # Находим следующий ID
                 max_id = cur.execute("SELECT MAX(id) FROM topics").fetchone()[0] or 0
                 next_id = max_id + 1
-                slug = __import__("re").sub(r"[^a-z0-9\-]+", "-", row["title"].lower()).strip("-")
+                base_slug = slugify(row["title"]) or f"topic-{next_id}"
+                final_slug = f"{base_slug}-{next_id}"
                 cur.execute("""
                     INSERT INTO topics (id, title, slug, cluster, type, priority_score, status, next_action)
                     VALUES (?, ?, ?, ?, ?, ?, 'backlog', 'одобрена из topics_proposed')
-                """, (next_id, row["title"], f"{slug}-{next_id}", row["cluster"], row["type"], row["priority_score"]))
+                """, (next_id, row["title"], final_slug, row["cluster"], row["type"], row["priority_score"]))
                 cur.execute("UPDATE topics_proposed SET status = 'принят' WHERE id = ?", (pid,))
                 conn.commit()
             self.send_json({"status": "ok", "new_topic_id": next_id})
@@ -2685,7 +2686,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
         if path == "/api/standards/upload_pdf":
             # Сохранение и индексация PDF ГОСТа (Рокки)
             pdf_b64 = payload.get("pdf_base64")
-            filename = payload.get("filename", "uploaded_standard.pdf")
+            raw_filename = payload.get("filename", "uploaded_standard.pdf")
+            filename = os.path.basename(raw_filename).strip() or "uploaded_standard.pdf"
             title = payload.get("title", filename)
             status_val = payload.get("status", "active")
             
@@ -2706,6 +2708,43 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     
                 result = pdf_gost_extractor.index_pdf_document(target_file, title=title, status=status_val)
                 self.send_json(result)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/humanizer/review":
+            text = payload.get("text", "")
+            if not text:
+                self.send_json({"status": "error", "message": "Текст не передан"}, 400)
+                return
+            try:
+                import humanizer_reviewer
+                res = humanizer_reviewer.audit_human_style(text)
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/competitors/radar":
+            query = payload.get("query", "")
+            url = payload.get("url", "")
+            try:
+                import competitor_radar
+                if url:
+                    res = competitor_radar.crawl_page_features(url)
+                else:
+                    res = competitor_radar.run_competitor_radar(query)
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/config/test_connection":
+            provider_id = payload.get("provider", "triad_cluster")
+            try:
+                import models_manager
+                res = models_manager.test_provider_connection(provider_id)
+                self.send_json(res)
             except Exception as e:
                 self.send_json({"status": "error", "message": str(e)}, 500)
             return
@@ -3060,6 +3099,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 published = conn.execute("SELECT count(*) FROM topics WHERE wp_post_id IS NOT NULL").fetchone()[0]
                 with_media = conn.execute("SELECT count(*) FROM topics WHERE media_json IS NOT NULL").fetchone()[0]
                 last_topic = conn.execute("SELECT id, title, status, updated_at FROM topics ORDER BY updated_at DESC LIMIT 1").fetchone()
+                target_unwritten = conn.execute("SELECT id, title FROM topics WHERE content_markdown IS NULL OR length(content_markdown) < 200 ORDER BY priority DESC LIMIT 1").fetchone()
+                target_nomedia = conn.execute("SELECT id, title FROM topics WHERE media_json IS NULL ORDER BY id ASC LIMIT 1").fetchone()
 
             highlight = "card-craftsman-researcher"
             action = None
@@ -3094,7 +3135,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
             elif any(k in msg for k in ("нужно сделать", "дальше", "план", "что делать")):
                 if written < total_topics:
-                    target_t = conn.execute("SELECT id, title FROM topics WHERE content_markdown IS NULL OR length(content_markdown) < 200 ORDER BY priority DESC LIMIT 1").fetchone()
+                    target_t = target_unwritten
                     tid = target_t["id"] if target_t else 1
                     highlight = "card-craftsman-writer"
                     reply = (
@@ -3104,7 +3145,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     )
                     action = {"label": f"Отправить тему #{tid} Коту", "agent": "02-writer", "target_id": tid}
                 elif with_media < written:
-                    target_t = conn.execute("SELECT id, title FROM topics WHERE media_json IS NULL ORDER BY id ASC LIMIT 1").fetchone()
+                    target_t = target_nomedia
                     tid = target_t["id"] if target_t else 1
                     highlight = "card-craftsman-illustrator"
                     reply = (

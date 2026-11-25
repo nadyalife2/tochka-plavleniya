@@ -59,7 +59,7 @@ def _read_key() -> str:
     from keys import get_key
     value = get_key("MUTAGEN_API_KEY")
     if not value:
-        raise SystemExit(
+        raise RuntimeError(
             "❌ Не найден MUTAGEN_API_KEY. Откройте config/api-keys.local.yaml "
             "и впишите ключ Мутагена справа от MUTAGEN_API_KEY:"
         )

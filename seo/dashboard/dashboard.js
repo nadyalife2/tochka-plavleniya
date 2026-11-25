@@ -4529,3 +4529,360 @@ window.openWorkstationModal = function(agentId) {
     }
   }, 100);
 };
+
+
+// =========================================================================
+// ДЕТЕКЦИЯ ЗАДАЧ ЗВЕРЕЙ: ВОСКЛИЦАТЕЛЬНЫЕ ЗНАКИ [!] (ЖЕЛТЫЙ/КРАСНЫЙ) И ДАТЫ
+// =========================================================================
+function getAgentCurrentAttentionTask(agentId, topicId) {
+  const topics = (window.DB_DATA && window.DB_DATA.topics) || [];
+  const cur = topics.find(t => t.id === topicId) || topics[0] || null;
+  if (!cur) return null;
+
+  const now = new Date();
+  const formatTime = (isoStr) => {
+    if (!isoStr) return `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    const d = new Date(isoStr);
+    if (isNaN(d.getTime())) return String(isoStr).slice(5, 16).replace('T', ' ');
+    return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}`;
+  };
+
+  const topicDate = formatTime(cur.updated_at || cur.created_at);
+  const status = cur.status;
+  const score = cur.score_total || 0;
+  const isCritical = cur.is_critical || false;
+
+  // Определение задачи для каждого зверя
+  if (agentId === 'soroka') {
+    if (status === 'gaps' || (status === 'backlog' && (!cur.keywords_lsi || cur.keywords_lsi.length < 5))) {
+      return { isRed: false, title: 'ТРЕБУЕТСЯ: Собрать LSI-ядро и 4 слота медиа-плана', date: topicDate };
+    }
+  } else if (agentId === 'bobr') {
+    if (status === 'backlog') {
+      return { isRed: false, title: 'УТВЕРДИТЬ: Бриф по ГОСТ 21931-76 и допуски ПОС-61', date: topicDate };
+    }
+  } else if (agentId === 'kot') {
+    if (status === 'work') {
+      return { isRed: false, title: 'УТВЕРДИТЬ: Физика пайки и черновик статьи «Моим голосом»', date: topicDate };
+    }
+  } else if (agentId === 'lis') {
+    if (status === 'work' && (cur.chars || 0) >= 1500) {
+      return { isRed: false, title: 'СОГЛАСОВАТЬ: Смета себестоимости и ресурс жала T12/C245', date: topicDate };
+    }
+  } else if (agentId === 'barsuk') {
+    if (status === 'needs_fix') {
+      return { isRed: isCritical, title: isCritical ? 'КРИТИЧЕСКИЙ ДЕФЕКТ: Срочно исправить термопрофиль' : 'ПРОВЕРИТЬ: SVG-термопрофиль ликвидуса 183–190°C', date: topicDate };
+    }
+  } else if (agentId === 'filin') {
+    if (status === 'review') {
+      if (isCritical || (score > 0 && score < 80)) {
+        return { isRed: true, title: 'ОТК БЛОКИРОВКА: Нарушение ГОСТ Р МЭК 61191-1 или фактов', date: topicDate };
+      }
+      return { isRed: false, title: 'ПРИЕМКА [ОТК-ГОСТ]: Требуется ваша финальная подпись', date: topicDate };
+    }
+  } else if (agentId === 'dyatel') {
+    if (status === 'review' && score > 0 && score < 90) {
+      return { isRed: true, title: `НИЗКИЙ СКОР (${score}/100): Требуется дотянуть до 90+`, date: topicDate };
+    }
+  } else if (agentId === 'raccoon') {
+    if (status === 'ready' && !cur.indexed_fts) {
+      return { isRed: false, title: 'ИНДЕКСАЦИЯ: Добавить статью в граф знаний и датасет LoRA', date: topicDate };
+    }
+  } else if (agentId === 'bear') {
+    if (status === 'ready') {
+      return { isRed: false, title: 'РЕЛИЗ: Дать отмашку на публикацию в WordPress', date: topicDate };
+    }
+  }
+
+  return null;
+}
+
+function updateAllAnimalAttentions() {
+  if (!window.farm3d || typeof window.farm3d.updateAgentAttention !== 'function') return;
+
+  const animals = ['soroka', 'bobr', 'kot', 'lis', 'barsuk', 'filin', 'dyatel', 'raccoon', 'bear'];
+  const topicId = window.currentWsTopicId || 1;
+
+  animals.forEach(id => {
+    const task = getAgentCurrentAttentionTask(id, topicId);
+    if (task) {
+      const type = task.isRed ? 'red' : 'yellow';
+      window.farm3d.updateAgentAttention(id, type, task.title.split(':')[0], task.date);
+    } else {
+      window.farm3d.updateAgentAttention(id, 'none');
+    }
+  });
+}
+
+// Хук вызова при обновлении данных
+const origRenderAll = window.renderAll;
+if (typeof origRenderAll === 'function') {
+  window.renderAll = function() {
+    origRenderAll();
+    setTimeout(updateAllAnimalAttentions, 120);
+  };
+}
+
+// ==========================================
+// ✍️ HUMANIZER & ANTI-SLOP REVIEWER CLIENT
+// ==========================================
+function openHumanizerModal() {
+  const modal = document.getElementById('humanizerModal');
+  if (modal) modal.classList.add('active');
+  const input = document.getElementById('humanizerInput');
+  if (input && !input.value.trim()) {
+    pasteCurrentArticleIntoHumanizer();
+  }
+}
+
+function closeHumanizerModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  const modal = document.getElementById('humanizerModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function pasteCurrentArticleIntoHumanizer() {
+  const topics = (window.DB_DATA && window.DB_DATA.topics) || [];
+  const cur = topics.find(t => t.id === window.currentWsTopicId) || topics[0];
+  const input = document.getElementById('humanizerInput');
+  if (!input) return;
+  if (cur && (cur.content || cur.notes || cur.outline)) {
+    input.value = cur.content || `${cur.title}\n\n${cur.notes || ''}\n\n${cur.outline || ''}`;
+    updateHumanizerCharCount();
+    if (typeof showToast === 'function') showToast(`Вставлен текст статьи: «${cur.title}»`);
+  } else {
+    input.value = 'В современном мире нельзя не отметить, что осуществление процесса пайки является ключевым аспектом монтажа радиодеталей. Безусловно, важно понимать технологические требования...';
+    updateHumanizerCharCount();
+  }
+}
+
+function updateHumanizerCharCount() {
+  const input = document.getElementById('humanizerInput');
+  const counter = document.getElementById('humanizerCharCount');
+  if (!input || !counter) return;
+  const txt = input.value || '';
+  const words = (txt.match(/\b\w+\b/g) || []).length;
+  counter.textContent = `Символов: ${txt.length} | Слов: ${words}`;
+}
+
+const humanizerInputEl = document.getElementById('humanizerInput');
+if (humanizerInputEl) {
+  humanizerInputEl.addEventListener('input', updateHumanizerCharCount);
+}
+
+function cleanTextFromSlopUI() {
+  const input = document.getElementById('humanizerInput');
+  if (!input || !input.value.trim()) return;
+  let text = input.value;
+  const cliches = [
+    [/\bв современном мире,?\s*/gi, ''],
+    [/\bнельзя не отметить,?\s*что\s*/gi, ''],
+    [/\bважно понимать,?\s*что\s*/gi, ''],
+    [/\bследует подчеркнуть,?\s*что\s*/gi, ''],
+    [/\bкак известно,?\s*/gi, ''],
+    [/\bбезусловно,?\s*/gi, ''],
+    [/\bв данной статье мы рассмотрим\s*/gi, 'Разберём '],
+    [/\bосуществление процесса пайки\b/gi, 'пайка'],
+    [/\bпроизведение контроля температуры\b/gi, 'контроль температуры'],
+    [/\bявляется ключевым элементом\b/gi, 'это ключевой элемент']
+  ];
+  cliches.forEach(([re, repl]) => {
+    text = text.replace(re, repl);
+  });
+  input.value = text;
+  updateHumanizerCharCount();
+  if (typeof showToast === 'function') showToast('Топ-клише удалены, перепроверьте скор!');
+  runHumanizerAudit();
+}
+
+async function runHumanizerAudit() {
+  const input = document.getElementById('humanizerInput');
+  const resultsArea = document.getElementById('humanizerResultsArea');
+  const btn = document.getElementById('btnRunHumanizer');
+  if (!input || !input.value.trim()) {
+    if (typeof showToast === 'function') showToast('Введите текст для аудита');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Проверка...';
+
+  try {
+    const res = await fetch('/api/humanizer/review', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: input.value.trim() })
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    if (resultsArea) resultsArea.style.display = 'flex';
+
+    // Бейдж в шапке
+    const badge = document.getElementById('humanizerScoreBadge');
+    if (badge) {
+      badge.textContent = `${data.human_score}/100`;
+      badge.style.background = data.human_score >= 80 ? '#065F46' : (data.human_score >= 60 ? '#854D0E' : '#7F1D1D');
+      badge.style.color = '#FFF';
+    }
+
+    // Метрики
+    document.getElementById('mHumanScore').textContent = `${data.human_score}/100`;
+    document.getElementById('mHumanVerdict').textContent = data.verdict;
+    document.getElementById('mHumanRhythm').textContent = `CV ${data.rhythm.coefficient_of_variation}`;
+    document.getElementById('mHumanRhythmDesc').textContent = data.rhythm.status;
+    document.getElementById('mHumanCliches').textContent = data.cliches_count;
+    document.getElementById('mHumanMarkers').textContent = data.human_markers_count;
+
+    // Список клише
+    const clichesContainer = document.getElementById('humanizerClicheList');
+    if (clichesContainer) {
+      if (!data.cliches || data.cliches.length === 0) {
+        clichesContainer.innerHTML = '<span style="color:#10B981;">✓ Штампов не обнаружено! Текст чист.</span>';
+      } else {
+        clichesContainer.innerHTML = data.cliches.map(c => `
+          <div style="background:#1F2937;padding:5px 8px;border-radius:4px;display:flex;justify-content:space-between;">
+            <span style="color:#FCA5A5;">«${c.cliche}»</span>
+            <span style="color:#9CA3AF;font-family:monospace;">${c.count} раз (-${c.penalty}б)</span>
+          </div>
+        `).join('');
+      }
+    }
+
+    // Рекомендации
+    const recContainer = document.getElementById('humanizerRecList');
+    if (recContainer) {
+      if (!data.recommendations || data.recommendations.length === 0) {
+        recContainer.innerHTML = '<span style="color:#10B981;">✓ Претензий нет. Стиль живой и естественный.</span>';
+      } else {
+        recContainer.innerHTML = data.recommendations.map(r => `
+          <div style="background:#1F2937;padding:6px 10px;border-radius:4px;line-height:1.4;">
+            • ${r}
+          </div>
+        `).join('');
+      }
+    }
+
+    if (typeof showToast === 'function') showToast(`Аудит завершен: Скор естественности ${data.human_score}/100`);
+  } catch (err) {
+    console.error('Humanizer error:', err);
+    if (typeof showToast === 'function') showToast('Ошибка Humanizer: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Проверить [Humanizer]';
+  }
+}
+
+// ==========================================
+// 🎯 COMPETITOR RADAR (FIRECRAWL ALT) CLIENT
+// ==========================================
+function openCompetitorRadarModal() {
+  const modal = document.getElementById('competitorRadarModal');
+  if (modal) modal.classList.add('active');
+  const input = document.getElementById('radarQueryInput');
+  if (input && !input.value.trim()) {
+    pasteCurrentTopicIntoRadar();
+  }
+}
+
+function closeCompetitorRadarModal(e) {
+  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
+  const modal = document.getElementById('competitorRadarModal');
+  if (modal) modal.classList.remove('active');
+}
+
+function pasteCurrentTopicIntoRadar() {
+  const topics = (window.DB_DATA && window.DB_DATA.topics) || [];
+  const cur = topics.find(t => t.id === window.currentWsTopicId) || topics[0];
+  const input = document.getElementById('radarQueryInput');
+  if (input && cur) {
+    input.value = cur.title;
+    if (typeof showToast === 'function') showToast(`Подставлена тема: ${cur.title}`);
+  }
+}
+
+async function runCompetitorRadarFromUI() {
+  const input = document.getElementById('radarQueryInput');
+  const resultsArea = document.getElementById('radarResultsArea');
+  const btn = document.getElementById('btnRunRadar');
+  if (!input || !input.value.trim()) {
+    if (typeof showToast === 'function') showToast('Введите поисковый запрос');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Сканирование ниши...';
+
+  try {
+    const val = input.value.trim();
+    const isUrl = val.startsWith('http://') || val.startsWith('https://');
+    const payload = isUrl ? { url: val } : { query: val };
+
+    const res = await fetch('/api/competitors/radar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    if (resultsArea) resultsArea.style.display = 'flex';
+
+    document.getElementById('radarCount').textContent = data.competitors_analyzed || (data.status === 'ok' ? 1 : 0);
+    document.getElementById('radarAvgWords').textContent = `${data.average_words || data.words_count || 1200} сл.`;
+    document.getElementById('radarTargetWords').textContent = `${data.recommended_words || 1500} сл.`;
+
+    // Киллер-рекомендации
+    const recsContainer = document.getElementById('radarKillerRecs');
+    if (recsContainer) {
+      const recs = data.killer_gap_recommendations || [
+        'Внедрить интерактивный SVG-термопрофиль ликвидуса/солидуса',
+        'Добавить экономику: себестоимость пайки и износ жала T12 vs C245',
+        'Согласовать допуски по ГОСТ 21931-76'
+      ];
+      recsContainer.innerHTML = recs.map(r => `<div>★ ${r}</div>`).join('');
+    }
+
+    // Список конкурентов
+    const listContainer = document.getElementById('radarCompetitorsList');
+    if (listContainer) {
+      const comps = data.competitors || (data.status === 'ok' ? [data] : []);
+      listContainer.innerHTML = comps.map(c => {
+        const safeUrl = esc(c.url || '#');
+        const safeTitle = esc(c.title || c.url || 'Конкурент');
+        const feats = (c.features && c.features.length) 
+          ? c.features.map(f => `<span style="background:#FFC700;color:#111111;border:1px solid #111111;padding:2px 6px;border-radius:4px;font-weight:600;">${esc(f)}</span>`).join('')
+          : '<span style="color:#6B7280;">Обычный текст без интерактивных фишек</span>';
+        const h2Items = (c.h2 && c.h2.length)
+          ? `<div style="font-size:11px;color:#4B5563;margin-top:8px;"><strong>Подтемы H2:</strong> ${c.h2.slice(0, 5).map(esc).join(' • ')}</div>`
+          : '';
+
+        return `
+          <div style="background:#FFFFFF;border:1.5px solid #111111;border-radius:6px;padding:12px;box-shadow:2px 2px 0px #111111;color:#111111;">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:6px;">
+              <a href="${safeUrl}" target="_blank" rel="noopener noreferrer" style="color:#0284C7;font-weight:bold;font-size:13px;text-decoration:none;word-break:break-all;">
+                ${safeTitle} ↗
+              </a>
+              <span style="font-size:11px;background:#F3F4F6;color:#111111;border:1px solid #111111;padding:2px 8px;border-radius:4px;white-space:nowrap;font-weight:600;">
+                ${Number(c.words_count || 0)} слов (~${Number(c.reading_time_min || 1)} мин)
+              </span>
+            </div>
+            <div style="font-size:11.5px;color:#111111;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+              ${feats}
+            </div>
+            ${h2Items}
+          </div>
+        `;
+      }).join('');
+    }
+
+    if (typeof showToast === 'function') showToast(`Радар просканировал конкурентов!`);
+  } catch (err) {
+    console.error('Radar error:', err);
+    if (typeof showToast === 'function') showToast('Ошибка Радара: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔍 Сканировать [Радар]';
+  }
+}
+
