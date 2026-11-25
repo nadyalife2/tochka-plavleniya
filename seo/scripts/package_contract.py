@@ -61,7 +61,7 @@ def load_schema() -> dict:
 def parse_faq_from_text(text: str) -> list[dict]:
     """Извлекает реальные вопросы-ответы из блока ## FAQ или ### FAQ: в тексте статьи."""
     faq_items = []
-    faq_block_match = re.search(r"(?im)^#{2,3}\s*[^a-zA-Zа-яА-Я0-9\n]*(?:FAQ|Частые вопросы|Часто задаваемые|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
+    faq_block_match = re.search(r"(?im)^#{2,3}\s*(?:\d+[.)]\s*)?[^a-zA-Zа-яА-Я0-9\n]*(?:FAQ|Частые вопросы|Часто задаваемые|Вопросы и ответы)[^\n]*\n([\s\S]+?)(?=\n#{1,2}\s+[^\n]+|\Z)", text)
     if faq_block_match:
         block = faq_block_match.group(1).strip()
         # 1. Формат q: ... \n a: ... (разбиение по меткам q: и a:)

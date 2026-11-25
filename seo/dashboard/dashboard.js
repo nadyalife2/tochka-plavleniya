@@ -127,14 +127,123 @@ function getTopicColumn(t) {
   return 'backlog';
 }
 
+const SAAS_VIEW_TITLES = {
+  overview: 'Центр управления редакцией',
+  kanban: 'Статьи и Канбан-доска',
+  agents: 'Конвейер публикаций (9 этапов)',
+  gaps: 'Идеи и пробелы ниши',
+  radar: 'Радар конкурентов',
+  humanizer: 'Humanizer & Анти-slop аудит',
+  competitors: 'Сайты-конкуренты в нише',
+  analysis: 'Мутаген & Вордстат спрос',
+  models: 'Кластер Triad-Omni & Модели',
+  export: 'Готовые к публикации в WordPress',
+  backups: 'Резервные копии SQLite',
+};
+
+function toggleSaasSidebar() {
+  const sb = document.getElementById('saasSidebar');
+  if (sb) sb.classList.toggle('open');
+}
+
+function renderOverviewCenter() {
+  const grid = document.getElementById('overviewAttentionGrid');
+  const shieldTitle = document.getElementById('overviewShieldTitle');
+  const shieldSub = document.getElementById('overviewShieldSubtitle');
+  const shieldIcon = document.getElementById('overviewShieldIcon');
+  if (!grid) return;
+
+  const topics = (typeof DB_DATA !== 'undefined' && DB_DATA.topics) || [];
+  const proposed = (typeof DB_DATA !== 'undefined' && DB_DATA.topics_proposed) || [];
+
+  const needsFix = topics.filter(t => (t.chars || 0) > 500 && (t.score_total === null || t.score_total < 80) && t.status !== 'ready' && t.status !== 'published');
+  const readyForApproval = topics.filter(t => (t.score_total || 0) >= 80 && t.status !== 'ready' && t.status !== 'published');
+  const proposedWaiting = proposed.filter(t => t.status === 'предложен');
+
+  const attention = [
+    ...needsFix.map(t => ({ ...t, _kind: 'fix' })),
+    ...readyForApproval.map(t => ({ ...t, _kind: 'approve' })),
+  ];
+  const totalAttention = attention.length + proposedWaiting.length;
+
+  if (shieldTitle && shieldSub && shieldIcon) {
+    if (totalAttention > 0) {
+      shieldIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
+      shieldIcon.style.background = '#FFFBEB';
+      shieldIcon.style.borderColor = '#F59E0B';
+      shieldTitle.textContent = `Требуется внимание: ${attention.length} статей и ${proposedWaiting.length} идей`;
+      shieldSub.textContent = `Кластер Triad-Omni (3/3) онлайн · В базе ${topics.length} тем · ${needsFix.length} на правки, ${readyForApproval.length} на приёмку`;
+    } else {
+      shieldIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>';
+      shieldIcon.style.background = '#ECFDF5';
+      shieldIcon.style.borderColor = '#10B981';
+      shieldTitle.textContent = 'Система «Точка Плавления» в строю';
+      shieldSub.textContent = `Все этапы конвейера штатно работают · В базе ${topics.length} тем`;
+    }
+  }
+
+  if (attention.length === 0) {
+    grid.innerHTML = '<div style="padding:14px 16px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;font-size:13px;color:#166534;font-weight:500;">Все готовые статьи проверены и не требуют срочного вмешательства.</div>';
+    return;
+  }
+
+  grid.innerHTML = attention.slice(0, 6).map(t => {
+    const isRed = t._kind === 'fix';
+    const badgeColor = isRed ? '#DC2626' : '#B45309';
+    const badgeBg = isRed ? '#FEF2F2' : '#FFFBEB';
+    const borderColor = isRed ? '#FECACA' : '#FDE68A';
+    const markerLabel = isRed ? `! Правки (${t.score_total || '—'}/100)` : `! Приёмка ОТК (${t.score_total}/100)`;
+    const dateStr = (t.updated_at || t.created_at || '').slice(0, 10) || 'сегодня';
+    return `
+      <div onclick="openInspector(${t.id})" class="attention-mini-card" style="cursor:pointer;background:#FFFFFF;border:1px solid #E2E8F0;border-left:3px solid ${badgeColor};border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:5px;transition:box-shadow 0.15s;">
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;font-family:var(--mono);">
+          <span style="background:${badgeBg};color:${badgeColor};border:1px solid ${borderColor};padding:1px 6px;border-radius:4px;font-weight:700;">${markerLabel}</span>
+          <span style="color:#64748B;">${esc(dateStr)} · #${t.id}</span>
+        </div>
+        <div style="font-weight:700;font-size:13px;color:#0F172A;line-height:1.35;">${esc(t.title || '')}</div>
+        <div style="font-size:11.5px;color:#64748B;">${esc(t.next_action || 'Ожидает решения шеф-редактора')}</div>
+      </div>`;
+  }).join('');
+}
+
 function switchTab(name) {
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
-  const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes(name));
+  const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes("'" + name + "'"));
   if (btn) btn.classList.add('active');
   const view = document.getElementById('view-' + name);
   if (view) view.classList.add('active');
-  if (name === 'analysis') {
+
+  const titleEl = document.getElementById('activeViewTitle');
+  if (titleEl && SAAS_VIEW_TITLES[name]) {
+    titleEl.textContent = SAAS_VIEW_TITLES[name];
+  }
+
+  // Close mobile sidebar after click
+  const sb = document.getElementById('saasSidebar');
+  if (sb && sb.classList.contains('open')) sb.classList.remove('open');
+
+  // Contextual visibility: stepper only on kanban/agents, banner only on kanban
+  const stepper = document.getElementById('pipelineStepperBar');
+  const banner = document.getElementById('decisionBanner');
+  if (stepper) stepper.style.display = (name === 'kanban' || name === 'agents') ? '' : 'none';
+  if (banner) banner.style.display = (name === 'kanban') ? '' : 'none';
+
+  if (name === 'overview') {
+    renderOverviewCenter();
+  } else if (name === 'models') {
+    if (typeof loadModelsConfig === 'function') loadModelsConfig();
+  } else if (name === 'humanizer') {
+    const input = document.getElementById('humanizerInput');
+    if (input && !input.value.trim() && typeof pasteCurrentArticleIntoHumanizer === 'function') {
+      pasteCurrentArticleIntoHumanizer();
+    }
+  } else if (name === 'radar') {
+    const input = document.getElementById('radarQueryInput');
+    if (input && !input.value.trim() && typeof pasteCurrentTopicIntoRadar === 'function') {
+      pasteCurrentTopicIntoRadar();
+    }
+  } else if (name === 'analysis') {
     renderAnalysisHistory();
     loadKeywordSuggestions();
   } else if (name === 'competitors') {
@@ -1501,7 +1610,8 @@ function renderDecisionBanner() {
     banner.style.display = 'none';
     return;
   }
-  banner.style.display = 'block';
+  const isKanbanActive = document.getElementById('view-kanban')?.classList.contains('active');
+  banner.style.display = isKanbanActive ? 'block' : 'none';
 
   let fixHtml = needsFix.map(t => `
     <li>
@@ -1614,6 +1724,7 @@ function renderExportTab() {
 
 // Kanban Renderer с независимым скроллом и контекстными кнопками
 function renderKanban() {
+  if (typeof renderOverviewCenter === 'function') renderOverviewCenter();
   const board = document.getElementById('kanbanBoard');
   board.innerHTML = '';
 
@@ -3999,15 +4110,11 @@ const ANIMAL_NAMES_MAP = {
 };
 
 async function openModelsConfigModal() {
-  const modal = document.getElementById('modelsConfigModal');
-  if (modal) modal.classList.add('active');
-  await loadModelsConfig();
+  switchTab('models');
 }
 
 function closeModelsConfigModal(e) {
-  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
-  const modal = document.getElementById('modelsConfigModal');
-  if (modal) modal.classList.remove('active');
+  // No-op: Models is now a dedicated SaaS tab
 }
 
 async function loadModelsConfig() {
@@ -4535,7 +4642,7 @@ window.openWorkstationModal = function(agentId) {
 // ДЕТЕКЦИЯ ЗАДАЧ ЗВЕРЕЙ: ВОСКЛИЦАТЕЛЬНЫЕ ЗНАКИ [!] (ЖЕЛТЫЙ/КРАСНЫЙ) И ДАТЫ
 // =========================================================================
 function getAgentCurrentAttentionTask(agentId, topicId) {
-  const topics = (window.DB_DATA && window.DB_DATA.topics) || [];
+  const topics = (typeof DB_DATA !== 'undefined' && DB_DATA.topics) || [];
   const cur = topics.find(t => t.id === topicId) || topics[0] || null;
   if (!cur) return null;
 
@@ -4627,22 +4734,15 @@ if (typeof origRenderAll === 'function') {
 // ✍️ HUMANIZER & ANTI-SLOP REVIEWER CLIENT
 // ==========================================
 function openHumanizerModal() {
-  const modal = document.getElementById('humanizerModal');
-  if (modal) modal.classList.add('active');
-  const input = document.getElementById('humanizerInput');
-  if (input && !input.value.trim()) {
-    pasteCurrentArticleIntoHumanizer();
-  }
+  switchTab('humanizer');
 }
 
 function closeHumanizerModal(e) {
-  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
-  const modal = document.getElementById('humanizerModal');
-  if (modal) modal.classList.remove('active');
+  // No-op: Humanizer is now a dedicated SaaS tab
 }
 
 function pasteCurrentArticleIntoHumanizer() {
-  const topics = (window.DB_DATA && window.DB_DATA.topics) || [];
+  const topics = (typeof DB_DATA !== 'undefined' && DB_DATA.topics) || [];
   const cur = topics.find(t => t.id === window.currentWsTopicId) || topics[0];
   const input = document.getElementById('humanizerInput');
   if (!input) return;
@@ -4777,22 +4877,15 @@ async function runHumanizerAudit() {
 // 🎯 COMPETITOR RADAR (FIRECRAWL ALT) CLIENT
 // ==========================================
 function openCompetitorRadarModal() {
-  const modal = document.getElementById('competitorRadarModal');
-  if (modal) modal.classList.add('active');
-  const input = document.getElementById('radarQueryInput');
-  if (input && !input.value.trim()) {
-    pasteCurrentTopicIntoRadar();
-  }
+  switchTab('radar');
 }
 
 function closeCompetitorRadarModal(e) {
-  if (e && e.target !== e.currentTarget && !e.target.classList.contains('modal-close')) return;
-  const modal = document.getElementById('competitorRadarModal');
-  if (modal) modal.classList.remove('active');
+  // No-op: Competitor Radar is now a dedicated SaaS tab
 }
 
 function pasteCurrentTopicIntoRadar() {
-  const topics = (window.DB_DATA && window.DB_DATA.topics) || [];
+  const topics = (typeof DB_DATA !== 'undefined' && DB_DATA.topics) || [];
   const cur = topics.find(t => t.id === window.currentWsTopicId) || topics[0];
   const input = document.getElementById('radarQueryInput');
   if (input && cur) {

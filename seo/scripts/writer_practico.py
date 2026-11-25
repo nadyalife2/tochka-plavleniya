@@ -255,15 +255,23 @@ def call_yandex_ai_studio(prompt: str, system_prompt: str) -> str | None:
 def call_triad_omni(prompt: str, system_prompt: str, base_url: str = "http://127.0.0.1:8000") -> str | None:
     """Локальный кластер Triad-Omni Edge AI (Node-1 Mi 10T + Node-2 Nord N10).
 
-    Эндпоинт OpenAI-совместимый: /v1/chat/completions на шлюзе fast-path router.
+    Эндпоинт OpenAI-совместимый: /v1/chat/completions на узлах или шлюзе.
     0 рублей затрат, 100% приватность, без VPN.
     """
-    endpoints = [base_url, "http://192.168.31.48:8000"]
+    endpoints = [
+        "http://127.0.0.1:8080",
+        "http://192.168.31.161:8080",
+        "http://127.0.0.1:8081",
+        "http://192.168.31.57:8081",
+        base_url,
+        "http://192.168.31.48:8000",
+    ]
     body = {
         "model": "qwen3.5-9b-tochka",
         "messages": [
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt},
+            {"role": "assistant", "content": "<think>\n</think>\n"},
         ],
         "temperature": 0.35,
         "max_tokens": 4096,
@@ -276,13 +284,15 @@ def call_triad_omni(prompt: str, system_prompt: str, base_url: str = "http://127
                 data=data_bytes,
                 headers={"Content-Type": "application/json"},
             )
-            with urllib.request.urlopen(req, timeout=120) as resp:
+            print(f"   (Triad-Omni: опрашиваю узел {ep})...", flush=True)
+            with urllib.request.urlopen(req, timeout=180) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
             content = data["choices"][0]["message"]["content"]
             content = re.sub(r"<think>.*?</think>", "", content, flags=re.DOTALL).strip()
             if len(content) > 300:
+                print(f"   (Triad-Omni узел {ep} успешно вернул {len(content)} символов)", flush=True)
                 return content
-        except Exception:
+        except Exception as e:
             continue
     return None
 
@@ -660,8 +670,8 @@ def main():
     parser.add_argument("--id", required=True, help="ID темы из базы")
     parser.add_argument("--voice", default="practico", choices=sorted(VOICES.keys()),
                         help="голос автора: practico (инженер) или practico2 (голос заказчика)")
-    parser.add_argument("--provider", default="auto", choices=["auto", "claude", "deepseek", "yandex"],
-                        help="канал генерации: auto (каскад) / claude / deepseek / yandex")
+    parser.add_argument("--provider", default="auto", choices=["auto", "triad", "omniroute", "claude", "deepseek", "yandex"],
+                        help="канал генерации: auto (каскад) / triad / omniroute / claude / deepseek / yandex")
     args = parser.parse_args()
     write_article_for_topic(args.id, voice=args.voice, provider=args.provider)
 

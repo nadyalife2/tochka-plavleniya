@@ -137,7 +137,9 @@ def detect_alloy(text: str, title: str = "") -> tuple[str, list[str]]:
             continue
         count = 0
         for marker in markers:
-            count += low.count(marker) + 5 * low_title.count(marker)
+            # Используем поиск с границами слов, чтобы 'розе' не срабатывал на 'розетка'
+            pattern = r'(?i)(?:\b|(?<=[^a-zа-я0-9]))' + re.escape(marker) + r'(?:\b|(?=[^a-zа-я0-9]))'
+            count += len(re.findall(pattern, low)) + 5 * len(re.findall(pattern, low_title))
         if count:
             hits[key] = count
 

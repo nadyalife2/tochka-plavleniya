@@ -1367,3 +1367,482 @@
     outline: none;
   }
 
+
+  /* =====================================================================
+     SAAS SHELL ARCHITECTURE (Kaspersky + Dify / Tabler Left Sidebar)
+     ===================================================================== */
+  .saas-shell {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+  }
+  .saas-sidebar {
+    width: 248px;
+    flex-shrink: 0;
+    background: var(--card);
+    border-right: 2px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+    z-index: 600;
+  }
+  .saas-sidebar__brand {
+    padding: 14px 16px;
+    border-bottom: 2px solid var(--border);
+    background: var(--dark-surface);
+    color: #FFFFFF;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    cursor: pointer;
+  }
+  .saas-sidebar__brand-title {
+    font-size: 14.5px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .saas-sidebar__brand-sub {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.4px;
+  }
+  .saas-nav {
+    padding: 10px 10px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
+  }
+  .saas-nav-group {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #6B7280;
+    letter-spacing: 0.6px;
+    padding: 10px 8px 4px;
+  }
+  .saas-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1.5px solid transparent;
+    background: transparent;
+    color: var(--ink);
+    font-family: var(--font);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.12s ease;
+  }
+  .saas-nav-btn:hover {
+    background: #F3F4F6;
+    border-color: #D1D5DB;
+  }
+  .saas-nav-btn.active {
+    background: var(--accent);
+    color: #111111;
+    border: 1.5px solid #111111;
+    font-weight: 800;
+    box-shadow: 3px 3px 0px #111111;
+  }
+  .saas-nav-btn .tab-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: #E5E7EB;
+    color: #111111;
+  }
+  .saas-nav-btn.active .tab-badge {
+    background: #111111;
+    color: #FFC700;
+  }
+  .saas-sidebar__footer {
+    padding: 12px 14px;
+    border-top: 1.5px solid var(--border-hairline);
+    background: #F9FAFB;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .saas-workspace {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  .saas-topbar {
+    position: sticky;
+    top: 0;
+    z-index: 500;
+    background: var(--card);
+    border-bottom: 2px solid var(--border);
+    padding: 8px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .saas-topbar__left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .saas-topbar__title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+  .saas-topbar__actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .saas-content {
+    padding: 16px 20px 48px;
+    flex: 1;
+    max-width: 1480px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .saas-mobile-toggle {
+    display: none;
+    padding: 4px 8px;
+    border: 1.5px solid #111111;
+    background: #FFFFFF;
+    border-radius: 4px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  /* Dedicated Full-Viewport 3D Farm Tab */
+  .saas-content.is-farm-mode {
+    padding: 10px 14px 12px;
+    max-width: 100%;
+  }
+  .saas-content.is-farm-mode #farm3DContainer {
+    height: calc(100vh - 130px) !important;
+    min-height: 560px;
+    margin-bottom: 0 !important;
+  }
+
+  /* Kaspersky-Style Command Center */
+  .kaspersky-shield {
+    background: #FFFFFF;
+    border: 2px solid #111111;
+    border-radius: 8px;
+    padding: 20px 24px;
+    box-shadow: 6px 6px 0px #111111;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+  }
+  .kaspersky-shield__status {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .kaspersky-shield__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+    background: #ECFDF5;
+    border: 2px solid #059669;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .kaspersky-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .kaspersky-tile {
+    background: #FFFFFF;
+    border: 2px solid #111111;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 4px 4px 0px #111111;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: left;
+  }
+  .kaspersky-tile:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px #111111;
+    background: #FFFBEB;
+  }
+  .kaspersky-tile__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .kaspersky-tile__icon {
+    font-size: 24px;
+  }
+  .kaspersky-tile__badge {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    background: var(--accent);
+    color: #111111;
+    border: 1px solid #111111;
+  }
+  .kaspersky-tile__title {
+    font-size: 14px;
+    font-weight: 800;
+    color: #111111;
+  }
+  .kaspersky-tile__desc {
+    font-size: 12px;
+    color: #4B5563;
+    line-height: 1.4;
+  }
+
+  /* In-Page Panel Wrapper (for Models, Humanizer, Radar tabs) */
+  .saas-panel-card {
+    background: #FFFFFF;
+    border: 2px solid #111111;
+    border-radius: 8px;
+    padding: 22px;
+    box-shadow: 6px 6px 0px #111111;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (max-width: 960px) {
+    .saas-sidebar {
+      position: fixed;
+      left: -260px;
+      transition: left 0.2s ease;
+    }
+    .saas-sidebar.open {
+      left: 0;
+    }
+    .saas-mobile-toggle {
+      display: inline-flex;
+    }
+  }
+
+  /* =====================================================================
+     PREMIUM SAAS REFINEMENT LAYER (Linear / Vercel / Kaspersky Clean)
+     ===================================================================== */
+  body {
+    background-color: #F8FAFC !important;
+    background-image: none !important;
+    color: #0F172A;
+  }
+  .saas-sidebar {
+    width: 232px;
+    border-right: 1px solid #E2E8F0;
+    background: #FFFFFF;
+    box-shadow: 1px 0 0 rgba(15, 23, 42, 0.03);
+  }
+  .saas-sidebar__brand {
+    padding: 12px 14px;
+    background: #0F172A;
+    border-bottom: 1px solid #1E293B;
+  }
+  .saas-sidebar__brand-title {
+    font-size: 13.5px;
+    letter-spacing: -0.01em;
+  }
+  .saas-sidebar__brand-sub {
+    font-size: 9.5px;
+    color: #FBBF24;
+  }
+  .saas-nav {
+    padding: 4px 8px 8px;
+    gap: 1px;
+  }
+  .saas-nav-group {
+    font-size: 9.5px;
+    color: #94A3B8;
+    padding: 6px 8px 2px;
+    letter-spacing: 0.06em;
+  }
+  .saas-nav-btn {
+    padding: 5px 9px;
+    font-size: 12.5px;
+    font-weight: 500;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    color: #334155;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    gap: 9px;
+  }
+  .saas-nav-btn:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+    border-color: transparent;
+  }
+  .saas-nav-btn.active {
+    background: #FEF3C7;
+    color: #0F172A;
+    border: 1px solid #F59E0B;
+    font-weight: 700;
+    box-shadow: none;
+  }
+  .saas-nav-btn .nav-ico {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    color: #64748B;
+  }
+  .saas-nav-btn.active .nav-ico {
+    color: #B45309;
+  }
+  .saas-nav-btn .tab-badge {
+    background: #F1F5F9;
+    color: #475569;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 9999px;
+  }
+  .saas-nav-btn.active .tab-badge {
+    background: #0F172A;
+    color: #FBBF24;
+  }
+  .saas-sidebar__footer {
+    padding: 10px 12px;
+    border-top: 1px solid #E2E8F0;
+    background: #F8FAFC;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .saas-topbar {
+    border-bottom: 1px solid #E2E8F0;
+    padding: 10px 22px;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+  }
+  .saas-topbar__title {
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: none;
+    color: #0F172A;
+  }
+  .saas-content {
+    padding: 20px 24px 48px;
+  }
+
+  /* Clean elevated SaaS cards instead of heavy black comic boxes */
+  .kaspersky-shield {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 20px 24px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+    margin-bottom: 18px;
+  }
+  .kaspersky-shield__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    border: 1px solid #A7F3D0;
+  }
+  .kaspersky-tiles {
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+  .kaspersky-tile {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+    gap: 8px;
+  }
+  .kaspersky-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px -4px rgba(15, 23, 42, 0.08);
+    border-color: #CBD5E1;
+    background: #FFFFFF;
+  }
+  .kaspersky-tile__badge {
+    background: #F1F5F9;
+    color: #334155;
+    border: 1px solid #E2E8F0;
+    border-radius: 9999px;
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+  .kaspersky-tile:hover .kaspersky-tile__badge {
+    background: #FEF3C7;
+    color: #92400E;
+    border-color: #FDE68A;
+  }
+  .saas-panel-card {
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 20px 22px;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+  }
+  .attention-mini-card:hover {
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  }
+  .btn--dark-cta {
+    background: #0F172A !important;
+    color: #FFFFFF !important;
+    border: 1px solid #0F172A !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn--dark-cta:hover {
+    background: #1E293B !important;
+  }
+  .btn--amber-cta {
+    background: #F59E0B !important;
+    color: #0F172A !important;
+    border: 1px solid #D97706 !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn--amber-cta:hover {
+    background: #FBBF24 !important;
+  }
