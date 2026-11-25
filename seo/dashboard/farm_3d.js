@@ -114,6 +114,9 @@
       // 11.2. 3D Таблички-Бейджи над головами всех мастеров
       this.setupOverheadNameplates();
 
+      // 11.3. Восклицательные знаки внимания [!] и даты задач
+      this.setupAttentionMarkers();
+
       // 12. Первичный запрос статуса здоровья и автозамены
       this.fetchInitialHealth();
 
@@ -1711,6 +1714,17 @@
         this.stationMeshes.raccoon.graphMesh.rotation.y += 0.02 * this.speed;
         this.stationMeshes.raccoon.graphMesh.rotation.z = Math.sin(time * 2.0) * 0.15;
         this.stationMeshes.raccoon.graphMesh.position.y = 1.6 + Math.sin(time * 3.0) * 0.08;
+      }
+
+      
+      // 1.4. Плавное парение восклицательных знаков [!]
+      if (this.agents) {
+        this.agents.forEach((agent, idx) => {
+          if (agent.attentionMarker && agent.attentionMarker.visible) {
+            const baseY = (agent.id === 'bear') ? 4.5 : 4.1;
+            agent.attentionMarker.position.y = baseY + Math.sin(time * 3.5 + idx) * 0.16;
+          }
+        });
       }
 
       // 1.2. Обновление миникарты радара

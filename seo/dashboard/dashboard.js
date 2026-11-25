@@ -3196,6 +3196,30 @@ function openWorkstationModal(agentId) {
     }
   }
 
+  
+  // Плашка внимания и даты задачи (Желтый / Красный восклицательный знак)
+  const attBanner = document.getElementById('wsModalAttentionBanner');
+  if (attBanner) {
+    const taskInfo = getAgentCurrentAttentionTask(currentWsAgentId, currentWsTopicId);
+    if (taskInfo) {
+      attBanner.style.display = 'flex';
+      attBanner.style.background = taskInfo.isRed ? '#7F1D1D' : '#78350F';
+      attBanner.style.borderColor = taskInfo.isRed ? '#DC2626' : '#D97706';
+      attBanner.style.color = taskInfo.isRed ? '#FECACA' : '#FEF3C7';
+      attBanner.innerHTML = `
+        <span style="font-size:22px;line-height:1;">${taskInfo.isRed ? '🚨' : '⚠️'}</span>
+        <div style="flex:1;">
+          <div style="font-weight:800;font-size:12.5px;letter-spacing:0.3px;">${taskInfo.title}</div>
+          <div style="font-size:11px;opacity:0.95;margin-top:2px;">
+            Поступила в работу: <strong>📅 ${taskInfo.date}</strong> · Требуется ваше подтверждение
+          </div>
+        </div>
+      `;
+    } else {
+      attBanner.style.display = 'none';
+    }
+  }
+
   const modal = document.getElementById('workstationModal');
   if (modal) modal.classList.add('active');
 }
