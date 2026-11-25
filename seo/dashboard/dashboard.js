@@ -94,12 +94,12 @@ const STATUS_RU = {
 };
 
 const COLUMNS = [
-  { code: 'backlog', title: '1. Бэклог', desc: 'Идеи без текста' },
-  { code: 'work', title: '2. В работе', desc: 'Сбор фактов / бриф' },
-  { code: 'needs_fix', title: '3. Требует правок', desc: 'Есть текст < 80 баллов' },
-  { code: 'review', title: '4. На ревью (ОТК)', desc: 'Балл ≥ 80, ждёт приёмки' },
-  { code: 'ready', title: '5. Готово к выгрузке', desc: 'Утверждено шеф-редактором' },
-  { code: 'published', title: '6. В WordPress', desc: 'Опубликовано' }
+  { code: 'backlog', title: '1. Бэклог', desc: 'Идеи без текста', dot: '#94A3B8' },
+  { code: 'work', title: '2. В работе', desc: 'Сбор фактов / бриф', dot: '#3B82F6' },
+  { code: 'needs_fix', title: '3. Требует правок', desc: 'Текст < 80 баллов', dot: '#EF4444' },
+  { code: 'review', title: '4. На ревью (ОТК)', desc: 'Балл ≥ 80, ждёт приёмки', dot: '#F59E0B' },
+  { code: 'ready', title: '5. Готово к выгрузке', desc: 'Утверждено редактором', dot: '#10B981' },
+  { code: 'published', title: '6. В WordPress', desc: 'Опубликовано', dot: '#6366F1' }
 ];
 
 // Поправка #1: Колонку определять строго по данным (текст, балл, статус)
@@ -128,17 +128,17 @@ function getTopicColumn(t) {
 }
 
 const SAAS_VIEW_TITLES = {
-  overview: 'Центр управления редакцией',
+  overview: 'Пульт управления редакцией',
   kanban: 'Статьи и Канбан-доска',
-  agents: 'Конвейер публикаций (9 этапов)',
-  gaps: 'Идеи и пробелы ниши',
-  radar: 'Радар конкурентов',
-  humanizer: 'Humanizer & Анти-slop аудит',
-  competitors: 'Сайты-конкуренты в нише',
-  analysis: 'Мутаген & Вордстат спрос',
-  models: 'Кластер Triad-Omni & Модели',
-  export: 'Готовые к публикации в WordPress',
-  backups: 'Резервные копии SQLite',
+  agents: 'Конвейер 9 инженерных агентов',
+  gaps: 'Семантические пробелы и темы',
+  radar: 'Радар поисковой выдачи (SERP)',
+  humanizer: 'Очеловечивание и ОТК-аудит',
+  competitors: 'База сайтов-конкурентов',
+  analysis: 'Анализ поискового спроса',
+  models: 'Конфигурация Edge-кластера и моделей',
+  export: 'Пакетная выгрузка в WordPress',
+  backups: 'Резервное копирование SQLite',
 };
 
 function toggleSaasSidebar() {
@@ -223,11 +223,11 @@ function switchTab(name) {
   const sb = document.getElementById('saasSidebar');
   if (sb && sb.classList.contains('open')) sb.classList.remove('open');
 
-  // Contextual visibility: stepper only on kanban/agents, banner only on kanban
+  // Contextual visibility: stepper only on agents
   const stepper = document.getElementById('pipelineStepperBar');
   const banner = document.getElementById('decisionBanner');
-  if (stepper) stepper.style.display = (name === 'kanban' || name === 'agents') ? '' : 'none';
-  if (banner) banner.style.display = (name === 'kanban') ? '' : 'none';
+  if (stepper) stepper.style.display = (name === 'agents') ? '' : 'none';
+  if (banner) banner.style.display = 'none';
 
   if (name === 'overview') {
     renderOverviewCenter();
@@ -1722,26 +1722,83 @@ function renderExportTab() {
   });
 }
 
-// Kanban Renderer с независимым скроллом и контекстными кнопками
+// ===== KANBAN & LIST VIEW SYSTEM (High Density & Ergonomic) =====
+let KANBAN_VIEW_MODE = 'board';
+let KANBAN_STATUS_FILTER = '';
+
+function setKanbanViewMode(mode) {
+  KANBAN_VIEW_MODE = mode;
+  const btnB = document.getElementById('btnViewModeBoard');
+  const btnL = document.getElementById('btnViewModeList');
+  if (btnB) btnB.classList.toggle('active', mode === 'board');
+  if (btnL) btnL.classList.toggle('active', mode === 'list');
+  renderKanban();
+}
+
+function setKanbanStatusFilter(status) {
+  KANBAN_STATUS_FILTER = status;
+  document.querySelectorAll('.kanban-chip').forEach(c => {
+    const onclickStr = c.getAttribute('onclick') || '';
+    const isAct = onclickStr.includes("'" + status + "'");
+    c.classList.toggle('active', isAct);
+  });
+  renderKanban();
+}
+
 function renderKanban() {
   if (typeof renderOverviewCenter === 'function') renderOverviewCenter();
   const board = document.getElementById('kanbanBoard');
+  const listView = document.getElementById('kanbanListView');
+  if (!board) return;
+
+  const allTopics = (typeof DB_DATA !== 'undefined' && DB_DATA.topics) || [];
+
+  // Update chip counters
+  const elAll = document.getElementById('chipAllCount');
+  const elWork = document.getElementById('chipWorkCount');
+  const elFix = document.getElementById('chipFixCount');
+  const elReady = document.getElementById('chipReadyCount');
+  if (elAll) elAll.textContent = allTopics.length;
+  if (elWork) elWork.textContent = allTopics.filter(t => getTopicColumn(t) === 'work').length;
+  if (elFix) elFix.textContent = allTopics.filter(t => getTopicColumn(t) === 'needs_fix').length;
+  if (elReady) elReady.textContent = allTopics.filter(t => ['review', 'ready', 'published'].includes(getTopicColumn(t))).length;
+
+  const clusterFilter = (document.getElementById('clusterSelect')?.value || '').toLowerCase();
+  const searchFilter = (document.getElementById('kanbanSearch')?.value || '').toLowerCase().trim();
+
+  // Filter topics
+  const matchesFilter = (t) => {
+    const colCode = getTopicColumn(t);
+    if (KANBAN_STATUS_FILTER && colCode !== KANBAN_STATUS_FILTER) return false;
+    if (ACTIVE_STEP_FILTER && colCode !== ACTIVE_STEP_FILTER) return false;
+    if (clusterFilter && (t.cluster || '').toLowerCase() !== clusterFilter) return false;
+    if (searchFilter && !t.title.toLowerCase().includes(searchFilter) && !('#' + t.id).includes(searchFilter)) return false;
+    return true;
+  };
+
+  if (KANBAN_VIEW_MODE === 'list') {
+    board.style.display = 'none';
+    if (listView) {
+      listView.style.display = 'block';
+      renderKanbanListView(allTopics.filter(matchesFilter));
+    }
+    return;
+  }
+
+  // Board Mode
+  board.style.display = 'grid';
+  if (listView) listView.style.display = 'none';
   board.innerHTML = '';
 
-  if (ACTIVE_STEP_FILTER) {
+  if (ACTIVE_STEP_FILTER || KANBAN_STATUS_FILTER) {
     board.style.gridTemplateColumns = 'minmax(320px, 480px)';
   } else {
     board.style.gridTemplateColumns = '';
   }
 
-  const clusterFilter = document.getElementById('clusterSelect').value.toLowerCase();
-  const searchFilter = document.getElementById('kanbanSearch').value.toLowerCase().trim();
-
   COLUMNS.forEach(col => {
-    // Если активен фильтр этапа, скрываем неактивные колонки
-    if (ACTIVE_STEP_FILTER && ACTIVE_STEP_FILTER !== col.code) {
-      return;
-    }
+    if (ACTIVE_STEP_FILTER && ACTIVE_STEP_FILTER !== col.code) return;
+    if (KANBAN_STATUS_FILTER && KANBAN_STATUS_FILTER !== col.code) return;
 
     let colCardsHtml = '';
     let count = 0;
@@ -1752,30 +1809,26 @@ function renderKanban() {
     colDiv.setAttribute('tabindex', '0');
     colDiv.setAttribute('role', 'region');
 
-    DB_DATA.topics.forEach(t => {
+    allTopics.forEach(t => {
       const cCode = getTopicColumn(t);
       if (cCode !== col.code) return;
-
       if (clusterFilter && (t.cluster || '').toLowerCase() !== clusterFilter) return;
       if (searchFilter && !t.title.toLowerCase().includes(searchFilter) && !('#' + t.id).includes(searchFilter)) return;
 
       count++;
       const pScore = t.priority_score || 50;
-      const pClass = pScore >= 90 ? 'prio-pill--hot' : (pScore >= 75 ? 'prio-pill--warm' : 'prio-pill--cold');
+      const pClass = pScore >= 85 ? 'prio-pill--hot' : (pScore >= 70 ? 'prio-pill--warm' : 'prio-pill--cold');
 
       let scoreBadge = '';
       let warnBlock = '';
       let seoBadge = '';
       const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
 
-      // Приоритет темы по спросу и конкуренции (0–100, класс A/B/C/D)
       if (t.seo_priority != null) {
         let detail = {};
         try { detail = JSON.parse(t.seo_priority_json || '{}'); } catch (e) { detail = {}; }
         const grade = detail.grade || '?';
-        const gColor = grade === 'A' ? '#059669' : (grade === 'B' ? '#B45309' : (grade === 'C' ? '#6B7280' : '#B91C1C'));
-        const gBg = grade === 'A' ? '#A7F3D0' : (grade === 'B' ? '#FEF08A' : (grade === 'C' ? '#E5E7EB' : '#FECACA'));
-        seoBadge = `<span class="prio-pill" style="background:${gBg};color:${gColor};font-weight:800;" title="Спрос+конкуренция+интент+готовность">SEO ${t.seo_priority} · ${grade}</span>`;
+        seoBadge = `<span class="prio-pill" style="background:#F1F5F9;color:#334155;border-color:#E2E8F0;" title="SEO ${t.seo_priority}">SEO ${grade}</span>`;
       }
 
       if (t.score_total !== null && t.score_total !== undefined) {
@@ -1783,50 +1836,52 @@ function renderKanban() {
         scoreBadge = `<span class="score-pill ${sClass}">${t.score_total}/100</span>`;
         if (t.score_total < 80 && chars > 500) {
           const firstIssue = (t.score_data && t.score_data.issues && t.score_data.issues[0]) || 'требуется доработка';
-          warnBlock = `<div class="task-card__warn">⚠️ ${esc(firstIssue)}</div>`;
+          warnBlock = `<div class="task-card__warn" title="${esc(firstIssue)}">⚠️ ${esc(firstIssue)}</div>`;
         }
       } else if (chars > 500) {
-        scoreBadge = `<span class="score-pill score-pill--mid">${Math.round(chars/1000)}k зн.</span>`;
+        scoreBadge = `<span class="score-pill score-pill--mid">${(chars/1000).toFixed(1)}k зн.</span>`;
       }
 
-      // Контекстная кнопка прямо на карточке
+      // Compact Action Button
       let actionBtn = '';
       if (col.code === 'backlog') {
-        actionBtn = `<button class="btn btn--xs btn--primary" onclick="event.stopPropagation(); promptAgentTarget('01-researcher'); CURRENT_TOPIC_ID=${t.id};">▶ Бриф</button>`;
+        actionBtn = `<button class="task-card__action-btn" style="background:#F1F5F9;color:#334155;border-color:#CBD5E1;" onclick="event.stopPropagation(); promptAgentTarget('01-researcher'); CURRENT_TOPIC_ID=${t.id};">▶ Бриф</button>`;
       } else if (col.code === 'work') {
-        actionBtn = `<button class="btn btn--xs btn--primary" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; writeArticleForCurrentTopic();">✍️ Написать</button>`;
+        actionBtn = `<button class="task-card__action-btn" style="background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE;" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; writeArticleForCurrentTopic();">✍️ Писать</button>`;
       } else if (col.code === 'needs_fix') {
-        actionBtn = `<button class="btn btn--xs btn--warning" onclick="event.stopPropagation(); openInspector(${t.id});">⚠️ Замечания (${t.score_total || '—'})</button>`;
+        actionBtn = `<button class="task-card__action-btn" style="background:#FEF2F2;color:#B91C1C;border-color:#FECACA;" onclick="event.stopPropagation(); openInspector(${t.id});">⚠️ Правки</button>`;
       } else if (col.code === 'review') {
-        actionBtn = `<button class="btn btn--xs btn--success" onclick="event.stopPropagation(); approveArticle(${t.id});">✓ В приёмку</button>`;
+        actionBtn = `<button class="task-card__action-btn" style="background:#ECFDF5;color:#047857;border-color:#A7F3D0;" onclick="event.stopPropagation(); approveArticle(${t.id});">✓ Принять</button>`;
       } else if (col.code === 'ready') {
-        actionBtn = `<button class="btn btn--xs btn--primary" onclick="event.stopPropagation(); exportSingleArticle(${t.id});">📦 Проверить v1.1</button>`;
+        actionBtn = `<button class="task-card__action-btn" style="background:#EFF6FF;color:#2563EB;border-color:#BFDBFE;" onclick="event.stopPropagation(); exportSingleArticle(${t.id});">📦 v1.1</button>`;
       } else if (col.code === 'published') {
-        actionBtn = `<span style="font-size:10px;font-weight:700;color:#059669;">✓ Опубликовано</span>`;
+        actionBtn = `<span style="font-size:9.5px;font-weight:600;color:#059669;">✓ В WP</span>`;
       }
 
+      const rawCluster = (t.cluster || '').split('/').pop().trim();
+      const shortCluster = rawCluster.length > 14 ? rawCluster.slice(0, 14) + '…' : rawCluster;
+
       colCardsHtml += `
-        <article class="task-card" draggable="true" data-topic-id="${t.id}" tabindex="0" role="button" aria-label="Статья #${t.id}: ${esc(t.title)}. ${STATUS_RU[t.status] || t.status}. ${chars > 0 ? chars + ' знаков' : 'без текста'}" onclick="openInspector(${t.id})" onkeydown="handleTaskCardKeydown(event, ${t.id})">
+        <article class="task-card" draggable="true" data-topic-id="${t.id}" tabindex="0" role="button" aria-label="Статья #${t.id}: ${esc(t.title)}" onclick="openInspector(${t.id})" onkeydown="handleTaskCardKeydown(event, ${t.id})">
           <div class="task-card__top">
-            <label class="bulk-check" style="display:flex;align-items:center;gap:4px;cursor:pointer;">
-              <input type="checkbox" value="${t.id}" onchange="toggleBulkSelection(this)" style="width:18px;height:18px;flex-shrink:0;">
-            </label>
-            <span class="task-card__id" style="cursor:grab;" title="Перетащите в другую колонку">⠿ #${t.id}</span>
+            <div class="task-card__top-left">
+              <input type="checkbox" value="${t.id}" onchange="toggleBulkSelection(this)" onclick="event.stopPropagation();" style="width:13px;height:13px;cursor:pointer;accent-color:#0F172A;margin:0;">
+              <span class="task-card__id" style="cursor:grab;" title="Перетащите для смены статуса">#${t.id}</span>
+            </div>
             <div class="task-card__badges">
-              ${t.is_critical ? '<span class="prio-pill" style="background:#FEE2E2;color:#B91C1C;">⚠ критично</span>' : ''}
+              ${t.is_critical ? '<span class="prio-pill prio-pill--hot" title="Критическая тема">⚠</span>' : ''}
               <span class="prio-pill ${pClass}">P${pScore}</span>
               ${seoBadge}
               ${scoreBadge}
             </div>
           </div>
-          <h3 class="task-card__title">${esc(t.title)}</h3>
-          <div class="task-card__footer">
-            <span class="task-card__cluster" title="${esc(t.cluster)}">${esc((t.cluster || '').slice(0, 20))}</span>
-            <span style="font-family:var(--mono);">${chars > 0 ? (chars > 999 ? (chars/1000).toFixed(1) + 'k' : chars) + ' зн.' : '—'}</span>
-          </div>
+          <div class="task-card__title" title="${esc(t.title)}">${esc(t.title)}</div>
           ${warnBlock}
-          <div class="task-card__action-row">
-            <span style="font-size:10px;color:var(--muted);">${STATUS_RU[t.status] || t.status}</span>
+          <div class="task-card__footer">
+            <div class="task-card__footer-left">
+              <span class="task-card__cluster" title="${esc(t.cluster)}">${esc(shortCluster || 'Пайка')}</span>
+              <span class="task-card__chars">${chars > 0 ? (chars > 999 ? (chars/1000).toFixed(1) + 'k' : chars) + ' зн.' : '—'}</span>
+            </div>
             ${actionBtn}
           </div>
         </article>
@@ -1836,13 +1891,16 @@ function renderKanban() {
     colDiv.innerHTML = `
       <div class="board-column__header">
         <div>
-          <span class="board-column__title">${col.title}</span>
-          <div style="font-size:10px;color:var(--muted);">${col.desc}</div>
+          <div class="board-column__title-wrap">
+            <span class="board-column__dot" style="background:${col.dot || '#94A3B8'};"></span>
+            <span class="board-column__title">${col.title}</span>
+          </div>
+          <div class="board-column__desc">${col.desc}</div>
         </div>
         <span class="board-column__badge">${count}</span>
       </div>
       <div class="board-column__cards">
-        ${colCardsHtml || '<div style="color:var(--muted);font-size:12px;text-align:center;padding:24px 0;">—</div>'}
+        ${colCardsHtml || '<div style="color:#94A3B8;font-size:11.5px;text-align:center;padding:24px 0;">Нет задач</div>'}
       </div>
     `;
     colDiv.setAttribute('aria-label', `Колонка: ${col.title}, ${count} задач`);
@@ -1850,6 +1908,104 @@ function renderKanban() {
   });
 
   initKanbanDnD();
+}
+
+function renderKanbanListView(topics) {
+  const listView = document.getElementById('kanbanListView');
+  if (!listView) return;
+
+  if (!topics || topics.length === 0) {
+    listView.innerHTML = '<div style="padding:32px;text-align:center;color:#64748B;font-size:13px;">Статей по заданным фильтрам не найдено</div>';
+    return;
+  }
+
+  const rowsHtml = topics.map(t => {
+    const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
+    const pScore = t.priority_score || 50;
+    const pClass = pScore >= 85 ? 'prio-pill--hot' : (pScore >= 70 ? 'prio-pill--warm' : 'prio-pill--cold');
+
+    let scoreBadge = '—';
+    if (t.score_total !== null && t.score_total !== undefined) {
+      const sClass = t.score_total >= 80 ? 'score-pill--high' : (t.score_total >= 60 ? 'score-pill--mid' : 'score-pill--low');
+      scoreBadge = `<span class="score-pill ${sClass}">${t.score_total}/100</span>`;
+    } else if (chars > 500) {
+      scoreBadge = `<span class="score-pill score-pill--mid">${(chars/1000).toFixed(1)}k зн.</span>`;
+    }
+
+    const cCode = getTopicColumn(t);
+    const colObj = COLUMNS.find(c => c.code === cCode) || { title: STATUS_RU[t.status] || t.status, dot: '#94A3B8' };
+
+    let actionBtn = '';
+    if (cCode === 'backlog') {
+      actionBtn = `<button class="btn btn--xs" onclick="event.stopPropagation(); promptAgentTarget('01-researcher'); CURRENT_TOPIC_ID=${t.id};" style="font-size:11px;padding:2px 8px;">▶ Бриф</button>`;
+    } else if (cCode === 'work') {
+      actionBtn = `<button class="btn btn--xs btn--primary" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; writeArticleForCurrentTopic();" style="font-size:11px;padding:2px 8px;">✍️ Писать</button>`;
+    } else if (cCode === 'needs_fix') {
+      actionBtn = `<button class="btn btn--xs btn--warning" onclick="event.stopPropagation(); openInspector(${t.id});" style="font-size:11px;padding:2px 8px;">⚠️ Правки</button>`;
+    } else if (cCode === 'review') {
+      actionBtn = `<button class="btn btn--xs btn--success" onclick="event.stopPropagation(); approveArticle(${t.id});" style="font-size:11px;padding:2px 8px;">✓ Принять</button>`;
+    } else if (cCode === 'ready') {
+      actionBtn = `<button class="btn btn--xs btn--primary" onclick="event.stopPropagation(); exportSingleArticle(${t.id});" style="font-size:11px;padding:2px 8px;">📦 v1.1</button>`;
+    } else {
+      actionBtn = `<span style="font-size:11px;color:#059669;font-weight:600;">✓ Опубликовано</span>`;
+    }
+
+    return `
+      <tr onclick="openInspector(${t.id})" style="cursor:pointer;">
+        <td style="width:28px;" onclick="event.stopPropagation();">
+          <input type="checkbox" value="${t.id}" onchange="toggleBulkSelection(this)" style="width:13px;height:13px;accent-color:#0F172A;cursor:pointer;">
+        </td>
+        <td style="width:45px;font-family:var(--mono);font-size:11px;color:#64748B;font-weight:600;">#${t.id}</td>
+        <td>
+          <div style="font-weight:600;color:#0F172A;font-size:12px;line-height:1.35;">${esc(t.title)}</div>
+        </td>
+        <td style="width:130px;">
+          <span class="task-card__cluster" title="${esc(t.cluster)}">${esc((t.cluster || '').split('/').pop().trim())}</span>
+        </td>
+        <td style="width:140px;">
+          <span style="display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#334155;font-weight:500;">
+            <span style="width:6px;height:6px;border-radius:50%;background:${colObj.dot};display:inline-block;"></span>
+            ${colObj.title}
+          </span>
+        </td>
+        <td style="width:75px;font-family:var(--mono);font-size:11px;color:#64748B;">
+          ${chars > 0 ? chars.toLocaleString('ru-RU') : '—'}
+        </td>
+        <td style="width:65px;">${scoreBadge}</td>
+        <td style="width:55px;"><span class="prio-pill ${pClass}">P${pScore}</span></td>
+        <td style="width:95px;text-align:right;" onclick="event.stopPropagation();">${actionBtn}</td>
+      </tr>
+    `;
+  }).join('');
+
+  listView.innerHTML = `
+    <table class="kanban-table">
+      <thead>
+        <tr>
+          <th style="width:28px;"><input type="checkbox" onchange="toggleSelectAllInList(this)" style="width:13px;height:13px;accent-color:#0F172A;cursor:pointer;"></th>
+          <th>ID</th>
+          <th>Заголовок статьи</th>
+          <th>Кластер</th>
+          <th>Статус</th>
+          <th>Знаков</th>
+          <th>Оценка</th>
+          <th>Приоритет</th>
+          <th style="text-align:right;">Действие</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${rowsHtml}
+      </tbody>
+    </table>
+  `;
+}
+
+function toggleSelectAllInList(masterCb) {
+  const isChecked = masterCb.checked;
+  document.querySelectorAll('#kanbanListView tbody input[type="checkbox"]').forEach(cb => {
+    cb.checked = isChecked;
+    toggleBulkSelection(cb);
+  });
 }
 
 // ===== Drag & Drop карточек между колонками (нативный HTML5, без CDN) =====
@@ -2998,7 +3154,7 @@ async function askAssistant(customQuestion) {
 }
 
 async function promptFullPipelineRun() {
-  const tidStr = prompt('Введите ID темы для запуска сквозного цикла Артели (Бобёр → Кот → Барсук → Филин → Дятел):', '1');
+  const tidStr = prompt('Введите ID темы для запуска сквозного конвейера (Бриф → Текст → Визуал → ОТК → Скоринг):', '1');
   if (!tidStr) return;
   const tid = parseInt(tidStr, 10);
   if (!tid || tid < 1) {
@@ -3011,15 +3167,15 @@ async function promptFullPipelineRun() {
 async function runFullPipelineForTopic(tid) {
   const consoleEl = document.getElementById('agentConsole');
   if (consoleEl) {
-    consoleEl.innerText = `[СКВОЗНОЙ ЦИКЛ] Запуск полного конвейера Артели для темы #${tid}...\n`;
+    consoleEl.innerText = `[СКВОЗНОЙ ЦИКЛ] Запуск полного конвейера для темы #${tid}...\n`;
   }
 
   const steps = [
-    { name: '🦫 Бобёр-Конструктор (01-researcher)', agent: '01-researcher' },
-    { name: '🐱 Кот-Паяльщик (02-writer)', agent: '02-writer' },
-    { name: '🦡 Барсук-Иллюстратор (05-illustrator)', agent: '05-illustrator' },
-    { name: '🦉 Филин-Ревизор + Humanizer (03-reviewer)', agent: '03-reviewer' },
-    { name: '🪵 Дятел-Метролог (04-scorer)', agent: '04-scorer' }
+    { name: '🔍 01. Исследователь стандартов (01-researcher)', agent: '01-researcher' },
+    { name: '⚡ 04. Автор-инженер Practico 1 (02-writer)', agent: '02-writer' },
+    { name: '🎨 09. Технический иллюстратор (05-illustrator)', agent: '05-illustrator' },
+    { name: '🛡️ 07. Инженерный ОТК + Humanizer (03-reviewer)', agent: '03-reviewer' },
+    { name: '📊 08. Метролог Скоринг (04-scorer)', agent: '04-scorer' }
   ];
 
   for (const step of steps) {
@@ -3045,7 +3201,7 @@ async function runFullPipelineForTopic(tid) {
   }
 
   if (consoleEl) {
-    consoleEl.innerText += `\n[ГОТОВО] Сквозной цикл Артели для темы #${tid} завершен!\n`;
+    consoleEl.innerText += `\n[ГОТОВО] Сквозной цикл обработки темы #${tid} завершён.\n`;
   }
   refreshData();
   askAssistant(`Что с темой #${tid}?`);
@@ -3093,7 +3249,7 @@ function toggleTownPause() {
 }
 
 function promptMissionRun() {
-  const tid = prompt('Введите ID темы для запуска сюжетной миссии в Городке (Сорока -> Бобёр -> Кот -> Барсук -> Филин -> Дятел -> WP):', '1');
+  const tid = prompt('Введите ID темы для запуска конвейера (Фактчек → Бриф → Текст → Визуал → ОТК → Скоринг → WP):', '1');
   if (!tid) return;
   if (window.aiTown) {
     window.aiTown.startMissionPipeline(parseInt(tid, 10) || 1);
@@ -3105,9 +3261,9 @@ function promptMissionRun() {
 // ============================================================
 const CRAFTSMAN_DOSSIER = {
   soroka: {
-    title: 'Сорока Клара (LSI & ГОСТ-Разведчица)',
+    title: '02. Инженерный фактчекер & SERP',
     role: '00-research · Поисковая семантика, LSI & Конкуренты',
-    icon: '🪶',
+    icon: '🔬',
     agentTarget: '00-research',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3117,13 +3273,13 @@ const CRAFTSMAN_DOSSIER = {
       • Классификация интента аудитории: Новичок (выбор жала) vs Практик (реболлинг BGA).
     `,
     task: `
-      Собрать актуальное LSI-ядро по выбранной теме, найти сильные стороны конкурентов, зафиксировать пробелы в выдаче и сформировать первичное семантическое ТЗ для Бобра.
+      Собрать актуальное LSI-ядро по выбранной теме, найти сильные стороны конкурентов, зафиксировать пробелы в выдаче и сформировать первичное семантическое ТЗ.
     `
   },
   bobr: {
-    title: 'Бобёр-Конструктор',
+    title: '01. Исследователь стандартов',
     role: '01-researcher · Бриф ГОСТ Р МЭК 61191-1 & Регламент FAQ',
-    icon: '🦫',
+    icon: '🔍',
     agentTarget: '01-researcher',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3136,13 +3292,13 @@ const CRAFTSMAN_DOSSIER = {
         4. Как правильно очистить жало T12/900M от нагара?
     `,
     task: `
-      Сформировать утвержденный инженерный бриф статьи по ГОСТ, зафиксировать нормативные допуски, структуру H2/H3 и передать утвержденный паспорт Коту-Паяльщику.
+      Сформировать утвержденный инженерный бриф статьи по ГОСТ, зафиксировать нормативные допуски, структуру H2/H3 и передать утвержденный паспорт автору.
     `
   },
   kot: {
-    title: 'Кот-Паяльщик (Practico 1)',
+    title: '04. Автор-инженер (Practico 1)',
     role: '02-writer · Практический лонгрид, физика пайки и ПОС-61',
-    icon: '🐱',
+    icon: '⚡',
     agentTarget: '02-writer',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3156,9 +3312,9 @@ const CRAFTSMAN_DOSSIER = {
     `
   },
   lis: {
-    title: 'Лис-Прагматик (Practico 2)',
+    title: '05. Автор-прагматик (Practico 2)',
     role: '02-writer-2 · Финансовый аудит, сметы и окупаемость',
-    icon: '🦊',
+    icon: '💼',
     agentTarget: '02-writer-2',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3171,9 +3327,9 @@ const CRAFTSMAN_DOSSIER = {
     `
   },
   barsuk: {
-    title: 'Барсук-Иллюстратор',
+    title: '09. Технический иллюстратор',
     role: '05-illustrator · Векторные SVG-термопрофили и Hero-визуал',
-    icon: '🦡',
+    icon: '🎨',
     agentTarget: '05-illustrator',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3186,9 +3342,9 @@ const CRAFTSMAN_DOSSIER = {
     `
   },
   filin: {
-    title: 'Филин-Ревизор [ОТК]',
+    title: '07. Инженерный ОТК-контроль',
     role: '03-reviewer · Детектор нейроштампов SlopMonster и приемка',
-    icon: '🦉',
+    icon: '🛡️',
     agentTarget: '03-reviewer',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3204,9 +3360,9 @@ const CRAFTSMAN_DOSSIER = {
     `
   },
   dyatel: {
-    title: 'Дятел-Метролог',
+    title: '08. Метролог (Скоринг 0–100)',
     role: '04-scorer · Математический AST-скоринг на 100 баллов',
-    icon: '🪵',
+    icon: '📊',
     agentTarget: '04-scorer',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3223,9 +3379,9 @@ const CRAFTSMAN_DOSSIER = {
     `
   },
   raccoon: {
-    title: 'Енот-Датасетник & Архивариус Знаний',
+    title: 'Архивариус датасетов & Граф знаний',
     role: '06-knowledge · Graphify граф связей, аудит базы и подготовка датасета LoRA (ChatML JSONL)',
-    icon: '🦝',
+    icon: '🗄️',
     agentTarget: '06-knowledge',
     docs: `
       <strong>Стандарты и регламенты:</strong><br>
@@ -3239,9 +3395,9 @@ const CRAFTSMAN_DOSSIER = {
     `
   },
   bear: {
-    title: 'Медведь-Бригадир (Игрок)',
-    role: 'Староста Артели · Локальный Агент Triad-Omni (Mi 10T + Nord N10 + Redmi 4)',
-    icon: '🐻',
+    title: 'AI Шеф-редактор конвейера',
+    role: 'Оркестратор · Локальный Агент Triad-Omni (Mi 10T + Nord N10 + Redmi 4)',
+    icon: '⚡',
     agentTarget: 'assistant',
     docs: `
       <strong>Архитектура кластера Triad-Omni v4.9:</strong><br>
@@ -4098,15 +4254,15 @@ let globalModelsConfig = null;
 let currentConfigAnimalTab = 'bear';
 
 const ANIMAL_NAMES_MAP = {
-  bear: { name: 'Медведь Михалыч', role: 'Прораб & Маршрутизатор', icon: '🐻' },
-  soroka: { name: 'Сорока Клара', role: 'LSI & ГОСТ-Разведчица', icon: '🪶' },
-  bobr: { name: 'Бобёр Борис', role: 'Архитектор ТЗ', icon: '🦫' },
-  kot: { name: 'Кот Феликс', role: 'Физика пайки & Авторский голос', icon: '🐱' },
-  lis: { name: 'Лис Рейнард', role: 'Экономист оборудования', icon: '🦊' },
-  barsuk: { name: 'Барсук Бруно', role: 'Термопрофиль & Ошибки', icon: '🦡' },
-  filin: { name: 'Филин Архимед', role: 'Главный [ОТК-ГОСТ]', icon: '🦉' },
-  dyatel: { name: 'Дятел Вуди', role: 'AST-Скорер & Валидатор', icon: '🪵' },
-  raccoon: { name: 'Енот Рокки', role: 'Graphify & PDF-Архивариус', icon: '🦝' }
+  bear: { name: 'AI Шеф-редактор', role: 'Прораб & Маршрутизатор Triad', icon: '⚡' },
+  soroka: { name: '02. Инженерный фактчекер', role: 'LSI & SERP-Разведка', icon: '🔬' },
+  bobr: { name: '01. Исследователь стандартов', role: 'Архитектор ТЗ & ГОСТ', icon: '🔍' },
+  kot: { name: '04. Автор-инженер Practico 1', role: 'Физика пайки & Авторский голос', icon: '⚡' },
+  lis: { name: '05. Автор-прагматик Practico 2', role: 'Экономист оборудования & Сметы', icon: '💼' },
+  barsuk: { name: '09. Технический иллюстратор', role: 'Термопрофиль & SVG W3C', icon: '🎨' },
+  filin: { name: '07. Инженерный ОТК-контроль', role: 'Главный [ОТК-ГОСТ] & SlopMonster', icon: '🛡️' },
+  dyatel: { name: '08. Метролог (Скоринг)', role: 'AST-Скорер & Валидатор 0-100', icon: '📊' },
+  raccoon: { name: 'Архивариус датасетов', role: 'Graphify & PDF-Архивариус', icon: '🗄️' }
 };
 
 async function openModelsConfigModal() {
@@ -4441,7 +4597,7 @@ async function loadArticleMediaPlan() {
   if (!container) return;
   const topic = (window.state && window.state.topics) ? window.state.topics.find(t => t.id === currentWsTopicId) : { id: 1, title: 'Пайка плат для начинающих', solder_alloy: 'ПОС-61 (183–190°C)' };
   
-  container.innerHTML = '<span style="color:#FBBF24;">⏳ Сорока Клара составляет медиа-план и SEO-Geo промпты...</span>';
+  container.innerHTML = '<span style="color:#FBBF24;">⏳ Формирование медиа-плана и SEO-Geo промптов...</span>';
   try {
     const res = await fetch(`/api/media/plan?title=${encodeURIComponent(topic.title || '')}&alloy=${encodeURIComponent(topic.solder_alloy || '')}`);
     globalMediaPack = await res.json();
@@ -4512,7 +4668,7 @@ async function requestRefinedPrompt() {
   const basePrompt = globalMediaPack.slots[currentMediaSlot].prompt_1;
 
   box.style.display = 'block';
-  box.innerHTML = '<span>⏳ Сорока Клара формулирует Промпт №2 с оптическими исправлениями...</span>';
+  box.innerHTML = '<span>⏳ Оптимизация промпта №2 с оптическими исправлениями...</span>';
 
   try {
     const res = await fetch('/api/media/refine_prompt', {

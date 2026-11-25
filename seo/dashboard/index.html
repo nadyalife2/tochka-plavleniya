@@ -23,11 +23,13 @@
     </div>
 
     <nav class="saas-nav">
-      <div class="saas-nav-group">Производство</div>
+      <div class="saas-nav-group">Главная</div>
       <button class="saas-nav-btn tab-btn active" id="tabBtnOverview" onclick="switchTab('overview')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Центр управления</span>
+        <span>Пульт управления</span>
       </button>
+
+      <div class="saas-nav-group">Производство контента</div>
       <button class="saas-nav-btn tab-btn" id="tabBtnKanban" onclick="switchTab('kanban')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></svg>
         <span>Статьи и Канбан</span>
@@ -35,47 +37,47 @@
       </button>
       <button class="saas-nav-btn tab-btn" onclick="switchTab('agents')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        <span>Конвейер 9 этапов</span>
-      </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('gaps')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span>Идеи и пробелы</span>
-        <span class="tab-badge" id="bCountProposed">0</span>
-      </button>
-
-      <div class="saas-nav-group">SEO &amp; Качество</div>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('radar')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-        <span>Радар конкурентов</span>
+        <span>Конвейер 9 агентов</span>
       </button>
       <button class="saas-nav-btn tab-btn" onclick="switchTab('humanizer')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
-        <span>Humanizer-аудит</span>
+        <span>Очеловечивание и ОТК</span>
+      </button>
+
+      <div class="saas-nav-group">Разведка &amp; SEO</div>
+      <button class="saas-nav-btn tab-btn" onclick="switchTab('radar')">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        <span>Радар выдачи (SERP)</span>
       </button>
       <button class="saas-nav-btn tab-btn" onclick="switchTab('competitors')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <span>Сайты ниши</span>
+        <span>База конкурентов</span>
         <span class="tab-badge" id="bCountComps">0</span>
+      </button>
+      <button class="saas-nav-btn tab-btn" onclick="switchTab('gaps')">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span>Семантические пробелы</span>
+        <span class="tab-badge" id="bCountProposed">0</span>
       </button>
       <button class="saas-nav-btn tab-btn" onclick="switchTab('analysis')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <span>Мутаген и спрос</span>
+        <span>Спрос и Мутаген</span>
         <span class="tab-badge" id="bCountAnalysis">0</span>
       </button>
 
-      <div class="saas-nav-group">Система и Выгрузка</div>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('models')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>
-        <span>Кластер и модели</span>
-      </button>
+      <div class="saas-nav-group">Инфраструктура &amp; Выгрузка</div>
       <button class="saas-nav-btn tab-btn" onclick="switchTab('export')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span>Готовые к WP</span>
-        <span class="tab-badge" id="bCountExport" style="background:#D1FAE5;color:#065F46;">0</span>
+        <span>Выгрузка в WordPress</span>
+        <span class="tab-badge" id="bCountExport" style="background:#ECFDF5;color:#047857;">0</span>
+      </button>
+      <button class="saas-nav-btn tab-btn" onclick="switchTab('models')">
+        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>
+        <span>Edge-кластер Triad-Omni</span>
       </button>
       <button class="saas-nav-btn tab-btn" onclick="switchTab('backups')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-        <span>Бэкапы SQLite</span>
+        <span>Резервные копии</span>
         <span class="tab-badge" id="bCountBackups">0</span>
       </button>
     </nav>
@@ -236,78 +238,97 @@
         </div>
       </section>
 
-<!-- TAB 1: KANBAN -->
+<!-- TAB 1: KANBAN & TOPICS -->
   <section class="tab-view" id="view-kanban">
-    <div style="background:#FAFAFA;border:1px solid var(--border-hairline);border-radius:var(--radius-sm);padding:6px 10px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <input type="text" id="kanbanSearch" placeholder="Поиск по названию или #ID..." oninput="filterKanban()" style="padding:5px 9px;border:1px solid var(--border-hairline);background:#FFF;width:240px;font-size:12px;border-radius:var(--radius-sm);">
-        <label style="font-size:11.5px;font-weight:600;display:flex;align-items:center;gap:4px;">Кластер:
-          <select id="clusterSelect" onchange="filterKanban()" style="padding:4px 8px;border:1px solid var(--border-hairline);background:#FFF;font-size:11.5px;border-radius:var(--radius-sm);">
-            <option value="">Все кластеры</option>
-          </select>
-        </label>
-        <button class="btn btn--xs" id="btnResetFilter" onclick="resetStepFilter()" style="display:none;">Сбросить фильтр этапа ✕</button>
+    <div class="kanban-toolbar">
+      <div class="kanban-toolbar__left">
+        <div class="kanban-toolbar__search">
+          <svg class="kanban-toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="kanbanSearch" class="kanban-toolbar__input" placeholder="Поиск по названию или #ID..." oninput="filterKanban()">
+        </div>
+        <select id="clusterSelect" class="kanban-toolbar__select" onchange="filterKanban()">
+          <option value="">Все кластеры</option>
+        </select>
+        <div class="kanban-toolbar__chips" id="kanbanFilterChips">
+          <button class="kanban-chip active" onclick="setKanbanStatusFilter('')">Все (<span id="chipAllCount">0</span>)</button>
+          <button class="kanban-chip" onclick="setKanbanStatusFilter('work')">В работе (<span id="chipWorkCount">0</span>)</button>
+          <button class="kanban-chip" onclick="setKanbanStatusFilter('needs_fix')">Правки (<span id="chipFixCount">0</span>)</button>
+          <button class="kanban-chip" onclick="setKanbanStatusFilter('ready')">Готово (<span id="chipReadyCount">0</span>)</button>
+        </div>
+        <button class="btn btn--xs" id="btnResetFilter" onclick="resetStepFilter()" style="display:none;border-color:#CBD5E1;border-radius:6px;">Сбросить фильтр ✕</button>
       </div>
-      <div style="display:flex;gap:6px;align-items:center;">
-        <span class="kanban-hint" title="Зажмите карточку и перетащите в другую колонку — статус обновится" style="font-size:11px;color:var(--muted);font-family:var(--mono);">⠿ перетаскивание меняет статус</span>
+
+      <div class="kanban-toolbar__right">
+        <div class="view-segmented-switch">
+          <button class="view-segmented-btn active" id="btnViewModeBoard" onclick="setKanbanViewMode('board')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></svg>
+            Доска
+          </button>
+          <button class="view-segmented-btn" id="btnViewModeList" onclick="setKanbanViewMode('list')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Список
+          </button>
+        </div>
+        <button class="btn--amber-cta" style="padding:4px 10px;font-size:11.5px;" onclick="toggleNewTopicBox()">+ Новая тема</button>
       </div>
     </div>
 
-    <!-- Окно быстрого добавления темы из головы -->
-    <div id="newTopicBox" style="display:none;background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius-md);padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 3px rgba(0,0,0,0.04);">
+    <!-- Окно быстрого добавления темы -->
+    <div id="newTopicBox" style="display:none;background:#FFFFFF;border:1px solid #CBD5E1;border-radius:8px;padding:12px 14px;margin-bottom:10px;box-shadow:0 4px 12px rgba(0,0,0,0.05);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-        <h3 style="margin:0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
-          [НОВАЯ ТЕМА В БЭКЛОГ]
-        </h3>
-        <span style="font-size:11px;font-family:var(--mono);color:var(--muted);">Тема сразу попадёт в колонку «Бэклог» для обработки агентами</span>
+        <div style="font-size:12px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:6px;">
+          <span>＋ Добавить новую тему в бэклог</span>
+        </div>
+        <span style="font-size:11px;color:#64748B;">Сразу поступит в очередь для обработки агентами</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 220px 150px 150px 180px;gap:8px;margin-bottom:8px;">
-        <input type="text" id="newTopicTitle" placeholder="Название темы (например: Как паять алюминиевые радиаторы)..." style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;">
-        <select id="newTopicCluster" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;"></select>
-        <select id="newTopicType" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;">
+      <div style="display:grid;grid-template-columns:1fr 200px 140px 140px 160px;gap:8px;margin-bottom:8px;">
+        <input type="text" id="newTopicTitle" placeholder="Название темы (например: Как паять алюминиевые радиаторы)..." style="padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;">
+        <select id="newTopicCluster" style="padding:6px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;"></select>
+        <select id="newTopicType" style="padding:6px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;">
           <option value="гайд">гайд / мануал</option>
           <option value="выбор">выбор припоя</option>
           <option value="ошибки">дефекты пайки</option>
           <option value="обзор">обзор станции</option>
         </select>
-        <select id="newTopicPriority" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;">
+        <select id="newTopicPriority" style="padding:6px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;">
           <option value="высокий">Высокий (P85)</option>
           <option value="средний" selected>Средний (P60)</option>
         </select>
-        <button class="btn btn--primary" onclick="createNewTopicFromInput()">+ Добавить в бэклог</button>
+        <button class="btn btn--primary" style="font-size:12px;border-radius:6px;" onclick="createNewTopicFromInput()">Добавить</button>
       </div>
       <div>
-        <input type="text" id="newTopicNotes" placeholder="Ваши мысли, ключевые тезисы или акценты статьи (необязательно)..." style="width:100%;padding:5px 10px;border:1px dashed var(--border);font-size:11px;background:var(--bg);">
+        <input type="text" id="newTopicNotes" placeholder="Ключевые тезисы или акценты статьи (необязательно)..." style="width:100%;padding:5px 10px;border:1px dashed #CBD5E1;border-radius:6px;font-size:11px;background:#F8FAFC;">
       </div>
     </div>
 
-    <!-- Bulk Actions Toolbar -->
-    <div id="bulkToolbar" style="display:none;gap:8px;margin-bottom:12px;padding:8px 12px;background:#FFF8E1;border:1.5px solid #D97706;border-radius:var(--radius-md);align-items:center;flex-wrap:wrap;justify-content:space-between;">
-      <span style="font-weight:700;font-size:12px;">Выбрано: <strong id="bulkCount" style="font-family:var(--mono);">0</strong></span>
+    <!-- Панель групповых действий -->
+    <div id="bulkToolbar" style="display:none;gap:10px;margin-bottom:10px;padding:8px 14px;background:#0F172A;color:#FFFFFF;border-radius:8px;align-items:center;flex-wrap:wrap;justify-content:space-between;box-shadow:0 4px 12px rgba(15,23,42,0.15);">
+      <span style="font-weight:600;font-size:12px;">Выбрано статей: <strong id="bulkCount" style="font-family:var(--mono);color:#38BDF8;">0</strong></span>
       <div style="display:flex;gap:6px;flex-wrap:wrap;">
-        <button class="btn btn--xs btn--success" onclick="bulkAction('approve')">[УТВЕРДИТЬ ВСЕ]</button>
-        <button class="btn btn--xs btn--primary" onclick="bulkAction('score')">[СКОРИНГ]</button>
-        <button class="btn btn--xs" onclick="bulkAction('export_wp')">[В WORDPRESS]</button>
-        <button class="btn btn--xs btn--danger" onclick="bulkAction('reject')">[НА ДОРАБОТКУ]</button>
-        <button class="btn btn--xs" onclick="clearBulkSelection()">[СБРОСИТЬ]</button>
+        <button class="btn btn--xs btn--success" onclick="bulkAction('approve')">✓ Утвердить все</button>
+        <button class="btn btn--xs btn--primary" onclick="bulkAction('score')">⚡ Скоринг</button>
+        <button class="btn btn--xs" onclick="bulkAction('export_wp')" style="background:#1E293B;color:#F8FAFC;border-color:#334155;">📦 В WordPress</button>
+        <button class="btn btn--xs btn--danger" onclick="bulkAction('reject')">⚠️ На доработку</button>
+        <button class="btn btn--xs" onclick="clearBulkSelection()" style="background:transparent;color:#94A3B8;border-color:#334155;">Сбросить</button>
       </div>
     </div>
 
     <div class="kanban-board" id="kanbanBoard"></div>
+    <div class="kanban-list-view" id="kanbanListView" style="display:none;"></div>
   </section>
 
   <!-- TAB 2: READY TO EXPORT (WORDPRESS DELIVERY) -->
   <section class="tab-view" id="view-export">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
       <div>
-        <h2 style="margin:0;font-size:16px;font-weight:800;text-transform:uppercase;">Статьи, готовые к выгрузке в WordPress</h2>
+        <h2 style="margin:0;font-size:16px;font-weight:700;color:#0F172A;">Статьи, готовые к выгрузке в WordPress</h2>
         <div style="font-size:12px;color:var(--muted);">Материалы с подтверждённым качеством (≥80 баллов, проверенные рецензентом и утверждённые шеф-редактором).</div>
       </div>
       <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
-        <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm" style="text-decoration:none;" title="Скачать JSON манифест базы для нейросети">[СКАЧАТЬ JSON]</a>
-        <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm" style="text-decoration:none;" title="Скачать Markdown манифест">[СКАЧАТЬ MD]</a>
-        <a href="/api/export.html" target="_blank" class="btn btn--sm" style="text-decoration:none;" title="Открыть базу в HTML в новой вкладке">[ОТКРЫТЬ HTML ↗]</a>
-        <button class="btn btn--primary" onclick="exportAllReady()">[ВЫГРУЗИТЬ В WORDPRESS]</button>
+        <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm" style="text-decoration:none;" title="Скачать JSON манифест базы для нейросети">📥 Скачать JSON</a>
+        <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm" style="text-decoration:none;" title="Скачать Markdown манифест">📄 Скачать MD</a>
+        <a href="/api/export.html" target="_blank" class="btn btn--sm" style="text-decoration:none;" title="Открыть базу в HTML в новой вкладке">🌐 Открыть HTML ↗</a>
+        <button class="btn btn--primary" onclick="exportAllReady()">🚀 Выгрузить всё в WordPress</button>
       </div>
     </div>
 
@@ -388,10 +409,10 @@
           </div>
         </div>
         <div class="fc-export-actions">
-          <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm">[СКАЧАТЬ JSON]</a>
-          <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm">[СКАЧАТЬ MD]</a>
-          <a href="/api/export.html" target="_blank" class="btn btn--sm">[ОТКРЫТЬ HTML ↗]</a>
-          <button class="btn btn--sm btn--primary" onclick="copyExistingBaseJson()">📋 [В БУФЕР: ВСЯ БАЗА]</button>
+          <a href="/api/export.json" download="tchp-existing-base.json" class="btn btn--sm">📥 Скачать JSON</a>
+          <a href="/api/export.md" download="tchp-existing-base.md" class="btn btn--sm">📄 Скачать MD</a>
+          <a href="/api/export.html" target="_blank" class="btn btn--sm">🌐 Открыть HTML ↗</a>
+          <button class="btn btn--sm btn--primary" onclick="copyExistingBaseJson()">📋 Скопировать в буфер</button>
         </div>
       </div>
 
@@ -440,10 +461,10 @@
       <!-- 1.4 Кнопка мгновенного копирования готового промпта в буфер -->
       <div class="fc-prompt-actions">
         <button class="btn btn--primary" id="btnCopyPrompt" type="button" onclick="copyGeneratedFirecrawlPrompt()">
-          📋 СКОПИРОВАТЬ ГОТОВЫЙ ПРОМПТ В БУФЕР
+          📋 Скопировать промпт в буфер
         </button>
-        <button class="btn btn--sm" type="button" onclick="togglePromptPreview()">
-          [Показать / Скрыть текст промпта]
+        <button class="btn btn--sm" type="button" onclick="togglePromptPreview()" style="border-color:#CBD5E1;border-radius:6px;">
+          Показать / скрыть промпт
         </button>
       </div>
 
@@ -454,23 +475,23 @@
     </div>
 
     <!-- Блок 2: Импорт выгрузки Firecrawl с дедупликацией -->
-    <div style="background:var(--card);border:2px solid var(--border);padding:14px 16px;margin-bottom:20px;box-shadow:2px 2px 0px rgba(0,0,0,0.05);">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+    <div class="saas-panel-card" style="margin-bottom:20px;padding:16px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;">
         <div>
-          <h3 style="margin:0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:6px;">
+          <h3 style="margin:0;font-size:13.5px;font-weight:700;color:var(--ink);letter-spacing:-0.01em;display:flex;align-items:center;gap:6px;">
             📥 Импорт выгрузки Firecrawl (JSON или Markdown) с дедупликацией
           </h3>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">
+          <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">
             Вставьте содержимое <code>solder_seo_additional.json</code> или <code>solder_seo_additional.md</code> (или результат скрейпинга одной страницы). Дубликаты по доменам, URL, кластерам и слагам будут автоматически отфильтрованы.
           </div>
         </div>
         <div style="display:flex;gap:6px;">
-          <button class="btn btn--sm btn--primary" onclick="importFirecrawlData()">⚡ Разобрать и добавить с дедупликацией</button>
-          <button class="btn btn--sm" onclick="clearFirecrawlInput()">Очистить</button>
+          <button class="btn btn--sm btn--primary" onclick="importFirecrawlData()">⚡ Разобрать и добавить</button>
+          <button class="btn btn--sm" onclick="clearFirecrawlInput()" style="border-color:#CBD5E1;border-radius:6px;">Очистить</button>
         </div>
       </div>
-      <textarea id="fcContent" placeholder="Вставьте сюда JSON (solder_seo_additional.json) или Markdown (solder_seo_additional.md) выгрузку Firecrawl..." rows="5" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);font-family:var(--mono);font-size:11.5px;line-height:1.45;resize:vertical;"></textarea>
-      <div id="fcResult" style="display:none;margin-top:10px;padding:10px 14px;border:1.5px solid var(--border);font-size:12px;"></div>
+      <textarea id="fcContent" placeholder="Вставьте сюда JSON (solder_seo_additional.json) или Markdown (solder_seo_additional.md) выгрузку Firecrawl..." rows="5" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:6px;font-family:var(--mono);font-size:11.5px;line-height:1.5;resize:vertical;background:#F8FAFC;"></textarea>
+      <div id="fcResult" style="display:none;margin-top:10px;padding:10px 14px;border:1px solid var(--border);border-radius:6px;font-size:12px;"></div>
     </div>
 
     <div class="data-table-container" style="margin-bottom:24px;">
@@ -520,14 +541,14 @@
     </div>
 
     <!-- Информационный блок: Баланс и Экономичные механики Мутагена -->
-    <div style="background:var(--card);border:1.5px solid var(--border);padding:14px;margin-bottom:14px;">
+    <div class="saas-panel-card" style="padding:16px;margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);">
         <div style="display:flex;align-items:center;gap:10px;">
-          <span style="font-size:13px;font-weight:800;">Баланс API Мутагена:</span>
-          <span id="analysisMutagenBalance" style="background:#D1FAE5;color:#065F46;padding:3px 10px;font-size:13px;font-weight:800;border:1px solid #10B981;">
+          <span style="font-size:13px;font-weight:700;color:var(--ink);">Баланс API Мутагена:</span>
+          <span id="analysisMutagenBalance" style="background:#ECFDF5;color:#047857;padding:3px 10px;font-size:12.5px;font-weight:700;border:1px solid #A7F3D0;border-radius:6px;">
             15.92 ₽ (~53 проверок)
           </span>
-          <button class="btn btn--xs" onclick="refreshMutagenBalance()" title="Обновить баланс с сервера">↻ Обновить</button>
+          <button class="btn btn--xs" onclick="refreshMutagenBalance()" title="Обновить баланс с сервера" style="border-color:#CBD5E1;border-radius:6px;">↻ Обновить</button>
         </div>
         <div style="font-size:11.5px;color:var(--muted);">
           Тариф: 0,30 ₽ за фразу · Вордстат: 0 ₽ · Лимит на сайте mutagen.ru: 10–20 проверок/сутки бесплатно
@@ -536,53 +557,53 @@
 
       <!-- Карточки механик экономии -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:10px;margin-bottom:12px;">
-        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
-          <div style="font-weight:800;color:#047857;margin-bottom:3px;">🎁 0 ₽ — Лимит на mutagen.ru</div>
-          <div style="color:var(--ink);line-height:1.4;">В веб-кабинете на сайте mutagen.ru ежедневно даётся 10–20 бесплатных проверок конкуренции в сутки. Можно тестировать темы без списания с API.</div>
+        <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;">
+          <div style="font-weight:700;color:#047857;margin-bottom:4px;">🎁 0 ₽ — Лимит на mutagen.ru</div>
+          <div style="color:var(--ink-secondary);line-height:1.45;">В веб-кабинете на сайте mutagen.ru ежедневно даётся 10–20 бесплатных проверок конкуренции в сутки. Можно тестировать темы без списания с API.</div>
         </div>
-        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
-          <div style="font-weight:800;color:#1D4ED8;margin-bottom:3px;">🎯 «Золотые темы» (strong ≤ 5–7)</div>
-          <div style="color:var(--ink);line-height:1.4;">Слабая конкуренция: статьи занимают ТОП-3 Яндекса за 1–2 недели без покупных ссылок. Проверяйте узкие боли мастера, а не общие слова.</div>
+        <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;">
+          <div style="font-weight:700;color:#1D4ED8;margin-bottom:4px;">🎯 «Золотые темы» (strong ≤ 5–7)</div>
+          <div style="color:var(--ink-secondary);line-height:1.45;">Слабая конкуренция: статьи занимают ТОП-3 Яндекса за 1–2 недели без покупных ссылок. Проверяйте узкие боли мастера, а не общие слова.</div>
         </div>
-        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
-          <div style="font-weight:800;color:#B45309;margin-bottom:3px;"> хвосты (tails > 1 000)</div>
-          <div style="color:var(--ink);line-height:1.4;">Параметр tails показывает суммарный спрос по десяткам микро-запросов. Одна статья закрывает сразу весь кластер и собирает стабильный трафик.</div>
+        <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;">
+          <div style="font-weight:700;color:#B45309;margin-bottom:4px;">📈 Длинные хвосты (tails > 1 000)</div>
+          <div style="color:var(--ink-secondary);line-height:1.45;">Параметр tails показывает суммарный спрос по десяткам микро-запросов. Одна статья закрывает сразу весь кластер и собирает стабильный трафик.</div>
         </div>
-        <div style="background:#F9FAFB;border:1px solid var(--border);padding:9px 11px;font-size:11.5px;">
-          <div style="font-weight:800;color:#6B21A8;margin-bottom:3px;">🔎 Подсказки и FAQ (бесплатно)</div>
-          <div style="color:var(--ink);line-height:1.4;">Живые формулировки людей из подсказок Яндекса/Google («как паять», «почему не лудится»). Готовые подзаголовки H2 и вопросы для блока FAQ.</div>
+        <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;font-size:12px;">
+          <div style="font-weight:700;color:#6B21A8;margin-bottom:4px;">🔎 Подсказки и FAQ (бесплатно)</div>
+          <div style="color:var(--ink-secondary);line-height:1.45;">Живые формулировки людей из подсказок Яндекса/Google («как паять», «почему не лудится»). Готовые подзаголовки H2 и вопросы для блока FAQ.</div>
         </div>
       </div>
 
       <!-- Быстрые чипсы перспективных тем -->
       <div>
-        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;margin-bottom:6px;">
+        <div style="font-size:11.5px;font-weight:600;color:var(--muted);margin-bottom:6px;">
           ⚡ Перспективные темы из бэклога для быстрой проверки:
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;">
-          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка алюминия припой')">#48 Пайка алюминия (припой)</button>
-          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка нержавейки кислотой')">#49 Пайка нержавейки (кислота)</button>
-          <button class="btn btn--xs" onclick="setAnalysisPhrase('холодная пайка как исправить')">#26 Холодная пайка (исправление)</button>
-          <button class="btn btn--xs" onclick="setAnalysisPhrase('ремонт наушников пайка проводов')">#36 Ремонт наушников (провода)</button>
-          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка smd 0402 0201')">#58 Пайка SMD 0402/0201</button>
-          <button class="btn btn--xs" onclick="setAnalysisPhrase('беспроводной паяльник какой выбрать')">#9 Беспроводной паяльник (выбор)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка алюминия припой')" style="border-radius:6px;">#48 Пайка алюминия (припой)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка нержавейки кислотой')" style="border-radius:6px;">#49 Пайка нержавейки (кислота)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('холодная пайка как исправить')" style="border-radius:6px;">#26 Холодная пайка (исправление)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('ремонт наушников пайка проводов')" style="border-radius:6px;">#36 Ремонт наушников (провода)</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('пайка smd 0402 0201')" style="border-radius:6px;">#58 Пайка SMD 0402/0201</button>
+          <button class="btn btn--xs" onclick="setAnalysisPhrase('беспроводной паяльник какой выбрать')" style="border-radius:6px;">#9 Беспроводной паяльник (выбор)</button>
         </div>
       </div>
     </div>
 
-    <div style="background:var(--card);border:1.5px solid var(--border);padding:12px;margin-bottom:14px;">
-      <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
+    <div class="saas-panel-card" style="padding:14px;margin-bottom:14px;">
+      <div style="font-size:11.5px;color:var(--muted);margin-bottom:8px;">
         💡 Подсказки берутся из SEO-ключей конкурентов, хвостов Вордстата и уже измеренных фраз — выберите из списка или впишите свою.
       </div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-        <input type="text" id="analysisPhrase" list="kwSuggestList" placeholder="Введите или выберите фразу" style="flex:1;min-width:260px;padding:7px 10px;border:1.5px solid var(--border);font-size:12px;">
+        <input type="text" id="analysisPhrase" list="kwSuggestList" placeholder="Введите или выберите фразу" style="flex:1;min-width:260px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12.5px;background:#FFF;">
         <datalist id="kwSuggestList"></datalist>
-        <select id="kwSuggestSelect" onchange="pickSuggestion(this)" style="padding:7px 10px;border:1.5px solid var(--border);font-size:12px;max-width:280px;">
+        <select id="kwSuggestSelect" onchange="pickSuggestion(this)" style="padding:8px 12px;border:1px solid var(--border);border-radius:6px;font-size:12px;max-width:280px;background:#FFF;cursor:pointer;">
           <option value="">— подсказки от конкурентов —</option>
         </select>
         <button class="btn btn--primary" onclick="checkPhrase('auto')">📊 Узнать спрос (бесплатно)</button>
         <button class="btn btn--warning" onclick="checkPhrase('mutagen')">🔬 Проверить Мутагеном (0,30 ₽)</button>
-        <button class="btn" onclick="recalcPriorities()">⚡ Пересчитать приоритет тем</button>
+        <button class="btn" onclick="recalcPriorities()" style="border-color:#CBD5E1;border-radius:6px;">⚡ Пересчитать приоритет тем</button>
       </div>
       <div id="priorityBox" style="margin-top:12px;display:none;"></div>
       <div id="analysisResult" style="margin-top:12px;display:none;"></div>
@@ -612,15 +633,15 @@
   <section class="tab-view" id="view-agents">
     <div style="margin-bottom:14px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px;">
       <div>
-        <h2 style="margin:0;font-size:18px;font-weight:800;letter-spacing:-0.02em;">Инженерная Артель Мастеров (Конвейер Агентов)</h2>
-        <div style="font-size:12px;color:var(--muted);">Автономная мастерская: каждый мастер решает строгую инженерную задачу по стандартам MASTER_EDITORIAL_BOOK.md.</div>
+        <h2 style="margin:0;font-size:18px;font-weight:700;letter-spacing:-0.02em;color:#0F172A;">Конвейер автономных инженерных агентов</h2>
+        <div style="font-size:12px;color:var(--muted);">9-этапный сквозной цикл генерации, валидации ГОСТ и выгрузки статей по стандартам MASTER_EDITORIAL_BOOK.md.</div>
       </div>
       <div style="display:flex;gap:8px;align-items:center;">
         <button class="btn btn--sm btn--primary" type="button" onclick="exportColabDataset()" title="Собрать датасет статей (score >= 80) в JSONL ChatML для Google Colab Unsloth">
-          ⚡ [ВЫГРУЗИТЬ DATASET В COLAB]
+          ⚡ Экспорт датасета (Colab)
         </button>
         <button class="btn btn--sm" type="button" onclick="refreshClusterTelemetry()" title="Опросить шлюзы Triad-Omni (:8000) и OmniRoute (:20128)">
-          [ОБНОВИТЬ СВЯЗЬ]
+          🔄 Опросить кластер
         </button>
       </div>
     </div>
@@ -628,7 +649,7 @@
     <!-- Кластерная телеметрия: Triad-Omni & OmniRoute Live Bar -->
     <div class="cluster-telemetry-bar">
       <div>
-        <div style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">
           Аппаратный кластер Triad-Omni Edge AI & OmniRoute Gateway:
         </div>
         <div class="cluster-telemetry__nodes" id="clusterTelemetryNodes">
@@ -653,10 +674,10 @@
     </div>
 
     <!-- Глобальный выбор основного канала генерации -->
-    <div style="background:#FFF;border:1.5px solid var(--border);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-radius:6px;">
+    <div style="background:#FFF;border:1px solid #CBD5E1;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-radius:8px;">
       <div style="display:flex;align-items:center;gap:10px;">
-        <span style="font-weight:800;font-size:13px;">🛠️ Базовый канал генерации:</span>
-        <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:6px 10px;border:1.5px solid var(--border);font-size:12px;font-weight:700;cursor:pointer;border-radius:4px;">
+        <span style="font-weight:700;font-size:12.5px;color:#0F172A;">🛠️ Базовый канал генерации:</span>
+        <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:5px 10px;border:1px solid #CBD5E1;font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;">
           <option value="auto">⚡ Авто-каскад (Triad-Omni 0₽ → OmniRoute → Claude → DeepSeek → Yandex)</option>
           <option value="triad">🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN</option>
           <option value="omniroute">🌐 OmniRoute Multi-Model (:20128, 750+ моделей) — без VPN</option>
@@ -670,19 +691,19 @@
       </div>
     </div>
 
-    <!-- Интерактивный виджет Старосты Артели (Говорящий Бригадир) -->
+    <!-- Интерактивный виджет AI Шеф-редактора -->
     <div class="assistant-foreman-panel" id="assistantForemanPanel">
       <div class="assistant-foreman-header">
         <div class="assistant-avatar-box">
-          <div class="assistant-avatar-icon">🐻</div>
+          <div class="assistant-avatar-icon" style="background:#0F172A;color:#FFC700;font-size:18px;">⚡</div>
           <div>
-            <h3 style="margin:0;font-size:15px;font-weight:800;letter-spacing:-0.01em;">Староста Артели (Говорящий Бригадир)</h3>
-            <div style="font-size:11px;color:#A1A1AA;">Живой координатор фермы зверей · знание контекста SQLite и состояния узлов</div>
+            <h3 style="margin:0;font-size:15px;font-weight:700;color:#0F172A;">AI Шеф-редактор конвейера</h3>
+            <div style="font-size:11px;color:#64748B;">Интеллектуальный координатор редакции · контекст SQLite и состояние узлов</div>
           </div>
         </div>
         <div style="display:flex;gap:8px;align-items:center;">
-          <button class="btn btn--xs" id="btnToggleVoice" type="button" onclick="toggleSpeech()" style="background:#27272A;color:#FFC700;border:1px solid #FFC700;">
-            🔇 Голос Артели: ВЫКЛ
+          <button class="btn btn--xs" id="btnToggleVoice" type="button" onclick="toggleSpeech()" style="background:#0F172A;color:#FFC700;border:1px solid #334155;">
+            🔇 Голос редактора: ВЫКЛ
           </button>
           <button class="btn btn--xs btn--primary" type="button" onclick="promptFullPipelineRun()">
             ⚡ Полный цикл для темы (#ID)
@@ -690,47 +711,47 @@
         </div>
       </div>
 
-      <!-- Облако ответа Старосты -->
+      <!-- Облако ответа Шеф-редактора -->
       <div class="assistant-reply-bubble" id="assistantReplyBubble">
-        Приветствую на ферме зверей-мастеров! Я слежу за работой каждого верстака в реальном времени. Спросите меня внизу или кликните быстрый вопрос, и я покажу, кто сейчас занят и что делать дальше.
+        Конвейер автономных агентов готов к работе. Я отслеживаю статус каждого производственного этапа в реальном времени. Выберите действие или введите команду ниже.
       </div>
 
       <!-- Быстрые вопросы-чипы -->
       <div class="assistant-chips">
-        <button class="assistant-chip-btn" type="button" onclick="askAssistant('На чем мы остановились?')">📍 На чем мы остановились?</button>
-        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Что уже сделали?')">✅ Что уже сделали?</button>
-        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Что нужно сделать дальше?')">🚀 Что нужно сделать дальше?</button>
-        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Кто из зверей сейчас занят?')">🐾 Кто из мастеров на связи?</button>
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('На чем мы остановились?')">📍 Текущий статус задач</button>
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Что уже сделали?')">✅ Готовые материалы</button>
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Что нужно сделать дальше?')">🚀 Следующие шаги</button>
+        <button class="assistant-chip-btn" type="button" onclick="askAssistant('Кто из мастеров на связи?')">🛡️ Статус агентов</button>
       </div>
 
       <!-- Поле ввода для свободного диалога -->
       <div class="assistant-input-row">
-        <input type="text" class="assistant-input" id="assistantInput" placeholder="Спросить Бригадира (напр. 'какой статус у темы #15' или 'что с картинками')..." onkeydown="if(event.key==='Enter') askAssistant()">
-        <button class="btn btn--primary" type="button" onclick="askAssistant()" style="padding:0 18px;">Спросить</button>
+        <input type="text" class="assistant-input" id="assistantInput" placeholder="Команда шеф-редактору (напр. 'какой статус у темы #15' или 'запустить скоринг')..." onkeydown="if(event.key==='Enter') askAssistant()">
+        <button class="btn btn--primary" type="button" onclick="askAssistant()" style="padding:0 18px;">Выполнить</button>
         <div id="assistantActionBox" style="display:inline-flex;"></div>
       </div>
     </div>
 
-    <!-- Верстаки Артели (Craftsmen Workshop Grid) -->
+    <!-- Верстаки конвейера (Agent Cards Grid) -->
     <div class="craftsmen-grid" id="craftsmenGrid">
 
-      <!-- Мастер 1: Бобёр-Конструктор (Бриф и ГОСТ) -->
+      <!-- Этап 1: Исследователь стандартов & LSI -->
       <div class="craftsman-card" id="card-craftsman-researcher">
         <div class="craftsman-header">
           <div class="craftsman-avatar-box">
-            <div class="craftsman-icon" title="Бобёр-Конструктор">🦫</div>
+            <div class="craftsman-icon" title="01. Исследователь стандартов">🔍</div>
             <div>
-              <h3 class="craftsman-title">Бобёр-Конструктор</h3>
-              <div class="craftsman-role">01-researcher · Бриф & LSI</div>
+              <h3 class="craftsman-title">01. Исследователь стандартов</h3>
+              <div class="craftsman-role">01-researcher · Бриф, ГОСТ & LSI</div>
             </div>
           </div>
           <span class="prio-pill prio-pill--cold">0 ₽ · Edge RAG</span>
         </div>
         <div class="craftsman-desc">
-          Возводит плотину стандартов: парсит интент новичка, формулирует LSI-ядро, сверяет ГОСТ Р МЭК 61191 / IPC-A-610H и закладывает 4–6 вопросов для FAQ.
+          Парсит интент радиомонтажника, формирует семантическое LSI-ядро, сверяет ГОСТ Р МЭК 61191-1 / IPC-A-610H и закладывает 4 обязательных вопроса FAQ.
         </div>
         <div class="craftsman-controls">
-          <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:3px;">МОДЕЛЬ МАСТЕРА (HOT-SWAP):</label>
+          <label style="font-size:10px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">МОДЕЛЬ ЭТАПА (HOT-SWAP):</label>
           <select class="craftsman-model-select" id="modelSelect-researcher">
             <option value="triad:node-2">NODE-2: LFM2.5-8B + SQLite FTS5 (0 ₽)</option>
             <option value="omniroute:auto">OmniRoute: Auto / Reasoning</option>
@@ -740,81 +761,146 @@
         </div>
       </div>
 
-      <!-- Мастер 2: Кот-Паяльщик Practico 1 (Ведущий инженер) -->
-      <div class="craftsman-card" id="card-craftsman-writer" style="border:2px solid var(--border);">
-        <!-- SVG анимация тонкого паяльного дымка -->
-        <svg class="solder-smoke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-          <path d="M12 22 C10 18, 14 14, 12 10 C10 6, 14 2, 12 1" stroke="#FFC700" stroke-linecap="round"/>
-        </svg>
+      <!-- Этап 2: Инженерный фактчекер & SERP -->
+      <div class="craftsman-card" id="card-craftsman-analyzer">
         <div class="craftsman-header">
           <div class="craftsman-avatar-box">
-            <div class="craftsman-icon" title="Кот-Паяльщик Practico 1" style="background:#FFF7ED;border-color:#EA580C;">🐱</div>
+            <div class="craftsman-icon" title="02. Инженерный фактчекер">🔬</div>
             <div>
-              <h3 class="craftsman-title">Кот-Паяльщик (Practico 1)</h3>
-              <div class="craftsman-role">02-writer · Инженер-диагност</div>
+              <h3 class="craftsman-title">02. Инженерный фактчекер</h3>
+              <div class="craftsman-role">00-research · Физика сплавов & SERP</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--hot">Реестр сплавов</span>
+        </div>
+        <div class="craftsman-desc">
+          Сверяет температуры солидус/ликвидус по materials-registry.php, анализирует топ-10 конкурентов SERP, выявляет калькуляторы и формулы припоя.
+        </div>
+        <div class="craftsman-controls">
+          <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
+            Движок: HTML/LSI Parser · Perplexity Sonar
+          </div>
+          <button class="btn btn--primary" style="width:100%;" onclick="runAgent('bot-analyzer')">▶ Анализ SERP & Фактов</button>
+        </div>
+      </div>
+
+      <!-- Этап 3: Архитектор структуры (ТЗ) -->
+      <div class="craftsman-card" id="card-craftsman-outliner">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="03. Архитектор структуры">📐</div>
+            <div>
+              <h3 class="craftsman-title">03. Архитектор структуры</h3>
+              <div class="craftsman-role">03-outliner · Answer-First Каркас</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--cold">H2/H3 Сетка</span>
+        </div>
+        <div class="craftsman-desc">
+          Формирует логический скелет статьи: блок прямого ответа (Answer-First ≤ 40 слов), иерархию подзаголовков, таблицы флюсов и чек-листы безопасности.
+        </div>
+        <div class="craftsman-controls">
+          <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
+            Движок: Smart Outliner v1.1
+          </div>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('01-researcher')">▶ Создать структуру (#ID)</button>
+        </div>
+      </div>
+
+      <!-- Этап 4: Ведущий автор Practico 1 (Инженер) -->
+      <div class="craftsman-card" id="card-craftsman-writer">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="04. Ведущий автор Practico 1">⚡</div>
+            <div>
+              <h3 class="craftsman-title">04. Автор-инженер (Practico 1)</h3>
+              <div class="craftsman-role">02-writer · Ведущий инженер-диагност</div>
             </div>
           </div>
           <span class="prio-pill prio-pill--hot" id="badgeWriter1Model">Triad / Claude</span>
         </div>
         <div class="craftsman-desc">
-          Голос сервисного инженера с осциллографом: строгая триада «факт → физика → последствие», Answer First ≤ 40 слов, тонкая ирония над мифами и чистая физика пайки.
+          Строгая инженерная триада «факт → физика шва → ошибка монтажника». Практика пайки T12/900M, реболлинг BGA, температурные коридоры и флюсы.
         </div>
         <div class="craftsman-controls">
-          <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:3px;">МОДЕЛЬ МАСТЕРА (HOT-SWAP):</label>
+          <label style="font-size:10px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">МОДЕЛЬ ЭТАПА (HOT-SWAP):</label>
           <select class="craftsman-model-select" id="modelSelect-writer1" onchange="updateCraftsmanModel('writer1', this.value)">
-            <option value="triad">🐺 Triad-Omni: Qwen3.5-9B (Node-1, 0 ₽)</option>
-            <option value="omniroute">🌐 OmniRoute: DeepSeek-R1 / Auto</option>
-            <option value="claude">🟣 Claude Sonnet 4.6 (Antigravity)</option>
-            <option value="deepseek">🔵 DeepSeek Chat (api.deepseek.com)</option>
-            <option value="yandex">🟡 YandexGPT Pro 32k</option>
+            <option value="triad">Triad-Omni: Qwen3.5-9B (Node-1, 0 ₽)</option>
+            <option value="omniroute">OmniRoute: DeepSeek-R1 / Auto</option>
+            <option value="claude">Claude Sonnet 4.6 (Antigravity)</option>
+            <option value="deepseek">DeepSeek Chat (api.deepseek.com)</option>
+            <option value="yandex">YandexGPT Pro 32k</option>
           </select>
-          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('02-writer')">▶ Написать статью (Practico 1)</button>
+          <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('02-writer')">▶ Написать (Practico 1)</button>
         </div>
       </div>
 
-      <!-- Мастер 3: Лис-Прагматик Practico 2 (Голос заказчика) -->
-      <div class="craftsman-card" id="card-craftsman-writer2" style="border:2px solid var(--border);background:#18181B;color:#FFF;">
+      <!-- Этап 5: Автор Practico 2 (Бизнес и Сроки) -->
+      <div class="craftsman-card" id="card-craftsman-writer2">
         <div class="craftsman-header">
           <div class="craftsman-avatar-box">
-            <div class="craftsman-icon" title="Лис-Прагматик Practico 2" style="background:#27272A;border-color:#52525B;">🦊</div>
+            <div class="craftsman-icon" title="05. Автор-прагматик Practico 2">💼</div>
             <div>
-              <h3 class="craftsman-title" style="color:#FFC700;">Лис-Прагматик (Practico 2)</h3>
-              <div class="craftsman-role" style="color:#A1A1AA;">02-writer-2 · Голос заказчика</div>
+              <h3 class="craftsman-title">05. Автор-прагматик (Practico 2)</h3>
+              <div class="craftsman-role">02-writer-2 · Экономика & Смета</div>
             </div>
           </div>
           <span class="prio-pill prio-pill--warm">Бизнес & Сроки</span>
         </div>
-        <div class="craftsman-desc" style="color:#D4D4D8;">
-          Владелец сервисного бизнеса: деньги и сроки в каждом абзаце, «что купить / где разведут», окупаемость паяльной станции, без лишних академических лекций.
+        <div class="craftsman-desc">
+          Голос владельца мастерской: расчёт себестоимости одного паяного соединения, сравнение станций, экономика расходников («почему флюс за 300 ₽ бережёт плату за 15 000 ₽»).
         </div>
-        <div class="craftsman-controls" style="border-color:#3F3F46;">
-          <label style="font-size:10px;font-weight:800;color:#A1A1AA;display:block;margin-bottom:3px;">МОДЕЛЬ МАСТЕРА (HOT-SWAP):</label>
-          <select class="craftsman-model-select" id="modelSelect-writer2" style="background:#27272A;color:#FFF;border-color:#52525B;">
-            <option value="triad">🐺 Triad-Omni: Qwen3.5-9B (0 ₽)</option>
-            <option value="omniroute">🌐 OmniRoute: Gemini / Claude</option>
-            <option value="claude">🟣 Claude Sonnet 4.6</option>
+        <div class="craftsman-controls">
+          <label style="font-size:10px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">МОДЕЛЬ ЭТАПА (HOT-SWAP):</label>
+          <select class="craftsman-model-select" id="modelSelect-writer2">
+            <option value="triad">Triad-Omni: Qwen3.5-9B (0 ₽)</option>
+            <option value="omniroute">OmniRoute: Gemini / Claude</option>
+            <option value="claude">Claude Sonnet 4.6</option>
           </select>
           <button class="btn btn--primary" style="width:100%;" onclick="promptAgentTarget('02-writer-2')">▶ Написать (Practico 2)</button>
         </div>
       </div>
 
-      <!-- Мастер 4: Филин-Ревизор (ОТК и Фактчек) -->
-      <div class="craftsman-card" id="card-craftsman-reviewer" style="border:2px solid var(--border);">
+      <!-- Этап 6: Очеловечивание и Slop-контроль -->
+      <div class="craftsman-card" id="card-craftsman-humanizer">
         <div class="craftsman-header">
           <div class="craftsman-avatar-box">
-            <div class="craftsman-icon" title="Филин-Ревизор ОТК">🦉</div>
+            <div class="craftsman-icon" title="06. Очеловечивание и стиль">✨</div>
             <div>
-              <h3 class="craftsman-title">Филин-Ревизор [ОТК-2026]</h3>
-              <div class="craftsman-role">03-reviewer · Фактчек и Контроль</div>
+              <h3 class="craftsman-title">06. Очеловечивание и стиль</h3>
+              <div class="craftsman-role">05-humanizer · Anti-Slop Editor</div>
             </div>
           </div>
-          <span class="prio-pill prio-pill--warm">Claude Opus / DeepSeek</span>
+          <span class="prio-pill prio-pill--warm">Живой язык</span>
         </div>
         <div class="craftsman-desc">
-          Строгий контролер со штампом [ОТК]: сверяет сплавы по materials-registry.php, инспектирует температуры, ТБ, отлавливает пустой ИИ-слоп и пакует JSON v1.1.
+          Вычищает 50+ нейросетевых штампов («в современном мире», «погрузимся»), настраивает естественный темпоритм речи и проверяет соответствие авторскому голосу.
         </div>
         <div class="craftsman-controls">
-          <label style="font-size:10px;font-weight:800;color:var(--muted);display:block;margin-bottom:3px;">МОДЕЛЬ РЕВИЗОРА:</label>
+          <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
+            Движок: SlopMonster Filter · Deslop AST
+          </div>
+          <button class="btn btn--primary" style="width:100%;" onclick="switchTab('humanizer')">▶ Открыть студию стиля</button>
+        </div>
+      </div>
+
+      <!-- Этап 7: Инженерный ОТК-контроль -->
+      <div class="craftsman-card" id="card-craftsman-reviewer">
+        <div class="craftsman-header">
+          <div class="craftsman-avatar-box">
+            <div class="craftsman-icon" title="07. Инженерный ОТК-контроль">🛡️</div>
+            <div>
+              <h3 class="craftsman-title">07. Инженерный ОТК-контроль</h3>
+              <div class="craftsman-role">03-reviewer · Фактчек и Приемка</div>
+            </div>
+          </div>
+          <span class="prio-pill prio-pill--warm">Штамп [ОТК-2026]</span>
+        </div>
+        <div class="craftsman-desc">
+          Строгий входной контроль: сверяет сплавы по materials-registry.php, инспектирует температуры, вентиляцию, ТБ и пакует валидный контракт публикации v1.1.
+        </div>
+        <div class="craftsman-controls">
+          <label style="font-size:10px;font-weight:700;color:var(--muted);display:block;margin-bottom:4px;">МОДЕЛЬ РЕВИЗОРА:</label>
           <select class="craftsman-model-select" id="modelSelect-reviewer">
             <option value="claude-opus">Claude Opus 4.6 (Deep Reasoning)</option>
             <option value="omniroute-r1">OmniRoute: DeepSeek-R1 Full</option>
@@ -824,20 +910,20 @@
         </div>
       </div>
 
-      <!-- Мастер 5: Дятел-Метролог (Скорер 0–100) -->
+      <!-- Этап 8: Метролог (Математический скоринг 0–100) -->
       <div class="craftsman-card" id="card-craftsman-scorer">
         <div class="craftsman-header">
           <div class="craftsman-avatar-box">
-            <div class="craftsman-icon" title="Дятел-Метролог">🪵</div>
+            <div class="craftsman-icon" title="08. Метролог (Скоринг)">📊</div>
             <div>
-              <h3 class="craftsman-title">Дятел-Метролог</h3>
-              <div class="craftsman-role">04-scorer · Скоринг 0–100</div>
+              <h3 class="craftsman-title">08. Метролог (Скоринг)</h3>
+              <div class="craftsman-role">04-scorer · AST-Скоринг 0–100</div>
             </div>
           </div>
-          <span class="prio-pill prio-pill--cold">0 ₽ · Чистая математика</span>
+          <span class="prio-pill prio-pill--cold">0 токенов · 100 баллов</span>
         </div>
         <div class="craftsman-desc">
-          Методично выстукивает плату: строгий математический расчёт 100 баллов по 6 объективным блокам (Факты, Интент, Голос, SEO, Ссылки, ИИ-слоп) без эмоций.
+          Математический расчёт 100 баллов по 6 объективным блокам (Факты, Интент, Голос, SEO, Ссылки, Анти-слоп). Допуск к публикации выдаётся при балле ≥ 80.
         </div>
         <div class="craftsman-controls">
           <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
@@ -847,43 +933,20 @@
         </div>
       </div>
 
-      <!-- Мастер 6: Сорока-Разведчица (Анализ конкурентов и фишек) -->
-      <div class="craftsman-card" id="card-craftsman-analyzer">
+      <!-- Этап 9: Технический иллюстратор & Верстка -->
+      <div class="craftsman-card" id="card-craftsman-illustrator">
         <div class="craftsman-header">
           <div class="craftsman-avatar-box">
-            <div class="craftsman-icon" title="Сорока-Разведчица">🪶</div>
+            <div class="craftsman-icon" title="09. Технический иллюстратор">🎨</div>
             <div>
-              <h3 class="craftsman-title">Сорока-Разведчица</h3>
-              <div class="craftsman-role">bot-analyzer & 00-research</div>
+              <h3 class="craftsman-title">09. Технический иллюстратор</h3>
+              <div class="craftsman-role">05-illustrator · SVG-схемы & Паспорт</div>
             </div>
           </div>
-          <span class="prio-pill prio-pill--hot">Фишки & SEO</span>
+          <span class="prio-pill prio-pill--warm">SVG / W3C 1.1</span>
         </div>
         <div class="craftsman-desc">
-          Тащит в гнездо лучшие фичи: парсит сайты конкурентов, находит калькуляторы, таблицы, схемы, собирает SEO-хвосты и считает силу доменов.
-        </div>
-        <div class="craftsman-controls">
-          <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
-            Движок: HTML/LSI Parser · Perplexity Sonar
-          </div>
-          <button class="btn btn--primary" style="width:100%;" onclick="runAgent('bot-analyzer')">▶ Анализировать фишки</button>
-        </div>
-      </div>
-
-      <!-- Мастер 7: Барсук-Иллюстратор (05-illustrator) -->
-      <div class="craftsman-card" id="card-craftsman-illustrator" style="border:2px solid var(--border);">
-        <div class="craftsman-header">
-          <div class="craftsman-avatar-box">
-            <div class="craftsman-icon" title="Барсук-Иллюстратор" style="background:#FEF3C7;border-color:#D97706;">🦡</div>
-            <div>
-              <h3 class="craftsman-title">Барсук-Иллюстратор</h3>
-              <div class="craftsman-role">05-illustrator · SVG-схемы & Hero</div>
-            </div>
-          </div>
-          <span class="prio-pill prio-pill--warm">SVG / Flux / Imagen</span>
-        </div>
-        <div class="craftsman-desc">
-          Чертит точные векторные SVG-термопрофили оплавления по реестру сплавов, формирует кибердек-промпты для Hero-обложек (#FFC700) и встраивает блок media в контракт статьи.
+          Генерирует точные векторные SVG-термопрофили оплавления по реестру сплавов, формирует кибердек-обложки Hero и внедряет блок media в контракт статьи.
         </div>
         <div class="craftsman-controls">
           <div style="font-family:var(--font-mono, monospace);font-size:11px;color:var(--muted);margin-bottom:8px;">
@@ -896,7 +959,7 @@
     </div>
 
     <h3 style="margin:16px 0 6px;font-size:13px;font-weight:800;letter-spacing:-0.01em;">Терминальный лог конвейера и осциллограф токенов:</h3>
-    <div class="log-console" id="agentConsole">> Готов к выполнению задач. Выберите мастера артели выше.</div>
+    <div class="log-console" id="agentConsole">> Конвейер готов к работе. Выберите этап производства контента выше.</div>
   </section>
 
   <!-- TAB 6: BACKUPS -->
@@ -926,124 +989,235 @@
     </div>
   </section>
 
-  <section class="tab-view" id="view-humanizer">
-    <div class="saas-panel-card">
-<div style="border-bottom:2px solid #111111;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+  <!-- TAB 7: TRIAD-OMNI MODELS & EDGE CLUSTER -->
+  <section class="tab-view" id="view-models">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
       <div>
-        <h2 style="margin:0;font-size:18px;font-weight:800;color:#111111;display:flex;align-items:center;gap:8px;">
-          <span>✍️ Humanizer: Аудит естественности и отсев AI-штампов</span>
-          <span id="humanizerScoreBadge" style="font-size:12px;padding:3px 8px;border-radius:4px;background:#FFC700;color:#111111;border:1.5px solid #111111;font-weight:bold;">Ожидание текста</span>
+        <h2 style="margin:0;font-size:17px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;">
+          <span>📱 Аппаратный кластер Triad-Omni Edge AI & Маршрутизация моделей</span>
         </h2>
-        <div style="font-size:12.5px;color:#4B5563;margin-top:4px;">
-          Проверка на 100+ нейросетевых клише (ChatGPT / Claude / DeepSeek), вариативность длины предложений (Burstiness) и женский авторский стиль Точки Плавления.
+        <div style="font-size:12px;color:var(--muted);margin-top:3px;">
+          Гетерогенный кластер мобильных ARM-узлов (Xiaomi Mi 10T, OnePlus Nord N10, Redmi Note 4) с прямым питанием 4.18V и облачный шлюз OmniRoute (754 модели).
         </div>
       </div>
       <div style="display:flex;gap:8px;">
-        <button class="btn btn--xs" onclick="pasteCurrentArticleIntoHumanizer()" style="background:#FFFFFF;color:#0284C7;border:1.5px solid #111111;box-shadow:2px 2px 0px #111111;font-weight:bold;">📥 Вставить текущую статью</button>
+        <button class="btn btn--sm btn--primary" onclick="loadModelsConfig()">🔄 Обновить статус моделей</button>
+        <button class="btn btn--sm" onclick="refreshClusterTelemetry()" style="border-color:#CBD5E1;border-radius:6px;">⚡ Пинг узлов</button>
       </div>
     </div>
 
-    <!-- Текстовое поле -->
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
-      <textarea id="humanizerInput" placeholder="Вставьте текст статьи, черновик или абзацы для проверки на AI-воду и очеловечивания..." style="width:100%;height:180px;background:#F9FAFB;border:1.5px solid #111111;color:#111111;padding:12px;border-radius:6px;font-family:inherit;font-size:13.5px;line-height:1.6;resize:vertical;"></textarea>
-      
-      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-        <div id="humanizerCharCount" style="font-size:12px;color:#4B5563;font-family:monospace;font-weight:bold;">Символов: 0 | Слов: 0</div>
+    <!-- Карточки аппаратных узлов кластера -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));gap:12px;margin-bottom:18px;">
+      <!-- Узел 1: Mi 10T -->
+      <div class="saas-panel-card" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
+            <span>🧠 NODE-1 (Главный мозг)</span>
+          </strong>
+          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :8080 ОНЛАЙН</span>
+        </div>
+        <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
+          <strong>Xiaomi Mi 10T 5G</strong> (Snapdragon 865, 8GB LPDDR5)<br>
+          Модель: <code>Qwen3.5-9B-UD-Q3_K_XL</code><br>
+          Ядра Kryo 585 (4-7), батч <code>-ub 64</code>, KV <code>q8_0</code><br>
+          Питание: <strong>Bypass 4.18V (0 мА)</strong>
+        </div>
+        <div style="font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;">
+          ✓ 0 ₽ за токен · 100% приватность
+        </div>
+      </div>
+
+      <!-- Узел 2: Nord N10 -->
+      <div class="saas-panel-card" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
+            <span>⚡ NODE-2 (Рефлексы & RAG)</span>
+          </strong>
+          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :8081 / :8082</span>
+        </div>
+        <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
+          <strong>OnePlus Nord N10 5G</strong> (Snapdragon 690, 6GB)<br>
+          Модели: <code>LFM2.5-8B</code> + <code>BGE-M3</code><br>
+          База знаний: SQLite FTS5 RAG (~4 мс)<br>
+          Защита батареи: <strong>Battery Guard 24/7</strong>
+        </div>
+        <div style="font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;">
+          ✓ Семантический поиск и факты офлайн
+        </div>
+      </div>
+
+      <!-- Узел 3: Redmi Note 4 -->
+      <div class="saas-panel-card" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
+            <span>🛡️ NODE-3 (Шлюз телеметрии)</span>
+          </strong>
+          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :8000 ОНЛАЙН</span>
+        </div>
+        <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
+          <strong>Xiaomi Redmi Note 4</strong> (Snapdragon 625)<br>
+          Сервис: <strong>Fast-Path Router v4.9</strong><br>
+          Regex-команды за 0.02 мс без расхода токенов<br>
+          Питание: <strong>DC-DC 4.18V без батареи</strong>
+        </div>
+        <div style="font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;">
+          ✓ Аппаратный роутинг и хаб телеметрии
+        </div>
+      </div>
+
+      <!-- Резерв: OmniRoute -->
+      <div class="saas-panel-card" style="padding:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
+            <span>🌐 OmniRoute Gateway</span>
+          </strong>
+          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :20128 АКТИВЕН</span>
+        </div>
+        <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
+          <strong>Каскадный шлюз 754 моделей</strong><br>
+          Резерв: Claude Sonnet 4.6, DeepSeek-R1, Gemini 3.7<br>
+          Каскад: автоматический Hot-Swap при перегрузке<br>
+          Доступность: <strong>Без VPN / Бесшовный прокси</strong>
+        </div>
+        <div style="font-size:11px;color:#1D4ED8;background:#EFF6FF;padding:4px 8px;border-radius:4px;border:1px solid #BFDBFE;">
+          ✓ Надежный резерв для сложных задач
+        </div>
+      </div>
+    </div>
+
+    <!-- Вкладки назначения моделей для этапов производства -->
+    <div class="saas-panel-card" style="padding:18px 20px;margin-bottom:18px;">
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;color:var(--ink);">Назначение приоритетных моделей по этапам (1 Primary + 4 Alternates)</h3>
+      <div id="modelsAnimalTabsContainer" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
+      <div id="modelsAnimalConfigContent"></div>
+    </div>
+
+    <!-- Панель настройки API-ключей -->
+    <div class="saas-panel-card" style="padding:18px 20px;">
+      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;color:var(--ink);">Настройка ключей внешних провайдеров (Fallback Providers)</h3>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Ключи сохраняются локально в зашифрованном конфиге и используются только при недоступности локального кластера.</div>
+      <div id="modelsProviderKeysContainer" style="display:flex;flex-direction:column;gap:8px;"></div>
+    </div>
+  </section>
+
+  <section class="tab-view" id="view-humanizer">
+    <div class="saas-panel-card" style="padding:18px 20px;">
+      <div style="border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h2 style="margin:0;font-size:16px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;">
+            <span>✍️ Humanizer: Аудит естественности и отсев AI-штампов</span>
+            <span id="humanizerScoreBadge" style="font-size:11px;padding:3px 8px;border-radius:6px;background:#FEF3C7;color:#92400E;border:1px solid #FCD34D;font-weight:600;">Ожидание текста</span>
+          </h2>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px;">
+            Проверка на 100+ нейросетевых клише (ChatGPT / Claude / DeepSeek), вариативность длины предложений (Burstiness) и женский авторский стиль Точки Плавления.
+          </div>
+        </div>
         <div style="display:flex;gap:8px;">
-          <button class="btn btn--sm" onclick="cleanTextFromSlopUI()" style="background:#FFFFFF;color:#D97706;border:1.5px solid #111111;box-shadow:2px 2px 0px #111111;font-weight:bold;">🧹 Удалить вводные штампы</button>
-          <button class="btn btn--sm btn--primary" id="btnRunHumanizer" onclick="runHumanizerAudit()" style="background:#FFC700;color:#111111;border:1.5px solid #111111;box-shadow:2px 2px 0px #111111;font-weight:800;">🚀 Проверить [Humanizer]</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Результаты аудита -->
-    <div id="humanizerResultsArea" style="flex:1;overflow-y:auto;display:none;flex-direction:column;gap:12px;padding-right:6px;">
-      <!-- Метрики -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;text-align:center;box-shadow:2px 2px 0px #111111;">
-          <div style="font-size:11px;color:#4B5563;font-weight:bold;">СКОР ЕСТЕСТВЕННОСТИ</div>
-          <div id="mHumanScore" style="font-size:26px;font-weight:900;color:#059669;margin:4px 0;">--/100</div>
-          <div id="mHumanVerdict" style="font-size:11px;color:#374151;font-weight:500;">-</div>
-        </div>
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;text-align:center;box-shadow:2px 2px 0px #111111;">
-          <div style="font-size:11px;color:#4B5563;font-weight:bold;">РИТМИКА (BURSTINESS CV)</div>
-          <div id="mHumanRhythm" style="font-size:26px;font-weight:900;color:#0284C7;margin:4px 0;">--</div>
-          <div id="mHumanRhythmDesc" style="font-size:11px;color:#374151;font-weight:500;">-</div>
-        </div>
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;text-align:center;box-shadow:2px 2px 0px #111111;">
-          <div style="font-size:11px;color:#4B5563;font-weight:bold;">AI-КЛИШЕ И ШТАМПЫ</div>
-          <div id="mHumanCliches" style="font-size:26px;font-weight:900;color:#DC2626;margin:4px 0;">0</div>
-          <div style="font-size:11px;color:#374151;font-weight:500;">Найдено шаблонов</div>
-        </div>
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;text-align:center;box-shadow:2px 2px 0px #111111;">
-          <div style="font-size:11px;color:#4B5563;font-weight:bold;">МАРКЕРЫ ЖИВОЙ РЕЧИ</div>
-          <div id="mHumanMarkers" style="font-size:26px;font-weight:900;color:#D97706;margin:4px 0;">0</div>
-          <div style="font-size:11px;color:#374151;font-weight:500;">Инженерные обороты</div>
+          <button class="btn btn--xs" onclick="pasteCurrentArticleIntoHumanizer()" style="border-color:#CBD5E1;border-radius:6px;">📥 Вставить текущую статью</button>
         </div>
       </div>
 
-      <!-- Детализация клише и рекомендации -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;box-shadow:2px 2px 0px #111111;">
-          <strong style="font-size:12px;color:#DC2626;display:block;margin-bottom:8px;">⚠️ Обнаруженные нейросетевые штампы:</strong>
-          <div id="humanizerClicheList" style="font-size:12px;color:#111111;display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;">
-            Нет обнаруженных клише.
-          </div>
-        </div>
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;box-shadow:2px 2px 0px #111111;">
-          <strong style="font-size:12px;color:#059669;display:block;margin-bottom:8px;">💡 Рекомендации по очеловечиванию:</strong>
-          <div id="humanizerRecList" style="font-size:12px;color:#111111;display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;">
-            -
+      <!-- Текстовое поле -->
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;">
+        <textarea id="humanizerInput" placeholder="Вставьте текст статьи, черновик или абзацы для проверки на AI-воду и очеловечивания..." style="width:100%;height:180px;background:#FFFFFF;border:1px solid var(--border);color:var(--ink);padding:12px;border-radius:8px;font-family:inherit;font-size:13px;line-height:1.6;resize:vertical;"></textarea>
+        
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+          <div id="humanizerCharCount" style="font-size:11.5px;color:var(--muted);font-family:var(--mono);font-weight:600;">Символов: 0 | Слов: 0</div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn--sm" onclick="cleanTextFromSlopUI()" style="border-color:#CBD5E1;border-radius:6px;">🧹 Удалить вводные штампы</button>
+            <button class="btn btn--sm btn--primary" id="btnRunHumanizer" onclick="runHumanizerAudit()">🚀 Проверить [Humanizer]</button>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- Результаты аудита -->
+      <div id="humanizerResultsArea" style="flex:1;overflow-y:auto;display:none;flex-direction:column;gap:12px;padding-right:6px;">
+        <!-- Метрики -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+            <div style="font-size:11px;color:var(--muted);font-weight:600;">СКОР ЕСТЕСТВЕННОСТИ</div>
+            <div id="mHumanScore" style="font-size:24px;font-weight:800;color:#059669;margin:4px 0;">--/100</div>
+            <div id="mHumanVerdict" style="font-size:11.5px;color:var(--ink-secondary);font-weight:500;">-</div>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+            <div style="font-size:11px;color:var(--muted);font-weight:600;">РИТМИКА (BURSTINESS CV)</div>
+            <div id="mHumanRhythm" style="font-size:24px;font-weight:800;color:#0284C7;margin:4px 0;">--</div>
+            <div id="mHumanRhythmDesc" style="font-size:11.5px;color:var(--ink-secondary);font-weight:500;">-</div>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+            <div style="font-size:11px;color:var(--muted);font-weight:600;">AI-КЛИШЕ И ШТАМПЫ</div>
+            <div id="mHumanCliches" style="font-size:24px;font-weight:800;color:#DC2626;margin:4px 0;">0</div>
+            <div style="font-size:11.5px;color:var(--ink-secondary);font-weight:500;">Найдено шаблонов</div>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center;box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+            <div style="font-size:11px;color:var(--muted);font-weight:600;">МАРКЕРЫ ЖИВОЙ РЕЧИ</div>
+            <div id="mHumanMarkers" style="font-size:24px;font-weight:800;color:#D97706;margin:4px 0;">0</div>
+            <div style="font-size:11.5px;color:var(--ink-secondary);font-weight:500;">Инженерные обороты</div>
+          </div>
+        </div>
+
+        <!-- Детализация клише и рекомендации -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div style="background:#FFFFFF;border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+            <strong style="font-size:12px;color:#DC2626;display:block;margin-bottom:8px;">⚠️ Обнаруженные нейросетевые штампы:</strong>
+            <div id="humanizerClicheList" style="font-size:12px;color:var(--ink);display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto;">
+              Нет обнаруженных клише.
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid var(--border);border-radius:8px;padding:14px;box-shadow:0 1px 3px rgba(15,23,42,0.04);">
+            <strong style="font-size:12px;color:#059669;display:block;margin-bottom:8px;">💡 Рекомендации по очеловечиванию:</strong>
+            <div id="humanizerRecList" style="font-size:12px;color:var(--ink);display:flex;flex-direction:column;gap:6px;max-height:160px;overflow-y:auto;">
+              -
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <section class="tab-view" id="view-radar">
     <div class="saas-panel-card">
-<div style="border-bottom:2px solid #111111;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
-      <div>
-        <h2 style="margin:0;font-size:18px;font-weight:800;color:#111111;display:flex;align-items:center;gap:8px;">
-          <span>🎯 Радар конкурентов & Экстрактор фишек (Бесплатный аналог Firecrawl)</span>
-        </h2>
-        <div style="font-size:12.5px;color:#4B5563;margin-top:4px;">
-          Автономный парсер выдачи (0₽, без API-ключей): извлечение структуры H1-H3, таблиц, калькуляторов и киллер-фич ниши для Сороки Клары.
+      <div style="border-bottom:1px solid #E2E8F0;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
+        <div>
+          <h2 style="margin:0;font-size:17px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:8px;">
+            <span>🎯 Радар поисковой выдачи (SERP) & Анализ конкурентов</span>
+          </h2>
+          <div style="font-size:12px;color:#64748B;margin-top:4px;">
+            Автономный парсер выдачи: извлечение структуры H1-H3, таблиц, калькуляторов и ключевых фишек топа для создания превосходящего контента.
+          </div>
         </div>
+        <button class="btn btn--xs" onclick="pasteCurrentTopicIntoRadar()">📥 Вставить тему текущей статьи</button>
       </div>
-      <button class="btn btn--xs" onclick="pasteCurrentTopicIntoRadar()" style="background:#FFFFFF;color:#D97706;border:1.5px solid #111111;box-shadow:2px 2px 0px #111111;font-weight:bold;">📥 Тема текущей статьи</button>
-    </div>
 
-    <!-- Поисковая строка -->
-    <div style="display:flex;gap:8px;margin-bottom:14px;">
-      <input type="text" id="radarQueryInput" placeholder="Введите поисковый запрос (например: «пайка bga флюсом трафарет») или прямой URL..." style="flex:1;background:#F9FAFB;border:1.5px solid #111111;color:#111111;padding:8px 12px;border-radius:6px;font-size:13px;">
-      <button class="btn btn--sm btn--primary" id="btnRunRadar" onclick="runCompetitorRadarFromUI()" style="background:#FFC700;color:#111111;border:1.5px solid #111111;box-shadow:2px 2px 0px #111111;font-weight:800;white-space:nowrap;">🔍 Сканировать [Радар]</button>
-    </div>
-
-    <!-- Результаты сканирования -->
-    <div id="radarResultsArea" style="flex:1;overflow-y:auto;display:none;flex-direction:column;gap:12px;padding-right:6px;">
-      <!-- Сводка ниши -->
-      <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;text-align:center;box-shadow:2px 2px 0px #111111;">
-          <div style="font-size:11px;color:#4B5563;font-weight:bold;">САЙТОВ ПРОАНАЛИЗИРОВАНО</div>
-          <div id="radarCount" style="font-size:24px;font-weight:900;color:#D97706;margin:4px 0;">0</div>
-          <div style="font-size:11px;color:#374151;font-weight:500;">ТОП выдачи</div>
-        </div>
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;text-align:center;box-shadow:2px 2px 0px #111111;">
-          <div style="font-size:11px;color:#4B5563;font-weight:bold;">СРЕДНИЙ ОБЪЕМ КОНКУРЕНТОВ</div>
-          <div id="radarAvgWords" style="font-size:24px;font-weight:900;color:#0284C7;margin:4px 0;">0 сл.</div>
-          <div style="font-size:11px;color:#374151;font-weight:500;">Текст статьи</div>
-        </div>
-        <div style="background:#F9FAFB;border:1.5px solid #111111;border-radius:6px;padding:12px;text-align:center;box-shadow:2px 2px 0px #111111;">
-          <div style="font-size:11px;color:#4B5563;font-weight:bold;">РЕКОМЕНДУЕМЫЙ ОБЪЕМ ДЛЯ НАС</div>
-          <div id="radarTargetWords" style="font-size:24px;font-weight:900;color:#059669;margin:4px 0;">0 сл.</div>
-          <div style="font-size:11px;color:#374151;font-weight:500;">+25% для победы в выдаче</div>
-        </div>
+      <!-- Поисковая строка -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;">
+        <input type="text" id="radarQueryInput" placeholder="Введите поисковый запрос (например: «пайка bga флюсом трафарет») или прямой URL..." style="flex:1;background:#F8FAFC;border:1px solid #CBD5E1;color:#0F172A;padding:8px 12px;border-radius:6px;font-size:12.5px;">
+        <button class="btn btn--sm btn--primary" id="btnRunRadar" onclick="runCompetitorRadarFromUI()" style="white-space:nowrap;">🔍 Сканировать SERP</button>
       </div>
+
+      <!-- Результаты сканирования -->
+      <div id="radarResultsArea" style="flex:1;overflow-y:auto;display:none;flex-direction:column;gap:12px;padding-right:6px;">
+        <!-- Сводка ниши -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));gap:10px;">
+          <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:11px;color:#64748B;font-weight:600;">САЙТОВ ПРОАНАЛИЗИРОВАНО</div>
+            <div id="radarCount" style="font-size:24px;font-weight:800;color:#D97706;margin:4px 0;">0</div>
+            <div style="font-size:11px;color:#475569;">ТОП выдачи</div>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:11px;color:#64748B;font-weight:600;">СРЕДНИЙ ОБЪЕМ КОНКУРЕНТОВ</div>
+            <div id="radarAvgWords" style="font-size:24px;font-weight:800;color:#0284C7;margin:4px 0;">0 сл.</div>
+            <div style="font-size:11px;color:#475569;">Текст статьи</div>
+          </div>
+          <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px;text-align:center;">
+            <div style="font-size:11px;color:#64748B;font-weight:600;">РЕКОМЕНДУЕМЫЙ ОБЪЕМ ДЛЯ НАС</div>
+            <div id="radarTargetWords" style="font-size:24px;font-weight:800;color:#059669;margin:4px 0;">0 сл.</div>
+            <div style="font-size:11px;color:#475569;">+25% для победы в выдаче</div>
+          </div>
+        </div>
 
       <!-- Киллер-рекомендации для Точки Плавления -->
-      <div style="background:#FFFBEB;border:2px solid #B45309;border-radius:6px;padding:14px;box-shadow:2px 2px 0px #B45309;">
+      <div style="background:#FFFDF5;border:1px solid #FDE68A;border-radius:8px;padding:14px;box-shadow:0 1px 3px rgba(245,158,11,0.08);">
         <strong style="font-size:13px;color:#92400E;display:flex;align-items:center;gap:6px;margin-bottom:8px;">
           <span>★ Как Точке Плавления обойти этих конкурентов:</span>
         </strong>
@@ -1073,9 +1247,9 @@
     <!-- Шапка мастера -->
     <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid #27272A;padding-bottom:14px;margin-bottom:16px;flex-wrap:wrap;gap:12px;">
       <div style="display:flex;align-items:center;gap:14px;">
-        <div id="wsModalIcon" style="font-size:36px;width:56px;height:56px;background:#27272A;border-radius:12px;display:flex;align-items:center;justify-content:center;border:2px solid #FFC700;">🦫</div>
+        <div id="wsModalIcon" style="font-size:32px;width:56px;height:56px;background:#27272A;border-radius:12px;display:flex;align-items:center;justify-content:center;border:2px solid #3B82F6;">🔍</div>
         <div>
-          <h2 id="wsModalTitle" style="margin:0;font-size:20px;font-weight:800;color:#FFF;">Бобёр-Конструктор</h2>
+          <h2 id="wsModalTitle" style="margin:0;font-size:20px;font-weight:800;color:#FFF;">01. Исследователь стандартов</h2>
           <div id="wsModalRole" style="font-size:12px;color:#A1A1AA;font-family:monospace;">01-researcher · Бриф ГОСТ Р МЭК 61191-1</div>
         </div>
       </div>
@@ -1261,30 +1435,30 @@
       <h2 id="mTitle" style="margin:6px 0 0;font-size:17px;font-weight:800;line-height:1.3;">Название статьи</h2>
     </div>
 
-    <!-- Вкладки модального окна: Оценка vs Текст статьи vs Бриф для автора vs Паспорт статьи -->
-    <div style="display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:12px;flex-wrap:wrap;">
-      <button class="tab-btn active" id="modalTabBtnScore" onclick="switchModalTab('score')">[ОЦЕНКА 0–100]</button>
-      <button class="tab-btn" id="modalTabBtnText" onclick="switchModalTab('text')">[ТЕКСТ СТАТЬИ] <span class="tab-badge" id="mTextCharsBadge">0 зн.</span></button>
-      <button class="tab-btn" id="modalTabBtnBrief" onclick="switchModalTab('brief')">[БРИФ АВТОРА]</button>
-      <button class="tab-btn" id="modalTabBtnPassport" onclick="switchModalTab('passport')">[ПАСПОРТ v1.1]</button>
+    <!-- Вкладки модального окна инспектора -->
+    <div style="display:flex;gap:4px;border-bottom:1px solid #E2E8F0;margin-bottom:14px;flex-wrap:wrap;">
+      <button class="tab-btn active" id="modalTabBtnScore" onclick="switchModalTab('score')">Оценка качества (0–100)</button>
+      <button class="tab-btn" id="modalTabBtnText" onclick="switchModalTab('text')">Текст статьи <span class="tab-badge" id="mTextCharsBadge">0 зн.</span></button>
+      <button class="tab-btn" id="modalTabBtnBrief" onclick="switchModalTab('brief')">Бриф автора</button>
+      <button class="tab-btn" id="modalTabBtnPassport" onclick="switchModalTab('passport')">Паспорт публикации v1.1</button>
     </div>
 
     <!-- Вкладка 1: Оценка и замечания -->
     <div id="modalPanelScore">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-        <h3 style="margin:0;font-size:13px;font-weight:700;text-transform:uppercase;">Инженерная оценка качества (0–100):</h3>
-        <span id="mTotalScore" style="font-family:var(--mono);font-size:16px;font-weight:800;padding:2px 8px;border:1.5px solid #111;border-radius:var(--radius-sm);">—</span>
+        <h3 style="margin:0;font-size:13px;font-weight:700;color:#0F172A;">Инженерная оценка качества (0–100):</h3>
+        <span id="mTotalScore" style="font-family:var(--mono);font-size:15px;font-weight:700;padding:2px 8px;border:1px solid #CBD5E1;border-radius:6px;">—</span>
       </div>
 
       <div id="mScoreGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px;"></div>
 
-      <div id="mBlockersBox" style="display:none;background:#FEE2E2;border:1.5px solid #B91C1C;border-radius:var(--radius-sm);padding:10px;margin-bottom:10px;">
-        <strong style="color:#B91C1C;font-size:12px;">[БЛОКЕРЫ БЕЗОПАСНОСТИ / ТЕМПЕРАТУР]:</strong>
+      <div id="mBlockersBox" style="display:none;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;padding:10px;margin-bottom:10px;">
+        <strong style="color:#B91C1C;font-size:12px;">Критические блокеры качества и безопасности:</strong>
         <ul id="mBlockersList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#7F1D1D;"></ul>
       </div>
 
-      <div id="mIssuesBox" style="display:none;background:#FEF9C3;border:1.5px solid #A16207;border-radius:var(--radius-sm);padding:10px;margin-bottom:10px;">
-        <strong style="color:#854D0E;font-size:12px;">[ЗАМЕЧАНИЯ К ДОРАБОТКЕ]:</strong>
+      <div id="mIssuesBox" style="display:none;background:#FFFBEB;border:1px solid #FDE68A;border-radius:6px;padding:10px;margin-bottom:10px;">
+        <strong style="color:#B45309;font-size:12px;">Замечания ОТК к доработке:</strong>
         <ul id="mIssuesList" style="margin:4px 0 0;padding-left:18px;font-size:12px;color:#713F12;"></ul>
       </div>
 
@@ -1316,7 +1490,7 @@
           <span id="mAnswerFirstBadge" style="font-family:var(--mono);font-size:11px;padding:2px 8px;border:1.5px solid var(--border);background:#FFF;font-weight:700;">ЛИД: 0/40 СЛОВ</span>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-          <button class="btn btn--xs btn--primary" id="mBtnToggleSplit" type="button" onclick="toggleSplitWorkbench()">[ВЕРСТАК]</button>
+          <button class="btn btn--xs btn--primary" id="mBtnToggleSplit" type="button" onclick="toggleSplitWorkbench()">Верстак</button>
           <select id="mTemplateSelect" style="padding:4px 6px;border:1.5px solid var(--border);font-size:11.5px;background:#FFF;" title="Выбрать инженерный шаблон статьи">
             <option value="">— Инженерный шаблон ▾ —</option>
             <option value="how-to">1. Пошаговая инструкция (How-to)</option>
@@ -1325,24 +1499,24 @@
             <option value="reference">4. Инженерный справочник (Reference)</option>
             <option value="safety">5. Безопасность и организация (Safety)</option>
           </select>
-          <button class="btn btn--xs" type="button" onclick="applySelectedTemplate()">[ШАБЛОН]</button>
-          <button class="btn btn--xs" id="mTextPreviewBtn" onclick="toggleMarkdownPreview()">[ПРЕВЬЮ]</button>
-          <button class="btn btn--sm btn--primary" onclick="saveEditedArticleText()">[СОХРАНИТЬ В БД]</button>
+          <button class="btn btn--xs" type="button" onclick="applySelectedTemplate()">Шаблон</button>
+          <button class="btn btn--xs" id="mTextPreviewBtn" onclick="toggleMarkdownPreview()">Предпросмотр</button>
+          <button class="btn btn--sm btn--primary" onclick="saveEditedArticleText()">Сохранить в БД</button>
           <span id="mAutosaveStatus" style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-left:6px;"></span>
         </div>
       </div>
 
       <!-- Панель быстрых вставок Practico -->
       <div class="practico-toolbar">
-        <span style="font-size:11px;font-weight:800;text-transform:uppercase;color:var(--muted);margin-right:2px;">Вставки Practico:</span>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('master_secret')">[СЕКРЕТ МАСТЕРА]</button>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('temp_table')">[РЕЖИМЫ Т°]</button>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('alloy_compare')">[СРАВНЕНИЕ СПЛАВОВ]</button>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('passport_card')">[ПАСПОРТ ПРОЦЕССА]</button>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('safety_lead')">[ТБ ГОСТ 12.3.040]</button>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('fact_source')">[ИСТОЧНИК ФАКТА]</button>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('sources_block')">[СТАНДАРТЫ ГОСТ/IPC]</button>
-        <button class="practico-btn" type="button" onclick="insertPracticoBlock('faq_block')">[FAQ 4 ВОПРОСА]</button>
+        <span style="font-size:11px;font-weight:600;color:#64748B;margin-right:4px;">Вставки Practico:</span>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('master_secret')">💡 Секрет мастера</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('temp_table')">🌡️ Режимы T°</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('alloy_compare')">⚖️ Сравнение сплавов</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('passport_card')">📋 Паспорт процесса</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('safety_lead')">🛡️ ТБ ГОСТ 12.3.040</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('fact_source')">📎 Источник факта</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('sources_block')">📚 Стандарты ГОСТ/IPC</button>
+        <button class="practico-btn" type="button" onclick="insertPracticoBlock('faq_block')">❓ FAQ (4 вопроса)</button>
       </div>
 
       <!-- Сетка Сплит-Верстака (Редактор + Живой ассистент ГОСТ/SEO) -->
@@ -1355,8 +1529,8 @@
         <!-- Правая колонка ассистента Сплит-Верстака -->
         <div id="mWorkbenchSidebar" style="display:none;background:var(--card);border:1.5px solid var(--border);padding:12px;max-height:560px;overflow-y:auto;">
           <div style="display:flex;gap:4px;border-bottom:1.5px solid var(--border);margin-bottom:10px;">
-            <button class="tab-btn active" id="wbTabGost" type="button" onclick="switchWbTab('gost')" style="font-size:11px;padding:4px 8px;">[ГОСТ / ФИЗИКА]</button>
-            <button class="tab-btn" id="wbTabSerp" type="button" onclick="switchWbTab('serp')" style="font-size:11px;padding:4px 8px;">[SERP И ССЫЛКИ]</button>
+            <button class="tab-btn active" id="wbTabGost" type="button" onclick="switchWbTab('gost')" style="font-size:11px;padding:4px 8px;">ГОСТ и физика</button>
+            <button class="tab-btn" id="wbTabSerp" type="button" onclick="switchWbTab('serp')" style="font-size:11px;padding:4px 8px;">SERP и ссылки</button>
           </div>
 
           <!-- Секция ГОСТ и стандарты -->
