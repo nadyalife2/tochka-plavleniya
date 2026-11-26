@@ -22,63 +22,34 @@
       <div class="saas-sidebar__brand-sub">EDITORIAL SAAS · TRIAD-OMNI</div>
     </div>
 
-    <nav class="saas-nav">
-      <div class="saas-nav-group">Главная</div>
-      <button class="saas-nav-btn tab-btn active" id="tabBtnOverview" onclick="switchTab('overview')">
+    <nav class="saas-nav" id="mainSaasNav">
+      <button class="saas-nav-btn tab-btn active" id="tabBtnToday" onclick="switchTab('today')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        <span>Пульт управления</span>
+        <span>Сегодня</span>
+        <span class="tab-badge" id="bCountToday">0</span>
       </button>
 
-      <div class="saas-nav-group">Производство контента</div>
-      <button class="saas-nav-btn tab-btn" id="tabBtnKanban" onclick="switchTab('kanban')">
+      <button class="saas-nav-btn tab-btn" id="tabBtnTopics" onclick="switchTab('topics')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></svg>
-        <span>Статьи и Канбан</span>
+        <span>Темы</span>
         <span class="tab-badge" id="bCountTopics">0</span>
       </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('agents')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-        <span>Конвейер 9 агентов</span>
-      </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('humanizer')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
-        <span>Очеловечивание и ОТК</span>
-      </button>
 
-      <div class="saas-nav-group">Разведка &amp; SEO</div>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('radar')">
+      <button class="saas-nav-btn tab-btn" id="tabBtnRecon" onclick="switchTab('recon')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-        <span>Радар выдачи (SERP)</span>
-      </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('competitors')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        <span>База конкурентов</span>
-        <span class="tab-badge" id="bCountComps">0</span>
-      </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('gaps')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        <span>Семантические пробелы</span>
-        <span class="tab-badge" id="bCountProposed">0</span>
-      </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('analysis')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        <span>Спрос и Мутаген</span>
-        <span class="tab-badge" id="bCountAnalysis">0</span>
+        <span>Разведка</span>
+        <span class="tab-badge" id="bCountRecon">0</span>
       </button>
 
-      <div class="saas-nav-group">Инфраструктура &amp; Выгрузка</div>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('export')">
+      <button class="saas-nav-btn tab-btn" id="tabBtnPublish" onclick="switchTab('publish')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-        <span>Выгрузка в WordPress</span>
-        <span class="tab-badge" id="bCountExport" style="background:#ECFDF5;color:#047857;">0</span>
+        <span>Публикация</span>
+        <span class="tab-badge" id="bCountPublish" style="background:#ECFDF5;color:#047857;">0</span>
       </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('models')">
+
+      <button class="saas-nav-btn tab-btn" id="tabBtnSystem" onclick="switchTab('system')">
         <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>
-        <span>Edge-кластер Triad-Omni</span>
-      </button>
-      <button class="saas-nav-btn tab-btn" onclick="switchTab('backups')">
-        <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-        <span>Резервные копии</span>
-        <span class="tab-badge" id="bCountBackups">0</span>
+        <span>Система</span>
       </button>
     </nav>
 
@@ -100,14 +71,20 @@
     <header class="saas-topbar" role="banner">
       <div class="saas-topbar__left">
         <button class="saas-mobile-toggle" type="button" onclick="toggleSaasSidebar()">☰ Меню</button>
-        <h1 class="saas-topbar__title" id="activeViewTitle">Центр управления редакцией</h1>
-        <span class="agent-chip" onclick="switchTab('models')" title="Проверить статус узлов Triad-Omni">
-          <span class="status-dot active"></span> Triad-Omni 3/3 (0₽)
-        </span>
+        <h1 class="saas-topbar__title" id="activeViewTitle">Сегодня / Пульт редакции</h1>
+        <button class="agent-chip-quiet" onclick="openClusterDiagnostics()" title="Аппаратный статус Triad-Omni & Диагностика">
+          <span class="pulse-dot"></span>
+          <span id="headerClusterText">Письмо локально (Mi 10T) · Шлюз онлайн</span>
+        </button>
       </div>
 
       <div class="saas-topbar__actions">
-        <button class="btn--amber-cta" style="padding:5px 12px;font-size:12px;" onclick="switchTab('kanban'); toggleNewTopicBox();">+ Новая тема</button>
+        <button class="btn btn--sm" onclick="openCommandPalette()" style="border-color:#CBD5E1;border-radius:6px;gap:6px;display:inline-flex;align-items:center;" title="Поиск и быстрые действия (Ctrl+K)">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <span>Поиск</span>
+          <span class="cmd-kbd">Ctrl+K</span>
+        </button>
+        <button class="btn--amber-cta" style="padding:5px 14px;font-size:12px;" onclick="openNewArticleDrawer()">+ Новая тема</button>
         <button class="btn btn--sm" onclick="refreshData()" title="Обновить данные из SQLite" style="border-color:#CBD5E1;border-radius:6px;">Обновить</button>
         <div class="dropdown-tools">
           <button class="btn btn--sm dropdown-toggle" type="button" onclick="toggleToolsMenu(event)" title="Экспорт и резервное копирование" style="border-color:#CBD5E1;border-radius:6px;">
@@ -166,74 +143,76 @@
       <section class="agents-status-strip" style="display:none;"></section>
       <section class="decision-banner" id="decisionBanner" style="display:none;"></section>
 
-      <!-- TAB 0: OVERVIEW (KASPERSKY-STYLE COMMAND CENTER) -->
+      <!-- TAB 0: TODAY (PREMIUM EDITORIAL INBOX & ACTION QUEUE) -->
       <section class="tab-view active" id="view-overview">
-        <div class="kaspersky-shield">
-          <div class="kaspersky-shield__status">
-            <div class="kaspersky-shield__icon" id="overviewShieldIcon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
-            </div>
+        <!-- 5-Stage Stepper Ribbon -->
+        <div class="stepper-ribbon" id="todayStepperRibbon">
+          <div class="stepper-item" onclick="switchTab('topics'); setKanbanStatusFilter('idea');" title="Новые идеи и темы">
+            <span>01 Идеи</span>
+            <span class="stepper-badge" id="stepRibbonIdeas">0</span>
+          </div>
+          <span class="stepper-arrow">→</span>
+          <div class="stepper-item" onclick="switchTab('topics'); setKanbanStatusFilter('work');" title="Черновики в процессе генерации">
+            <span>02 В работе</span>
+            <span class="stepper-badge" id="stepRibbonWork">0</span>
+          </div>
+          <span class="stepper-arrow">→</span>
+          <div class="stepper-item" onclick="switchTab('topics'); setKanbanStatusFilter('needs_fix');" title="Статьи с замечаниями">
+            <span>03 Правка</span>
+            <span class="stepper-badge" style="background:#FEE2E2;color:#991B1B;" id="stepRibbonFix">0</span>
+          </div>
+          <span class="stepper-arrow">→</span>
+          <div class="stepper-item" onclick="switchTab('topics'); setKanbanStatusFilter('review');" title="Ожидают приёмки шеф-редактором">
+            <span>04 Приёмка</span>
+            <span class="stepper-badge" style="background:#FEF3C7;color:#92400E;" id="stepRibbonReview">0</span>
+          </div>
+          <span class="stepper-arrow">→</span>
+          <div class="stepper-item" onclick="switchTab('publish');" title="Опубликовано на сайте">
+            <span>05 На сайте</span>
+            <span class="stepper-badge" style="background:#ECFDF5;color:#065F46;" id="stepRibbonSite">0</span>
+          </div>
+        </div>
+
+        <!-- Action Queue (3 Solution Cards) -->
+        <div class="action-queue-grid" id="todayActionQueueGrid">
+          <!-- Карточка 1: Статьи в правке -->
+          <div class="action-card action-card--danger">
             <div>
-              <h2 style="margin:0;font-size:17px;font-weight:700;color:#0F172A;" id="overviewShieldTitle">Система «Точка Плавления» в строю</h2>
-              <div style="font-size:13px;color:#64748B;margin-top:3px;" id="overviewShieldSubtitle">
-                Локальный кластер Triad-Omni (3/3 узла) подключён, база SQLite синхронизирована.
-              </div>
+              <span class="action-card__tag action-card__tag--danger">🔴 Требуют доработки</span>
+              <h4 class="action-card__title" id="actionFixTitle">Загрузка задач на правку...</h4>
+              <p class="action-card__desc" id="actionFixDesc">Тексты с баллом менее 80 или замечаниями по ГОСТ/IPC.</p>
             </div>
+            <button class="btn btn--sm btn--danger" id="actionFixBtn" onclick="switchTab('topics'); setKanbanStatusFilter('needs_fix');">Открыть правку →</button>
           </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;">
-            <button class="btn--amber-cta" onclick="switchTab('kanban')">Открыть Канбан</button>
-            <button class="btn--dark-cta" onclick="switchTab('agents')">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span>Конвейер 9 этапов</span>
-            </button>
+
+          <!-- Карточка 2: Приёмка и отправка на сайт -->
+          <div class="action-card action-card--warning">
+            <div>
+              <span class="action-card__tag action-card__tag--warning">🟡 Готовы к приёмке</span>
+              <h4 class="action-card__title" id="actionReviewTitle">Загрузка статей на приёмку...</h4>
+              <p class="action-card__desc" id="actionReviewDesc">Прошли проверку QA-аудитора и готовы к согласованию.</p>
+            </div>
+            <button class="btn btn--sm btn--primary" id="actionReviewBtn" onclick="switchTab('publish');">Опубликовать →</button>
+          </div>
+
+          <!-- Карточка 3: Семантические пробелы без статей -->
+          <div class="action-card action-card--success">
+            <div>
+              <span class="action-card__tag action-card__tag--success">🟢 Новые темы и разведка</span>
+              <h4 class="action-card__title" id="actionGapsTitle">Загрузка пробелов конкурентов...</h4>
+              <p class="action-card__desc" id="actionGapsDesc">Ключевые слова из SERP без покрытия статьями.</p>
+            </div>
+            <button class="btn btn--sm" id="actionGapsBtn" onclick="switchTab('recon'); switchReconSegment('gaps');" style="border-color:#CBD5E1;">Разобрать пробелы →</button>
           </div>
         </div>
 
-        <div class="kaspersky-tiles">
-          <button class="kaspersky-tile" type="button" onclick="switchTab('agents')">
-            <div class="kaspersky-tile__top">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              <span class="kaspersky-tile__badge">9 ЭТАПОВ</span>
-            </div>
-            <div class="kaspersky-tile__title">Конвейер публикаций</div>
-            <div class="kaspersky-tile__desc">Сквозной цикл от LSI-брифа и ГОСТ-фактчека до контракта v1.1.</div>
-          </button>
-
-          <button class="kaspersky-tile" type="button" onclick="switchTab('models')">
-            <div class="kaspersky-tile__top">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/></svg>
-              <span class="kaspersky-tile__badge">3/3 УЗЛА</span>
-            </div>
-            <div class="kaspersky-tile__title">Кластер Triad-Omni</div>
-            <div class="kaspersky-tile__desc">Мониторинг смартфонов Mi 10T, Nord N10, Redmi 4 и облачный резерв.</div>
-          </button>
-
-          <button class="kaspersky-tile" type="button" onclick="switchTab('humanizer')">
-            <div class="kaspersky-tile__top">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/></svg>
-              <span class="kaspersky-tile__badge">ANTI-SLOP</span>
-            </div>
-            <div class="kaspersky-tile__title">Humanizer-Ревьюер</div>
-            <div class="kaspersky-tile__desc">Вычитка AI-клише, проверка ритмики (Burstiness) и женского голоса.</div>
-          </button>
-
-          <button class="kaspersky-tile" type="button" onclick="switchTab('radar')">
-            <div class="kaspersky-tile__top">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#2563EB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-              <span class="kaspersky-tile__badge">0 ₽ · FREE</span>
-            </div>
-            <div class="kaspersky-tile__title">Радар конкурентов</div>
-            <div class="kaspersky-tile__desc">Автономный парсер выдачи, таблиц и киллер-фич без Firecrawl.</div>
-          </button>
-        </div>
-
-        <div class="saas-panel-card" style="padding:18px 20px;">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
-            <h3 style="margin:0;font-size:13.5px;font-weight:700;color:#0F172A;">Задачи, требующие внимания шеф-редактора</h3>
-            <button class="btn btn--xs" onclick="switchTab('kanban')" style="border-color:#CBD5E1;border-radius:6px;">Все статьи →</button>
+        <!-- Quiet status strip -->
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 16px;background:#FFFFFF;border:1px solid #E2E8F0;border-radius:8px;font-size:12px;color:#64748B;flex-wrap:wrap;gap:8px;">
+          <div>
+            <strong style="color:#0F172A;">⚡ Triad-Omni:</strong> <span id="todayClusterSummaryText">Mi 10T (генератор) · Nord N10 (QA-аудитор) · Redmi 4 (шлюз)</span>
           </div>
-          <div id="overviewAttentionGrid" style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:10px;">
-            <div style="color:#64748B;font-size:12.5px;">Загружаю список активных задач...</div>
+          <div>
+            <strong style="color:#0F172A;">📊 Разведка:</strong> <span id="todayMutagenText">Локальный Мутаген 0 ₽ · FTS5 RAG активен</span>
           </div>
         </div>
       </section>
@@ -1759,6 +1738,233 @@
     <!-- Secondary Quality & Content Toolbar in Modal -->
     <div id="modalSecondaryToolbar" style="display:none;margin-top:8px;padding:8px 12px;background:#F0F2F1;border:1px solid var(--border);font-size:11.5px;gap:8px;align-items:center;flex-wrap:wrap;">
       <!-- Генерируются динамически в openInspector() -->
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     PREMIUM SAAS: ARTICLE DRAWER (ШТОРКА СТАТЬИ)
+     ========================================================================== -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeArticleDrawer()"></div>
+<aside class="article-drawer" id="articleDrawer" aria-hidden="true" role="dialog" aria-label="Шторка статьи">
+  <div class="article-drawer__header">
+    <div style="flex:1;padding-right:12px;">
+      <h3 class="article-drawer__title" id="drawerArticleTitle">Пайка алюминиевых радиаторов</h3>
+      <div class="article-drawer__meta">
+        <span class="status-badge status-badge--fix" id="drawerArticleBadge">В правке</span>
+        <span class="drawer-score" id="drawerArticleScore" style="font-family:var(--mono);font-size:12px;font-weight:700;color:#0F172A;background:#E2E8F0;padding:2px 7px;border-radius:4px;">74/100</span>
+        <span style="font-size:11.5px;color:#64748B;" id="drawerArticleClusterText">Кластер: Пайка алюминия</span>
+      </div>
+    </div>
+    <button class="drawer-close-btn" type="button" onclick="closeArticleDrawer()" title="Закрыть шторку (Esc)">✕</button>
+  </div>
+
+  <nav class="drawer-tabs" role="tablist">
+    <button class="drawer-tab active" id="drawerTabBtnBrief" type="button" onclick="switchDrawerTab('brief')">Бриф</button>
+    <button class="drawer-tab" id="drawerTabBtnText" type="button" onclick="switchDrawerTab('text')">Текст</button>
+    <button class="drawer-tab" id="drawerTabBtnCheck" type="button" onclick="switchDrawerTab('check')">Проверка</button>
+    <button class="drawer-tab" id="drawerTabBtnPublish" type="button" onclick="switchDrawerTab('publish')">Публикация</button>
+  </nav>
+
+  <div class="drawer-body">
+    <!-- PANE 1: БРИФ -->
+    <section class="drawer-pane active" id="drawerPaneBrief">
+      <div style="display:grid;grid-template-columns:1fr 140px 140px;gap:10px;margin-bottom:14px;">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Кластер</label>
+          <input type="text" id="drawerInputCluster" class="form-input" style="width:100%;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;" />
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Тип статьи</label>
+          <select id="drawerSelectType" class="form-select" style="width:100%;padding:6px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;">
+            <option value="гайд">гайд / регламент</option>
+            <option value="выбор">выбор припоя</option>
+            <option value="ошибки">дефекты пайки</option>
+            <option value="обзор">обзор станции</option>
+          </select>
+        </div>
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Приоритет</label>
+          <select id="drawerSelectPriority" class="form-select" style="width:100%;padding:6px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;">
+            <option value="высокий">Высокий</option>
+            <option value="средний" selected>Средний</option>
+            <option value="низкий">Низкий</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Главный поисковый запрос (Ключ)</label>
+        <input type="text" id="drawerInputKeyword" class="form-input" style="width:100%;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12.5px;font-weight:600;" placeholder="Например: пайка алюминиевого радиатора" />
+      </div>
+
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Что обязательно сказать в статье (Техрегламент & ГОСТ):</label>
+        <textarea id="drawerTextNotes" style="width:100%;height:140px;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;line-height:1.5;resize:vertical;" placeholder="• Снять оксидную плёнку флюсом для алюминия&#10;• Назвать марку припоя (ПОС-61 или HTS-2000)&#10;• Температуру не указывать без ссылки на стандарт&#10;• Предупредить про пары флюса"></textarea>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #E2E8F0;">
+        <span style="font-size:11.5px;color:#64748B;">Черновик генерируется чанками на NODE-1</span>
+        <button class="btn btn--primary" type="button" onclick="saveDrawerBrief()">Сохранить бриф</button>
+      </div>
+    </section>
+
+    <!-- PANE 2: ТЕКСТ (СПЛИТ-РЕДАКТОР) -->
+    <section class="drawer-pane" id="drawerPaneText">
+      <div class="drawer-split">
+        <div>
+          <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Текст статьи (Markdown / HTML)</label>
+          <textarea class="drawer-editor-area" id="drawerArticleText" placeholder="Черновик пока не сгенерирован..."></textarea>
+        </div>
+        <div class="drawer-sidebar-stats">
+          <strong style="font-size:12px;color:#0F172A;border-bottom:1px solid #E2E8F0;padding-bottom:4px;">Параметры текста</strong>
+          <div>Объём: <strong id="drawerStatChars">0</strong> зн. (<strong id="drawerStatWords">0</strong> сл.)</div>
+          <div>Главный ключ: <span id="drawerStatKeyFound" style="color:#059669;font-weight:600;">в наличии</span></div>
+          <div>BLUF-абзац: <span id="drawerStatBluf" style="color:#059669;font-weight:600;">35-85 слов</span></div>
+          <div>Таблицы: <strong id="drawerStatTables">1</strong> шт.</div>
+          <button class="btn btn--xs" type="button" onclick="copyDrawerTextToHumanizer()" style="margin-top:10px;border-color:#CBD5E1;">Очеловечить в Studio</button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid #E2E8F0;">
+        <button class="btn btn--ghost" type="button" onclick="saveDrawerArticleText()">Сохранить черновик</button>
+        <button class="btn btn--amber-cta" type="button" onclick="switchDrawerTab('check'); runArticleAudit();">Отправить на проверку →</button>
+      </div>
+    </section>
+
+    <!-- PANE 3: ПРОВЕРКА (ОТК, ФАКТЫ, СТИЛЬ, SEO) -->
+    <section class="drawer-pane" id="drawerPaneCheck">
+      <div class="drawer-check-summary drawer-check-summary--warn" id="drawerAuditSummary">
+        <strong style="font-size:13.5px;" id="drawerAuditHeadline">74/100 · Нельзя принять</strong>
+        <span style="font-size:12px;" id="drawerAuditSubtitle">Не хватает источника по ГОСТ. Стиль и SEO в норме.</span>
+      </div>
+
+      <!-- Блок Факты -->
+      <div class="check-item" id="checkBlockFacts">
+        <div class="check-item__head">
+          <span>🔬 Факты & Стандарты (NODE-2 RAG)</span>
+          <span class="status-badge status-badge--fix" id="badgeCheckFacts">Нужна правка</span>
+        </div>
+        <div style="font-size:12px;color:#64748B;margin-top:4px;" id="descCheckFacts">
+          300–350 °C указаны без ссылки на ГОСТ или даташит производителя.
+        </div>
+        <div class="check-fragment" id="fragmentCheckFacts">
+          <blockquote>«Алюминий паяют при 300–350 °C обычным оловянно-свинцовым припоем.»</blockquote>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn btn--xs btn--primary" type="button" onclick="fixFragmentSource()">Вставить ГОСТ 21931-76</button>
+            <button class="btn btn--xs" type="button" onclick="acceptFragmentAsIs()" style="border-color:#CBD5E1;">Оставить как есть</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Блок Стиль -->
+      <div class="check-item" id="checkBlockStyle">
+        <div class="check-item__head">
+          <span>✍️ Стиль & Голос (Anti-Slop)</span>
+          <span class="status-badge status-badge--success" id="badgeCheckStyle">Норма</span>
+        </div>
+        <div style="font-size:12px;color:#64748B;margin-top:4px;">
+          Клише отсутствуют, ритмика (Burstiness) в норме, женский инженерный голос выдержан.
+        </div>
+      </div>
+
+      <!-- Блок SEO & AEO -->
+      <div class="check-item" id="checkBlockSeo">
+        <div class="check-item__head">
+          <span>🌐 SEO & AEO Цитируемость</span>
+          <span class="status-badge status-badge--success" id="badgeCheckSeo">Норма</span>
+        </div>
+        <div style="font-size:12px;color:#64748B;margin-top:4px;">
+          BLUF-ответ на 1 месте, таблица параметров есть, схема TechArticle валидна.
+        </div>
+      </div>
+
+      <div class="drawer-footer" style="margin-top:20px;padding:0;">
+        <button class="btn btn--ghost" type="button" onclick="switchDrawerTab('text')">← Вернуться к тексту</button>
+        <button class="btn btn--amber-cta" id="btnDrawerApproveArticle" type="button" onclick="approveCurrentArticleInDrawer()" disabled title="Сначала закройте правки">Принять статью</button>
+      </div>
+    </section>
+
+    <!-- PANE 4: ПУБЛИКАЦИЯ -->
+    <section class="drawer-pane" id="drawerPanePublish">
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Заголовок для сайта tochka-plavleniya.ru</label>
+        <input type="text" id="drawerPublishTitle" class="form-input" style="width:100%;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:13px;font-weight:700;" />
+      </div>
+      <div style="margin-bottom:14px;">
+        <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Адрес страницы (URL Slug)</label>
+        <input type="text" id="drawerPublishSlug" class="form-input" style="width:100%;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:var(--mono);" />
+      </div>
+
+      <div style="background:#ECFDF5;border:1px solid #A7F3D0;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+        <strong style="font-size:12.5px;color:#065F46;">✓ Статья готова к публикации</strong>
+        <div style="font-size:11.5px;color:#047857;margin-top:2px;">
+          Контракт v1.1 валидирован детерминированным гейткипером на NODE-3.
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <button class="btn btn--ghost" type="button" onclick="switchDrawerTab('check')">← Проверка</button>
+        <button class="btn btn--primary" type="button" onclick="publishCurrentArticleFromDrawer()" style="padding:7px 18px;font-weight:700;">🚀 Опубликовать в WordPress</button>
+      </div>
+    </section>
+  </div>
+</aside>
+
+<!-- ==========================================================================
+     DIAGNOSTICS & TELEMETRY MODAL (TRIAD-OMNI)
+     ========================================================================== -->
+<div class="cmd-palette-backdrop" id="clusterDiagnosticsModal" onclick="if(event.target===this)closeClusterDiagnostics()">
+  <div class="cmd-palette-modal" style="width:680px;padding:20px 24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid #E2E8F0;padding-bottom:10px;">
+      <h3 style="margin:0;font-size:16px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:8px;">
+        <span class="pulse-dot"></span>
+        <span>Аппаратный кластер Triad-Omni & Fast Router v4.9</span>
+      </h3>
+      <button class="drawer-close-btn" type="button" onclick="closeClusterDiagnostics()">✕</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:16px;">
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;">
+        <div style="font-size:11px;color:#64748B;">NODE-1 (Мозг)</div>
+        <strong style="font-size:13px;color:#0F172A;">Mi 10T (:8080)</strong>
+        <div style="font-size:11px;color:#059669;margin-top:2px;">Bypass 4.18V (0 мА)</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;">
+        <div style="font-size:11px;color:#64748B;">NODE-2 (QA & RAG)</div>
+        <strong style="font-size:13px;color:#0F172A;">Nord N10 (:8081)</strong>
+        <div style="font-size:11px;color:#059669;margin-top:2px;">Battery Guard 24/7</div>
+      </div>
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;">
+        <div style="font-size:11px;color:#64748B;">NODE-3 (Шлюз)</div>
+        <strong style="font-size:13px;color:#0F172A;">Redmi Note 4 (:8000)</strong>
+        <div style="font-size:11px;color:#059669;margin-top:2px;">DC-DC 4.18V (без АКБ)</div>
+      </div>
+    </div>
+
+    <div style="background:#F1F5F9;border-radius:6px;padding:10px 12px;font-size:11.5px;color:#475569;margin-bottom:16px;">
+      <strong>Резерв:</strong> OmniRoute Cloud (:20128) · 754 модели · Автоматическая эскалация после 2 ошибок или при перегреве (>45°C).
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button class="btn btn--sm" type="button" onclick="refreshClusterTelemetry()">⚡ Пинг узлов</button>
+      <button class="btn btn--primary btn--sm" type="button" onclick="closeClusterDiagnostics(); switchTab('system');">Полная настройка →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================================================
+     COMMAND PALETTE (CTRL+K)
+     ========================================================================== -->
+<div class="cmd-palette-backdrop" id="commandPaletteModal" onclick="if(event.target===this)closeCommandPalette()">
+  <div class="cmd-palette-modal">
+    <div class="cmd-palette-input-wrap">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="commandPaletteInput" class="cmd-palette-input" placeholder="Поиск по статьям, разделам или командам..." oninput="handleCommandPaletteSearch(this.value)" onkeydown="handleCommandPaletteKey(event)" />
+      <span class="cmd-kbd">Esc</span>
+    </div>
+    <div class="cmd-palette-results" id="commandPaletteResults">
+      <!-- Генерируются в JS -->
     </div>
   </div>
 </div>

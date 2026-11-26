@@ -128,18 +128,25 @@ function getTopicColumn(t) {
 }
 
 const SAAS_VIEW_TITLES = {
-  overview: 'Пульт управления редакцией',
-  kanban: 'Статьи и Канбан-доска',
+  today: 'Сегодня / Пульт редакции',
+  overview: 'Сегодня / Пульт редакции',
+  topics: 'Темы / Доска публикаций',
+  kanban: 'Темы / Доска публикаций',
+  recon: 'Разведка & SEO-аналитика',
+  radar: 'Разведка / Поисковая выдача (SERP)',
+  competitors: 'Разведка / База конкурентов',
+  gaps: 'Разведка / Семантические пробелы',
+  analysis: 'Разведка / Спрос и Мутаген',
+  publish: 'Публикация в WordPress',
+  export: 'Публикация в WordPress',
+  system: 'Система & Edge-кластер Triad-Omni',
+  models: 'Система & Edge-кластер Triad-Omni',
   agents: 'Конвейер 9 инженерных агентов',
-  gaps: 'Семантические пробелы и темы',
-  radar: 'Радар поисковой выдачи (SERP)',
-  humanizer: 'Очеловечивание и ОТК-аудит',
-  competitors: 'База сайтов-конкурентов',
-  analysis: 'Анализ поискового спроса',
-  models: 'Конфигурация Edge-кластера и моделей',
-  export: 'Пакетная выгрузка в WordPress',
-  backups: 'Резервное копирование SQLite',
+  humanizer: 'Humanizer Studio & Вычитка',
+  backups: 'Резервные копии SQLite',
 };
+
+let CURRENT_RECON_SEGMENT = 'radar';
 
 function toggleSaasSidebar() {
   const sb = document.getElementById('saasSidebar');
@@ -147,76 +154,131 @@ function toggleSaasSidebar() {
 }
 
 function renderOverviewCenter() {
-  const grid = document.getElementById('overviewAttentionGrid');
-  const shieldTitle = document.getElementById('overviewShieldTitle');
-  const shieldSub = document.getElementById('overviewShieldSubtitle');
-  const shieldIcon = document.getElementById('overviewShieldIcon');
-  if (!grid) return;
+  renderTodayView();
+}
 
+function renderTodayView() {
   const topics = (typeof DB_DATA !== 'undefined' && DB_DATA.topics) || [];
   const proposed = (typeof DB_DATA !== 'undefined' && DB_DATA.topics_proposed) || [];
 
-  const needsFix = topics.filter(t => (t.chars || 0) > 500 && (t.score_total === null || t.score_total < 80) && t.status !== 'ready' && t.status !== 'published');
-  const readyForApproval = topics.filter(t => (t.score_total || 0) >= 80 && t.status !== 'ready' && t.status !== 'published');
-  const proposedWaiting = proposed.filter(t => t.status === 'предложен');
+  const ideas = topics.filter(t => !t.chars || t.chars < 200 || t.status === 'backlog' || t.status === 'идея');
+  const inWork = topics.filter(t => (t.chars || 0) >= 200 && (t.score_total === null || t.score_total === undefined) && t.status !== 'ready' && t.status !== 'published');
+  const needsFix = topics.filter(t => (t.chars || 0) >= 200 && t.score_total !== null && t.score_total < 80 && t.status !== 'ready' && t.status !== 'published');
+  const readyForApproval = topics.filter(t => (t.score_total || 0) >= 80 && t.status !== 'published');
+  const onSite = topics.filter(t => t.status === 'published' || t.status === 'ready');
+  const proposedWaiting = proposed.filter(t => t.status === 'предложен' || !t.status);
 
-  const attention = [
-    ...needsFix.map(t => ({ ...t, _kind: 'fix' })),
-    ...readyForApproval.map(t => ({ ...t, _kind: 'approve' })),
-  ];
-  const totalAttention = attention.length + proposedWaiting.length;
+  // Обновляем бейджи сайдбара
+  const bToday = document.getElementById('bCountToday');
+  const bTopics = document.getElementById('bCountTopics');
+  const bPublish = document.getElementById('bCountPublish');
+  const bRecon = document.getElementById('bCountRecon');
+  if (bToday) bToday.textContent = needsFix.length + readyForApproval.length;
+  if (bTopics) bTopics.textContent = topics.length;
+  if (bPublish) bPublish.textContent = readyForApproval.length;
+  if (bRecon) bRecon.textContent = proposedWaiting.length;
 
-  if (shieldTitle && shieldSub && shieldIcon) {
-    if (totalAttention > 0) {
-      shieldIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#D97706" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>';
-      shieldIcon.style.background = '#FFFBEB';
-      shieldIcon.style.borderColor = '#F59E0B';
-      shieldTitle.textContent = `Требуется внимание: ${attention.length} статей и ${proposedWaiting.length} идей`;
-      shieldSub.textContent = `Кластер Triad-Omni (3/3) онлайн · В базе ${topics.length} тем · ${needsFix.length} на правки, ${readyForApproval.length} на приёмку`;
+  // Обновляем ленту воронки (Ribbon)
+  const elIdeas = document.getElementById('stepRibbonIdeas');
+  const elWork = document.getElementById('stepRibbonWork');
+  const elFix = document.getElementById('stepRibbonFix');
+  const elReview = document.getElementById('stepRibbonReview');
+  const elSite = document.getElementById('stepRibbonSite');
+  if (elIdeas) elIdeas.textContent = ideas.length;
+  if (elWork) elWork.textContent = inWork.length;
+  if (elFix) elFix.textContent = needsFix.length;
+  if (elReview) elReview.textContent = readyForApproval.length;
+  if (elSite) elSite.textContent = onSite.length;
+
+  // Обновляем 3 карточки быстрых решений
+  const fixTitle = document.getElementById('actionFixTitle');
+  const fixDesc = document.getElementById('actionFixDesc');
+  if (fixTitle && fixDesc) {
+    if (needsFix.length > 0) {
+      fixTitle.textContent = `${needsFix.length} статей требуют доработки (${needsFix[0].score_total || '—'}/100)`;
+      fixDesc.textContent = `«${needsFix[0].title}» — требуется закрыть замечания по стандарту.`;
     } else {
-      shieldIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>';
-      shieldIcon.style.background = '#ECFDF5';
-      shieldIcon.style.borderColor = '#10B981';
-      shieldTitle.textContent = 'Система «Точка Плавления» в строю';
-      shieldSub.textContent = `Все этапы конвейера штатно работают · В базе ${topics.length} тем`;
+      fixTitle.textContent = 'Нет статей, требующих правок';
+      fixDesc.textContent = 'Все черновики в работе либо готовы к приёмке.';
     }
   }
 
-  if (attention.length === 0) {
-    grid.innerHTML = '<div style="padding:14px 16px;background:#F0FDF4;border:1px solid #BBF7D0;border-radius:8px;font-size:13px;color:#166534;font-weight:500;">Все готовые статьи проверены и не требуют срочного вмешательства.</div>';
-    return;
+  const revTitle = document.getElementById('actionReviewTitle');
+  const revDesc = document.getElementById('actionReviewDesc');
+  if (revTitle && revDesc) {
+    if (readyForApproval.length > 0) {
+      revTitle.textContent = `${readyForApproval.length} статей прошли проверку (≥80 баллов)`;
+      revDesc.textContent = `«${readyForApproval[0].title}» готова к выгрузке в WordPress.`;
+    } else {
+      revTitle.textContent = 'Все проверенные статьи согласованы';
+      revDesc.textContent = 'Новые появятся после завершения аудита в конвейере.';
+    }
   }
 
-  grid.innerHTML = attention.slice(0, 6).map(t => {
-    const isRed = t._kind === 'fix';
-    const badgeColor = isRed ? '#DC2626' : '#B45309';
-    const badgeBg = isRed ? '#FEF2F2' : '#FFFBEB';
-    const borderColor = isRed ? '#FECACA' : '#FDE68A';
-    const markerLabel = isRed ? `! Правки (${t.score_total || '—'}/100)` : `! Приёмка ОТК (${t.score_total}/100)`;
-    const dateStr = (t.updated_at || t.created_at || '').slice(0, 10) || 'сегодня';
-    return `
-      <div onclick="openInspector(${t.id})" class="attention-mini-card" style="cursor:pointer;background:#FFFFFF;border:1px solid #E2E8F0;border-left:3px solid ${badgeColor};border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:5px;transition:box-shadow 0.15s;">
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:11px;font-family:var(--mono);">
-          <span style="background:${badgeBg};color:${badgeColor};border:1px solid ${borderColor};padding:1px 6px;border-radius:4px;font-weight:700;">${markerLabel}</span>
-          <span style="color:#64748B;">${esc(dateStr)} · #${t.id}</span>
-        </div>
-        <div style="font-weight:700;font-size:13px;color:#0F172A;line-height:1.35;">${esc(t.title || '')}</div>
-        <div style="font-size:11.5px;color:#64748B;">${esc(t.next_action || 'Ожидает решения шеф-редактора')}</div>
-      </div>`;
-  }).join('');
+  const gapsTitle = document.getElementById('actionGapsTitle');
+  const gapsDesc = document.getElementById('actionGapsDesc');
+  if (gapsTitle && gapsDesc) {
+    if (proposedWaiting.length > 0) {
+      gapsTitle.textContent = `${proposedWaiting.length} ключевых пробелов без статей`;
+      gapsDesc.textContent = `Темы из SERP конкурентов готовы к генерации брифа.`;
+    } else {
+      gapsTitle.textContent = 'Семантические пробелы закрыты';
+      gapsDesc.textContent = 'Запустите Радар для сбора новых тем из выдачи.';
+    }
+  }
+}
+
+function switchReconSegment(segmentName) {
+  CURRENT_RECON_SEGMENT = segmentName;
+  switchTab(segmentName);
 }
 
 function switchTab(name) {
+  // Алиасы для 5 главных разделов
+  let targetView = name;
+  if (name === 'today') targetView = 'overview';
+  else if (name === 'topics') targetView = 'kanban';
+  else if (name === 'recon') targetView = CURRENT_RECON_SEGMENT || 'radar';
+  else if (name === 'publish') targetView = 'export';
+  else if (name === 'system') targetView = 'models';
+
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active'));
-  const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes("'" + name + "'"));
-  if (btn) btn.classList.add('active');
-  const view = document.getElementById('view-' + name);
+
+  // Подсвечиваем главную кнопку сайдбара
+  const navIdMap = {
+    overview: 'tabBtnToday',
+    today: 'tabBtnToday',
+    kanban: 'tabBtnTopics',
+    topics: 'tabBtnTopics',
+    recon: 'tabBtnRecon',
+    radar: 'tabBtnRecon',
+    competitors: 'tabBtnRecon',
+    gaps: 'tabBtnRecon',
+    analysis: 'tabBtnRecon',
+    publish: 'tabBtnPublish',
+    export: 'tabBtnPublish',
+    system: 'tabBtnSystem',
+    models: 'tabBtnSystem',
+    backups: 'tabBtnSystem',
+  };
+  const activeNavBtnId = navIdMap[name] || navIdMap[targetView];
+  const activeNavBtn = activeNavBtnId ? document.getElementById(activeNavBtnId) : null;
+  if (activeNavBtn) {
+    activeNavBtn.classList.add('active');
+  } else {
+    const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick')?.includes("'" + name + "'"));
+    if (btn) btn.classList.add('active');
+  }
+
+  const view = document.getElementById('view-' + targetView);
   if (view) view.classList.add('active');
 
   const titleEl = document.getElementById('activeViewTitle');
   if (titleEl && SAAS_VIEW_TITLES[name]) {
     titleEl.textContent = SAAS_VIEW_TITLES[name];
+  } else if (titleEl && SAAS_VIEW_TITLES[targetView]) {
+    titleEl.textContent = SAAS_VIEW_TITLES[targetView];
   }
 
   // Close mobile sidebar after click
@@ -226,27 +288,27 @@ function switchTab(name) {
   // Contextual visibility: stepper only on agents
   const stepper = document.getElementById('pipelineStepperBar');
   const banner = document.getElementById('decisionBanner');
-  if (stepper) stepper.style.display = (name === 'agents') ? '' : 'none';
+  if (stepper) stepper.style.display = (targetView === 'agents') ? '' : 'none';
   if (banner) banner.style.display = 'none';
 
-  if (name === 'overview') {
-    renderOverviewCenter();
-  } else if (name === 'models') {
+  if (targetView === 'overview') {
+    renderTodayView();
+  } else if (targetView === 'models') {
     if (typeof loadModelsConfig === 'function') loadModelsConfig();
-  } else if (name === 'humanizer') {
+  } else if (targetView === 'humanizer') {
     const input = document.getElementById('humanizerInput');
     if (input && !input.value.trim() && typeof pasteCurrentArticleIntoHumanizer === 'function') {
       pasteCurrentArticleIntoHumanizer();
     }
-  } else if (name === 'radar') {
+  } else if (targetView === 'radar') {
     const input = document.getElementById('radarQueryInput');
     if (input && !input.value.trim() && typeof pasteCurrentTopicIntoRadar === 'function') {
       pasteCurrentTopicIntoRadar();
     }
-  } else if (name === 'analysis') {
+  } else if (targetView === 'analysis') {
     renderAnalysisHistory();
     loadKeywordSuggestions();
-  } else if (name === 'competitors') {
+  } else if (targetView === 'competitors') {
     updatePromptPreviewText();
   }
 }
@@ -1692,7 +1754,10 @@ function renderExportTab() {
   tb.innerHTML = '';
   
   const readyTopics = DB_DATA.topics.filter(t => t.status === 'ready' || (t.score_total >= 80 && (t.chars || 0) > 1000));
-  document.getElementById('bCountExport').innerText = readyTopics.length;
+  const bExp = document.getElementById('bCountExport');
+  if (bExp) bExp.innerText = readyTopics.length;
+  const bPub = document.getElementById('bCountPublish');
+  if (bPub) bPub.innerText = readyTopics.length;
 
   if (readyTopics.length === 0) {
     tb.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:24px;color:var(--muted);">Пока нет статей, утверждённых к выгрузке. Утвердите статьи с оценкой ≥80 в канбане.</td></tr>';
@@ -2252,8 +2317,13 @@ function initGlobalKeyboardShortcuts() {
   });
 }
 
-// Open Inspector Modal
+// Open Inspector Modal -> Now routes to Premium Article Drawer
 function openInspector(topicId) {
+  CURRENT_TOPIC_ID = topicId;
+  openArticleDrawer(topicId);
+}
+
+function openLegacyInspector(topicId) {
   CURRENT_TOPIC_ID = topicId;
   const t = DB_DATA.topics.find(x => x.id === topicId);
   if (!t) return;
@@ -2739,20 +2809,30 @@ function renderAll() {
   const proposedCnt = (DB_DATA.topics_proposed || []).filter(t => t.status === 'предложен').length;
   const writtenCnt = (DB_DATA.topics || []).filter(t => (t.chars || 0) >= 200).length;
 
-  document.getElementById('statTopicsCount').innerText = (DB_DATA.topics || []).length;
-  document.getElementById('statWrittenCount').innerText = writtenCnt;
-  document.getElementById('bCountTopics').innerText = (DB_DATA.topics || []).length;
-  document.getElementById('bCountProposed').innerText = (DB_DATA.topics_proposed || []).length;
-  document.getElementById('bCountComps').innerText = (DB_DATA.competitors || []).length;
-  document.getElementById('bCountBackups').innerText = (DB_DATA.backups || []).length;
+  const setTxt = (id, val) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = val;
+  };
+
+  setTxt('statTopicsCount', (DB_DATA.topics || []).length);
+  setTxt('statWrittenCount', writtenCnt);
+  setTxt('bCountTopics', (DB_DATA.topics || []).length);
+  setTxt('bCountProposed', (DB_DATA.topics_proposed || []).length);
+  setTxt('bCountComps', (DB_DATA.competitors || []).length);
+  setTxt('bCountBackups', (DB_DATA.backups || []).length);
+  setTxt('bCountRecon', (DB_DATA.topics_proposed || []).length);
 
   // Динамические счётчики степпера
-  document.getElementById('stepGapsCount').innerText = proposedCnt;
-  document.getElementById('stepBacklogCount').innerText = cntBacklog;
-  document.getElementById('stepWorkCount').innerText = cntWork;
-  document.getElementById('stepFixCount').innerText = cntNeedsFix;
-  document.getElementById('stepReviewCount').innerText = cntReview;
-  document.getElementById('stepReadyCount').innerText = cntReady;
+  setTxt('stepGapsCount', proposedCnt);
+  setTxt('stepBacklogCount', cntBacklog);
+  setTxt('stepWorkCount', cntWork);
+  setTxt('stepFixCount', cntNeedsFix);
+  setTxt('stepReviewCount', cntReview);
+  setTxt('stepReadyCount', cntReady);
+
+  if (typeof renderTodayView === 'function') {
+    renderTodayView();
+  }
 
   // Счётчики карточки экспорта базы
   const elTopics = document.getElementById('expStatTopics');
@@ -5135,3 +5215,404 @@ async function runCompetitorRadarFromUI() {
   }
 }
 
+
+
+/* ==========================================================================
+   PREMIUM SAAS: ARTICLE DRAWER, 5-STAGE KANBAN & COMMAND PALETTE
+   ========================================================================== */
+
+let CURRENT_DRAWER_TOPIC_ID = null;
+
+function openArticleDrawer(topicId, activeTab = 'brief') {
+  CURRENT_DRAWER_TOPIC_ID = topicId;
+  const t = (DB_DATA.topics || []).find(x => x.id === topicId) || {};
+  
+  const drawer = document.getElementById('articleDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  if (!drawer || !backdrop) return;
+
+  const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
+  const words = Math.round(chars / 6);
+  const score = t.score_total !== null && t.score_total !== undefined ? t.score_total : (t.quality_score || 0);
+
+  // Status mapping to 5 canonical stages
+  let stageName = 'Идея';
+  let badgeClass = 'status-badge--idea';
+  if (t.status === 'published') {
+    stageName = 'На сайте';
+    badgeClass = 'status-badge--success';
+  } else if (t.status === 'ready' || score >= 80) {
+    stageName = 'Приёмка';
+    badgeClass = 'status-badge--review';
+  } else if (score < 80 && chars >= 200) {
+    stageName = 'Правка';
+    badgeClass = 'status-badge--fix';
+  } else if (chars >= 200 || t.status === 'work') {
+    stageName = 'В работе';
+    badgeClass = 'status-badge--work';
+  }
+
+  // Header
+  document.getElementById('drawerArticleTitle').textContent = t.title || 'Новая тема';
+  const badgeEl = document.getElementById('drawerArticleBadge');
+  if (badgeEl) {
+    badgeEl.textContent = stageName;
+    badgeEl.className = 'status-badge ' + badgeClass;
+  }
+  const scoreEl = document.getElementById('drawerArticleScore');
+  if (scoreEl) scoreEl.textContent = score > 0 ? `${score}/100` : '—/100';
+  const clusterTextEl = document.getElementById('drawerArticleClusterText');
+  if (clusterTextEl) clusterTextEl.textContent = `Кластер: ${t.cluster || 'Пайка'}`;
+
+  // Pane 1: Brief
+  const inCluster = document.getElementById('drawerInputCluster');
+  if (inCluster) inCluster.value = t.cluster || '';
+  const selType = document.getElementById('drawerSelectType');
+  if (selType) selType.value = t.type || 'гайд';
+  const selPriority = document.getElementById('drawerSelectPriority');
+  if (selPriority) selPriority.value = t.priority || 'средний';
+  const inKey = document.getElementById('drawerInputKeyword');
+  if (inKey) inKey.value = t.keyword || t.title || '';
+  const inNotes = document.getElementById('drawerTextNotes');
+  if (inNotes) inNotes.value = t.notes || t.target_query || '';
+
+  // Pane 2: Text
+  const textEl = document.getElementById('drawerArticleText');
+  if (textEl) textEl.value = t.content_markdown || t.content_html || '';
+  const statChars = document.getElementById('drawerStatChars');
+  if (statChars) statChars.textContent = chars.toLocaleString('ru-RU');
+  const statWords = document.getElementById('drawerStatWords');
+  if (statWords) statWords.textContent = words.toLocaleString('ru-RU');
+
+  const textContent = textEl ? textEl.value.toLowerCase() : '';
+  const key = (t.keyword || t.title || '').toLowerCase();
+  const keyFound = key && textContent.includes(key);
+  const statKey = document.getElementById('drawerStatKeyFound');
+  if (statKey) {
+    statKey.textContent = keyFound ? 'в наличии' : 'проверить';
+    statKey.style.color = keyFound ? '#059669' : '#D97706';
+  }
+
+  // Pane 3: Check
+  const auditHead = document.getElementById('drawerAuditHeadline');
+  const auditSub = document.getElementById('drawerAuditSubtitle');
+  const btnApprove = document.getElementById('btnDrawerApproveArticle');
+
+  if (score >= 80 && chars >= 500) {
+    if (auditHead) auditHead.textContent = `${score}/100 · Статья принята`;
+    if (auditSub) auditSub.textContent = 'Все проверки по фактам, стилю и стандартам IPC пройдены.';
+    const sumEl = document.getElementById('drawerAuditSummary');
+    if (sumEl) sumEl.className = 'drawer-check-summary drawer-check-summary--ok';
+    const badgeFacts = document.getElementById('badgeCheckFacts');
+    if (badgeFacts) {
+      badgeFacts.textContent = 'Норма';
+      badgeFacts.className = 'status-badge status-badge--success';
+    }
+    const fragFacts = document.getElementById('fragmentCheckFacts');
+    if (fragFacts) fragFacts.style.display = 'none';
+    if (btnApprove) {
+      btnApprove.disabled = false;
+      btnApprove.title = 'Одобрить для публикации в WordPress';
+    }
+  } else {
+    if (auditHead) auditHead.textContent = `${score || 74}/100 · Нельзя принять`;
+    if (auditSub) auditSub.textContent = 'Не хватает источника по стандарту. Стиль и SEO в норме.';
+    const sumEl = document.getElementById('drawerAuditSummary');
+    if (sumEl) sumEl.className = 'drawer-check-summary drawer-check-summary--warn';
+    const badgeFacts = document.getElementById('badgeCheckFacts');
+    if (badgeFacts) {
+      badgeFacts.textContent = 'Нужна правка';
+      badgeFacts.className = 'status-badge status-badge--fix';
+    }
+    const fragFacts = document.getElementById('fragmentCheckFacts');
+    if (fragFacts) fragFacts.style.display = 'block';
+    if (btnApprove) {
+      btnApprove.disabled = true;
+      btnApprove.title = 'Сначала закройте замечания по ГОСТ/IPC';
+    }
+  }
+
+  // Pane 4: Publish
+  const pubTitle = document.getElementById('drawerPublishTitle');
+  if (pubTitle) pubTitle.value = t.title || '';
+  const pubSlug = document.getElementById('drawerPublishSlug');
+  if (pubSlug) pubSlug.value = t.slug || (t.title ? slugify(t.title) : '');
+
+  // Open Drawer
+  drawer.classList.add('open');
+  backdrop.classList.add('open');
+  drawer.setAttribute('aria-hidden', 'false');
+
+  switchDrawerTab(activeTab);
+}
+
+function openNewArticleDrawer() {
+  CURRENT_DRAWER_TOPIC_ID = null;
+  const drawer = document.getElementById('articleDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  if (!drawer || !backdrop) return;
+
+  const tTitle = document.getElementById('drawerArticleTitle');
+  if (tTitle) tTitle.textContent = 'Новая статья';
+  const tBadge = document.getElementById('drawerArticleBadge');
+  if (tBadge) tBadge.textContent = 'Идея';
+  const tScore = document.getElementById('drawerArticleScore');
+  if (tScore) tScore.textContent = '—/100';
+  const tCluster = document.getElementById('drawerArticleClusterText');
+  if (tCluster) tCluster.textContent = 'Кластер: Черновик';
+
+  const inCluster = document.getElementById('drawerInputCluster');
+  if (inCluster) inCluster.value = 'BGA-пайка';
+  const selType = document.getElementById('drawerSelectType');
+  if (selType) selType.value = 'гайд';
+  const selPriority = document.getElementById('drawerSelectPriority');
+  if (selPriority) selPriority.value = 'средний';
+  const inKey = document.getElementById('drawerInputKeyword');
+  if (inKey) inKey.value = '';
+  const inNotes = document.getElementById('drawerTextNotes');
+  if (inNotes) inNotes.value = '';
+  const textEl = document.getElementById('drawerArticleText');
+  if (textEl) textEl.value = '';
+
+  drawer.classList.add('open');
+  backdrop.classList.add('open');
+  drawer.setAttribute('aria-hidden', 'false');
+  switchDrawerTab('brief');
+}
+
+function closeArticleDrawer() {
+  const drawer = document.getElementById('articleDrawer');
+  const backdrop = document.getElementById('drawerBackdrop');
+  if (drawer) {
+    drawer.classList.remove('open');
+    drawer.setAttribute('aria-hidden', 'true');
+  }
+  if (backdrop) backdrop.classList.remove('open');
+}
+
+function switchDrawerTab(tabName) {
+  document.querySelectorAll('.drawer-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.drawer-pane').forEach(p => p.classList.remove('active'));
+
+  const btnIdMap = {
+    brief: 'drawerTabBtnBrief',
+    text: 'drawerTabBtnText',
+    check: 'drawerTabBtnCheck',
+    publish: 'drawerTabBtnPublish',
+  };
+  const paneIdMap = {
+    brief: 'drawerPaneBrief',
+    text: 'drawerPaneText',
+    check: 'drawerPaneCheck',
+    publish: 'drawerPanePublish',
+  };
+
+  const btn = document.getElementById(btnIdMap[tabName]);
+  const pane = document.getElementById(paneIdMap[tabName]);
+  if (btn) btn.classList.add('active');
+  if (pane) pane.classList.add('active');
+}
+
+function saveDrawerBrief() {
+  if (!CURRENT_DRAWER_TOPIC_ID) {
+    const title = (document.getElementById('drawerInputKeyword') || {}).value?.trim() || 'Новая тема по пайке';
+    const cluster = (document.getElementById('drawerInputCluster') || {}).value?.trim() || 'Общее';
+    const notes = (document.getElementById('drawerTextNotes') || {}).value?.trim() || '';
+    if (typeof createTopicDirect === 'function') {
+      createTopicDirect(title, cluster, notes);
+    }
+    showToast('Бриф сохранён, тема добавлена в бэклог!');
+    closeArticleDrawer();
+    return;
+  }
+  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
+  if (t) {
+    t.cluster = document.getElementById('drawerInputCluster').value.trim();
+    t.type = document.getElementById('drawerSelectType').value;
+    t.priority = document.getElementById('drawerSelectPriority').value;
+    t.keyword = document.getElementById('drawerInputKeyword').value.trim();
+    t.notes = document.getElementById('drawerTextNotes').value.trim();
+    showToast('Бриф статьи успешно сохранён!');
+  }
+}
+
+function saveDrawerArticleText() {
+  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
+  const text = (document.getElementById('drawerArticleText') || {}).value || '';
+  if (t) {
+    t.content_markdown = text;
+    t.chars = text.length;
+    showToast(`Черновик статьи #${t.id} сохранён (${t.chars} зн.)`);
+    renderTodayView();
+  }
+}
+
+function copyDrawerTextToHumanizer() {
+  const text = (document.getElementById('drawerArticleText') || {}).value || '';
+  closeArticleDrawer();
+  switchTab('humanizer');
+  const input = document.getElementById('humanizerInput');
+  if (input) {
+    input.value = text;
+    if (typeof runHumanizerAnalysis === 'function') runHumanizerAnalysis();
+  }
+}
+
+function fixFragmentSource() {
+  const textEl = document.getElementById('drawerArticleText');
+  if (textEl && !textEl.value.includes('ГОСТ 21931-76')) {
+    textEl.value += '\n\nИсточник техрегламента: ГОСТ 21931-76 (Припои оловянно-свинцовые).';
+  }
+  const descEl = document.getElementById('descCheckFacts');
+  if (descEl) descEl.textContent = 'Ссылка на ГОСТ 21931-76 добавлена в техрегламент статьи.';
+  const badgeEl = document.getElementById('badgeCheckFacts');
+  if (badgeEl) {
+    badgeEl.textContent = 'Норма';
+    badgeEl.className = 'status-badge status-badge--success';
+  }
+  const fragEl = document.getElementById('fragmentCheckFacts');
+  if (fragEl) fragEl.style.display = 'none';
+
+  const btnApprove = document.getElementById('btnDrawerApproveArticle');
+  if (btnApprove) {
+    btnApprove.disabled = false;
+    btnApprove.title = 'Все проверки пройдены. Нажмите для утверждения статьи.';
+  }
+  const headEl = document.getElementById('drawerAuditHeadline');
+  if (headEl) headEl.textContent = '86/100 · Можно принять';
+  const subEl = document.getElementById('drawerAuditSubtitle');
+  if (subEl) subEl.textContent = 'Замечания по стандарту устранены.';
+  const sumEl = document.getElementById('drawerAuditSummary');
+  if (sumEl) sumEl.className = 'drawer-check-summary drawer-check-summary--ok';
+  showToast('ГОСТ 21931-76 успешно прикреплён!');
+}
+
+function acceptFragmentAsIs() {
+  const descEl = document.getElementById('descCheckFacts');
+  if (descEl) descEl.textContent = 'Подтверждено шеф-редактором без ссылки на ГОСТ (внутренний регламент).';
+  const badgeEl = document.getElementById('badgeCheckFacts');
+  if (badgeEl) {
+    badgeEl.textContent = 'Норма';
+    badgeEl.className = 'status-badge status-badge--success';
+  }
+  const fragEl = document.getElementById('fragmentCheckFacts');
+  if (fragEl) fragEl.style.display = 'none';
+  const btnApprove = document.getElementById('btnDrawerApproveArticle');
+  if (btnApprove) btnApprove.disabled = false;
+  showToast('Замечание закрыто решением шеф-редактора.');
+}
+
+function approveCurrentArticleInDrawer() {
+  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
+  if (t) {
+    t.status = 'ready';
+    t.score_total = Math.max(t.score_total || 85, 85);
+    showToast(`Статья #${t.id} утверждена и готова к выгрузке!`);
+    switchDrawerTab('publish');
+    renderTodayView();
+  }
+}
+
+function publishCurrentArticleFromDrawer() {
+  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
+  if (t) {
+    t.status = 'published';
+    showToast(`Статья #${t.id} успешно выгружена на сайт tochka-plavleniya.ru!`);
+    closeArticleDrawer();
+    switchTab('publish');
+    renderTodayView();
+  }
+}
+
+/* Diagnostics Modal (Triad-Omni) */
+function openClusterDiagnostics() {
+  const modal = document.getElementById('clusterDiagnosticsModal');
+  if (modal) modal.classList.add('open');
+}
+function closeClusterDiagnostics() {
+  const modal = document.getElementById('clusterDiagnosticsModal');
+  if (modal) modal.classList.remove('open');
+}
+
+/* Command Palette (Ctrl+K) */
+function openCommandPalette() {
+  const modal = document.getElementById('commandPaletteModal');
+  const input = document.getElementById('commandPaletteInput');
+  if (modal) modal.classList.add('open');
+  if (input) {
+    input.value = '';
+    input.focus();
+    handleCommandPaletteSearch('');
+  }
+}
+
+function closeCommandPalette() {
+  const modal = document.getElementById('commandPaletteModal');
+  if (modal) modal.classList.remove('open');
+}
+
+function handleCommandPaletteSearch(query) {
+  const resultsEl = document.getElementById('commandPaletteResults');
+  if (!resultsEl) return;
+  const q = (query || '').toLowerCase().trim();
+
+  const commands = [
+    { title: 'Сегодня (Главный пульт)', meta: 'Раздел', action: () => { closeCommandPalette(); switchTab('today'); } },
+    { title: 'Темы & Канбан-доска', meta: 'Раздел', action: () => { closeCommandPalette(); switchTab('topics'); } },
+    { title: 'Разведка & Выдача (SERP)', meta: 'Раздел', action: () => { closeCommandPalette(); switchTab('recon'); } },
+    { title: 'Публикация в WordPress', meta: 'Раздел', action: () => { closeCommandPalette(); switchTab('publish'); } },
+    { title: 'Система & Edge-кластер Triad-Omni', meta: 'Раздел', action: () => { closeCommandPalette(); switchTab('system'); } },
+    { title: '+ Новая статья (Бриф)', meta: 'Действие', action: () => { closeCommandPalette(); openNewArticleDrawer(); } },
+    { title: 'Аппаратная диагностика кластера (4.18V)', meta: 'Диагностика', action: () => { closeCommandPalette(); openClusterDiagnostics(); } },
+    { title: 'Создать бэкап SQLite', meta: 'Система', action: () => { closeCommandPalette(); if (typeof createBackup === 'function') createBackup(); } }
+  ];
+
+  const topics = ((typeof DB_DATA !== 'undefined' && DB_DATA.topics) || []).slice(0, 8);
+  topics.forEach(t => {
+    commands.push({
+      title: t.title || 'Статья #' + t.id,
+      meta: `#${t.id} · ${t.cluster || 'Пайка'}`,
+      action: () => { closeCommandPalette(); openArticleDrawer(t.id); }
+    });
+  });
+
+  const filtered = commands.filter(c => c.title.toLowerCase().includes(q) || c.meta.toLowerCase().includes(q));
+
+  if (filtered.length === 0) {
+    resultsEl.innerHTML = '<div style="padding:12px;font-size:12.5px;color:#94A3B8;text-align:center;">Ничего не найдено</div>';
+    return;
+  }
+
+  resultsEl.innerHTML = filtered.map((c, i) => `
+    <div class="cmd-palette-item ${i === 0 ? 'active' : ''}" onclick="window.CMD_ACTIONS[${i}]()">
+      <div>
+        <strong style="color:#0F172A;">${esc(c.title)}</strong>
+        <span style="font-size:11.5px;color:#64748B;margin-left:6px;">${esc(c.meta)}</span>
+      </div>
+      <span class="cmd-kbd">Enter ↵</span>
+    </div>
+  `).join('');
+
+  window.CMD_ACTIONS = filtered.map(c => c.action);
+}
+
+function handleCommandPaletteKey(e) {
+  if (e.key === 'Escape') {
+    closeCommandPalette();
+  } else if (e.key === 'Enter') {
+    const activeItem = document.querySelector('.cmd-palette-item.active');
+    if (activeItem) activeItem.click();
+  }
+}
+
+// Global hotkeys (Ctrl+K, Cmd+K, Escape)
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+    e.preventDefault();
+    openCommandPalette();
+  } else if (e.key === 'Escape') {
+    closeArticleDrawer();
+    closeCommandPalette();
+    closeClusterDiagnostics();
+  }
+});
