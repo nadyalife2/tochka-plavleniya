@@ -3078,28 +3078,58 @@ async function refreshClusterTelemetry() {
   const node3 = document.getElementById('node3Badge');
   const omni = document.getElementById('omniRouteBadge');
 
+  const cardNode1 = document.getElementById('node1CardBadge');
+  const cardNode2 = document.getElementById('node2CardBadge');
+  const cardNode3 = document.getElementById('node3CardBadge');
+  const cardOmni = document.getElementById('omniCardBadge');
+
+  const diagNode1 = document.getElementById('diagNode1Badge');
+  const diagNode2 = document.getElementById('diagNode2Badge');
+  const diagNode3 = document.getElementById('diagNode3Badge');
+
+  const headerClusterText = document.getElementById('headerClusterText');
+  const todayClusterText = document.getElementById('todayClusterSummaryText');
+
   try {
     const res = await fetch(API_BASE + '/api/cluster/status').then(r => r.json());
     if (res && res.status === 'ok') {
       const t = res.triad || {};
       const o = res.omniroute || {};
+      const isTriadOnline = t.status === 'online';
 
-      if (t.status === 'online') {
+      if (isTriadOnline) {
         if (node1) { node1.className = 'telemetry-node-badge online'; node1.innerHTML = '<span class="pulse-dot"></span> NODE-1 (Mi 10T) :8080 · ONLINE'; }
         if (node2) { node2.className = 'telemetry-node-badge online'; node2.innerHTML = '<span class="pulse-dot"></span> NODE-2 (Nord N10) :8081 · ONLINE'; }
         if (node3) { node3.className = 'telemetry-node-badge online'; node3.innerHTML = '<span class="pulse-dot"></span> NODE-3 (Redmi 4) :8000 · ONLINE'; }
+        if (cardNode1) { cardNode1.className = 'telemetry-node-badge online'; cardNode1.textContent = '🟢 :8080 ОНЛАЙН'; cardNode1.style = 'font-size:10.5px;padding:2px 8px;'; }
+        if (cardNode2) { cardNode2.className = 'telemetry-node-badge online'; cardNode2.textContent = '🟢 :8081 / :8082'; cardNode2.style = 'font-size:10.5px;padding:2px 8px;'; }
+        if (cardNode3) { cardNode3.className = 'telemetry-node-badge online'; cardNode3.textContent = '🟢 :8000 ОНЛАЙН'; cardNode3.style = 'font-size:10.5px;padding:2px 8px;'; }
+        if (diagNode3) { diagNode3.textContent = '🟢 Онлайн · Router v4.9'; diagNode3.style.color = '#059669'; }
+        if (headerClusterText) headerClusterText.textContent = 'Письмо локально (Mi 10T) · Шлюз онлайн';
+        if (todayClusterText) todayClusterText.textContent = 'Mi 10T (генератор) · Nord N10 (QA-аудитор) · Redmi 4 (шлюз :8000)';
       } else {
-        if (node1) { node1.className = 'telemetry-node-badge standby'; node1.innerHTML = '<span class="pulse-dot"></span> NODE-1 (Mi 10T) · Ожидание'; }
-        if (node2) { node2.className = 'telemetry-node-badge standby'; node2.innerHTML = '<span class="pulse-dot"></span> NODE-2 (Nord N10) · Ожидание'; }
-        if (node3) { node3.className = 'telemetry-node-badge standby'; node3.innerHTML = '<span class="pulse-dot"></span> NODE-3 (Redmi 4) · Ожидание'; }
+        // Узлы в режиме ожидания или офлайн
+        if (node1) { node1.className = 'telemetry-node-badge standby'; node1.innerHTML = '<span class="pulse-dot" style="background:#F59E0B;"></span> NODE-1 (Mi 10T) · Ожидание'; }
+        if (node2) { node2.className = 'telemetry-node-badge standby'; node2.innerHTML = '<span class="pulse-dot" style="background:#F59E0B;"></span> NODE-2 (Nord N10) · Ожидание'; }
+        if (node3) { node3.className = 'telemetry-node-badge offline'; node3.innerHTML = '<span class="pulse-dot" style="background:#EF4444;"></span> NODE-3 (Redmi 4) · ОФФЛАЙН'; }
+        
+        if (cardNode1) { cardNode1.className = 'telemetry-node-badge standby'; cardNode1.textContent = '⚪ :8080 ОЖИДАНИЕ'; cardNode1.style = 'font-size:10.5px;padding:2px 8px;background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;'; }
+        if (cardNode2) { cardNode2.className = 'telemetry-node-badge standby'; cardNode2.textContent = '⚪ :8081 ОЖИДАНИЕ'; cardNode2.style = 'font-size:10.5px;padding:2px 8px;background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;'; }
+        if (cardNode3) { cardNode3.className = 'telemetry-node-badge offline'; cardNode3.textContent = '🔴 :8000 ОФФЛАЙН'; cardNode3.style = 'font-size:10.5px;padding:2px 8px;background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;'; }
+
+        if (diagNode3) { diagNode3.textContent = '🔴 Офлайн (порт :8000 не отвечает)'; diagNode3.style.color = '#DC2626'; }
+        if (headerClusterText) headerClusterText.textContent = 'Письмо локально · Шлюз NODE-3 офлайн';
+        if (todayClusterText) todayClusterText.textContent = 'Шлюз NODE-3 (:8000) оффлайн · Резервный шлюз готов';
       }
 
       if (o.status === 'online') {
         if (omni) { omni.className = 'telemetry-node-badge online'; omni.innerHTML = `<span class="pulse-dot"></span> OmniRoute :20128 · ${o.models_count || 754} Моделей`; }
+        if (cardOmni) { cardOmni.className = 'telemetry-node-badge online'; cardOmni.textContent = '🟢 :20128 АКТИВЕН'; cardOmni.style = 'font-size:10.5px;padding:2px 8px;'; }
       } else {
         if (omni) { omni.className = 'telemetry-node-badge standby'; omni.innerHTML = `<span class="pulse-dot"></span> OmniRoute · Резерв (${o.models_count || 754})`; }
+        if (cardOmni) { cardOmni.className = 'telemetry-node-badge standby'; cardOmni.textContent = '⚪ :20128 РЕЗЕРВ'; cardOmni.style = 'font-size:10.5px;padding:2px 8px;background:#F1F5F9;color:#475569;'; }
       }
-      showToast('📡 Телеметрия кластера обновлена');
+      showToast('📡 Телеметрия кластера проверена');
     }
   } catch (e) {
     console.warn('Ошибка опроса телеметрии:', e);
@@ -3146,11 +3176,11 @@ function updateCraftsmanModel(craftsmanId, modelValue) {
 
 document.addEventListener('DOMContentLoaded', () => {
   renderAll();
+  refreshClusterTelemetry();
   fetch(API_BASE + '/api/status')
     .then(r => r.json())
     .then(() => {
       refreshData();
-      refreshClusterTelemetry();
     })
     .catch(() => {});
 });

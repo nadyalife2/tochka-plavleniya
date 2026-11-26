@@ -993,7 +993,7 @@
           <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
             <span>🧠 NODE-1 (Главный мозг)</span>
           </strong>
-          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :8080 ОНЛАЙН</span>
+          <span class="telemetry-node-badge standby" id="node1CardBadge" style="font-size:10.5px;padding:2px 8px;">⚪ :8080 ОЖИДАНИЕ</span>
         </div>
         <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
           <strong>Xiaomi Mi 10T 5G</strong> (Snapdragon 865, 8GB LPDDR5)<br>
@@ -1012,7 +1012,7 @@
           <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
             <span>⚡ NODE-2 (Рефлексы & RAG)</span>
           </strong>
-          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :8081 / :8082</span>
+          <span class="telemetry-node-badge standby" id="node2CardBadge" style="font-size:10.5px;padding:2px 8px;">⚪ :8081 ОЖИДАНИЕ</span>
         </div>
         <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
           <strong>OnePlus Nord N10 5G</strong> (Snapdragon 690, 6GB)<br>
@@ -1031,7 +1031,7 @@
           <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
             <span>🛡️ NODE-3 (Шлюз телеметрии)</span>
           </strong>
-          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :8000 ОНЛАЙН</span>
+          <span class="telemetry-node-badge offline" id="node3CardBadge" style="font-size:10.5px;padding:2px 8px;background:#FEE2E2;color:#991B1B;border-color:#FCA5A5;">🔴 :8000 ОФФЛАЙН</span>
         </div>
         <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
           <strong>Xiaomi Redmi Note 4</strong> (Snapdragon 625)<br>
@@ -1039,8 +1039,8 @@
           Regex-команды за 0.02 мс без расхода токенов<br>
           Питание: <strong>DC-DC 4.18V без батареи</strong>
         </div>
-        <div style="font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;">
-          ✓ Аппаратный роутинг и хаб телеметрии
+        <div style="font-size:11px;color:#B91C1C;background:#FEF2F2;padding:4px 8px;border-radius:4px;border:1px solid #FECACA;" id="node3CardFooter">
+          ⚠ Узел не подключён к сети (резерв: OmniRoute)
         </div>
       </div>
 
@@ -1050,7 +1050,7 @@
           <strong style="font-size:13px;color:var(--ink);display:flex;align-items:center;gap:6px;">
             <span>🌐 OmniRoute Gateway</span>
           </strong>
-          <span class="telemetry-node-badge online" style="font-size:10.5px;padding:2px 8px;">🟢 :20128 АКТИВЕН</span>
+          <span class="telemetry-node-badge standby" id="omniCardBadge" style="font-size:10.5px;padding:2px 8px;background:#F1F5F9;color:#475569;">⚪ :20128 РЕЗЕРВ</span>
         </div>
         <div style="font-size:12px;color:var(--ink-secondary);line-height:1.5;margin-bottom:10px;">
           <strong>Каскадный шлюз 754 моделей</strong><br>
@@ -1938,7 +1938,7 @@
       <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;">
         <div style="font-size:11px;color:#64748B;">NODE-3 (Шлюз)</div>
         <strong style="font-size:13px;color:#0F172A;">Redmi Note 4 (:8000)</strong>
-        <div style="font-size:11px;color:#059669;margin-top:2px;">DC-DC 4.18V (без АКБ)</div>
+        <div id="diagNode3Badge" style="font-size:11px;color:#DC2626;margin-top:2px;font-weight:600;">🔴 Офлайн / Ожидание</div>
       </div>
     </div>
 
