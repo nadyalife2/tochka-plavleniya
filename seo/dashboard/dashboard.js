@@ -341,6 +341,7 @@ function switchTab(name) {
     renderTodayView();
   } else if (targetView === 'models') {
     if (typeof loadModelsConfig === 'function') loadModelsConfig();
+    refreshClusterTelemetry();
   } else if (targetView === 'humanizer') {
     const input = document.getElementById('humanizerInput');
     if (input && !input.value.trim() && typeof pasteCurrentArticleIntoHumanizer === 'function') {
@@ -3159,8 +3160,8 @@ async function refreshClusterTelemetry() {
         if (cardNode2) { cardNode2.className = 'telemetry-node-badge online'; cardNode2.textContent = '🟢 :8081 / :8082'; cardNode2.style = 'font-size:10.5px;padding:2px 8px;'; }
         if (cardNode3) { cardNode3.className = 'telemetry-node-badge online'; cardNode3.textContent = '🟢 :8000 ОНЛАЙН'; cardNode3.style = 'font-size:10.5px;padding:2px 8px;'; }
         if (footerNode3) {
-          footerNode3.style = 'font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;';
-          footerNode3.innerHTML = '✓ Аппаратный роутер и хаб телеметрии активен';
+          footerNode3.style.cssText = 'font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;';
+          footerNode3.innerHTML = '✓ Шлюз подключён к сети (192.168.31.48:8000 · Fast-Path активен)';
         }
         if (diagNode3) { diagNode3.textContent = '🟢 Онлайн · Router v4.9'; diagNode3.style.color = '#059669'; }
         if (headerClusterText) headerClusterText.textContent = 'Письмо локально (Mi 10T) · Шлюз онлайн';
@@ -3175,7 +3176,7 @@ async function refreshClusterTelemetry() {
         if (cardNode2) { cardNode2.className = 'telemetry-node-badge standby'; cardNode2.textContent = '⚪ :8081 ОЖИДАНИЕ'; cardNode2.style = 'font-size:10.5px;padding:2px 8px;background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;'; }
         if (cardNode3) { cardNode3.className = 'telemetry-node-badge offline'; cardNode3.textContent = '🔴 :8000 ОФФЛАЙН'; cardNode3.style = 'font-size:10.5px;padding:2px 8px;background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;'; }
         if (footerNode3) {
-          footerNode3.style = 'font-size:11px;color:#B91C1C;background:#FEF2F2;padding:4px 8px;border-radius:4px;border:1px solid #FECACA;';
+          footerNode3.style.cssText = 'font-size:11px;color:#B91C1C;background:#FEF2F2;padding:4px 8px;border-radius:4px;border:1px solid #FECACA;';
           footerNode3.innerHTML = '⚠ Узел не подключён к сети (резерв: OmniRoute)';
         }
 
