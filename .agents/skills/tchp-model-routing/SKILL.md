@@ -1,68 +1,54 @@
 ---
 name: tchp-model-routing
-description: Model routing, VPN requirements and failover for the Тоchka Plavleniya project — which model writes, reviews, fact-checks and codes, and how the rules evolve with the repository.
-argument-hint: "[models|vpn|failover|critical-article]"
+description: Model routing, VPN requirements, failover and Council of Models (10 models) for the Тоchka Plavleniya project — roles, channels, and cross-model validation rules.
+argument-hint: "[models|council|vpn|failover|critical-article]"
 metadata:
   author: tchp
-  version: "1.0.0"
+  version: "2.1.0"
 ---
 
-# Model Routing — Точка Плавления
+# Совет моделей и маршрутизация — Точка Плавления
 
-Единый источник правил: [seo/MODEL-ROUTING.md](../../../seo/MODEL-ROUTING.md). При расхождении
-приоритет у MODEL-ROUTING.md, этот skill — краткая операционная памятка.
+Единый источник правил Совета моделей и маршрутизации конвейера «Точка Плавления».
 
-## Роли
+## 1. Совет моделей (10 членов коллегии)
 
-| Роль | Модель | VPN |
-|---|---|---|
-| Писать статьи (голос 1 / голос 2) | `claude-sonnet-5` (Oxion) | не нужен |
-| Рецензия обычной статьи | `gemini-3.7-flash` (Oxion) | не нужен |
-| Рецензия критичной статьи | `claude-opus-4.6` (Oxion) | не нужен |
-| Фактчек (другое семейство) | `deepseek-v4-pro-0813` (Oxion) | не нужен |
-| Код/техно-аудит | `deepseek-v4-pro-0813` | не нужен |
-| Рутина, LSI, черновики | `deepseek-v4-flash-0731` | не нужен |
-| Бесплатный резерв | `deepseek-v4.1-flash:free` (Token Harbor) | **только с VPN** |
-| Бесплатный резерв №2 | `kilo-auto/free`, `nvidia/nemotron-3.5-lightning:free` (Kilo Gateway) | **только с VPN** |
-| YandexGPT 5 Pro (Yandex AI Studio) | `gpt://<folder>/yandexgpt/latest` | не нужен |
+| № | Модель | Роль в проекте | Канал / Провайдер | Назначение |
+|---|---|---|---|---|
+| **1** | **Gemini 3.8 / 4 (Google)** | **Координатор, UX-директор, архитектура** | Текущая среда + `antigravity-consult` | Общая координация, UX/UI верстака и лонгридов, оперативное ревью |
+| **2** | **Claude Sonnet 4.6 / Opus 4.6 (Anthropic)** | **Главный редактор, голос Practico** | `antigravity-consult` (OAuth CLI) + DSH / Oxion | Редактура, статьи голосом Practico, аудит критичных тем (220В, безопасность, ГОСТ/IPC) |
+| **3** | **ddgw/gpt-5.6-luna** | **Универсал, vision, упаковка данных** | OmniRoute / DSH | Комплексные проверки UI, структурирование схем и JSON, кросс-валидация |
+| **4** | **ddgw/claude-haiku-4-5** | **Точный анализ кода (Claude 4.5 Haiku)** | OmniRoute / DSH (DDGW) | Быстрый и строгий аудит кода калькуляторов, CSS-токенов, скриптов |
+| **5** | **gc/grok-4.7** | **Флагман xAI (Комплексный анализ)** | OmniRoute / DSH (gc) | Внесистемный критический анализ, поиск неочевидных пробелов и альтернативных гипотез |
+| **6** | **pplx-web/pplx-auto** | **Верховный онлайн-фактчекер (Perplexity AI)** | OmniRoute (`pplx-web`) + Desktop App | Поиск в реальном времени: свежие ревизии ГОСТ, IPC-A-610H (2025–2026), даташиты производителей (Kester, Indium, AIM) |
+| **7** | **moonshotai/kimi-k3.1-pro** | **Kimi K3.1 Pro (Vision & Reasoning)** | NVIDIA NIM · Аккаунт 2 | Глубокое логическое рассуждение, анализ графиков термопрофилей и диаграмм |
+| **8** | **minimaxai/minimax-m3.1-flash** | **MiniMax M3.1 Flash** | NVIDIA NIM · Аккаунт 2 | Быстрый семантический скоринг, LSI-кластеризация, оперативная фильтрация |
+| **9** | **mistralai/mistral-large-4-1t-a52b** | **Mistral Large 4 1T (Vision & Reasoning)** | NVIDIA NIM · Аккаунт 2 | Тяжёлый инженерный фактчекинг, сверка физики пайки и химических свойств сплавов/флюсов |
+| **10** | **z-ai/glm-5.3-flash** | **GLM 5.3 Flash** | NVIDIA NIM · Аккаунт 2 | Вспомогательный быстрый анализ, синтез выжимок, валидация метаданных |
 
-Модели в селекторе DSH помечены суффиксами `· VPN ON` / `· VPN OFF`.
+---
 
-## Режимы Sonnet
+## 2. Кросс-модельные сценарии (Консилиум)
 
-1. **paste** — пользователь вставляет готовый текст на дашборде; Sonnet сохраняет факты и числа,
-   приводит к стандартам (Answer First ≤ 40 слов, 4–8 H2, 1–2 таблицы, FAQ 4–6, источники 2–4,
-   5 500–7 000 знаков).
-2. **draft** — написание с нуля голосом Practico 1 (`practico`) или Practico 2 (`practico2`).
+1. **Критическая статья (Безопасность / 220В / ГОСТ):**
+   - Черновик: Claude Sonnet 4.6
+   - Онлайн-проверка стандартов и даташитов: Perplexity AI (`pplx-web/pplx-auto`)
+   - Инженерный фактчек: Mistral Large 4 1T (NVIDIA NIM) + Kimi K3.1 Pro
+   - Финальное ОТК: Claude Opus 4.6
+2. **UI/UX & Архитектура верстака (`DESIGN.md`):**
+   - Архитектура и токен-система: Gemini 3.8 / 4 (`ux-director`)
+   - Аудит кода компонентов: Claude 4.5 Haiku (`ddgw/claude-haiku-4-5`)
+   - Vision & layout-контроль: `ddgw/gpt-5.6-luna` + Playwright
+3. **Сложные инженерные споры / ТРИЗ / Патенты:**
+   - Позиция A: Gemini 4 + Mistral Large 4 1T
+   - Пруфы из живой сети: Perplexity AI
+   - Критическая контр-позиция: Grok 4.7 (`gc/grok-4.7`) + Kimi K3.1 Pro
+   - Синтез решения: Координатор
 
-## Критичная статья
+---
 
-Флаг ставится в карточке на дашборде. Критично: сеть/220 В, токсичность флюсов, температуры и
-сплавы, ГОСТ/IPC, медицинские/юридические утверждения, хабовые статьи. Критичная — Opus, обычная —
-Gemini. Нашёл блокер у Gemini → перевести в критичные и прогнать Opus.
+## 3. Требования по каналам и VPN
 
-## Фактчек
-
-Отдельный агент, другое семейство (DeepSeek V4 Pro), таблица «утверждение | статус | комментарий».
-Требование slopmonster: полировка и фактчек — не тем семейством, что писало текст.
-
-## VPN и каналы
-
-⚠️ Oxion (Claude для статей, Gemini для рецензии) **не работает при включённом VPN** — таймаут.
-Token Harbor и Kilo наоборот **требуют VPN** (`403` без него). Одновременно не работают.
-
-- `· VPN вкл` — Token Harbor, Kilo, OpenRouter.
-- `· VPN выкл` — Oxion: Claude Sonnet 5, Gemini 3.7 Flash, GPT-5.6 Luna, DeepSeek V4 Pro/Flash.
-- `· VPN любой` — Yandex AI Studio (YandexGPT), DeepSeek-аккаунт, SourceCraft CLI.
-- Схема: статьи → VPN выкл; бесплатный резерв → VPN вкл.
-- OpenCode Zen / freetap — удалён из профиля.
-
-## Как этот skill развивается
-
-Правила живут в репозитории и меняются вместе с проектом:
-1. Изменение маршрутизации/лимитов/критериев — сначала в [`seo/MODEL-ROUTING.md`](../../../seo/MODEL-ROUTING.md),
-   затем краткое отражение здесь (этот skill читается агентами автоматически).
-2. Провайдеры и ключи — в профиле DSH (`~/.dsh/profiles/web/cordis.patch.yml`, `~/.dsh/.env`),
-   в репозиторий секреты не попадают.
-3. Для пересборки skill из обсуждений использовать skill `build-partner` (Improve System).
-4. Изменения кода/правил — отдельная ветка + PR, тесты `python tests/run-all-tests.py` до коммита.
+- **Oxion AI / Antigravity CLI (Google OAuth):** работают напрямую без сторонних прокси.
+- **NVIDIA NIM (Аккаунт 2):** Kimi K3.1 Pro, MiniMax M3.1 Flash, Mistral Large 4 1T, GLM 5.3 Flash через MCP `nvidia` / direct API.
+- **OmniRoute / DSH (порт 20128):** маршрутизация `ddgw/gpt-5.6-luna`, `ddgw/claude-haiku-4-5`, `gc/grok-4.7`, `pplx-web/pplx-auto`.
