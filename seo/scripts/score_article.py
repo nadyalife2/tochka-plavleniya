@@ -261,6 +261,9 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
     verdict = "готово к ОТК" if total >= 80 else ("черновик" if total >= 60 else "в доработку")
     if blockers:
         verdict = "блокер"
+
+    aeo_geo = compute_aeo_geo_score(text, result)
+
     return {
         "article_id": article_id,
         "generated_at": __import__("datetime").datetime.now().isoformat(timespec="seconds"),
@@ -269,10 +272,119 @@ def blocks(text: str, plan: dict | None, article_id: str) -> dict:
         "blocks": score,
         "total": total,
         "verdict": verdict,
+        "aeo_geo": aeo_geo,
         "issues": issues,
         "blockers": blockers,
         "manual": ["проверить факты по первоисточникам", "проверить уникальность (text.ru/Главред)",
                    "прочитать голосом вслух (голос Practico)"],
+    }
+
+
+def compute_aeo_geo_score(text: str, metrics: dict | None = None) -> dict:
+    """AEO & GEO Скоринг цитируемости статьи нейросетями (Yandex Нейро / Perplexity / Gemini).
+    
+    Модели цитируют контент, содержащий четкие предикаты: [Сущность] + [Свойство] + [Физическое значение].
+    5 инженерных критериев (по 20 баллов каждый):
+    1. Answer First (прямой ответ в первом абзаце <= 40 слов).
+    2. Таблица параметров с физическими величинами (°C, мм, Вт, сплавы).
+    3. Ссылки на стандарты и первоисточники (ГОСТ, IPC, J-STD, TDS).
+    4. Структурированный FAQ-блок (готов для Schema.org FAQPage).
+    5. Anti-Slop (полная чистота от AI-воды и штампов).
+    """
+    if metrics is None:
+        plain = strip_markdown(text)
+        paras = paragraphs(plain)
+        sents = [s for p in paras for s in sentences(p)]
+        first_para = paras[0] if paras else ""
+        answer_words = len(words(first_para))
+        sources = sum(1 for marker in SOURCE_MARKERS for _ in re.finditer(marker, plain.lower()))
+        faq = count_faq(text)
+        ai_hits = [p for p in AI_PATTERNS if p in plain.lower()]
+        stop_hits = [p for p in STOP_PHRASES if p in plain.lower()]
+        temps = re.findall(r"\d{2,3}\s*°\s*[CС]", plain)
+        alloys_ok = any(a in plain.lower() for a in ALLOYS)
+    else:
+        answer_words = metrics.get("answer_first_words", 0)
+        sources = metrics.get("sources", 0)
+        faq = metrics.get("faq", 0)
+        ai_hits = metrics.get("ai_patterns", [])
+        stop_hits = metrics.get("stop_phrases", [])
+        temps = range(metrics.get("temps", 0))
+        alloys_ok = metrics.get("alloys", False)
+
+    predicates = []
+    total_pts = 0
+
+    # 1. Answer First
+    af_pts = 20 if 0 < answer_words <= 40 else (10 if answer_words <= 60 else 0)
+    total_pts += af_pts
+    predicates.append({
+        "name": "answer_first",
+        "title": "Прямой ответ в первом абзаце (Answer First)",
+        "points": af_pts,
+        "max": 20,
+        "status": "pass" if af_pts == 20 else ("warn" if af_pts > 0 else "fail"),
+        "detail": f"{answer_words} слов в зачине (норма: ≤ 40 слов без вводных конструкций)"
+    })
+
+    # 2. Таблица параметров с единицами измерения
+    has_md_table = bool(re.search(r"\|[-:\s|]+\|", text))
+    has_units = bool(temps) or bool(re.search(r"\b(мм|вт|мпа|мком|г/см3|%|sn\d+pb\d+)\b", text.lower()))
+    tbl_pts = 20 if (has_md_table and has_units) else (12 if (has_md_table or (has_units and alloys_ok)) else 0)
+    total_pts += tbl_pts
+    predicates.append({
+        "name": "params_table",
+        "title": "Таблица параметров с физическими величинами",
+        "points": tbl_pts,
+        "max": 20,
+        "status": "pass" if tbl_pts >= 18 else ("warn" if tbl_pts > 0 else "fail"),
+        "detail": "Таблица Markdown с величинами (°C, мм, сплавы) найдена" if has_md_table else "Таблица параметров не найдена (нейросетям сложнее парсить)"
+    })
+
+    # 3. Первоисточники и стандарты (ГОСТ/IPC/TDS)
+    std_pts = 20 if sources >= 2 else (10 if sources == 1 else 0)
+    total_pts += std_pts
+    predicates.append({
+        "name": "standards",
+        "title": "Ссылки на первоисточники (ГОСТ, IPC, TDS)",
+        "points": std_pts,
+        "max": 20,
+        "status": "pass" if std_pts == 20 else ("warn" if std_pts > 0 else "fail"),
+        "detail": f"Найдено {sources} упоминаний стандартов (цель: ≥ 2 для авторитетности)"
+    })
+
+    # 4. FAQ блок
+    faq_pts = 20 if faq >= 3 else (10 if faq in (1, 2) else 0)
+    total_pts += faq_pts
+    predicates.append({
+        "name": "faq_block",
+        "title": "FAQ-блок для микроразметки Schema.org FAQPage",
+        "points": faq_pts,
+        "max": 20,
+        "status": "pass" if faq_pts == 20 else ("warn" if faq_pts > 0 else "fail"),
+        "detail": f"Найдено {faq} вопросов FAQ (норма: 3–5 вопросов под сниппет)"
+    })
+
+    # 5. Чистота от AI-штампов
+    slop_count = len(ai_hits) + len(stop_hits)
+    slop_pts = 20 if slop_count == 0 else (10 if slop_count == 1 else 0)
+    total_pts += slop_pts
+    predicates.append({
+        "name": "anti_slop",
+        "title": "Чистота от AI-клише и штампов (Anti-Slop)",
+        "points": slop_pts,
+        "max": 20,
+        "status": "pass" if slop_pts == 20 else ("warn" if slop_pts > 0 else "fail"),
+        "detail": "Штампы отсутствуют" if slop_count == 0 else f"Обнаружено {slop_count} AI-маркеров/стоп-фраз"
+    })
+
+    level = "Высокая (AEO / GEO Ready)" if total_pts >= 80 else ("Умеренная" if total_pts >= 50 else "Низкая")
+    return {
+        "score": total_pts,
+        "max": 100,
+        "level": level,
+        "badge_class": "status-badge--success" if total_pts >= 80 else ("status-badge--review" if total_pts >= 50 else "status-badge--fix"),
+        "predicates": predicates
     }
 
 

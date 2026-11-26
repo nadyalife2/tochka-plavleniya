@@ -1809,6 +1809,35 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "phrase": phrase, "wordstat_history": ws_hist, "mutagen_history": mg_hist})
             return
 
+        if path == "/api/keyword/local_mutagen":
+            phrase = (parse_qs(url.query).get("phrase") or [""])[0].strip()
+            if not phrase:
+                self.send_json({"status": "error", "message": "Укажите ?phrase="}, 400)
+                return
+            try:
+                from competition_score import compute_local_mutagen
+                res = compute_local_mutagen(phrase)
+                self.send_json({"status": "ok", "result": res})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/article/aeo_score":
+            aid = (parse_qs(url.query).get("id") or [""])[0].strip()
+            text = (parse_qs(url.query).get("text") or [""])[0].strip()
+            try:
+                from score_article import compute_aeo_geo_score
+                if aid and not text:
+                    with get_connection() as conn:
+                        row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (aid,)).fetchone()
+                        if row and row["content_markdown"]:
+                            text = row["content_markdown"]
+                res = compute_aeo_geo_score(text or "")
+                self.send_json({"status": "ok", "aeo_geo": res})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
         if path == "/api/keyword/history":
             # Сводная таблица ключевых фраз: объединяем Вордстат (широкий спрос) и Мутаген (конкуренция, точный спрос, хвосты, ставки Директа)
             merged = {}
@@ -1885,6 +1914,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
             rows = list(merged.values())
             rows.sort(key=lambda x: x.get("checked_at") or "", reverse=True)
+            try:
+                from competition_score import compute_local_mutagen
+                for it in rows[:60]:
+                    it["local_mutagen"] = compute_local_mutagen(it["phrase"])
+            except Exception:
+                pass
             self.send_json({"phrases_checked": len(rows), "history": rows[:100]})
             return
 
@@ -3199,6 +3234,36 @@ class DashboardHandler(BaseHTTPRequestHandler):
         # 7. Запуск субагента
         if path == "/api/agent/run":
             self.dispatch_agent_run(payload)
+            return
+
+        if path == "/api/keyword/local_mutagen":
+            phrase = (payload.get("phrase") or "").strip()
+            serp_urls = payload.get("serp_urls") or []
+            if not phrase:
+                self.send_json({"status": "error", "message": "Пустая фраза"}, 400)
+                return
+            try:
+                from competition_score import compute_local_mutagen
+                res = compute_local_mutagen(phrase, serp_urls=serp_urls)
+                self.send_json({"status": "ok", "result": res})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
+        if path == "/api/article/aeo_score":
+            text = payload.get("text") or ""
+            aid = parse_row_id(payload.get("topic_id") or payload.get("article_id"))
+            try:
+                from score_article import compute_aeo_geo_score
+                if aid and not text:
+                    with get_connection() as conn:
+                        row = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (aid,)).fetchone()
+                        if row and row["content_markdown"]:
+                            text = row["content_markdown"]
+                res = compute_aeo_geo_score(text)
+                self.send_json({"status": "ok", "aeo_geo": res})
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
             return
 
         # 7.5. Проверка фразы: спрос (Вордстат, бесплатно) и конкуренция (Мутаген, платно)

@@ -335,6 +335,12 @@
 
   <!-- TAB 3: PROPOSED TOPICS FROM GAPS -->
   <section class="tab-view" id="view-gaps">
+    <div class="recon-subnav-bar">
+      <button class="recon-subnav-btn" onclick="switchReconTab('radar')">🎯 Радар выдачи (SERP)</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('analysis')">🔬 Спрос & Мутаген (0 ₽)</button>
+      <button class="recon-subnav-btn active" onclick="switchReconTab('gaps')">🧩 Семантические пробелы</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('competitors')">🏆 Конкуренты</button>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
       <div>
         <h2 style="margin:0;font-size:17px;font-weight:800;">Предложенные темы из контентных пробелов</h2>
@@ -364,6 +370,12 @@
 
   <!-- TAB 4: COMPETITORS & FEATURES -->
   <section class="tab-view" id="view-competitors">
+    <div class="recon-subnav-bar">
+      <button class="recon-subnav-btn" onclick="switchReconTab('radar')">🎯 Радар выдачи (SERP)</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('analysis')">🔬 Спрос & Мутаген (0 ₽)</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('gaps')">🧩 Семантические пробелы</button>
+      <button class="recon-subnav-btn active" onclick="switchReconTab('competitors')">🏆 Конкуренты</button>
+    </div>
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
       <div>
         <h2 style="margin:0;font-size:17px;font-weight:800;">Анализ конкурентов, SEO-слов и фишек</h2>
@@ -511,11 +523,47 @@
 
   <!-- TAB 4.5: KEYWORD ANALYSIS (Вордстат + Мутаген) -->
   <section class="tab-view" id="view-analysis">
+    <div class="recon-subnav-bar">
+      <button class="recon-subnav-btn" onclick="switchReconTab('radar')">🎯 Радар выдачи (SERP)</button>
+      <button class="recon-subnav-btn active" onclick="switchReconTab('analysis')">🔬 Спрос & Мутаген (0 ₽)</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('gaps')">🧩 Семантические пробелы</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('competitors')">🏆 Конкуренты</button>
+    </div>
+
     <div style="margin-bottom:12px;">
       <h2 style="margin:0;font-size:17px;font-weight:800;">🔬 Анализ поисковых запросов и конкуренции</h2>
       <div style="font-size:12px;color:var(--muted);">
-        Спрос — бесплатно через Яндекс AI Studio (Wordstat API). Конкуренция и хвосты — Мутаген (0,30 ₽ за фразу).
+        Спрос — бесплатно через Яндекс AI Studio (Wordstat API). Конкуренция и хвосты — Мутаген и локальная эвристика (0 ₽).
         Результаты кэшируются: повторная проверка денег не тратит.
+      </div>
+    </div>
+
+    <!-- Локальный бесплатный Мутаген 0 ₽ -->
+    <div class="saas-panel-card" style="padding:16px;margin-bottom:14px;border:1px solid #CBD5E1;background:#FFFFFF;">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px;">
+        <div>
+          <h3 style="margin:0;font-size:14px;font-weight:700;color:#0F172A;display:flex;align-items:center;gap:6px;">
+            <span>⚡ Локальный бесплатный Мутаген (0 ₽)</span>
+            <span class="badge" style="background:#ECFDF5;color:#047857;font-size:11px;padding:2px 8px;">0 ₽ · Без API-баланса</span>
+          </h3>
+          <div style="font-size:11.5px;color:#64748B;margin-top:2px;">
+            Оценка сложности (1–25) по составу выдачи: выявление коммерческих монолитов (маркетплейсов) и открытых инфо-ниш.
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+        <input type="text" id="localMutagenInput" class="form-input" placeholder="Введите фразу (например: пос-61 температура плавления)" style="flex:1;padding:7px 12px;font-size:13px;" onkeydown="if(event.key==='Enter') runLocalMutagenCheck()" />
+        <button class="btn btn--primary" type="button" onclick="runLocalMutagenCheck()" style="padding:7px 16px;font-weight:700;">Рассчитать (0 ₽)</button>
+      </div>
+
+      <div id="localMutagenResultBox" style="display:none;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:13px;font-weight:700;color:#0F172A;" id="localMutagenResTitle">—</span>
+          <span class="mutagen-free-badge mutagen-free-badge--green" id="localMutagenResBadge">Сложность: —/25</span>
+        </div>
+        <div style="font-size:12px;color:#334155;margin-bottom:6px;" id="localMutagenResVerdict">—</div>
+        <div style="font-size:11.5px;color:#64748B;" id="localMutagenResDetails">—</div>
       </div>
     </div>
 
@@ -1155,6 +1203,12 @@
   </section>
 
   <section class="tab-view" id="view-radar">
+    <div class="recon-subnav-bar">
+      <button class="recon-subnav-btn active" onclick="switchReconTab('radar')">🎯 Радар выдачи (SERP)</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('analysis')">🔬 Спрос & Мутаген (0 ₽)</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('gaps')">🧩 Семантические пробелы</button>
+      <button class="recon-subnav-btn" onclick="switchReconTab('competitors')">🏆 Конкуренты</button>
+    </div>
     <div class="saas-panel-card">
       <div style="border-bottom:1px solid #E2E8F0;padding-bottom:12px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;">
         <div>
@@ -1868,14 +1922,57 @@
         </div>
       </div>
 
-      <!-- Блок SEO & AEO -->
+      <!-- Блок SEO & AEO Цитируемость (Yandex Нейро / Perplexity / Gemini) -->
       <div class="check-item" id="checkBlockSeo">
         <div class="check-item__head">
-          <span>🌐 SEO & AEO Цитируемость</span>
-          <span class="status-badge status-badge--success" id="badgeCheckSeo">Норма</span>
+          <span style="font-weight:700;">🌐 AEO & GEO Цитируемость нейросетями</span>
+          <span class="status-badge status-badge--success" id="badgeCheckSeo">90% · Готово к цитированию</span>
         </div>
         <div style="font-size:12px;color:#64748B;margin-top:4px;">
-          BLUF-ответ на 1 месте, таблица параметров есть, схема TechArticle валидна.
+          Скоринг готовности статьи для извлечения фактов Yandex Нейро, Perplexity и Gemini (5 инженерных предикатов).
+        </div>
+
+        <div class="aeo-progress-container">
+          <div class="aeo-progress-bar aeo-progress-bar--high" id="aeoProgressBar" style="width: 90%;"></div>
+        </div>
+
+        <div id="aeoPredicatesContainer" style="margin-top:10px;">
+          <!-- Заполняется динамически функцией updateDrawerAeoScore -->
+          <div class="aeo-predicate-card">
+            <div>
+              <div class="aeo-predicate-title">1. Прямой ответ в первом абзаце (Answer First)</div>
+              <div class="aeo-predicate-detail" id="aeoPred1Detail">18 слов в первом абзаце (норма: ≤ 40 слов)</div>
+            </div>
+            <span class="status-badge status-badge--success" id="aeoPred1Badge">20/20</span>
+          </div>
+          <div class="aeo-predicate-card">
+            <div>
+              <div class="aeo-predicate-title">2. Таблица параметров с физическими величинами</div>
+              <div class="aeo-predicate-detail" id="aeoPred2Detail">Таблица Markdown с величинами (°C, мм, сплавы) присутствует</div>
+            </div>
+            <span class="status-badge status-badge--success" id="aeoPred2Badge">20/20</span>
+          </div>
+          <div class="aeo-predicate-card">
+            <div>
+              <div class="aeo-predicate-title">3. Ссылки на первоисточники и стандарты</div>
+              <div class="aeo-predicate-detail" id="aeoPred3Detail">ГОСТ 21931-76 и IPC J-STD-006 валидированы</div>
+            </div>
+            <span class="status-badge status-badge--success" id="aeoPred3Badge">20/20</span>
+          </div>
+          <div class="aeo-predicate-card">
+            <div>
+              <div class="aeo-predicate-title">4. FAQ-блок под Schema.org FAQPage</div>
+              <div class="aeo-predicate-detail" id="aeoPred4Detail">4 вопроса с четкими краткими ответами</div>
+            </div>
+            <span class="status-badge status-badge--success" id="aeoPred4Badge">20/20</span>
+          </div>
+          <div class="aeo-predicate-card">
+            <div>
+              <div class="aeo-predicate-title">5. Чистота от AI-воды (Anti-Slop)</div>
+              <div class="aeo-predicate-detail" id="aeoPred5Detail">0 запрещенных штампов и клише</div>
+            </div>
+            <span class="status-badge status-badge--success" id="aeoPred5Badge">20/20</span>
+          </div>
         </div>
       </div>
 

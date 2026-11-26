@@ -228,9 +228,55 @@ function renderTodayView() {
   }
 }
 
-function switchReconSegment(segmentName) {
+function switchReconTab(segmentName) {
   CURRENT_RECON_SEGMENT = segmentName;
   switchTab(segmentName);
+  document.querySelectorAll('.recon-subnav-btn').forEach(btn => {
+    btn.classList.toggle('active', !!btn.getAttribute('onclick')?.includes("'" + segmentName + "'"));
+  });
+}
+
+function switchReconSegment(segmentName) {
+  switchReconTab(segmentName);
+}
+
+async function runLocalMutagenCheck() {
+  const input = document.getElementById('localMutagenInput');
+  const phrase = (input ? input.value : '').trim();
+  if (!phrase) {
+    showToast('Введите фразу для оценки');
+    return;
+  }
+  const box = document.getElementById('localMutagenResultBox');
+  const title = document.getElementById('localMutagenResTitle');
+  const badge = document.getElementById('localMutagenResBadge');
+  const verdict = document.getElementById('localMutagenResVerdict');
+  const details = document.getElementById('localMutagenResDetails');
+
+  if (title) title.textContent = `Оценка фразы: «${phrase}»...`;
+  if (box) box.style.display = 'block';
+
+  try {
+    const res = await apiPost('/api/keyword/local_mutagen', { phrase });
+    if (res && res.status === 'ok' && res.result) {
+      const r = res.result;
+      if (title) title.textContent = `«${r.keyword}»`;
+      if (badge) {
+        badge.textContent = `Сложность: ${r.mutagen_score}/25 (0 ₽)`;
+        badge.className = 'mutagen-free-badge ' + (r.verdict === 'green' ? 'mutagen-free-badge--green' : (r.verdict === 'yellow' ? 'mutagen-free-badge--yellow' : 'mutagen-free-badge--red'));
+      }
+      if (verdict) verdict.textContent = r.verdict_ru;
+      if (details) {
+        const intName = r.intent === 'informational' ? 'Информационный' : (r.intent === 'commercial' ? 'Коммерческий (маркетплейсы)' : 'Смешанный');
+        details.innerHTML = `Интент: <strong>${intName}</strong> · Проанализировано доменов: <strong>${r.total_domains_analysed}</strong> (магазинов: ${r.commercial_domains}, инфо-ресурсов: ${r.informational_domains}) · Стоимость: <strong>0 ₽</strong>`;
+      }
+      showToast(`Локальный Мутаген: ${r.mutagen_score}/25 · ${r.verdict === 'green' ? 'Зеленый свет' : (r.verdict === 'commercial_skip' ? 'Пропуск' : 'Средняя сложность')}`);
+    } else {
+      showToast(res.message || 'Ошибка расчета', 'error');
+    }
+  } catch (err) {
+    showToast('Сбой запроса: ' + err.message, 'error');
+  }
 }
 
 function switchTab(name) {
@@ -752,10 +798,17 @@ async function renderAnalysisHistory() {
     tb.innerHTML = rows.map((r, i) => {
       const comp = r.competition;
       const hasComp = comp != null;
-      const compClass = hasComp ? (comp <= 10 ? 'score-pill--high' : (comp <= 18 ? 'score-pill--mid' : 'score-pill--low')) : '';
-      const compHtml = hasComp 
-        ? `<span class="score-pill ${compClass}">${comp}/25</span>` 
-        : '<span style="color:var(--muted);">—</span>';
+      let compHtml = '';
+      if (hasComp) {
+        const compClass = comp <= 10 ? 'score-pill--high' : (comp <= 18 ? 'score-pill--mid' : 'score-pill--low');
+        compHtml = `<span class="score-pill ${compClass}">${comp}/25</span>`;
+      } else if (r.local_mutagen) {
+        const lm = r.local_mutagen;
+        const bCls = lm.verdict === 'green' ? 'mutagen-free-badge--green' : (lm.verdict === 'yellow' ? 'mutagen-free-badge--yellow' : 'mutagen-free-badge--red');
+        compHtml = `<span class="mutagen-free-badge ${bCls}" title="${esc(lm.verdict_ru)}">${lm.mutagen_score}/25 (0 ₽)</span>`;
+      } else {
+        compHtml = '<span style="color:var(--muted);">—</span>';
+      }
 
       const rawBroad = r.demand_broad != null ? r.demand_broad : (r.source === 'wordstat' ? r.demand : null);
       const broadDemand = rawBroad != null 
@@ -3082,6 +3135,7 @@ async function refreshClusterTelemetry() {
   const cardNode2 = document.getElementById('node2CardBadge');
   const cardNode3 = document.getElementById('node3CardBadge');
   const cardOmni = document.getElementById('omniCardBadge');
+  const footerNode3 = document.getElementById('node3CardFooter');
 
   const diagNode1 = document.getElementById('diagNode1Badge');
   const diagNode2 = document.getElementById('diagNode2Badge');
@@ -3104,6 +3158,10 @@ async function refreshClusterTelemetry() {
         if (cardNode1) { cardNode1.className = 'telemetry-node-badge online'; cardNode1.textContent = '🟢 :8080 ОНЛАЙН'; cardNode1.style = 'font-size:10.5px;padding:2px 8px;'; }
         if (cardNode2) { cardNode2.className = 'telemetry-node-badge online'; cardNode2.textContent = '🟢 :8081 / :8082'; cardNode2.style = 'font-size:10.5px;padding:2px 8px;'; }
         if (cardNode3) { cardNode3.className = 'telemetry-node-badge online'; cardNode3.textContent = '🟢 :8000 ОНЛАЙН'; cardNode3.style = 'font-size:10.5px;padding:2px 8px;'; }
+        if (footerNode3) {
+          footerNode3.style = 'font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;';
+          footerNode3.innerHTML = '✓ Аппаратный роутер и хаб телеметрии активен';
+        }
         if (diagNode3) { diagNode3.textContent = '🟢 Онлайн · Router v4.9'; diagNode3.style.color = '#059669'; }
         if (headerClusterText) headerClusterText.textContent = 'Письмо локально (Mi 10T) · Шлюз онлайн';
         if (todayClusterText) todayClusterText.textContent = 'Mi 10T (генератор) · Nord N10 (QA-аудитор) · Redmi 4 (шлюз :8000)';
@@ -3116,6 +3174,10 @@ async function refreshClusterTelemetry() {
         if (cardNode1) { cardNode1.className = 'telemetry-node-badge standby'; cardNode1.textContent = '⚪ :8080 ОЖИДАНИЕ'; cardNode1.style = 'font-size:10.5px;padding:2px 8px;background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;'; }
         if (cardNode2) { cardNode2.className = 'telemetry-node-badge standby'; cardNode2.textContent = '⚪ :8081 ОЖИДАНИЕ'; cardNode2.style = 'font-size:10.5px;padding:2px 8px;background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;'; }
         if (cardNode3) { cardNode3.className = 'telemetry-node-badge offline'; cardNode3.textContent = '🔴 :8000 ОФФЛАЙН'; cardNode3.style = 'font-size:10.5px;padding:2px 8px;background:#FEE2E2;color:#991B1B;border:1px solid #FCA5A5;'; }
+        if (footerNode3) {
+          footerNode3.style = 'font-size:11px;color:#B91C1C;background:#FEF2F2;padding:4px 8px;border-radius:4px;border:1px solid #FECACA;';
+          footerNode3.innerHTML = '⚠ Узел не подключён к сети (резерв: OmniRoute)';
+        }
 
         if (diagNode3) { diagNode3.textContent = '🔴 Офлайн (порт :8000 не отвечает)'; diagNode3.style.color = '#DC2626'; }
         if (headerClusterText) headerClusterText.textContent = 'Письмо локально · Шлюз NODE-3 офлайн';
@@ -5441,6 +5503,56 @@ function switchDrawerTab(tabName) {
   const pane = document.getElementById(paneIdMap[tabName]);
   if (btn) btn.classList.add('active');
   if (pane) pane.classList.add('active');
+
+  if (tabName === 'check') {
+    updateDrawerAeoScore();
+  }
+}
+
+async function updateDrawerAeoScore() {
+  const textEl = document.getElementById('drawerArticleText');
+  const text = textEl ? textEl.value.trim() : '';
+  const badgeSeo = document.getElementById('badgeCheckSeo');
+  const bar = document.getElementById('aeoProgressBar');
+
+  if (!text) {
+    if (badgeSeo) {
+      badgeSeo.textContent = '0% · Черновик не написан';
+      badgeSeo.className = 'status-badge status-badge--fix';
+    }
+    if (bar) {
+      bar.style.width = '0%';
+      bar.className = 'aeo-progress-bar aeo-progress-bar--low';
+    }
+    return;
+  }
+
+  try {
+    const res = await apiPost('/api/article/aeo_score', { text });
+    if (res && res.status === 'ok' && res.aeo_geo) {
+      const a = res.aeo_geo;
+      if (badgeSeo) {
+        badgeSeo.textContent = `${a.score}% · ${a.level}`;
+        badgeSeo.className = 'status-badge ' + (a.badge_class || 'status-badge--success');
+      }
+      if (bar) {
+        bar.style.width = `${a.score}%`;
+        bar.className = 'aeo-progress-bar ' + (a.score >= 80 ? 'aeo-progress-bar--high' : (a.score >= 50 ? 'aeo-progress-bar--mid' : 'aeo-progress-bar--low'));
+      }
+      (a.predicates || []).forEach((p, idx) => {
+        const num = idx + 1;
+        const detEl = document.getElementById(`aeoPred${num}Detail`);
+        const bEl = document.getElementById(`aeoPred${num}Badge`);
+        if (detEl) detEl.textContent = p.detail;
+        if (bEl) {
+          bEl.textContent = `${p.points}/${p.max}`;
+          bEl.className = 'status-badge ' + (p.status === 'pass' ? 'status-badge--success' : (p.status === 'warn' ? 'status-badge--review' : 'status-badge--fix'));
+        }
+      });
+    }
+  } catch (e) {
+    console.error('AEO score update error:', e);
+  }
 }
 
 function saveDrawerBrief() {

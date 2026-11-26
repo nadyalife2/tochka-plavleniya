@@ -50,7 +50,14 @@ COMMERCIAL_MARKERS = [
 E_COMMERCE_DOMAINS = {
     "ozon.ru", "wildberries.ru", "market.yandex.ru", "dns-shop.ru", "vseinstrumenti.ru",
     "chipdip.ru", "sbermegamarket.ru", "megamarket.ru", "aliexpress.ru", "avito.ru",
-    "leroymerlin.ru", "lemanapro.ru", "citilink.ru", "solderpoint.ru/shop"
+    "leroymerlin.ru", "lemanapro.ru", "citilink.ru", "solderpoint.ru/shop", "profsnab.ru",
+    "siriust.ru", "green-spark.ru", "electronoff.ua", "pribor-spb.ru"
+}
+
+INFORMATIONAL_DOMAINS = {
+    "habr.com", "drive2.ru", "radiokot.ru", "cxem.net", "forum.easyelectronics.ru",
+    "pikabu.ru", "dzen.ru", "zen.yandex.ru", "overclockers.ru", "mysku.club",
+    "ixbt.com", "profipipe.ru", "svarka-paika.ru", "electrik.info", "tehno-science.ru"
 }
 
 VITAL_DOMAINS = {
@@ -170,6 +177,83 @@ def evaluate_keyword_competition(keyword: str, cluster: str = "") -> dict:
         "intent_type": intent_type,
         "vital_domain": vital_found,
         "details": details,
+    }
+
+
+def compute_local_mutagen(keyword: str, serp_urls: list[str] | None = None) -> dict:
+    """Бесплатный локальный аналог Мутагена (0 ₽).
+    Оценивает конкурентность ключевой фразы по классической шкале Мутагена (1–25).
+    
+    Механика:
+    1. Если 7+ из 10 сайтов в выдаче — маркетплейсы/магазины:
+       запрос чисто коммерческий, информационная статья не пробьется -> 'commercial_skip', score 20–25.
+    2. Если 4+ сайтов — статьи/форумы/Habr/Drive2:
+       информационный интент открыт, конкуренция слабая -> 'green' (зеленый свет), score 1–6.
+    3. Иначе -> 'yellow' (средняя сложность), score 7–14.
+    """
+    kw_low = keyword.lower().strip()
+    comm_hits = sum(1 for m in COMMERCIAL_MARKERS if m in kw_low)
+    is_pure_commercial = comm_hits >= 2 or ("купить" in kw_low or "цена" in kw_low)
+
+    domains = []
+    if serp_urls:
+        for u in serp_urls:
+            m = re.search(r"https?://([^/]+)", u)
+            if m:
+                domains.append(m.group(1).lower())
+    else:
+        # Извлекаем релевантные домены из локальной базы raw_articles / radar_cache
+        words = [w for w in re.findall(r"[a-zа-яё0-9\-]+", kw_low) if len(w) > 2]
+        with get_connection() as conn:
+            for w in words[:2]:
+                rows = conn.execute(
+                    "SELECT domain FROM raw_articles WHERE lower(title) LIKE ? LIMIT 10",
+                    (f"%{w}%",)
+                ).fetchall()
+                domains.extend([r["domain"] for r in rows])
+        # Убираем дубли, сохраняя порядок
+        seen = set()
+        domains = [d for d in domains if not (d in seen or seen.add(d))][:10]
+
+    comm_count = sum(1 for d in domains if any(cd in d for cd in E_COMMERCE_DOMAINS))
+    info_count = sum(1 for d in domains if any(idm in d for idm in INFORMATIONAL_DOMAINS))
+    vital_site = next((d for d in domains if d in VITAL_DOMAINS), None)
+
+    total_analysed = max(1, len(domains))
+    comm_ratio = comm_count / total_analysed
+
+    # Расчет по шкале 1–25
+    if is_pure_commercial or comm_count >= 7 or (total_analysed >= 5 and comm_ratio >= 0.7):
+        mutagen_score = min(25, 18 + comm_count)
+        verdict = "commercial_skip"
+        verdict_ru = "🔴 Коммерческий монолит (маркетплейсы в топе) → Пропуск статьи"
+        intent = "commercial"
+    elif info_count >= 4 or (total_analysed >= 3 and info_count >= total_analysed * 0.4 and comm_count <= 2):
+        mutagen_score = max(1, min(6, 1 + comm_count * 2))
+        verdict = "green"
+        verdict_ru = "🟢 Зеленый свет (информационная выдача, быстрый выход в ТОП-3)"
+        intent = "informational"
+    else:
+        base_val = 7 + int(comm_ratio * 10)
+        if vital_site:
+            base_val += 3
+        mutagen_score = max(7, min(17, base_val))
+        verdict = "yellow"
+        verdict_ru = "🟡 Средняя сложность (нужен глубокий разбор и ГОСТ)"
+        intent = "mixed" if comm_count > 0 else "informational"
+
+    return {
+        "keyword": keyword,
+        "mutagen_score": mutagen_score,
+        "verdict": verdict,
+        "verdict_ru": verdict_ru,
+        "intent": intent,
+        "commercial_domains": comm_count,
+        "informational_domains": info_count,
+        "vital_site": vital_site,
+        "total_domains_analysed": total_analysed,
+        "cost": "0 ₽ (Локальный анализ)",
+        "domains_sample": domains[:5]
     }
 
 
