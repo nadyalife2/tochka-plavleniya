@@ -1,0 +1,109 @@
+{
+  "article_id": "64",
+  "generated_at": "2026-11-27T15:07:12",
+  "file": null,
+  "metrics": {
+    "chars": 5561,
+    "h1": [
+      "Самодельный флюс из канифоли: состав, вред испарений и сравнение с покупными"
+    ],
+    "h2_count": 8,
+    "avg_sentence_words": 13.9,
+    "avg_paragraph_sentences": 2.7,
+    "faq": 4,
+    "internal_links": 4,
+    "sources": 11,
+    "temps": 16,
+    "alloys": true,
+    "answer_first_words": 36,
+    "stop_phrases": [],
+    "bureaucratic": [
+      "необходимо"
+    ],
+    "ai_patterns": [],
+    "dangerous": []
+  },
+  "blocks": {
+    "intent": {
+      "points": 20,
+      "max": 20
+    },
+    "facts": {
+      "points": 21,
+      "max": 25
+    },
+    "voice": {
+      "points": 15,
+      "max": 15
+    },
+    "seo": {
+      "points": 20,
+      "max": 20
+    },
+    "links": {
+      "points": 10,
+      "max": 10
+    },
+    "ai": {
+      "points": 10,
+      "max": 10
+    }
+  },
+  "total": 96,
+  "verdict": "готово к ОТК",
+  "aeo_geo": {
+    "score": 100,
+    "max": 100,
+    "level": "Высокая (AEO / GEO Ready)",
+    "badge_class": "status-badge--success",
+    "predicates": [
+      {
+        "name": "answer_first",
+        "title": "Прямой ответ в первом абзаце (Answer First)",
+        "points": 20,
+        "max": 20,
+        "status": "pass",
+        "detail": "36 слов в зачине (норма: ≤ 40 слов без вводных конструкций)"
+      },
+      {
+        "name": "params_table",
+        "title": "Таблица параметров с физическими величинами",
+        "points": 20,
+        "max": 20,
+        "status": "pass",
+        "detail": "Таблица Markdown с величинами (°C, мм, сплавы) найдена"
+      },
+      {
+        "name": "standards",
+        "title": "Ссылки на первоисточники (ГОСТ, IPC, TDS)",
+        "points": 20,
+        "max": 20,
+        "status": "pass",
+        "detail": "Найдено 11 упоминаний стандартов (цель: ≥ 2 для авторитетности)"
+      },
+      {
+        "name": "faq_block",
+        "title": "FAQ-блок для микроразметки Schema.org FAQPage",
+        "points": 20,
+        "max": 20,
+        "status": "pass",
+        "detail": "Найдено 4 вопросов FAQ (норма: 3–5 вопросов под сниппет)"
+      },
+      {
+        "name": "anti_slop",
+        "title": "Чистота от AI-клише и штампов (Anti-Slop)",
+        "points": 20,
+        "max": 20,
+        "status": "pass",
+        "detail": "Штампы отсутствуют"
+      }
+    ]
+  },
+  "issues": [],
+  "blockers": [],
+  "manual": [
+    "проверить факты по первоисточникам",
+    "проверить уникальность (text.ru/Главред)",
+    "прочитать голосом вслух (голос Practico)"
+  ]
+}
