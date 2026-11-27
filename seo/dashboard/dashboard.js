@@ -1405,8 +1405,11 @@ async function acceptAdaptation() {
   showToast('✓ Адаптированная версия принята и сохранена в SQLite!');
 }
 
-function promptAgentTarget(agentName) {
-  const tid = prompt(`Введите ID статьи для ${agentName}:`);
+function promptAgentTarget(agentName, defaultId) {
+  let tid = defaultId || CURRENT_TOPIC_ID;
+  if (!tid) {
+    tid = prompt(`Введите ID статьи для ${agentName}:`);
+  }
   if (!tid) return;
   CURRENT_TOPIC_ID = parseInt(tid, 10) || tid;
   if (agentName === '04-scorer') {
@@ -1998,7 +2001,7 @@ function renderKanban() {
       // Compact Action Button
       let actionBtn = '';
       if (col.code === 'backlog') {
-        actionBtn = `<button class="task-card__action-btn" style="background:#F1F5F9;color:#334155;border-color:#CBD5E1;" onclick="event.stopPropagation(); promptAgentTarget('01-researcher'); CURRENT_TOPIC_ID=${t.id};">▶ Бриф</button>`;
+        actionBtn = `<button class="task-card__action-btn" style="background:#F1F5F9;color:#334155;border-color:#CBD5E1;" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; openArticleDrawer(${t.id}, 'brief');">▶ Бриф</button>`;
       } else if (col.code === 'work') {
         actionBtn = `<button class="task-card__action-btn" style="background:#EFF6FF;color:#1D4ED8;border-color:#BFDBFE;" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; writeArticleForCurrentTopic();">✍️ Писать</button>`;
       } else if (col.code === 'needs_fix') {
@@ -2104,7 +2107,7 @@ function renderKanbanListView(topics) {
 
     let actionBtn = '';
     if (cCode === 'backlog') {
-      actionBtn = `<button class="btn btn--xs" onclick="event.stopPropagation(); promptAgentTarget('01-researcher'); CURRENT_TOPIC_ID=${t.id};" style="font-size:11px;padding:2px 8px;">▶ Бриф</button>`;
+      actionBtn = `<button class="btn btn--xs" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; openArticleDrawer(${t.id}, 'brief');" style="font-size:11px;padding:2px 8px;">▶ Бриф</button>`;
     } else if (cCode === 'work') {
       actionBtn = `<button class="btn btn--xs btn--primary" onclick="event.stopPropagation(); CURRENT_TOPIC_ID=${t.id}; writeArticleForCurrentTopic();" style="font-size:11px;padding:2px 8px;">✍️ Писать</button>`;
     } else if (cCode === 'needs_fix') {
@@ -5588,8 +5591,9 @@ async function runCompetitorRadarFromUI() {
 let CURRENT_DRAWER_TOPIC_ID = null;
 
 function openArticleDrawer(topicId, activeTab = 'brief') {
-  CURRENT_DRAWER_TOPIC_ID = topicId;
-  const t = (DB_DATA.topics || []).find(x => x.id === topicId) || {};
+  CURRENT_DRAWER_TOPIC_ID = Number(topicId) || topicId;
+  CURRENT_TOPIC_ID = CURRENT_DRAWER_TOPIC_ID;
+  const t = (DB_DATA.topics || []).find(x => Number(x.id) === Number(topicId)) || {};
   
   const drawer = document.getElementById('articleDrawer');
   const backdrop = document.getElementById('drawerBackdrop');
@@ -5638,7 +5642,13 @@ function openArticleDrawer(topicId, activeTab = 'brief') {
   const inKey = document.getElementById('drawerInputKeyword');
   if (inKey) inKey.value = t.keyword || t.title || '';
   const inNotes = document.getElementById('drawerTextNotes');
-  if (inNotes) inNotes.value = t.notes || t.target_query || '';
+  if (inNotes) {
+    let notesVal = t.notes || t.next_action || t.target_query || '';
+    if (typeof notesVal === 'string' && notesVal.startsWith('добавлено вручную: ')) {
+      notesVal = notesVal.replace('добавлено вручную: ', '');
+    }
+    inNotes.value = notesVal;
+  }
 
   // Pane 2: Text
   const textEl = document.getElementById('drawerArticleText');
@@ -5883,14 +5893,34 @@ async function saveDrawerBrief() {
     closeArticleDrawer();
     return;
   }
-  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
+  const t = (DB_DATA.topics || []).find(x => Number(x.id) === Number(CURRENT_DRAWER_TOPIC_ID));
   if (t) {
-    t.cluster = document.getElementById('drawerInputCluster').value.trim();
-    t.type = document.getElementById('drawerSelectType').value;
-    t.priority = document.getElementById('drawerSelectPriority').value;
-    t.keyword = document.getElementById('drawerInputKeyword').value.trim();
-    t.notes = document.getElementById('drawerTextNotes').value.trim();
-    showToast('Бриф статьи успешно сохранён!');
+    t.cluster = (document.getElementById('drawerInputCluster') || {}).value?.trim() || t.cluster;
+    t.type = (document.getElementById('drawerSelectType') || {}).value || t.type;
+    t.priority = (document.getElementById('drawerSelectPriority') || {}).value || t.priority;
+    t.keyword = (document.getElementById('drawerInputKeyword') || {}).value?.trim() || t.keyword;
+    t.title = (document.getElementById('drawerInputKeyword') || {}).value?.trim() || t.title;
+    const notesVal = (document.getElementById('drawerTextNotes') || {}).value?.trim() || '';
+    t.notes = notesVal;
+    t.next_action = notesVal ? `добавлено вручную: ${notesVal}` : t.next_action;
+    showToast('Бриф статьи сохранён!');
+    try {
+      const res = await apiPost('/api/topics/update-brief', {
+        id: t.id,
+        title: t.title,
+        cluster: t.cluster,
+        type: t.type,
+        priority: t.priority,
+        notes: notesVal
+      });
+      if (res && res.status === 'ok') {
+        showToast(`Бриф #${t.id} сохранён в SQLite!`, 'success');
+        if (typeof fetchAllData === 'function') await fetchAllData();
+        renderKanban();
+      }
+    } catch (e) {
+      console.warn('API update-brief fallback:', e);
+    }
   }
 }
 

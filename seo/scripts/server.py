@@ -2618,6 +2618,40 @@ class DashboardHandler(BaseHTTPRequestHandler):
             })
             return
 
+        # 1.6. Обновление брифа существующей темы (заметки, кластер, тип)
+        if path == "/api/topics/update-brief":
+            tid = self.require_id(payload)
+            if tid is None:
+                return
+            title = _scalar(payload.get("title", ""), "").strip()
+            cluster = _scalar(payload.get("cluster", ""), "").strip()
+            ctype = _scalar(payload.get("type", ""), "").strip()
+            priority = _scalar(payload.get("priority", ""), "").strip()
+            notes = _scalar(payload.get("notes", ""), "").strip()
+            now_str = datetime.now().isoformat(timespec="seconds")
+
+            with get_connection() as conn:
+                cur = conn.cursor()
+                row = cur.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
+                if not row:
+                    self.send_json({"status": "error", "message": "Тема не найдена"}, 404)
+                    return
+                new_next_action = f"добавлено вручную: {notes}" if notes else row["next_action"]
+                cur.execute("""
+                    UPDATE topics
+                    SET title = coalesce(nullif(?, ''), title),
+                        cluster = coalesce(nullif(?, ''), cluster),
+                        type = coalesce(nullif(?, ''), type),
+                        priority = coalesce(nullif(?, ''), priority),
+                        next_action = ?,
+                        updated_at = ?
+                    WHERE id = ?
+                """, (title, cluster, ctype, priority, new_next_action, now_str, tid))
+                conn.commit()
+
+            self.send_json({"status": "ok", "id": tid})
+            return
+
         # 2. Одобрить предложенную тему -> в topics
         if path == "/api/topics/approve":
             pid = self.require_id(payload)
