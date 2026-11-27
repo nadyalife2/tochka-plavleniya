@@ -5070,9 +5070,9 @@
     "semantic_hash": ""
   },
   "seo/dashboard/dashboard.js": {
-    "mtime": 1795768204.3103788,
-    "seen": 1795769069.7649078,
-    "ast_hash": "75a7c74bf03e1e9208c208fc6ef518e1",
+    "mtime": 1795776613.9231143,
+    "seen": 1795777126.3403213,
+    "ast_hash": "643638406734eb5dcf9bb16a61edb8dd",
     "semantic_hash": ""
   },
   "seo/dashboard/farm_3d.js": {
@@ -5088,9 +5088,9 @@
     "semantic_hash": ""
   },
   "seo/dashboard/graph.json": {
-    "mtime": 1795729327.401804,
-    "seen": 1795769069.7649078,
-    "ast_hash": "f326780426487af24a26372a2aab929f",
+    "mtime": 1795769063.7437885,
+    "seen": 1795774139.8115964,
+    "ast_hash": "f735477a79529905bb466158db6ce8c2",
     "semantic_hash": ""
   },
   "seo/dashboard/offline_data.json": {
@@ -5430,9 +5430,9 @@
     "semantic_hash": ""
   },
   "seo/scripts/models_manager.py": {
-    "mtime": 1795728841.6876326,
-    "seen": 1795769069.7649078,
-    "ast_hash": "f0def252a48f2627f7388dff46dbb8ed",
+    "mtime": 1795769717.9530816,
+    "seen": 1795774139.8115964,
+    "ast_hash": "1680a2c00bd71bf601b5b657670ef38c",
     "semantic_hash": ""
   },
   "seo/scripts/mutagen.py": {
@@ -5490,9 +5490,9 @@
     "semantic_hash": ""
   },
   "seo/scripts/server.py": {
-    "mtime": 1795745688.5363562,
-    "seen": 1795769069.7649078,
-    "ast_hash": "7ad03a1f773197bb5f6650372298ef0e",
+    "mtime": 1795776626.001001,
+    "seen": 1795777126.3403213,
+    "ast_hash": "fbce017d5713f3e753062b4faa165f8e",
     "semantic_hash": ""
   },
   "seo/scripts/standards_lookup.py": {
@@ -14850,15 +14850,15 @@
     "semantic_hash": ""
   },
   "seo/dashboard/graph.html": {
-    "mtime": 1795728701.551089,
-    "seen": 1795769069.7669132,
-    "ast_hash": "929a581ed62daa0f7cc048b976745d58",
+    "mtime": 1795769071.1603792,
+    "seen": 1795774139.8161922,
+    "ast_hash": "48fc769ba0c5d3157b65c7aa332f2e52",
     "semantic_hash": ""
   },
   "seo/dashboard/index.html": {
-    "mtime": 1795767853.4633303,
-    "seen": 1795769069.7669132,
-    "ast_hash": "48f841d49dbc4e1b882403ee815a87fd",
+    "mtime": 1795775154.4058743,
+    "seen": 1795777126.3403213,
+    "ast_hash": "75a75dd6e50e73ddc74848ce1f29be41",
     "semantic_hash": ""
   },
   "seo/data/article_1.md": {
@@ -22241,12 +22241,6 @@
     "ast_hash": "ed98f495649c2f0dd11d611d04b24561",
     "semantic_hash": ""
   },
-  "\u0418\u0434\u0435\u0438/README.md": {
-    "mtime": 1795730569.9984777,
-    "seen": 1795769069.768917,
-    "ast_hash": "117f2d5123c746e40bec444505125862",
-    "semantic_hash": ""
-  },
   "\u0441\u0430\u043c\u0438 \u0441\u0442\u0430\u0442\u044c\u0438/1-kak-payat-payalnikom-dlya-nachinayuschih.md": {
     "mtime": 1793472113.126068,
     "seen": 1795769069.768917,
@@ -24651,6 +24645,18 @@
     "mtime": 1795728701.6671374,
     "seen": 1795769069.768917,
     "ast_hash": "a71a40c17780159dc7156d773ecb8d20",
+    "semantic_hash": ""
+  },
+  "docs/DEVICE_INTEGRATION_NOTES.md": {
+    "mtime": 1795773391.672899,
+    "seen": 1795774139.8161922,
+    "ast_hash": "be4b4258a0a73b112492356a90b6cad4",
+    "semantic_hash": ""
+  },
+  "docs/FUTURE_IDEAS.md": {
+    "mtime": 1795730569.9984777,
+    "seen": 1795774139.8161922,
+    "ast_hash": "117f2d5123c746e40bec444505125862",
     "semantic_hash": ""
   },
   ".agents/skills/awesome-rea/tests/awesome-lint/package-lock.json": {

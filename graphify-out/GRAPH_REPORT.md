@@ -1,52 +1,54 @@
 # Graph Report - сайт для пайки  (2026-11-27)
 
 ## Corpus Check
-- 1993 files · ~13,527,261 words
+- 1993 files · ~13,187,572 words
 - Verdict: corpus is large enough that graph structure adds value.
-- Unclassified: 420 file(s) not represented in the graph (top: .woff2 180, .css 65, .csv 54)
+- Unclassified: 421 file(s) not represented in the graph (top: .woff2 180, .css 65, .csv 54)
 
 ## Summary
-- 25703 nodes · 49389 edges · 1532 communities (880 shown, 652 thin omitted)
+- 25714 nodes · 49418 edges · 1630 communities (874 shown, 756 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 1612 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `abece2d7`
+- Built from commit: `f6252b99`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
-- get_connection
+- excel_io.py
 - three.min.js
 - BugTracker
 - Lt
 - ref_node_assert
 - .agents/skills/impeccable/scripts/live-browser.js
 - triad_harness_bundle/skills/impeccable/scripts/live-browser.js
+- en
 - Ce
-- tempfile
+- Ne
+- sys
 - argparse
 - setup
 - .agents/skills/awesome-rea/scripts/validate_site.py
 - vt
 - agent_orchestrator.py
-- urllib_parse
+- pathlib
 - hello-elementor-settings.js
 - .agents/skills/awesome-rea/scripts/collect_discovery_leads.py
-- sys
+- hashlib
 - connectSSE
 - connectSSE
 - subprocess
-- triad_harness_bundle/skills/awesome-rea/scripts/collect_discovery_leads.py
+- triad_harness_bundle/skills/awesome-rea/scripts/discovery_leads.py
 - omni_fast_router_v4_9.py
 - dashboard.js
-- writer_practico.py
+- TestLLMEvalAndSecuritySuite
 - rick_voice.py
 - hello-conversion-banner.js
-- triad_harness_bundle/skills/awesome-rea/scripts/discovery_leads.py
+- triad_harness_bundle/skills/awesome-rea/scripts/build_discovery_leads.py
 - triad_harness_bundle/skills/awesome-rea/scripts/validate_site.py
 - .agents/skills/awesome-rea/tests/paper_search_ui.cjs
-- .setAttribute
+- constructor
 - triad_harness_bundle/skills/awesome-rea/tests/paper_search_ui.cjs
 - generate_app_icon.py
 - hello-home-app.js
@@ -62,17 +64,17 @@
 - triad_harness_bundle/skills/awesome-rea/scripts/build_readme.py
 - omni_forge_ui.py
 - BugTrackerActivity.kt
-- base64
-- parseObject
-- xml_etree_elementtree
+- ws
+- Kn
+- build_evidence_previews.py
 - St
 - SurveyTests
 - hashlib
-- .agents/skills/awesome-rea/tests/test_scheduled_source_scan.py
-- html_parser
+- snapshot
+- HeadingRows
 - scripts/core.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_scheduled_source_scan.py
-- .agents/skills/awesome-rea/scripts/scan_sources.py
+- run_scan
 - triad_harness_bundle/skills/awesome-rea/scripts/scan_sources.py
 - sn
 - json
@@ -101,13 +103,13 @@
 - el
 - IndexNowDeltaTests
 - el
-- .agents/skills/awesome-rea/tests/test_scan_classification.py
+- ClassificationDeterminismTests
 - test-package-a1.php
 - ClassLoader
 - .agents/skills/awesome-rea/scripts/build_discoveries.py
 - .agents/skills/awesome-rea/scripts/build_site.py
-- datetime
-- .agents/skills/awesome-rea/tests/test_discovery_site.py
+- PublicRedirect
+- .agents/skills/awesome-rea/scripts/validate_agent_formats.py
 - build_worklist.py
 - Farm3DEngine
 - text
@@ -117,18 +119,17 @@
 - triad_harness_bundle/skills/impeccable/scripts/modern-screenshot.umd.js
 - with
 - .agents/skills/awesome-rea/scripts/privacy_guard.py
-- pathlib
-- .agents/skills/awesome-rea/tests/test_contributor_docs.py
-- triad_harness_bundle/skills/awesome-rea/scripts/build_site.py
+- .agents/skills/awesome-rea/tests/test_curated_repository_search.py
+- ContributorReferenceTests
 - ml
 - with
 - .agents/skills/awesome-rea/tests/browser/smoke.cjs
-- urllib_error
+- triad_harness_bundle/skills/awesome-rea/scripts/scan_graphql_transport.py
 - triad_harness_bundle/skills/awesome-rea/scripts/privacy_guard.py
-- html
-- .agents/skills/awesome-rea/tests/test_privacy_guard.py
+- .agents/skills/awesome-rea/scripts/requirement_facets.py
+- zlib
 - nl
-- typing
+- zipfile
 - letterSpacing
 - steps
 - build_evidence_previews.py
@@ -137,7 +138,7 @@
 - .agents/skills/impeccable/scripts/modern-screenshot.umd.js
 - showToast
 - hello-elementor-topbar.js
-- package_contract.py
+- collect_target_download_links
 - steps
 - text
 - text
@@ -147,7 +148,7 @@
 - .agents/skills/awesome-rea/scripts/ingest_discoveries.py
 - slide_search_core.py
 - DesignSystemGenerator
-- urllib_request
+- FastOmniHandler
 - blocks
 - blocks
 - triad_harness_bundle/skills/awesome-rea/tests/browser/smoke.cjs
@@ -157,7 +158,7 @@
 - repository_metadata.py
 - .agents/skills/awesome-rea/tests/app_logic_ui.cjs
 - triad_harness_bundle/skills/awesome-rea/scripts/build_entry_pages.py
-- At
+- ordered_map
 - add_action
 - with
 - .agents/skills/awesome-rea/scripts/review_pr.py
@@ -206,18 +207,18 @@
 - triad_harness_bundle/skills/awesome-rea/tests/test_scan_frontier_integration.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_discoveries.py
 - grapes.json
-- .agents/skills/awesome-rea/scripts/repository_stats.py
+- re
 - .agents/skills/awesome-rea/tests/test_scan_delivery_holds.py
 - applyEditing
 - fe
 - applyEditing
 - fontWeight
 - with
-- .agents/skills/awesome-rea/tests/test_public_artifact_leads.py
+- PublicLeadTests
 - spacing
-- triad_harness_bundle/skills/awesome-rea/tests/test_public_artifact_leads.py
+- PublicLeadTests
 - switchTab
-- constructor
+- us
 - with
 - .agents/skills/awesome-rea/scripts/agent_formats.py
 - BatteryDiagnosticsActivity
@@ -256,7 +257,7 @@
 - .agents/skills/awesome-rea/scripts/indexnow_automation.py
 - RESTTransportTests
 - html-token-validator.py
-- design_system.py
+- parse_decision_rules
 - triad_harness_bundle/skills/awesome-rea/scripts/build_browse_pages.py
 - MainActivity
 - Ls
@@ -269,7 +270,7 @@
 - t
 - .agents/skills/awesome-rea/site/site.js
 - .agents/skills/awesome-rea/tests/local_shortlist_ui.cjs
-- PrivacyGuardTests
+- web_tools.py
 - .agents/skills/awesome-rea/tests/test_site_metadata.py
 - .agents/skills/awesome-rea/tests/test_source_scope_review.py
 - radius
@@ -283,16 +284,16 @@
 - triad_harness_bundle/skills/awesome-rea/tests/local_shortlist_ui.cjs
 - createLiveBrowserDomHelpers
 - render_case_pages
-- test_evidence_classes.py
+- EvidenceClassDataTests
 - gray
-- sqlite3
+- async_omni_gateway_v4_8.py
 - handleManualEditActivity
 - slopmonster/tools/deslop.py
 - wordpress
 - Settings_Footer
 - Lc
 - HTMLParser
-- PrivacyGuardTests
+- At
 - handleManualEditActivity
 - 03-annotation.json
 - link
@@ -300,8 +301,8 @@
 - steps
 - .agents/skills/awesome-rea/scripts/build_discovery_leads.py
 - .agents/skills/awesome-rea/scripts/build_survey.py
-- .agents/skills/awesome-rea/scripts/validate_agent_formats.py
-- main
+- existing_keys
+- collect
 - _SharedTokens
 - CaseCoverageTests
 - .agents/skills/awesome-rea/tests/test_discovery_reviews.py
@@ -309,7 +310,7 @@
 - ScanTransportTests
 - .agents/skills/awesome-rea/tests/test_section_target_counts.py
 - color
-- test_core.py
+- TestDomainDetection
 - triad_harness_bundle/skills/awesome-rea/scripts/build_survey.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_section_target_counts.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_homepage_locales.py
@@ -324,17 +325,17 @@
 - .agents/skills/awesome-rea/scripts/validate_schema_org.py
 - renderSources
 - .agents/skills/awesome-rea/tests/test_discovery_ingest.py
-- .agents/skills/awesome-rea/tests/test_page_metadata.py
+- MetaDescriptionTests
 - .agents/skills/awesome-rea/tests/test_paper_identity.py
 - ReadmeContentsTest
 - .agents/skills/awesome-rea/tests/test_static_page_links.py
 - SchemaOrgValidatorTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_paper_identity.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_page_metadata.py
+- MetaDescriptionTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_discovery_ingest.py
 - SchemaOrgValidatorTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_static_page_links.py
-- triad_harness_bundle/skills/awesome-rea/scripts/validate_schema_org.py
+- .agents/skills/awesome-rea/tests/test_static_page_links.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_scan_interruption.py
 - elementor-functions.php
 - ThermalSimulator
@@ -357,9 +358,9 @@
 - radius
 - link
 - .agents/skills/awesome-rea/tests/expanded_details_ui.cjs
-- .agents/skills/awesome-rea/tests/test_crawl_policy.py
+- CrawlPolicyTests
 - github_lead
-- copy
+- .agents/skills/awesome-rea/tests/test_pacm_venue.py
 - .agents/skills/awesome-rea/tests/test_review_dispatch.py
 - .agents/skills/awesome-rea/tests/test_scan_increment.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_review_dispatch.py
@@ -376,11 +377,11 @@
 - blocks
 - agent_files.py
 - .agents/skills/awesome-rea/tests/test_artifact_links.py
-- .agents/skills/awesome-rea/tests/test_structured_data.py
+- ResourceEntityTests
 - TestTailwindConfigGenerator
 - triad_harness_bundle/skills/awesome-rea/scripts/validate_discovery.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_artifact_links.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_structured_data.py
+- ResourceEntityTests
 - elements
 - browse_guides.py
 - og_images.py
@@ -388,15 +389,15 @@
 - .agents/skills/awesome-rea/scripts/submit_indexnow.py
 - EntryDiscoveryValidationTests
 - .agents/skills/awesome-rea/tests/test_ledger_link_check.py
-- test_repository_metadata_refresh.py
+- QueryTests
 - generate-slide.py
 - onAnnotDown
-- TestStyleTaxonomy
+- test_style_taxonomy.py
 - triad_harness_bundle/skills/awesome-rea/scripts/build_feed.py
-- xs
+- WorkflowTests
 - init.qcom.post_boot.sh
 - omni_env.sh
-- PageResources
+- triad_harness_bundle/skills/awesome-rea/scripts/collect_discovery_leads.py
 - client
 - onAnnotDown
 - text
@@ -407,20 +408,20 @@
 - .agents/skills/awesome-rea/scripts/build_feed.py
 - CDNNormalizationTests
 - .agents/skills/awesome-rea/tests/test_case_pages.py
-- .agents/skills/awesome-rea/tests/test_readme_size.py
+- ReadmePaperSplitTest
 - ScanRunProvenanceTests
 - .agents/skills/awesome-rea/tests/test_website_identity.py
 - fontSize
 - triad_harness_bundle/skills/awesome-rea/tests/test_case_pages.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_website_identity.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_discovery_leads.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_readme_size.py
+- .agents/skills/awesome-rea/tests/test_readme_size.py
 - triad_harness_bundle/skills/awesome-rea/scripts/validate_agent_formats.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_ledger_link_check.py
-- triad_harness_bundle/skills/awesome-rea/scripts/submit_indexnow.py
-- triad_harness_bundle/skills/awesome-rea/scripts/indexnow_automation.py
+- survey_listings
+- main
 - properties
-- score_article.py
+- Any
 - scripts/cartridge_manager.py
 - loadSources
 - triad_harness_bundle/skills/awesome-rea/site/site.js
@@ -432,13 +433,13 @@
 - blocks
 - text
 - .agents/skills/awesome-rea/scripts/strict_json.py
-- .agents/skills/awesome-rea/scripts/locale_literals.py
-- .agents/skills/awesome-rea/scripts/source_availability.py
+- ContributorReferenceTests
+- run
 - .agents/skills/awesome-rea/tests/category_labels_ui.cjs
 - client
 - PackagingTests
 - fetch-background.py
-- test_relevance_evaluator.py
+- TestThresholdGate
 - triad_harness_bundle/skills/awesome-rea/scripts/source_availability.py
 - TestPackageContract
 - triad_harness_bundle/skills/awesome-rea/scripts/structured_data.py
@@ -450,13 +451,13 @@
 - fontWeight
 - fontSize
 - attributes
-- fetch_previews.py
+- test_core_data_quality.py
 - _Markdown
 - .agents/skills/awesome-rea/scripts/source_scope.py
 - .agents/skills/awesome-rea/tests/test_data_classes.py
-- .agents/skills/awesome-rea/tests/test_requirement_facets.py
-- .agents/skills/awesome-rea/tests/test_scan_chronology.py
-- .agents/skills/awesome-rea/tests/test_scan_discovery_report.py
+- RequirementFacetTests
+- ScanChronologyTests
+- DiscoveryReportTests
 - .agents/skills/awesome-rea/tests/test_site_footer.py
 - actOnAgentTarget
 - createLiveBrowserSessionState
@@ -465,13 +466,13 @@
 - triad_harness_bundle/skills/awesome-rea/tests/test_data_classes.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_resource_rows.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_discovery_reviews.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_requirement_facets.py
+- RequirementFacetTests
 - triad_harness_bundle/skills/awesome-rea/scripts/source_scope.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_scan_discovery_report.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_scan_chronology.py
+- DiscoveryReportTests
+- ScanChronologyTests
 - AITownEngine
 - models_manager.py
-- omni_gateway_v4_6.py
+- xml_etree_elementtree
 - scripts/prune_vocab_head.py
 - ClusterNodeManager.kt
 - 05_OPTIMIZED_OMNI_GATEWAY_V4_6.py
@@ -481,11 +482,11 @@
 - text
 - blocks
 - settings
-- .agents/skills/awesome-rea/scripts/backfill_added_at.py
+- test_harness_adapter.py
 - plain_text
 - .agents/skills/awesome-rea/scripts/build_repository_index.py
 - .agents/skills/awesome-rea/scripts/page_metadata.py
-- .agents/skills/awesome-rea/scripts/validate_papers.py
+- ClassificationDeterminismTests
 - verify_evidence_entry.py
 - .agents/skills/awesome-rea/tests/empty_paper_search_ui.cjs
 - .agents/skills/awesome-rea/tests/test_rest_readme_integrity.py
@@ -493,10 +494,10 @@
 - triad_harness_bundle/skills/awesome-rea/tests/test_rest_readme_integrity.py
 - triad_harness_bundle/skills/awesome-rea/scripts/validate_papers.py
 - handleCommandPaletteSearch
-- priority_v2.py
+- survey_listings
 - colab_package/prune_vocab_head.py
 - triad_harness_bundle/skills/awesome-rea/scripts/backfill_added_at.py
-- plain_text
+- test_design_system_mode.py
 - triad_harness_bundle/skills/awesome-rea/scripts/strict_json.py
 - triad_harness_bundle/skills/awesome-rea/scripts/page_metadata.py
 - triad_harness_bundle/skills/awesome-rea/tests/empty_paper_search_ui.cjs
@@ -504,16 +505,16 @@
 - button
 - attributes
 - ScanEvidenceClassTests
-- .agents/skills/awesome-rea/scripts/scan_diagnostics.py
+- DiagnosticSidecar
 - .agents/skills/awesome-rea/tests/test_agent_validators.py
 - .agents/skills/awesome-rea/tests/test_entry_link_targets.py
 - .agents/skills/awesome-rea/tests/test_entry_siblings.py
-- server.py
+- get_connection
 - .agents/skills/awesome-rea/tests/test_review_age.py
 - .agents/skills/awesome-rea/tests/test_sitemaps.py
 - .agents/skills/awesome-rea/tests/test_text_encoding.py
-- cip/generate.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_scan_diagnostics.py
+- clean
+- SidecarBoundaryTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_section_index_links.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_agent_validators.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_review_age.py
@@ -522,11 +523,11 @@
 - properties
 - temp_data
 - nc
-- competitor_radar.py
+- .agents/skills/awesome-rea/scripts/source_availability.py
 - settings-controller.php
 - attributes
-- triad_harness_bundle/skills/awesome-rea/scripts/scan_diagnostics.py
-- CDNNormalizationTests
+- main
+- test_native_desktop_stack_freshness.py
 - Settings_Controller
 - letterSpacing
 - color
@@ -536,8 +537,8 @@
 - color
 - attributes
 - attributes
-- .agents/skills/awesome-rea/scripts/locale_review_inputs.py
-- .agents/skills/awesome-rea/scripts/private_scan_worker.py
+- .agents/skills/awesome-rea/tests/test_discovery_site.py
+- .agents/skills/awesome-rea/scripts/review_disclaimers.py
 - .agents/skills/awesome-rea/tests/test_entry_related.py
 - .agents/skills/awesome-rea/tests/test_evidence_labels.py
 - RedirectTests
@@ -549,11 +550,11 @@
 - test_tailwind_config_gen.py
 - CatalogRefreshTest
 - triad_harness_bundle/skills/awesome-rea/tests/test_entry_related.py
-- triad_harness_bundle/skills/awesome-rea/scripts/locale_review_inputs.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_review_date_tolerance.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_discovery_site.py
+- read_rows
+- classify
+- existing_keys
 - triad_harness_bundle/skills/awesome-rea/tests/test_evidence_labels.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_readme_case_methods.py
+- triad_harness_bundle/skills/awesome-rea/scripts/source_browser.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_papers_phone_filters.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_locale_fingerprints.py
 - attributes
@@ -576,13 +577,12 @@
 - .agents/skills/awesome-rea/tests/test_about_rea.py
 - CuratedTranslationValidatorTests
 - .agents/skills/awesome-rea/tests/test_locale_review_inputs.py
-- .agents/skills/awesome-rea/tests/test_rest_readme_validation.py
+- .policy
 - validate-asset.cjs
-- TailwindConfigGenerator
 - TestWebStackFreshness
 - triad_harness_bundle/skills/awesome-rea/tests/test_locale_review_inputs.py
 - triad_harness_bundle/skills/awesome-rea/scripts/resource_listing.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_rest_readme_validation.py
+- .policy
 - triad_harness_bundle/skills/awesome-rea/scripts/merge_pr.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_landmark_nesting.py
 - CameraCaptureSession
@@ -592,7 +592,7 @@
 - xiaomi_edge_node.py
 - body
 - steps
-- prose_only
+- .agents/skills/awesome-rea/scripts/review_age.py
 - normalizeSearchText
 - triad_harness_bundle/skills/awesome-rea/tests/language_fragment_ui.cjs
 - CuratedTranslationValidatorTests
@@ -620,7 +620,7 @@
 - .agents/skills/awesome-rea/tests/test_indexnow_delta.py
 - PaperFileTest
 - .agents/skills/awesome-rea/tests/test_paper_source_labels.py
-- .agents/skills/awesome-rea/tests/test_paper_topics.py
+- triad_harness_bundle/skills/awesome-rea/scripts/review_age.py
 - .agents/skills/awesome-rea/tests/test_paper_url_identifiers.py
 - .agents/skills/awesome-rea/tests/test_repeated_link_names.py
 - .agents/skills/awesome-rea/tests/test_resume_evidence.py
@@ -628,20 +628,20 @@
 - ShellTests
 - .agents/skills/awesome-rea/tests/test_strict_json.py
 - .agents/skills/awesome-rea/tests/test_target_card_highlight.py
-- test_validate_tokens.py
+- shutil
 - card
 - K
 - main
 - patch_plugin_ru.py
-- _select_palette_for_mode
-- TestDomainDetection
+- Keys
+- Landmarks
 - TestSearchDomains
 - triad_harness_bundle/skills/awesome-rea/scripts/catalog.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_paper_topics.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_strict_json.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_paper_source_labels.py
+- triad_harness_bundle/skills/awesome-rea/tests/test_strict_json.py
+- .render
 - triad_harness_bundle/skills/awesome-rea/tests/test_repeated_link_names.py
-- triad_harness_bundle/skills/awesome-rea/scripts/discovery_reviews.py
+- ResourceRowTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_resume_evidence.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_paper_url_identifiers.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_backfill_added_at.py
@@ -663,32 +663,32 @@
 - steps
 - _document
 - _resource_content
-- zlib
-- .agents/skills/awesome-rea/scripts/catalog.py
-- forked_checks.py
+- .agents/skills/awesome-rea/scripts/privacy_guard.py
+- copy
+- generate_design_system
 - .agents/skills/awesome-rea/tests/test_curated_fields.py
 - RenderedFixtures
 - MarkdownListLinksTests
 - .agents/skills/awesome-rea/tests/test_paper_diagnostics.py
-- .agents/skills/awesome-rea/tests/test_paper_groups.py
+- FactCards
 - .agents/skills/awesome-rea/tests/test_paper_listing_size.py
 - SeedDiscoveryRegressionTests
-- .agents/skills/awesome-rea/tests/test_readme_agent_cross_reference.py
-- .agents/skills/awesome-rea/tests/test_repository_stats.py
-- .agents/skills/awesome-rea/tests/test_requirements_label.py
-- .agents/skills/awesome-rea/tests/test_site_shell.py
+- pdf_gost_extractor.py
+- ReadStarsTests
+- RequirementsLabelTests
+- topics_from_gaps.py
 - DescriptionCaptureTests
 - embed-tokens.cjs
 - validate-tokens.cjs
 - design-tokens-starter.json
-- triad_harness_bundle/skills/awesome-rea/tests/test_requirements_label.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_readme_agent_cross_reference.py
+- RequirementsLabelTests
+- .agents/skills/awesome-rea/scripts/site_footer.py
 - TwinTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_paper_diagnostics.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_site_shell.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_paper_listing_size.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_paper_groups.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_repository_stats.py
+- Landmarks
+- ReadStarsTests
 - animals
 - items
 - updateLiveCharCounter
@@ -696,7 +696,7 @@
 - is_wp_error
 - updates
 - triad_harness_bundle/skills/awesome-rea/.github/workflows/validate.yml
-- record_problems
+- ReadmeCasesTest
 - triad_harness_bundle/skills/awesome-rea/tests/homepage_url_ui.cjs
 - RenderedFixtures
 - MarkdownListLinksTests
@@ -730,7 +730,7 @@
 - .agents/skills/awesome-rea/tests/test_evidence_pins.py
 - test_home_overview.py
 - FakeGitHub
-- .agents/skills/awesome-rea/tests/test_readme_secondary_targets.py
+- CDNNormalizationTests
 - StaticApiTests
 - inject-brand-context.cjs
 - TestShadcnInstaller
@@ -738,7 +738,7 @@
 - triad_harness_bundle/skills/awesome-rea/tests/test_evidence_pins.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_duplicate_readmes.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_curated_fields.py
-- test_live_wp_integration.py
+- triad_harness_bundle/skills/awesome-rea/scripts/requirement_facets.py
 - GitHub
 - Element
 - triad_harness_bundle/skills/awesome-rea/tests/test_artifact_evidence_guide.py
@@ -758,37 +758,37 @@
 - sherbet.json
 - all_sources
 - .agents/skills/awesome-rea/.github/workflows/source-scan.yml
-- .agents/skills/awesome-rea/scripts/asset_paths.py
+- Landmarks
 - _parse_registry
 - build_entry_pages
-- validate_case_coverage
+- .agents/skills/awesome-rea/scripts/private_scan_worker.py
 - LinkNames
 - .agents/skills/awesome-rea/tests/browser/package.json
 - AwesomeLintReportTests
 - CaseDiscoveryTests
 - CatalogRevisionTests
-- .agents/skills/awesome-rea/tests/test_color_scheme.py
+- .agents/skills/awesome-rea/tests/test_review_date_tolerance.py
 - RunTest
 - .agents/skills/awesome-rea/tests/test_failure_metadata.py
 - FingerprintedAssetTests
-- .agents/skills/awesome-rea/tests/test_first_resource_walkthrough.py
+- build_site
 - test_forked_checks.py
-- .agents/skills/awesome-rea/tests/test_listing_entry_requirements.py
+- ListingEntryRequirementTests
 - .agents/skills/awesome-rea/tests/test_paper_jsonld_identity.py
-- .agents/skills/awesome-rea/tests/test_paper_order.py
+- build_worklist.py
 - .agents/skills/awesome-rea/tests/test_readme_paper_venue.py
-- .agents/skills/awesome-rea/tests/test_resource_form_prompts.py
+- SimpleArticleExtractor
 - ResourcePagesTests
 - .agents/skills/awesome-rea/tests/test_title_arrow.py
 - sync-brand-to-tokens.cjs
 - generate-tokens.cjs
 - duration
 - triad_harness_bundle/skills/awesome-rea/tests/test_paper_jsonld_identity.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_listing_entry_requirements.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_paper_order.py
+- ListingEntryRequirementTests
+- phone_tools.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_title_arrow.py
-- triad_harness_bundle/skills/awesome-rea/scripts/review_disclaimers.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_paper_search.py
+- CategoryLabelTests
+- prose_only
 - triad_harness_bundle/skills/awesome-rea/tests/test_color_scheme.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_failure_metadata.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_first_resource_walkthrough.py
@@ -798,7 +798,7 @@
 - StreamRelay
 - all_sources
 - triad_harness_bundle/skills/awesome-rea/.github/workflows/source-scan.yml
-- triad_harness_bundle/skills/awesome-rea/scripts/asset_paths.py
+- .agents/skills/awesome-rea/scripts/source_browser.py
 - validate_case_coverage
 - LinkNames
 - label
@@ -811,7 +811,7 @@
 - TrustedReviewTest
 - Links
 - FingerprintedAssetTests
-- triad_harness_bundle/skills/awesome-rea/tests/test_resource_form_prompts.py
+- .agents/skills/awesome-rea/tests/test_paper_topics.py
 - tchp/includes/functions.php
 - styles/04-afternoon.json
 - styles
@@ -842,9 +842,9 @@
 - normalizeSearchText
 - .agents/skills/awesome-rea/tests/awesome-lint/package.json
 - ActiveFilterTests
-- .agents/skills/awesome-rea/tests/test_browse_card_density.py
+- triad_harness_bundle/skills/awesome-rea/scripts/privacy_guard.py
 - .agents/skills/awesome-rea/tests/test_browse_last_push.py
-- CommunityOutreachTests
+- ReadmePaperSplitTest
 - CuratedSearchRankTests
 - CuratedSortTests
 - FilterHistoryTests
@@ -856,20 +856,20 @@
 - MatchContextTests
 - .agents/skills/awesome-rea/tests/test_not_found_pages.py
 - .agents/skills/awesome-rea/tests/test_paper_update_guide.py
-- test_preview_thumbs.py
+- ThumbnailTests
 - .agents/skills/awesome-rea/tests/test_promotion_worksheet.py
-- .agents/skills/awesome-rea/tests/test_reconstruction_pairing.py
-- .agents/skills/awesome-rea/tests/test_requirements_lists.py
-- .agents/skills/awesome-rea/tests/test_resource_listing.py
+- main
+- .agents/skills/awesome-rea/tests/test_paper_groups.py
+- ResourceListingTests
+- design_system.py
 - BM25
-- BM25
-- triad_harness_bundle/skills/awesome-rea/tests/test_reconstruction_pairing.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_requirements_lists.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_source_category.py
+- .agents/skills/awesome-rea/scripts/artifact_links.py
+- .agents/skills/awesome-rea/tests/test_readme_agent_cross_reference.py
+- SourceCategoryTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_print_layout.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_github_url_aliases.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_not_found_pages.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_resource_listing.py
+- ResourceListingTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_browse_last_push.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_lean_catalog.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_local_shortlist.py
@@ -886,7 +886,7 @@
 - triad_harness_bundle/skills/awesome-rea/scripts/home_art.py
 - triad_harness_bundle/skills/awesome-rea/tests/awesome-lint/package.json
 - ActiveFilterTests
-- CommunityOutreachTests
+- triad_harness_bundle/skills/awesome-rea/tests/test_readme_agent_cross_reference.py
 - CuratedSearchRankTests
 - CuratedSortTests
 - FilterHistoryTests
@@ -920,24 +920,24 @@
 - build_browse_pages
 - entry_path
 - .agents/skills/awesome-rea/scripts/data_classes.py
-- .agents/skills/awesome-rea/scripts/data_downloads.py
-- .agents/skills/awesome-rea/scripts/evidence_links.py
+- triad_harness_bundle/skills/awesome-rea/tests/test_paper_groups.py
+- run_pipeline.py
 - .agents/skills/awesome-rea/scripts/language_fragment.py
 - PublicDownloadTests
-- FakeResponse
+- Links
 - lead_root
 - EntryEvidenceClassTest
-- .agents/skills/awesome-rea/tests/test_eyebrow_min_size.py
-- test_fetch_previews.py
+- .agents/skills/awesome-rea/tests/test_filtered_export.py
+- .agents/skills/awesome-rea/tests/test_readme_contribution_links.py
 - HomepageURLTests
-- ThumbnailTests
+- .do_POST
 - .read
-- .agents/skills/awesome-rea/tests/test_static_api.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_static_api.py
+- logo/search.py
+- triad_harness_bundle/skills/awesome-rea/tests/test_filtered_export.py
 - triad_harness_bundle/skills/awesome-rea/scripts/language_fragment.py
-- triad_harness_bundle/skills/awesome-rea/tests/test_category_labels.py
+- CategoryLabelTests
 - triad_harness_bundle/skills/awesome-rea/tests/test_paper_venue_search.py
-- triad_harness_bundle/skills/awesome-rea/scripts/data_downloads.py
+- triad_harness_bundle/skills/awesome-rea/tests/test_readme_contribution_links.py
 - bobr
 - kot
 - lis
@@ -948,8 +948,8 @@
 - start_brain_mi10t_v2.sh
 - stube_watchdog.sh
 - TestCanonicalAlloys
-- TestNoRawIdInPostHandlers
-- TestParseRowId
+- triad_harness_bundle/skills/awesome-rea/scripts/build_manifest.py
+- pingClusterNodes
 - theme4/includes/search-modal.php
 - backup-dsh-settings.ps1
 - triad_harness_bundle/skills/awesome-rea/.github/workflows/discovery-leads.yml
@@ -960,13 +960,13 @@
 - steps
 - argus_bench.c
 - triad_harness_bundle/skills/awesome-rea/scripts/data_classes.py
-- triad_harness_bundle/skills/awesome-rea/scripts/evidence_links.py
-- FooterLinks
+- validate_case_coverage
+- PublicRedirect
 - AwesomeLintReportTests
 - PublicDownloadTests
 - FakeResponse
 - lead_root
-- triad_harness_bundle/skills/awesome-rea/tests/test_eyebrow_min_size.py
+- .agents/skills/awesome-rea/tests/test_first_resource_walkthrough.py
 - HomepageURLTests
 - .read
 - tchp/assets/js/workbench.js
@@ -982,11 +982,11 @@
 - ingest
 - unit
 - validate-status
-- Page
+- .agents/skills/awesome-rea/tests/test_paper_search.py
 - .agents/skills/awesome-rea/tests/test_empty_paper_search.py
 - .agents/skills/awesome-rea/tests/test_filter_focus.py
 - .agents/skills/awesome-rea/tests/test_markdown_links.py
-- search_index
+- Links
 - SidecarBoundaryTests
 - TransportDiagnosticTests
 - .agents/skills/impeccable/scripts/live-browser-ignores.js
@@ -1001,14 +1001,14 @@
 - article-contract-v1.schema.json
 - loadModelsConfig
 - OmniGatewayHandler
-- triad_armv8_bench.py
+- CrawlPolicyTests
 - theme4/includes/footer.php
 - report
 - ingest
 - jobs
 - validate-status
-- Page
-- SectionTargetCounts
+- triad_harness_bundle/skills/awesome-rea/tests/test_curated_repository_search.py
+- triad_harness_bundle/skills/awesome-rea/tests/test_filter_focus.py
 - triad_harness_bundle/skills/awesome-rea/tests/test_empty_paper_search.py
 - MatchContextTests
 - TransportDiagnosticTests
@@ -1023,11 +1023,12 @@
 - collect
 - env
 - scan
-- classify_scan_evidence.py
-- EntryTitleTests
+- ReviewDisclaimerTests
+- .agents/skills/awesome-rea/tests/test_entry_titles.py
 - ReadmeTagTest
 - cleanse.sh
-- split_values
+- TailwindConfigGenerator
+- contribution_content
 - archimedes
 - clara
 - rocky
@@ -1038,7 +1039,7 @@
 - install_cluster_pkgs.sh
 - soc_database.py
 - start_melvin.sh
-- restore_nord10_system.py
+- print_block
 - run_router.sh
 - start_router_mi10t.sh
 - start_brain_mi10t.sh
@@ -1050,7 +1051,7 @@
 - collect
 - env
 - scan
-- EntryTitleTests
+- triad_harness_bundle/skills/awesome-rea/tests/test_entry_titles.py
 - ReadmeSecondaryTargetTest
 - ReadmeTagTest
 - triad_omni_web_ui_bundle/web_ui/cartridges/manifest.json
@@ -1085,7 +1086,7 @@
 - theme4/assets/js/solder-quiz.js
 - report
 - validate
-- ApiError
+- .agents/skills/awesome-rea/tests/test_resource_form_prompts.py
 - BreadcrumbSchemaTests
 - TrackerTest
 - interface
@@ -1098,11 +1099,11 @@
 - styles
 - color
 - core/image
-- BoundedWriter
-- ScheduledTransport
-- unknown_field_warnings
-- scan_run_entries
-- validate_scan_chronology
+- triad_harness_bundle/skills/awesome-rea/scripts/review_disclaimers.py
+- withdrawn_redirect_rules
+- ReadmeCasesTest
+- triad_harness_bundle/skills/awesome-rea/tests/test_paper_search.py
+- triad_harness_bundle/skills/awesome-rea/tests/test_resource_form_prompts.py
 - .agents/skills/awesome-rea/site/language-fragment.js
 - test_cleanse.sh
 - content_html
@@ -1126,7 +1127,7 @@
 - core/image
 - margin
 - browser
-- validate_evidence_media
+- NoRedirect
 - check_files.sh
 - check_unsloth.sh
 - hf_query.sh
@@ -1168,13 +1169,104 @@
 - 📱 Приложение SolderCam-Pro (`com.soldercam.pro`)
 - Спецификация узлов:
 - 📂 Структура репозитория
+- PaperVenueSearchTests
+- .agents/skills/awesome-rea/tests/test_browse_card_density.py
+- test_shared_tokens.py
+- github_api_fetch
+- NoRedirect
+- .agents/skills/awesome-rea/scripts/crawl_policy.py
+- RequirementBudgetTests
+- RecoveryProvenanceTests
+- ProtocolReportTests
+- RelabelReportTests
+- StylesheetReferenceTests
+- triad_harness_bundle/skills/awesome-rea/scripts/contribution_pages.py
+- triad_harness_bundle/skills/awesome-rea/scripts/crawl_policy.py
+- BoundedWriter
+- ScheduledTransport
+- BM25
+- triad_harness_bundle/skills/awesome-rea/tests/test_paper_form_fields.py
+- Response
+- RequirementBudgetTests
+- RecoveryProvenanceTests
+- ProtocolReportTests
+- RelabelReportTests
+- case
+- read_seed_input
+- FakeResponse
+- PageTitleTests
+- build_dashboard.py
+- TestNoRawIdInPostHandlers
+- TestParseRowId
+- PageTitleTests
+- triad_harness_bundle/skills/awesome-rea/tests/unit_shards.py
+- .agents/skills/awesome-rea/scripts/source_descriptions.py
+- SectionTargetCounts
+- CommunityOutreachTests
+- FetchPreviewsTest
+- HomeTests
+- CompetitorContentExtractor
+- triad_harness_bundle/skills/awesome-rea/scripts/source_descriptions.py
+- validate_site
+- CommunityOutreachTests
+- write_page_twins
+- withdrawn_redirect_rules
+- CuratedTranslationReviewTests
+- label_rules
+- ReadmeSecondaryTargetTest
+- SiteNodeTests
+- TestTokenizer
+- _Blocks
+- CuratedTranslationReviewTests
+- WorkflowTests
+- SiteNodeTests
+- errors
+- WorkflowTest
+- CatalogDescriptionTests
+- scope_errors
+- OpenGraphHookTests
+- TestBm25CoreBehavior
+- TestMetricMath
+- Keys
+- errors
+- WorkflowTest
+- CatalogDescriptionTests
+- scope_errors
+- OpenGraphHookTests
+- BoundedWriter
+- scanner_implementation
+- ScheduledTransport
+- unknown_field_warnings
+- scan_run_entries
+- validate_scan_chronology
+- WorkflowTest
+- Response
+- PreviewFigureTests
+- ReadmeSizeBudgetTest
+- FetchTests
+- PublishTests
+- CommandTests
+- GraphQLRecordValidationTests
+- TestFixtureValidation
+- cleanTextFromSlopUI
+- NoRedirect
+- WorkflowTest
+- LanguageFragmentTests
+- ReadmeSizeBudgetTest
+- CommandTests
+- GraphQLRecordValidationTests
+- yn
+- validate_evidence_media
+- .test_throttled_readme_is_not_recorded_as_missing
+- upload_file_to_yandex_disk
+- run
 - re
 
 ## God Nodes (most connected - your core abstractions)
 1. `Lt` - 135 edges
 2. `vt` - 90 edges
 3. `get_connection()` - 90 edges
-4. `showToast()` - 71 edges
+4. `showToast()` - 73 edges
 5. `tn` - 65 edges
 6. `St` - 60 edges
 7. `Ce` - 59 edges
@@ -1183,33 +1275,33 @@
 10. `se` - 50 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `es()` --indirect_call--> `Za()`  [INFERRED]
-  wp-content/themes/hello-elementor/assets/js/hello-elementor-settings.js → seo/dashboard/three.min.js
-- `q()` --indirect_call--> `K()`  [INFERRED]
-  .agents/skills/impeccable/scripts/modern-screenshot.umd.js → seo/dashboard/three.min.js
-- `Ve()` --indirect_call--> `He()`  [INFERRED]
-  .agents/skills/impeccable/scripts/modern-screenshot.umd.js → wp-content/themes/hello-elementor/assets/js/hello-conversion-banner.js
-- `Ve()` --indirect_call--> `qe()`  [INFERRED]
-  .agents/skills/impeccable/scripts/modern-screenshot.umd.js → wp-content/themes/hello-elementor/assets/js/hello-conversion-banner.js
+- `bt()` --indirect_call--> `gt()`  [INFERRED]
+  triad_harness_bundle/skills/impeccable/scripts/modern-screenshot.umd.js → seo/dashboard/three.min.js
 - `fe()` --indirect_call--> `K()`  [INFERRED]
+  triad_harness_bundle/skills/impeccable/scripts/modern-screenshot.umd.js → seo/dashboard/three.min.js
+- `q()` --indirect_call--> `K()`  [INFERRED]
+  triad_harness_bundle/skills/impeccable/scripts/modern-screenshot.umd.js → seo/dashboard/three.min.js
+- `Ve()` --indirect_call--> `He()`  [INFERRED]
+  triad_harness_bundle/skills/impeccable/scripts/modern-screenshot.umd.js → wp-content/themes/hello-elementor/assets/js/hello-conversion-banner.js
+- `bt()` --indirect_call--> `gt()`  [INFERRED]
   .agents/skills/impeccable/scripts/modern-screenshot.umd.js → seo/dashboard/three.min.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (1532 total, 652 thin omitted)
+## Communities (1630 total, 756 thin omitted)
 
-### Community 2 - "get_connection"
-Cohesion: 0.03
-Nodes (85): analyze_all_competitors(), analyze_domain(), fetch_page(), main(), evaluate_keyword_competition(), init_competition_table(), main(), save_evaluation() (+77 more)
+### Community 2 - "excel_io.py"
+Cohesion: 0.17
+Nodes (13): backup_master(), _ensure_columns(), _ensure_sheet(), _find_row(), read_research_cache(), save_article(), save_competitor_proposals(), save_competitors() (+5 more)
 
 ### Community 3 - "three.min.js"
 Cohesion: 0.02
-Nodes (115): _allocateTargets(), ao(), _applyPMREM(), as(), Ba, bi(), bind(), bindSkeletons() (+107 more)
+Nodes (107): _allocateTargets(), _applyPMREM(), as(), bi(), bind(), bindSkeletons(), _blur(), br() (+99 more)
 
 ### Community 5 - "Lt"
 Cohesion: 0.02
-Nodes (17): Ea(), ec, hs, je, jn(), Lt, Ne, re (+9 more)
+Nodes (28): Ao, bo, clone(), Co, Da, v(), Ga, je (+20 more)
 
 ### Community 6 - "ref_node_assert"
 Cohesion: 0.02
@@ -1223,17 +1315,21 @@ Nodes (125): applyGlobalBarLabelState(), applyLiveBarPreference(), applyPlacehol
 Cohesion: 0.03
 Nodes (125): applyGlobalBarLabelState(), applyLiveBarPreference(), applyPlaceholderSizingStyles(), averageRgb01(), bindEditBadgeProxy(), bufferToBase64(), buildCollapsible(), buildColorModels() (+117 more)
 
-### Community 10 - "Ce"
-Cohesion: 0.02
-Nodes (14): Ce, r(), en, hh, ia, $s, se, sh (+6 more)
+### Community 9 - "en"
+Cohesion: 0.06
+Nodes (11): en, t(), l(), o(), a(), o(), Si(), Ti() (+3 more)
 
-### Community 12 - "tempfile"
-Cohesion: 0.02
-Nodes (8): AboutLinkGroupTests, CategoryLabelTests, short_hash(), PaperVenueSearchTests, StylesheetReferenceTests, AboutLinkGroupTests, short_hash(), BootstrapQualificationTests
+### Community 10 - "Ce"
+Cohesion: 0.03
+Nodes (15): Ce, r(), hh, ia, parseSkeletons(), qn, p(), $s (+7 more)
+
+### Community 12 - "sys"
+Cohesion: 0.01
+Nodes (13): main(), safe_text(), AboutLinkGroupTests, WithoutPillowTests, ScriptImportTests, VendoredVocabularyTests, main(), main() (+5 more)
 
 ### Community 13 - "argparse"
 Cohesion: 0.02
-Nodes (51): is_enforced(), main(), read_allowlist(), summarize(), linked_repository_count(), main(), render(), _ids() (+43 more)
+Nodes (80): is_enforced(), main(), read_allowlist(), summarize(), linked_repository_count(), main(), render(), main() (+72 more)
 
 ### Community 14 - "setup"
 Cohesion: 0.02
@@ -1245,27 +1341,27 @@ Nodes (44): csp_allows(), csp_directives(), expected_paper_schema(), header_rule
 
 ### Community 16 - "vt"
 Cohesion: 0.03
-Nodes (7): bl, dc, eh, No, Oo, vt, zo
+Nodes (8): bl, dc, eh, Fo, Ll, No, Oo, vt
 
 ### Community 17 - "agent_orchestrator.py"
-Cohesion: 0.03
-Nodes (54): api_tts(), chat(), check_fast_tools(), check_quips(), check_thermal_guard(), get_burp_audio(), get_live_weather(), get_persona() (+46 more)
+Cohesion: 0.06
+Nodes (31): api_tts(), chat(), check_fast_tools(), check_quips(), check_thermal_guard(), get_burp_audio(), get_live_weather(), get_persona() (+23 more)
 
-### Community 18 - "urllib_parse"
-Cohesion: 0.02
-Nodes (8): ContributionDiscoveryTests, Links, ReadmeCasesTest, ResourceRowTests, ContributionDiscoveryTests, Links, LanguageFragmentTests, ReadmeCasesTest
+### Community 18 - "pathlib"
+Cohesion: 0.01
+Nodes (41): cache_key(), cached_path(), download(), extension_for(), fetch(), main(), task(), read_site() (+33 more)
 
 ### Community 19 - "hello-elementor-settings.js"
 Cohesion: 0.04
-Nodes (74): qi(), dn(), Ac(), add(), ae(), Ao(), Ba(), be() (+66 more)
+Nodes (67): qi(), Za(), dn(), Ac(), add(), Ao(), Ba(), be() (+59 more)
 
 ### Community 20 - ".agents/skills/awesome-rea/scripts/collect_discovery_leads.py"
-Cohesion: 0.05
-Nodes (51): allowed(), arxiv_listings(), candidates_from(), clean_arxiv(), clean_doi(), Client, collect(), commit_batch() (+43 more)
+Cohesion: 0.10
+Nodes (16): Client, collect(), directory_listings(), due(), excluded(), git_blob_sha(), github_file(), huggingface_listings() (+8 more)
 
-### Community 21 - "sys"
+### Community 21 - "hashlib"
 Cohesion: 0.01
-Nodes (24): WorkflowTests, run(), WorkflowTest, setUpModule(), RequirementBudgetTests, CaptureParityTests, ScriptImportTests, SearchNormalizationTests (+16 more)
+Nodes (44): digest(), theme_script_hash(), blob_digests(), main(), print_readme(), receipt(), review_record(), run_review() (+36 more)
 
 ### Community 22 - "connectSSE"
 Cohesion: 0.06
@@ -1276,44 +1372,44 @@ Cohesion: 0.06
 Nodes (90): applyParamDefaults(), applyParamValue(), applySavedSessionMeta(), buildParamsPanel(), checkpointPayload(), clampVariantIndex(), closedClipPath(), closeTunePopover() (+82 more)
 
 ### Community 24 - "subprocess"
-Cohesion: 0.03
-Nodes (34): main(), RuntimeEvidencePolicyTests, tracked(), main(), _cli(), run_adb(), push_file(), sh() (+26 more)
+Cohesion: 0.02
+Nodes (73): backfill(), check_ref(), file_versions(), first_appearances(), first_parent_commits(), git(), main(), with_added_at() (+65 more)
 
-### Community 25 - "triad_harness_bundle/skills/awesome-rea/scripts/collect_discovery_leads.py"
-Cohesion: 0.05
-Nodes (48): allowed(), arxiv_listings(), candidates_from(), clean_arxiv(), clean_doi(), Client, collect(), commit_batch() (+40 more)
+### Community 25 - "triad_harness_bundle/skills/awesome-rea/scripts/discovery_leads.py"
+Cohesion: 0.10
+Nodes (24): prepare(), batch_bytes(), batch_files(), batch_path(), bounded_text(), build_batch(), compiled(), digest() (+16 more)
 
 ### Community 26 - "omni_fast_router_v4_9.py"
-Cohesion: 0.06
-Nodes (33): verify_cartridge_passport(), build_node1_payload(), check_node3_active(), check_node_sync(), create_local_backup(), detect_local_node_id(), evaluate_complexity(), execute_cluster_tool() (+25 more)
+Cohesion: 0.12
+Nodes (22): check_node3_active(), check_node_sync(), detect_local_node_id(), find_adb_executable(), find_live_node2_url(), find_live_node3_url(), get_adb_devices_status(), get_cluster_status_sync() (+14 more)
 
 ### Community 27 - "dashboard.js"
 Cohesion: 0.03
-Nodes (61): ANALYSIS_ROWS, ANIMAL_NAMES_MAP, applyAlloyPreset(), askAssistant(), BULK_SELECTED, cleanTextFromSlopUI(), clearBulkSelection(), closeWorkstationModal() (+53 more)
+Nodes (59): acceptFragmentAsIs(), ANALYSIS_ROWS, ANIMAL_NAMES_MAP, applyAlloyPreset(), askAssistant(), BULK_SELECTED, clearBulkSelection(), closeWorkstationModal() (+51 more)
 
-### Community 28 - "writer_practico.py"
-Cohesion: 0.04
-Nodes (28): analyze_competitor_html(), fetch_url_html(), search_and_analyze_competitors(), SimpleArticleExtractor, SSRFSecurityError, validate_url_for_ssrf(), ask_perplexity(), get_credentials() (+20 more)
+### Community 28 - "TestLLMEvalAndSecuritySuite"
+Cohesion: 0.09
+Nodes (3): SSRFSecurityError, validate_url_for_ssrf(), TestLLMEvalAndSecuritySuite
 
 ### Community 30 - "hello-conversion-banner.js"
 Cohesion: 0.08
-Nodes (65): a(), ae(), B(), Be(), Bt(), c(), ce(), d() (+57 more)
+Nodes (65): t(), a(), ae(), B(), Bt(), c(), ce(), d() (+57 more)
 
-### Community 31 - "triad_harness_bundle/skills/awesome-rea/scripts/discovery_leads.py"
-Cohesion: 0.05
-Nodes (46): batch_export(), batch_export_path(), export_document(), lead_queue(), run_url(), write_lead_exports(), prepare(), split_shared_pages() (+38 more)
+### Community 31 - "triad_harness_bundle/skills/awesome-rea/scripts/build_discovery_leads.py"
+Cohesion: 0.27
+Nodes (6): batch_export(), batch_export_path(), export_document(), lead_queue(), run_url(), write_lead_exports()
 
 ### Community 32 - "triad_harness_bundle/skills/awesome-rea/scripts/validate_site.py"
-Cohesion: 0.04
-Nodes (28): expected_paper_schema(), main(), published_repository_document(), report_listing_sizes(), schema_entities(), structured_checks(), validate_artifact_links(), validate_breadcrumbs() (+20 more)
+Cohesion: 0.03
+Nodes (42): csp_allows(), csp_directives(), expected_paper_schema(), header_rules(), main(), Page, PageResources, published_repository_document() (+34 more)
 
 ### Community 33 - ".agents/skills/awesome-rea/tests/paper_search_ui.cjs"
 Cohesion: 0.04
 Nodes (50): allowedValues(), initialize(), initializeCopyLinks(), initializeLayout(), initializeShortlist(), sync(), matches(), paperTitle() (+42 more)
 
-### Community 34 - ".setAttribute"
-Cohesion: 0.04
-Nodes (27): Ao, bo, ci, clone(), Co, Da, v(), Ga (+19 more)
+### Community 34 - "constructor"
+Cohesion: 0.05
+Nodes (17): Ah, bc, constructor(), d(), u(), fa, fh, ge (+9 more)
 
 ### Community 36 - "triad_harness_bundle/skills/awesome-rea/tests/paper_search_ui.cjs"
 Cohesion: 0.04
@@ -1325,83 +1421,79 @@ Nodes (3): draw_squircle(), generate_master_icon(), main()
 
 ### Community 40 - "hello-home-app.js"
 Cohesion: 0.08
-Nodes (53): a(), ae(), B(), be(), c(), ce(), d(), de() (+45 more)
+Nodes (54): g(), a(), ae(), B(), be(), c(), ce(), d() (+46 more)
 
 ### Community 41 - "i"
 Cohesion: 0.04
-Nodes (28): cl, ei, t(), s(), C(), G(), H(), O() (+20 more)
+Nodes (23): cl, s(), G(), H(), O(), U(), z(), hl (+15 more)
 
 ### Community 42 - "validate_data.py"
-Cohesion: 0.02
-Nodes (68): detect_domain(), get_cip_brief(), _load_csv(), search(), search_all(), _search_csv(), detect_domain(), _load_csv() (+60 more)
+Cohesion: 0.11
+Nodes (31): _catalog_date(), _check_app_interface_contract(), _check_catalog_contract(), _check_catalog_summary(), _check_color_contract(), _check_core_data_contract(), _check_file(), _check_font_catalog() (+23 more)
 
 ### Community 43 - "tn"
 Cohesion: 0.04
-Nodes (13): _a, Do, $e(), fl, Fo, gl, Ho, Ke() (+5 more)
+Nodes (12): _a, Do, $e(), fl, gl, Ho, Ke(), Ms (+4 more)
 
 ### Community 44 - "os"
-Cohesion: 0.04
-Nodes (24): enhance_prompt(), generate_batch(), generate_logo(), load_env(), main(), download_loop(), main(), copy_tree_filtered() (+16 more)
+Cohesion: 0.02
+Nodes (53): build_data_downloads(), fingerprint(), json_bytes(), projected_records(), failure_event(), _parent(), _utc(), validate_destination() (+45 more)
 
 ### Community 45 - "Pt"
-Cohesion: 0.04
-Nodes (23): bs, Et, jt(), Mh, mi(), f(), h(), m() (+15 more)
+Cohesion: 0.07
+Nodes (5): jt(), Mh, Pt, Dt(), Ut()
 
 ### Community 46 - "built_site"
-Cohesion: 0.04
-Nodes (17): built_site(), ApiEvidenceClassUnitTest, ApiMatchesCatalogTest, CopyPermalinkTests, LanguageFragmentTests, LinkFragmentTest, print_block(), PrintLayoutTests (+9 more)
+Cohesion: 0.05
+Nodes (12): built_site(), ApiEvidenceClassUnitTest, ApiMatchesCatalogTest, CopyPermalinkTests, LanguageFragmentTests, LinkFragmentTest, SourceCategoryTests, cases() (+4 more)
 
 ### Community 47 - "triad_harness_bundle/skills/awesome-rea/scripts/scheduled_source_scan.py"
-Cohesion: 0.07
-Nodes (44): BoundedWriter, compress_file(), decompress_file(), import_seed(), load_seed(), main(), pack_seed(), read_manifest() (+36 more)
+Cohesion: 0.08
+Nodes (42): compress_file(), decompress_file(), import_seed(), load_seed(), main(), pack_seed(), read_manifest(), verify_frontier() (+34 more)
 
 ### Community 48 - ".agents/skills/awesome-rea/scripts/build_home.py"
 Cohesion: 0.05
 Nodes (37): build_home(), _count(), _drawer(), _e(), evidence_bucket(), evidence_chip(), evidence_guide_url(), evidence_label() (+29 more)
 
 ### Community 49 - "triad_harness_bundle/skills/awesome-rea/tests/test_scan_delivery_holds.py"
-Cohesion: 0.08
-Nodes (15): API, arguments(), DeliveryTests, defer_second(), HoldValidationTests, pending_snapshot(), repo(), saved_frontier() (+7 more)
+Cohesion: 0.09
+Nodes (14): API, arguments(), DeliveryTests, defer_second(), pending_snapshot(), repo(), saved_frontier(), Transport (+6 more)
 
 ### Community 50 - "triad_harness_bundle/skills/awesome-rea/scripts/build_readme.py"
-Cohesion: 0.05
-Nodes (36): agent_cross_reference(), browsable_index_count(), case_method(), case_order(), collection_section(), heading_anchor(), main(), method_groups() (+28 more)
+Cohesion: 0.04
+Nodes (44): agent_cross_reference(), case_method(), case_order(), collection_section(), entry_type(), heading_anchor(), lead_sentence(), main() (+36 more)
 
 ### Community 51 - "omni_forge_ui.py"
-Cohesion: 0.06
-Nodes (34): build_datasets(), clean_markdown_text(), detect_hardware_domain(), extract_qa_from_markdown(), generate_cot_reasoning(), find_local_cloud_folders(), get_yandex_public_download_url(), load_cloud_config() (+26 more)
+Cohesion: 0.08
+Nodes (27): find_local_cloud_folders(), load_cloud_config(), save_cloud_config(), sync_all_to_cloud(), get_article(), get_article_history(), list_articles(), rollback_article() (+19 more)
 
-### Community 54 - "base64"
-Cohesion: 0.06
-Nodes (19): theme_script_hash(), blob_digests(), main(), print_readme(), receipt(), review_record(), run_review(), build_signed_apk() (+11 more)
+### Community 54 - "ws"
+Cohesion: 0.08
+Nodes (32): bs, C(), mi(), f(), h(), m(), x(), y() (+24 more)
 
-### Community 55 - "parseObject"
-Cohesion: 0.04
-Nodes (16): Ah, fa, fh, fs, gs, Kn, $l, oi() (+8 more)
+### Community 55 - "Kn"
+Cohesion: 0.08
+Nodes (5): fs, gs, Kn, oi(), ys
 
-### Community 56 - "xml_etree_elementtree"
+### Community 56 - "build_evidence_previews.py"
 Cohesion: 0.14
-Nodes (7): test_mujoco_scene_xml(), validate_json_feeds(), MainFeedTest, FeedTests, paper(), resource(), site()
-
-### Community 57 - "St"
-Cohesion: 0.04
-Nodes (8): cs, S(), y(), St, Tt, us(), b(), M()
+Nodes (16): best_image(), cached(), collect(), github_preview(), heading_before(), image_references(), main(), page_preview() (+8 more)
 
 ### Community 58 - "SurveyTests"
-Cohesion: 0.06
-Nodes (11): contribution_content(), EntryPageTests, Page, paper(), resource(), fixture(), Page, pair() (+3 more)
+Cohesion: 0.09
+Nodes (8): EntryPageTests, Page, paper(), resource(), fixture(), Page, pair(), SurveyTests
 
 ### Community 60 - "hashlib"
-Cohesion: 0.06
-Nodes (39): capture_description(), validate_description_capture(), apply_supplement_scope(), bounded_bytes(), cache_output(), check_counts(), check_source(), cited_selections() (+31 more)
+Cohesion: 0.10
+Nodes (33): browsable_index_count(), apply_supplement_scope(), bounded_bytes(), cache_output(), check_counts(), check_source(), cited_selections(), compose_published() (+25 more)
 
-### Community 62 - ".agents/skills/awesome-rea/tests/test_scheduled_source_scan.py"
+### Community 62 - "snapshot"
 Cohesion: 0.07
-Nodes (19): archive_bytes(), ArchiveTests, artifact(), FakeAPI, NestedSchemaTests, paired_archive(), PairedCheckpointTests, child() (+11 more)
+Nodes (17): archive_bytes(), ArchiveTests, artifact(), FakeAPI, NestedSchemaTests, paired_archive(), PairedCheckpointTests, child() (+9 more)
 
-### Community 63 - "html_parser"
-Cohesion: 0.02
-Nodes (15): built_survey(), LandmarkNestingTests, Landmarks, Landmarks, PaperLandmarkTests, HeadingRows, record(), SectionIndexLinkTests (+7 more)
+### Community 63 - "HeadingRows"
+Cohesion: 0.15
+Nodes (3): HeadingRows, record(), SectionIndexLinkTests
 
 ### Community 64 - "scripts/core.py"
 Cohesion: 0.06
@@ -1409,27 +1501,27 @@ Nodes (31): BM25, _contains_phrase(), detect_domain(), _domain_keywords(), _exac
 
 ### Community 65 - "triad_harness_bundle/skills/awesome-rea/tests/test_scheduled_source_scan.py"
 Cohesion: 0.07
-Nodes (19): archive_bytes(), ArchiveTests, artifact(), FakeAPI, NestedSchemaTests, paired_archive(), PairedCheckpointTests, child() (+11 more)
+Nodes (17): archive_bytes(), ArchiveTests, artifact(), FakeAPI, NestedSchemaTests, paired_archive(), PairedCheckpointTests, child() (+9 more)
 
-### Community 66 - ".agents/skills/awesome-rea/scripts/scan_sources.py"
-Cohesion: 0.05
-Nodes (33): classification_segments(), classify(), curated_references(), discovery_report(), discovery_summary(), duplicate_readme_report(), file_digest(), held_repository_ids() (+25 more)
+### Community 66 - "run_scan"
+Cohesion: 0.17
+Nodes (14): initial_meta(), now(), readme_record(), repository_ineligibility(), run_scan(), accept(), add_candidate(), checkpoint() (+6 more)
 
 ### Community 67 - "triad_harness_bundle/skills/awesome-rea/scripts/scan_sources.py"
-Cohesion: 0.05
-Nodes (33): classification_segments(), classify(), curated_references(), discovery_report(), discovery_summary(), duplicate_readme_report(), file_digest(), held_repository_ids() (+25 more)
+Cohesion: 0.07
+Nodes (24): curated_references(), discovery_report(), discovery_summary(), file_digest(), held_repository_ids(), initial_meta(), now(), paper_references() (+16 more)
 
 ### Community 68 - "sn"
 Cohesion: 0.04
 Nodes (12): ac, an, cn, dn, fn, hn, la, ln (+4 more)
 
 ### Community 71 - "json"
-Cohesion: 0.02
-Nodes (70): fingerprint_status(), main(), read_fingerprints(), read_localizations(), source_fingerprint(), validate_fingerprints(), validate_localizations(), write_fingerprints() (+62 more)
+Cohesion: 0.01
+Nodes (92): main(), now_utc(), supplement_records(), fingerprint_status(), main(), read_fingerprints(), read_localizations(), source_fingerprint() (+84 more)
 
 ### Community 72 - "time"
 Cohesion: 0.08
-Nodes (30): build_node1_payload(), check_node3_active(), check_node_sync(), create_local_backup(), detect_local_node_id(), evaluate_complexity(), execute_cluster_tool(), find_adb_executable() (+22 more)
+Nodes (29): build_node1_payload(), check_node3_active(), check_node_sync(), create_local_backup(), detect_local_node_id(), evaluate_complexity(), execute_cluster_tool(), find_adb_executable() (+21 more)
 
 ### Community 73 - "setLiveState"
 Cohesion: 0.09
@@ -1460,24 +1552,24 @@ Cohesion: 0.11
 Nodes (14): blob_result(), client(), entry(), envelope(), FakeClock, git_sha(), IdentityAndPrivacyTests, Opener (+6 more)
 
 ### Community 81 - ".agents/skills/awesome-rea/scripts/discovery_leads.py"
-Cohesion: 0.06
-Nodes (37): batch_bytes(), batch_files(), batch_path(), bounded_text(), build_batch(), clean_host(), compiled(), digest() (+29 more)
+Cohesion: 0.08
+Nodes (29): prepare(), arxiv_from(), batch_bytes(), batch_files(), batch_path(), bounded_text(), build_batch(), clean_host() (+21 more)
 
 ### Community 82 - "text"
 Cohesion: 0.05
 Nodes (60): core/code, core/post-author-name, core/post-terms, core/post-title, core/pullquote, core/quote, core/site-title, color (+52 more)
 
 ### Community 83 - ".agents/skills/awesome-rea/scripts/public_source_supplements.py"
-Cohesion: 0.08
-Nodes (35): apply_supplement_scope(), bounded_bytes(), cache_output(), check_counts(), check_source(), cited_selections(), compose_published(), copy_public_evidence() (+27 more)
+Cohesion: 0.10
+Nodes (32): apply_supplement_scope(), bounded_bytes(), cache_output(), check_counts(), check_source(), cited_selections(), compose_published(), copy_public_evidence() (+24 more)
 
 ### Community 84 - ".agents/skills/awesome-rea/scripts/scan_graphql_transport.py"
-Cohesion: 0.06
-Nodes (22): _entries(), GraphQLReadmeTransport, _identity(), _integer(), _json_object(), NoRedirect, _oid(), _reject_constant() (+14 more)
+Cohesion: 0.19
+Nodes (7): GraphQLReadmeTransport, _identity(), _integer(), _json_object(), _reject_constant(), _repository(), _utc()
 
 ### Community 85 - "Jt"
-Cohesion: 0.04
-Nodes (10): ai, Jl, Jt, kl, Ql, vl(), Yl, bn() (+2 more)
+Cohesion: 0.10
+Nodes (5): Jl, kl, Ql, vl(), Yl
 
 ### Community 86 - ".agents/skills/awesome-rea/scripts/build_discovery_pages.py"
 Cohesion: 0.06
@@ -1488,12 +1580,12 @@ Cohesion: 0.07
 Nodes (57): agentHasWorkInFlight(), armPageChatForTyping(), attachSteerFocusDebug(), attachSteerFocusGuard(), buildSteerProcessingDots(), buildSteerQueueHint(), clearSteerAwaitTimer(), clearSteerFocusRecoverTimer() (+49 more)
 
 ### Community 88 - "SurveyTests"
-Cohesion: 0.07
+Cohesion: 0.09
 Nodes (8): EntryPageTests, Page, paper(), resource(), fixture(), Page, pair(), SurveyTests
 
 ### Community 89 - "jc"
 Cohesion: 0.04
-Nodes (5): ct(), Es, jc, qc, setValue()
+Nodes (5): jc, qc, rt, setValue(), xs
 
 ### Community 90 - "syncPageChatFocus"
 Cohesion: 0.07
@@ -1512,8 +1604,8 @@ Cohesion: 0.07
 Nodes (11): entry(), IndexNowDeltaTests, fetch(), CollectionTests, errors_for(), FakeAPI, public(), recheck() (+3 more)
 
 ### Community 94 - "classify_evidence_classes.py"
-Cohesion: 0.07
-Nodes (27): _AuthStrippingRedirect, cached(), classify(), collect_download_signals(), collect_media_signals(), dedupe_strings(), fetch_page(), github_api_fetch() (+19 more)
+Cohesion: 0.11
+Nodes (16): classify(), collect_download_signals(), collect_media_signals(), github_repo_slug(), has_complete_evidence(), has_target_install(), is_c0_candidate(), load_c0_reviews() (+8 more)
 
 ### Community 95 - "el"
 Cohesion: 0.07
@@ -1527,9 +1619,9 @@ Nodes (11): entry(), IndexNowDeltaTests, fetch(), CollectionTests, errors_for(),
 Cohesion: 0.07
 Nodes (54): actionLabel(), applyConfigureBarChrome(), bindConfigureCountPillTooltip(), bindConfigureInlineControlHover(), bindConfigureModifierPillHover(), buildConfigureActionControl(), buildConfigureCountControl(), buildConfigureRow() (+46 more)
 
-### Community 98 - ".agents/skills/awesome-rea/tests/test_scan_classification.py"
-Cohesion: 0.05
-Nodes (14): ClassificationDeterminismTests, ProtocolReportTests, ProtocolTargetTests, readme_api(), json(), RelabelReportTests, repository(), ClassificationDeterminismTests (+6 more)
+### Community 98 - "ClassificationDeterminismTests"
+Cohesion: 0.17
+Nodes (5): ClassificationDeterminismTests, ProtocolTargetTests, readme_api(), json(), repository()
 
 ### Community 99 - "test-package-a1.php"
 Cohesion: 0.05
@@ -1547,33 +1639,33 @@ Nodes (28): awaiting_review(), badge_document(), batch_export(), batch_export_pa
 Cohesion: 0.05
 Nodes (11): build_site(), build_staged_site(), cached_preview(), catalog_index(), check_output_directory(), default_targets(), explorer_page(), group_for() (+3 more)
 
-### Community 103 - "datetime"
-Cohesion: 0.05
-Nodes (22): band_labels(), band_of(), main(), read_catalogs(), review_queue(), text_lines(), utc_date(), inclusion_date_error() (+14 more)
+### Community 103 - "PublicRedirect"
+Cohesion: 0.20
+Nodes (3): PublicRedirect, RedirectRefused, without_credentials()
 
-### Community 104 - ".agents/skills/awesome-rea/tests/test_discovery_site.py"
-Cohesion: 0.07
-Nodes (13): MainFeedTest, queue_root(), QueueTest, sample_queue(), FeedTests, paper(), resource(), site() (+5 more)
+### Community 104 - ".agents/skills/awesome-rea/scripts/validate_agent_formats.py"
+Cohesion: 0.11
+Nodes (8): Alternates, expected_twins(), validate_agent_files(), validate_agent_formats(), validate_agent_headers(), validate_api(), validate_llms(), validate_twins()
 
 ### Community 105 - "build_worklist.py"
-Cohesion: 0.08
-Nodes (35): avatar_svg(), build_html(), esc(), load_all_scores(), main(), short(), blockers(), build() (+27 more)
+Cohesion: 0.23
+Nodes (9): main(), render(), hubs(), inbound_candidates(), _is_written(), orphan_links(), outbound_candidates(), status_label() (+1 more)
 
 ### Community 107 - "text"
 Cohesion: 0.06
 Nodes (49): core/code, core/paragraph, core/post-author-name, core/post-title, core/pullquote, core/quote, color, color (+41 more)
 
 ### Community 108 - "triad_harness_bundle/skills/awesome-rea/scripts/build_discovery_pages.py"
-Cohesion: 0.06
-Nodes (19): _about_link_groups(), _asset(), breadcrumb_schema(), build_discovery_pages(), _case_collection(), _case_row(), collection_page_schema(), _collection_twin() (+11 more)
+Cohesion: 0.07
+Nodes (18): _about_link_groups(), _asset(), breadcrumb_schema(), build_discovery_pages(), _case_collection(), _case_row(), collection_page_schema(), _collection_twin() (+10 more)
 
 ### Community 109 - ".constructor"
 Cohesion: 0.09
 Nodes (39): MapControls, OrbitControls, dollyIn(), dollyOut(), getZoomScale(), handleKeyDown(), handleMouseDownDolly(), handleMouseDownPan() (+31 more)
 
 ### Community 110 - "delivery_cli.py"
-Cohesion: 0.09
-Nodes (15): TestDeliveryCliUnit, build_wp_payload(), compute_canonical_fingerprint(), compute_server_post_fingerprint(), DeliveryJournal, file_lock(), main(), normalize_alloy() (+7 more)
+Cohesion: 0.07
+Nodes (18): TestDeliveryCliUnit, build_wp_payload(), compute_canonical_fingerprint(), compute_server_post_fingerprint(), DeliveryJournal, file_lock(), main(), normalize_alloy() (+10 more)
 
 ### Community 111 - "triad_harness_bundle/skills/impeccable/scripts/modern-screenshot.umd.js"
 Cohesion: 0.10
@@ -1584,24 +1676,16 @@ Cohesion: 0.04
 Nodes (46): concurrency, cancel-in-progress, group, DEFAULT_BRANCH, GH_TOKEN, HEAD_SHA, INPUT_SHA, PREVIOUS_SHA256 (+38 more)
 
 ### Community 114 - ".agents/skills/awesome-rea/scripts/privacy_guard.py"
-Cohesion: 0.09
-Nodes (15): decoded(), default_paths(), Detector, digest(), files_under(), Finding, fold(), is_archive() (+7 more)
+Cohesion: 0.13
+Nodes (7): Detector, digest(), Finding, fold(), scan(), _scan_chunk(), _scan_serial()
 
-### Community 115 - "pathlib"
-Cohesion: 0.01
-Nodes (32): AppLogicTests, CuratedRepositorySearchTests, DatasetTypeTests, resource(), EmptyRepositorySearchTests, ExpandedDetailsTests, FilteredExportTests, PaperCodeEvidenceTests (+24 more)
-
-### Community 116 - ".agents/skills/awesome-rea/tests/test_contributor_docs.py"
-Cohesion: 0.05
-Nodes (8): ContributorReferenceTests, table(), form_options(), markdown_tables(), ContributorReferenceTests, table(), form_options(), markdown_tables()
-
-### Community 117 - "triad_harness_bundle/skills/awesome-rea/scripts/build_site.py"
-Cohesion: 0.05
-Nodes (8): build_site(), build_staged_site(), catalog_index(), check_output_directory(), default_targets(), explorer_page(), group_for(), main()
+### Community 116 - "ContributorReferenceTests"
+Cohesion: 0.14
+Nodes (4): ContributorReferenceTests, table(), form_options(), markdown_tables()
 
 ### Community 118 - "ml"
-Cohesion: 0.06
-Nodes (6): Al, el, Ll, ml, Rl, Tl()
+Cohesion: 0.08
+Nodes (5): Al, el, ml, Rl, Tl()
 
 ### Community 119 - "with"
 Cohesion: 0.04
@@ -1611,25 +1695,29 @@ Nodes (46): concurrency, cancel-in-progress, group, DEFAULT_BRANCH, GH_TOKEN, HE
 Cohesion: 0.10
 Nodes (39): assert, CHROME_CANDIDATES, completeCatalog(), count(), dataAccess(), dist, {execFileSync}, fs (+31 more)
 
-### Community 121 - "urllib_error"
-Cohesion: 0.06
-Nodes (31): describe(), get_key(), _load(), _parse_credentials_refs(), _parse_flat_yaml(), require_key(), cached_metrics(), _call() (+23 more)
+### Community 121 - "triad_harness_bundle/skills/awesome-rea/scripts/scan_graphql_transport.py"
+Cohesion: 0.13
+Nodes (8): GraphQLReadmeTransport, _identity(), _integer(), _json_object(), NoRedirect, _reject_constant(), _repository(), _utc()
 
 ### Community 122 - "triad_harness_bundle/skills/awesome-rea/scripts/privacy_guard.py"
-Cohesion: 0.08
-Nodes (14): _character_class(), decoded(), default_paths(), Detector, digest(), files_under(), Finding, fold() (+6 more)
+Cohesion: 0.12
+Nodes (6): decoded(), Detector, digest(), Finding, fold(), text_of()
 
-### Community 123 - "html"
-Cohesion: 0.07
-Nodes (13): facet_errors(), item_html(), _items(), ordered_items(), download_label(), download_link(), footer_downloads(), site_footer() (+5 more)
+### Community 123 - ".agents/skills/awesome-rea/scripts/requirement_facets.py"
+Cohesion: 0.25
+Nodes (4): facet_errors(), item_html(), _items(), ordered_items()
+
+### Community 124 - "zlib"
+Cohesion: 0.19
+Nodes (4): main(), patch_dex_bytes(), patch_boot(), read_gguf_kv()
 
 ### Community 125 - "nl"
 Cohesion: 0.06
-Nodes (7): n(), dl, il(), Ml(), nl, parseShapes(), zl
+Nodes (6): n(), dl, il(), Ml(), nl, zl
 
-### Community 126 - "typing"
-Cohesion: 0.07
-Nodes (18): deploy_cartridge_to_node1(), evaluate_uploaded_image(), generate_article_media_pack(), list_cartridges(), refine_image_prompt_iteration(), generate_harness_dataset(), main(), activate_version() (+10 more)
+### Community 126 - "zipfile"
+Cohesion: 0.16
+Nodes (9): activate_version(), compute_sha256(), get_active_cartridge(), get_storage_stats(), list_cartridges(), prune_cartridge_cache(), set_active_cartridge(), unpack_and_install_cartridge() (+1 more)
 
 ### Community 127 - "letterSpacing"
 Cohesion: 0.07
@@ -1640,28 +1728,28 @@ Cohesion: 0.05
 Nodes (44): concurrency, cancel-in-progress, group, if, permissions, runs-on, steps, timeout-minutes (+36 more)
 
 ### Community 130 - "build_evidence_previews.py"
-Cohesion: 0.07
-Nodes (21): best_image(), cached(), carried_forward(), collect(), github_preview(), heading_before(), image_references(), main() (+13 more)
+Cohesion: 0.12
+Nodes (5): carried_forward(), usable_image(), public_media_url(), EvidencePreviewTests, _FakeClient
 
 ### Community 131 - ".agents/skills/awesome-rea/scripts/build_readme.py"
 Cohesion: 0.07
-Nodes (23): browsable_index_count(), case_groups(), collection_section(), heading_anchor(), main(), paper_groups(), paper_section(), readme_size_warnings() (+15 more)
+Nodes (25): browsable_index_count(), case_groups(), collection_section(), heading_anchor(), main(), paper_groups(), paper_section(), readme_size_warnings() (+17 more)
 
 ### Community 133 - ".agents/skills/impeccable/scripts/modern-screenshot.umd.js"
 Cohesion: 0.11
 Nodes (42): ae(), bt(), Ct(), de(), dt(), _e(), er(), Et() (+34 more)
 
 ### Community 134 - "showToast"
-Cohesion: 0.11
-Nodes (45): acceptAdaptation(), acceptFragmentAsIs(), apiPost(), approveArticle(), approveCompetitor(), approveTopic(), bulkAction(), closeInspector() (+37 more)
+Cohesion: 0.14
+Nodes (38): apiPost(), approveArticle(), approveCompetitor(), approveTopic(), bulkAction(), closeInspector(), confirmRewriteCurrentTopic(), createBackup() (+30 more)
 
 ### Community 135 - "hello-elementor-topbar.js"
-Cohesion: 0.17
-Nodes (38): g(), A(), B(), c(), e(), f(), ce(), d() (+30 more)
+Cohesion: 0.18
+Nodes (37): A(), B(), c(), e(), f(), ce(), d(), E() (+29 more)
 
-### Community 137 - "package_contract.py"
-Cohesion: 0.07
-Nodes (20): alloy_label(), detect_alloy(), main(), melt_range(), normalize_key(), work_range(), design_visual_package_for_topic(), generate_alloy_reflow_svg() (+12 more)
+### Community 137 - "collect_target_download_links"
+Cohesion: 0.21
+Nodes (5): artifact_basename_matches_target(), collect_target_download_links(), dedupe_strings(), external_priority(), CollectedDownloadLinkTests
 
 ### Community 138 - "steps"
 Cohesion: 0.05
@@ -1696,12 +1784,12 @@ Cohesion: 0.08
 Nodes (17): format_context(), format_result(), main(), BM25, calculate_pattern_break(), detect_domain(), get_background_config(), get_color_for_emotion() (+9 more)
 
 ### Community 146 - "DesignSystemGenerator"
-Cohesion: 0.09
-Nodes (5): DesignSystemGenerator, TestReasoningMatch, read_rows(), TestLandingAndStackContract, TestReasoningContract
+Cohesion: 0.10
+Nodes (4): DesignSystemGenerator, _resolve_dial(), TestReasoningMatch, TestReasoningContract
 
-### Community 147 - "urllib_request"
-Cohesion: 0.06
-Nodes (17): collect_aeo_cluster(), fetch_google_suggest(), main(), save_to_sqlite(), expand_seed(), fetch_suggestions(), main(), add_log() (+9 more)
+### Community 147 - "FastOmniHandler"
+Cohesion: 0.16
+Nodes (9): add_log(), cosine_sim(), FastOmniHandler, fetch_active_skills(), filter_mcp_tools(), get_db(), get_embedding(), http_json() (+1 more)
 
 ### Community 148 - "blocks"
 Cohesion: 0.07
@@ -1728,8 +1816,8 @@ Cohesion: 0.05
 Nodes (41): if, runs-on, steps, timeout-minutes, concurrency, cancel-in-progress, group, COLLECT_RESULT (+33 more)
 
 ### Community 154 - "repository_metadata.py"
-Cohesion: 0.09
-Nodes (21): catalog_keys(), changed(), _clean(), commit_snapshot(), fetch(), main(), _missing_repository(), observed_at() (+13 more)
+Cohesion: 0.10
+Nodes (19): catalog_keys(), changed(), _clean(), commit_snapshot(), fetch(), main(), _missing_repository(), observed_at() (+11 more)
 
 ### Community 155 - ".agents/skills/awesome-rea/tests/app_logic_ui.cjs"
 Cohesion: 0.07
@@ -1738,6 +1826,10 @@ Nodes (18): assert, byClass(), camel(), clone(), descendants(), Element, fs, has
 ### Community 156 - "triad_harness_bundle/skills/awesome-rea/scripts/build_entry_pages.py"
 Cohesion: 0.09
 Nodes (21): _asset_url(), build_entry_pages(), _definitions(), _document(), entry_path(), _feedback(), feedback_urls(), _link() (+13 more)
+
+### Community 157 - "ordered_map"
+Cohesion: 0.12
+Nodes (10): _apply(), _context(), ordered_map(), _run(), run_all(), workers(), PageResources, parse_built_files() (+2 more)
 
 ### Community 158 - "add_action"
 Cohesion: 0.07
@@ -1749,7 +1841,7 @@ Nodes (41): if, runs-on, steps, timeout-minutes, concurrency, cancel-in-progress
 
 ### Community 160 - ".agents/skills/awesome-rea/scripts/review_pr.py"
 Cohesion: 0.10
-Nodes (23): api(), changes_public_archive(), content_at(), dispatch_binding_error(), dispatch_inputs(), dispatched(), find_existing_review(), InvalidJSON (+15 more)
+Nodes (22): api(), changes_public_archive(), content_at(), dispatch_binding_error(), dispatch_inputs(), dispatched(), find_existing_review(), InvalidJSON (+14 more)
 
 ### Community 161 - ".agents/skills/awesome-rea/tests/test_discovery_leads.py"
 Cohesion: 0.06
@@ -1760,8 +1852,8 @@ Cohesion: 0.07
 Nodes (17): assert, byClass(), camel(), descendants(), Element, fs, hasClass(), html (+9 more)
 
 ### Community 163 - "t"
-Cohesion: 0.17
-Nodes (37): t(), a(), B(), r(), c(), ce(), d(), de() (+29 more)
+Cohesion: 0.14
+Nodes (44): a(), ae(), B(), r(), c(), ce(), d(), de() (+36 more)
 
 ### Community 164 - "elements"
 Cohesion: 0.07
@@ -1781,7 +1873,7 @@ Nodes (14): document_links(), evidence_pin_warnings(), fence_start(), list_item_
 
 ### Community 168 - "triad_harness_bundle/skills/awesome-rea/scripts/review_pr.py"
 Cohesion: 0.10
-Nodes (23): api(), changes_public_archive(), content_at(), dispatch_binding_error(), dispatch_inputs(), dispatched(), find_existing_review(), InvalidJSON (+15 more)
+Nodes (22): api(), changes_public_archive(), content_at(), dispatch_binding_error(), dispatch_inputs(), dispatched(), find_existing_review(), InvalidJSON (+14 more)
 
 ### Community 169 - "text"
 Cohesion: 0.07
@@ -1816,8 +1908,8 @@ Cohesion: 0.11
 Nodes (19): allowed_fetch(), canonical_lead(), capture(), clean_url(), Collector, counts(), digest(), lead_id() (+11 more)
 
 ### Community 177 - "triad_harness_bundle/skills/awesome-rea/scripts/ingest_discoveries.py"
-Cohesion: 0.11
-Nodes (24): check_results(), close_pull(), commit_batch(), dispatch_checks(), git(), GitHub, log(), main() (+16 more)
+Cohesion: 0.09
+Nodes (25): ApiError, check_results(), close_pull(), commit_batch(), dispatch_checks(), git(), GitHub, log() (+17 more)
 
 ### Community 178 - "blocks"
 Cohesion: 0.07
@@ -1828,20 +1920,20 @@ Cohesion: 0.08
 Nodes (17): alternate_links(), authors_omitted(), bibtex_text(), build_paper_pages(), formatted_date(), icon(), journal_title(), listing_size_warning() (+9 more)
 
 ### Community 180 - "HTMLParser"
-Cohesion: 0.05
-Nodes (9): AboutLinkGroups, DocumentTitle, FooterLinks, SectionTargetCounts, Stylesheets, validate_about_links(), validate_section_target_counts(), validate_shared_footer() (+1 more)
+Cohesion: 0.06
+Nodes (8): AboutLinkGroups, DocumentTitle, FooterLinks, Page, Stylesheets, validate_about_links(), validate_link_fragments(), VisibleBreadcrumb
 
 ### Community 181 - ".agents/skills/awesome-rea/tests/test_qualified_scan_goal.py"
-Cohesion: 0.08
-Nodes (7): WorkerIdentityTests, BootstrapQualificationTests, mixed_snapshot(), qualification_receipt(), QualificationTests, RuntimeQualificationTests, child()
+Cohesion: 0.10
+Nodes (6): WorkerIdentityTests, mixed_snapshot(), qualification_receipt(), QualificationTests, RuntimeQualificationTests, child()
 
 ### Community 182 - "triad_harness_bundle/skills/awesome-rea/scripts/build_paper_pages.py"
 Cohesion: 0.08
 Nodes (17): alternate_links(), authors_omitted(), bibtex_text(), build_paper_pages(), formatted_date(), icon(), journal_title(), listing_size_warning() (+9 more)
 
 ### Community 183 - "triad_harness_bundle/skills/awesome-rea/scripts/build_discoveries.py"
-Cohesion: 0.10
-Nodes (21): badge_document(), batch_export(), batch_export_path(), batch_file_url(), card(), discovery_feed(), discovery_queue(), export_document() (+13 more)
+Cohesion: 0.07
+Nodes (25): badge_document(), batch_export(), batch_export_path(), batch_file_url(), card(), discovery_feed(), discovery_queue(), export_document() (+17 more)
 
 ### Community 184 - "Notifications"
 Cohesion: 0.09
@@ -1860,8 +1952,8 @@ Cohesion: 0.12
 Nodes (25): acknowledge_candidates(), active_partition(), add_queries(), cache_path(), checked_base(), checked_run_id(), current_seconds(), defer_candidates() (+17 more)
 
 ### Community 188 - ".agents/skills/awesome-rea/tests/test_discoveries.py"
-Cohesion: 0.11
-Nodes (11): BatchValidationTest, capture(), empty_existing(), IngestPullGitHub, make_batch(), prepared_root(), PrepareTest, receipt() (+3 more)
+Cohesion: 0.05
+Nodes (13): BatchValidationTest, capture(), empty_existing(), IngestPullGitHub, make_batch(), prepared_root(), PrepareTest, receipt() (+5 more)
 
 ### Community 189 - "color"
 Cohesion: 0.05
@@ -1908,44 +2000,40 @@ Cohesion: 0.10
 Nodes (11): SourceIsolationTest, clock(), parsed(), resolve(), Clock, FakeGitHub, receipt_archive(), ReceiptTests (+3 more)
 
 ### Community 200 - ".agents/skills/awesome-rea/tests/test_scan_frontier_integration.py"
-Cohesion: 0.08
-Nodes (12): arguments(), DiscoveryDeadlineTests, json(), FreshFrontierQueryTests, fetch_batch(), json(), FrontierRetryTests, GraphQLRecordValidationTests (+4 more)
+Cohesion: 0.09
+Nodes (11): arguments(), DiscoveryDeadlineTests, json(), FreshFrontierQueryTests, fetch_batch(), json(), FrontierRetryTests, LegacyPendingTests (+3 more)
 
 ### Community 201 - "state"
 Cohesion: 0.15
 Nodes (6): PartitionTests, PersistenceTests, QueueTests, repo(), response(), state()
 
 ### Community 202 - "triad_harness_bundle/skills/awesome-rea/scripts/build_api.py"
-Cohesion: 0.08
-Nodes (14): api_page(), build_api(), candidates_document(), categories_document(), _cell(), changes_document(), csv_bytes(), csv_rows() (+6 more)
+Cohesion: 0.07
+Nodes (15): api_page(), build_api(), candidates_document(), categories_document(), _cell(), changes_document(), csv_bytes(), csv_rows() (+7 more)
 
 ### Community 203 - "triad_harness_bundle/skills/awesome-rea/tests/test_scan_frontier_integration.py"
-Cohesion: 0.08
-Nodes (12): arguments(), DiscoveryDeadlineTests, json(), FreshFrontierQueryTests, fetch_batch(), json(), FrontierRetryTests, GraphQLRecordValidationTests (+4 more)
+Cohesion: 0.09
+Nodes (11): arguments(), DiscoveryDeadlineTests, json(), FreshFrontierQueryTests, fetch_batch(), json(), FrontierRetryTests, LegacyPendingTests (+3 more)
 
 ### Community 204 - "triad_harness_bundle/skills/awesome-rea/tests/test_discoveries.py"
-Cohesion: 0.11
-Nodes (11): BatchValidationTest, capture(), empty_existing(), IngestPullGitHub, make_batch(), prepared_root(), PrepareTest, receipt() (+3 more)
+Cohesion: 0.06
+Nodes (12): BatchValidationTest, capture(), empty_existing(), IngestPullGitHub, make_batch(), PrepareTest, receipt(), SelectionTest (+4 more)
 
 ### Community 205 - "grapes.json"
 Cohesion: 0.06
 Nodes (35): core/post-comments, core/post-date, core/post-terms, core/site-title, radius, border, color, :visited (+27 more)
 
-### Community 206 - ".agents/skills/awesome-rea/scripts/repository_stats.py"
-Cohesion: 0.07
-Nodes (14): compact_count(), read_stars(), refreshed_stats(), repository_stars(), star_count(), stats_path(), write_fresh_stats(), compact_count() (+6 more)
+### Community 206 - "re"
+Cohesion: 0.05
+Nodes (5): ai, Ea(), Jt, re, ri()
 
 ### Community 207 - ".agents/skills/awesome-rea/tests/test_scan_delivery_holds.py"
-Cohesion: 0.15
-Nodes (8): API, arguments(), DeliveryTests, HoldValidationTests, pending_snapshot(), repo(), saved_frontier(), Transport
+Cohesion: 0.24
+Nodes (7): API, arguments(), DeliveryTests, pending_snapshot(), repo(), saved_frontier(), Transport
 
 ### Community 208 - "applyEditing"
 Cohesion: 0.08
 Nodes (35): addManualContextText(), applyEditing(), buildLocatorForLeaf(), canRestoreManualEditElement(), collectManualContextPieces(), walk(), contextElementForManualEdit(), copyEditContainerContext() (+27 more)
-
-### Community 209 - "fe"
-Cohesion: 0.11
-Nodes (16): fe, ps(), B(), F(), G(), H(), I(), J() (+8 more)
 
 ### Community 210 - "applyEditing"
 Cohesion: 0.08
@@ -1959,25 +2047,17 @@ Nodes (34): core/post-title, core/pullquote, core/query-pagination, core/quote, 
 Cohesion: 0.06
 Nodes (33): runs-on, steps, timeout-minutes, concurrency, cancel-in-progress, group, github_token, jobs (+25 more)
 
-### Community 213 - ".agents/skills/awesome-rea/tests/test_public_artifact_leads.py"
-Cohesion: 0.09
-Nodes (7): error(), FixtureClient, Opener, PublicLeadTests, PublicTransportTests, readme(), Response
-
 ### Community 214 - "spacing"
 Cohesion: 0.06
 Nodes (34): $type, $value, $type, $value, $type, $value, $type, $value (+26 more)
 
-### Community 215 - "triad_harness_bundle/skills/awesome-rea/tests/test_public_artifact_leads.py"
-Cohesion: 0.09
-Nodes (7): error(), FixtureClient, Opener, PublicLeadTests, PublicTransportTests, readme(), Response
-
 ### Community 216 - "switchTab"
 Cohesion: 0.10
-Nodes (34): checkPhrase(), checkPhraseValue(), renderLoading(), checkTopicPhrase(), esc(), exportSingleArticle(), filterByStep(), filterKanban() (+26 more)
+Nodes (34): acceptAdaptation(), checkPhrase(), checkPhraseValue(), renderLoading(), checkTopicPhrase(), esc(), filterByStep(), filterKanban() (+26 more)
 
-### Community 217 - "constructor"
+### Community 217 - "us"
 Cohesion: 0.08
-Nodes (17): bc, compileCubemapShader(), compileEquirectangularShader(), _compileMaterial(), constructor(), d(), u(), ge (+9 more)
+Nodes (30): ao(), ca, co(), cs, S(), y(), eo(), go (+22 more)
 
 ### Community 218 - "with"
 Cohesion: 0.06
@@ -1988,8 +2068,8 @@ Cohesion: 0.11
 Nodes (18): bullet_facts(), collection_markdown(), rows(), entry_route(), full_catalog_markdown(), json_text(), label_text(), link() (+10 more)
 
 ### Community 221 - "yo"
-Cohesion: 0.09
-Nodes (9): ds(), F(), G(), k(), V(), z(), jo, qo (+1 more)
+Cohesion: 0.06
+Nodes (13): Ba, ds(), F(), G(), k(), V(), z(), jo (+5 more)
 
 ### Community 222 - "steps"
 Cohesion: 0.06
@@ -2008,7 +2088,7 @@ Cohesion: 0.11
 Nodes (7): fixture(), one_record_batch(), registry(), withdrawal(), WithdrawalRegistryTests, WithdrawalReviewTests, WithdrawnEvidenceTests
 
 ### Community 226 - ".agents/skills/awesome-rea/tests/test_source_availability.py"
-Cohesion: 0.15
+Cohesion: 0.17
 Nodes (9): arguments(), CommandTests, document(), FakeAPI, gone(), OutcomeTests, repo(), RunTests (+1 more)
 
 ### Community 227 - "button"
@@ -2024,7 +2104,7 @@ Cohesion: 0.10
 Nodes (10): _Document, _locale_url(), localized_homepage(), schema_page(), translated(), _markup(), _root_url(), _Strings (+2 more)
 
 ### Community 230 - "triad_harness_bundle/skills/awesome-rea/tests/test_source_availability.py"
-Cohesion: 0.15
+Cohesion: 0.17
 Nodes (9): arguments(), CommandTests, document(), FakeAPI, gone(), OutcomeTests, repo(), RunTests (+1 more)
 
 ### Community 232 - "triad_harness_bundle/skills/awesome-rea/site/app.js"
@@ -2036,8 +2116,8 @@ Cohesion: 0.07
 Nodes (31): core/button, color, :hover, spacing, background, palette, text, variations (+23 more)
 
 ### Community 234 - "check_pr_hygiene.py"
-Cohesion: 0.13
-Nodes (15): body_problems(), codex_review_summary(), commit_problems(), is_bot(), is_maintainer(), is_maintainer_or_bot_login(), is_web_flow(), main() (+7 more)
+Cohesion: 0.16
+Nodes (11): body_problems(), codex_review_summary(), commit_problems(), is_maintainer(), is_maintainer_or_bot_login(), is_web_flow(), pull_request_problems(), CodexReviewTests (+3 more)
 
 ### Community 235 - ".agents/skills/awesome-rea/scripts/site_shell.py"
 Cohesion: 0.11
@@ -2064,16 +2144,16 @@ Cohesion: 0.10
 Nodes (14): accounting_errors(), annotation(), baseline_binding(), check_increment(), directory_reader(), fingerprint(), git_reader(), read() (+6 more)
 
 ### Community 242 - ".agents/skills/awesome-rea/scripts/validate_discovery.py"
-Cohesion: 0.09
-Nodes (10): built_page_dates(), discovery_class_pages(), Document, expected_entry_routes(), main(), _read_document(), resource_pages(), validate_robots() (+2 more)
+Cohesion: 0.08
+Nodes (11): built_page_dates(), discovery_class_pages(), Document, expected_entry_routes(), main(), _read_document(), resource_pages(), validate_robots() (+3 more)
 
 ### Community 243 - ".agents/skills/awesome-rea/tests/test_paper_authors_omitted.py"
 Cohesion: 0.11
 Nodes (6): AuthorsOmittedOutputTests, AuthorsOmittedValidationTests, errors_for(), omitted(), paper(), RelatedMarkerTests
 
 ### Community 244 - "triad_harness_bundle/skills/awesome-rea/tests/test_indexnow_automation.py"
-Cohesion: 0.09
-Nodes (6): Clock, FakeGitHub, receipt_archive(), ReceiptTests, WaitTests, WorkflowTests
+Cohesion: 0.14
+Nodes (4): Clock, FakeGitHub, ReceiptTests, WaitTests
 
 ### Community 245 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_authors_omitted.py"
 Cohesion: 0.11
@@ -2100,12 +2180,12 @@ Cohesion: 0.07
 Nodes (7): read_case_coverage(), dumps(), read_reviews(), review_order(), split_queue(), validate_reviews(), ReviewDisclaimerTests
 
 ### Community 251 - ".agents/skills/awesome-rea/scripts/check_links.py"
-Cohesion: 0.10
-Nodes (12): check_url(), classify_ledger_loss(), fetch_once(), ledger_sources(), main(), PublicRedirect, records_missing(), RedirectRefused (+4 more)
+Cohesion: 0.04
+Nodes (31): check_url(), classify_ledger_loss(), fetch_once(), ledger_sources(), main(), records_missing(), request_url(), source_urls() (+23 more)
 
 ### Community 252 - "github_signals"
-Cohesion: 0.13
-Nodes (8): artifact_basename_matches_target(), collect_target_download_links(), external_priority(), github_signals(), ClassZeroCandidateTests, CollectedDownloadLinkTests, DownloadSignalTests, meta()
+Cohesion: 0.35
+Nodes (3): github_signals(), DownloadSignalTests, meta()
 
 ### Community 253 - ".agents/skills/awesome-rea/scripts/indexnow_automation.py"
 Cohesion: 0.11
@@ -2119,25 +2199,25 @@ Nodes (7): Clock, FakeHTTPS, ok(), RESTTransportTests, respond(), respond(), res
 Cohesion: 0.13
 Nodes (12): get_context(), is_allowed_exception(), is_allowed_rgba(), is_inside_block(), load_css_variables(), main(), print_result(), print_summary() (+4 more)
 
-### Community 256 - "design_system.py"
-Cohesion: 0.09
-Nodes (12): ansi_ljust(), _detect_page_type(), format_ascii_box(), format_master_md(), format_page_override_md(), _generate_intelligent_overrides(), hex_to_ansi(), persist_design_system() (+4 more)
+### Community 256 - "parse_decision_rules"
+Cohesion: 0.21
+Nodes (5): apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), _validate_action(), _check_reasoning_contract()
 
 ### Community 257 - "triad_harness_bundle/skills/awesome-rea/scripts/build_browse_pages.py"
 Cohesion: 0.10
 Nodes (10): browse_path(), build_browse_pages(), category_document(), external_url(), icon(), related_links(), repository_card(), title_end() (+2 more)
 
 ### Community 259 - "Ls"
-Cohesion: 0.11
-Nodes (4): Ls, i(), sc, yn()
+Cohesion: 0.06
+Nodes (7): ct(), Es, Ls, i(), sc, Vs, yn()
 
 ### Community 260 - "tools/deslop.py"
-Cohesion: 0.10
-Nodes (14): run_offline_reviewer(), audit(), markdown_prose(), normalise(), parse_args(), read_input(), read_utf8(), _root_pattern() (+6 more)
+Cohesion: 0.12
+Nodes (11): markdown_prose(), normalise(), parse_args(), read_input(), read_utf8(), _strip_block(), _strip_comments(), _strip_tags() (+3 more)
 
 ### Community 261 - "triad_harness_bundle/skills/awesome-rea/scripts/sitemaps.py"
-Cohesion: 0.12
-Nodes (13): english_path(), instant(), language_alternates(), latest(), normalized_date(), page_dates(), read_sitemaps(), record_date() (+5 more)
+Cohesion: 0.11
+Nodes (14): english_path(), instant(), language_alternates(), latest(), normalized_date(), page_dates(), read_sitemaps(), record_date() (+6 more)
 
 ### Community 262 - "RESTTransportTests"
 Cohesion: 0.13
@@ -2167,6 +2247,10 @@ Nodes (23): callno(), cardHTML(), chunked(), cjk(), classChip(), dist(), emptyHT
 Cohesion: 0.08
 Nodes (11): assert, descendants(), Element, homepage(), {initializeShortlist, readShortlist}, paperPage(), papers, path (+3 more)
 
+### Community 269 - "web_tools.py"
+Cohesion: 0.09
+Nodes (18): clean_rss_text(), extract_news_count(), extract_news_topic(), get_currency_dict(), get_currency_rates(), get_current_datetime_fact(), get_live_news(), get_live_weather() (+10 more)
+
 ### Community 270 - ".agents/skills/awesome-rea/tests/test_site_metadata.py"
 Cohesion: 0.08
 Nodes (6): CatalogPreloadTests, HomepageDestinationTests, OpenGraphTests, resource(), SecurityHeaderTests, social_page()
@@ -2184,7 +2268,7 @@ Cohesion: 0.10
 Nodes (22): collectEditableTextRows(), visit(), createLiveBrowserDomHelpers(), cloneWithoutChrome(), cssId(), liveUiRoot(), makeFrozenAnchor(), own() (+14 more)
 
 ### Community 274 - "triad_harness_bundle/skills/awesome-rea/tests/test_source_scope_review.py"
-Cohesion: 0.17
+Cohesion: 0.22
 Nodes (10): blob(), blob_path(), CommandTests, document(), FakeAPI, git_sha(), ReceiptTests, repo() (+2 more)
 
 ### Community 275 - "triad_harness_bundle/skills/awesome-rea/tests/test_site_metadata.py"
@@ -2195,17 +2279,13 @@ Nodes (6): CatalogPreloadTests, HomepageDestinationTests, OpenGraphTests, resour
 Cohesion: 0.15
 Nodes (3): sanitize_key(), Utils, Admin_Config
 
-### Community 277 - "PublicSourceSupplementTests"
-Cohesion: 0.11
-Nodes (4): with_curated_labels(), PublicSourceSupplementTests, reuses_class_evidence(), run()
-
 ### Community 278 - "omni_gateway_v4_7.py"
 Cohesion: 0.17
 Nodes (19): add_log(), anthropic_to_oai(), cosine_sim(), db_exec(), db_query(), dynamic_detect_domain(), escalate(), fetch_active_skills() (+11 more)
 
 ### Community 279 - "triad_harness_bundle/skills/awesome-rea/scripts/build_manifest.py"
-Cohesion: 0.12
-Nodes (12): collect_manifest(), _ElementSpans, html_digest(), manifest_bytes(), normalized_html_bytes(), remove_beacon(), remove_email_decoder(), restore_email() (+4 more)
+Cohesion: 0.17
+Nodes (6): _ElementSpans, normalized_html_bytes(), remove_beacon(), remove_email_decoder(), restore_email(), _TagAttributes
 
 ### Community 280 - "triad_harness_bundle/skills/awesome-rea/tests/local_shortlist_ui.cjs"
 Cohesion: 0.08
@@ -2217,19 +2297,19 @@ Nodes (22): collectEditableTextRows(), visit(), createLiveBrowserDomHelpers(), c
 
 ### Community 282 - "render_case_pages"
 Cohesion: 0.10
-Nodes (15): case_method(), case_order(), case_page(), case_page_name(), method_groups(), other_targets(), recent_cases(), render_case_file() (+7 more)
+Nodes (15): case_method(), case_order(), case_page(), case_page_name(), entry_type(), method_groups(), other_targets(), recent_cases() (+7 more)
 
-### Community 283 - "test_evidence_classes.py"
-Cohesion: 0.08
-Nodes (6): is_demo_image(), EvidenceClassDataTests, _FakeClient, GitLabDisabledFeatureTests, GitLabReadmeTests, GitLabThrottleTests
+### Community 283 - "EvidenceClassDataTests"
+Cohesion: 0.14
+Nodes (3): is_demo_image(), EvidenceClassDataTests, _FakeClient
 
 ### Community 284 - "gray"
 Cohesion: 0.08
 Nodes (27): $type, $value, $type, $value, $type, $value, $type, $value (+19 more)
 
-### Community 285 - "sqlite3"
-Cohesion: 0.05
-Nodes (27): chunk_standard_text(), extract_text_from_pdf(), index_pdf_document(), init_knowledge_db(), list_indexed_standards(), search_knowledge_base(), handle_anthropic_messages(), handle_chat() (+19 more)
+### Community 285 - "async_omni_gateway_v4_8.py"
+Cohesion: 0.11
+Nodes (6): handle_anthropic_messages(), handle_chat(), init_db(), handle_anthropic_messages(), handle_chat(), init_db()
 
 ### Community 286 - "handleManualEditActivity"
 Cohesion: 0.16
@@ -2244,8 +2324,8 @@ Cohesion: 0.07
 Nodes (26): MYSQL_DATABASE, MYSQL_PASSWORD, MYSQL_ROOT_PASSWORD, MYSQL_USER, WORDPRESS_DB_HOST, WORDPRESS_DB_NAME, WORDPRESS_DB_PASSWORD, WORDPRESS_DB_USER (+18 more)
 
 ### Community 291 - "HTMLParser"
-Cohesion: 0.07
-Nodes (7): AboutLinkGroups, DocumentTitle, Stylesheets, validate_about_links(), validate_stylesheet_references(), validate_unique_titles(), VisibleBreadcrumb
+Cohesion: 0.06
+Nodes (7): AboutLinkGroups, DocumentTitle, FooterLinks, SectionTargetCounts, Stylesheets, validate_about_links(), VisibleBreadcrumb
 
 ### Community 293 - "handleManualEditActivity"
 Cohesion: 0.16
@@ -2275,17 +2355,13 @@ Nodes (12): awaiting_review(), batch_export(), batch_export_path(), data_points(
 Cohesion: 0.12
 Nodes (12): build_survey(), Citations, cited_ids(), discussion_sections(), public_url(), read_survey(), reference_order(), add() (+4 more)
 
-### Community 300 - ".agents/skills/awesome-rea/scripts/validate_agent_formats.py"
-Cohesion: 0.10
-Nodes (9): Alternates, expected_twins(), validate_agent_files(), validate_agent_formats(), validate_agent_headers(), validate_api(), validate_json_feeds(), validate_llms() (+1 more)
-
-### Community 301 - "main"
+### Community 300 - "existing_keys"
 Cohesion: 0.14
-Nodes (18): failure_url_error(), main(), nonempty_string(), normalized_url(), parse_iso(), public_https_error(), source_unavailable_errors(), string_list() (+10 more)
+Nodes (11): split_shared_pages(), entry_key(), entry_name(), existing_keys(), add(), add_scan(), add_url(), lead_keys() (+3 more)
 
-### Community 302 - "_SharedTokens"
-Cohesion: 0.11
-Nodes (6): PageResources, parse_built_files(), _parse_file(), parse_once(), _SharedTokens, validate_catalog_preload()
+### Community 301 - "collect"
+Cohesion: 0.12
+Nodes (15): arxiv_listings(), Client, collect(), directory_listings(), excluded(), git_blob_sha(), github_file(), huggingface_listings() (+7 more)
 
 ### Community 304 - ".agents/skills/awesome-rea/tests/test_discovery_reviews.py"
 Cohesion: 0.14
@@ -2307,10 +2383,6 @@ Nodes (7): build(), current_resources(), fixture(), record(), section_rows(), Se
 Cohesion: 0.12
 Nodes (26): $type, $value, $type, $value, $type, $value, 500, 600 (+18 more)
 
-### Community 310 - "test_core.py"
-Cohesion: 0.08
-Nodes (6): format_markdown(), generate_design_system(), TestBm25CoreBehavior, TestDiagnosticsContracts, TestPersistence, TestTokenizer
-
 ### Community 311 - "triad_harness_bundle/skills/awesome-rea/scripts/build_survey.py"
 Cohesion: 0.12
 Nodes (12): build_survey(), Citations, cited_ids(), discussion_sections(), public_url(), read_survey(), reference_order(), add() (+4 more)
@@ -2328,8 +2400,8 @@ Cohesion: 0.09
 Nodes (25): cssnano, postcss, postcss-cli, @wordpress/browserslist-config, author, browserslist, bugs, url (+17 more)
 
 ### Community 317 - "triad_harness_bundle/skills/awesome-rea/scripts/discoveries.py"
-Cohesion: 0.16
-Nodes (14): batch_bytes(), batch_files(), build_batch(), curated_urls(), digest(), existing_identities(), load_batches(), main() (+6 more)
+Cohesion: 0.11
+Nodes (20): batch_bytes(), batch_files(), build_batch(), curated_urls(), digest(), existing_identities(), load_batches(), main() (+12 more)
 
 ### Community 318 - "renderSources"
 Cohesion: 0.14
@@ -2348,63 +2420,55 @@ Cohesion: 0.08
 Nodes (25): blockTypes, color, radius, style, width, link, typography, border (+17 more)
 
 ### Community 323 - ".agents/skills/awesome-rea/scripts/validate_schema_org.py"
-Cohesion: 0.14
-Nodes (10): block_errors(), _Blocks, defined_ids(), literal_fits(), node_errors(), nodes(), _page_blocks(), page_errors() (+2 more)
+Cohesion: 0.18
+Nodes (5): _Blocks, defined_ids(), nodes(), _page_blocks(), validate_site()
 
 ### Community 324 - "renderSources"
 Cohesion: 0.14
 Nodes (25): announceRevealed(), applyLanguage(), applyLayout(), changeLayout(), curatedURL(), expandedRecords(), fromKeyboard(), languageHref() (+17 more)
 
 ### Community 325 - ".agents/skills/awesome-rea/tests/test_discovery_ingest.py"
-Cohesion: 0.11
-Nodes (6): CommitTest, FakeAPI, WaitAndMergeTest, answers(), WorkflowTest, fetch_batch()
-
-### Community 326 - ".agents/skills/awesome-rea/tests/test_page_metadata.py"
-Cohesion: 0.08
-Nodes (3): CatalogDescriptionTests, MetaDescriptionTests, PageTitleTests
+Cohesion: 0.16
+Nodes (5): CommitTest, FakeAPI, WaitAndMergeTest, answers(), fetch_batch()
 
 ### Community 327 - ".agents/skills/awesome-rea/tests/test_paper_identity.py"
 Cohesion: 0.18
 Nodes (6): errors_for(), PaperIdentityTests, publisher_paper(), security24_paper(), woot19_paper(), workshop_paper()
 
 ### Community 328 - "ReadmeContentsTest"
-Cohesion: 0.14
+Cohesion: 0.18
 Nodes (3): paper(), ReadmeContentsTest, resource()
 
 ### Community 329 - ".agents/skills/awesome-rea/tests/test_static_page_links.py"
-Cohesion: 0.10
-Nodes (6): BibtexMonthTests, build_static_pages(), dated_paper(), LanguageLinkTests, LanguageSwitch, navigation()
+Cohesion: 0.17
+Nodes (4): build_static_pages(), LanguageLinkTests, LanguageSwitch, navigation()
 
 ### Community 330 - "SchemaOrgValidatorTests"
-Cohesion: 0.14
-Nodes (4): page(), SchemaOrgValidatorTests, SiteValidationTests, VendoredVocabularyTests
+Cohesion: 0.18
+Nodes (3): page(), SchemaOrgValidatorTests, SiteValidationTests
 
 ### Community 331 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_identity.py"
 Cohesion: 0.18
 Nodes (6): errors_for(), PaperIdentityTests, publisher_paper(), security24_paper(), woot19_paper(), workshop_paper()
 
-### Community 332 - "triad_harness_bundle/skills/awesome-rea/tests/test_page_metadata.py"
-Cohesion: 0.08
-Nodes (3): CatalogDescriptionTests, MetaDescriptionTests, PageTitleTests
-
 ### Community 333 - "triad_harness_bundle/skills/awesome-rea/tests/test_discovery_ingest.py"
-Cohesion: 0.11
-Nodes (6): CommitTest, FakeAPI, WaitAndMergeTest, answers(), WorkflowTest, fetch_batch()
+Cohesion: 0.16
+Nodes (5): CommitTest, FakeAPI, WaitAndMergeTest, answers(), fetch_batch()
 
 ### Community 334 - "SchemaOrgValidatorTests"
-Cohesion: 0.14
-Nodes (4): page(), SchemaOrgValidatorTests, SiteValidationTests, VendoredVocabularyTests
+Cohesion: 0.18
+Nodes (3): page(), SchemaOrgValidatorTests, SiteValidationTests
 
 ### Community 335 - "triad_harness_bundle/skills/awesome-rea/tests/test_static_page_links.py"
-Cohesion: 0.10
-Nodes (6): BibtexMonthTests, build_static_pages(), dated_paper(), LanguageLinkTests, LanguageSwitch, navigation()
+Cohesion: 0.17
+Nodes (4): build_static_pages(), LanguageLinkTests, LanguageSwitch, navigation()
 
-### Community 336 - "triad_harness_bundle/skills/awesome-rea/scripts/validate_schema_org.py"
-Cohesion: 0.14
-Nodes (10): block_errors(), _Blocks, defined_ids(), literal_fits(), main(), node_errors(), nodes(), page_errors() (+2 more)
+### Community 336 - ".agents/skills/awesome-rea/tests/test_static_page_links.py"
+Cohesion: 0.07
+Nodes (9): BibtexMonthTests, dated_paper(), block_errors(), literal_fits(), node_errors(), page_errors(), Vocabulary, BibtexMonthTests (+1 more)
 
 ### Community 337 - "triad_harness_bundle/skills/awesome-rea/tests/test_scan_interruption.py"
-Cohesion: 0.15
+Cohesion: 0.17
 Nodes (6): API, arguments(), interrupt_on_call(), repository(), ScanInterruptionTests, Transport
 
 ### Community 338 - "elementor-functions.php"
@@ -2452,19 +2516,19 @@ Cohesion: 0.16
 Nodes (7): paper(), ProtocolTargetTests, resource(), export_bytes(), full_export(), record(), SourceBrowserTests
 
 ### Community 349 - ".agents/skills/awesome-rea/tests/test_scan_interruption.py"
-Cohesion: 0.16
+Cohesion: 0.17
 Nodes (6): API, arguments(), interrupt_on_call(), repository(), ScanInterruptionTests, Transport
 
 ### Community 350 - "test_design_system_mode.py"
-Cohesion: 0.13
-Nodes (6): _filter_anti_patterns_for_mode(), _palette_is_dark(), _relative_luminance(), TestAntiPatternGating, TestEndToEndCoherence, TestLuminance
+Cohesion: 0.11
+Nodes (8): _contrast_ratio(), _derive_dark_palette(), _palette_is_dark(), _relative_luminance(), _select_palette_for_mode(), TestEndToEndCoherence, TestLuminance, TestPaletteSelection
 
 ### Community 351 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_citations.py"
 Cohesion: 0.14
 Nodes (7): ArxivLocatorTests, CitationValidationTests, ContainerMetadataTests, errors_for(), fields(), paper(), ReviewedContainerRecordTests
 
 ### Community 352 - "triad_harness_bundle/skills/awesome-rea/tests/test_source_browser.py"
-Cohesion: 0.16
+Cohesion: 0.18
 Nodes (7): paper(), ProtocolTargetTests, resource(), export_bytes(), full_export(), record(), SourceBrowserTests
 
 ### Community 353 - "with"
@@ -2495,29 +2559,21 @@ Nodes (10): assert, byId(), Element, fs, path, root, script, setup() (+2 more)
 Cohesion: 0.18
 Nodes (8): BatchValidationTest, github_lead(), LayersAndExportTest, make_batch(), SelectionTest, source_results(), TrustedReviewTest, web_lead()
 
-### Community 361 - "copy"
-Cohesion: 0.10
-Nodes (6): journal_field(), JournalTitleTests, PacmRecordTests, journal_field(), JournalTitleTests, PacmRecordTests
+### Community 361 - ".agents/skills/awesome-rea/tests/test_pacm_venue.py"
+Cohesion: 0.22
+Nodes (3): journal_field(), JournalTitleTests, PacmRecordTests
 
 ### Community 362 - ".agents/skills/awesome-rea/tests/test_review_dispatch.py"
-Cohesion: 0.14
-Nodes (5): dispatched_review(), DispatchedReviewTest, DispatchGitHub, DispatchWorkflowTest, scope_change()
-
-### Community 363 - ".agents/skills/awesome-rea/tests/test_scan_increment.py"
-Cohesion: 0.13
-Nodes (5): API, locales(), repository(), scan(), ScanIncrementTests
+Cohesion: 0.12
+Nodes (7): error(), Opener, PublicTransportTests, dispatched_review(), DispatchedReviewTest, DispatchGitHub, scope_change()
 
 ### Community 364 - "triad_harness_bundle/skills/awesome-rea/tests/test_review_dispatch.py"
-Cohesion: 0.14
-Nodes (5): dispatched_review(), DispatchedReviewTest, DispatchGitHub, DispatchWorkflowTest, scope_change()
+Cohesion: 0.12
+Nodes (7): error(), Opener, PublicTransportTests, dispatched_review(), DispatchedReviewTest, DispatchGitHub, scope_change()
 
 ### Community 365 - "ReadmeContentsTest"
-Cohesion: 0.16
+Cohesion: 0.20
 Nodes (3): paper(), ReadmeContentsTest, resource()
-
-### Community 366 - "triad_harness_bundle/skills/awesome-rea/tests/test_scan_increment.py"
-Cohesion: 0.13
-Nodes (5): API, locales(), repository(), scan(), ScanIncrementTests
 
 ### Community 367 - "with"
 Cohesion: 0.09
@@ -2560,24 +2616,16 @@ Cohesion: 0.14
 Nodes (9): add_front_matter(), agents_markdown(), quoted(), split_blocks(), twin_type(), write_agent_files(), write_full_catalog(), AgentFilesTest (+1 more)
 
 ### Community 377 - ".agents/skills/awesome-rea/tests/test_artifact_links.py"
-Cohesion: 0.19
+Cohesion: 0.24
 Nodes (6): ArtifactLinkTests, CuratedLabelTests, labeled(), paper(), resource(), source()
-
-### Community 378 - ".agents/skills/awesome-rea/tests/test_structured_data.py"
-Cohesion: 0.12
-Nodes (4): entity(), OpenGraphHookTests, ResourceEntityTests, SiteNodeTests
 
 ### Community 380 - "triad_harness_bundle/skills/awesome-rea/scripts/validate_discovery.py"
-Cohesion: 0.12
-Nodes (7): built_page_dates(), Document, expected_entry_routes(), main(), validate_robots(), validate_route_inventory(), validate_sitemaps()
+Cohesion: 0.10
+Nodes (8): built_page_dates(), Document, expected_entry_routes(), main(), validate_robots(), validate_route_inventory(), validate_sitemaps(), BuiltSitemapTests
 
 ### Community 381 - "triad_harness_bundle/skills/awesome-rea/tests/test_artifact_links.py"
-Cohesion: 0.19
+Cohesion: 0.24
 Nodes (6): ArtifactLinkTests, CuratedLabelTests, labeled(), paper(), resource(), source()
-
-### Community 382 - "triad_harness_bundle/skills/awesome-rea/tests/test_structured_data.py"
-Cohesion: 0.12
-Nodes (4): entity(), OpenGraphHookTests, ResourceEntityTests, SiteNodeTests
 
 ### Community 383 - "elements"
 Cohesion: 0.16
@@ -2588,8 +2636,8 @@ Cohesion: 0.19
 Nodes (15): curated_entries(), faq_html(), faq_schema(), faqs(), guide(), license_of(), markdown_notes(), n() (+7 more)
 
 ### Community 385 - "og_images.py"
-Cohesion: 0.20
-Nodes (9): Canvas, _faces(), _glyph(), _mask(), _masthead(), measure(), _paper(), render_card() (+1 more)
+Cohesion: 0.17
+Nodes (10): Canvas, _faces(), _glyph(), _mask(), _masthead(), measure(), _paper(), render_card() (+2 more)
 
 ### Community 386 - ".agents/skills/awesome-rea/scripts/structured_data.py"
 Cohesion: 0.14
@@ -2603,10 +2651,6 @@ Nodes (9): canonical_html_file(), fetch_bytes(), main(), manifest_delta(), read_
 Cohesion: 0.15
 Nodes (6): dead(), entry(), ledger(), LedgerReferenceTests, LinkCheckExitTests, RecordedMissingTests
 
-### Community 390 - "test_repository_metadata_refresh.py"
-Cohesion: 0.11
-Nodes (6): FetchTests, PublishTests, QueryTests, response(), TrackerTests, WorkflowTests
-
 ### Community 391 - "generate-slide.py"
 Cohesion: 0.14
 Nodes (11): _e(), generate_chart_slide(), generate_cta_slide(), generate_deck(), generate_metrics_slide(), generate_problem_slide(), generate_solution_slide(), generate_testimonial_slide() (+3 more)
@@ -2615,12 +2659,8 @@ Nodes (11): _e(), generate_chart_slide(), generate_cta_slide(), generate_deck(),
 Cohesion: 0.15
 Nodes (21): applyPlaceholderDimensions(), beginEditPin(), buildAnnotationsForCapture(), buildPinElement(), cancelEditingPin(), clampPlaceholderSize(), finalizeEditingPin(), initAnnotOverlay() (+13 more)
 
-### Community 393 - "TestStyleTaxonomy"
-Cohesion: 0.11
-Nodes (5): _query_wants_dark(), _resolve_color_mode(), _style_is_dark_primary(), TestModeResolution, TestStyleTaxonomy
-
 ### Community 394 - "triad_harness_bundle/skills/awesome-rea/scripts/build_feed.py"
-Cohesion: 0.15
+Cohesion: 0.16
 Nodes (9): atom_feed(), build_feeds(), discovery_summary(), entry_time(), feed_entries(), feed_link(), json_feed(), merged_entries() (+1 more)
 
 ### Community 396 - "init.qcom.post_boot.sh"
@@ -2631,9 +2671,9 @@ Nodes (20): 8917_sched_dcvs_eas(), 8917_sched_dcvs_hmp(), 8937_sched_dcvs_eas(),
 Cohesion: 0.10
 Nodes (16): node_telemetry.sh script, node_telemetry_test.sh script, LD_LIBRARY_PATH, LLAMA, PATH, PORT, SECONDARY_PORT, omni_env.sh script (+8 more)
 
-### Community 398 - "PageResources"
-Cohesion: 0.10
-Nodes (10): csp_allows(), csp_directives(), header_rules(), PageResources, validate_catalog_preload(), validate_feeds(), validate_fingerprinted_assets(), validate_host_indexing() (+2 more)
+### Community 398 - "triad_harness_bundle/skills/awesome-rea/scripts/collect_discovery_leads.py"
+Cohesion: 0.11
+Nodes (18): allowed(), commit_batch(), dispatch_checks(), due(), kind_for(), log(), main(), markdown_links() (+10 more)
 
 ### Community 399 - "client"
 Cohesion: 0.12
@@ -2664,16 +2704,12 @@ Cohesion: 0.13
 Nodes (6): external_url(), icon(), related_links(), repository_card(), scan_class_badge(), title_end()
 
 ### Community 406 - ".agents/skills/awesome-rea/scripts/build_feed.py"
-Cohesion: 0.16
+Cohesion: 0.15
 Nodes (9): atom_feed(), build_feeds(), discovery_summary(), entry_time(), feed_entries(), feed_link(), json_feed(), merged_entries() (+1 more)
 
 ### Community 408 - ".agents/skills/awesome-rea/tests/test_case_pages.py"
-Cohesion: 0.20
+Cohesion: 0.24
 Nodes (5): CaseDocument, CasePageTests, resource(), schema(), ListingSuggestionTests
-
-### Community 409 - ".agents/skills/awesome-rea/tests/test_readme_size.py"
-Cohesion: 0.10
-Nodes (4): LeadSentenceTest, OneLineEntryTest, ReadmePaperSplitTest, ReadmeSizeBudgetTest
 
 ### Community 410 - "ScanRunProvenanceTests"
 Cohesion: 0.18
@@ -2684,40 +2720,40 @@ Cohesion: 0.11
 Nodes (20): $type, $value, $type, $value, $type, $value, $type, $value (+12 more)
 
 ### Community 413 - "triad_harness_bundle/skills/awesome-rea/tests/test_case_pages.py"
-Cohesion: 0.20
+Cohesion: 0.24
 Nodes (5): CaseDocument, CasePageTests, resource(), schema(), ListingSuggestionTests
 
 ### Community 415 - "triad_harness_bundle/skills/awesome-rea/tests/test_discovery_leads.py"
 Cohesion: 0.11
 Nodes (6): IdentityTest, IngestScopeTest, MergeTest, registry(), RegistryTest, WorkflowTest
 
-### Community 416 - "triad_harness_bundle/skills/awesome-rea/tests/test_readme_size.py"
-Cohesion: 0.10
-Nodes (4): LeadSentenceTest, OneLineEntryTest, ReadmePaperSplitTest, ReadmeSizeBudgetTest
+### Community 416 - ".agents/skills/awesome-rea/tests/test_readme_size.py"
+Cohesion: 0.08
+Nodes (4): LeadSentenceTest, OneLineEntryTest, LeadSentenceTest, OneLineEntryTest
 
 ### Community 417 - "triad_harness_bundle/skills/awesome-rea/scripts/validate_agent_formats.py"
-Cohesion: 0.13
-Nodes (6): Alternates, expected_twins(), validate_agent_formats(), validate_agent_headers(), validate_llms(), validate_twins()
+Cohesion: 0.07
+Nodes (13): MainFeedTest, queue_root(), QueueTest, sample_queue(), FeedTests, paper(), resource(), site() (+5 more)
 
 ### Community 418 - "triad_harness_bundle/skills/awesome-rea/tests/test_ledger_link_check.py"
 Cohesion: 0.16
 Nodes (6): dead(), entry(), ledger(), LedgerReferenceTests, LinkCheckExitTests, RecordedMissingTests
 
-### Community 419 - "triad_harness_bundle/skills/awesome-rea/scripts/submit_indexnow.py"
-Cohesion: 0.16
-Nodes (9): canonical_html_file(), fetch_bytes(), main(), manifest_delta(), read_previous_manifest(), source_revision(), verify_live_build(), verify_page() (+1 more)
+### Community 419 - "survey_listings"
+Cohesion: 0.17
+Nodes (14): arxiv_listings(), candidates_from(), clean_arxiv(), clean_doi(), github_snapshot(), identity_rank(), merged_paper(), paper_in_scope() (+6 more)
 
-### Community 420 - "triad_harness_bundle/skills/awesome-rea/scripts/indexnow_automation.py"
-Cohesion: 0.15
-Nodes (8): api(), default_head(), deployment_state(), main(), output(), previous_receipt(), read_receipt(), wait_for_deployment()
+### Community 420 - "main"
+Cohesion: 0.14
+Nodes (18): failure_url_error(), main(), nonempty_string(), normalized_url(), parse_iso(), public_https_error(), source_unavailable_errors(), string_list() (+10 more)
 
 ### Community 421 - "properties"
 Cohesion: 0.10
 Nodes (20): description, enum, type, description, type, enum, type, type (+12 more)
 
-### Community 422 - "score_article.py"
-Cohesion: 0.22
-Nodes (14): main(), parse_faq_from_text(), blocks(), compute_aeo_geo_score(), count_faq(), headings(), internal_links(), load_text() (+6 more)
+### Community 422 - "Any"
+Cohesion: 0.19
+Nodes (5): create_local_backup(), get_local_cartridges_list(), get_target_brain_url(), handle_deploy_cartridge_to_mi10t(), TriadRouterHandler
 
 ### Community 423 - "scripts/cartridge_manager.py"
 Cohesion: 0.18
@@ -2756,16 +2792,16 @@ Cohesion: 0.12
 Nodes (20): core/navigation, core/navigation-submenu, color, :focus, spacing, :visited, background, text (+12 more)
 
 ### Community 433 - ".agents/skills/awesome-rea/scripts/strict_json.py"
+Cohesion: 0.12
+Nodes (12): load_resources(), listed(), nonempty_text(), read_curated_translations(), validate_curated_translations(), load_resume(), _invalid_constant(), load_path() (+4 more)
+
+### Community 434 - "ContributorReferenceTests"
 Cohesion: 0.14
-Nodes (10): listed(), nonempty_text(), read_curated_translations(), validate_curated_translations(), _invalid_constant(), load_path(), loads(), _unique_object() (+2 more)
+Nodes (4): ContributorReferenceTests, table(), form_options(), markdown_tables()
 
-### Community 434 - ".agents/skills/awesome-rea/scripts/locale_literals.py"
-Cohesion: 0.16
-Nodes (10): all_values(), chinese_value(), display(), findings_for(), literal_report(), literals(), main(), read_exceptions() (+2 more)
-
-### Community 435 - ".agents/skills/awesome-rea/scripts/source_availability.py"
-Cohesion: 0.15
-Nodes (8): check_record(), CountedAPI, main(), public_repository(), recorded_name_lookup(), run_recheck(), summary_lines(), write_report()
+### Community 435 - "run"
+Cohesion: 0.13
+Nodes (16): allowed(), commit_batch(), dispatch_checks(), kind_for(), main(), markdown_links(), merge_pull(), open_or_update_pull() (+8 more)
 
 ### Community 436 - ".agents/skills/awesome-rea/tests/category_labels_ui.cjs"
 Cohesion: 0.12
@@ -2782,10 +2818,6 @@ Nodes (3): PackagingTests, PrivateBootstrapRuntimeTests, SeedFixture
 ### Community 439 - "fetch-background.py"
 Cohesion: 0.16
 Nodes (9): generate_css_for_background(), get_background_image(), get_curated_images(), get_overlay_css(), get_pexels_search_url(), load_backgrounds_config(), load_brand_colors(), main() (+1 more)
-
-### Community 440 - "test_relevance_evaluator.py"
-Cohesion: 0.12
-Nodes (3): TestFixtureValidation, TestMetricMath, TestThresholdGate
 
 ### Community 441 - "triad_harness_bundle/skills/awesome-rea/scripts/source_availability.py"
 Cohesion: 0.15
@@ -2831,13 +2863,9 @@ Nodes (19): core/comments-pagination-next, color, typography, typography, captio
 Cohesion: 0.11
 Nodes (17): description, label, multiple, options, placeholder, value, body, attributes (+9 more)
 
-### Community 452 - "fetch_previews.py"
-Cohesion: 0.18
-Nodes (9): cache_key(), cached_path(), download(), extension_for(), fetch(), main(), task(), read_site() (+1 more)
-
-### Community 453 - "_Markdown"
-Cohesion: 0.15
-Nodes (4): _Markdown, page_markdown(), write_page_twins(), PageTwinTests
+### Community 452 - "test_core_data_quality.py"
+Cohesion: 0.14
+Nodes (11): read_rows(), TestAccessibilityGuidance, TestChartsTypographyAndIcons, TestCurrentReactGuidance, TestSemanticColors, _check_chart_contract(), _check_typography_contract(), _configured_font_names() (+3 more)
 
 ### Community 454 - ".agents/skills/awesome-rea/scripts/source_scope.py"
 Cohesion: 0.14
@@ -2847,13 +2875,13 @@ Nodes (7): apply_scope(), exclusion_counts(), read_scope(), timestamp(), unavail
 Cohesion: 0.13
 Nodes (4): DataClassValidationTests, DataClassVocabularyTests, errors_for(), ProtocolTagTests
 
-### Community 457 - ".agents/skills/awesome-rea/tests/test_scan_chronology.py"
-Cohesion: 0.20
-Nodes (5): chronology_errors(), ScanChronologyTests, scope_errors(), ScopeChronologyTests, with_changes()
+### Community 457 - "ScanChronologyTests"
+Cohesion: 0.44
+Nodes (3): chronology_errors(), ScanChronologyTests, with_changes()
 
-### Community 458 - ".agents/skills/awesome-rea/tests/test_scan_discovery_report.py"
-Cohesion: 0.14
-Nodes (5): API, DiscoveryReportTests, query_row(), repository(), scan()
+### Community 458 - "DiscoveryReportTests"
+Cohesion: 0.15
+Nodes (4): API, DiscoveryReportTests, query_row(), repository()
 
 ### Community 460 - "actOnAgentTarget"
 Cohesion: 0.27
@@ -2875,28 +2903,28 @@ Nodes (4): decision(), queue_with(), QueueTest, ValidationTest
 Cohesion: 0.14
 Nodes (7): apply_scope(), exclusion_counts(), read_scope(), timestamp(), unavailable_clause(), validate_availability(), validate_scope()
 
-### Community 469 - "triad_harness_bundle/skills/awesome-rea/tests/test_scan_discovery_report.py"
-Cohesion: 0.14
-Nodes (5): API, DiscoveryReportTests, query_row(), repository(), scan()
+### Community 469 - "DiscoveryReportTests"
+Cohesion: 0.15
+Nodes (4): API, DiscoveryReportTests, query_row(), repository()
 
-### Community 470 - "triad_harness_bundle/skills/awesome-rea/tests/test_scan_chronology.py"
-Cohesion: 0.20
-Nodes (5): chronology_errors(), ScanChronologyTests, scope_errors(), ScopeChronologyTests, with_changes()
+### Community 470 - "ScanChronologyTests"
+Cohesion: 0.44
+Nodes (3): chronology_errors(), ScanChronologyTests, with_changes()
 
 ### Community 472 - "models_manager.py"
-Cohesion: 0.21
-Nodes (7): get_models_config(), load_yaml_raw(), save_yaml_raw(), set_animal_model(), set_provider_key(), test_provider_connection(), update_models_config()
-
-### Community 473 - "omni_gateway_v4_6.py"
 Cohesion: 0.19
-Nodes (9): add_log(), cosine_sim(), FastOmniHandler, fetch_active_skills(), filter_mcp_tools(), get_db(), get_embedding(), http_json() (+1 more)
+Nodes (8): apply_local_first_defaults(), get_models_config(), load_yaml_raw(), save_yaml_raw(), set_animal_model(), set_provider_key(), test_provider_connection(), update_models_config()
+
+### Community 473 - "xml_etree_elementtree"
+Cohesion: 0.14
+Nodes (7): validate_json_feeds(), MainFeedTest, FeedTests, paper(), resource(), site(), test_mujoco_scene_xml()
 
 ### Community 474 - "scripts/prune_vocab_head.py"
-Cohesion: 0.20
-Nodes (7): analyze_token_frequencies(), build_pruning_indices(), calculate_ram_savings(), generate_vocab_pruning_plan(), main(), prune_model_weights_torch(), simulate_pruned_head_tensors()
+Cohesion: 0.22
+Nodes (5): analyze_token_frequencies(), build_pruning_indices(), calculate_ram_savings(), generate_vocab_pruning_plan(), prune_model_weights_torch()
 
 ### Community 476 - "05_OPTIMIZED_OMNI_GATEWAY_V4_6.py"
-Cohesion: 0.19
+Cohesion: 0.16
 Nodes (9): add_log(), cosine_sim(), FastOmniHandler, fetch_active_skills(), filter_mcp_tools(), get_db(), get_embedding(), http_json() (+1 more)
 
 ### Community 477 - "attributes"
@@ -2923,13 +2951,13 @@ Nodes (18): core/avatar, core/image, core/post-featured-image, core/quote, core/
 Cohesion: 0.11
 Nodes (18): palette, contentSize, wideSize, settings, appearanceTools, color, layout, spacing (+10 more)
 
-### Community 483 - ".agents/skills/awesome-rea/scripts/backfill_added_at.py"
-Cohesion: 0.22
-Nodes (8): backfill(), check_ref(), file_versions(), first_appearances(), first_parent_commits(), git(), main(), with_added_at()
+### Community 483 - "test_harness_adapter.py"
+Cohesion: 0.12
+Nodes (6): verify_cartridge_passport(), build_node1_payload(), evaluate_complexity(), execute_cluster_tool(), handle_tier0(), TestHarnessAdapter
 
 ### Community 484 - "plain_text"
-Cohesion: 0.12
-Nodes (9): agent_cross_reference(), entry_type(), lead_sentence(), original_title(), paper_line(), paper_venue(), plain_text(), section_order() (+1 more)
+Cohesion: 0.15
+Nodes (7): agent_cross_reference(), lead_sentence(), original_title(), paper_line(), paper_venue(), plain_text(), section_order()
 
 ### Community 485 - ".agents/skills/awesome-rea/scripts/build_repository_index.py"
 Cohesion: 0.15
@@ -2939,20 +2967,20 @@ Nodes (5): curated_resources(), main(), obsolete_pages(), related_markers(), ren
 Cohesion: 0.17
 Nodes (8): _clean(), description_problem(), meta_description(), page_title(), paper_description(), resource_description(), shorten(), title_problem()
 
-### Community 487 - ".agents/skills/awesome-rea/scripts/validate_papers.py"
-Cohesion: 0.16
-Nodes (7): canonical_paper_url(), has_reviewed_publisher_identity(), main(), read_papers(), url_identifier_error(), validate_citation(), validate_papers()
+### Community 487 - "ClassificationDeterminismTests"
+Cohesion: 0.17
+Nodes (5): ClassificationDeterminismTests, ProtocolTargetTests, readme_api(), json(), repository()
 
 ### Community 488 - "verify_evidence_entry.py"
-Cohesion: 0.23
-Nodes (14): clear_cache(), code_report(), docs_report(), download_report(), find_record(), image_dimensions(), image_report(), load_catalog() (+6 more)
+Cohesion: 0.21
+Nodes (16): classification(), clear_cache(), code_report(), docs_report(), download_report(), fetch(), find_record(), image_dimensions() (+8 more)
 
 ### Community 489 - ".agents/skills/awesome-rea/tests/empty_paper_search_ui.cjs"
 Cohesion: 0.14
 Nodes (13): allowed, application(), assert, CATALOG_REQUESTS, destination(), element(), fs, html (+5 more)
 
 ### Community 490 - ".agents/skills/awesome-rea/tests/test_rest_readme_integrity.py"
-Cohesion: 0.19
+Cohesion: 0.23
 Nodes (3): API, git_sha(), RestIntegrityTests
 
 ### Community 491 - "triad_harness_bundle/skills/awesome-rea/scripts/build_repository_index.py"
@@ -2960,20 +2988,20 @@ Cohesion: 0.15
 Nodes (5): curated_resources(), main(), obsolete_pages(), related_markers(), rendered_files()
 
 ### Community 492 - "triad_harness_bundle/skills/awesome-rea/tests/test_rest_readme_integrity.py"
-Cohesion: 0.19
+Cohesion: 0.23
 Nodes (3): API, git_sha(), RestIntegrityTests
 
 ### Community 493 - "triad_harness_bundle/skills/awesome-rea/scripts/validate_papers.py"
-Cohesion: 0.16
+Cohesion: 0.15
 Nodes (7): canonical_paper_url(), has_reviewed_publisher_identity(), main(), read_papers(), url_identifier_error(), validate_citation(), validate_papers()
 
 ### Community 494 - "handleCommandPaletteSearch"
-Cohesion: 0.12
-Nodes (17): approveCurrentArticleInDrawer(), closeArticleDrawer(), closeCommandPalette(), copyDrawerTextToHumanizer(), handleCommandPaletteKey(), handleCommandPaletteSearch(), openArticleDrawer(), openClusterDiagnostics() (+9 more)
+Cohesion: 0.11
+Nodes (20): approveCurrentArticleInDrawer(), autoDetectArticleType(), closeArticleDrawer(), closeCommandPalette(), copyDrawerTextToHumanizer(), handleCommandPaletteKey(), handleCommandPaletteSearch(), handleDrawerBriefInput() (+12 more)
 
-### Community 495 - "priority_v2.py"
-Cohesion: 0.19
-Nodes (11): competition_points(), compute_for_topic(), demand_points(), ensure_columns(), find_metrics(), intent_points(), main(), _overlap() (+3 more)
+### Community 495 - "survey_listings"
+Cohesion: 0.13
+Nodes (18): candidates_from(), clean_arxiv(), clean_doi(), github_snapshot(), identity_rank(), merged_paper(), paper_in_scope(), pre_list_listings() (+10 more)
 
 ### Community 496 - "colab_package/prune_vocab_head.py"
 Cohesion: 0.20
@@ -2983,13 +3011,13 @@ Nodes (7): analyze_token_frequencies(), build_pruning_indices(), calculate_ram_s
 Cohesion: 0.22
 Nodes (8): backfill(), check_ref(), file_versions(), first_appearances(), first_parent_commits(), git(), main(), with_added_at()
 
-### Community 498 - "plain_text"
+### Community 498 - "test_design_system_mode.py"
 Cohesion: 0.14
-Nodes (9): entry_type(), lead_sentence(), original_title(), other_targets(), paper_line(), paper_venue(), plain_text(), resource_line() (+1 more)
+Nodes (6): _filter_anti_patterns_for_mode(), _query_wants_dark(), _resolve_color_mode(), _style_is_dark_primary(), TestAntiPatternGating, TestModeResolution
 
 ### Community 499 - "triad_harness_bundle/skills/awesome-rea/scripts/strict_json.py"
-Cohesion: 0.16
-Nodes (9): listed(), nonempty_text(), read_curated_translations(), validate_curated_translations(), _invalid_constant(), load_path(), loads(), _unique_object() (+1 more)
+Cohesion: 0.13
+Nodes (11): load_resources(), listed(), nonempty_text(), read_curated_translations(), validate_curated_translations(), load_resume(), _invalid_constant(), load_path() (+3 more)
 
 ### Community 500 - "triad_harness_bundle/skills/awesome-rea/scripts/page_metadata.py"
 Cohesion: 0.17
@@ -3012,43 +3040,39 @@ Cohesion: 0.12
 Nodes (15): description, label, multiple, options, placeholder, value, body, attributes (+7 more)
 
 ### Community 506 - "ScanEvidenceClassTests"
-Cohesion: 0.18
+Cohesion: 0.21
 Nodes (3): classify(), record(), ScanEvidenceClassTests
-
-### Community 507 - ".agents/skills/awesome-rea/scripts/scan_diagnostics.py"
-Cohesion: 0.18
-Nodes (5): DiagnosticSidecar, failure_event(), _parent(), _utc(), validate_destination()
 
 ### Community 508 - ".agents/skills/awesome-rea/tests/test_agent_validators.py"
 Cohesion: 0.14
 Nodes (4): HeaderValidatorTests, LlmsValidatorTests, page(), TwinValidatorTests
 
 ### Community 510 - ".agents/skills/awesome-rea/tests/test_entry_siblings.py"
-Cohesion: 0.19
+Cohesion: 0.22
 Nodes (5): case(), resource(), SectionLinks, SectionSiblingTests, game_case()
 
-### Community 511 - "server.py"
-Cohesion: 0.04
-Nodes (37): main(), compute_local_mutagen(), export_manifest_html(), export_manifest_markdown(), list_voices(), build_knowledge_status(), build_llms_txt(), check_all_agents_health() (+29 more)
+### Community 511 - "get_connection"
+Cohesion: 0.01
+Nodes (144): main(), analyze_all_competitors(), analyze_domain(), fetch_page(), main(), main(), compute_local_mutagen(), evaluate_keyword_competition() (+136 more)
 
 ### Community 512 - ".agents/skills/awesome-rea/tests/test_review_age.py"
-Cohesion: 0.16
-Nodes (4): CommandTests, paper(), QueueTests, resource()
+Cohesion: 0.22
+Nodes (3): paper(), QueueTests, resource()
 
 ### Community 513 - ".agents/skills/awesome-rea/tests/test_sitemaps.py"
-Cohesion: 0.14
-Nodes (4): BuiltSitemapTests, dates(), PageDateTests, SitemapFileTests
+Cohesion: 0.20
+Nodes (3): dates(), PageDateTests, SitemapFileTests
 
 ### Community 514 - ".agents/skills/awesome-rea/tests/test_text_encoding.py"
-Cohesion: 0.17
+Cohesion: 0.19
 Nodes (4): implicit_encoding_calls(), TextEncodingTest, implicit_encoding_calls(), TextEncodingTest
 
-### Community 515 - "cip/generate.py"
-Cohesion: 0.19
-Nodes (7): build_cip_prompt(), check_logo_required(), generate_cip_set(), generate_with_nano_banana(), load_env(), load_logo_image(), main()
+### Community 515 - "clean"
+Cohesion: 0.20
+Nodes (11): approved_proposals(), build_plan(), clean(), load_master(), map_status(), norm_id(), parse_planned_links(), priority_rank() (+3 more)
 
 ### Community 519 - "triad_harness_bundle/skills/awesome-rea/tests/test_section_index_links.py"
-Cohesion: 0.14
+Cohesion: 0.15
 Nodes (3): HeadingRows, record(), SectionIndexLinkTests
 
 ### Community 520 - "triad_harness_bundle/skills/awesome-rea/tests/test_agent_validators.py"
@@ -3056,16 +3080,16 @@ Cohesion: 0.14
 Nodes (4): HeaderValidatorTests, LlmsValidatorTests, page(), TwinValidatorTests
 
 ### Community 521 - "triad_harness_bundle/skills/awesome-rea/tests/test_review_age.py"
-Cohesion: 0.16
-Nodes (4): CommandTests, paper(), QueueTests, resource()
+Cohesion: 0.22
+Nodes (3): paper(), QueueTests, resource()
 
 ### Community 522 - "triad_harness_bundle/skills/awesome-rea/tests/test_entry_siblings.py"
-Cohesion: 0.19
+Cohesion: 0.22
 Nodes (5): case(), resource(), SectionLinks, SectionSiblingTests, game_case()
 
 ### Community 523 - "triad_harness_bundle/skills/awesome-rea/tests/test_sitemaps.py"
-Cohesion: 0.14
-Nodes (4): BuiltSitemapTests, dates(), PageDateTests, SitemapFileTests
+Cohesion: 0.20
+Nodes (3): dates(), PageDateTests, SitemapFileTests
 
 ### Community 524 - "properties"
 Cohesion: 0.12
@@ -3075,9 +3099,9 @@ Nodes (16): minLength, type, properties, type, minLength, type, a, model (+8 mor
 Cohesion: 0.12
 Nodes (16): description, enum, type, description, type, kind, peak, range (+8 more)
 
-### Community 527 - "competitor_radar.py"
-Cohesion: 0.16
-Nodes (4): CompetitorContentExtractor, crawl_page_features(), run_competitor_radar(), search_duckduckgo_lite()
+### Community 527 - ".agents/skills/awesome-rea/scripts/source_availability.py"
+Cohesion: 0.15
+Nodes (8): check_record(), CountedAPI, main(), public_repository(), recorded_name_lookup(), run_recheck(), summary_lines(), write_report()
 
 ### Community 528 - "settings-controller.php"
 Cohesion: 0.16
@@ -3087,9 +3111,9 @@ Nodes (8): add_filter(), sanitize_title(), Finder, {closure#4}(), {closure#5}(),
 Cohesion: 0.12
 Nodes (15): description, label, multiple, options, placeholder, value, body, attributes (+7 more)
 
-### Community 530 - "triad_harness_bundle/skills/awesome-rea/scripts/scan_diagnostics.py"
-Cohesion: 0.18
-Nodes (5): DiagnosticSidecar, failure_event(), _parent(), _utc(), validate_destination()
+### Community 530 - "main"
+Cohesion: 0.11
+Nodes (9): DiagnosticSidecar, classification_segments(), classify(), duplicate_readme_report(), main(), protocol_report(), protocol_signals(), published_fields() (+1 more)
 
 ### Community 532 - "Settings_Controller"
 Cohesion: 0.18
@@ -3127,32 +3151,32 @@ Nodes (14): description, label, options, placeholder, value, body, attributes, i
 Cohesion: 0.13
 Nodes (14): description, label, options, placeholder, value, body, attributes, id (+6 more)
 
-### Community 541 - ".agents/skills/awesome-rea/scripts/locale_review_inputs.py"
-Cohesion: 0.23
-Nodes (10): digest(), git_reader(), read(), main(), numeric(), parse(), plan(), review_entry() (+2 more)
+### Community 541 - ".agents/skills/awesome-rea/tests/test_discovery_site.py"
+Cohesion: 0.16
+Nodes (3): queue_root(), QueueTest, sample_queue()
 
-### Community 542 - ".agents/skills/awesome-rea/scripts/private_scan_worker.py"
-Cohesion: 0.20
-Nodes (7): git_value(), main(), require_tracked_bytes(), run_worker(), validate_config(), ActionsAPI, NoRedirect
+### Community 542 - ".agents/skills/awesome-rea/scripts/review_disclaimers.py"
+Cohesion: 0.18
+Nodes (5): banned_sentences(), defensive_sentences(), findings(), main(), sentences()
 
 ### Community 543 - ".agents/skills/awesome-rea/tests/test_entry_related.py"
-Cohesion: 0.16
+Cohesion: 0.20
 Nodes (3): fixtures(), RelatedEntryTests, RelatedSection
 
 ### Community 544 - ".agents/skills/awesome-rea/tests/test_evidence_labels.py"
-Cohesion: 0.15
+Cohesion: 0.20
 Nodes (3): EvidenceLabelTests, Links, links()
 
 ### Community 546 - ".agents/skills/awesome-rea/tests/test_locale_fingerprints.py"
-Cohesion: 0.20
+Cohesion: 0.29
 Nodes (4): bound(), check(), document(), LocaleFingerprintTests
 
 ### Community 547 - ".agents/skills/awesome-rea/tests/test_papers_phone_filters.py"
-Cohesion: 0.16
-Nodes (4): declarations(), FormChildren, media_block(), PhonePaperFilterTests
+Cohesion: 0.18
+Nodes (3): FormChildren, media_block(), PhonePaperFilterTests
 
 ### Community 548 - ".agents/skills/awesome-rea/tests/test_readme_case_methods.py"
-Cohesion: 0.20
+Cohesion: 0.31
 Nodes (3): case(), ReadmeCaseMethodTests, tool()
 
 ### Community 550 - "extract-colors.cjs"
@@ -3160,32 +3184,32 @@ Cohesion: 0.20
 Nodes (11): calculateCompliance(), colorDistance(), displayPalette(), extractHexColors(), findNearestBrandColor(), fs, generateImageMagickCommand(), hexToRgb() (+3 more)
 
 ### Community 553 - "triad_harness_bundle/skills/awesome-rea/tests/test_entry_related.py"
-Cohesion: 0.16
+Cohesion: 0.20
 Nodes (3): fixtures(), RelatedEntryTests, RelatedSection
 
-### Community 554 - "triad_harness_bundle/skills/awesome-rea/scripts/locale_review_inputs.py"
-Cohesion: 0.23
-Nodes (10): digest(), git_reader(), read(), main(), numeric(), parse(), plan(), review_entry() (+2 more)
+### Community 554 - "read_rows"
+Cohesion: 0.16
+Nodes (6): read_rows(), split_values(), style_identities(), TestGeneratedCatalogContract, TestLandingAndStackContract, TestStyleIdentityContract
 
-### Community 555 - "triad_harness_bundle/skills/awesome-rea/tests/test_review_date_tolerance.py"
-Cohesion: 0.25
-Nodes (5): minimal_paper(), minimal_resource(), paper_errors(), resource_errors(), TestReviewDateTolerance
-
-### Community 556 - "triad_harness_bundle/skills/awesome-rea/tests/test_discovery_site.py"
+### Community 555 - "classify"
 Cohesion: 0.19
-Nodes (3): queue_root(), QueueTest, sample_queue()
+Nodes (6): classification_segments(), classify(), protocol_report(), protocol_signals(), published_fields(), relabel_report()
+
+### Community 556 - "existing_keys"
+Cohesion: 0.14
+Nodes (11): split_shared_pages(), entry_key(), entry_name(), existing_keys(), add(), add_scan(), add_url(), lead_keys() (+3 more)
 
 ### Community 557 - "triad_harness_bundle/skills/awesome-rea/tests/test_evidence_labels.py"
-Cohesion: 0.15
+Cohesion: 0.20
 Nodes (3): EvidenceLabelTests, Links, links()
 
-### Community 558 - "triad_harness_bundle/skills/awesome-rea/tests/test_readme_case_methods.py"
-Cohesion: 0.20
-Nodes (3): case(), ReadmeCaseMethodTests, tool()
+### Community 558 - "triad_harness_bundle/skills/awesome-rea/scripts/source_browser.py"
+Cohesion: 0.23
+Nodes (5): compact_json_bytes(), project_source_browser(), read_json_bytes(), validate_source_browser(), write_source_browser()
 
 ### Community 559 - "triad_harness_bundle/skills/awesome-rea/tests/test_papers_phone_filters.py"
-Cohesion: 0.16
-Nodes (4): declarations(), FormChildren, media_block(), PhonePaperFilterTests
+Cohesion: 0.18
+Nodes (3): FormChildren, media_block(), PhonePaperFilterTests
 
 ### Community 560 - "triad_harness_bundle/skills/awesome-rea/tests/test_locale_fingerprints.py"
 Cohesion: 0.20
@@ -3252,19 +3276,11 @@ Cohesion: 0.21
 Nodes (5): check_state(), guard(), main(), mergeable_pull(), Refused
 
 ### Community 577 - "social_cards.py"
-Cohesion: 0.19
-Nodes (6): card_slug(), write_card(), _alt(), _card_key(), _cards(), write_social_cards()
-
-### Community 578 - ".agents/skills/awesome-rea/tests/test_about_rea.py"
 Cohesion: 0.16
-Nodes (3): AboutPageReaTests, FactCards, readme_definition()
-
-### Community 579 - "CuratedTranslationValidatorTests"
-Cohesion: 0.20
-Nodes (3): CuratedTranslationReviewTests, CuratedTranslationValidatorTests, errors_for()
+Nodes (7): card_slug(), write_card(), _alt(), _card_key(), _cards(), write_social_cards(), page()
 
 ### Community 580 - ".agents/skills/awesome-rea/tests/test_locale_review_inputs.py"
-Cohesion: 0.22
+Cohesion: 0.36
 Nodes (3): candidate(), LocaleReviewInputTests, record()
 
 ### Community 582 - "validate-asset.cjs"
@@ -3272,7 +3288,7 @@ Cohesion: 0.25
 Nodes (13): checkManifest(), formatBytes(), formatOutput(), fs, main(), parseFilename(), path, RULES (+5 more)
 
 ### Community 586 - "triad_harness_bundle/skills/awesome-rea/tests/test_locale_review_inputs.py"
-Cohesion: 0.22
+Cohesion: 0.36
 Nodes (3): candidate(), LocaleReviewInputTests, record()
 
 ### Community 587 - "triad_harness_bundle/skills/awesome-rea/scripts/resource_listing.py"
@@ -3282,10 +3298,6 @@ Nodes (7): _count(), facet(), option(), in_listing_order(), in_section_order(), 
 ### Community 589 - "triad_harness_bundle/skills/awesome-rea/scripts/merge_pr.py"
 Cohesion: 0.21
 Nodes (5): check_state(), guard(), main(), mergeable_pull(), Refused
-
-### Community 590 - "triad_harness_bundle/skills/awesome-rea/tests/test_landmark_nesting.py"
-Cohesion: 0.18
-Nodes (3): built_survey(), LandmarkNestingTests, Landmarks
 
 ### Community 591 - "CameraCaptureSession"
 Cohesion: 0.20
@@ -3300,8 +3312,8 @@ Cohesion: 0.14
 Nodes (14): description, type, description, type, class, description, standard, standard_data (+6 more)
 
 ### Community 594 - "apiGet"
-Cohesion: 0.16
-Nodes (14): apiGet(), copyExistingBaseJson(), deleteVoice(), loadKeywordSuggestions(), loadModalBrief(), loadModalPassport(), loadVoiceIntoEditor(), loadVoices() (+6 more)
+Cohesion: 0.18
+Nodes (13): apiGet(), copyExistingBaseJson(), deleteVoice(), loadKeywordSuggestions(), loadModalBrief(), loadModalPassport(), loadVoiceIntoEditor(), loadVoices() (+5 more)
 
 ### Community 595 - "xiaomi_edge_node.py"
 Cohesion: 0.30
@@ -3315,9 +3327,9 @@ Nodes (13): description, label, options, value, body, attributes, id, type (+5 m
 Cohesion: 0.21
 Nodes (14): steps, ALL_SOURCES, COLLECT_RESULT, DEFAULT_BRANCH, GH_TOKEN, INGEST_RESULT, steps, steps (+6 more)
 
-### Community 598 - "prose_only"
-Cohesion: 0.16
-Nodes (9): document_links(), fence_start(), list_item_prefix(), markdown_anchors(), mask_inline_code(), nonparagraph_block(), prose_only(), flush_paragraph() (+1 more)
+### Community 598 - ".agents/skills/awesome-rea/scripts/review_age.py"
+Cohesion: 0.26
+Nodes (7): band_labels(), band_of(), main(), read_catalogs(), review_queue(), text_lines(), utc_date()
 
 ### Community 599 - "normalizeSearchText"
 Cohesion: 0.23
@@ -3326,10 +3338,6 @@ Nodes (14): canonicalTopic(), compactText(), curatedMatchHint(), githubRepo(), n
 ### Community 600 - "triad_harness_bundle/skills/awesome-rea/tests/language_fragment_ui.cjs"
 Cohesion: 0.14
 Nodes (9): assert, docs, header, ids, {languageHref, initialize}, other, page, path (+1 more)
-
-### Community 601 - "CuratedTranslationValidatorTests"
-Cohesion: 0.20
-Nodes (3): CuratedTranslationReviewTests, CuratedTranslationValidatorTests, errors_for()
 
 ### Community 603 - "elements"
 Cohesion: 0.16
@@ -3388,8 +3396,8 @@ Cohesion: 0.15
 Nodes (13): with, cache, cache-dependency-path, if-no-files-found, include-hidden-files, key, name, node-version (+5 more)
 
 ### Community 617 - "scan_status_badge.py"
-Cohesion: 0.28
-Nodes (6): badge(), document_bytes(), last_successful_scan(), main(), parse_time(), BadgeTests
+Cohesion: 0.20
+Nodes (7): badge(), document_bytes(), last_successful_scan(), main(), parse_time(), BadgeTests, WorkflowTests
 
 ### Community 618 - ".agents/skills/awesome-rea/tests/curated_sort_ui.cjs"
 Cohesion: 0.17
@@ -3404,7 +3412,7 @@ Cohesion: 0.17
 Nodes (12): assert, context, fs, legacy, nodes, published, row, scope (+4 more)
 
 ### Community 622 - ".agents/skills/awesome-rea/tests/test_backfill_added_at.py"
-Cohesion: 0.26
+Cohesion: 0.31
 Nodes (4): BackfillTest, git(), resource(), write()
 
 ### Community 624 - "PaperFileTest"
@@ -3415,25 +3423,17 @@ Nodes (3): entry_lines(), PaperFileTest, readme_block()
 Cohesion: 0.22
 Nodes (3): paper(), PaperSourceLabelTests, source_items()
 
-### Community 626 - ".agents/skills/awesome-rea/tests/test_paper_topics.py"
-Cohesion: 0.23
-Nodes (4): directory_topics(), load_papers(), PaperTopicTest, readme_topics()
-
-### Community 628 - ".agents/skills/awesome-rea/tests/test_repeated_link_names.py"
-Cohesion: 0.19
-Nodes (3): links(), paper(), RepeatedLinkNameTests
+### Community 626 - "triad_harness_bundle/skills/awesome-rea/scripts/review_age.py"
+Cohesion: 0.26
+Nodes (7): band_labels(), band_of(), main(), read_catalogs(), review_queue(), text_lines(), utc_date()
 
 ### Community 629 - ".agents/skills/awesome-rea/tests/test_resume_evidence.py"
 Cohesion: 0.23
 Nodes (4): legacy_snapshot(), ResumeEvidenceTests, success(), write()
 
-### Community 633 - ".agents/skills/awesome-rea/tests/test_target_card_highlight.py"
-Cohesion: 0.21
-Nodes (3): forced_colors_block(), rules(), TargetCardHighlightTests
-
-### Community 634 - "test_validate_tokens.py"
-Cohesion: 0.21
-Nodes (4): test_sync_parses_bundled_starter_template(), _run(), test_flags_hardcoded_hex_sharing_line_with_token(), test_token_only_line_reports_no_violation()
+### Community 634 - "shutil"
+Cohesion: 0.04
+Nodes (21): digest(), fingerprinted_href(), remove_unhashed_copies(), write_fingerprinted(), test_sync_parses_bundled_starter_template(), _run(), test_flags_hardcoded_hex_sharing_line_with_token(), test_token_only_line_reports_no_violation() (+13 more)
 
 ### Community 635 - "card"
 Cohesion: 0.18
@@ -3447,36 +3447,16 @@ Nodes (12): be(), Ce(), Ee(), ht(), pt(), u(), Rt(), ut() (+4 more)
 Cohesion: 0.23
 Nodes (6): is_logic_literal(), load_dict(), main(), patch(), plugin_path(), revert()
 
-### Community 639 - "_select_palette_for_mode"
-Cohesion: 0.22
-Nodes (4): _contrast_ratio(), _derive_dark_palette(), _select_palette_for_mode(), TestPaletteSelection
-
-### Community 642 - "triad_harness_bundle/skills/awesome-rea/scripts/catalog.py"
-Cohesion: 0.19
-Nodes (3): load_resources(), main(), normalize_search_text()
-
-### Community 643 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_topics.py"
-Cohesion: 0.23
-Nodes (4): directory_topics(), load_papers(), PaperTopicTest, readme_topics()
-
-### Community 645 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_source_labels.py"
-Cohesion: 0.22
-Nodes (3): paper(), PaperSourceLabelTests, source_items()
-
-### Community 646 - "triad_harness_bundle/skills/awesome-rea/tests/test_repeated_link_names.py"
-Cohesion: 0.19
-Nodes (3): links(), paper(), RepeatedLinkNameTests
-
-### Community 647 - "triad_harness_bundle/skills/awesome-rea/scripts/discovery_reviews.py"
-Cohesion: 0.17
-Nodes (4): dumps(), read_reviews(), split_queue(), validate_reviews()
+### Community 643 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_source_labels.py"
+Cohesion: 0.08
+Nodes (10): accessible_name(), evidence_link(), source_label(), paper(), PaperSourceLabelTests, source_items(), directory_topics(), load_papers() (+2 more)
 
 ### Community 648 - "triad_harness_bundle/skills/awesome-rea/tests/test_resume_evidence.py"
 Cohesion: 0.23
 Nodes (4): legacy_snapshot(), ResumeEvidenceTests, success(), write()
 
 ### Community 650 - "triad_harness_bundle/skills/awesome-rea/tests/test_backfill_added_at.py"
-Cohesion: 0.26
+Cohesion: 0.31
 Nodes (4): BackfillTest, git(), resource(), write()
 
 ### Community 651 - "providers"
@@ -3494,10 +3474,6 @@ Nodes (12): assert, context, fs, legacy, nodes, published, row, scope (+4 more)
 ### Community 654 - "PaperFileTest"
 Cohesion: 0.19
 Nodes (3): entry_lines(), PaperFileTest, readme_block()
-
-### Community 657 - "triad_harness_bundle/skills/awesome-rea/tests/test_target_card_highlight.py"
-Cohesion: 0.21
-Nodes (3): forced_colors_block(), rules(), TargetCardHighlightTests
 
 ### Community 658 - "border"
 Cohesion: 0.15
@@ -3543,29 +3519,29 @@ Nodes (11): _asset_url(), _definitions(), _document(), _evidence_preview(), _evi
 Cohesion: 0.17
 Nodes (7): evidence_class_badge(), _repository_row(), _requirements(), _resource_content(), _star_line(), _summary(), _tools()
 
-### Community 669 - "zlib"
-Cohesion: 0.20
-Nodes (3): main(), CardTests, page()
+### Community 669 - ".agents/skills/awesome-rea/scripts/privacy_guard.py"
+Cohesion: 0.15
+Nodes (8): decoded(), default_paths(), files_under(), is_archive(), main(), separated(), text_of(), tracked_files()
 
-### Community 670 - ".agents/skills/awesome-rea/scripts/catalog.py"
-Cohesion: 0.20
-Nodes (3): load_resources(), main(), normalize_search_text()
+### Community 670 - "copy"
+Cohesion: 0.01
+Nodes (19): paper(), PaperOrderTests, curated_records(), ReconstructionPairingTests, curated_records(), RequirementListTests, github_repository(), related_entry() (+11 more)
 
-### Community 671 - "forked_checks.py"
-Cohesion: 0.27
-Nodes (6): _apply(), _context(), ordered_map(), _run(), run_all(), workers()
+### Community 671 - "generate_design_system"
+Cohesion: 0.12
+Nodes (7): ansi_ljust(), format_ascii_box(), format_markdown(), generate_design_system(), hex_to_ansi(), section_header(), TestPersistence
 
 ### Community 675 - ".agents/skills/awesome-rea/tests/test_paper_diagnostics.py"
-Cohesion: 0.30
+Cohesion: 0.50
 Nodes (3): errors_for(), paper(), PaperDiagnosticsTest
 
-### Community 676 - ".agents/skills/awesome-rea/tests/test_paper_groups.py"
-Cohesion: 0.33
-Nodes (3): correct_document(), PaperGroupTests, section()
+### Community 679 - "pdf_gost_extractor.py"
+Cohesion: 0.19
+Nodes (6): chunk_standard_text(), extract_text_from_pdf(), index_pdf_document(), init_knowledge_db(), list_indexed_standards(), search_knowledge_base()
 
-### Community 679 - ".agents/skills/awesome-rea/tests/test_readme_agent_cross_reference.py"
-Cohesion: 0.24
-Nodes (4): AgentCrossReferenceTest, agents_section(), is_agent_integration(), resource()
+### Community 682 - "topics_from_gaps.py"
+Cohesion: 0.18
+Nodes (8): estimate_priority(), is_service_title(), keywords_count_of(), main(), normalize_title(), promote(), slugify(), topic_from_competitor_title()
 
 ### Community 684 - "embed-tokens.cjs"
 Cohesion: 0.17
@@ -3579,17 +3555,13 @@ Nodes (11): extensions, formatReport(), fs, getFiles(), main(), parseArgs(), pat
 Cohesion: 0.17
 Nodes (11): $type, $value, dark, semantic, $schema, $type, $value, semantic (+3 more)
 
-### Community 688 - "triad_harness_bundle/skills/awesome-rea/tests/test_readme_agent_cross_reference.py"
-Cohesion: 0.24
-Nodes (4): AgentCrossReferenceTest, agents_section(), is_agent_integration(), resource()
+### Community 688 - ".agents/skills/awesome-rea/scripts/site_footer.py"
+Cohesion: 0.31
+Nodes (4): download_label(), download_link(), footer_downloads(), site_footer()
 
 ### Community 690 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_diagnostics.py"
-Cohesion: 0.30
+Cohesion: 0.50
 Nodes (3): errors_for(), paper(), PaperDiagnosticsTest
-
-### Community 693 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_groups.py"
-Cohesion: 0.33
-Nodes (3): correct_document(), PaperGroupTests, section()
 
 ### Community 695 - "animals"
 Cohesion: 0.17
@@ -3618,10 +3590,6 @@ Nodes (11): default-days, patterns, github-actions, interval, updates, cooldown,
 ### Community 701 - "triad_harness_bundle/skills/awesome-rea/.github/workflows/validate.yml"
 Cohesion: 0.17
 Nodes (11): concurrency, cancel-in-progress, group, name, on, pull_request, push, workflow_dispatch (+3 more)
-
-### Community 702 - "record_problems"
-Cohesion: 0.21
-Nodes (6): privacy_detector(), protected_identifier(), record_problems(), select_records(), strong_topics(), private_json_locations()
 
 ### Community 703 - "triad_harness_bundle/skills/awesome-rea/tests/homepage_url_ui.cjs"
 Cohesion: 0.20
@@ -3708,12 +3676,16 @@ Cohesion: 0.25
 Nodes (3): APIOnlyRedirect, GitHub, is_api_origin()
 
 ### Community 730 - "test_browse_guides.py"
-Cohesion: 0.25
+Cohesion: 0.38
 Nodes (3): BrowseGuideTests, build(), record()
 
 ### Community 732 - ".agents/skills/awesome-rea/tests/test_duplicate_readmes.py"
-Cohesion: 0.24
+Cohesion: 0.33
 Nodes (3): DuplicateReadmeReportTests, fixture(), scan()
+
+### Community 735 - "FakeGitHub"
+Cohesion: 0.26
+Nodes (3): FakeGitHub, GuardTest, run()
 
 ### Community 738 - "inject-brand-context.cjs"
 Cohesion: 0.31
@@ -3724,16 +3696,20 @@ Cohesion: 0.22
 Nodes (4): open_graph_meta(), png_size(), website_node(), website_reference()
 
 ### Community 742 - "triad_harness_bundle/skills/awesome-rea/tests/test_duplicate_readmes.py"
-Cohesion: 0.24
+Cohesion: 0.33
 Nodes (3): DuplicateReadmeReportTests, fixture(), scan()
 
-### Community 744 - "test_live_wp_integration.py"
-Cohesion: 0.27
-Nodes (3): LiveWpIntegrationTester, main(), WordPressClient
+### Community 744 - "triad_harness_bundle/skills/awesome-rea/scripts/requirement_facets.py"
+Cohesion: 0.25
+Nodes (4): facet_errors(), item_html(), _items(), ordered_items()
 
 ### Community 745 - "GitHub"
 Cohesion: 0.25
 Nodes (3): APIOnlyRedirect, GitHub, is_api_origin()
+
+### Community 748 - "FakeGitHub"
+Cohesion: 0.26
+Nodes (3): FakeGitHub, GuardTest, run()
 
 ### Community 750 - "ye"
 Cohesion: 0.20
@@ -3787,10 +3763,6 @@ Nodes (10): default, description, required, type, all_sources, on, schedule, wor
 Cohesion: 0.20
 Nodes (9): concurrency, cancel-in-progress, group, jobs, name, on, schedule, workflow_dispatch (+1 more)
 
-### Community 764 - ".agents/skills/awesome-rea/scripts/asset_paths.py"
-Cohesion: 0.31
-Nodes (4): digest(), fingerprinted_href(), remove_unhashed_copies(), write_fingerprinted()
-
 ### Community 765 - "_parse_registry"
 Cohesion: 0.22
 Nodes (7): _bibtex_literal(), _cite(), block(), resource_citation(), _parse_registry(), num(), text()
@@ -3799,9 +3771,9 @@ Nodes (7): _bibtex_literal(), _cite(), block(), resource_citation(), _parse_regi
 Cohesion: 0.22
 Nodes (5): build_entry_pages(), matching_entries(), _output_path(), section_siblings(), row()
 
-### Community 767 - "validate_case_coverage"
-Cohesion: 0.29
-Nodes (7): coverage_counts(), validate_case_coverage(), day(), fail(), fields(), text(), urls()
+### Community 767 - ".agents/skills/awesome-rea/scripts/private_scan_worker.py"
+Cohesion: 0.20
+Nodes (7): git_value(), main(), require_tracked_bytes(), run_worker(), validate_config(), ActionsAPI, NoRedirect
 
 ### Community 768 - "LinkNames"
 Cohesion: 0.20
@@ -3811,21 +3783,29 @@ Nodes (3): link_destination(), LinkNames, validate_unique_link_names()
 Cohesion: 0.22
 Nodes (9): description, devDependencies, puppeteer-core@25.12.0, puppeteer-core, license, name, private, scripts (+1 more)
 
-### Community 777 - ".agents/skills/awesome-rea/tests/test_first_resource_walkthrough.py"
-Cohesion: 0.29
-Nodes (3): catalog_records(), code_blocks(), WalkthroughTests
+### Community 773 - ".agents/skills/awesome-rea/tests/test_review_date_tolerance.py"
+Cohesion: 0.25
+Nodes (5): minimal_paper(), minimal_resource(), paper_errors(), resource_errors(), TestReviewDateTolerance
+
+### Community 777 - "build_site"
+Cohesion: 0.14
+Nodes (8): build_site(), build_staged_site(), catalog_index(), check_output_directory(), default_targets(), explorer_page(), group_for(), main()
 
 ### Community 778 - "test_forked_checks.py"
-Cohesion: 0.27
+Cohesion: 0.29
 Nodes (3): fail(), ForkedChecksTests, square()
+
+### Community 781 - "build_worklist.py"
+Cohesion: 0.29
+Nodes (11): blockers(), build(), cluster_table(), keywords_of(), links_text(), main(), next_topics(), render_csv() (+3 more)
 
 ### Community 782 - ".agents/skills/awesome-rea/tests/test_readme_paper_venue.py"
 Cohesion: 0.29
 Nodes (3): paper(), ReadmePaperVenueTest, visible_line()
 
-### Community 783 - ".agents/skills/awesome-rea/tests/test_resource_form_prompts.py"
-Cohesion: 0.38
-Nodes (4): field(), fields(), required(), ResourceFormPromptTests
+### Community 783 - "SimpleArticleExtractor"
+Cohesion: 0.15
+Nodes (4): analyze_competitor_html(), fetch_url_html(), search_and_analyze_competitors(), SimpleArticleExtractor
 
 ### Community 786 - "sync-brand-to-tokens.cjs"
 Cohesion: 0.29
@@ -3839,16 +3819,20 @@ Nodes (9): flattenTokens(), fs, generateCSS(), generateTailwind(), main(), parse
 Cohesion: 0.20
 Nodes (10): fast, normal, slow, $type, $value, $type, $value, duration (+2 more)
 
-### Community 795 - "triad_harness_bundle/skills/awesome-rea/scripts/review_disclaimers.py"
-Cohesion: 0.24
-Nodes (4): banned_sentences(), findings(), main(), sentences()
+### Community 793 - "phone_tools.py"
+Cohesion: 0.20
+Nodes (6): dispatch_tool(), get_battery(), get_hardware_status(), search_memory(), set_torch(), toggle_torch()
+
+### Community 796 - "prose_only"
+Cohesion: 0.16
+Nodes (9): document_links(), fence_start(), list_item_prefix(), markdown_anchors(), mask_inline_code(), nonparagraph_block(), prose_only(), flush_paragraph() (+1 more)
 
 ### Community 799 - "triad_harness_bundle/skills/awesome-rea/tests/test_first_resource_walkthrough.py"
 Cohesion: 0.29
 Nodes (3): catalog_records(), code_blocks(), WalkthroughTests
 
 ### Community 800 - "triad_harness_bundle/skills/awesome-rea/tests/test_readme_paper_venue.py"
-Cohesion: 0.29
+Cohesion: 0.38
 Nodes (3): paper(), ReadmePaperVenueTest, visible_line()
 
 ### Community 801 - "mcp.json"
@@ -3863,9 +3847,9 @@ Nodes (10): default, description, required, type, all_sources, on, schedule, wor
 Cohesion: 0.20
 Nodes (9): concurrency, cancel-in-progress, group, jobs, name, on, schedule, workflow_dispatch (+1 more)
 
-### Community 806 - "triad_harness_bundle/skills/awesome-rea/scripts/asset_paths.py"
-Cohesion: 0.31
-Nodes (4): digest(), fingerprinted_href(), remove_unhashed_copies(), write_fingerprinted()
+### Community 806 - ".agents/skills/awesome-rea/scripts/source_browser.py"
+Cohesion: 0.23
+Nodes (5): compact_json_bytes(), project_source_browser(), read_json_bytes(), validate_source_browser(), write_source_browser()
 
 ### Community 807 - "validate_case_coverage"
 Cohesion: 0.29
@@ -3891,9 +3875,9 @@ Nodes (8): application(), assert, change(), element(), settle(), snapshot(), tar
 Cohesion: 0.29
 Nodes (4): lead_keys_with_entry(), listing(), ProjectPageTest, SharedPageTest
 
-### Community 819 - "triad_harness_bundle/skills/awesome-rea/tests/test_resource_form_prompts.py"
-Cohesion: 0.38
-Nodes (4): field(), fields(), required(), ResourceFormPromptTests
+### Community 819 - ".agents/skills/awesome-rea/tests/test_paper_topics.py"
+Cohesion: 0.23
+Nodes (4): directory_topics(), load_papers(), PaperTopicTest, readme_topics()
 
 ### Community 821 - "styles/04-afternoon.json"
 Cohesion: 0.20
@@ -4007,6 +3991,30 @@ Nodes (9): canonicalTopic(), githubRepo(), matchExcerpt(), matchHint(), normaliz
 Cohesion: 0.25
 Nodes (8): description, devDependencies, awesome-lint@2.2.1, awesome-lint, license, name, private, type
 
+### Community 850 - "triad_harness_bundle/skills/awesome-rea/scripts/privacy_guard.py"
+Cohesion: 0.26
+Nodes (7): _character_class(), default_paths(), files_under(), main(), scan(), separated(), tracked_files()
+
+### Community 866 - "main"
+Cohesion: 0.17
+Nodes (6): discovery_report(), discovery_summary(), duplicate_readme_report(), held_repository_ids(), main(), run_segments()
+
+### Community 867 - ".agents/skills/awesome-rea/tests/test_paper_groups.py"
+Cohesion: 0.33
+Nodes (3): correct_document(), PaperGroupTests, section()
+
+### Community 869 - "design_system.py"
+Cohesion: 0.02
+Nodes (34): SchemaCheckTests, detect_domain(), get_cip_brief(), _load_csv(), search(), search_all(), _search_csv(), detect_domain() (+26 more)
+
+### Community 871 - ".agents/skills/awesome-rea/scripts/artifact_links.py"
+Cohesion: 0.38
+Nodes (3): github_repository(), related_entry(), with_artifact_links()
+
+### Community 872 - ".agents/skills/awesome-rea/tests/test_readme_agent_cross_reference.py"
+Cohesion: 0.24
+Nodes (4): AgentCrossReferenceTest, agents_section(), is_agent_integration(), resource()
+
 ### Community 883 - "triad_harness_bundle/skills/awesome-rea/scripts/site_footer.py"
 Cohesion: 0.31
 Nodes (4): download_label(), download_link(), footer_downloads(), site_footer()
@@ -4046,6 +4054,10 @@ Nodes (5): exploded_view(), _line(), _plate(), _poly(), _pt()
 ### Community 892 - "triad_harness_bundle/skills/awesome-rea/tests/awesome-lint/package.json"
 Cohesion: 0.25
 Nodes (8): description, devDependencies, awesome-lint@2.2.1, awesome-lint, license, name, private, type
+
+### Community 894 - "triad_harness_bundle/skills/awesome-rea/tests/test_readme_agent_cross_reference.py"
+Cohesion: 0.24
+Nodes (4): AgentCrossReferenceTest, agents_section(), is_agent_integration(), resource()
 
 ### Community 902 - "hello-elementor-child/assets/js/main.js"
 Cohesion: 0.28
@@ -4147,17 +4159,17 @@ Nodes (4): definition(), browse_path(), build_browse_pages(), category_document(
 Cohesion: 0.25
 Nodes (5): entry_path(), feedback_urls(), _related_entries(), _section_links(), _text()
 
-### Community 928 - ".agents/skills/awesome-rea/scripts/data_downloads.py"
-Cohesion: 0.36
-Nodes (4): build_data_downloads(), fingerprint(), json_bytes(), projected_records()
+### Community 928 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_groups.py"
+Cohesion: 0.33
+Nodes (3): correct_document(), PaperGroupTests, section()
 
-### Community 929 - ".agents/skills/awesome-rea/scripts/evidence_links.py"
-Cohesion: 0.36
-Nodes (3): accessible_name(), evidence_link(), source_label()
+### Community 929 - "run_pipeline.py"
+Cohesion: 0.30
+Nodes (9): find_article_file(), get_topic_data(), main(), step_approve(), step_prompt_reviewer(), step_prompt_writer(), step_research(), step_score() (+1 more)
 
-### Community 946 - "triad_harness_bundle/skills/awesome-rea/scripts/data_downloads.py"
-Cohesion: 0.36
-Nodes (4): build_data_downloads(), fingerprint(), json_bytes(), projected_records()
+### Community 938 - ".do_POST"
+Cohesion: 0.21
+Nodes (6): add_log(), detect_domain(), get_kb_context(), http_json(), MasterGatewayHandler, web_search_ddg()
 
 ### Community 947 - "bobr"
 Cohesion: 0.25
@@ -4195,6 +4207,14 @@ Nodes (7): GGML_OPENMP, HOME, LD_LIBRARY_PATH, OMP_NUM_THREADS, PATH, PREFIX, st
 Cohesion: 0.61
 Nodes (7): apply_tcp_tuning(), check_health(), is_ciadpi_running(), is_stube_focused(), stube_watchdog.sh script, start_ciadpi(), stop_ciadpi()
 
+### Community 957 - "triad_harness_bundle/skills/awesome-rea/scripts/build_manifest.py"
+Cohesion: 0.27
+Nodes (6): collect_manifest(), html_digest(), manifest_bytes(), read_build_manifest(), without_star_counts(), write_build_manifest()
+
+### Community 958 - "pingClusterNodes"
+Cohesion: 0.29
+Nodes (7): fetchRoutingConfig(), openRoutingModal(), pingClusterNodes(), restoreAllNodes(), saveRoutingYaml(), simulateNodeFailure(), updateClusterHealthCards()
+
 ### Community 959 - "theme4/includes/search-modal.php"
 Cohesion: 0.46
 Nodes (6): escapeHtml(), escapeRegex(), highlightQuery(), openSearch(), renderResults(), updateActiveResult()
@@ -4231,9 +4251,17 @@ Nodes (8): unit, shard, fail-fast, matrix, runs-on, steps, strategy, timeout-min
 Cohesion: 0.22
 Nodes (3): get_time_sec(), main(), print_cpu_topology()
 
-### Community 969 - "triad_harness_bundle/skills/awesome-rea/scripts/evidence_links.py"
-Cohesion: 0.36
-Nodes (3): accessible_name(), evidence_link(), source_label()
+### Community 969 - "validate_case_coverage"
+Cohesion: 0.29
+Nodes (7): coverage_counts(), validate_case_coverage(), day(), fail(), fields(), text(), urls()
+
+### Community 970 - "PublicRedirect"
+Cohesion: 0.20
+Nodes (3): PublicRedirect, RedirectRefused, without_credentials()
+
+### Community 975 - ".agents/skills/awesome-rea/tests/test_first_resource_walkthrough.py"
+Cohesion: 0.29
+Nodes (3): catalog_records(), code_blocks(), WalkthroughTests
 
 ### Community 978 - "tchp/assets/js/workbench.js"
 Cohesion: 0.29
@@ -4320,12 +4348,8 @@ Cohesion: 0.29
 Nodes (6): additionalProperties, description, required, $schema, title, type
 
 ### Community 1010 - "loadModelsConfig"
-Cohesion: 0.33
-Nodes (7): loadModelsConfig(), renderModelsConfigContent(), renderModelsConfigTabs(), renderProviderKeysContent(), saveAnimalModelSelection(), saveProviderKeyClick(), selectConfigAnimalTab()
-
-### Community 1012 - "triad_armv8_bench.py"
-Cohesion: 0.52
-Nodes (5): get_connected_devices(), get_device_cpu_telemetry(), main(), run_cmd(), run_local_fallback_bench()
+Cohesion: 0.20
+Nodes (11): applyAllLocalFirstDefaults(), applyCustomModel(), buildModelOptionsHtml(), handleModelSelectChange(), loadModelsConfig(), renderModelsConfigContent(), renderModelsConfigTabs(), renderProviderKeysContent() (+3 more)
 
 ### Community 1014 - "theme4/includes/footer.php"
 Cohesion: 0.48
@@ -4391,17 +4415,13 @@ Nodes (6): DEFAULT_BRANCH, GH_TOKEN, INGEST_RESULT, MERGE_SHA, SCAN_RESULT, env
 Cohesion: 0.33
 Nodes (6): scan, checkpoint_ready, if, outputs, runs-on, timeout-minutes
 
-### Community 1035 - "classify_scan_evidence.py"
-Cohesion: 0.47
-Nodes (3): main(), now_utc(), supplement_records()
-
 ### Community 1039 - "cleanse.sh"
 Cohesion: 0.60
 Nodes (5): cli_failed(), emit_copy(), find_bin(), run_bounded(), cleanse.sh script
 
-### Community 1042 - "split_values"
-Cohesion: 0.47
-Nodes (3): split_values(), style_identities(), TestStyleIdentityContract
+### Community 1042 - "contribution_content"
+Cohesion: 0.25
+Nodes (3): contribution_content(), SurveyCopyTests, walk()
 
 ### Community 1043 - "archimedes"
 Cohesion: 0.33
@@ -4438,10 +4458,6 @@ Nodes (5): HOME, LD_LIBRARY_PATH, PATH, PREFIX, install_cluster_pkgs.sh script
 ### Community 1052 - "start_melvin.sh"
 Cohesion: 0.33
 Nodes (5): OMP_NUM_THREADS, OMP_WAIT_POLICY, OPENBLAS_NUM_THREADS, PROOT_TMP_DIR, start_melvin.sh script
-
-### Community 1053 - "restore_nord10_system.py"
-Cohesion: 0.60
-Nodes (4): adb_shell(), main(), restore_critical(), run()
 
 ### Community 1054 - "run_router.sh"
 Cohesion: 0.33
@@ -4595,6 +4611,10 @@ Nodes (5): report, if, needs, runs-on, timeout-minutes
 Cohesion: 0.40
 Nodes (5): validate, if, needs, runs-on, timeout-minutes
 
+### Community 1106 - ".agents/skills/awesome-rea/tests/test_resource_form_prompts.py"
+Cohesion: 0.38
+Nodes (4): field(), fields(), required(), ResourceFormPromptTests
+
 ### Community 1109 - "interface"
 Cohesion: 0.40
 Nodes (4): interface, default_prompt, display_name, short_description
@@ -4631,9 +4651,17 @@ Nodes (5): color, typography, :active, background, :active
 Cohesion: 0.40
 Nodes (5): core/image, core/post-featured-image, filter, filter, duotone
 
-### Community 1126 - "validate_scan_chronology"
-Cohesion: 0.67
-Nodes (3): validate_scan_chronology(), recorded(), time_of()
+### Community 1122 - "triad_harness_bundle/skills/awesome-rea/scripts/review_disclaimers.py"
+Cohesion: 0.24
+Nodes (4): banned_sentences(), findings(), main(), sentences()
+
+### Community 1123 - "withdrawn_redirect_rules"
+Cohesion: 0.33
+Nodes (3): withdrawn_listing(), withdrawn_redirect_rules(), write_withdrawn_redirects()
+
+### Community 1126 - "triad_harness_bundle/skills/awesome-rea/tests/test_resource_form_prompts.py"
+Cohesion: 0.38
+Nodes (4): field(), fields(), required(), ResourceFormPromptTests
 
 ### Community 1127 - ".agents/skills/awesome-rea/site/language-fragment.js"
 Cohesion: 0.67
@@ -4715,29 +4743,69 @@ Nodes (4): spacing, bottom, top, margin
 Cohesion: 0.67
 Nodes (3): runs-on, timeout-minutes, browser
 
+### Community 1533 - "github_api_fetch"
+Cohesion: 0.11
+Nodes (10): _AuthStrippingRedirect, cached(), fetch_page(), github_api_fetch(), gitlab_api_fetch(), HttpClient, now_utc(), retry_seconds() (+2 more)
+
+### Community 1546 - "triad_harness_bundle/skills/awesome-rea/tests/test_paper_form_fields.py"
+Cohesion: 0.33
+Nodes (3): fields(), PaperFormFieldTests, required()
+
+### Community 1552 - "case"
+Cohesion: 0.36
+Nodes (3): case(), ReadmeCaseMethodTests, tool()
+
+### Community 1553 - "read_seed_input"
+Cohesion: 0.25
+Nodes (4): curated_references(), paper_references(), read_seed_input(), tracker_references()
+
+### Community 1560 - "build_dashboard.py"
+Cohesion: 0.43
+Nodes (6): avatar_svg(), build_html(), esc(), load_all_scores(), main(), short()
+
+### Community 1564 - "triad_harness_bundle/skills/awesome-rea/tests/unit_shards.py"
+Cohesion: 0.43
+Nodes (5): cases(), group_key(), main(), plan(), require()
+
+### Community 1572 - "validate_site"
+Cohesion: 0.33
+Nodes (3): defined_ids(), nodes(), validate_site()
+
+### Community 1575 - "withdrawn_redirect_rules"
+Cohesion: 0.33
+Nodes (3): withdrawn_listing(), withdrawn_redirect_rules(), write_withdrawn_redirects()
+
+### Community 1604 - "validate_scan_chronology"
+Cohesion: 0.67
+Nodes (3): validate_scan_chronology(), recorded(), time_of()
+
+### Community 1614 - "cleanTextFromSlopUI"
+Cohesion: 0.50
+Nodes (4): cleanTextFromSlopUI(), pasteCurrentArticleIntoHumanizer(), runHumanizerAudit(), updateHumanizerCharCount()
+
 ### Community 2149 - "re"
-Cohesion: 0.02
-Nodes (50): github_repository(), related_entry(), with_artifact_links(), catalog_revision_warning(), robots_txt(), errors(), _type_matches(), FactListPhoneTests (+42 more)
+Cohesion: 0.01
+Nodes (123): catalog_revision_warning(), is_bot(), main(), pull_request_commits(), all_values(), chinese_value(), display(), findings_for() (+115 more)
 
 ## Knowledge Gaps
-- **2235 isolated node(s):** `npx`, `@uimax/mcp-server`, `name`, `description`, `title` (+2230 more)
-  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 9994 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
-- **652 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **2235 isolated node(s):** `DB_DATA`, `BULK_SELECTED`, `STATUS_RU`, `COLUMNS`, `SAAS_VIEW_TITLES` (+2230 more)
+  These have ≤1 connection - possible missing edges or undocumented components. (Counts symbols only; 9996 node(s) total have ≤1 connection when file, concept and rationale nodes are included.)
+- **756 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `gs` connect `parseObject` to `Ce`?**
+- **Why does `Lt` connect `Lt` to `sn`, `ws`?**
   _High betweenness centrality (0.000) - this node is a cross-community bridge._
-- **What connects `npx`, `@uimax/mcp-server`, `name` to the rest of the system?**
+- **What connects `DB_DATA`, `BULK_SELECTED`, `STATUS_RU` to the rest of the system?**
   _2235 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `MainActivity.kt` be split into smaller, more focused modules?**
   _Cohesion score 0.13333333333333333 - nodes in this community are weakly interconnected._
-- **Why does `Ce` connect `Ce` to `xs`, `At`?**
+- **Why does `C()` connect `ws` to `vt`?**
   _High betweenness centrality (0.000) - this node is a cross-community bridge._
 - **Should `BatteryDiagnosticsActivity.kt` be split into smaller, more focused modules?**
   _Cohesion score 0.09782608695652174 - nodes in this community are weakly interconnected._
-- **Should `get_connection` be split into smaller, more focused modules?**
-  _Cohesion score 0.026579043446513326 - nodes in this community are weakly interconnected._
+- **Why does `vt` connect `vt` to `yt`, `sn`, `Lt`, `Ne`, `re`?**
+  _High betweenness centrality (0.000) - this node is a cross-community bridge._
 - **Should `three.min.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.01656155463262062 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.015532206486980357 - nodes in this community are weakly interconnected._
