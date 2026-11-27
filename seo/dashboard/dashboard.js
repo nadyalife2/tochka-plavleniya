@@ -2375,8 +2375,6 @@ function initGlobalKeyboardShortcuts() {
     }
   });
 }
-  });
-}
 
 // Open Inspector Modal -> Now routes to Premium Article Drawer
 function openInspector(topicId) {
