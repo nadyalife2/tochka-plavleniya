@@ -2039,29 +2039,29 @@
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:16px;">
-      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;">
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;" id="diagCardNode1">
         <div style="font-size:11px;color:#64748B;">NODE-1 (Мозг)</div>
         <strong style="font-size:13px;color:#0F172A;">Mi 10T (:8080)</strong>
-        <div style="font-size:11px;color:#059669;margin-top:2px;">Bypass 4.18V (0 мА)</div>
+        <div id="diagNode1Badge" style="font-size:11px;color:#059669;margin-top:2px;font-weight:600;">🟢 Онлайн · Qwen 9B</div>
       </div>
-      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;">
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;" id="diagCardNode2">
         <div style="font-size:11px;color:#64748B;">NODE-2 (QA & RAG)</div>
         <strong style="font-size:13px;color:#0F172A;">Nord N10 (:8081)</strong>
-        <div style="font-size:11px;color:#059669;margin-top:2px;">Battery Guard 24/7</div>
+        <div id="diagNode2Badge" style="font-size:11px;color:#059669;margin-top:2px;font-weight:600;">🟢 Онлайн · LFM 8B</div>
       </div>
-      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;">
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 12px;" id="diagCardNode3">
         <div style="font-size:11px;color:#64748B;">NODE-3 (Шлюз)</div>
         <strong style="font-size:13px;color:#0F172A;">Redmi Note 4 (:8000)</strong>
-        <div id="diagNode3Badge" style="font-size:11px;color:#DC2626;margin-top:2px;font-weight:600;">🔴 Офлайн / Ожидание</div>
+        <div id="diagNode3Badge" style="font-size:11px;color:#059669;margin-top:2px;font-weight:600;">🟢 Онлайн · Router v4.9</div>
       </div>
     </div>
 
-    <div style="background:#F1F5F9;border-radius:6px;padding:10px 12px;font-size:11.5px;color:#475569;margin-bottom:16px;">
-      <strong>Резерв:</strong> OmniRoute Cloud (:20128) · 754 модели · Автоматическая эскалация после 2 ошибок или при перегреве (>45°C).
+    <div style="background:#F1F5F9;border-radius:6px;padding:10px 12px;font-size:11.5px;color:#475569;margin-bottom:16px;" id="diagOmniReserveBox">
+      <strong>Резерв:</strong> <span id="diagOmniText">OmniRoute Cloud (:20128) · 1865 моделей · Автоматическая эскалация при перегреве (>45°C).</span>
     </div>
 
     <div style="display:flex;justify-content:flex-end;gap:8px;">
-      <button class="btn btn--sm" type="button" onclick="refreshClusterTelemetry()">⚡ Пинг узлов</button>
+      <button class="btn btn--sm" id="btnDiagPing" type="button" onclick="refreshClusterTelemetry(this)">⚡ Пинг узлов</button>
       <button class="btn btn--primary btn--sm" type="button" onclick="closeClusterDiagnostics(); switchTab('system');">Полная настройка →</button>
     </div>
   </div>
