@@ -4507,6 +4507,63 @@ function selectConfigAnimalTab(animalId) {
   renderModelsConfigContent(animalId);
 }
 
+function buildModelOptionsHtml(allAvailable, selectedValue, animalId) {
+  const LOCAL_REC = {
+    clara: 'triad:node2_reflex', soroka: 'triad:node2_reflex',
+    boris: 'triad:node1_brain', bobr: 'triad:node1_brain',
+    felix: 'triad:node1_brain', kot: 'triad:node1_brain',
+    reynard: 'triad:node3_gateway', lis: 'triad:node3_gateway',
+    bruno: 'local_vector_svg', barsuk: 'local_vector_svg',
+    archimedes: 'local_slop_monster', filin: 'local_slop_monster',
+    woody: 'local_ast_scorer', dyatel: 'local_ast_scorer',
+    rocky: 'triad:node2_reflex', raccoon: 'triad:node2_reflex',
+    mikhalych: 'triad:node1_brain', bear: 'triad:node1_brain'
+  };
+  const recLocal = LOCAL_REC[animalId] || 'triad:node1_brain';
+
+  const localModels = [];
+  const omnirouteModels = [];
+  const cloudModels = [];
+
+  (allAvailable || []).forEach(m => {
+    const isLocal = m.category === 'local' || (m.provider && m.provider.includes('Local')) || (m.id && (m.id.startsWith('triad:') || m.id.startsWith('local_')));
+    const isOmni = m.category === 'omniroute' || (m.id && m.id.startsWith('omniroute:'));
+    if (isLocal) localModels.push(m);
+    else if (isOmni) omnirouteModels.push(m);
+    else cloudModels.push(m);
+  });
+
+  localModels.sort((a, b) => (a.id === recLocal ? -1 : (b.id === recLocal ? 1 : 0)));
+
+  let html = '';
+  html += `<optgroup label="🟢 1. Локальные узлы и агенты (0₽ / Офлайн / В первую очередь)">`;
+  localModels.forEach(m => {
+    const isRec = (m.id === recLocal);
+    const label = `${isRec ? '⭐ [РЕКОМЕНДОВАНО] ' : ''}${m.name} [${m.type || '0₽'}]`;
+    html += `<option value="${m.id}" ${m.id === selectedValue ? 'selected' : ''}>${label}</option>`;
+  });
+  html += `</optgroup>`;
+
+  html += `<optgroup label="🌐 2. Шлюз OmniRoute (:20128 / Федеративный каскад / Без VPN)">`;
+  omnirouteModels.forEach(m => {
+    html += `<option value="${m.id}" ${m.id === selectedValue ? 'selected' : ''}>${m.name} [${m.type || 'Каскад'}]</option>`;
+  });
+  html += `</optgroup>`;
+
+  html += `<optgroup label="☁️ 3. Прямые внешние API (Резерв по личному ключу)">`;
+  cloudModels.forEach(m => {
+    html += `<option value="${m.id}" ${m.id === selectedValue ? 'selected' : ''}>${m.name} (${m.provider})</option>`;
+  });
+  html += `</optgroup>`;
+
+  const isCustom = selectedValue && !allAvailable.some(m => m.id === selectedValue) && selectedValue !== '';
+  html += `<optgroup label="✏️ 4. Ручная настройка">`;
+  html += `<option value="__custom__" ${isCustom ? 'selected' : ''}>🛠️ Ввести свою модель или endpoint вручную...</option>`;
+  html += `</optgroup>`;
+
+  return html;
+}
+
 function renderModelsConfigContent(animalId) {
   const container = document.getElementById('modelsAnimalConfigContent');
   if (!container || !globalModelsConfig) return;
@@ -4514,26 +4571,67 @@ function renderModelsConfigContent(animalId) {
   const allAvailable = globalModelsConfig.all_available_models || [];
   const info = ANIMAL_NAMES_MAP[animalId] || { name: animalId, role: '', icon: '🐾' };
 
+  const LOCAL_REC = {
+    clara: { id: 'triad:node2_reflex', name: 'Triad Node-2 (Nord N10 LFM2.5-8B / BGE-M3)' },
+    soroka: { id: 'triad:node2_reflex', name: 'Triad Node-2 (Nord N10 LFM2.5-8B / BGE-M3)' },
+    boris: { id: 'triad:node1_brain', name: 'Triad Node-1: Mi 10T 5G (Qwen3.5-9B)' },
+    bobr: { id: 'triad:node1_brain', name: 'Triad Node-1: Mi 10T 5G (Qwen3.5-9B)' },
+    felix: { id: 'triad:node1_brain', name: 'Triad Node-1: Mi 10T 5G (Qwen3.5-9B)' },
+    kot: { id: 'triad:node1_brain', name: 'Triad Node-1: Mi 10T 5G (Qwen3.5-9B)' },
+    reynard: { id: 'triad:node3_gateway', name: 'Triad Node-3 Fast-Path Regex (0.02ms)' },
+    lis: { id: 'triad:node3_gateway', name: 'Triad Node-3 Fast-Path Regex (0.02ms)' },
+    bruno: { id: 'local_vector_svg', name: 'Нативный SVG-генератор термопрофилей' },
+    barsuk: { id: 'local_vector_svg', name: 'Нативный SVG-генератор термопрофилей' },
+    archimedes: { id: 'local_slop_monster', name: 'SlopMonster: Анализатор штампов & Anti-Slop' },
+    filin: { id: 'local_slop_monster', name: 'SlopMonster: Анализатор штампов & Anti-Slop' },
+    woody: { id: 'local_ast_scorer', name: 'AST Scorer: 100-балльная метрология' },
+    dyatel: { id: 'local_ast_scorer', name: 'AST Scorer: 100-балльная метрология' },
+    rocky: { id: 'triad:node2_reflex', name: 'Triad Node-2 (Graphify & LoRA Dataset)' },
+    raccoon: { id: 'triad:node2_reflex', name: 'Triad Node-2 (Graphify & LoRA Dataset)' },
+    mikhalych: { id: 'triad:node1_brain', name: 'Triad Node-1 (Координатор артели)' },
+    bear: { id: 'triad:node1_brain', name: 'Triad Node-1 (Координатор артели)' }
+  };
+  const rec = LOCAL_REC[animalId] || { id: 'triad:node1_brain', name: 'Triad Node-1: Mi 10T 5G' };
+
   let html = `
     <div style="background:#18181D;border:1px solid #3F3F46;border-radius:8px;padding:16px;">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-        <span style="font-size:24px;">${info.icon}</span>
-        <div>
-          <div style="font-weight:800;font-size:15px;color:#FFF;">${info.name}</div>
-          <div style="font-size:12px;color:#A1A1AA;">${info.role} · ${animalCfg.description || ''}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:24px;">${info.icon}</span>
+          <div>
+            <div style="font-weight:800;font-size:15px;color:#FFF;">${info.name}</div>
+            <div style="font-size:12px;color:#A1A1AA;">${info.role} · ${animalCfg.description || ''}</div>
+          </div>
+        </div>
+        <div style="background:#064E3B;border:1px solid #059669;border-radius:6px;padding:6px 12px;display:flex;align-items:center;gap:8px;">
+          <span style="font-size:12px;">🟢</span>
+          <span style="font-size:11.5px;color:#A7F3D0;font-weight:700;">Локальный узел справляется: ${rec.name}</span>
+          <button type="button" class="btn btn--xs" onclick="saveAnimalModelSelection('${animalId}', 'primary', '${rec.id}')" style="background:#10B981;color:#064E3B;font-weight:800;border:none;border-radius:4px;padding:3px 8px;cursor:pointer;">
+            ⚡ Выбрать (0₽)
+          </button>
         </div>
       </div>
+
       <div style="font-size:12px;color:#94A3B8;margin-bottom:14px;">
-        Назначьте 1 приоритетную модель и до 4 альтернативных резервов на случай недоступности узла:
+        Назначьте 1 приоритетную модель (сначала опрашивается локальный агент) и до 4 альтернативных резервов (OmniRoute или внешние API):
       </div>
+
       <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:12px;">
+        <!-- Primary Slot -->
         <div style="background:#09090B;border:1.5px solid #22C55E;border-radius:6px;padding:10px;">
-          <label style="font-size:11px;font-weight:700;color:#4ADE80;display:block;margin-bottom:4px;">
-            ⭐ 1. ПРИОРИТЕТНАЯ МОДЕЛЬ (Primary)
-          </label>
-          <select id="cfgModel_primary" onchange="saveAnimalModelSelection('${animalId}', 'primary', this.value)" style="width:100%;background:#18181D;border:1px solid #22C55E;color:#FFF;padding:6px;border-radius:4px;font-size:12px;">
-            ${allAvailable.map(m => `<option value="${m.id}" ${m.id === animalCfg.primary ? 'selected' : ''}>${m.name} (${m.provider}) [${m.type}]</option>`).join('')}
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <label style="font-size:11px;font-weight:700;color:#4ADE80;">
+              ⭐ 1. ПРИОРИТЕТНАЯ МОДЕЛЬ (Primary)
+            </label>
+            <span style="font-size:10px;color:#6EE7B7;background:#064E3B;padding:1px 6px;border-radius:3px;">В первую очередь</span>
+          </div>
+          <select id="cfgModel_primary" onchange="handleModelSelectChange('${animalId}', 'primary', this.value)" style="width:100%;background:#18181D;border:1px solid #22C55E;color:#FFF;padding:6px;border-radius:4px;font-size:12px;">
+            ${buildModelOptionsHtml(allAvailable, animalCfg.primary, animalId)}
           </select>
+          <div id="customBox_primary" style="margin-top:6px;display:${animalCfg.primary && !allAvailable.some(m => m.id === animalCfg.primary) ? 'flex' : 'none'};gap:4px;">
+            <input type="text" id="customInput_primary" value="${animalCfg.primary || ''}" placeholder="кастомный id / endpoint..." style="flex:1;background:#18181D;border:1px solid #71717A;color:#FFF;padding:4px 6px;border-radius:4px;font-size:11px;">
+            <button type="button" class="btn btn--xs" onclick="applyCustomModel('${animalId}', 'primary')" style="background:#22C55E;color:#000;font-weight:bold;padding:4px 8px;">OK</button>
+          </div>
           <div style="font-size:10px;color:#6EE7B7;margin-top:4px;">Первой опрашивается при поступлении задачи</div>
         </div>
   `;
@@ -4541,15 +4639,20 @@ function renderModelsConfigContent(animalId) {
   const alternates = animalCfg.alternates || [];
   for (let i = 0; i < 4; i++) {
     const curVal = alternates[i] || '';
+    const isCustomAlt = curVal && !allAvailable.some(m => m.id === curVal);
     html += `
       <div style="background:#09090B;border:1px solid #3F3F46;border-radius:6px;padding:10px;">
         <label style="font-size:11px;font-weight:700;color:#F59E0B;display:block;margin-bottom:4px;">
           🔄 Альтернатива #${i + 1}
         </label>
-        <select id="cfgModel_alt_${i}" onchange="saveAnimalModelSelection('${animalId}', ${i}, this.value)" style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px;border-radius:4px;font-size:12px;">
+        <select id="cfgModel_alt_${i}" onchange="handleModelSelectChange('${animalId}', ${i}, this.value)" style="width:100%;background:#18181D;border:1px solid #52525B;color:#FFF;padding:6px;border-radius:4px;font-size:12px;">
           <option value="">-- Не назначена --</option>
-          ${allAvailable.map(m => `<option value="${m.id}" ${m.id === curVal ? 'selected' : ''}>${m.name} (${m.provider})</option>`).join('')}
+          ${buildModelOptionsHtml(allAvailable, curVal, animalId)}
         </select>
+        <div id="customBox_${i}" style="margin-top:6px;display:${isCustomAlt ? 'flex' : 'none'};gap:4px;">
+          <input type="text" id="customInput_${i}" value="${curVal}" placeholder="кастомный id / endpoint..." style="flex:1;background:#18181D;border:1px solid #71717A;color:#FFF;padding:4px 6px;border-radius:4px;font-size:11px;">
+          <button type="button" class="btn btn--xs" onclick="applyCustomModel('${animalId}', ${i})" style="background:#F59E0B;color:#000;font-weight:bold;padding:4px 8px;">OK</button>
+        </div>
         <div style="font-size:10px;color:#71717A;margin-top:4px;">Резерв ${i + 1} при отказе предыдущих</div>
       </div>
     `;
@@ -4560,6 +4663,38 @@ function renderModelsConfigContent(animalId) {
     </div>
   `;
   container.innerHTML = html;
+}
+
+function handleModelSelectChange(animalId, slot, selectedValue) {
+  const customBox = document.getElementById(`customBox_${slot}`);
+  if (selectedValue === '__custom__') {
+    if (customBox) customBox.style.display = 'flex';
+  } else {
+    if (customBox) customBox.style.display = 'none';
+    saveAnimalModelSelection(animalId, slot, selectedValue);
+  }
+}
+
+function applyCustomModel(animalId, slot) {
+  const inp = document.getElementById(`customInput_${slot}`);
+  const val = inp ? inp.value.trim() : '';
+  if (!val) return alert('Введите идентификатор или URL модели!');
+  saveAnimalModelSelection(animalId, slot, val);
+}
+
+async function applyAllLocalFirstDefaults() {
+  try {
+    showToast('Включение режима Local-First (Сначала локальный агент)...', 'info');
+    const res = await apiPost('/api/config/apply_local_first', {});
+    if (res && res.status === 'ok') {
+      showToast(`✓ Режим Local-First активирован! Локальный узел назначен для ${res.updated || 9} мастеров.`, 'success');
+      await loadModelsConfig();
+    } else {
+      showToast(`Ошибка: ${(res && res.message) || 'Не удалось применить'}`, 'error');
+    }
+  } catch (err) {
+    showToast(`Ошибка: ${err.message}`, 'error');
+  }
 }
 
 async function saveAnimalModelSelection(animalId, slot, modelName) {
@@ -4599,20 +4734,39 @@ function renderProviderKeysContent() {
     const pData = providers[p.key] || {};
     const hasKey = pData.has_key;
     return `
-      <div style="background:#09090B;border:1px solid #27272A;border-radius:6px;padding:8px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
+      <div style="background:#09090B;border:1px solid #27272A;border-radius:6px;padding:10px 12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
         <div style="min-width:180px;">
-          <div style="font-weight:700;font-size:11.5px;color:#FFF;">${p.label}</div>
-          <div style="font-size:10px;color:${hasKey ? '#4ADE80' : '#EF4444'};">${hasKey ? '● Ключ активен' : '○ Не настроен'}</div>
+          <div style="font-weight:700;font-size:12px;color:#FFF;">${p.label}</div>
+          <div style="font-size:10.5px;color:${hasKey ? '#4ADE80' : '#EF4444'};font-family:var(--mono);">
+            ${hasKey ? '● Ключ активен (Резерв)' : '○ Не настроен'}
+          </div>
         </div>
-        <div style="display:flex;gap:6px;flex:1;min-width:240px;">
-          <input type="password" id="providerKey_${p.key}" placeholder="Введите API ключ или хост..." style="flex:1;background:#18181D;border:1px solid #3F3F46;color:#FFF;padding:4px 8px;border-radius:4px;font-size:11px;">
+        <div style="display:flex;gap:6px;flex:1;min-width:260px;">
+          <input type="password" id="providerKey_${p.key}" placeholder="Введите API ключ или хост..." style="flex:1;background:#18181D;border:1px solid #3F3F46;color:#FFF;padding:5px 8px;border-radius:4px;font-size:11px;">
           <button type="button" class="btn btn--xs" onclick="saveProviderKeyClick('${p.key}')" style="background:#4F46E5;color:#FFF;border:none;border-radius:4px;padding:4px 10px;cursor:pointer;font-weight:bold;font-size:11px;">
             Сохранить
+          </button>
+          <button type="button" class="btn btn--xs" onclick="testProviderKeyClick('${p.key}')" style="background:#27272A;color:#E4E4E7;border:1px solid #52525B;border-radius:4px;padding:4px 8px;cursor:pointer;font-size:11px;" title="Проверить сетевой доступ">
+            🔌 Тест
           </button>
         </div>
       </div>
     `;
   }).join('');
+}
+
+async function testProviderKeyClick(provider) {
+  try {
+    showToast(`Проверка связи с ${provider}...`, 'info');
+    const res = await apiPost('/api/config/test_provider', { provider: provider });
+    if (res && res.connected) {
+      showToast(`✓ ${provider}: ${res.details || 'Связь установлена'}`, 'success');
+    } else {
+      showToast(`⚠️ ${provider}: ${(res && res.details) || 'Нет ответа или ключ не задан'}`, 'warning');
+    }
+  } catch (err) {
+    showToast(`Ошибка проверки ${provider}: ${err.message}`, 'error');
+  }
 }
 
 async function saveProviderKeyClick(provider) {

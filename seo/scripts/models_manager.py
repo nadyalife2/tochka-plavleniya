@@ -28,23 +28,54 @@ ANIMAL_ALIASES: Dict[str, str] = {
 REVERSE_ALIASES: Dict[str, str] = {v: k for k, v in ANIMAL_ALIASES.items()}
 
 CURATED_MODELS: List[Dict[str, str]] = [
-    {"id": "triad:node1_brain", "name": "Triad Node-1: Qwen3.5-9B-UD-Q3_K_XL (LPDDR5)", "provider": "Triad-Omni Local", "type": "Локальная / 0₽"},
-    {"id": "triad:node2_reflex", "name": "Triad Node-2: LFM2.5-8B + BGE-M3 (LPDDR4X)", "provider": "Triad-Omni Local", "type": "Локальная / 0₽"},
-    {"id": "triad:node3_gateway", "name": "Triad Node-3: Regex Fast-Path (0.02ms)", "provider": "Triad-Omni Local", "type": "Локальная / 0₽"},
-    {"id": "deepseek/deepseek-chat", "name": "DeepSeek-V3 (671B MoE)", "provider": "DeepSeek API", "type": "Облако / Эконом"},
-    {"id": "deepseek/deepseek-reasoner", "name": "DeepSeek-R1 (Рассуждения / CoT)", "provider": "DeepSeek API", "type": "Облако / Рассуждения"},
-    {"id": "anthropic/claude-3.5-sonnet", "name": "Claude 3.5 Sonnet (Литературный & Код)", "provider": "Anthropic API", "type": "Облако / Премиум"},
-    {"id": "anthropic/claude-3.7-sonnet", "name": "Claude 3.7 Sonnet (Гибридный CoT)", "provider": "Anthropic API", "type": "Облако / Премиум"},
-    {"id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash (Ультрабыстрый)", "provider": "Google Gemini", "type": "Облако / Скорость"},
-    {"id": "google/gemini-1.5-pro", "name": "Gemini 1.5 Pro (2M контекст)", "provider": "Google Gemini", "type": "Облако / Длинный контекст"},
-    {"id": "qwen/qwen-2.5-72b-instruct", "name": "Qwen 2.5 72B Instruct", "provider": "OpenRouter", "type": "Облако / Универсал"},
-    {"id": "qwen/qwen-2.5-32b-instruct", "name": "Qwen 2.5 32B Instruct", "provider": "OpenRouter", "type": "Облако / Баланс"},
-    {"id": "qwen/qwen-2.5-14b-instruct", "name": "Qwen 2.5 14B Instruct", "provider": "OpenRouter", "type": "Облако / Быстрый"},
-    {"id": "meta-llama/llama-3.3-70b-instruct", "name": "Llama 3.3 70B Instruct", "provider": "OpenRouter", "type": "Облако / Открытый вес"},
-    {"id": "openai/gpt-4o-mini", "name": "GPT-4o Mini", "provider": "OpenRouter", "type": "Облако / Эконом"},
-    {"id": "local_ollama:qwen2.5:7b", "name": "Локальный Ollama (Qwen 2.5 7B на ПК)", "provider": "Ollama Local", "type": "Локальный ПК"},
-    {"id": "local_ollama:mistral:7b", "name": "Локальный Ollama (Mistral 7B на ПК)", "provider": "Ollama Local", "type": "Локальный ПК"},
+    # 1. Локальные узлы и агенты (0₽, Офлайн, Приоритет №1)
+    {"id": "triad:node1_brain", "name": "Triad Node-1: Mi 10T 5G (Qwen3.5-9B UD-Q3_K_XL, LPDDR5)", "provider": "Triad-Omni Local", "type": "Локальная / 0₽", "category": "local"},
+    {"id": "triad:node2_reflex", "name": "Triad Node-2: Nord N10 (LFM2.5-8B + BGE-M3)", "provider": "Triad-Omni Local", "type": "Локальная / 0₽", "category": "local"},
+    {"id": "triad:node3_gateway", "name": "Triad Node-3: Fast-Path Regex & Валидатор (0.02ms)", "provider": "Triad-Omni Local", "type": "Локальная / 0₽", "category": "local"},
+    {"id": "local_vector_svg", "name": "Нативный SVG-генератор термопрофилей", "provider": "Local Algorithm", "type": "Локальная / 0₽", "category": "local"},
+    {"id": "local_slop_monster", "name": "SlopMonster: Анализатор штампов & Anti-Slop", "provider": "Local Algorithm", "type": "Локальная / 0₽", "category": "local"},
+    {"id": "local_ast_scorer", "name": "AST Scorer: 100-балльная метрология", "provider": "Local Algorithm", "type": "Локальная / 0₽", "category": "local"},
+    {"id": "local_ollama:qwen2.5:7b", "name": "Локальный Ollama на ПК (Qwen 2.5 7B)", "provider": "Ollama Local", "type": "Локальный ПК", "category": "local"},
+
+    # 2. Шлюз OmniRoute (Федеративный :20128, Без VPN)
+    {"id": "omniroute:auto/thinking", "name": "OmniRoute: Авто-выбор CoT Reasoning", "provider": "OmniRoute Hub", "type": "Каскад / Без VPN", "category": "omniroute"},
+    {"id": "omniroute:deepseek-r1", "name": "OmniRoute: DeepSeek-R1 (Рассуждения)", "provider": "OmniRoute Hub", "type": "Каскад / Без VPN", "category": "omniroute"},
+    {"id": "omniroute:deepseek-chat", "name": "OmniRoute: DeepSeek-V3 (671B MoE)", "provider": "OmniRoute Hub", "type": "Каскад / Без VPN", "category": "omniroute"},
+    {"id": "omniroute:claude-sonnet-4-6", "name": "OmniRoute: Claude Sonnet 4.6", "provider": "OmniRoute Hub", "type": "Каскад / Без VPN", "category": "omniroute"},
+    {"id": "omniroute:gemini-2-5-flash", "name": "OmniRoute: Gemini 2.5 Flash", "provider": "OmniRoute Hub", "type": "Каскад / Без VPN", "category": "omniroute"},
+    {"id": "omniroute:kimi-k3-pro", "name": "OmniRoute: Kimi K3.1 Pro", "provider": "OmniRoute Hub", "type": "Каскад / Без VPN", "category": "omniroute"},
+
+    # 3. Облачные внешние провайдеры (По личному API-ключу / Резерв)
+    {"id": "deepseek/deepseek-chat", "name": "DeepSeek-V3 (Direct API)", "provider": "DeepSeek API", "type": "Облако / Эконом", "category": "cloud"},
+    {"id": "deepseek/deepseek-reasoner", "name": "DeepSeek-R1 (Direct API)", "provider": "DeepSeek API", "type": "Облако / CoT", "category": "cloud"},
+    {"id": "anthropic/claude-3.5-sonnet", "name": "Claude 3.5 Sonnet (Direct API)", "provider": "Anthropic API", "type": "Облако / Премиум", "category": "cloud"},
+    {"id": "anthropic/claude-3.7-sonnet", "name": "Claude 3.7 Sonnet (Direct API)", "provider": "Anthropic API", "type": "Облако / Премиум", "category": "cloud"},
+    {"id": "google/gemini-2.5-flash", "name": "Gemini 2.5 Flash (Direct API)", "provider": "Google Gemini", "type": "Облако / Скорость", "category": "cloud"},
+    {"id": "google/gemini-1.5-pro", "name": "Gemini 1.5 Pro (Direct API)", "provider": "Google Gemini", "type": "Облако / Длинный контекст", "category": "cloud"},
+    {"id": "qwen/qwen-2.5-72b-instruct", "name": "Qwen 2.5 72B Instruct (OpenRouter)", "provider": "OpenRouter", "type": "Облако / Универсал", "category": "cloud"},
+    {"id": "openai/gpt-4o-mini", "name": "GPT-4o Mini (OpenRouter)", "provider": "OpenRouter", "type": "Облако / Эконом", "category": "cloud"}
 ]
+
+LOCAL_RECOMMENDED_MAP: Dict[str, str] = {
+    "clara": "triad:node2_reflex",     # LFM2.5-8B + BGE-M3 (LSI & ГОСТ-радар)
+    "soroka": "triad:node2_reflex",
+    "boris": "triad:node1_brain",      # Mi 10T Qwen3.5-9B (ТЗ и ГОСТ допуски)
+    "bobr": "triad:node1_brain",
+    "felix": "triad:node1_brain",      # Mi 10T Qwen3.5-9B (Черновик и физика пайки)
+    "kot": "triad:node1_brain",
+    "reynard": "triad:node3_gateway",   # Regex Fast-Path (Сметы и окупаемость)
+    "lis": "triad:node3_gateway",
+    "bruno": "local_vector_svg",        # Нативный SVG генератор
+    "barsuk": "local_vector_svg",
+    "archimedes": "local_slop_monster", # SlopMonster
+    "filin": "local_slop_monster",
+    "woody": "local_ast_scorer",        # AST Scorer
+    "dyatel": "local_ast_scorer",
+    "rocky": "triad:node2_reflex",      # Graphify & LoRA Dataset
+    "raccoon": "triad:node2_reflex",
+    "mikhalych": "triad:node1_brain",   # Координатор артели
+    "bear": "triad:node1_brain",
+}
 
 
 def load_yaml_raw(filepath: Path) -> Dict[str, Any]:
@@ -111,6 +142,22 @@ def get_models_config() -> Dict[str, Any]:
         "animals": normalized_animals,
         "all_available_models": CURATED_MODELS
     }
+
+
+def apply_local_first_defaults() -> Dict[str, Any]:
+    """Устанавливает во все слоты primary локальные узлы и агенты, которые справляются с задачей."""
+    raw = load_yaml_raw(MODELS_YAML)
+    animals = raw.get("animals", {})
+    count = 0
+    for animal_id, data in animals.items():
+        if isinstance(data, dict):
+            recommended = LOCAL_RECOMMENDED_MAP.get(animal_id)
+            if recommended:
+                data["primary"] = recommended
+                data["current_selection"] = "primary"
+                count += 1
+    save_yaml_raw(MODELS_YAML, raw)
+    return {"status": "ok", "message": f"Применён режим Local-First для {count} мастеров", "updated": count}
 
 
 def update_models_config(new_config: Dict[str, Any]) -> bool:

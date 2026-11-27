@@ -2704,6 +2704,15 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": str(e)}, 500)
             return
 
+        if path == "/api/config/apply_local_first":
+            try:
+                import models_manager
+                res = models_manager.apply_local_first_defaults()
+                self.send_json(res)
+            except Exception as e:
+                self.send_json({"status": "error", "message": str(e)}, 500)
+            return
+
         if path == "/api/config/provider_key":
             provider = payload.get("provider")
             api_key = payload.get("api_key", "")

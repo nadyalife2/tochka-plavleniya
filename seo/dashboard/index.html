@@ -1114,13 +1114,30 @@
 
     <!-- Вкладки назначения моделей для этапов производства -->
     <div class="saas-panel-card" style="padding:18px 20px;margin-bottom:18px;">
-      <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;color:var(--ink);">Назначение приоритетных моделей по этапам (1 Primary + 4 Alternates)</h3>
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:12px;">
+        <div>
+          <h3 style="margin:0;font-size:14px;font-weight:700;color:var(--ink);">Назначение приоритетных моделей по этапам (Local-First + OmniRoute)</h3>
+          <div style="font-size:11.5px;color:var(--muted);margin-top:2px;">Сначала задачу решает локальный агент (0₽). При перегрузке срабатывает каскадный резерв OmniRoute или внешний ключ.</div>
+        </div>
+        <button type="button" class="btn btn--xs" onclick="applyAllLocalFirstDefaults()" style="background:#059669;color:#FFF;border:none;border-radius:6px;padding:6px 14px;cursor:pointer;font-weight:700;display:inline-flex;align-items:center;gap:6px;">
+          ⚡ Включить везде локальные агенты (Local-First 0₽)
+        </button>
+      </div>
       <div id="modelsAnimalTabsContainer" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
       <div id="modelsAnimalConfigContent"></div>
     </div>
 
     <!-- Панель настройки API-ключей -->
     <div class="saas-panel-card" style="padding:18px 20px;">
+      <div style="background:#1E293B;border:1px solid #334155;border-radius:8px;padding:12px 14px;margin-bottom:14px;display:flex;align-items:flex-start;gap:10px;">
+        <span style="font-size:20px;">🛡️</span>
+        <div>
+          <strong style="font-size:12.5px;color:#38BDF8;">Каскадный режим: Локальный узел в приоритете (0₽ расход)</strong>
+          <div style="font-size:11.5px;color:#94A3B8;margin-top:2px;">
+            Если локальный узел (Mi 10T / Triad) активен, внешние ключи не расходуются и используются исключительно как страховочный резерв (Fallback). Вы экономите 100% затрат на токены.
+          </div>
+        </div>
+      </div>
       <h3 style="margin:0 0 10px;font-size:14px;font-weight:700;color:var(--ink);">Настройка ключей внешних провайдеров (Fallback Providers)</h3>
       <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">Ключи сохраняются локально в зашифрованном конфиге и используются только при недоступности локального кластера.</div>
       <div id="modelsProviderKeysContainer" style="display:flex;flex-direction:column;gap:8px;"></div>
