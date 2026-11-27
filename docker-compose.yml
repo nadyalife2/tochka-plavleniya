@@ -2,28 +2,28 @@ name: tochka-plavleniya
 
 services:
   wordpress-db:
-    image: mysql:8.0
+    image: mysql:8.0.36
     container_name: wordpress-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: wordpress
-      MYSQL_PASSWORD: wordpresspassword
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-dev_root_secure_pass_9182}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-wordpress}
+      MYSQL_USER: ${MYSQL_USER:-wp_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-dev_wp_secure_pass_3847}
     volumes:
       - db_data:/var/lib/mysql
 
   wordpress:
-    image: wordpress:latest
+    image: wordpress:6.5-php8.2-apache
     container_name: wordpress-app
     restart: always
     ports:
-      - "8040:80"
+      - "${WORDPRESS_PORT:-8040}:80"
     environment:
       WORDPRESS_DB_HOST: wordpress-db
-      WORDPRESS_DB_USER: wordpress
-      WORDPRESS_DB_PASSWORD: wordpresspassword
-      WORDPRESS_DB_NAME: wordpress
+      WORDPRESS_DB_USER: ${MYSQL_USER:-wp_user}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD:-dev_wp_secure_pass_3847}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE:-wordpress}
     volumes:
       - ./wp-content:/var/www/html/wp-content
       - ./php.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
@@ -32,4 +32,3 @@ services:
 
 volumes:
   db_data:
-  wordpress_data:

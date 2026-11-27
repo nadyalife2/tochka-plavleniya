@@ -16,6 +16,12 @@ if ($uri === '/llms.txt' || $uri === '/llms-full.txt' || $uri === '/robots.txt')
     }
 }
 
+// 0.1 Редиректы канонических URL (301 Moved Permanently)
+if (rtrim($uri, '/') === '/bga-rebolling') {
+    header('Location: /bga-reballing/', true, 301);
+    exit;
+}
+
 // 1. Если запрашивается реальный статический файл (css, js, svg, png, jpg, webp, woff2 и т.д.)
 $file = __DIR__ . $uri;
 if ($uri !== '/' && file_exists($file) && !is_dir($file)) {

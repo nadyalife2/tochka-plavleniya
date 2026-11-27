@@ -1306,6 +1306,62 @@ html.dark .badge-norm {
   }
 }
 
+/* ==========================================================================
+   Режим «У верстака» (Workbench Mode) — крупный шрифт, высокий контраст,
+   эргономика работы под паяльной лампой на расстоянии 50–70 см
+   ========================================================================== */
+body.workbench-mode-active {
+  --color-paper: #ffffff;
+  --color-ink: #000000;
+  --color-ink-muted: #1f2937;
+}
+
+html.dark body.workbench-mode-active {
+  --color-paper: #09090b;
+  --color-ink: #f9fafb;
+  --color-ink-muted: #e5e7eb;
+}
+
+body.workbench-mode-active .article-content {
+  font-size: 1.18rem !important;
+  line-height: 1.85 !important;
+}
+
+body.workbench-mode-active .article-content p,
+body.workbench-mode-active .article-content li {
+  font-size: 1.18rem !important;
+  line-height: 1.85 !important;
+  color: var(--color-ink) !important;
+}
+
+body.workbench-mode-active .article-content h2 {
+  font-size: 1.6rem !important;
+  border-bottom: 2.5px solid #f59e0b !important;
+  padding-bottom: 0.4rem;
+}
+
+body.workbench-mode-active .article-content table {
+  font-size: 1.05rem !important;
+}
+
+/* Мобильная адаптивность таблиц пайки */
+@media (max-width: 640px) {
+  .wp-block-table,
+  .article-content .wp-block-table,
+  figure.bom-table {
+    border-radius: 6px;
+    box-shadow: inset -8px 0 8px -6px rgba(0, 0, 0, 0.15);
+  }
+  .article-content table {
+    font-size: 0.82rem;
+  }
+  .article-content th,
+  .article-content td {
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+
 
 
 

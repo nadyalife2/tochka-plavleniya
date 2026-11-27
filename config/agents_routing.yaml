@@ -29,8 +29,8 @@ craftsmen:
   kot:
     name: "Кот-Паяльщик (Practico 1)"
     role: "02-writer (Физика пайки & ПОС-61)"
-    primary: "triad:node1_brain"
-    fallback_1: "triad:node2_reflex"
+    primary: "omniroute:claude-sonnet-4-6"
+    fallback_1: "triad:node1_brain"
     fallback_2: "omniroute:deepseek-chat"
     auto_failover: true
     status: "alive"

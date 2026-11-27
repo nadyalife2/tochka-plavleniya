@@ -997,6 +997,27 @@ def start_background_job(agent: str, cmd: list[str], target_id=None) -> int:
     return job_id
 
 
+def sweep_abandoned_jobs_on_startup() -> int:
+    """При старте сервера переводит все задачи, зависшие в 'running' после перезапуска процесса, в 'abandoned'."""
+    now_str = datetime.now().isoformat(timespec="seconds")
+    try:
+        with get_connection() as conn:
+            cur = conn.execute(
+                "UPDATE jobs SET status = 'abandoned', "
+                "log = COALESCE(log, '') || '\n[СЕРВЕР] Процесс был перезапущен; задача прервана.', "
+                "updated_at = ? WHERE status = 'running'",
+                (now_str,),
+            )
+            count = cur.rowcount or 0
+            conn.commit()
+            if count > 0:
+                print(f"[STARTUP] Очищено {count} зависших задач со статусом 'running' -> 'abandoned'")
+            return count
+    except Exception as ex:
+        print(f"[WARNING] Не удалось выполнить sweep_abandoned_jobs_on_startup: {ex}")
+        return 0
+
+
 def mark_stale_jobs() -> int:
     """Помечает задачи, зависшие дольше таймаута: статус не должен висеть «running» вечно."""
     cutoff = (datetime.now() - timedelta(seconds=JOB_TIMEOUT_SECONDS + 120)).isoformat(timespec="seconds")
@@ -1328,12 +1349,13 @@ class DashboardHandler(BaseHTTPRequestHandler):
         sys.stderr.write(f"[{datetime.now().strftime('%H:%M:%S')}] {args[0]} {args[1]}\n")
 
     def _allowed_origin(self) -> str:
-        """Безопасный CORS: разрешает только локальные хосты (127.0.0.1 / localhost), блокирует внешние сайты."""
+        """Безопасный CORS: разрешает только локальные хосты (127.0.0.1 / localhost) и боевой домен."""
         origin = self.headers.get("Origin", "")
         if origin and (
             origin.startswith("http://localhost:")
             or origin.startswith("http://127.0.0.1:")
-            or origin in ("http://localhost", "http://127.0.0.1")
+            or origin in ("http://localhost", "http://127.0.0.1", "https://tochka-plavleniya.ru")
+            or origin.startswith("https://tochka-plavleniya.ru")
         ):
             return origin
         return "http://127.0.0.1:8765"
@@ -1419,6 +1441,21 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json(build_knowledge_status())
             return
 
+        # Интерактивный граф знаний Graphify
+        if path in ("/graph", "/graphify", "/graph.html"):
+            g_html = ROOT / "graphify-out" / "graph.html"
+            if not g_html.exists():
+                g_html = DASHBOARD_DIR / "graph.html"
+            if g_html.exists():
+                content = g_html.read_bytes()
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Content-Length", str(len(content)))
+                self.send_header("Access-Control-Allow-Origin", self._allowed_origin())
+                self.end_headers()
+                self.wfile.write(content)
+                return
+
         if path == "/api/dataset/download":
             ds_path = ROOT / "scratch" / "lora_training_dataset.jsonl"
             if not ds_path.exists():
@@ -1429,7 +1466,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_header("Content-Type", "application/jsonl; charset=utf-8")
                 self.send_header("Content-Length", str(len(body)))
                 self.send_header("Content-Disposition", 'attachment; filename="lora_training_dataset.jsonl"')
-                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Access-Control-Allow-Origin", self._allowed_origin())
                 self.end_headers()
                 self.wfile.write(body)
                 return
@@ -1457,7 +1494,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Length", str(len(body)))
             if path != "/api/export.html":
                 self.send_header("Content-Disposition", f'attachment; filename="{filename}"')
-            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Origin", self._allowed_origin())
             self.end_headers()
             self.wfile.write(body)
             return
@@ -1473,7 +1510,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", "text/plain; charset=utf-8")
             self.send_header("Content-Length", str(len(body)))
-            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Origin", self._allowed_origin())
             self.end_headers()
             self.wfile.write(body)
             return
@@ -1979,7 +2016,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-Type", ctype)
             self.send_header("Content-Length", str(len(content)))
-            self.send_header("Access-Control-Allow-Origin", "*")
+            self.send_header("Access-Control-Allow-Origin", self._allowed_origin())
             self.end_headers()
             self.wfile.write(content)
             return
@@ -2555,10 +2592,12 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 return
 
             with get_connection() as conn:
+                conn.execute("BEGIN IMMEDIATE;")
                 cur = conn.cursor()
                 max_id = cur.execute("SELECT MAX(id) FROM topics").fetchone()[0] or 0
                 next_id = max_id + 1
-                slug = slugify(title) + f"-{next_id}"
+                base_slug = slugify(title)
+                slug = f"{base_slug}-{next_id}" if base_slug else f"topic-{next_id}"
                 priority_score = 85 if priority.lower() in ("высокий", "hot") else 60
                 now_str = datetime.now().isoformat(timespec="seconds")
 
@@ -3627,6 +3666,7 @@ def main():
     args = parser.parse_args()
 
     run_all_migrations()
+    sweep_abandoned_jobs_on_startup()
     server = ThreadingHTTPServer(("127.0.0.1", args.port), DashboardHandler)
     print("=" * 60)
     print(f"СЕРВЕР SEO-КОНВЕЙЕРА ЗАПУЩЕН:")

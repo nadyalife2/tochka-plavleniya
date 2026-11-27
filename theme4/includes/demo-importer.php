@@ -278,7 +278,7 @@ function tchp_run_demo_import() {
         'smd-0402-vs-0603'                 => 'praktika',
         'gid-po-flyusam'                   => 'materialy',
         'zhala-payalnika'                  => 'start',
-        'bga-rebolling'                    => 'praktika',
+        'bga-reballing'                    => 'praktika',
         'splav-roze'                       => 'materialy',
         'bezsvintsovaya-payka'             => 'materialy',
         'antistaticheskaya-zashchita'      => 'start',

@@ -28,6 +28,8 @@ def get_connection():
     conn = sqlite3.connect(str(DB_PATH), timeout=20.0)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA journal_mode=WAL;")
+    conn.execute("PRAGMA synchronous=NORMAL;")
+    conn.execute("PRAGMA busy_timeout=5000;")
     conn.execute("PRAGMA foreign_keys=ON;")
     try:
         yield conn
@@ -212,9 +214,27 @@ def init_db() -> None:
         """)
 
 
+def cleanup_old_backups(max_days: int = 14) -> int:
+    """Удаляет резервные копии старше указанного количества дней (защита диска от переполнения)."""
+    if not BACKUP_DIR.exists():
+        return 0
+    now = datetime.now()
+    deleted = 0
+    for p in BACKUP_DIR.glob("seo_*.db"):
+        try:
+            mtime = datetime.fromtimestamp(p.stat().st_mtime)
+            if (now - mtime).days > max_days:
+                p.unlink(missing_ok=True)
+                deleted += 1
+        except Exception:
+            pass
+    return deleted
+
+
 def backup_database() -> dict:
-    """Создаёт резервную копию базы данных в seo/data/_backup/."""
+    """Создаёт резервную копию базы данных в seo/data/_backup/ с авто-ротацией старых копий."""
     BACKUP_DIR.mkdir(parents=True, exist_ok=True)
+    cleanup_old_backups(14)
     stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     backup_file = BACKUP_DIR / f"seo_{stamp}.db"
 
@@ -334,20 +354,45 @@ def migrate_schema_v7() -> None:
 
 
 def run_all_migrations() -> None:
-    """Последовательно выполняет все миграции схемы БД (от v2 до v7)."""
+    """Последовательно выполняет все миграции схемы БД (от v2 до v7) с фиксацией версий."""
     init_db()
-    for mig in (
-        migrate_schema_v2,
-        migrate_schema_v3,
-        migrate_schema_v4,
-        migrate_schema_v5,
-        migrate_schema_v6,
-        migrate_schema_v7,
-    ):
+    with get_connection() as conn:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS schema_migrations (
+                version TEXT PRIMARY KEY,
+                applied_at TEXT NOT NULL
+            );
+            """
+        )
+        conn.commit()
+
+    migrations = [
+        ("v2", migrate_schema_v2),
+        ("v3", migrate_schema_v3),
+        ("v4", migrate_schema_v4),
+        ("v5", migrate_schema_v5),
+        ("v6", migrate_schema_v6),
+        ("v7", migrate_schema_v7),
+    ]
+
+    for ver, mig in migrations:
+        with get_connection() as conn:
+            row = conn.execute("SELECT version FROM schema_migrations WHERE version = ?", (ver,)).fetchone()
+        if row:
+            continue
         try:
             mig()
-        except Exception:
-            pass
+            with get_connection() as conn:
+                conn.execute(
+                    "INSERT OR REPLACE INTO schema_migrations (version, applied_at) VALUES (?, ?)",
+                    (ver, datetime.now().isoformat(timespec="seconds")),
+                )
+                conn.commit()
+        except Exception as err:
+            import sys
+            print(f"[ERROR] Migration {ver} ({mig.__name__}) failed: {err}", file=sys.stderr)
+            raise
 
 
 def _rows(conn, sql: str) -> list[dict]:

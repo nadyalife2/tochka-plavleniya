@@ -339,6 +339,17 @@ function switchTab(name) {
 
   if (targetView === 'overview') {
     renderTodayView();
+  } else if (targetView === 'kanban') {
+    renderKanban();
+  } else if (targetView === 'export') {
+    renderExportTab();
+  } else if (targetView === 'gaps') {
+    renderProposedTopics();
+  } else if (targetView === 'competitors') {
+    renderCompetitors();
+    updatePromptPreviewText();
+  } else if (targetView === 'backups') {
+    renderBackups();
   } else if (targetView === 'models') {
     if (typeof loadModelsConfig === 'function') loadModelsConfig();
     refreshClusterTelemetry();
@@ -355,8 +366,6 @@ function switchTab(name) {
   } else if (targetView === 'analysis') {
     renderAnalysisHistory();
     loadKeywordSuggestions();
-  } else if (targetView === 'competitors') {
-    updatePromptPreviewText();
   }
 }
 
@@ -2196,18 +2205,22 @@ function initKanbanDnD() {
     }
   });
 }
+let filterKanbanTimer = null;
 function filterKanban() {
-  renderKanban();
+  if (filterKanbanTimer) clearTimeout(filterKanbanTimer);
+  filterKanbanTimer = setTimeout(() => {
+    renderKanban();
+  }, 180);
 }
 
-// Render Proposed Topics
+// Render Proposed Topics (Batch DOM Update)
 function renderProposedTopics() {
   const tb = document.getElementById('proposedTopicsBody');
-  tb.innerHTML = '';
-  (DB_DATA.topics_proposed || []).forEach(t => {
+  if (!tb) return;
+  const rows = (DB_DATA.topics_proposed || []).map(t => {
     const isAccepted = t.status === 'принят';
     const isRejected = t.status === 'отклонён';
-    tb.innerHTML += `
+    return `
       <tr>
         <td style="font-family:var(--mono);font-weight:700;">${t.id}</td>
         <td><span class="prio-pill prio-pill--warm">P${t.priority_score}</span></td>
@@ -2229,14 +2242,14 @@ function renderProposedTopics() {
       </tr>
     `;
   });
+  tb.innerHTML = rows.join('');
 }
 
-// Render Competitors
+// Render Competitors (Batch DOM Update)
 function renderCompetitors() {
   const tb = document.getElementById('competitorsBody');
-  tb.innerHTML = '';
-  (DB_DATA.competitors || []).forEach(c => {
-    tb.innerHTML += `
+  if (tb) {
+    const rows = (DB_DATA.competitors || []).map(c => `
       <tr>
         <td><strong>${esc(c.domain)}</strong><br><a href="${c.blog_url || 'https://' + c.domain}" target="_blank" style="font-size:11px;color:var(--muted);">перейти ↗</a></td>
         <td><span class="prio-pill ${c.score >= 70 ? 'prio-pill--hot' : 'prio-pill--cold'}">${c.score || 50}/100</span></td>
@@ -2248,45 +2261,47 @@ function renderCompetitors() {
           <button class="btn btn--sm btn--primary" onclick="runAgent('bot-analyzer')">Анализ фишек</button>
         </td>
       </tr>
-    `;
-  });
+    `);
+    tb.innerHTML = rows.join('');
+  }
 
   const ptb = document.getElementById('proposedCompetitorsBody');
-  ptb.innerHTML = '';
-  (DB_DATA.competitors_proposed || []).forEach(c => {
-    const isAccepted = c.status === 'принят';
-    ptb.innerHTML += `
-      <tr>
-        <td><strong>${esc(c.domain)}</strong></td>
-        <td>${esc(c.niche || '—')}</td>
-        <td>${c.hits || 1} запросов</td>
-        <td>${c.articles_count || 0}</td>
-        <td><a href="${c.example_url || '#'}" target="_blank" style="font-size:11px;">${esc((c.example_url || '').slice(0,35))}</a></td>
-        <td><span style="font-weight:700;color:${isAccepted ? '#059669' : '#D97706'}">${c.status}</span></td>
-        <td>
-          ${!isAccepted ? `<button class="btn btn--sm btn--success" onclick="approveCompetitor('${c.domain}')">✓ Добавить</button>` : '—'}
-        </td>
-      </tr>
-    `;
-  });
+  if (ptb) {
+    const pRows = (DB_DATA.competitors_proposed || []).map(c => {
+      const isAccepted = c.status === 'принят';
+      return `
+        <tr>
+          <td><strong>${esc(c.domain)}</strong></td>
+          <td>${esc(c.niche || '—')}</td>
+          <td>${c.hits || 1} запросов</td>
+          <td>${c.articles_count || 0}</td>
+          <td><a href="${c.example_url || '#'}" target="_blank" style="font-size:11px;">${esc((c.example_url || '').slice(0,35))}</a></td>
+          <td><span style="font-weight:700;color:${isAccepted ? '#059669' : '#D97706'}">${c.status}</span></td>
+          <td>
+            ${!isAccepted ? `<button class="btn btn--sm btn--success" onclick="approveCompetitor('${c.domain}')">✓ Добавить</button>` : '—'}
+          </td>
+        </tr>
+      `;
+    });
+    ptb.innerHTML = pRows.join('');
+  }
 }
 
-// Render Backups
+// Render Backups (Batch DOM Update)
 function renderBackups() {
   const tb = document.getElementById('backupsBody');
-  tb.innerHTML = '';
-  (DB_DATA.backups || []).forEach((b, idx) => {
-    tb.innerHTML += `
-      <tr>
-        <td style="font-family:var(--mono);">${idx + 1}</td>
-        <td><strong>${esc(b.filename)}</strong></td>
-        <td style="font-family:var(--mono);">${Math.round(b.size_bytes / 1024)} КБ</td>
-        <td>${b.records_count} тем</td>
-        <td style="font-size:12px;color:var(--muted);">${b.created_at}</td>
-        <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${esc(b.filepath)}</td>
-      </tr>
-    `;
-  });
+  if (!tb) return;
+  const rows = (DB_DATA.backups || []).map((b, idx) => `
+    <tr>
+      <td style="font-family:var(--mono);">${idx + 1}</td>
+      <td><strong>${esc(b.filename)}</strong></td>
+      <td style="font-family:var(--mono);">${Math.round(b.size_bytes / 1024)} КБ</td>
+      <td>${b.records_count} тем</td>
+      <td style="font-size:12px;color:var(--muted);">${b.created_at}</td>
+      <td style="font-family:var(--mono);font-size:11px;color:var(--muted);">${esc(b.filepath)}</td>
+    </tr>
+  `);
+  tb.innerHTML = rows.join('');
 }
 
 // ===== KEYBOARD NAVIGATION HANDLERS =====
@@ -2337,28 +2352,18 @@ function handleTaskCardKeydown(event, topicId) {
   }
 }
 
-// Global keyboard shortcuts
+// Global keyboard shortcuts (Initialized once, prevents listener accumulation)
+let _globalShortcutsInitialized = false;
 function initGlobalKeyboardShortcuts() {
+  if (_globalShortcutsInitialized) return;
+  _globalShortcutsInitialized = true;
   document.addEventListener('keydown', e => {
-    // Cmd/Ctrl + K = Command Palette (future)
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-      e.preventDefault();
-      showToast('⌘K Command Palette — в разработке');
-    }
     // Cmd/Ctrl + Enter = Save in text editor
     if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
       const activeTab = document.querySelector('.tab-view[style*="block"]')?.id;
       if (activeTab === 'view-text' || activeTab === 'modalPanelText') {
         e.preventDefault();
         saveEditedArticleText();
-      }
-    }
-    // Escape = Close modal
-    if (e.key === 'Escape') {
-      if (document.getElementById('inspectorModal').classList.contains('active')) {
-        closeInspector();
-      } else if (document.getElementById('mPasteBox')?.style.display !== 'none') {
-        togglePasteBox();
       }
     }
     // Alt + 1..7 = Switch tabs
@@ -2368,6 +2373,8 @@ function initGlobalKeyboardShortcuts() {
       const idx = parseInt(e.key, 10) - 1;
       if (tabs[idx]) switchTab(tabs[idx]);
     }
+  });
+}
   });
 }
 
@@ -2901,14 +2908,29 @@ function renderAll() {
   if (elUrls) elUrls.innerText = (DB_DATA.raw_articles || []).length;
 
   renderDecisionBanner();
-  renderExportTab();
-  renderKanban();
-  renderProposedTopics();
-  renderCompetitors();
-  renderBackups();
-  renderAnalysisHistory();
   refreshMutagenBalance();
   initGlobalKeyboardShortcuts();
+
+  // Lazy render: render the view that is currently visible to prevent off-screen DOM thrashing
+  const activeTabEl = document.querySelector('.tab-view.active');
+  const activeViewId = activeTabEl ? activeTabEl.id : 'view-overview';
+
+  if (activeViewId === 'view-kanban') {
+    renderKanban();
+  } else if (activeViewId === 'view-export') {
+    renderExportTab();
+  } else if (activeViewId === 'view-gaps') {
+    renderProposedTopics();
+  } else if (activeViewId === 'view-competitors') {
+    renderCompetitors();
+  } else if (activeViewId === 'view-backups') {
+    renderBackups();
+  } else if (activeViewId === 'view-analysis') {
+    renderAnalysisHistory();
+  } else {
+    if (typeof renderTodayView === 'function') renderTodayView();
+    renderKanban();
+  }
 }
 
 // ==========================================
@@ -3680,12 +3702,15 @@ function loadWorkstationTopicData(topicId) {
       <div style="background:rgba(15,23,42,0.8);border:1px solid #10B981;border-radius:8px;padding:12px;margin-bottom:10px;">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
           <span style="font-weight:bold;color:#10B981;font-size:13px;">🕸️ GRAPHIFY & БАЗА ЗНАНИЙ АРТЕЛИ</span>
-          <span id="raccoonGraphStatusBadge" style="background:#064E3B;color:#6EE7B7;padding:2px 8px;border-radius:4px;font-size:11px;">Связи: 153+ узлов</span>
+          <span id="raccoonGraphStatusBadge" style="background:#064E3B;color:#6EE7B7;padding:2px 8px;border-radius:4px;font-size:11px;">Связи: 2 776 узлов · 4 133 ребра</span>
         </div>
         <div style="font-size:12px;color:#CBD5E1;line-height:1.5;margin-bottom:10px;" id="raccoonKnowledgeDetails">
           Загрузка статуса базы знаний и графа...
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="/graph.html" target="_blank" class="btn btn-sm" style="background:#0284C7;color:#FFFFFF;text-decoration:none;border-radius:6px;padding:6px 12px;font-size:11px;display:inline-flex;align-items:center;gap:4px;font-weight:bold;">
+            🌐 Открыть граф (2 776 узлов)
+          </a>
           <button type="button" class="btn btn-sm" style="background:#047857;color:#FFFFFF;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:bold;font-size:11px;" onclick="triggerGraphifyUpdate()">
             🕸️ Обновить граф Graphify
           </button>
@@ -4141,12 +4166,15 @@ function renderCraftsmanWorkbench(agentId) {
           <div style="font-weight:800;color:#10B981;font-size:13px;display:flex;align-items:center;gap:6px;">
             🦝 GRAPHIFY & ПОДГОТОВКА ОБУЧАЮЩЕГО ДАТАСЕТА LORA
           </div>
-          <span id="raccoonGraphStatusBadge" style="background:#064E3B;color:#6EE7B7;padding:2px 8px;border-radius:4px;font-size:11px;">Связи: 14 039 узлов</span>
+          <span id="raccoonGraphStatusBadge" style="background:#064E3B;color:#6EE7B7;padding:2px 8px;border-radius:4px;font-size:11px;">Связи: 2 776 узлов · 4 133 ребра</span>
         </div>
         <div style="font-size:12px;color:#CBD5E1;line-height:1.6;margin-bottom:12px;" id="raccoonKnowledgeDetails">
           Загрузка статуса базы знаний и графа связей...
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <a href="/graph.html" target="_blank" class="btn btn--sm" style="background:#0284C7;color:#FFFFFF;text-decoration:none;border-radius:6px;padding:7px 14px;font-size:11.5px;display:inline-flex;align-items:center;gap:4px;font-weight:bold;">
+            🌐 Открыть граф (2 776 узлов)
+          </a>
           <button type="button" class="btn btn--sm" style="background:#047857;color:#FFFFFF;border:none;border-radius:6px;padding:7px 14px;cursor:pointer;font-weight:bold;font-size:11.5px;" onclick="triggerGraphifyUpdate()">
             🕸️ Обновить граф Graphify
           </button>
@@ -5579,7 +5607,7 @@ function saveDrawerBrief() {
   }
 }
 
-function saveDrawerArticleText() {
+async function saveDrawerArticleText() {
   const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
   const text = (document.getElementById('drawerArticleText') || {}).value || '';
   if (t) {
@@ -5587,6 +5615,14 @@ function saveDrawerArticleText() {
     t.chars = text.length;
     showToast(`Черновик статьи #${t.id} сохранён (${t.chars} зн.)`);
     renderTodayView();
+    try {
+      const res = await apiPost('/api/topics/update-text', { id: t.id, content_markdown: text });
+      if (res && res.status === 'ok') {
+        showToast(`Черновик статьи #${t.id} сохранён в БД (${t.chars} зн.)`, 'success');
+      }
+    } catch (e) {
+      console.warn('Failed to persist article text to server', e);
+    }
   }
 }
 
@@ -5645,7 +5681,7 @@ function acceptFragmentAsIs() {
   showToast('Замечание закрыто решением шеф-редактора.');
 }
 
-function approveCurrentArticleInDrawer() {
+async function approveCurrentArticleInDrawer() {
   const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
   if (t) {
     t.status = 'ready';
@@ -5653,17 +5689,35 @@ function approveCurrentArticleInDrawer() {
     showToast(`Статья #${t.id} утверждена и готова к выгрузке!`);
     switchDrawerTab('publish');
     renderTodayView();
+    try {
+      await apiPost('/api/articles/status', { id: t.id, status: 'ready' });
+    } catch (e) {
+      console.warn('Failed to update article status', e);
+    }
   }
 }
 
-function publishCurrentArticleFromDrawer() {
+async function publishCurrentArticleFromDrawer() {
   const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
   if (t) {
-    t.status = 'published';
-    showToast(`Статья #${t.id} успешно выгружена на сайт tochka-plavleniya.ru!`);
-    closeArticleDrawer();
-    switchTab('publish');
-    renderTodayView();
+    showToast(`Запуск агента доставки статьи #${t.id}...`, 'info');
+    try {
+      const res = await apiPost('/api/agent/run', { agent: 'delivery', target_id: t.id });
+      if (res && res.status === 'succeeded') {
+        t.status = 'published';
+        showToast(`Статья #${t.id} успешно выгружена на сайт tochka-plavleniya.ru!`, 'success');
+        closeArticleDrawer();
+        switchTab('publish');
+        renderTodayView();
+      } else {
+        const msg = (res && res.message) ? res.message : 'Доставка завершилась с предупреждением';
+        showToast(`Доставка #${t.id}: ${msg}`, 'warning');
+        t.status = 'ready';
+        renderTodayView();
+      }
+    } catch (e) {
+      showToast(`Ошибка доставки #${t.id}: ${e.message}`, 'error');
+    }
   }
 }
 
@@ -5757,5 +5811,11 @@ document.addEventListener('keydown', (e) => {
     closeArticleDrawer();
     closeCommandPalette();
     closeClusterDiagnostics();
+    if (typeof closeInspector === 'function') closeInspector();
+    if (typeof closeWorkstationModal === 'function') closeWorkstationModal();
+    if (typeof closeRoutingModal === 'function') closeRoutingModal();
+    if (typeof closeModelsConfigModal === 'function') closeModelsConfigModal();
+    if (typeof closeHumanizerModal === 'function') closeHumanizerModal();
+    if (typeof closeCompetitorRadarModal === 'function') closeCompetitorRadarModal();
   }
 });

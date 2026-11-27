@@ -1,0 +1,71 @@
+{
+  "name": "TCHP Atomic WP Article Publisher",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "tchp-publish-article",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "trigger-webhook",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Чистая Code-нода: валидация, отсечение мусора и сборка атомарного REST-пакета WP\nconst item = $input.first().json;\n\n// 1. Быстрый сброс тяжелых/бинарных полей из входного потока\nconst { raw_html, raw_markdown_debug, trace_logs, ...cleanPayload } = item;\n\n// 2. Валидация обязательного контракта статьи\nif (!cleanPayload.title || !cleanPayload.content || !cleanPayload.solder_alloy) {\n  throw new Error('Contract Violation: title, content or solder_alloy is missing');\n}\n\n// 3. Формирование атомарного полезного груза для WordPress REST API\n// WP принимает пост, мета-поля и таксономию в ОДНОМ HTTP-запросе\nconst wpPostPayload = {\n  title: cleanPayload.title,\n  content: cleanPayload.content,\n  status: cleanPayload.publish_now ? 'publish' : 'draft',\n  slug: cleanPayload.slug || '',\n  meta: {\n    tchp_solder_alloy: cleanPayload.solder_alloy,\n    tchp_temperature: cleanPayload.temperature || '',\n    tchp_difficulty: cleanPayload.difficulty || 'Мастер',\n    tchp_time_required: cleanPayload.time_required || '15 мин',\n    tchp_flux_recommended: cleanPayload.flux_recommended || '',\n    tchp_tip_geometry: cleanPayload.tip_geometry || '',\n    tchp_faq_items: cleanPayload.faq_items || [],\n    tchp_sources: cleanPayload.sources || []\n  }\n};\n\nreturn [{ json: wpPostPayload }];"
+      },
+      "id": "code-orchestrator",
+      "name": "Orchestrator & Validator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.WP_BASE_URL }}/wp-json/wp/v2/posts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "http-wp-atomic",
+      "name": "Atomic WP Post Delivery",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [680, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Orchestrator & Validator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orchestrator & Validator": {
+      "main": [
+        [
+          {
+            "node": "Atomic WP Post Delivery",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  }
+}

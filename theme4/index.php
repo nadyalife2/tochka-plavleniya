@@ -92,7 +92,7 @@ $f_tag_pill = get_semantic_tag_pill($featured_article['tag_key'] ?? 'tools');
 $index_faq = [
     [
         'q' => 'Какую температуру выставить для припоя ПОС-61?',
-        'a' => 'Припой ПОС-61 плавится в интервале 183–190 °C (ГОСТ 21931-76). На паяльной станции выставляйте 260–290 °C. Это практический стартовый ориентир для мелкой пайки, а не норма ГОСТ: запас в 75–100 °C необходим, чтобы компенсировать отвод тепла в медные дорожки платы.'
+        'a' => 'Припой ПОС-61 плавится в интервале 183–190 °C (ГОСТ 21931-76). На паяльной станции выставляйте 260–290 °C как стартовый ориентир для мелкой пайки (SMD, тонкие провода). Полное технологическое окно жала для разных теплоёмкостей узлов составляет 240–320 °C (см. Калькулятор верстака). Запас в 75–100 °C необходим, чтобы компенсировать отвод тепла в медные дорожки платы.'
     ],
     [
         'q' => 'Нужен ли новичку дорогой паяльник вроде JBC?',
@@ -110,7 +110,8 @@ $index_faq = [
 
 ob_start();
 ?>
-  <?php if (!defined('RANK_MATH_VERSION')): ?><link rel="canonical" href="<?= $tchp_home ?>"><?php endif; ?>
+  <?php if (!defined('RANK_MATH_VERSION') && !function_exists('rank_math')): ?>
+  <link rel="canonical" href="<?= $tchp_home ?>">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -148,6 +149,7 @@ ob_start();
     ]
   }
   </script>
+  <?php endif; ?>
 <?php
 $extra_head = ob_get_clean();
 include __DIR__ . '/includes/header.php';
@@ -161,23 +163,47 @@ include __DIR__ . '/includes/header.php';
       <section id="top" class="scroll-mt-24 border-b border-paper-border pb-6 space-y-4">
         <div class="max-w-3xl space-y-3">
           
-          <!-- Single Subtle Workshop Stamp -->
-          <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink font-mono text-xs">
-            <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
-            <span class="font-bold tracking-wider uppercase">ОТК-2026</span>
-            <span class="text-ink-faint">/</span>
-            <span class="text-stamp text-ink-muted uppercase">ГОСТ Р & IPC-A-610</span>
+          <!-- Single Workshop Stamp & Trust Pill -->
+          <div class="flex items-center gap-2 flex-wrap">
+            <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded bg-paper-subtle border border-paper-border text-ink font-mono text-xs">
+              <span class="w-1.5 h-1.5 rounded-full bg-accent inline-block"></span>
+              <span class="font-bold tracking-wider uppercase">ОТК-2026</span>
+              <span class="text-ink-faint">/</span>
+              <span class="text-stamp text-ink-muted uppercase">ГОСТ Р & IPC-A-610G</span>
+            </div>
+            <span class="sketch-pill-yellow text-ink font-mono text-xs font-bold">100% ИНЖЕНЕРНЫЙ OPEN-SOURCE</span>
           </div>
 
-          <!-- Headline -->
-          <h1 class="text-3xl sm:text-5xl font-bold text-ink tracking-tight font-sans">
-            Инженерный справочник и регламенты пайки
+          <!-- Headline: Crisp 10-Second Value Proposition -->
+          <h1 class="text-3xl sm:text-5xl font-bold text-ink tracking-tight font-sans leading-tight">
+            Точная температура пайки за 10 секунд.<br class="hidden sm:inline">
+            <span class="underline decoration-accent decoration-2 underline-offset-4">Без перегрева меди и сожжённых чипов.</span>
           </h1>
 
-          <!-- Lead Paragraph: Calm, Editorial Typography -->
-          <p class="text-base sm:text-lg text-ink font-serif leading-[1.65]">
-            Практические температурные режимы для радиомонтажа, карты совместимости припоев и флюсов по ГОСТ и IPC.
+          <!-- Lead Paragraph: Clear Engineering Problem & Solution -->
+          <p class="text-base sm:text-lg text-ink-muted font-sans leading-relaxed max-w-2xl">
+            Открытые физические калькуляторы уставки паяльной станции, теплофизика 9 сплавов по ГОСТ и IPC, и пошаговые регламенты монтажа без рекламного шума.
           </p>
+
+          <!-- 4 Trust Signals -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-1 font-mono text-xs">
+            <div class="p-2.5 border border-paper-border rounded bg-card/70 shadow-2xs">
+              <div class="text-base sm:text-lg font-bold text-ink">0.1 мм</div>
+              <div class="text-[11px] text-ink-muted">допуски SMD/BGA</div>
+            </div>
+            <div class="p-2.5 border border-paper-border rounded bg-card/70 shadow-2xs">
+              <div class="text-base sm:text-lg font-bold text-ink">9 сплавов</div>
+              <div class="text-[11px] text-ink-muted">реестр ликвидуса</div>
+            </div>
+            <div class="p-2.5 border border-paper-border rounded bg-card/70 shadow-2xs">
+              <div class="text-base sm:text-lg font-bold text-ink">IPC-A-610</div>
+              <div class="text-[11px] text-ink-muted">критерии годности</div>
+            </div>
+            <div class="p-2.5 border border-paper-border rounded bg-card/70 shadow-2xs">
+              <div class="text-base sm:text-lg font-bold text-accent">0 ₽</div>
+              <div class="text-[11px] text-ink-muted">открытый верстак</div>
+            </div>
+          </div>
 
         </div>
       </section>
@@ -339,6 +365,10 @@ include __DIR__ . '/includes/header.php';
                 <span class="text-ink-faint text-xs">·</span>
                 <a href="<?= esc_url($site_root) ?>interactive.php#table" class="text-xs font-mono text-ink-muted hover:text-ink hover:underline transition-colors">
                   Реестр 9 сплавов ГОСТ
+                </a>
+                <span class="text-ink-faint text-xs">·</span>
+                <a id="exp-article-link" href="<?= esc_url($site_root) ?>single.php?slug=temperaturnye-profili" class="text-xs font-mono text-accent font-bold hover:underline transition-colors">
+                  Гид по термопрофилям ПОС-61 ↗
                 </a>
               </div>
             </div>
@@ -961,6 +991,12 @@ include __DIR__ . '/includes/header.php';
         const mKey = massEl.value || 'smd';
         const data = MATRIX[sKey]?.[mKey];
 
+        // Сохранение выбора мастера в браузере (LocalStorage Retention Loop)
+        try {
+          localStorage.setItem('tp_saved_solder', sKey);
+          localStorage.setItem('tp_saved_mass', mKey);
+        } catch (e) {}
+
         if (!data) {
           tempOutEl.textContent = '—';
           liqValEl.textContent = '—';
@@ -984,6 +1020,24 @@ include __DIR__ . '/includes/header.php';
           safetyEl.className = 'pill-blue text-[11px] font-bold px-2 py-0.5 rounded';
           safetyEl.textContent = 'СТАРТОВЫЙ ДИАПАЗОН // РАБОЧЕЕ ОКНО';
         }
+
+        // Обновление контекстной ссылки на статью о сплаве
+        const artEl = document.getElementById('exp-article-link');
+        const SOLDER_ARTICLES = {
+          pos61: { slug: 'temperaturnye-profili', title: 'Гид по термопрофилям ПОС-61 ↗' },
+          sn63pb37: { slug: 'sac305-vs-sn63pb37', title: 'Сравнение Sn63Pb37 и SAC305 ↗' },
+          sac305: { slug: 'sac305-vs-sn63pb37', title: 'Статья о пайке SAC305 (RoHS) ↗' },
+          pos40: { slug: 'temperaturnye-profili', title: 'Температурные режимы ПОС-40 ↗' },
+          sn42bi58: { slug: 'temperaturnye-profili', title: 'Низкотемпературная пайка Sn42Bi58 ↗' },
+          roze: { slug: 'splav-roze', title: 'Статья: Сплав Розе и демонтаж ↗' },
+          rose: { slug: 'splav-roze', title: 'Статья: Сплав Розе и демонтаж ↗' }
+        };
+        if (artEl && SOLDER_ARTICLES[sKey]) {
+          const art = SOLDER_ARTICLES[sKey];
+          const root = (window.TCHP_SITE_ROOT !== undefined) ? window.TCHP_SITE_ROOT : '';
+          artEl.href = root + 'single.php?slug=' + encodeURIComponent(art.slug);
+          artEl.textContent = art.title;
+        }
       }
 
       // Поддержка кнопок быстрого выбора задачи
@@ -1003,6 +1057,18 @@ include __DIR__ . '/includes/header.php';
           updateCalc();
         });
       });
+
+      // Восстановление сохранённого профиля мастера (LocalStorage Retention)
+      try {
+        const savedSolder = localStorage.getItem('tp_saved_solder');
+        const savedMass = localStorage.getItem('tp_saved_mass');
+        if (savedSolder && solderEl.querySelector(`option[value="${savedSolder}"]`)) {
+          solderEl.value = savedSolder;
+        }
+        if (savedMass && massEl.querySelector(`option[value="${savedMass}"]`)) {
+          massEl.value = savedMass;
+        }
+      } catch (e) {}
 
       solderEl.addEventListener('change', updateCalc);
       massEl.addEventListener('change', updateCalc);

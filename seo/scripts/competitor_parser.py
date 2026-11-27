@@ -11,8 +11,10 @@
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import re
+import socket
 import sqlite3
 import sys
 import urllib.parse
@@ -24,6 +26,38 @@ from typing import Any, Dict, List, Optional
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "seo" / "data"
 DB_PATH = DATA_DIR / "seo.db"
+
+
+class SSRFSecurityError(ValueError):
+    """Исключение при попытке запроса к приватным или петлевым адресам."""
+    pass
+
+
+def validate_url_for_ssrf(url: str) -> str:
+    """Проверяет URL на допустимость схемы и отсутствие обращения к локальным/приватным IP (ASVS V5.5)."""
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise SSRFSecurityError(f"Запрещенная схема URL: {parsed.scheme}. Разрешены только http и https.")
+
+    hostname = parsed.hostname
+    if not hostname:
+        raise SSRFSecurityError("В URL отсутствует имя хоста.")
+
+    # Защита от localhost и cloud metadata по имени
+    if hostname.lower() in ("localhost", "127.0.0.1", "0.0.0.0", "::1", "metadata.google.internal"):
+        raise SSRFSecurityError(f"Запрещено обращение к локальному хосту: {hostname}")
+
+    try:
+        addr_info = socket.getaddrinfo(hostname, None)
+        for family, _, _, _, sockaddr in addr_info:
+            ip_str = sockaddr[0]
+            ip_obj = ipaddress.ip_address(ip_str)
+            if ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local or ip_obj.is_multicast or ip_obj.is_reserved:
+                raise SSRFSecurityError(f"Запрещен запрос к внутреннему/приватному IP-адресу: {ip_str} ({hostname})")
+    except socket.gaierror as e:
+        raise SSRFSecurityError(f"Не удалось разрешить домен {hostname}: {e}")
+
+    return url
 
 
 class SimpleArticleExtractor(HTMLParser):
@@ -85,9 +119,10 @@ class SimpleArticleExtractor(HTMLParser):
 
 
 def fetch_url_html(url: str, timeout: int = 8) -> str:
-    """Выкачивает HTML страницы с корректным User-Agent."""
+    """Выкачивает HTML страницы с защитой от SSRF и корректным User-Agent."""
+    validated_url = validate_url_for_ssrf(url)
     req = urllib.request.Request(
-        url,
+        validated_url,
         headers={
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
             "Accept-Language": "ru-RU,ru;q=0.9,en;q=0.8"

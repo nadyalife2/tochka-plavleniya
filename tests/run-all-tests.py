@@ -156,6 +156,7 @@ def run_python_unit_tests():
         ROOT_DIR / "tests" / "test_delivery_cli_unit.py",
         ROOT_DIR / "tests" / "test_article_generator.py",
         ROOT_DIR / "tests" / "test_server_validation.py",
+        ROOT_DIR / "tests" / "test_llm_eval_suite.py",
     ]
     for script in test_scripts:
         res = subprocess.run([sys.executable, str(script)], capture_output=True, text=True, encoding="utf-8")

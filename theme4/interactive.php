@@ -10,6 +10,37 @@ require_once __DIR__ . '/data/interactive-rules.php';
 ob_start();
 $assets_base = function_exists('get_template_directory_uri') ? get_template_directory_uri() : '';
 $extra_head = '<link rel="stylesheet" href="' . $assets_base . '/assets/css/workbench.css"><link rel="stylesheet" href="' . $assets_base . '/assets/css/interactive.css">';
+$extra_head .= '
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "@id": "https://tochka-plavleniya.ru/interactive#app",
+  "name": "Инженерный верстак инженера ТОЧКА ПЛАВЛЕНИЯ",
+  "url": "https://tochka-plavleniya.ru/interactive.php",
+  "applicationCategory": "EngineeringApplication",
+  "operatingSystem": "All",
+  "browserRequirements": "Requires JavaScript. Requires HTML5.",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "RUB"
+  },
+  "featureList": [
+    "Расчет терморежима жала паяльной станции по ГОСТ 21931 и IPC",
+    "Подбор геометрии жал картриджей T12 и C245",
+    "Диагностическое дерево причин брака пайки по стандарту IPC-A-610",
+    "Калькулятор дозировки и расхода паяльной пасты (IPC-7095C)",
+    "Селектор флюса по коррозионной активности (J-STD-004B)",
+    "Справочный реестр ликвидуса и солидуса 9 марок припоев"
+  ],
+  "creator": {
+    "@type": "Organization",
+    "name": "ТОЧКА ПЛАВЛЕНИЯ",
+    "url": "https://tochka-plavleniya.ru"
+  }
+}
+</script>';
 include __DIR__ . '/includes/header.php';
 ?>
 

@@ -199,6 +199,9 @@ if (function_exists('have_posts') && have_posts()) {
                           <?= tp_icon('clock', 'w-3.5 h-3.5') ?>Редакционная проверка не завершена
                         </span>
                       <?php endif; ?>
+                      <button type="button" id="btnWorkbenchMode" onclick="toggleWorkbenchMode()" class="flex items-center gap-1.5 px-2.5 py-0.5 rounded border border-amber-600/40 bg-amber-500/10 text-amber-900 dark:text-amber-300 font-mono text-xs font-bold hover:bg-amber-500/20 transition-all cursor-pointer ml-auto" title="Режим для чтения за паяльным верстаком: крупный контрастный шрифт и удержание экрана включенным (Wake Lock)">
+                        <span>⚡ Верстак-режим</span>
+                      </button>
                     </div>
 
                     <?php if (!empty($required_tools)): ?>
@@ -227,6 +230,23 @@ if (function_exists('have_posts') && have_posts()) {
                   </header>
 
                 </div><!-- /Article Header Card -->
+
+                <?php
+                // Детекция тем с высоким напряжением 220В / сетевые блоки питания
+                $check_safety_text = get_the_title() . ' ' . get_the_content();
+                $is_high_voltage = (bool) preg_match('/220\s*[ВBвb]|сетев|импульсн|400\s*[ВBвb]|высоковольт|блок\s*питани/ui', $check_safety_text);
+                ?>
+                <?php if ($is_high_voltage): ?>
+                  <div class="my-4 p-4 rounded-lg border-2 border-red-600/80 bg-red-50 dark:bg-red-950/40 text-red-900 dark:text-red-100 font-mono text-xs sm:text-sm shadow-xs">
+                    <div class="flex items-center gap-2 font-bold text-red-700 dark:text-red-400 uppercase tracking-wider text-sm mb-1.5">
+                      <span class="text-base">⚠️</span>
+                      <span>ОТК БЕЗОПАСНОСТИ: ОПАСНОЕ НАПРЯЖЕНИЕ (220 В)</span>
+                    </div>
+                    <p class="leading-relaxed">
+                      Работа с первичными цепями сетевого оборудования смертельно опасна. Перед началом пайки <strong>обесточьте устройство</strong> (выньте вилку из розетки) и <strong>разрядите входной сетевой электролит (400–450 В)</strong> через резистор 1–2 кОм мощностью 2–5 Вт. Запрещено закорачивать банку отверткой или касаться радиаторов горячей стороны!
+                    </p>
+                  </div>
+                <?php endif; ?>
 
                 <?php if (has_post_thumbnail()): ?>
                   <div class="rounded-lg overflow-hidden border border-paper-border shadow-xs bg-paper">
@@ -259,6 +279,19 @@ if (function_exists('have_posts') && have_posts()) {
                 $detected_duplicates = [];
                 $post_content_html = tchp_process_article_anchors($post_content_html, $article_toc, $detected_duplicates);
                 ?>
+
+                <?php if (!empty($excerpt_text)): ?>
+                  <!-- AEO Answer First Technological Verdict Card -->
+                  <div class="my-4 p-4 rounded-lg border-2 border-accent/80 bg-accent/10 font-sans shadow-2xs" aria-label="Технологический вердикт Answer First">
+                    <div class="flex items-center gap-2 mb-1.5 font-mono text-xs font-bold uppercase tracking-wider text-ink">
+                      <span class="w-2 h-2 rounded-full bg-accent inline-block"></span>
+                      <span>ANSWER FIRST // ТЕХНОЛОГИЧЕСКИЙ ВЕРДИКТ:</span>
+                    </div>
+                    <p class="text-sm sm:text-base font-semibold text-ink leading-snug m-0">
+                      <?= esc_html($excerpt_text) ?>
+                    </p>
+                  </div>
+                <?php endif; ?>
 
                 <!-- Gutenberg / Editor Dynamic Post Content (Cards rendered inside) -->
                 <article class="article-content space-y-5 text-ink leading-relaxed">
@@ -583,6 +616,36 @@ if (function_exists('have_posts') && have_posts()) {
             });
           });
         });
+
+        // Режим «У верстака» (Workbench Mode) с удержанием экрана через Wake Lock API
+        let tchpWakeLock = null;
+        function toggleWorkbenchMode() {
+          const body = document.body;
+          const btn = document.getElementById('btnWorkbenchMode');
+          const isActive = body.classList.toggle('workbench-mode-active');
+          if (isActive) {
+            if (btn) {
+              btn.style.backgroundColor = '#f59e0b';
+              btn.style.color = '#000000';
+              btn.innerHTML = '<span>⚡ Верстак: ВКЛ (экран горит)</span>';
+            }
+            if ('wakeLock' in navigator) {
+              navigator.wakeLock.request('screen').then(wl => {
+                tchpWakeLock = wl;
+              }).catch(() => {});
+            }
+          } else {
+            if (btn) {
+              btn.style.backgroundColor = '';
+              btn.style.color = '';
+              btn.innerHTML = '<span>⚡ Верстак-режим</span>';
+            }
+            if (tchpWakeLock) {
+              tchpWakeLock.release().catch(() => {});
+              tchpWakeLock = null;
+            }
+          }
+        }
         </script>
 
         <?php
