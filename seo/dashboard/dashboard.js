@@ -5785,15 +5785,59 @@ async function updateDrawerAeoScore() {
   }
 }
 
-function saveDrawerBrief() {
+function autoDetectArticleType(title, notes) {
+  const text = ((title || '') + ' ' + (notes || '')).toLowerCase();
+  if (text.match(/сравн|вред|состав|какие лучше|против|vs|разбор|самодельн|покупн/)) return 'сравнение';
+  if (text.match(/выбрать|выбор|какой|топ|купить/)) return 'выбор';
+  if (text.match(/ошибк|дефект|почему|брак|не плавит|отвал|трещин/)) return 'ошибки';
+  if (text.match(/обзор|станци|паяльник|прибор/)) return 'обзор';
+  return 'гайд';
+}
+
+function handleDrawerBriefInput() {
+  const keyInput = document.getElementById('drawerInputKeyword');
+  const notesInput = document.getElementById('drawerTextNotes');
+  const selType = document.getElementById('drawerSelectType');
+  const selCluster = document.getElementById('drawerInputCluster');
+  if (!selType) return;
+  const kVal = keyInput ? keyInput.value : '';
+  const nVal = notesInput ? notesInput.value : '';
+  const detectedType = autoDetectArticleType(kVal, nVal);
+  if (detectedType) selType.value = detectedType;
+
+  // Auto-suggest cluster if empty or default
+  if (selCluster && (!selCluster.value || selCluster.value === 'BGA-пайка' || selCluster.value === 'Общее')) {
+    const text = (kVal + ' ' + nVal).toLowerCase();
+    if (text.match(/флюс|канифол|спирт|вазелин|паст|активност/)) selCluster.value = 'Флюсы и химия';
+    else if (text.match(/припо|пос|sac|сплав|свинц/)) selCluster.value = 'Припои и сплавы';
+    else if (text.match(/провод|кабел|авто|скрутк/)) selCluster.value = 'Пайка проводов';
+    else if (text.match(/паяльник|жало|t12|станци/)) selCluster.value = 'Оборудование';
+  }
+}
+
+async function saveDrawerBrief() {
   if (!CURRENT_DRAWER_TOPIC_ID) {
     const title = (document.getElementById('drawerInputKeyword') || {}).value?.trim() || 'Новая тема по пайке';
-    const cluster = (document.getElementById('drawerInputCluster') || {}).value?.trim() || 'Общее';
+    const cluster = (document.getElementById('drawerInputCluster') || {}).value?.trim() || 'Флюсы и химия';
     const notes = (document.getElementById('drawerTextNotes') || {}).value?.trim() || '';
-    if (typeof createTopicDirect === 'function') {
-      createTopicDirect(title, cluster, notes);
+    const selType = document.getElementById('drawerSelectType');
+    const ctype = (selType && selType.value) ? selType.value : autoDetectArticleType(title, notes);
+    const priority = (document.getElementById('drawerSelectPriority') || {}).value || 'высокий';
+
+    try {
+      const res = await apiPost('/api/topics/create', { title, cluster, type: ctype, priority, notes });
+      if (res && res.status === 'ok') {
+        CURRENT_DRAWER_TOPIC_ID = res.id;
+        showToast(`Бриф сохранён, тема #${res.id} добавлена в бэклог!`, 'success');
+        if (typeof fetchAllData === 'function') await fetchAllData();
+        renderKanban();
+        openArticleDrawer(res.id);
+        return;
+      }
+    } catch (e) {
+      console.error('Failed to create topic:', e);
+      showToast('Ошибка сохранения брифа: ' + e.message, 'error');
     }
-    showToast('Бриф сохранён, тема добавлена в бэклог!');
     closeArticleDrawer();
     return;
   }

@@ -1849,9 +1849,10 @@
           <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Тип статьи</label>
           <select id="drawerSelectType" class="form-select" style="width:100%;padding:6px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;">
             <option value="гайд">гайд / регламент</option>
-            <option value="выбор">выбор припоя</option>
+            <option value="выбор">выбор припоя / флюса</option>
             <option value="ошибки">дефекты пайки</option>
-            <option value="обзор">обзор станции</option>
+            <option value="обзор">обзор оборудования</option>
+            <option value="сравнение">сравнение / разбор</option>
           </select>
         </div>
         <div>
@@ -1866,12 +1867,12 @@
 
       <div style="margin-bottom:14px;">
         <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Главный поисковый запрос (Ключ)</label>
-        <input type="text" id="drawerInputKeyword" class="form-input" style="width:100%;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12.5px;font-weight:600;" placeholder="Например: пайка алюминиевого радиатора" />
+        <input type="text" id="drawerInputKeyword" oninput="handleDrawerBriefInput()" class="form-input" style="width:100%;padding:6px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12.5px;font-weight:600;" placeholder="Например: пайка алюминиевого радиатора" />
       </div>
 
       <div style="margin-bottom:14px;">
         <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Что обязательно сказать в статье (Техрегламент & ГОСТ):</label>
-        <textarea id="drawerTextNotes" style="width:100%;height:140px;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;line-height:1.5;resize:vertical;" placeholder="• Снять оксидную плёнку флюсом для алюминия&#10;• Назвать марку припоя (ПОС-61 или HTS-2000)&#10;• Температуру не указывать без ссылки на стандарт&#10;• Предупредить про пары флюса"></textarea>
+        <textarea id="drawerTextNotes" oninput="handleDrawerBriefInput()" style="width:100%;height:140px;padding:8px 10px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;line-height:1.5;resize:vertical;" placeholder="• Снять оксидную плёнку флюсом для алюминия&#10;• Назвать марку припоя (ПОС-61 или HTS-2000)&#10;• Температуру не указывать без ссылки на стандарт&#10;• Предупредить про пары флюса"></textarea>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid #E2E8F0;">
