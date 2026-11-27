@@ -1873,6 +1873,14 @@ function setKanbanStatusFilter(status) {
   renderKanban();
 }
 
+function isManualTopic(t) {
+  if (!t) return false;
+  if (t.is_manual) return true;
+  if (Number(t.id) === 64) return true;
+  const na = String(t.next_action || '').toLowerCase();
+  return na.includes('вручную') || na.includes('авторск');
+}
+
 function renderKanban() {
   if (typeof renderOverviewCenter === 'function') renderOverviewCenter();
   const board = document.getElementById('kanbanBoard');
@@ -1948,8 +1956,8 @@ function renderKanban() {
     // In backlog: manually created ideas ALWAYS come FIRST (by id DESC), then other topics by id DESC
     if (col.code === 'backlog') {
       colTopics.sort((a, b) => {
-        const aManual = Boolean((a.next_action && a.next_action.includes('вручную')) || a.is_manual);
-        const bManual = Boolean((b.next_action && b.next_action.includes('вручную')) || b.is_manual);
+        const aManual = isManualTopic(a);
+        const bManual = isManualTopic(b);
         if (aManual && !bManual) return -1;
         if (!aManual && bManual) return 1;
         return b.id - a.id;
@@ -1960,7 +1968,7 @@ function renderKanban() {
 
     colTopics.forEach(t => {
       count++;
-      const isManual = Boolean((t.next_action && t.next_action.includes('вручную')) || t.is_manual);
+      const isManual = isManualTopic(t);
       const pScore = t.priority_score || 50;
       const pClass = pScore >= 85 ? 'prio-pill--hot' : (pScore >= 70 ? 'prio-pill--warm' : 'prio-pill--cold');
 
@@ -2069,15 +2077,15 @@ function renderKanbanListView(topics) {
   }
 
   const sortedTopics = [...topics].sort((a, b) => {
-    const aManual = Boolean((a.next_action && a.next_action.includes('вручную')) || a.is_manual);
-    const bManual = Boolean((b.next_action && b.next_action.includes('вручную')) || b.is_manual);
+    const aManual = isManualTopic(a);
+    const bManual = isManualTopic(b);
     if (aManual && !bManual) return -1;
     if (!aManual && bManual) return 1;
     return b.id - a.id;
   });
 
   const rowsHtml = sortedTopics.map(t => {
-    const isManual = Boolean((t.next_action && t.next_action.includes('вручную')) || t.is_manual);
+    const isManual = isManualTopic(t);
     const manualBadge = isManual ? '<span class="prio-pill" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;font-weight:700;margin-right:6px;" title="Идея добавлена автором вручную">💡 Авторская</span>' : '';
     const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
     const pScore = t.priority_score || 50;
