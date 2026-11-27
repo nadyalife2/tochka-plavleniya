@@ -1937,13 +1937,30 @@ function renderKanban() {
     colDiv.setAttribute('tabindex', '0');
     colDiv.setAttribute('role', 'region');
 
-    allTopics.forEach(t => {
+    const colTopics = allTopics.filter(t => {
       const cCode = getTopicColumn(t);
-      if (cCode !== col.code) return;
-      if (clusterFilter && (t.cluster || '').toLowerCase() !== clusterFilter) return;
-      if (searchFilter && !t.title.toLowerCase().includes(searchFilter) && !('#' + t.id).includes(searchFilter)) return;
+      if (cCode !== col.code) return false;
+      if (clusterFilter && (t.cluster || '').toLowerCase() !== clusterFilter) return false;
+      if (searchFilter && !t.title.toLowerCase().includes(searchFilter) && !('#' + t.id).includes(searchFilter)) return false;
+      return true;
+    });
 
+    // In backlog: manually created ideas ALWAYS come FIRST (by id DESC), then other topics by id DESC
+    if (col.code === 'backlog') {
+      colTopics.sort((a, b) => {
+        const aManual = Boolean((a.next_action && a.next_action.includes('вручную')) || a.is_manual);
+        const bManual = Boolean((b.next_action && b.next_action.includes('вручную')) || b.is_manual);
+        if (aManual && !bManual) return -1;
+        if (!aManual && bManual) return 1;
+        return b.id - a.id;
+      });
+    } else {
+      colTopics.sort((a, b) => b.id - a.id);
+    }
+
+    colTopics.forEach(t => {
       count++;
+      const isManual = Boolean((t.next_action && t.next_action.includes('вручную')) || t.is_manual);
       const pScore = t.priority_score || 50;
       const pClass = pScore >= 85 ? 'prio-pill--hot' : (pScore >= 70 ? 'prio-pill--warm' : 'prio-pill--cold');
 
@@ -1988,15 +2005,18 @@ function renderKanban() {
 
       const rawCluster = (t.cluster || '').split('/').pop().trim();
       const shortCluster = rawCluster.length > 14 ? rawCluster.slice(0, 14) + '…' : rawCluster;
+      const cardCustomStyle = isManual ? 'style="border-left: 3.5px solid #F59E0B; background: #FFFDF8;"' : '';
+      const manualBadge = isManual ? '<span class="prio-pill" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;font-weight:700;" title="Идея добавлена автором вручную">💡 Авторская</span>' : '';
 
       colCardsHtml += `
-        <article class="task-card" draggable="true" data-topic-id="${t.id}" tabindex="0" role="button" aria-label="Статья #${t.id}: ${esc(t.title)}" onclick="openInspector(${t.id})" onkeydown="handleTaskCardKeydown(event, ${t.id})">
+        <article class="task-card" ${cardCustomStyle} draggable="true" data-topic-id="${t.id}" tabindex="0" role="button" aria-label="Статья #${t.id}: ${esc(t.title)}" onclick="openInspector(${t.id})" onkeydown="handleTaskCardKeydown(event, ${t.id})">
           <div class="task-card__top">
             <div class="task-card__top-left">
               <input type="checkbox" value="${t.id}" onchange="toggleBulkSelection(this)" onclick="event.stopPropagation();" style="width:13px;height:13px;cursor:pointer;accent-color:#0F172A;margin:0;">
-              <span class="task-card__id" style="cursor:grab;" title="Перетащите для смены статуса">#${t.id}</span>
+              <span class="task-card__id" style="cursor:grab;" title="Перетащите для смены статуса">${isManual ? '✏️ ' : ''}#${t.id}</span>
             </div>
             <div class="task-card__badges">
+              ${manualBadge}
               ${t.is_critical ? '<span class="prio-pill prio-pill--hot" title="Критическая тема">⚠</span>' : ''}
               <span class="prio-pill ${pClass}">P${pScore}</span>
               ${seoBadge}
@@ -2008,9 +2028,10 @@ function renderKanban() {
           <div class="task-card__footer">
             <div class="task-card__footer-left">
               <span class="task-card__cluster" title="${esc(t.cluster)}">${esc(shortCluster || 'Пайка')}</span>
-              <span class="task-card__chars">${chars > 0 ? (chars > 999 ? (chars/1000).toFixed(1) + 'k' : chars) + ' зн.' : '—'}</span>
             </div>
-            ${actionBtn}
+            <div class="task-card__footer-right">
+              ${actionBtn}
+            </div>
           </div>
         </article>
       `;
@@ -2047,7 +2068,17 @@ function renderKanbanListView(topics) {
     return;
   }
 
-  const rowsHtml = topics.map(t => {
+  const sortedTopics = [...topics].sort((a, b) => {
+    const aManual = Boolean((a.next_action && a.next_action.includes('вручную')) || a.is_manual);
+    const bManual = Boolean((b.next_action && b.next_action.includes('вручную')) || b.is_manual);
+    if (aManual && !bManual) return -1;
+    if (!aManual && bManual) return 1;
+    return b.id - a.id;
+  });
+
+  const rowsHtml = sortedTopics.map(t => {
+    const isManual = Boolean((t.next_action && t.next_action.includes('вручную')) || t.is_manual);
+    const manualBadge = isManual ? '<span class="prio-pill" style="background:#FEF3C7;color:#92400E;border-color:#FDE68A;font-weight:700;margin-right:6px;" title="Идея добавлена автором вручную">💡 Авторская</span>' : '';
     const chars = t.chars || (t.content_markdown ? t.content_markdown.trim().length : 0);
     const pScore = t.priority_score || 50;
     const pClass = pScore >= 85 ? 'prio-pill--hot' : (pScore >= 70 ? 'prio-pill--warm' : 'prio-pill--cold');
@@ -2079,13 +2110,16 @@ function renderKanbanListView(topics) {
     }
 
     return `
-      <tr onclick="openInspector(${t.id})" style="cursor:pointer;">
+      <tr onclick="openInspector(${t.id})" style="cursor:pointer;${isManual ? 'background:#FFFDF8;' : ''}">
         <td style="width:28px;" onclick="event.stopPropagation();">
           <input type="checkbox" value="${t.id}" onchange="toggleBulkSelection(this)" style="width:13px;height:13px;accent-color:#0F172A;cursor:pointer;">
         </td>
-        <td style="width:45px;font-family:var(--mono);font-size:11px;color:#64748B;font-weight:600;">#${t.id}</td>
+        <td style="width:45px;font-family:var(--mono);font-size:11px;color:#64748B;font-weight:600;">${isManual ? '✏️ ' : ''}#${t.id}</td>
         <td>
-          <div style="font-weight:600;color:#0F172A;font-size:12px;line-height:1.35;">${esc(t.title)}</div>
+          <div style="font-weight:600;color:#0F172A;font-size:12px;line-height:1.35;display:flex;align-items:center;">
+            ${manualBadge}
+            <span>${esc(t.title)}</span>
+          </div>
         </td>
         <td style="width:130px;">
           <span class="task-card__cluster" title="${esc(t.cluster)}">${esc((t.cluster || '').split('/').pop().trim())}</span>
