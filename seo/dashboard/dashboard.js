@@ -76,6 +76,7 @@ function setGlobalProvider(val) {
     yandex: '🟡 YandexGPT Pro 32k — VPN не нужен'
   };
   showToast(`Канал генерации: ${pNames[CURRENT_AI_PROVIDER] || CURRENT_AI_PROVIDER}`);
+  if (typeof updateDrawerGenControlsLabel === 'function') updateDrawerGenControlsLabel();
 }
 
 function esc(str) {
@@ -5759,6 +5760,7 @@ function openArticleDrawer(topicId, activeTab = 'brief') {
   const extBox = document.getElementById('drawerExternalPromptBox');
   if (extBox) extBox.style.display = 'none';
   populateDrawerVoicesSelect();
+  updateDrawerGenControlsLabel();
 
   // Загружаем SEO-контекст (Wordstat и LSI)
   loadDrawerSeoContext(t.id);
@@ -6175,6 +6177,22 @@ function buildDrawerExternalPrompt() {
   ].filter(Boolean).join('\n');
 }
 
+function updateDrawerGenControlsLabel() {
+  const vSel = document.getElementById('drawerVoiceSelect');
+  const pSel = document.getElementById('drawerProviderSelect');
+  const btn = document.getElementById('btnDrawerGeneratePractico');
+  const statusEl = document.getElementById('drawerGenStatus');
+  if (!vSel || !pSel) return;
+  const vLabel = (vSel.options[vSel.selectedIndex]?.text || vSel.value).split('(')[0].trim();
+  const pLabel = (pSel.options[pSel.selectedIndex]?.text || pSel.value).split('(')[0].trim();
+  if (btn && !btn.disabled) {
+    btn.innerHTML = `<span>✍️ Написать (${vLabel} · ${pLabel})</span>`;
+  }
+  if (statusEl) {
+    statusEl.textContent = `Выбрано: ${vLabel} · ${pLabel} — нажмите кнопку выше для запуска генерации`;
+  }
+}
+
 function updateDrawerExternalPromptIfOpen() {
   const box = document.getElementById('drawerExternalPromptBox');
   const ta = document.getElementById('drawerExternalPromptText');
@@ -6272,7 +6290,11 @@ async function generateDrawerArticlePractico() {
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<span>✍️ Сгенерировать статью</span>';
+      const vSel = document.getElementById('drawerVoiceSelect');
+      const pSel = document.getElementById('drawerProviderSelect');
+      const vLabel = vSel ? (vSel.options[vSel.selectedIndex]?.text || vSel.value).split('(')[0].trim() : 'Practico 1';
+      const pLabel = pSel ? (pSel.options[pSel.selectedIndex]?.text || pSel.value).split('(')[0].trim() : 'Авто';
+      btn.innerHTML = `<span>✍️ Написать (${vLabel} · ${pLabel})</span>`;
     }
   }
 }
