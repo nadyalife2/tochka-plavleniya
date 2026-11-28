@@ -77,6 +77,7 @@ function setGlobalProvider(val) {
   };
   showToast(`Канал генерации: ${pNames[CURRENT_AI_PROVIDER] || CURRENT_AI_PROVIDER}`);
   if (typeof updateDrawerGenControlsLabel === 'function') updateDrawerGenControlsLabel();
+  if (typeof syncModelStatusBadges === 'function') syncModelStatusBadges(CURRENT_AI_PROVIDER);
 }
 
 function esc(str) {
@@ -3364,6 +3365,7 @@ function updateCraftsmanModel(craftsmanId, modelValue) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  if (typeof loadCustomOmniModels === 'function') loadCustomOmniModels();
   renderAll();
   refreshClusterTelemetry();
   fetch(API_BASE + '/api/status')
@@ -6432,6 +6434,156 @@ function applyEvaluatedPriority() {
     t.priority_score = LAST_EVALUATED_TOPIC_PRIORITY.score;
   }
   showToast(`Приоритет выставлен: ${LAST_EVALUATED_TOPIC_PRIORITY.priority} (P${LAST_EVALUATED_TOPIC_PRIORITY.score}) — нажмите «Сохранить бриф»`, 'success');
+}
+
+const MODEL_TEST_CACHE = {};
+let OMNIROUTE_MODELS_LOADED = false;
+
+function syncModelStatusBadges(spec) {
+  const cached = MODEL_TEST_CACHE[spec || CURRENT_AI_PROVIDER || 'auto'];
+  ['agentModelStatusBadge', 'drawerModelStatusBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (!cached) {
+      el.textContent = '⚪ Не проверена';
+      el.style.background = '#F1F5F9';
+      el.style.color = '#475569';
+      el.style.borderColor = '#CBD5E1';
+      el.title = 'Нажмите «🔌 Тест», чтобы проверить доступность';
+    } else if (cached.ok) {
+      el.textContent = `🟢 Работает (${cached.latency_ms} мс)`;
+      el.style.background = '#ECFDF5';
+      el.style.color = '#047857';
+      el.style.borderColor = '#A7F3D0';
+      el.title = cached.message || 'OK';
+    } else {
+      el.textContent = '🔴 Оффлайн / ошибка';
+      el.style.background = '#FEF2F2';
+      el.style.color = '#B91C1C';
+      el.style.borderColor = '#FECACA';
+      el.title = cached.message || 'Ошибка';
+    }
+  });
+}
+
+async function testSelectedModel(source = 'drawer') {
+  const sel = document.getElementById(source === 'agent' ? 'agentProviderSelect' : 'drawerProviderSelect');
+  const spec = (sel ? sel.value : CURRENT_AI_PROVIDER) || 'auto';
+  const btn = document.getElementById(source === 'agent' ? 'btnTestAgentModel' : 'btnTestDrawerModel');
+
+  ['agentModelStatusBadge', 'drawerModelStatusBadge'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = '⏳ Проверка...';
+      el.style.background = '#FFFBEB';
+      el.style.color = '#B45309';
+      el.style.borderColor = '#FDE68A';
+    }
+  });
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await apiPost('/api/model/test', { provider: spec });
+    if (res) {
+      MODEL_TEST_CACHE[spec] = {
+        ok: Boolean(res.ok),
+        latency_ms: res.latency_ms || 0,
+        message: res.message || ''
+      };
+      syncModelStatusBadges(spec);
+      if (res.ok) {
+        showToast(`🟢 ${res.model || spec}: работает (${res.latency_ms} мс) — ${res.message}`, 'success');
+      } else {
+        showToast(`🔴 ${res.model || spec}: ${res.message}`, 'warning');
+      }
+    }
+  } catch (e) {
+    MODEL_TEST_CACHE[spec] = { ok: false, latency_ms: 0, message: e.message || 'Сбой сети' };
+    syncModelStatusBadges(spec);
+    showToast('Ошибка проверки модели', 'error');
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+async function toggleCustomModelBox() {
+  const box = document.getElementById('customModelAddBox');
+  if (!box) return;
+  const open = box.style.display === 'none';
+  box.style.display = open ? 'block' : 'none';
+  if (open && !OMNIROUTE_MODELS_LOADED) {
+    try {
+      const res = await apiGet('/api/omniroute/models');
+      if (res && res.status === 'ok' && Array.isArray(res.models)) {
+        const dl = document.getElementById('omnirouteModelsDatalist');
+        if (dl) {
+          dl.innerHTML = res.models.map(m => `<option value="${esc(m)}">`).join('');
+        }
+        OMNIROUTE_MODELS_LOADED = true;
+      }
+    } catch (e) {
+      console.warn('Could not load OmniRoute models list', e);
+    }
+  }
+}
+
+function appendCustomModelToSelects(val, label) {
+  ['agentProviderSelect', 'drawerProviderSelect', 'mVoiceModel'].forEach(selId => {
+    const sel = document.getElementById(selId);
+    if (!sel) return;
+    if ([...sel.options].some(o => o.value === val)) return;
+    const opt = document.createElement('option');
+    opt.value = val;
+    opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+
+function loadCustomOmniModels() {
+  try {
+    const raw = localStorage.getItem('tchp_custom_models');
+    const list = raw ? JSON.parse(raw) : [];
+    if (Array.isArray(list)) {
+      list.forEach(item => {
+        if (item && item.value && item.label) {
+          appendCustomModelToSelects(item.value, item.label);
+        }
+      });
+    }
+  } catch (e) {
+    console.warn('Failed to load custom models', e);
+  }
+}
+
+function addCustomOmniModel() {
+  const idInput = document.getElementById('customOmniModelInput');
+  const lblInput = document.getElementById('customOmniLabelInput');
+  let rawId = (idInput ? idInput.value : '').trim();
+  if (!rawId) {
+    showToast('Укажите ID модели (например: nvidia/gemma-4-31b-it)', 'warning');
+    return;
+  }
+  const value = rawId.startsWith('omniroute:') ? rawId : `omniroute:${rawId}`;
+  const shortName = (lblInput ? lblInput.value.trim() : '') || rawId;
+  const label = `⭐ ${shortName} (OmniRoute · Своя)`;
+
+  try {
+    const raw = localStorage.getItem('tchp_custom_models');
+    const list = raw ? JSON.parse(raw) : [];
+    if (!list.some(x => x.value === value)) {
+      list.push({ value, label });
+      localStorage.setItem('tchp_custom_models', JSON.stringify(list));
+    }
+  } catch (e) {
+    console.warn('localStorage error', e);
+  }
+
+  appendCustomModelToSelects(value, label);
+  setGlobalProvider(value);
+  if (idInput) idInput.value = '';
+  if (lblInput) lblInput.value = '';
+  showToast(`Модель «${shortName}» добавлена во все списки!`, 'success');
+  testSelectedModel('agent');
 }
 
 function copyDrawerTextToHumanizer() {

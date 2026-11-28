@@ -718,9 +718,29 @@
           <option value="deepseek">🔵 DeepSeek Chat (api.deepseek.com) — без VPN</option>
           <option value="yandex">🟡 YandexGPT Pro 32k — без VPN</option>
         </select>
+        <button class="btn btn--xs btn--ghost" id="btnTestAgentModel" type="button" onclick="testSelectedModel('agent')" style="border:1px solid #CBD5E1;font-weight:600;">🔌 Тест модели</button>
+        <span id="agentModelStatusBadge" class="prio-pill" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;font-size:11px;">⚪ Не проверена</span>
+        <button class="btn btn--xs btn--ghost" type="button" onclick="toggleCustomModelBox()" style="border:1px solid #CBD5E1;font-weight:600;">➕ Добавить модель</button>
       </div>
       <div style="font-size:11px;color:var(--muted);">
         💡 При падении или троттлинге любого канала срабатывает автоматический Hot-Swap
+      </div>
+    </div>
+
+    <!-- Панель добавления своей модели из OmniRoute -->
+    <div id="customModelAddBox" style="display:none;background:#F8FAFC;border:1px solid #CBD5E1;border-radius:8px;padding:10px 14px;margin-bottom:12px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;">
+          <strong style="font-size:12px;color:#0F172A;">➕ Добавить модель из OmniRoute (:20128):</strong>
+          <input id="customOmniModelInput" list="omnirouteModelsDatalist" placeholder="ID модели, напр. nvidia/gemma-4-31b-it или openrouter/qwen/..." style="min-width:280px;flex:1;padding:5px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-family:var(--mono);" />
+          <datalist id="omnirouteModelsDatalist"></datalist>
+          <input id="customOmniLabelInput" placeholder="Короткое имя (необязательно)" style="width:190px;padding:5px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;" />
+          <button class="btn btn--xs btn--primary" type="button" onclick="addCustomOmniModel()">Сохранить и добавить</button>
+        </div>
+        <button class="btn btn--xs" type="button" onclick="toggleCustomModelBox()">✕</button>
+      </div>
+      <div style="font-size:11px;color:#64748B;margin-top:6px;">
+        Начните вводить ID (например <code>nvidia/</code>, <code>antigravity/</code>, <code>perplexity</code>, <code>deepseek</code>) — подсказка подтянется из 1 909 моделей OmniRoute. Модель сохранится во всех списках.
       </div>
     </div>
 
@@ -1926,6 +1946,8 @@
               <option value="deepseek">🔵 DeepSeek Chat</option>
               <option value="yandex">🟡 YandexGPT Pro</option>
             </select>
+            <button class="btn btn--xs btn--ghost" id="btnTestDrawerModel" type="button" onclick="testSelectedModel('drawer')" style="border:1px solid #CBD5E1;font-weight:600;" title="Быстрый пинг выбранной модели">🔌 Тест</button>
+            <span id="drawerModelStatusBadge" class="prio-pill" style="background:#F1F5F9;color:#475569;border:1px solid #CBD5E1;font-size:11px;">⚪ Не проверена</span>
             <button class="btn btn--primary" id="btnDrawerGeneratePractico" type="button" onclick="generateDrawerArticlePractico()" style="font-weight:700;display:flex;align-items:center;gap:6px;">
               <span>✍️ Сгенерировать статью</span>
             </button>

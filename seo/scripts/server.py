@@ -1558,6 +1558,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self.send_json({"status": "error", "message": str(ex)}, 500)
             return
 
+        if path == "/api/omniroute/models":
+            try:
+                req = urllib.request.Request("http://127.0.0.1:20128/v1/models")
+                with urllib.request.urlopen(req, timeout=2.5) as resp:
+                    data = json.loads(resp.read().decode("utf-8"))
+                models = [m.get("id") for m in (data.get("data") or []) if m.get("id")]
+                self.send_json({"status": "ok", "count": len(models), "models": models})
+            except Exception as ex:  # noqa: BLE001
+                self.send_json({"status": "error", "models": [], "message": f"OmniRoute :20128 недоступен: {str(ex)[:100]}"}, 503)
+            return
+
         if path == "/api/dataset/export":
             try:
                 self.send_json(export_colab_harvesting_dataset())
@@ -2799,6 +2810,109 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 "author": author_label,
                 "voice": voice,
                 "provider": provider,
+            })
+            return
+
+        # 1.9. Тест доступности выбранной модели / канала ИИ (пинг + latency)
+        if path == "/api/model/test":
+            import time
+            spec = _scalar(payload.get("provider") or payload.get("model") or "auto", "auto").strip()
+            t0 = time.perf_counter()
+            ok = False
+            msg = ""
+            resolved = spec
+
+            try:
+                if spec.startswith("omniroute:") or spec == "omniroute":
+                    m_id = spec.split(":", 1)[1].strip() if ":" in spec else "auto/thinking"
+                    resolved = m_id
+                    body = {
+                        "model": m_id,
+                        "messages": [{"role": "user", "content": "Ответь одним словом: OK"}],
+                        "max_tokens": 16,
+                        "temperature": 0.0,
+                    }
+                    req = urllib.request.Request(
+                        "http://127.0.0.1:20128/v1/chat/completions",
+                        data=json.dumps(body, ensure_ascii=False).encode("utf-8"),
+                        headers={"Content-Type": "application/json"},
+                    )
+                    with urllib.request.urlopen(req, timeout=20) as resp:
+                        raw = json.loads(resp.read().decode("utf-8"))
+                    reply = (raw.get("choices") or [{}])[0].get("message", {}).get("content", "").strip()
+                    if reply:
+                        ok = True
+                        msg = f"Ответила ({reply[:30]})"
+                    else:
+                        msg = "Пустой ответ от OmniRoute"
+
+                elif spec == "triad" or spec.startswith("triad:"):
+                    tel = check_cluster_telemetry()
+                    alive_nodes = [n for n in (tel.get("nodes") or []) if n.get("state") in ("online", "alive")]
+                    if tel.get("status") == "online" or alive_nodes:
+                        ok = True
+                        msg = f"Кластер онлайн ({len(alive_nodes)} узл.)"
+                    else:
+                        msg = "Triad-Omni (:8000/:8080) сейчас в standby/оффлайн"
+
+                elif spec == "claude" or spec.startswith("antigravity:"):
+                    ask_ps1 = ROOT / ".agents" / "skills" / "antigravity-consult" / "scripts" / "ask.ps1"
+                    if not ask_ps1.exists():
+                        msg = "Скрипт ask.ps1 не найден"
+                    else:
+                        ps_cmd = f"$sb = [scriptblock]::Create((Get-Content -Raw -Encoding UTF8 '{ask_ps1}')); & $sb -Prompt 'Reply strictly with: OK' -Model 'claude-sonnet-4-6'"
+                        p = subprocess.run(["powershell", "-NoProfile", "-Command", ps_cmd], capture_output=True, text=True, encoding="utf-8", timeout=25)
+                        if p.returncode == 0 and p.stdout.strip() and "Eligibility check failed" not in p.stdout:
+                            ok = True
+                            msg = f"Antigravity CLI отвечает ({p.stdout.strip()[:25]})"
+                        else:
+                            err_txt = (p.stderr or p.stdout or "ошибка CLI").strip()[:90]
+                            msg = f"Antigravity CLI: {err_txt}"
+
+                elif spec == "deepseek":
+                    from keys import get_key
+                    k = get_key("DEEPSEEK_API_KEY")
+                    if not k:
+                        msg = "Нет DEEPSEEK_API_KEY в config/api-keys.local.yaml"
+                    else:
+                        req = urllib.request.Request(
+                            "https://api.deepseek.com/v1/chat/completions",
+                            data=json.dumps({"model": "deepseek-chat", "messages": [{"role": "user", "content": "OK"}], "max_tokens": 8}).encode("utf-8"),
+                            headers={"Content-Type": "application/json", "Authorization": f"Bearer {k}"},
+                        )
+                        with urllib.request.urlopen(req, timeout=15) as resp:
+                            if resp.status == 200:
+                                ok = True
+                                msg = "DeepSeek API отвечает"
+
+                elif spec == "yandex":
+                    from keys import get_key
+                    k = get_key("YANDEX_API_KEY")
+                    if not k:
+                        msg = "Нет YANDEX_API_KEY в config/api-keys.local.yaml"
+                    else:
+                        ok = True
+                        msg = "Ключ YandexGPT настроен"
+
+                else:  # auto
+                    tel = check_cluster_telemetry()
+                    omni_ok = (tel.get("omniroute") or {}).get("status") == "online"
+                    triad_ok = tel.get("status") == "online"
+                    ok = triad_ok or omni_ok
+                    msg = f"Triad: {'OK' if triad_ok else 'off'} · OmniRoute: {'OK' if omni_ok else 'off'}"
+
+            except Exception as ex:  # noqa: BLE001
+                ok = False
+                msg = f"{type(ex).__name__}: {str(ex)[:110]}"
+
+            latency_ms = int((time.perf_counter() - t0) * 1000)
+            self.send_json({
+                "status": "ok" if ok else "error",
+                "ok": ok,
+                "provider": spec,
+                "model": resolved,
+                "latency_ms": latency_ms,
+                "message": msg,
             })
             return
 
