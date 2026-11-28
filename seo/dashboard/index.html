@@ -707,6 +707,8 @@
         <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:5px 10px;border:1px solid #CBD5E1;font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;">
           <option value="auto">⚡ Авто-каскад (Triad-Omni 0₽ → OmniRoute → Claude → DeepSeek → Yandex)</option>
           <option value="triad">🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN</option>
+          <option value="omniroute:gemini/gemini-4-argon">🔷 Gemini 4 Argon (OmniRoute · быстрая)</option>
+          <option value="omniroute:antigravity/gemini-3.8-flash-high">🔷 Gemini 3.8 Flash High (OmniRoute · Antigravity)</option>
           <option value="omniroute:antigravity/claude-sonnet-4-6">🟣 Claude Sonnet 4.6 (OmniRoute · Antigravity)</option>
           <option value="omniroute:antigravity/claude-opus-4-6-thinking">🟣 Claude Opus 4.6 Thinking (OmniRoute · Antigravity)</option>
           <option value="omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b">🟢 NVIDIA Nemotron 3.5 Super 120B (OmniRoute · NVIDIA)</option>
@@ -1793,6 +1795,8 @@
           <select id="mVoiceSelect" onchange="loadVoiceIntoEditor(this.value)" style="padding:4px 6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;"></select>
           <select id="mVoiceModel" style="padding:4px 6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;">
             <option value="antigravity:claude-sonnet-4-6">🟣 Локальный Claude (Antigravity CLI · claude-sonnet-4-6)</option>
+            <option value="omniroute:gemini/gemini-4-argon">🔷 Gemini 4 Argon (OmniRoute)</option>
+            <option value="omniroute:antigravity/gemini-3.8-flash-high">🔷 Gemini 3.8 Flash High (OmniRoute · Antigravity)</option>
             <option value="omniroute:antigravity/claude-sonnet-4-6">Claude Sonnet 4.6 (OmniRoute · Antigravity)</option>
             <option value="omniroute:antigravity/claude-opus-4-6-thinking">Claude Opus 4.6 Thinking (OmniRoute · Antigravity)</option>
             <option value="omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b">NVIDIA Nemotron 3.5 Super 120B (OmniRoute)</option>
@@ -1934,6 +1938,8 @@
             </select>
             <select id="drawerProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:5px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-weight:600;background:#FFF;color:#0F172A;" title="Канал / модель ИИ">
               <option value="auto">⚡ Авто-каскад</option>
+              <option value="omniroute:gemini/gemini-4-argon">🔷 Gemini 4 Argon (OmniRoute)</option>
+              <option value="omniroute:antigravity/gemini-3.8-flash-high">🔷 Gemini 3.8 Flash High (OmniRoute)</option>
               <option value="omniroute:antigravity/claude-sonnet-4-6">🟣 Claude Sonnet 4.6 (OmniRoute)</option>
               <option value="omniroute:antigravity/claude-opus-4-6-thinking">🟣 Claude Opus 4.6 Thinking (OmniRoute)</option>
               <option value="omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b">🟢 NVIDIA Nemotron 120B (OmniRoute)</option>

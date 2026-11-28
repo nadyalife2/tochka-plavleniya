@@ -65,6 +65,8 @@ function setGlobalProvider(val) {
     auto: '⚡ Авто-каскад (Triad 0₽ → OmniRoute → Claude → DeepSeek → Yandex)',
     triad: '🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN',
     omniroute: '🌐 OmniRoute Gateway (:20128, 1909 моделей)',
+    'omniroute:gemini/gemini-4-argon': '🔷 Gemini 4 Argon (OmniRoute)',
+    'omniroute:antigravity/gemini-3.8-flash-high': '🔷 Gemini 3.8 Flash High (OmniRoute · Antigravity)',
     'omniroute:antigravity/claude-sonnet-4-6': '🟣 Claude Sonnet 4.6 (OmniRoute · Antigravity)',
     'omniroute:antigravity/claude-opus-4-6-thinking': '🟣 Claude Opus 4.6 Thinking (OmniRoute · Antigravity)',
     'omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b': '🟢 NVIDIA Nemotron 3.5 Super 120B (OmniRoute · NVIDIA)',
