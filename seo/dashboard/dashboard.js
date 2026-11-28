@@ -71,7 +71,7 @@ function setGlobalProvider(val) {
     'omniroute:openrouter/nvidia/nemotron-3-ultra-550b-a55b:free': '🟢 NVIDIA Nemotron 3 Ultra 550B Free (OmniRoute)',
     'omniroute:perplexity-web/pplx-sonar': '🔎 Perplexity Sonar (OmniRoute · pplx-web)',
     'omniroute:perplexity-web/pplx-sonnet': '🔎 Perplexity Sonnet (OmniRoute · pplx-web)',
-    claude: '🟣 Claude Sonnet — VPN ON',
+    claude: '🟣 Локальный Claude (Antigravity CLI · claude-sonnet-4-6)',
     deepseek: '🔵 DeepSeek Chat — VPN не нужен',
     yandex: '🟡 YandexGPT Pro 32k — VPN не нужен'
   };

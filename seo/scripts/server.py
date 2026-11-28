@@ -263,13 +263,19 @@ def yandex_chat(system_prompt: str, user_prompt: str, max_tokens: int = 8000) ->
     return content, model
 
 
-VOICE_MODEL_PREFIX = ("oxion:", "yandex:", "triad:", "omniroute:", "local_heuristic")
+VOICE_MODEL_PREFIX = ("oxion:", "yandex:", "triad:", "omniroute:", "antigravity:", "local_heuristic")
 
 
 def voice_generate(model: str, system_prompt: str, user_prompt: str,
                    max_tokens: int = 12000, temperature: float = 0.35) -> tuple[str, str]:
-    """Генерация выбранной моделью: `oxion:<id>`, `yandex:<id>`, `triad:<id>`, `omniroute:<id>`, `local_heuristic`."""
+    """Генерация выбранной моделью: `oxion:<id>`, `yandex:<id>`, `triad:<id>`, `omniroute:<id>`, `antigravity:<id>`, `local_heuristic`."""
     spec = (model or "oxion:claude-sonnet-5").strip()
+    if spec.startswith("antigravity:"):
+        from writer_practico import call_antigravity_cli
+        text = call_antigravity_cli(f"{system_prompt}\n\n{user_prompt}")
+        if text:
+            return text, f"{spec} (Antigravity CLI)"
+        raise RuntimeError("Локальный Antigravity CLI недоступен или требует VPN/авторизации.")
     if spec.startswith("local_heuristic"):
         from writer_practico import generate_local_heuristic_text
         text = generate_local_heuristic_text(user_prompt, system_prompt)
@@ -2235,6 +2241,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 prov = (payload.get("provider") or "").strip().lower()
                 if prov == "triad":
                     model_spec = "triad:qwen3.5-9b-tochka"
+                elif prov == "claude":
+                    model_spec = "antigravity:claude-sonnet-4-6"
                 elif prov.startswith("omniroute:"):
                     model_spec = prov
                 elif prov == "omniroute":
@@ -2339,6 +2347,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 prov = (payload.get("provider") or "").strip().lower()
                 if prov == "triad":
                     model_spec = "triad:qwen3.5-9b-tochka"
+                elif prov == "claude":
+                    model_spec = "antigravity:claude-sonnet-4-6"
                 elif prov.startswith("omniroute:"):
                     model_spec = prov
                 elif prov == "omniroute":
