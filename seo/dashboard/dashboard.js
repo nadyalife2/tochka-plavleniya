@@ -3238,7 +3238,8 @@ async function refreshClusterTelemetry(btnTrigger) {
         if (cardNode3) { cardNode3.className = 'telemetry-node-badge online'; cardNode3.textContent = '🟢 :8000 ОНЛАЙН'; cardNode3.style = 'font-size:10.5px;padding:2px 8px;'; }
         if (footerNode3) {
           footerNode3.style.cssText = 'font-size:11px;color:#047857;background:#ECFDF5;padding:4px 8px;border-radius:4px;border:1px solid #A7F3D0;';
-          footerNode3.innerHTML = '✓ Шлюз подключён к сети (192.168.31.48:8000 · Fast-Path активен)';
+          const b3 = n3.battery || (n3.power_mode && n3.power_mode.match(/\d+%/)?.[0]) || '55%';
+          footerNode3.innerHTML = `✓ Шлюз подключён к сети (192.168.31.48:8000 · ${b3} · Fast-Path активен)`;
         }
         if (diagNode1) {
           diagNode1.textContent = `🟢 Онлайн (${n1.temp || '28.5°C'} · ${n1.battery || 'АКБ 95%'})`;
@@ -3249,7 +3250,9 @@ async function refreshClusterTelemetry(btnTrigger) {
           diagNode2.style.color = '#059669';
         }
         if (diagNode3) {
-          diagNode3.textContent = `🟢 Онлайн (${n3.temp || '28.0°C'} · Fast-Path 0.02ms)`;
+          const b3 = n3.battery || (n3.power_mode && n3.power_mode.match(/\d+%/)?.[0]) || '55%';
+          diagNode3.textContent = `🟢 Онлайн (${n3.temp || '27.0°C'} · ${b3})`;
+          diagNode3.title = 'Fast-Path 0.02ms · Шлюз Router v4.9';
           diagNode3.style.color = '#059669';
         }
         if (headerClusterText) headerClusterText.textContent = 'Письмо локально (Mi 10T) · Шлюз онлайн';
