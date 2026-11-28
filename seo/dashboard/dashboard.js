@@ -5759,6 +5759,8 @@ function openArticleDrawer(topicId, activeTab = 'brief') {
   if (dProv) dProv.value = CURRENT_AI_PROVIDER || 'auto';
   const extBox = document.getElementById('drawerExternalPromptBox');
   if (extBox) extBox.style.display = 'none';
+  const evalBox = document.getElementById('drawerTopicEvalBox');
+  if (evalBox) evalBox.style.display = 'none';
   populateDrawerVoicesSelect();
   updateDrawerGenControlsLabel();
 
@@ -6297,6 +6299,139 @@ async function generateDrawerArticlePractico() {
       btn.innerHTML = `<span>✍️ Написать (${vLabel} · ${pLabel})</span>`;
     }
   }
+}
+
+let LAST_EVALUATED_TOPIC_PRIORITY = null;
+
+async function evaluateDrawerTopicViability(withMutagen = false) {
+  const kwEl = document.getElementById('drawerInputKeyword');
+  const box = document.getElementById('drawerTopicEvalBox');
+  const btn = document.getElementById('btnDrawerEvalTopic');
+  const btnM = document.getElementById('btnDrawerEvalMutagen');
+  const phrase = kwEl ? kwEl.value.trim() : '';
+  if (!phrase) {
+    showToast('Введите тему или главный поисковый запрос!', 'warning');
+    return;
+  }
+  if (!box) return;
+
+  if (btn) btn.disabled = true;
+  if (btnM) btnM.disabled = true;
+  box.style.display = 'block';
+  box.innerHTML = `<span style="color:#64748B;">⏳ Проверяем спрос в Яндекс.Вордстате и конкуренцию${withMutagen ? ' + Мутаген' : ''}...</span>`;
+
+  try {
+    const [kwRes, locRes] = await Promise.allSettled([
+      apiPost('/api/keyword/check', { phrase, source: withMutagen ? 'mutagen' : 'auto' }),
+      apiPost('/api/keyword/local_mutagen', { phrase })
+    ]);
+
+    const kw = kwRes.status === 'fulfilled' ? kwRes.value : null;
+    const loc = (locRes.status === 'fulfilled' && locRes.value && locRes.value.result) ? locRes.value.result : null;
+
+    const ws = kw && kw.wordstat ? kw.wordstat : null;
+    const mg = kw && kw.mutagen ? kw.mutagen : null;
+
+    const totalCount = ws ? Number(ws.totalCount || 0) : (mg ? Number(mg.wordstat || 0) : 0);
+    const tailsSum = ws && Array.isArray(ws.results)
+      ? ws.results.reduce((acc, r) => acc + Number(r.count || 0), 0)
+      : 0;
+    const effectiveDemand = Math.max(totalCount, Math.round(tailsSum * 0.5));
+    const trend = ws && ws.trend ? ws.trend : null;
+
+    const intentType = loc ? loc.intent_type : 'informational';
+    const oppScore = loc ? Number(loc.opportunity_score || 50) : 50;
+    const strong = mg && mg.strong != null ? Number(mg.strong) : null;
+
+    // Расчёт интегрального приоритета (0..100)
+    let pScore = 30;
+    if (effectiveDemand >= 100) pScore += 35;
+    else if (effectiveDemand >= 30) pScore += 25;
+    else if (effectiveDemand >= 10) pScore += 15;
+    else if (effectiveDemand >= 3) pScore += 8;
+
+    if (intentType === 'informational') pScore += 20;
+    else if (intentType === 'mixed') pScore += 10;
+    else pScore -= 15;
+
+    if (strong !== null) {
+      if (strong <= 10) pScore += 20;
+      else if (strong <= 20) pScore += 10;
+      else pScore -= 10;
+    } else {
+      pScore += Math.round((oppScore - 50) * 0.25);
+    }
+
+    if (trend && trend.direction === 'up') pScore += 5;
+    pScore = Math.max(5, Math.min(98, pScore));
+
+    let recPrio = 'средний';
+    let verdictBadge = '🟡 Средний приоритет';
+    let verdictColor = '#B45309';
+    let verdictBg = '#FFFBEB';
+    let verdictBorder = '#FDE68A';
+    if (pScore >= 70) {
+      recPrio = 'высокий';
+      verdictBadge = '🔥 Высокий приоритет — стоит писать';
+      verdictColor = '#047857';
+      verdictBg = '#ECFDF5';
+      verdictBorder = '#A7F3D0';
+    } else if (pScore < 45) {
+      recPrio = 'низкий';
+      verdictBadge = '⚪ Низкий приоритет — узкий или сложный запрос';
+      verdictColor = '#475569';
+      verdictBg = '#F1F5F9';
+      verdictBorder = '#CBD5E1';
+    }
+
+    LAST_EVALUATED_TOPIC_PRIORITY = { priority: recPrio, score: pScore };
+
+    const intentLabel = intentType === 'commercial'
+      ? '<span style="color:#B91C1C;font-weight:700;">⚠️ Коммерческий (много магазинов)</span>'
+      : (intentType === 'mixed' ? '<span style="color:#B45309;font-weight:600;">Смешанный</span>' : '<span style="color:#047857;font-weight:600;">Информационный (наш формат)</span>');
+
+    const trendLabel = trend
+      ? `${trend.direction === 'up' ? '📈' : (trend.direction === 'down' ? '📉' : '➡️')} ${trend.change_pct > 0 ? '+' : ''}${trend.change_pct}%`
+      : '—';
+
+    const topTails = ws && Array.isArray(ws.results) && ws.results.length
+      ? ws.results.slice(0, 3).map(r => `${esc(r.phrase)} (${r.count})`).join(' · ')
+      : 'нет точных хвостов';
+
+    box.style.background = verdictBg;
+    box.style.borderColor = verdictBorder;
+    box.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px;">
+        <strong style="color:${verdictColor};font-size:12.5px;">${verdictBadge} (P${pScore})</strong>
+        <button class="btn btn--xs btn--primary" type="button" onclick="applyEvaluatedPriority()">✓ Применить приоритет</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:6px;color:#1E293B;">
+        <div><strong>Спрос (Вордстат):</strong> ${ws ? `${totalCount.toLocaleString('ru-RU')}/мес (${trendLabel})` : 'недостаточно данных'}</div>
+        <div><strong>Интент выдачи:</strong> ${intentLabel}</div>
+        <div><strong>Шанс топа:</strong> ${strong !== null ? `Мутаген strong = <b>${strong}</b>` : `Локальная оценка ${oppScore}/100`}</div>
+      </div>
+      <div style="margin-top:6px;font-size:11px;color:#475569;">
+        <strong>Близкие запросы:</strong> ${topTails}
+      </div>
+    `;
+  } catch (e) {
+    box.innerHTML = `<span style="color:#B91C1C;">Не удалось оценить тему: ${esc(e.message || 'ошибка сети')}</span>`;
+  } finally {
+    if (btn) btn.disabled = false;
+    if (btnM) btnM.disabled = false;
+  }
+}
+
+function applyEvaluatedPriority() {
+  if (!LAST_EVALUATED_TOPIC_PRIORITY) return;
+  const sel = document.getElementById('drawerSelectPriority');
+  if (sel) sel.value = LAST_EVALUATED_TOPIC_PRIORITY.priority;
+  const t = (DB_DATA.topics || []).find(x => Number(x.id) === Number(CURRENT_DRAWER_TOPIC_ID));
+  if (t) {
+    t.priority = LAST_EVALUATED_TOPIC_PRIORITY.priority;
+    t.priority_score = LAST_EVALUATED_TOPIC_PRIORITY.score;
+  }
+  showToast(`Приоритет выставлен: ${LAST_EVALUATED_TOPIC_PRIORITY.priority} (P${LAST_EVALUATED_TOPIC_PRIORITY.score}) — нажмите «Сохранить бриф»`, 'success');
 }
 
 function copyDrawerTextToHumanizer() {
