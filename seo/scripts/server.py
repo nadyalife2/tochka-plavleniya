@@ -2662,34 +2662,51 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 if not row:
                     self.send_json({"status": "error", "message": "Тема не найдена"}, 404)
                     return
-                
+
                 title = row["title"] or ""
                 cluster = row["cluster"] or ""
                 notes = (row["next_action"] or "").replace("добавлено вручную: ", "")
 
-                # Ищем релевантные запросы Вордстат
-                ws_rows = conn.execute("""
-                    SELECT phrase, total_count FROM wordstat_metrics 
-                    WHERE phrase LIKE '%флюс%' OR phrase LIKE '%канифол%' OR phrase LIKE '%припой%'
-                    ORDER BY total_count DESC LIMIT 8
-                """).fetchall()
-                ws_list = [{"phrase": r["phrase"], "count": r["total_count"]} for r in ws_rows]
+                # Динамический подбор ключевых корней из заголовка и кластера
+                stop_words = {"как", "для", "при", "или", "что", "чем", "какой", "какая", "какие", "почему", "если", "без", "под", "над", "это"}
+                tokens = [
+                    w[:5] if len(w) > 6 else w
+                    for w in re.findall(r"[a-zа-яё0-9]+", f"{title} {cluster}".lower())
+                    if len(w) >= 4 and w not in stop_words
+                ][:5]
 
-                # LSI / подсказки
-                kw_rows = conn.execute("""
-                    SELECT keyword FROM keywords 
-                    WHERE keyword LIKE '%флюс%' OR keyword LIKE '%канифол%' OR keyword LIKE '%смыв%'
-                    LIMIT 8
-                """).fetchall()
-                kw_list = [r["keyword"] for r in kw_rows]
+                ws_list = []
+                kw_list = []
+                rel_list = []
+                if tokens:
+                    like_ws = " OR ".join(["lower(phrase) LIKE ?"] * len(tokens))
+                    params_ws = [f"%{tok}%" for tok in tokens]
+                    ws_rows = conn.execute(
+                        f"SELECT phrase, total_count FROM wordstat_metrics WHERE {like_ws} ORDER BY total_count DESC LIMIT 8",
+                        params_ws,
+                    ).fetchall()
+                    ws_list = [{"phrase": r["phrase"], "count": r["total_count"]} for r in ws_rows]
 
-                # Связанные темы для перелинковки
-                rel_topics = conn.execute("""
-                    SELECT id, title, cluster FROM topics 
-                    WHERE id != ? AND (cluster LIKE '%Флюс%' OR cluster LIKE '%Припо%' OR cluster LIKE '%Безопасн%')
-                    LIMIT 6
-                """, (tid,)).fetchall()
-                rel_list = [{"id": r["id"], "title": r["title"], "cluster": r["cluster"]} for r in rel_topics]
+                    like_kw = " OR ".join(["lower(keyword) LIKE ?"] * len(tokens))
+                    kw_rows = conn.execute(
+                        f"SELECT keyword FROM keywords WHERE {like_kw} LIMIT 8",
+                        params_ws,
+                    ).fetchall()
+                    kw_list = [r["keyword"] for r in kw_rows]
+
+                if not ws_list:
+                    ws_rows = conn.execute(
+                        "SELECT phrase, total_count FROM wordstat_metrics ORDER BY total_count DESC LIMIT 6"
+                    ).fetchall()
+                    ws_list = [{"phrase": r["phrase"], "count": r["total_count"]} for r in ws_rows]
+
+                cluster_root = (cluster.split("/")[-1].strip() or cluster).lower()
+                if cluster_root:
+                    rel_topics = conn.execute(
+                        "SELECT id, title, cluster FROM topics WHERE id != ? AND lower(cluster) LIKE ? LIMIT 6",
+                        (tid, f"%{cluster_root[:6]}%"),
+                    ).fetchall()
+                    rel_list = [{"id": r["id"], "title": r["title"], "cluster": r["cluster"]} for r in rel_topics]
 
             self.send_json({
                 "status": "ok",
@@ -2703,49 +2720,53 @@ class DashboardHandler(BaseHTTPRequestHandler):
             })
             return
 
-        # 1.8. Генерация черновика Агентом 02 (Practico) на основе брифа и SEO-семантики
+        # 1.8. Генерация черновика Агентом 02 (Practico 1 / Practico 2) на основе брифа и SEO-семантики
         if path == "/api/topics/generate-practico":
             tid = self.require_id(payload)
             if tid is None:
                 return
             voice = (payload.get("voice") or "practico").strip()
-            
+            provider = (payload.get("provider") or "auto").strip().lower()
+            force_llm = bool(payload.get("force_llm", False))
+
             with get_connection() as conn:
                 cur = conn.cursor()
                 row = cur.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
                 if not row:
                     self.send_json({"status": "error", "message": "Тема не найдена"}, 404)
                     return
-                title = row["title"]
-                notes = (row["next_action"] or "").replace("добавлено вручную: ", "")
-                cluster = row["cluster"] or "Флюсы и химия"
 
-            # Если для темы #64 уже подготовлен канонический инженерный черновик с 96/100
             draft_file = ROOT / "scratch" / f"article_{tid}_draft.md"
-            if draft_file.exists():
+            if draft_file.exists() and voice == "practico" and provider in ("", "auto") and not force_llm:
                 text = draft_file.read_text(encoding="utf-8")
+                author_label = f"Агент 02 ({voice} · канон)"
+                _save_written_article(tid, text, author=f"ai-{voice}")
             else:
-                from writer_practico import generate_local_heuristic_text, PRACTICO_SYSTEM_PROMPT
-                instruction = (
-                    f"Напиши статью по теме «{title}» в голосе Practico (инженер, женский род прошедшего времени). "
-                    f"Заметки автора: {notes}. Кластер: {cluster}. "
-                    "Стандарты: Answer First ≤ 40 слов, 4-8 H2, 1-2 таблицы по IPC J-STD-004B, FAQ 4-6 пар, "
-                    "объём 5 500-7 000 знаков. Верни готовый markdown."
-                )
-                text = generate_local_heuristic_text(user_prompt=instruction, system_prompt=PRACTICO_SYSTEM_PROMPT, topic_id=tid, voice=voice)
+                try:
+                    from writer_practico import write_article_for_topic
+                    res = write_article_for_topic(tid, voice=voice, provider=provider or "auto")
+                    text = res.get("text") or ""
+                    if not text:
+                        with get_connection() as conn:
+                            r = conn.execute("SELECT content_markdown FROM topics WHERE id = ?", (tid,)).fetchone()
+                            text = (r["content_markdown"] if r else "") or ""
+                    author_label = res.get("model_used") or f"Агент 02 ({voice} · {provider})"
+                except Exception as ex:
+                    self.send_json({
+                        "status": "error",
+                        "message": f"Не удалось сгенерировать через LLM ({type(ex).__name__}: {str(ex)[:140]}). Используйте кнопку «📋 Промпт для внешнего ИИ».",
+                    }, 503)
+                    return
 
             chars = len(text.strip())
             words = len(text.strip().split())
-            
-            # Сохраняем в базу данных topics
-            _save_written_article(tid, text, author=f"ai-{voice}")
 
             # Подсчёт скора
-            score_val = 96
+            score_val = 0
             try:
                 from score_article import blocks as score_blocks
                 report = score_blocks(text, None, str(tid))
-                score_val = report.get("total", score_val)
+                score_val = report.get("total", 0)
                 with get_connection() as conn:
                     conn.execute("UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
                                  (score_val, json.dumps(report, ensure_ascii=False), tid))
@@ -2760,7 +2781,9 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 "chars": chars,
                 "words": words,
                 "score": score_val,
-                "author": f"Агент 02 ({voice})"
+                "author": author_label,
+                "voice": voice,
+                "provider": provider,
             })
             return
 

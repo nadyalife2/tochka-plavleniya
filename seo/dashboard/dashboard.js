@@ -59,6 +59,8 @@ function setGlobalProvider(val) {
   if (mSel && mSel.value !== CURRENT_AI_PROVIDER) mSel.value = CURRENT_AI_PROVIDER;
   const aSel = document.getElementById('agentProviderSelect');
   if (aSel && aSel.value !== CURRENT_AI_PROVIDER) aSel.value = CURRENT_AI_PROVIDER;
+  const dSel = document.getElementById('drawerProviderSelect');
+  if (dSel && dSel.value !== CURRENT_AI_PROVIDER) dSel.value = CURRENT_AI_PROVIDER;
   const pNames = {
     auto: '⚡ Авто-каскад (Triad 0₽ → OmniRoute → Claude → DeepSeek → Yandex)',
     triad: '🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN',
@@ -5746,6 +5748,12 @@ function openArticleDrawer(topicId, activeTab = 'brief') {
   const kwBadge = document.getElementById('drawerMainKeywordBadge');
   if (kwBadge) kwBadge.textContent = t.keyword || t.title || 'флюс из канифоли';
 
+  const dProv = document.getElementById('drawerProviderSelect');
+  if (dProv) dProv.value = CURRENT_AI_PROVIDER || 'auto';
+  const extBox = document.getElementById('drawerExternalPromptBox');
+  if (extBox) extBox.style.display = 'none';
+  populateDrawerVoicesSelect();
+
   // Загружаем SEO-контекст (Wordstat и LSI)
   loadDrawerSeoContext(t.id);
 
@@ -6052,11 +6060,28 @@ function handleDrawerEditorInput() {
   }
 }
 
+let LAST_DRAWER_SEO_CONTEXT = null;
+
+function populateDrawerVoicesSelect() {
+  const sel = document.getElementById('drawerVoiceSelect');
+  if (!sel) return;
+  const cur = sel.value || 'practico';
+  const base = [
+    { id: 'practico', label: '🐱 Practico 1 (02-writer · Инженер)' },
+    { id: 'practico2', label: '🦊 Practico 2 (02-writer-2 · Практик и сметы)' }
+  ];
+  const extras = (DB_DATA.voices || []).filter(v => v.id !== 'practico' && v.id !== 'practico2');
+  sel.innerHTML = base.map(v => `<option value="${esc(v.id)}">${esc(v.label)}</option>`).join('') +
+    extras.map(v => `<option value="${esc(v.id)}">🎙️ ${esc(v.name || v.id)}</option>`).join('');
+  if ([...sel.options].some(o => o.value === cur)) sel.value = cur;
+}
+
 async function loadDrawerSeoContext(topicId) {
   if (!topicId) return;
   try {
     const res = await apiPost('/api/topics/seo-context', { id: topicId });
     if (res && res.status === 'ok') {
+      LAST_DRAWER_SEO_CONTEXT = res;
       const chipsEl = document.getElementById('drawerSeoChips');
       if (chipsEl) {
         let html = '';
@@ -6068,9 +6093,113 @@ async function loadDrawerSeoContext(topicId) {
         });
         if (html) chipsEl.innerHTML = html;
       }
+      updateDrawerExternalPromptIfOpen();
     }
   } catch (e) {
     console.warn('Failed to load SEO context', e);
+  }
+}
+
+function buildDrawerExternalPrompt() {
+  const t = (DB_DATA.topics || []).find(x => Number(x.id) === Number(CURRENT_DRAWER_TOPIC_ID)) || {};
+  const title = (document.getElementById('drawerInputKeyword') || {}).value?.trim() || t.title || 'Тема статьи';
+  const cluster = (document.getElementById('drawerInputCluster') || {}).value?.trim() || t.cluster || 'Пайка';
+  const ctype = (document.getElementById('drawerSelectType') || {}).value || t.type || 'гайд';
+  let notes = (document.getElementById('drawerTextNotes') || {}).value?.trim() || '';
+  if (!notes && t.next_action) notes = String(t.next_action).replace(/^добавлено вручную:\s*/i, '');
+
+  const voiceId = (document.getElementById('drawerVoiceSelect') || {}).value || 'practico';
+  const customVoice = (DB_DATA.voices || []).find(v => v.id === voiceId);
+
+  let voiceRules = '';
+  if (voiceId === 'practico2') {
+    voiceRules = [
+      'ГОЛОС: PRACTICO 2 («Голос решительного практика», Лис-Прагматик).',
+      '- Девиз: «Меньше слов — больше дела. Вот факт, вот режим, вот вердикт. Пошли паять».',
+      '- Обращение на «Вы» с уважением к коллеге, но жёстко, по делу, без лекций и «воды».',
+      '- Обязателен блок сметы / реальной цены материалов и оборудования (если применимо к теме).',
+      '- 2–4 хлёстких практических вердикта о дешёвых поделках и маркетинговой чуши.'
+    ].join('\n');
+  } else if (customVoice && customVoice.system_prompt) {
+    voiceRules = `ГОЛОС: ${customVoice.name || voiceId}\n${customVoice.system_prompt}`;
+  } else {
+    voiceRules = [
+      'ГОЛОС: PRACTICO 1 (ведущий инженерный автор «Точки Плавления», MASTER_EDITORIAL_BOOK.md).',
+      '- Формула: «Новичок по знаниям, коллега по достоинству». Обращение СТРОГО на «Вы» (с заглавной).',
+      '- НЕ выдумывать фальшивую биографию («за 20 лет в моей мастерской»). Сила — в безупречной физике и химии.',
+      '- Триада объяснения: Факт/Термин -> Физический механизм -> Практическое последствие для мастера.',
+      '- Сухая инженерная ирония: 2–5 точных замечаний над маркетингом, плохим инструментом и мифами (но в блоках о 220 В и токсичности юмор ЗАПРЕЩЁН).',
+      '- Живой ритм: чередуй короткие хлёсткие фразы с развёрнутыми объяснениями. Без канцелярского пассива.'
+    ].join('\n');
+  }
+
+  const seo = LAST_DRAWER_SEO_CONTEXT || {};
+  const wsLines = (seo.wordstat || []).map(w => `  • ${w.phrase} (${w.count}/мес)`).join('\n') || '  • (органично впиши ключевые фразы по теме)';
+  const lsiLines = (seo.lsi_keywords || []).join(', ') || 'флюс, канифоль, припой, смачивание, смывка';
+  const relLines = (seo.related_topics || []).map(r => `  • #${r.id}: ${r.title}`).join('\n') || '  • Подбери 3–5 логичных внутренних ссылок на статьи кластера (/slug/)';
+
+  return [
+    `Ты пишешь инженерную статью для сайта «Точка Плавления» (tochka-plavleniya.ru).`,
+    ``,
+    `ТЕМА (#${t.id || 'новая'}): ${title}`,
+    `КЛАСТЕР: ${cluster} | ТИП: ${ctype}`,
+    notes ? `ОБЯЗАТЕЛЬНО РАСКРЫТЬ (ТЗ автора):\n${notes}` : '',
+    ``,
+    voiceRules,
+    ``,
+    `SEO-СЕМАНТИКА (интегрировать естественно, без переспама):`,
+    `- Главный ключ: ${title}`,
+    `- Запросы Яндекс.Вордстат:\n${wsLines}`,
+    `- LSI-слова: ${lsiLines}`,
+    `- Перелинковка (вставить 3–5 внутренних ссылок формата [анкор](/slug/), без анкоров «тут/здесь»):\n${relLines}`,
+    ``,
+    `ЖЁСТКИЕ ТРЕБОВАНИЯ ОТК (СКОРИНГ 100 БАЛЛОВ):`,
+    `1. Answer First (BLUF): первый абзац сразу после H1 — строго ≤ 40 слов, прямой ответ с цифрами/режимами, без разгона.`,
+    `2. Объём: 5 500 – 7 000 знаков с пробелами.`,
+    `3. Структура: ровно один H1, 4–7 разделов H2, минимум 1 сравнительная Markdown-таблица.`,
+    `4. Факты и физика: ≥ 3 конкретных температур в °C, канонические марки сплавов (ПОС-61, ПОС-40, SAC305 и т.п.).`,
+    `5. Обязательные разделы: «## Безопасность и средства защиты» и «## Источники и нормативные документы» (минимум 2 ГОСТ / IPC / TDS).`,
+    `6. В самом конце — блок FAQ (4–6 пар):`,
+    `### FAQ:`,
+    `1. q: "Вопрос?"`,
+    `   a: "Короткий точный ответ."`,
+    `7. СТОП-ФРАЗЫ (ЗАПРЕЩЕНО): «в этой статье мы рассмотрим», «подводя итоги», «в заключение», «идеальный результат», «абсолютно безопасно», «проще простого», «справится любой», «секрет мастера», вопросы читателю в конце.`,
+    ``,
+    `Верни ТОЛЬКО готовый чистый Markdown без вводных слов и комментариев.`
+  ].filter(Boolean).join('\n');
+}
+
+function updateDrawerExternalPromptIfOpen() {
+  const box = document.getElementById('drawerExternalPromptBox');
+  const ta = document.getElementById('drawerExternalPromptText');
+  if (box && box.style.display !== 'none' && ta) {
+    ta.value = buildDrawerExternalPrompt();
+  }
+}
+
+function toggleDrawerExternalPrompt() {
+  const box = document.getElementById('drawerExternalPromptBox');
+  const ta = document.getElementById('drawerExternalPromptText');
+  if (!box || !ta) return;
+  const willOpen = box.style.display === 'none';
+  box.style.display = willOpen ? 'block' : 'none';
+  if (willOpen) {
+    ta.value = buildDrawerExternalPrompt();
+  }
+}
+
+async function copyDrawerExternalPrompt() {
+  const ta = document.getElementById('drawerExternalPromptText');
+  const promptText = ta ? ta.value : buildDrawerExternalPrompt();
+  try {
+    await navigator.clipboard.writeText(promptText);
+    showToast('✓ Полный промпт-ТЗ (правила + голос + SEO) скопирован в буфер!', 'success');
+  } catch (e) {
+    if (ta) {
+      ta.select();
+      document.execCommand('copy');
+      showToast('Промпт выделен и скопирован', 'success');
+    }
   }
 }
 
@@ -6080,18 +6209,20 @@ async function generateDrawerArticlePractico() {
     showToast('Сначала сохраните бриф статьи!', 'warning');
     return;
   }
+  const voice = (document.getElementById('drawerVoiceSelect') || {}).value || 'practico';
+  const provider = (document.getElementById('drawerProviderSelect') || {}).value || CURRENT_AI_PROVIDER || 'auto';
   const btn = document.getElementById('btnDrawerGeneratePractico');
   const statusEl = document.getElementById('drawerGenStatus');
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<span>⏳ Агент 02 пишет статью...</span>';
+    btn.innerHTML = '<span>⏳ Пишет агент...</span>';
   }
-  if (statusEl) statusEl.textContent = 'Обращение к RAG (ГОСТ 19113-84, IPC J-STD-004B) & синтез текста...';
+  if (statusEl) statusEl.textContent = `Запуск (${voice} · ${provider}) + RAG (ГОСТ/IPC) & SEO...`;
 
-  showToast(`Запуск Агента 02 Practico для темы #${topicId}...`, 'info');
+  showToast(`Запуск генерации #${topicId} (${voice} · ${provider})...`, 'info');
 
   try {
-    const res = await apiPost('/api/topics/generate-practico', { id: topicId, voice: 'practico' });
+    const res = await apiPost('/api/topics/generate-practico', { id: topicId, voice, provider });
     if (res && res.status === 'ok') {
       const textEl = document.getElementById('drawerArticleText');
       if (textEl) {
@@ -6100,37 +6231,42 @@ async function generateDrawerArticlePractico() {
       }
       const scoreBadge = document.getElementById('drawerStatScoreBadge');
       if (scoreBadge) {
-        scoreBadge.textContent = `${res.score || 96}/100`;
-        scoreBadge.style.color = '#047857';
+        scoreBadge.textContent = `${res.score || 0}/100`;
+        scoreBadge.style.color = (res.score || 0) >= 80 ? '#047857' : '#D97706';
       }
       const drawerScore = document.getElementById('drawerArticleScore');
-      if (drawerScore) drawerScore.textContent = `${res.score || 96}/100`;
+      if (drawerScore) drawerScore.textContent = `${res.score || 0}/100`;
 
-      const t = (DB_DATA.topics || []).find(x => x.id === topicId);
+      const t = (DB_DATA.topics || []).find(x => Number(x.id) === Number(topicId));
       if (t) {
         t.content_markdown = res.text;
         t.chars = res.chars;
         t.score_total = res.score;
-        t.status = 'review';
+        t.status = (res.score || 0) >= 80 ? 'review' : 'written';
       }
 
-      showToast(`✓ Статья #${topicId} успешно сгенерирована Агентом 02 (${res.chars} зн., ${res.score}/100)!`, 'success');
+      showToast(`✓ Статья #${topicId} сгенерирована (${res.chars} зн., ${res.score}/100)!`, 'success');
       if (statusEl) statusEl.textContent = `Готово! ${res.author} · ${res.chars} знаков · ${res.score}/100`;
 
       if (typeof fetchAllData === 'function') await fetchAllData();
       renderKanban();
     } else {
-      showToast('Ошибка генерации статьи', 'error');
-      if (statusEl) statusEl.textContent = 'Ошибка при вызове генератора';
+      const errMsg = (res && res.message) ? res.message : 'Ошибка генерации статьи';
+      showToast(errMsg, 'warning');
+      if (statusEl) statusEl.textContent = errMsg;
+      const box = document.getElementById('drawerExternalPromptBox');
+      if (box && box.style.display === 'none') toggleDrawerExternalPrompt();
     }
   } catch (e) {
     console.error('Error generating article:', e);
-    showToast('Ошибка сети при генерации', 'error');
-    if (statusEl) statusEl.textContent = 'Сбой сети';
+    showToast('Канал ИИ недоступен — открыт готовый промпт для внешнего агента', 'warning');
+    if (statusEl) statusEl.textContent = 'Локальные каналы ИИ оффлайн — скопируйте промпт ниже для внешнего ИИ';
+    const box = document.getElementById('drawerExternalPromptBox');
+    if (box && box.style.display === 'none') toggleDrawerExternalPrompt();
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.innerHTML = '<span>✍️ Сгенерировать статью (Агент 02 Practico)</span>';
+      btn.innerHTML = '<span>✍️ Сгенерировать статью</span>';
     }
   }
 }
