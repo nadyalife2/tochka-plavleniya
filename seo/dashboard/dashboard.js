@@ -6002,13 +6002,14 @@ function acceptFragmentAsIs() {
 }
 
 async function approveCurrentArticleInDrawer() {
-  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
+  const t = (DB_DATA.topics || []).find(x => Number(x.id) === Number(CURRENT_DRAWER_TOPIC_ID));
   if (t) {
     t.status = 'ready';
     t.score_total = Math.max(t.score_total || 85, 85);
-    showToast(`Статья #${t.id} утверждена и готова к выгрузке!`);
+    showToast(`Статья #${t.id} утверждена и готова к выгрузке!`, 'success');
     switchDrawerTab('publish');
-    renderTodayView();
+    if (typeof fetchAllData === 'function') await fetchAllData();
+    renderKanban();
     try {
       await apiPost('/api/articles/status', { id: t.id, status: 'ready' });
     } catch (e) {
@@ -6018,7 +6019,7 @@ async function approveCurrentArticleInDrawer() {
 }
 
 async function publishCurrentArticleFromDrawer() {
-  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID);
+  const t = (DB_DATA.topics || []).find(x => Number(x.id) === Number(CURRENT_DRAWER_TOPIC_ID));
   if (t) {
     showToast(`Запуск агента доставки статьи #${t.id}...`, 'info');
     try {
