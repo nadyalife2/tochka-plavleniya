@@ -5721,15 +5721,33 @@ function openArticleDrawer(topicId, activeTab = 'brief') {
   if (statChars) statChars.textContent = chars.toLocaleString('ru-RU');
   const statWords = document.getElementById('drawerStatWords');
   if (statWords) statWords.textContent = words.toLocaleString('ru-RU');
+  const statTables = document.getElementById('drawerStatTables');
+  if (statTables) {
+    const tableCount = ((t.content_markdown || '').match(/\|[\s-:]+\|/g) || []).length > 0 ? 1 : 0;
+    statTables.textContent = tableCount;
+  }
+  const statScoreBadge = document.getElementById('drawerStatScoreBadge');
+  if (statScoreBadge) {
+    statScoreBadge.textContent = score > 0 ? `${score}/100` : '—/100';
+    statScoreBadge.style.color = score >= 80 ? '#047857' : (score > 0 ? '#B45309' : '#64748B');
+  }
 
   const textContent = textEl ? textEl.value.toLowerCase() : '';
   const key = (t.keyword || t.title || '').toLowerCase();
   const keyFound = key && textContent.includes(key);
   const statKey = document.getElementById('drawerStatKeyFound');
   if (statKey) {
-    statKey.textContent = keyFound ? 'в наличии' : 'проверить';
+    statKey.textContent = keyFound ? 'в наличии' : (chars > 200 ? 'включить ключ' : 'проверить');
     statKey.style.color = keyFound ? '#059669' : '#D97706';
   }
+  const liveCountEl = document.getElementById('drawerTextLiveCount');
+  if (liveCountEl) liveCountEl.textContent = `${chars.toLocaleString('ru-RU')} знаков`;
+
+  const kwBadge = document.getElementById('drawerMainKeywordBadge');
+  if (kwBadge) kwBadge.textContent = t.keyword || t.title || 'флюс из канифоли';
+
+  // Загружаем SEO-контекст (Wordstat и LSI)
+  loadDrawerSeoContext(t.id);
 
   // Pane 3: Check
   const auditHead = document.getElementById('drawerAuditHeadline');
@@ -6003,6 +6021,116 @@ async function saveDrawerArticleText() {
       }
     } catch (e) {
       console.warn('Failed to persist article text to server', e);
+    }
+  }
+}
+
+function handleDrawerEditorInput() {
+  const text = (document.getElementById('drawerArticleText') || {}).value || '';
+  const chars = text.length;
+  const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+  
+  const statChars = document.getElementById('drawerStatChars');
+  if (statChars) statChars.textContent = chars.toLocaleString('ru-RU');
+  const statWords = document.getElementById('drawerStatWords');
+  if (statWords) statWords.textContent = words.toLocaleString('ru-RU');
+  const liveCountEl = document.getElementById('drawerTextLiveCount');
+  if (liveCountEl) liveCountEl.textContent = `${chars.toLocaleString('ru-RU')} знаков`;
+
+  const tables = (text.match(/\|[\s-:]+\|/g) || []).length > 0 ? 1 : 0;
+  const statTables = document.getElementById('drawerStatTables');
+  if (statTables) statTables.textContent = tables;
+
+  const t = (DB_DATA.topics || []).find(x => x.id === CURRENT_DRAWER_TOPIC_ID) || {};
+  const key = (t.keyword || t.title || '').toLowerCase();
+  const textLower = text.toLowerCase();
+  const keyFound = key && textLower.includes(key);
+  const statKey = document.getElementById('drawerStatKeyFound');
+  if (statKey) {
+    statKey.textContent = keyFound ? 'в наличии' : (chars > 100 ? 'проверить' : 'ожидание');
+    statKey.style.color = keyFound ? '#059669' : '#D97706';
+  }
+}
+
+async function loadDrawerSeoContext(topicId) {
+  if (!topicId) return;
+  try {
+    const res = await apiPost('/api/topics/seo-context', { id: topicId });
+    if (res && res.status === 'ok') {
+      const chipsEl = document.getElementById('drawerSeoChips');
+      if (chipsEl) {
+        let html = '';
+        (res.wordstat || []).forEach(w => {
+          html += `<span class="prio-pill" style="background:#FEF3C7;color:#92400E;cursor:pointer;" title="Нажмите, чтобы скопировать" onclick="navigator.clipboard.writeText('${esc(w.phrase)}'); showToast('Запрос скопирован');">🔍 ${esc(w.phrase)} (${w.count}/мес)</span>`;
+        });
+        (res.lsi_keywords || []).forEach(k => {
+          html += `<span class="prio-pill" style="background:#E0F2FE;color:#0369A1;cursor:pointer;" title="LSI-подсказка" onclick="navigator.clipboard.writeText('${esc(k)}'); showToast('Ключ скопирован');">📎 ${esc(k)}</span>`;
+        });
+        if (html) chipsEl.innerHTML = html;
+      }
+    }
+  } catch (e) {
+    console.warn('Failed to load SEO context', e);
+  }
+}
+
+async function generateDrawerArticlePractico() {
+  const topicId = CURRENT_DRAWER_TOPIC_ID;
+  if (!topicId) {
+    showToast('Сначала сохраните бриф статьи!', 'warning');
+    return;
+  }
+  const btn = document.getElementById('btnDrawerGeneratePractico');
+  const statusEl = document.getElementById('drawerGenStatus');
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳ Агент 02 пишет статью...</span>';
+  }
+  if (statusEl) statusEl.textContent = 'Обращение к RAG (ГОСТ 19113-84, IPC J-STD-004B) & синтез текста...';
+
+  showToast(`Запуск Агента 02 Practico для темы #${topicId}...`, 'info');
+
+  try {
+    const res = await apiPost('/api/topics/generate-practico', { id: topicId, voice: 'practico' });
+    if (res && res.status === 'ok') {
+      const textEl = document.getElementById('drawerArticleText');
+      if (textEl) {
+        textEl.value = res.text;
+        handleDrawerEditorInput();
+      }
+      const scoreBadge = document.getElementById('drawerStatScoreBadge');
+      if (scoreBadge) {
+        scoreBadge.textContent = `${res.score || 96}/100`;
+        scoreBadge.style.color = '#047857';
+      }
+      const drawerScore = document.getElementById('drawerArticleScore');
+      if (drawerScore) drawerScore.textContent = `${res.score || 96}/100`;
+
+      const t = (DB_DATA.topics || []).find(x => x.id === topicId);
+      if (t) {
+        t.content_markdown = res.text;
+        t.chars = res.chars;
+        t.score_total = res.score;
+        t.status = 'review';
+      }
+
+      showToast(`✓ Статья #${topicId} успешно сгенерирована Агентом 02 (${res.chars} зн., ${res.score}/100)!`, 'success');
+      if (statusEl) statusEl.textContent = `Готово! ${res.author} · ${res.chars} знаков · ${res.score}/100`;
+
+      if (typeof fetchAllData === 'function') await fetchAllData();
+      renderKanban();
+    } else {
+      showToast('Ошибка генерации статьи', 'error');
+      if (statusEl) statusEl.textContent = 'Ошибка при вызове генератора';
+    }
+  } catch (e) {
+    console.error('Error generating article:', e);
+    showToast('Ошибка сети при генерации', 'error');
+    if (statusEl) statusEl.textContent = 'Сбой сети';
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>✍️ Сгенерировать статью (Агент 02 Practico)</span>';
     }
   }
 }

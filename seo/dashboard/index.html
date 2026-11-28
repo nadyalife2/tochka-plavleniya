@@ -1884,23 +1884,56 @@
 
     <!-- PANE 2: ТЕКСТ (СПЛИТ-РЕДАКТОР) -->
     <section class="drawer-pane" id="drawerPaneText">
+      <!-- Панель управления генерацией и SEO-семантикой -->
+      <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <button class="btn btn--primary" id="btnDrawerGeneratePractico" type="button" onclick="generateDrawerArticlePractico()" style="font-weight:700;display:flex;align-items:center;gap:6px;">
+            <span>✍️ Сгенерировать статью (Агент 02 Practico)</span>
+          </button>
+          <span id="drawerGenStatus" style="font-size:11.5px;color:#64748B;">Канал: Practico 1 · RAG ГОСТ & IPC</span>
+        </div>
+        <div style="font-size:11.5px;color:#475569;display:flex;align-items:center;gap:6px;">
+          <span>Ключ:</span>
+          <code id="drawerMainKeywordBadge" style="background:#E2E8F0;padding:2px 6px;border-radius:4px;font-weight:600;color:#0F172A;">флюс из канифоли</code>
+        </div>
+      </div>
+
+      <!-- Блок найденных SEO-запросов и подсказок из Вордстат -->
+      <div id="drawerSeoKeywordsBox" style="background:#FFFDF8;border:1px dashed #FDE68A;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:11.5px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+          <strong style="color:#92400E;">🎯 SEO-запросы кластера (Wordstat & LSI для интеграции в текст):</strong>
+          <span style="color:#B45309;font-size:10.5px;">Автоматический учёт в скоринге</span>
+        </div>
+        <div id="drawerSeoChips" style="display:flex;flex-wrap:wrap;gap:6px;">
+          <span class="prio-pill" style="background:#FEF3C7;color:#92400E;">Как сделать флюс в домашних условиях (39/мес)</span>
+          <span class="prio-pill" style="background:#FEF3C7;color:#92400E;">Вреден ли дым от флюса и как защититься (3/мес)</span>
+          <span class="prio-pill" style="background:#FEF3C7;color:#92400E;">Канифоль или жидкий флюс (92/мес)</span>
+          <span class="prio-pill" style="background:#E0F2FE;color:#0369A1;">чем отмыть флюс с платы</span>
+          <span class="prio-pill" style="background:#E0F2FE;color:#0369A1;">надо ли смывать no clean флюс</span>
+        </div>
+      </div>
+
       <div class="drawer-split">
         <div>
-          <label style="display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:4px;">Текст статьи (Markdown / HTML)</label>
-          <textarea class="drawer-editor-area" id="drawerArticleText" placeholder="Черновик пока не сгенерирован..."></textarea>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <label style="font-size:11px;font-weight:700;color:#475569;">Текст статьи (Markdown / HTML)</label>
+            <span id="drawerTextLiveCount" style="font-size:11px;color:#64748B;">0 знаков</span>
+          </div>
+          <textarea class="drawer-editor-area" id="drawerArticleText" oninput="handleDrawerEditorInput()" placeholder="Нажмите «✍️ Сгенерировать статью (Агент 02 Practico)» для создания текста или вставьте свой черновик..."></textarea>
         </div>
         <div class="drawer-sidebar-stats">
           <strong style="font-size:12px;color:#0F172A;border-bottom:1px solid #E2E8F0;padding-bottom:4px;">Параметры текста</strong>
           <div>Объём: <strong id="drawerStatChars">0</strong> зн. (<strong id="drawerStatWords">0</strong> сл.)</div>
           <div>Главный ключ: <span id="drawerStatKeyFound" style="color:#059669;font-weight:600;">в наличии</span></div>
           <div>BLUF-абзац: <span id="drawerStatBluf" style="color:#059669;font-weight:600;">35-85 слов</span></div>
-          <div>Таблицы: <strong id="drawerStatTables">1</strong> шт.</div>
+          <div>Таблицы: <strong id="drawerStatTables">0</strong> шт.</div>
+          <div>ОТК-скор: <strong id="drawerStatScoreBadge" style="color:#047857;">—/100</strong></div>
           <button class="btn btn--xs" type="button" onclick="copyDrawerTextToHumanizer()" style="margin-top:10px;border-color:#CBD5E1;">Очеловечить в Studio</button>
         </div>
       </div>
 
       <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid #E2E8F0;position:sticky;bottom:0;background:#ffffff;z-index:10;padding-bottom:12px;">
-        <button class="btn btn--ghost" type="button" onclick="saveDrawerArticleText()">Сохранить черновик</button>
+        <button class="btn btn--ghost" type="button" onclick="saveDrawerArticleText()">💾 Сохранить черновик</button>
         <button class="btn btn--amber-cta" type="button" onclick="switchDrawerTab('check'); runArticleAudit();">Отправить на проверку →</button>
       </div>
     </section>

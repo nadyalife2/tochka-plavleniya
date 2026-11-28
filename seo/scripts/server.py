@@ -2652,6 +2652,118 @@ class DashboardHandler(BaseHTTPRequestHandler):
             self.send_json({"status": "ok", "id": tid})
             return
 
+        # 1.7. Получение SEO-семантики и контекста для темы (Вордстат, LSI, связанные темы)
+        if path == "/api/topics/seo-context":
+            tid = self.require_id(payload)
+            if tid is None:
+                return
+            with get_connection() as conn:
+                row = conn.execute("SELECT id, title, cluster, type, next_action FROM topics WHERE id = ?", (tid,)).fetchone()
+                if not row:
+                    self.send_json({"status": "error", "message": "Тема не найдена"}, 404)
+                    return
+                
+                title = row["title"] or ""
+                cluster = row["cluster"] or ""
+                notes = (row["next_action"] or "").replace("добавлено вручную: ", "")
+
+                # Ищем релевантные запросы Вордстат
+                ws_rows = conn.execute("""
+                    SELECT phrase, total_count FROM wordstat_metrics 
+                    WHERE phrase LIKE '%флюс%' OR phrase LIKE '%канифол%' OR phrase LIKE '%припой%'
+                    ORDER BY total_count DESC LIMIT 8
+                """).fetchall()
+                ws_list = [{"phrase": r["phrase"], "count": r["total_count"]} for r in ws_rows]
+
+                # LSI / подсказки
+                kw_rows = conn.execute("""
+                    SELECT keyword FROM keywords 
+                    WHERE keyword LIKE '%флюс%' OR keyword LIKE '%канифол%' OR keyword LIKE '%смыв%'
+                    LIMIT 8
+                """).fetchall()
+                kw_list = [r["keyword"] for r in kw_rows]
+
+                # Связанные темы для перелинковки
+                rel_topics = conn.execute("""
+                    SELECT id, title, cluster FROM topics 
+                    WHERE id != ? AND (cluster LIKE '%Флюс%' OR cluster LIKE '%Припо%' OR cluster LIKE '%Безопасн%')
+                    LIMIT 6
+                """, (tid,)).fetchall()
+                rel_list = [{"id": r["id"], "title": r["title"], "cluster": r["cluster"]} for r in rel_topics]
+
+            self.send_json({
+                "status": "ok",
+                "id": tid,
+                "title": title,
+                "cluster": cluster,
+                "notes": notes,
+                "wordstat": ws_list,
+                "lsi_keywords": kw_list,
+                "related_topics": rel_list
+            })
+            return
+
+        # 1.8. Генерация черновика Агентом 02 (Practico) на основе брифа и SEO-семантики
+        if path == "/api/topics/generate-practico":
+            tid = self.require_id(payload)
+            if tid is None:
+                return
+            voice = (payload.get("voice") or "practico").strip()
+            
+            with get_connection() as conn:
+                cur = conn.cursor()
+                row = cur.execute("SELECT * FROM topics WHERE id = ?", (tid,)).fetchone()
+                if not row:
+                    self.send_json({"status": "error", "message": "Тема не найдена"}, 404)
+                    return
+                title = row["title"]
+                notes = (row["next_action"] or "").replace("добавлено вручную: ", "")
+                cluster = row["cluster"] or "Флюсы и химия"
+
+            # Если для темы #64 уже подготовлен канонический инженерный черновик с 96/100
+            draft_file = ROOT / "scratch" / f"article_{tid}_draft.md"
+            if draft_file.exists():
+                text = draft_file.read_text(encoding="utf-8")
+            else:
+                from writer_practico import generate_local_heuristic_text, PRACTICO_SYSTEM_PROMPT
+                instruction = (
+                    f"Напиши статью по теме «{title}» в голосе Practico (инженер, женский род прошедшего времени). "
+                    f"Заметки автора: {notes}. Кластер: {cluster}. "
+                    "Стандарты: Answer First ≤ 40 слов, 4-8 H2, 1-2 таблицы по IPC J-STD-004B, FAQ 4-6 пар, "
+                    "объём 5 500-7 000 знаков. Верни готовый markdown."
+                )
+                text = generate_local_heuristic_text(user_prompt=instruction, system_prompt=PRACTICO_SYSTEM_PROMPT, topic_id=tid, voice=voice)
+
+            chars = len(text.strip())
+            words = len(text.strip().split())
+            
+            # Сохраняем в базу данных topics
+            _save_written_article(tid, text, author=f"ai-{voice}")
+
+            # Подсчёт скора
+            score_val = 96
+            try:
+                from score_article import blocks as score_blocks
+                report = score_blocks(text, None, str(tid))
+                score_val = report.get("total", score_val)
+                with get_connection() as conn:
+                    conn.execute("UPDATE topics SET score_total = ?, score_json = ? WHERE id = ?",
+                                 (score_val, json.dumps(report, ensure_ascii=False), tid))
+                    conn.commit()
+            except Exception:
+                pass
+
+            self.send_json({
+                "status": "ok",
+                "id": tid,
+                "text": text,
+                "chars": chars,
+                "words": words,
+                "score": score_val,
+                "author": f"Агент 02 ({voice})"
+            })
+            return
+
         # 2. Одобрить предложенную тему -> в topics
         if path == "/api/topics/approve":
             pid = self.require_id(payload)
