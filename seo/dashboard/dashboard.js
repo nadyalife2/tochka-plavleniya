@@ -5593,6 +5593,60 @@ async function runCompetitorRadarFromUI() {
 
 let CURRENT_DRAWER_TOPIC_ID = null;
 
+function setSelectTypeValue(sel, rawType) {
+  if (!sel) return;
+  const target = String(rawType || '').toLowerCase().trim();
+  if (!target) return;
+  // 1. Exact value match
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value.toLowerCase() === target) {
+      sel.selectedIndex = i;
+      return;
+    }
+  }
+  // 2. Partial / semantic match
+  if (target.includes('сравн') || target.includes('разбор') || target.includes('вред')) {
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value.includes('сравн')) {
+        sel.selectedIndex = i;
+        return;
+      }
+    }
+  }
+  if (target.includes('выбор') || target.includes('guide')) {
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value.includes('выбор')) {
+        sel.selectedIndex = i;
+        return;
+      }
+    }
+  }
+  if (target.includes('ошиб') || target.includes('дефект')) {
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value.includes('ошиб')) {
+        sel.selectedIndex = i;
+        return;
+      }
+    }
+  }
+  if (target.includes('обзор') || target.includes('рейтинг')) {
+    for (let i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value.includes('обзор')) {
+        sel.selectedIndex = i;
+        return;
+      }
+    }
+  }
+  // 3. Match by option text
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].text.toLowerCase().includes(target)) {
+      sel.selectedIndex = i;
+      return;
+    }
+  }
+  sel.value = rawType;
+}
+
 function openArticleDrawer(topicId, activeTab = 'brief') {
   CURRENT_DRAWER_TOPIC_ID = Number(topicId) || topicId;
   CURRENT_TOPIC_ID = CURRENT_DRAWER_TOPIC_ID;
@@ -5639,7 +5693,14 @@ function openArticleDrawer(topicId, activeTab = 'brief') {
   const inCluster = document.getElementById('drawerInputCluster');
   if (inCluster) inCluster.value = t.cluster || '';
   const selType = document.getElementById('drawerSelectType');
-  if (selType) selType.value = t.type || 'гайд';
+  if (selType) {
+    let rawType = t.type;
+    if (!rawType || rawType === 'гайд') {
+      const detected = autoDetectArticleType(t.title || t.keyword, t.notes || t.next_action);
+      if (detected) rawType = detected;
+    }
+    setSelectTypeValue(selType, rawType || 'сравнение / разбор');
+  }
   const selPriority = document.getElementById('drawerSelectPriority');
   if (selPriority) selPriority.value = t.priority || 'средний';
   const inKey = document.getElementById('drawerInputKeyword');
@@ -5842,7 +5903,7 @@ async function updateDrawerAeoScore() {
 
 function autoDetectArticleType(title, notes) {
   const text = ((title || '') + ' ' + (notes || '')).toLowerCase();
-  if (text.match(/сравн|вред|состав|какие лучше|против|vs|разбор|самодельн|покупн/)) return 'сравнение';
+  if (text.match(/сравн|вред|состав|какие лучше|против|vs|разбор|самодельн|покупн/)) return 'сравнение / разбор';
   if (text.match(/выбрать|выбор|какой|топ|купить/)) return 'выбор';
   if (text.match(/ошибк|дефект|почему|брак|не плавит|отвал|трещин/)) return 'ошибки';
   if (text.match(/обзор|станци|паяльник|прибор/)) return 'обзор';
@@ -5858,7 +5919,7 @@ function handleDrawerBriefInput() {
   const kVal = keyInput ? keyInput.value : '';
   const nVal = notesInput ? notesInput.value : '';
   const detectedType = autoDetectArticleType(kVal, nVal);
-  if (detectedType) selType.value = detectedType;
+  if (detectedType) setSelectTypeValue(selType, detectedType);
 
   // Auto-suggest cluster if empty or default
   if (selCluster && (!selCluster.value || selCluster.value === 'BGA-пайка' || selCluster.value === 'Общее')) {
