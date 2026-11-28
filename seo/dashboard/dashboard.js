@@ -61,6 +61,8 @@ function setGlobalProvider(val) {
   if (aSel && aSel.value !== CURRENT_AI_PROVIDER) aSel.value = CURRENT_AI_PROVIDER;
   const dSel = document.getElementById('drawerProviderSelect');
   if (dSel && dSel.value !== CURRENT_AI_PROVIDER) dSel.value = CURRENT_AI_PROVIDER;
+  const sSel = document.getElementById('systemProviderSelect');
+  if (sSel && sSel.value !== CURRENT_AI_PROVIDER) sSel.value = CURRENT_AI_PROVIDER;
   const pNames = {
     auto: '⚡ Авто-каскад (Triad 0₽ → OmniRoute → Claude → DeepSeek → Yandex)',
     triad: '🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN',
@@ -6443,7 +6445,7 @@ let OMNIROUTE_MODELS_LOADED = false;
 
 function syncModelStatusBadges(spec) {
   const cached = MODEL_TEST_CACHE[spec || CURRENT_AI_PROVIDER || 'auto'];
-  ['agentModelStatusBadge', 'drawerModelStatusBadge'].forEach(id => {
+  ['agentModelStatusBadge', 'drawerModelStatusBadge', 'systemModelStatusBadge'].forEach(id => {
     const el = document.getElementById(id);
     if (!el) return;
     if (!cached) {
@@ -6469,11 +6471,13 @@ function syncModelStatusBadges(spec) {
 }
 
 async function testSelectedModel(source = 'drawer') {
-  const sel = document.getElementById(source === 'agent' ? 'agentProviderSelect' : 'drawerProviderSelect');
+  const selId = source === 'agent' ? 'agentProviderSelect' : (source === 'system' ? 'systemProviderSelect' : 'drawerProviderSelect');
+  const btnId = source === 'agent' ? 'btnTestAgentModel' : (source === 'system' ? 'btnTestSystemModel' : 'btnTestDrawerModel');
+  const sel = document.getElementById(selId);
   const spec = (sel ? sel.value : CURRENT_AI_PROVIDER) || 'auto';
-  const btn = document.getElementById(source === 'agent' ? 'btnTestAgentModel' : 'btnTestDrawerModel');
+  const btn = document.getElementById(btnId);
 
-  ['agentModelStatusBadge', 'drawerModelStatusBadge'].forEach(id => {
+  ['agentModelStatusBadge', 'drawerModelStatusBadge', 'systemModelStatusBadge'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.textContent = '⏳ Проверка...';
@@ -6508,29 +6512,40 @@ async function testSelectedModel(source = 'drawer') {
   }
 }
 
+async function ensureOmnirouteDatalistLoaded() {
+  if (OMNIROUTE_MODELS_LOADED) return;
+  try {
+    const res = await apiGet('/api/omniroute/models');
+    if (res && res.status === 'ok' && Array.isArray(res.models)) {
+      const dl = document.getElementById('omnirouteModelsDatalist');
+      if (dl) {
+        dl.innerHTML = res.models.map(m => `<option value="${esc(m)}">`).join('');
+      }
+      OMNIROUTE_MODELS_LOADED = true;
+    }
+  } catch (e) {
+    console.warn('Could not load OmniRoute models list', e);
+  }
+}
+
 async function toggleCustomModelBox() {
   const box = document.getElementById('customModelAddBox');
   if (!box) return;
   const open = box.style.display === 'none';
   box.style.display = open ? 'block' : 'none';
-  if (open && !OMNIROUTE_MODELS_LOADED) {
-    try {
-      const res = await apiGet('/api/omniroute/models');
-      if (res && res.status === 'ok' && Array.isArray(res.models)) {
-        const dl = document.getElementById('omnirouteModelsDatalist');
-        if (dl) {
-          dl.innerHTML = res.models.map(m => `<option value="${esc(m)}">`).join('');
-        }
-        OMNIROUTE_MODELS_LOADED = true;
-      }
-    } catch (e) {
-      console.warn('Could not load OmniRoute models list', e);
-    }
-  }
+  if (open) await ensureOmnirouteDatalistLoaded();
+}
+
+async function toggleSystemCustomModelBox() {
+  const box = document.getElementById('systemCustomModelAddBox');
+  if (!box) return;
+  const open = box.style.display === 'none';
+  box.style.display = open ? 'block' : 'none';
+  if (open) await ensureOmnirouteDatalistLoaded();
 }
 
 function appendCustomModelToSelects(val, label) {
-  ['agentProviderSelect', 'drawerProviderSelect', 'mVoiceModel'].forEach(selId => {
+  ['agentProviderSelect', 'drawerProviderSelect', 'systemProviderSelect', 'mVoiceModel'].forEach(selId => {
     const sel = document.getElementById(selId);
     if (!sel) return;
     if ([...sel.options].some(o => o.value === val)) return;
@@ -6557,9 +6572,9 @@ function loadCustomOmniModels() {
   }
 }
 
-function addCustomOmniModel() {
-  const idInput = document.getElementById('customOmniModelInput');
-  const lblInput = document.getElementById('customOmniLabelInput');
+function addCustomOmniModel(source = 'agent') {
+  const idInput = document.getElementById(source === 'system' ? 'systemCustomOmniModelInput' : 'customOmniModelInput');
+  const lblInput = document.getElementById(source === 'system' ? 'systemCustomOmniLabelInput' : 'customOmniLabelInput');
   let rawId = (idInput ? idInput.value : '').trim();
   if (!rawId) {
     showToast('Укажите ID модели (например: nvidia/gemma-4-31b-it)', 'warning');
@@ -6585,7 +6600,7 @@ function addCustomOmniModel() {
   if (idInput) idInput.value = '';
   if (lblInput) lblInput.value = '';
   showToast(`Модель «${shortName}» добавлена во все списки!`, 'success');
-  testSelectedModel('agent');
+  testSelectedModel(source);
 }
 
 function copyDrawerTextToHumanizer() {
