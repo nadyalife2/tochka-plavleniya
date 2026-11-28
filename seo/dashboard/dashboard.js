@@ -6245,11 +6245,17 @@ async function generateDrawerArticlePractico() {
   const provider = (document.getElementById('drawerProviderSelect') || {}).value || CURRENT_AI_PROVIDER || 'auto';
   const btn = document.getElementById('btnDrawerGeneratePractico');
   const statusEl = document.getElementById('drawerGenStatus');
+  let sec = 0;
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<span>⏳ Пишет агент...</span>';
+    btn.innerHTML = '<span>⏳ Пишет агент... (0с)</span>';
   }
-  if (statusEl) statusEl.textContent = `Запуск (${voice} · ${provider}) + RAG (ГОСТ/IPC) & SEO...`;
+  if (statusEl) statusEl.textContent = `Запуск (${voice} · ${provider}) + RAG (ГОСТ/IPC) & SEO... (полная статья ~30–90с)`;
+  const genTimer = setInterval(() => {
+    sec += 1;
+    if (btn && btn.disabled) btn.innerHTML = `<span>⏳ Пишет агент... (${sec}с)</span>`;
+    if (statusEl) statusEl.textContent = `Идёт генерация (${voice} · ${provider}): ${sec} сек / макс 120с...`;
+  }, 1000);
 
   showToast(`Запуск генерации #${topicId} (${voice} · ${provider})...`, 'info');
 
@@ -6296,6 +6302,7 @@ async function generateDrawerArticlePractico() {
     const box = document.getElementById('drawerExternalPromptBox');
     if (box && box.style.display === 'none') toggleDrawerExternalPrompt();
   } finally {
+    clearInterval(genTimer);
     if (btn) {
       btn.disabled = false;
       const vSel = document.getElementById('drawerVoiceSelect');
