@@ -64,7 +64,13 @@ function setGlobalProvider(val) {
   const pNames = {
     auto: '⚡ Авто-каскад (Triad 0₽ → OmniRoute → Claude → DeepSeek → Yandex)',
     triad: '🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN',
-    omniroute: '🌐 OmniRoute Gateway (:20128, 750+ моделей)',
+    omniroute: '🌐 OmniRoute Gateway (:20128, 1909 моделей)',
+    'omniroute:antigravity/claude-sonnet-4-6': '🟣 Claude Sonnet 4.6 (OmniRoute · Antigravity)',
+    'omniroute:antigravity/claude-opus-4-6-thinking': '🟣 Claude Opus 4.6 Thinking (OmniRoute · Antigravity)',
+    'omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b': '🟢 NVIDIA Nemotron 3.5 Super 120B (OmniRoute · NVIDIA)',
+    'omniroute:openrouter/nvidia/nemotron-3-ultra-550b-a55b:free': '🟢 NVIDIA Nemotron 3 Ultra 550B Free (OmniRoute)',
+    'omniroute:perplexity-web/pplx-sonar': '🔎 Perplexity Sonar (OmniRoute · pplx-web)',
+    'omniroute:perplexity-web/pplx-sonnet': '🔎 Perplexity Sonnet (OmniRoute · pplx-web)',
     claude: '🟣 Claude Sonnet — VPN ON',
     deepseek: '🔵 DeepSeek Chat — VPN не нужен',
     yandex: '🟡 YandexGPT Pro 32k — VPN не нужен'

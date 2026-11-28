@@ -2235,8 +2235,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 prov = (payload.get("provider") or "").strip().lower()
                 if prov == "triad":
                     model_spec = "triad:qwen3.5-9b-tochka"
+                elif prov.startswith("omniroute:"):
+                    model_spec = prov
                 elif prov == "omniroute":
-                    model_spec = (payload.get("model") or "omniroute:auto/thinking").strip()
+                    model_spec = (payload.get("model") or "omniroute:antigravity/claude-sonnet-4-6").strip()
                     if not model_spec.startswith("omniroute:"):
                         model_spec = f"omniroute:{model_spec}"
                 elif prov == "local_heuristic":
@@ -2337,8 +2339,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 prov = (payload.get("provider") or "").strip().lower()
                 if prov == "triad":
                     model_spec = "triad:qwen3.5-9b-tochka"
+                elif prov.startswith("omniroute:"):
+                    model_spec = prov
                 elif prov == "omniroute":
-                    model_spec = (payload.get("model") or "omniroute:auto/thinking").strip()
+                    model_spec = (payload.get("model") or "omniroute:antigravity/claude-sonnet-4-6").strip()
                     if not model_spec.startswith("omniroute:"):
                         model_spec = f"omniroute:{model_spec}"
                 elif prov == "local_heuristic":
@@ -2726,7 +2730,8 @@ class DashboardHandler(BaseHTTPRequestHandler):
             if tid is None:
                 return
             voice = (payload.get("voice") or "practico").strip()
-            provider = (payload.get("provider") or "auto").strip().lower()
+            provider = (payload.get("provider") or "auto").strip()
+            model_override = (payload.get("model") or "").strip()
             force_llm = bool(payload.get("force_llm", False))
 
             with get_connection() as conn:
@@ -2737,14 +2742,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     return
 
             draft_file = ROOT / "scratch" / f"article_{tid}_draft.md"
-            if draft_file.exists() and voice == "practico" and provider in ("", "auto") and not force_llm:
+            if draft_file.exists() and voice == "practico" and provider.lower() in ("", "auto") and not model_override and not force_llm:
                 text = draft_file.read_text(encoding="utf-8")
                 author_label = f"Агент 02 ({voice} · канон)"
                 _save_written_article(tid, text, author=f"ai-{voice}")
             else:
                 try:
                     from writer_practico import write_article_for_topic
-                    res = write_article_for_topic(tid, voice=voice, provider=provider or "auto")
+                    res = write_article_for_topic(tid, voice=voice, provider=provider or "auto", model=model_override)
                     text = res.get("text") or ""
                     if not text:
                         with get_connection() as conn:

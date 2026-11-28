@@ -539,11 +539,17 @@ def _sanitize_field(text: str | None) -> str:
     return cleaned.strip()
 
 
-def write_article_for_topic(topic_id: int | str, voice: str = "practico", provider: str = "auto") -> dict:
+def write_article_for_topic(topic_id: int | str, voice: str = "practico", provider: str = "auto", model: str = "") -> dict:
     tid = int(topic_id) if str(topic_id).isdigit() else topic_id
     system_prompt, voice_name = VOICES.get(voice, VOICES["practico"])
-    provider = (provider or "auto").lower()
-    if provider not in ("auto", "claude", "deepseek", "yandex"):
+    raw_provider = (provider or "auto").strip()
+    omni_model = (model or "").strip()
+    if raw_provider.lower().startswith("omniroute:"):
+        omni_model = raw_provider.split(":", 1)[1].strip()
+        provider = "omniroute"
+    else:
+        provider = raw_provider.lower()
+    if provider not in ("auto", "triad", "omniroute", "claude", "deepseek", "yandex"):
         provider = "auto"
 
     with get_connection() as conn:
@@ -648,12 +654,13 @@ def write_article_for_topic(topic_id: int | str, voice: str = "practico", provid
 
     def try_omniroute() -> str | None:
         nonlocal model_used
-        print("   (Пробую шлюз OmniRoute :20128)...", flush=True)
-        text = call_omniroute(user_prompt, system_prompt)
+        target_m = omni_model or "auto/thinking"
+        print(f"   (Пробую шлюз OmniRoute :20128 · модель {target_m})...", flush=True)
+        text = call_omniroute(user_prompt, system_prompt, model=target_m)
         if text:
-            model_used = f"OmniRoute Gateway (:20128), {voice_name}"
+            model_used = f"OmniRoute ({target_m}), {voice_name}"
         else:
-            print("   (OmniRoute шлюз :20128 оффлайн)...", flush=True)
+            print(f"   (OmniRoute шлюз :20128 или модель {target_m} не ответили)...", flush=True)
         return text
 
     def try_claude() -> str | None:

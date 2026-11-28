@@ -707,7 +707,13 @@
         <select id="agentProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:5px 10px;border:1px solid #CBD5E1;font-size:12px;font-weight:600;cursor:pointer;border-radius:6px;">
           <option value="auto">⚡ Авто-каскад (Triad-Omni 0₽ → OmniRoute → Claude → DeepSeek → Yandex)</option>
           <option value="triad">🐺 Triad-Omni Edge Cluster (Qwen3.5-9B) — 0 ₽, без VPN</option>
-          <option value="omniroute">🌐 OmniRoute Multi-Model (:20128, 750+ моделей) — без VPN</option>
+          <option value="omniroute:antigravity/claude-sonnet-4-6">🟣 Claude Sonnet 4.6 (OmniRoute · Antigravity)</option>
+          <option value="omniroute:antigravity/claude-opus-4-6-thinking">🟣 Claude Opus 4.6 Thinking (OmniRoute · Antigravity)</option>
+          <option value="omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b">🟢 NVIDIA Nemotron 3.5 Super 120B (OmniRoute · NVIDIA)</option>
+          <option value="omniroute:openrouter/nvidia/nemotron-3-ultra-550b-a55b:free">🟢 NVIDIA Nemotron 3 Ultra 550B Free (OmniRoute)</option>
+          <option value="omniroute:perplexity-web/pplx-sonar">🔎 Perplexity Sonar (OmniRoute · pplx-web)</option>
+          <option value="omniroute:perplexity-web/pplx-sonnet">🔎 Perplexity Sonnet (OmniRoute · pplx-web)</option>
+          <option value="omniroute">🌐 OmniRoute Auto Thinking (:20128, 1909 моделей)</option>
           <option value="claude">🟣 Claude Sonnet 4.6 (Antigravity CLI / OpenRouter)</option>
           <option value="deepseek">🔵 DeepSeek Chat (api.deepseek.com) — без VPN</option>
           <option value="yandex">🟡 YandexGPT Pro 32k — без VPN</option>
@@ -1766,6 +1772,12 @@
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
           <select id="mVoiceSelect" onchange="loadVoiceIntoEditor(this.value)" style="padding:4px 6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;"></select>
           <select id="mVoiceModel" style="padding:4px 6px;border:1.5px solid var(--border);font-size:12px;background:#FFF;">
+            <option value="omniroute:antigravity/claude-sonnet-4-6">Claude Sonnet 4.6 (OmniRoute · Antigravity)</option>
+            <option value="omniroute:antigravity/claude-opus-4-6-thinking">Claude Opus 4.6 Thinking (OmniRoute · Antigravity)</option>
+            <option value="omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b">NVIDIA Nemotron 3.5 Super 120B (OmniRoute)</option>
+            <option value="omniroute:openrouter/nvidia/nemotron-3-ultra-550b-a55b:free">NVIDIA Nemotron 3 Ultra 550B Free (OmniRoute)</option>
+            <option value="omniroute:perplexity-web/pplx-sonnet">Perplexity Sonnet (OmniRoute · pplx-web)</option>
+            <option value="triad:qwen3.5-9b-tochka">Triad-Omni Qwen3.5-9B (Локальный, 0₽)</option>
             <option value="oxion:claude-sonnet-5">Claude Sonnet 5 (Oxion)</option>
             <option value="oxion:gemini-3.7-flash">Gemini 3.7 Flash (Oxion)</option>
             <option value="oxion:gpt-5.6-luna">GPT-5.6 Luna (Oxion)</option>
@@ -1894,9 +1906,15 @@
             </select>
             <select id="drawerProviderSelect" onchange="setGlobalProvider(this.value)" style="padding:5px 8px;border:1px solid #CBD5E1;border-radius:6px;font-size:12px;font-weight:600;background:#FFF;color:#0F172A;" title="Канал / модель ИИ">
               <option value="auto">⚡ Авто-каскад</option>
+              <option value="omniroute:antigravity/claude-sonnet-4-6">🟣 Claude Sonnet 4.6 (OmniRoute)</option>
+              <option value="omniroute:antigravity/claude-opus-4-6-thinking">🟣 Claude Opus 4.6 Thinking (OmniRoute)</option>
+              <option value="omniroute:nvidia/nemotron-3.5-super-vl-120b-a12b">🟢 NVIDIA Nemotron 120B (OmniRoute)</option>
+              <option value="omniroute:openrouter/nvidia/nemotron-3-ultra-550b-a55b:free">🟢 NVIDIA Nemotron 550B Free (OmniRoute)</option>
+              <option value="omniroute:perplexity-web/pplx-sonar">🔎 Perplexity Sonar (OmniRoute)</option>
+              <option value="omniroute:perplexity-web/pplx-sonnet">🔎 Perplexity Sonnet (OmniRoute)</option>
               <option value="triad">🐺 Triad-Omni (0 ₽)</option>
-              <option value="omniroute">🌐 OmniRoute (:20128)</option>
-              <option value="claude">🟣 Claude Sonnet</option>
+              <option value="omniroute">🌐 OmniRoute Auto (:20128)</option>
+              <option value="claude">🟣 Claude CLI / OpenRouter</option>
               <option value="deepseek">🔵 DeepSeek Chat</option>
               <option value="yandex">🟡 YandexGPT Pro</option>
             </select>
